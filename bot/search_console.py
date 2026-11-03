@@ -44,6 +44,18 @@ def available() -> bool:
     return KEY_FILE.exists()
 
 
+def check_key_file() -> None:
+    """키 파일이 '서비스 계정 JSON 전체'인지 확인 (키 ID 만 붙여넣는 실수 방지)."""
+    try:
+        data = json.loads(KEY_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        raise SystemExit(f"{KEY_FILE} 내용이 JSON 파일 전체가 아닙니다. "
+                         "다운로드한 .json 파일의 { 부터 } 까지 전부 넣어야 합니다.") from None
+    missing = [k for k in ("type", "client_email", "private_key") if k not in data]
+    if missing:
+        raise SystemExit(f"서비스 계정 키 파일이 아닙니다 (없는 항목: {', '.join(missing)})")
+
+
 def fetch(days: int = 28) -> list[dict]:
     """검색어·페이지별 성과. (서치콘솔 데이터는 2~3일 늦게 들어옴)"""
     from google.auth.transport.requests import AuthorizedSession
@@ -131,6 +143,7 @@ if __name__ == "__main__":
 
     if not available():
         raise SystemExit(f"서비스 계정 키가 없습니다: {KEY_FILE}")
+    check_key_file()
     data = fetch()
     with connect() as conn:
         print(update_signals(conn, data))
