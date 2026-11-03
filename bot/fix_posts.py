@@ -25,6 +25,31 @@ def _is_bot_card(att_id: str) -> bool:
     return "/card-" in wp_cli("eval", f"echo wp_get_attachment_url({int(att_id)});")
 
 
+def _classify_uncategorized(posts: list[dict]) -> None:
+    """'미분류' 글을 AI 로 분류 (설정의 글쓰기 AI 사용)."""
+    from .categories import CATEGORIES, slug_of
+    from .llm import make_llm
+    from .settings import load_settings
+
+    targets = []
+    for p in posts:
+        cats = wp_cli("post", "term", "list", str(p["ID"]), "category", "--field=slug").split()
+        if not cats or cats == ["uncategorized"]:
+            targets.append(p)
+    if not targets:
+        return
+    s = load_settings()
+    llm = make_llm(s.provider, s.api_key, s.model, light=True)
+    listing = "\n".join(f"{p['ID']}: {p['post_title']}" for p in targets)
+    raw = llm.generate(
+        f"블로그 글 제목을 보고 카테고리를 하나씩 고른다. 카테고리: {' / '.join(CATEGORIES)}\n"
+        '출력은 JSON 객체 하나만: {"글ID": "카테고리"}', listing)
+    result = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
+    for pid, name in result.items():
+        wp_cli("post", "term", "set", str(pid), "category", slug_of(str(name)), "--by=slug")
+        print(f"[보정] {pid} 카테고리 → {name}")
+
+
 def main() -> None:
     posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=any",
                               "--fields=ID,post_title,post_name", "--format=json") or "[]")
@@ -45,6 +70,10 @@ def main() -> None:
             keyword = urllib.parse.unquote(p["post_name"]) or p["post_title"]
             set_featured_card(int(pid), p["post_title"], keyword)
             print(f"[보정] {pid} 대표 이미지(제목 카드 v{CARD_VERSION})")
+    try:
+        _classify_uncategorized(posts)
+    except Exception as e:  # noqa: BLE001
+        print(f"[보정] 카테고리 분류 실패: {e}")
 
 
 if __name__ == "__main__":

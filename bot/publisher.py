@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from . import images
 from .blocks import to_blocks
+from .categories import slug_of
 from .settings import wp_cli
 from .writer import Article
 
@@ -72,6 +73,7 @@ def publish(article: Article, status: str, slug: str = "",
         f"--tags_input={','.join(article.tags)}",
         "--porcelain",
     ).strip())
+    wp_cli("post", "term", "set", str(post_id), "category", slug_of(article.category), "--by=slug")
     try:
         set_featured_card(post_id, article.title, slug or article.title)
     except Exception as e:  # noqa: BLE001 - 대표 이미지 실패가 글 저장을 막지 않게

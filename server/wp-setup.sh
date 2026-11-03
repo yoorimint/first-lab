@@ -59,6 +59,15 @@ for p in "${PLUGINS_INSTALL[@]}"; do
   wp plugin is-active "$p"   || wp plugin activate "$p"
 done
 
+# ---------- 카테고리 (bot/categories.py 목록) ----------
+log "카테고리 동기화"
+existing=$(wp term list category --field=slug)
+while IFS=$'\t' read -r name slug; do
+  echo "$existing" | grep -qx "$slug" || wp term create category "$name" --slug="$slug" --porcelain
+done < <(cd "$REPO_DIR" && python3 -m bot.categories)
+default_id=$(wp term get category life --by=slug --field=term_id)
+wp option update default_category "$default_id"   # 새 글 기본값 = 생활정보 ('미분류' 대신)
+
 # ---------- 관리자 로그인 아이디가 글 작성자로 노출되지 않게 ----------
 log "작성자 표시 이름 설정 (로그인 아이디 숨김)"
 for uid in $(wp user list --role=administrator --field=ID); do

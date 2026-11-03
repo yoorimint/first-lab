@@ -5,6 +5,8 @@ import json
 import re
 from dataclasses import dataclass, field
 
+from .categories import CATEGORIES, DEFAULT
+
 SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 전문 작가다.
 검색한 사람이 원하는 답을 빠르고 정확하게 얻도록 글을 쓴다.
 
@@ -19,13 +21,18 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 전문 �
 - 문체는 제목·본문·자주 묻는 질문까지 처음부터 끝까지 하나로 통일한다.
   페르소나에 말투가 정해져 있으면 그 말투, 없으면 '~습니다/~입니다' 체.
   '~요'와 '~습니다'를 섞거나, 문단마다 말투가 바뀌면 안 된다.
+  ('친근한 존댓말'은 '~해요/~예요' 체를 뜻한다.)
 
 [출력 형식] 아래 JSON 하나만 출력한다. 다른 말은 쓰지 않는다.
 {"title": "검색 결과에 노출될 제목 (40자 이내, 키워드 포함)",
  "excerpt": "검색 결과 설명문 (120자 이내)",
  "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong 태그만 사용, h1 금지)",
  "tags": ["태그1", "태그2", "태그3"],
+ "category": "카테고리 하나 (CATEGORY_LIST 중에서만)",
  "image_prompts": ["본문 흐름에 맞는 서로 다른 장면의 이미지 설명 3개 (각각 영어 한 문장, 사람 얼굴 클로즈업·글자 없이. 예: a quiet street in Jeju island with stone walls and tangerine trees)"]}"""
+
+
+SYSTEM_PROMPT = SYSTEM_PROMPT.replace("CATEGORY_LIST", " / ".join(CATEGORIES))
 
 
 @dataclass
@@ -35,6 +42,7 @@ class Article:
     content_html: str
     tags: list[str]
     image_prompts: list[str] = field(default_factory=list)
+    category: str = DEFAULT
 
 
 PERSONA_RULES = """[글쓴이 페르소나 적용 규칙]
@@ -62,6 +70,7 @@ def parse_article(raw: str) -> Article:
         excerpt=str(data.get("excerpt", "")).strip(),
         content_html=str(data["content_html"]).strip(),
         tags=[str(t).strip() for t in data.get("tags", []) if str(t).strip()][:8],
+        category=str(data.get("category", DEFAULT)).strip() if data.get("category") in CATEGORIES else DEFAULT,
         image_prompts=[str(p).strip() for p in (data.get("image_prompts") or [data.get("image_query", "")])
                        if str(p).strip()][:5],
     )
