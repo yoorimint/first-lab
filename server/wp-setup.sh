@@ -6,6 +6,7 @@ set -euo pipefail
 SITE=first-lab
 WEB_ROOT=/var/www/$SITE
 WP_USER=firstlab
+SITE_TITLE="퍼스트랩"
 TIMEZONE="Asia/Seoul"
 PERMALINK="/%postname%/"
 # SEO 플러그인: The SEO Framework (가볍고 DB 테이블을 추가하지 않아 SQLite와 궁합이 좋음)
@@ -27,7 +28,8 @@ if [ ! -x /usr/local/bin/wp ]; then
 fi
 
 # ---------- 기본 설정 ----------
-log "기본 설정 (시간대, 고유주소, 검색 노출, 핑백 끔)"
+log "기본 설정 (사이트 제목, 시간대, 고유주소, 검색 노출, 핑백 끔)"
+wp option update blogname "$SITE_TITLE"
 wp option update timezone_string "$TIMEZONE"
 wp option update blog_public 1                 # 검색엔진 노출 허용
 wp option update default_pingback_flag 0       # 스팸성 핑백 끔
@@ -55,6 +57,7 @@ rm -rf /var/cache/nginx/$SITE/*
 
 # ---------- 확인 ----------
 log "확인"
+wp option get blogname
 wp option get timezone_string
 wp option get permalink_structure
 wp plugin list --fields=name,status --format=csv
