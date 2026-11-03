@@ -5,8 +5,10 @@
   - 예전 'AI 생성 이미지' 캡션 제거
 """
 import json
+import re
 import subprocess
 import urllib.parse
+from pathlib import Path
 
 from .blocks import to_blocks
 from .publisher import CARD_VERSION, set_featured_card
@@ -50,7 +52,29 @@ def _classify_uncategorized(posts: list[dict]) -> None:
         print(f"[보정] {pid} 카테고리 → {name}")
 
 
+PATCHES = Path(__file__).resolve().parent.parent / "wordpress" / "patches.json"
+
+
+def apply_patches() -> None:
+    """wordpress/patches.json 의 글 수정 적용. 'find' 가 들어 있는 문단 전체를 교체 (이미 바뀌었으면 건너뜀)."""
+    if not PATCHES.exists():
+        return
+    for patch in json.loads(PATCHES.read_text(encoding="utf-8")):
+        pid = str(patch["post"])
+        try:
+            content = wp_cli("post", "get", pid, "--field=post_content")
+        except subprocess.CalledProcessError:
+            continue
+        m = re.search(r"<p>[^<]*" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
+        if not m:
+            continue
+        content = content.replace(m.group(0), f"<p>{patch['replace_paragraph']}</p>")
+        wp_cli("post", "update", pid, f"--post_content={content}")
+        print(f"[보정] {pid} 문단 수정: {patch['why']}")
+
+
 def main() -> None:
+    apply_patches()
     posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=any",
                               "--fields=ID,post_title,post_name", "--format=json") or "[]")
     for p in posts:
