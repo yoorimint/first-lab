@@ -60,6 +60,25 @@ MU_DIR=$WEB_ROOT/wp-content/mu-plugins
 install -d -o "$WP_USER" -g www-data -m 750 "$MU_DIR"
 install -o "$WP_USER" -g www-data -m 640 "$REPO_DIR"/wordpress/mu-plugins/*.php "$MU_DIR"/
 
+# ---------- 고정 페이지 (wordpress/pages/<slug>.html → 페이지) ----------
+# 파일 첫 줄 <!-- title: 제목 --> 이 페이지 제목. 없으면 만들고, 있으면 내용을 갱신.
+log "고정 페이지 동기화"
+for file in "$REPO_DIR"/wordpress/pages/*.html; do
+  slug=$(basename "$file" .html)
+  title=$(sed -n '1s/^<!-- title: \(.*\) -->$/\1/p' "$file")
+  content=$(tail -n +2 "$file")
+  id=$(wp post list --post_type=page --name="$slug" --post_status=any --field=ID)
+  if [ -z "$id" ]; then
+    id=$(wp post create --post_type=page --post_status=publish --post_name="$slug" \
+          --post_title="$title" --post_content="$content" --porcelain)
+  else
+    wp post update "$id" --post_status=publish --post_title="$title" --post_content="$content"
+  fi
+  if [ "$slug" = "privacy-policy" ]; then
+    wp option update wp_page_for_privacy_policy "$id"
+  fi
+done
+
 # ---------- 페이지 캐시 비우기 (변경 즉시 반영) ----------
 rm -rf /var/cache/nginx/$SITE/*
 
@@ -69,7 +88,7 @@ wp option get blogname
 wp option get timezone_string
 wp option get permalink_structure
 wp plugin list --fields=name,status --format=csv
-for path in / /sitemap.xml /robots.txt; do
+for path in / /sitemap.xml /robots.txt /about/ /contact/ /privacy-policy/; do
   curl -s -o /dev/null -w "$path %{http_code}\n" "https://first-lab.kr$path"
 done
 echo -e "\n워드프레스 설정 완료!"
