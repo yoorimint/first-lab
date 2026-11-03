@@ -29,6 +29,7 @@
 | `keyword_db.py` | 키워드 창고 SQLite (`/var/lib/first-lab/bot/keywords.db`) |
 | `scoring.py` | 점수 가중치 (`WEIGHTS`) |
 | `keyword_filter.py` | 금지어·질문형 단어 목록 |
+| `competition.py` | 경쟁도: Gemini 구글 검색 연동(무료)으로 상위 출처 도메인 → 대형 사이트 비율 = 난이도. 점검: `python -m bot.competition 키워드` |
 | `safety.py` | AI 안전 검사 (인물·정치·종교·의료·장소찾기 등 제외) |
 | `select_keyword.py` | 후보 선정. 점검: `python -m bot.select_keyword` |
 | `llm.py` | AI 제공사 교체 (Gemini/Claude/OpenAI) |

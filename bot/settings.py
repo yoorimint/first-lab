@@ -54,6 +54,8 @@ class BotSettings:
     target_length: int = 3000
     extra_prompt: str = ""
     api_key: str = ""  # 선택된 제공사의 키
+    gemini_key: str = ""  # 경쟁도 조회(구글 검색 연동)용 - 글쓰기 AI 와 무관하게 사용
+    competition_checks: int = 40  # 하루 경쟁도 조회 한도
 
     @classmethod
     def from_option(cls, raw: dict, secrets: dict[str, str]) -> "BotSettings":
@@ -74,6 +76,8 @@ class BotSettings:
             target_length=int(raw.get("target_length") or 3000),
             extra_prompt=raw.get("extra_prompt") or "",
             api_key=(raw.get(wp_field) or "").strip() or secrets.get(env_name, ""),
+            gemini_key=(raw.get("gemini_key") or "").strip() or secrets.get("GEMINI_API_KEY", ""),
+            competition_checks=int(raw.get("competition_checks") or 40),
         )
 
 
@@ -97,7 +101,9 @@ def load_settings() -> BotSettings:
 if __name__ == "__main__":
     # 점검용: 키 값은 숨기고 설정만 출력
     s = load_settings()
-    shown = {k: v for k, v in vars(s).items() if k != "api_key"}
-    shown["api_key"] = f"있음 (끝자리 {s.api_key[-4:]})" if s.api_key else "없음"
+    shown = {k: v for k, v in vars(s).items() if not k.endswith("key")}
+    for k in ("api_key", "gemini_key"):
+        v = getattr(s, k)
+        shown[k] = f"있음 (끝자리 {v[-4:]})" if v else "없음"
     for k, v in shown.items():
         print(f"{k:15} {v}")

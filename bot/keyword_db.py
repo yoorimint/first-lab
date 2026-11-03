@@ -33,6 +33,21 @@ CREATE INDEX IF NOT EXISTS idx_total ON keywords(total);
 """
 
 
+# 나중에 추가된 컬럼 (기존 DB 자동 보강)
+MIGRATIONS = {
+    "difficulty": "REAL",      # 경쟁 난이도 0~1 (구글 상위 사이트 기준)
+    "comp_info": "TEXT",       # 경쟁 요약 + 상위 도메인
+    "comp_checked": "TEXT",    # 경쟁도 조회 날짜
+}
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    existing = {r[1] for r in conn.execute("PRAGMA table_info(keywords)")}
+    for column, kind in MIGRATIONS.items():
+        if column not in existing:
+            conn.execute(f"ALTER TABLE keywords ADD COLUMN {column} {kind}")
+
+
 def norm(keyword: str) -> str:
     return "".join(keyword.split()).lower()
 
@@ -43,6 +58,7 @@ def connect(path: Path = DB_PATH):
     conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA)
+    _migrate(conn)
     try:
         yield conn
         conn.commit()
@@ -85,3 +101,15 @@ def summary(conn: sqlite3.Connection) -> dict:
         "new_today": conn.execute("SELECT COUNT(*) FROM keywords WHERE first_seen=?", (today,)).fetchone()[0],
         "by_status": counts,
     }
+
+
+def set_competition(conn: sqlite3.Connection, keyword: str, difficulty: float, info: str) -> None:
+    conn.execute(
+        "UPDATE keywords SET difficulty=?, comp_info=?, comp_checked=? WHERE keyword=?",
+        (difficulty, info, datetime.now().strftime("%Y-%m-%d"), keyword),
+    )
+
+
+def competition_checks_today(conn: sqlite3.Connection) -> int:
+    today = datetime.now().strftime("%Y-%m-%d")
+    return conn.execute("SELECT COUNT(*) FROM keywords WHERE comp_checked=?", (today,)).fetchone()[0]

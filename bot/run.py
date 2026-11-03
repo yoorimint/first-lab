@@ -23,7 +23,7 @@ from .discover import discover
 from .keyword_db import connect, set_status, summary
 from .llm import make_llm
 from .publisher import publish
-from .select_keyword import pick_keyword, ranked_candidates
+from .select_keyword import pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings
 from .state import add_log, load_state, pop_excluded, pop_manual_request, save_state
 from .writer import write_article
@@ -120,6 +120,18 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001
             add_log(state, False, f"키워드 수집 실패: {e}")
         state["discover_date"] = today
+        state["review_date"] = ""  # 수집 후 후보 재검토
+
+    # 하루 1회 상위 후보 사전 검토 (안전 검사 + 구글 상위 사이트 경쟁도) → 설정 페이지에 근거 표시
+    if state.get("review_date") != today and settings.api_key:
+        try:
+            with connect() as conn:
+                n = review_top(conn, settings, make_llm(settings.provider, settings.api_key, settings.model))
+            add_log(state, True, f"후보 검토: 상위 후보 안전 검사 + 경쟁도 {n}건 조회")
+        except Exception as e:  # noqa: BLE001
+            add_log(state, False, f"후보 검토 실패: {e}")
+        state["review_date"] = today
+        state["dashboard_at"] = ""  # 현황 즉시 갱신
 
     # 글 생성 (수동 요청 또는 자동 발행 시각)
     reason, slot = None, None

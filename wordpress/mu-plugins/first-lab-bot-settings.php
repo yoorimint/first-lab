@@ -36,6 +36,7 @@ function firstlab_bot_fields(): array {
 		'anthropic_key'  => array( 'label' => 'Claude API 키', 'type' => 'secret' ),
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
 		'hint_keywords'  => array( 'label' => '우선 주제 (선택)', 'type' => 'textarea', 'default' => '', 'help' => '비워두면 분야 상관없이 자동 발굴. 입력하면 이 단어가 들어간 키워드를 먼저 씀 (한 줄에 하나)' ),
+		'competition_checks' => array( 'label' => '하루 경쟁도 조회 수', 'type' => 'number', 'default' => 40, 'min' => 0, 'max' => 400, 'help' => 'Gemini 구글 검색 연동(무료 한도 내)으로 후보 키워드의 구글 상위 사이트를 확인. Gemini 키 필요' ),
 		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 50, 'min' => 0, 'max' => 300, 'help' => '네이버 API 호출 수 (1회당 연관 키워드 수백 개). 새벽 4시 이후 하루 1번 수집' ),
 		'min_volume'     => array( 'label' => '최소 월간 검색량', 'type' => 'number', 'default' => 500, 'min' => 0, 'max' => 10000000 ),
 		'max_volume'     => array( 'label' => '최대 월간 검색량', 'type' => 'number', 'default' => 30000, 'min' => 0, 'max' => 10000000 ),
@@ -207,7 +208,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 
 	<h3 id="candidates">다음 글감 후보 (점수순)</h3>
 	<table class="widefat striped" style="max-width:720px">
-		<thead><tr><th>키워드</th><th>월간 검색</th><th>롱테일의 원 키워드</th><th>점수</th><th>상태</th><th></th></tr></thead>
+		<thead><tr><th>키워드</th><th>월간 검색</th><th>롱테일의 원 키워드</th><th>구글 상위 경쟁 (난이도 0~1)</th><th>점수</th><th>상태</th><th></th></tr></thead>
 		<tbody>
 		<?php foreach ( (array) ( $state['candidates'] ?? array() ) as $c ) : ?>
 			<?php $is_pending = in_array( $c['keyword'], $pending, true ); ?>
@@ -215,6 +216,15 @@ function firstlab_bot_render_keywords( array $state ): void {
 				<td><?php echo esc_html( $c['keyword'] ); ?></td>
 				<td><?php echo number_format( (int) $c['total'] ); ?></td>
 				<td><?php echo esc_html( $c['head'] ?? '' ); ?></td>
+				<td>
+					<?php
+					if ( isset( $c['difficulty'] ) && null !== $c['difficulty'] ) {
+						printf( '<strong>%s</strong> <span class="description">%s</span>', esc_html( $c['difficulty'] ), esc_html( $c['comp_info'] ?? '' ) );
+					} else {
+						echo '<span class="description">미조회</span>';
+					}
+					?>
+				</td>
 				<td><?php echo esc_html( $c['score'] ); ?></td>
 				<td><?php echo esc_html( $labels[ $c['status'] ] ?? $c['status'] ); ?></td>
 				<td>
@@ -232,11 +242,11 @@ function firstlab_bot_render_keywords( array $state ): void {
 			</tr>
 		<?php endforeach; ?>
 		<?php if ( empty( $state['candidates'] ) ) : ?>
-			<tr><td colspan="6">아직 후보가 없습니다. 키워드 수집이 끝나면 표시됩니다.</td></tr>
+			<tr><td colspan="7">아직 후보가 없습니다. 키워드 수집이 끝나면 표시됩니다.</td></tr>
 		<?php endif; ?>
 		</tbody>
 	</table>
-	<p class="description">'미검사' 후보는 글을 쓰기 직전에 AI 안전 검사(인물·정치·종교·의료 등 제외)를 거칩니다.</p>
+	<p class="description">'미검사' 후보는 글을 쓰기 직전에 AI 안전 검사(인물·정치·종교·의료 등 제외)를 거칩니다. 경쟁 난이도는 구글 상위 출처 중 대형 사이트(정부·위키·언론·대기업) 비율이며, 0.8 이상은 글감에서 제외됩니다.</p>
 	<?php
 }
 
