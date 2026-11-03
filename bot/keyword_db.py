@@ -13,6 +13,7 @@ from .naver_ads import KeywordStat
 
 DB_PATH = Path("/var/lib/first-lab/bot/keywords.db")
 REFRESH_DAYS = 7  # 이 기간이 지나 다시 조회되면 이전 검색량을 보관 (상승 감지용)
+MIN_STORE_VOLUME = 100  # 월 검색량이 이보다 적으면 저장하지 않음 (창고 비대화 방지)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS keywords (
@@ -62,7 +63,10 @@ def connect(path: Path = DB_PATH):
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(path, timeout=60)  # 수집 작업과 봇이 동시에 쓸 때 대기
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")  # 읽기와 쓰기가 서로 막지 않게
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")  # 읽기와 쓰기가 서로 막지 않게 (한 번 설정되면 유지)
+    except sqlite3.OperationalError:
+        pass  # 다른 작업이 쓰는 중이면 이번엔 건너뜀
     conn.executescript(SCHEMA)
     _migrate(conn)
     try:
@@ -79,6 +83,8 @@ def upsert(conn: sqlite3.Connection, stats: list[KeywordStat]) -> int:
     stale = (now - timedelta(days=REFRESH_DAYS)).strftime("%Y-%m-%d")
     new = 0
     for s in stats:
+        if s.total < MIN_STORE_VOLUME:
+            continue
         row = conn.execute("SELECT total, last_checked FROM keywords WHERE keyword=?", (s.keyword,)).fetchone()
         if row is None:
             conn.execute(

@@ -41,8 +41,9 @@ class GeminiLLM:
     """모델명을 비워두면 사용 가능한 Flash 모델을 최신순으로 시도한다.
     '사용량 폭주(503)·한도 초과(429)'면 잠시 기다렸다 재시도하고, 그래도 안 되면 다음 모델로 넘어간다."""
 
-    RETRY_WAITS = (15, 45)  # 같은 모델 재시도 전 대기(초)
-    BUSY_CODES = (429, 500, 503, 504)  # 폭주·한도·서버 시간초과 → 재시도/다른 모델
+    RETRY_WAITS = (15, 45)  # 같은 모델 재시도 전 대기(초) - 일시적 폭주(503)·시간초과(504)일 때만
+    BUSY_CODES = (500, 503, 504)
+    QUOTA_CODE = 429  # 하루 무료 한도 초과 → 기다려도 소용없으니 바로 다음 모델
 
     def __init__(self, api_key: str, model: str = ""):
         from google import genai
@@ -95,13 +96,18 @@ class GeminiLLM:
                     self.model = model  # 실제로 사용한 모델 (기록용)
                     return response.text
                 except errors.APIError as e:
+                    last_error = e
+                    if e.code == self.QUOTA_CODE:
+                        break  # 이 모델 한도 소진 → 다음 모델
                     if e.code not in self.BUSY_CODES:
                         raise
-                    last_error = e
                     if wait is None:
                         break  # 이 모델 포기 → 다음 모델
                     time.sleep(wait)
-        raise LLMError(f"Gemini 모델들이 모두 사용량 폭주/한도 초과 상태입니다. 나중에 다시 시도됩니다 ({last_error})")
+        if getattr(last_error, "code", None) == self.QUOTA_CODE:
+            raise LLMError("Gemini 무료 하루 한도를 다 썼습니다 (매일 오후 4~5시경 초기화). "
+                           "설정에서 유료 키 또는 다른 AI로 바꾸면 계속 쓸 수 있습니다")
+        raise LLMError(f"Gemini 서버가 혼잡합니다. 다음 실행에서 다시 시도됩니다 ({last_error})")
 
 
 class OpenAILLM:

@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass
 
-GROUNDING_MODELS = ("gemini-2.5-flash", "gemini-2.5-flash-lite")  # 무료 grounding 제공 모델 (2026 기준 보도)
+GROUNDING_MODELS = ("gemini-2.5-flash",)  # 무료 grounding 제공 모델 (2.5-flash-lite 는 신규 사용자 불가 확인됨)
 
 # 강한 경쟁자: 이런 사이트가 상위를 차지하면 신규 블로그가 이기기 어렵다
 STRONG_SUFFIXES = (".go.kr", ".or.kr", ".ac.kr", ".gov", "wikipedia.org", "namu.wiki", "youtube.com")

@@ -15,7 +15,7 @@ PICK_FROM_TOP = 3  # 통과한 상위 N개 중 무작위 → 매번 같은 유�
 PER_HEAD = 2       # 같은 원 키워드(헤드)에서 나온 후보는 상위 목록에 최대 N개 (주제 쏠림 방지)
 COMP_WEIGHT = 3.0  # 경쟁 난이도 반영: 점수 += COMP_WEIGHT × (0.5 - 난이도)  → 쉬우면 가산, 어려우면 감점
 TOO_HARD = 0.8     # 이 이상이면 글감에서 제외 (상위 대부분이 대형 사이트)
-COMP_PER_RUN = 5   # 글 1개 쓸 때 경쟁도를 새로 조회할 최대 후보 수
+COMP_PER_RUN = 3   # 글 1개 쓸 때 경쟁도를 새로 조회할 최대 후보 수
 
 
 def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict]:
@@ -90,7 +90,7 @@ def _safety_check(conn, llm, batch: list[dict]) -> None:
     conn.commit()
 
 
-def review_top(conn, settings: BotSettings, llm, count: int = 20) -> int:
+def review_top(conn, settings: BotSettings, llm, count: int = 10) -> int:
     """하루 1회: 상위 후보를 미리 안전 검사 + 경쟁도 조회 (설정 페이지에서 근거 확인용). 조회 수 반환."""
     before = competition_checks_today(conn)
     candidates = ranked_candidates(conn, settings, limit=count)
