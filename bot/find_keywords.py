@@ -12,7 +12,7 @@ import argparse
 from .config import load_secrets, require
 from .keyword_filter import is_allowed
 from .naver_ads import NaverAdsClient
-from .naver_search import CallLimitExceeded, NaverSearchClient
+from .naver_search import CallLimitExceeded, NaverSearchClient, NaverSearchError
 from .textfmt import ljust, rjust
 
 
@@ -45,6 +45,8 @@ def main() -> None:
             docs = search.blog_total(s.keyword)
         except CallLimitExceeded:
             break
+        except NaverSearchError as e:
+            raise SystemExit(f"네이버 검색 API 오류 - {e}")
         rows.append((s, docs, s.total / max(docs, 1)))
     rows.sort(key=lambda r: r[2], reverse=True)
 
