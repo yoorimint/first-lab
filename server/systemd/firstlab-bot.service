@@ -6,5 +6,5 @@ After=network-online.target
 Type=oneshot
 WorkingDirectory=/opt/first-lab
 ExecStart=/opt/first-lab-venv/bin/python -m bot.run
-TimeoutStartSec=15min
+TimeoutStartSec=12min
 Nice=10

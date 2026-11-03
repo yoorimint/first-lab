@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import re
 
+TIMEOUT_SECONDS = 240  # AI 응답 최대 대기. 넘으면 실패 처리 (봇이 멈춰 다음 실행을 막지 않게)
+
 
 class LLMError(RuntimeError):
     pass
@@ -17,7 +19,7 @@ class AnthropicLLM:
     def __init__(self, api_key: str, model: str = ""):
         import anthropic
 
-        self.client = anthropic.Anthropic(api_key=api_key)
+        self.client = anthropic.Anthropic(api_key=api_key, timeout=TIMEOUT_SECONDS, max_retries=1)
         self.model = model or self.default_model
 
     def generate(self, system: str, prompt: str) -> str:
@@ -38,8 +40,9 @@ class AnthropicLLM:
 class GeminiLLM:
     def __init__(self, api_key: str, model: str = ""):
         from google import genai
+        from google.genai import types
 
-        self.client = genai.Client(api_key=api_key)
+        self.client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=TIMEOUT_SECONDS * 1000))
         self.model = model or self._pick_flash_model()
 
     def _pick_flash_model(self) -> str:
@@ -75,7 +78,7 @@ class OpenAILLM:
 
         if not model:
             raise LLMError("OpenAI는 설정 페이지에 모델 이름을 입력해야 합니다")
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(api_key=api_key, timeout=TIMEOUT_SECONDS, max_retries=1)
         self.model = model
 
     def generate(self, system: str, prompt: str) -> str:
