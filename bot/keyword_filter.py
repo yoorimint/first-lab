@@ -16,3 +16,12 @@ BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING
 
 def is_allowed(keyword: str) -> bool:
     return not any(word in keyword for word in BLOCKED_WORDS)
+
+
+# 질문형(롱테일) 신호: 정보를 찾는 검색 → 글 한 편으로 답하기 좋음
+QUESTION_WORDS = ["방법", "하는법", "신청", "조건", "자격", "기간", "기준", "차이", "뜻", "의미",
+                  "비용", "순서", "준비물", "종류", "추천", "계산", "정리", "주의사항", "후기", "꿀팁"]
+
+
+def is_question(keyword: str) -> bool:
+    return any(word in keyword for word in QUESTION_WORDS)
