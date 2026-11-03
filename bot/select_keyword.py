@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import random
 
-from .competition import check as check_competition
+from . import competition
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
 from .keyword_filter import is_allowed, is_question
 from .llm import LLMBusy
@@ -91,12 +91,13 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
 
 def _check_competition(conn, settings: BotSettings, candidates: list[dict], limit: int) -> None:
     """경쟁도 미조회 후보를 하루 한도 안에서 조회해 DB·후보 목록에 반영."""
-    if not settings.gemini_key:
+    if not competition.source(settings):
+        print("[경쟁도] 조회 불가: 네이버 검색 API·Gemini 키가 없어 경쟁도 없이 고릅니다", flush=True)
         return
     budget = min(limit, settings.competition_checks - competition_checks_today(conn))
     for c in [c for c in candidates if c["difficulty"] is None][:max(budget, 0)]:
         try:
-            comp = check_competition(settings.gemini_key, c["keyword"])
+            comp = competition.check_any(settings, c["keyword"])
         except Exception as e:  # noqa: BLE001 - 경쟁도 조회 실패는 글쓰기를 막지 않음
             print(f"[경쟁도] {c['keyword']} 실패: {e}", flush=True)
             break
