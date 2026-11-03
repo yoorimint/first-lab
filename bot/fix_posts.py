@@ -65,7 +65,8 @@ def apply_patches() -> None:
             content = wp_cli("post", "get", pid, "--field=post_content")
         except subprocess.CalledProcessError:
             continue
-        m = re.search(r"<p>[^<]*" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
+        # 문단 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
+        m = re.search(r"<p>(?:(?!</p>).)*?" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
         if not m:
             continue
         content = content.replace(m.group(0), f"<p>{patch['replace_paragraph']}</p>")
