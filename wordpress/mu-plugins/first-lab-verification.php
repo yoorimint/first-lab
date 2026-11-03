@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_SITE_VERIFICATION = array(
 	'google-site-verification' => '0ABz8ab9NKoHBvkXE3tM7MCmIOiTpLVh25WBO0bAxok',
-	'naver-site-verification'  => '',
+	'naver-site-verification'  => 'dada5a0e936084f1ec92b426f31cc9f2836f947c',
 );
 
 add_action(
