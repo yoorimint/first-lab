@@ -61,6 +61,9 @@ add_const WP_TEMP_DIR "'$TMP_DIR'"
 chmod 600 "$WP_CONFIG" && chown "$WP_USER:$WP_USER" "$WP_CONFIG"  # nginx도 못 읽게
 
 # ---------- 4. PHP 풀 ----------
+log "PHP 확장 (imagick: 업로드 이미지 축소판 화질 개선 — 사이트 상태 점검 권장 항목)"
+dpkg -s php$PHP_VER-imagick &>/dev/null \
+  || DEBIAN_FRONTEND=noninteractive apt-get install -y -q php$PHP_VER-imagick
 log "PHP 전용 풀 설치"
 install -m 644 "$REPO_DIR/php-fpm/$SITE.conf" /etc/php/$PHP_VER/fpm/pool.d/$SITE.conf
 # 기본 풀(www)은 사용처가 없으므로 끔
