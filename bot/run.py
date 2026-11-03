@@ -86,8 +86,10 @@ def create_one(settings: BotSettings) -> str:
                                             image_count=settings.image_count)
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = "발행" if settings.post_status == "publish" else "초안 저장"
+    cost = getattr(llm, "cost_usd", 0.0)
+    cost_note = f", AI 비용 약 ${cost:.2f}(≈{cost * 1400:,.0f}원)" if cost else ""
     return (f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}, "
-            f"내부 링크 {link_count}개) {link}")
+            f"내부 링크 {link_count}개{cost_note}) {link}")
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:

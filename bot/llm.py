@@ -20,19 +20,24 @@ class LLMBusy(LLMError):
 class AnthropicLLM:
     default_model = "claude-opus-5-5"
 
-    MAX_SEARCHES = 5       # 글 1개당 웹 검색 최대 횟수 (검색당 별도 요금)
+    MAX_SEARCHES = 3       # 글 1개당 웹 검색 최대 횟수 (검색 1회 $0.01 + 검색 결과 읽는 입력 토큰)
+    # 추론(생각) 깊이: 높을수록 품질↑·비용↑ (생각한 토큰도 출력 요금). 글쓰기는 medium, 판정 작업은 low
+    EFFORT_WRITE, EFFORT_LIGHT = "medium", "low"
+    PRICE = {"claude-sonnet-5-5": (2.0, 10.0), "claude-opus-5-5": (4.0, 20.0), "claude-haiku-5-5": (0.10, 0.50)}
     MAX_CONTINUATIONS = 4  # 검색이 길어져 중간에 멈춘(pause_turn) 경우 이어서 진행할 최대 횟수
     WEB_SEARCH = {
         "type": "web_search_20260209", "name": "web_search", "max_uses": MAX_SEARCHES,
         "user_location": {"type": "approximate", "country": "KR", "timezone": "Asia/Seoul"},
     }
 
-    def __init__(self, api_key: str, model: str = ""):
+    def __init__(self, api_key: str, model: str = "", light: bool = False):
         import anthropic
 
         # 웹 검색을 하면 응답이 길어지므로 대기 시간을 넉넉히
         self.client = anthropic.Anthropic(api_key=api_key, timeout=TIMEOUT_SECONDS * 2, max_retries=1)
         self.model = model or self.default_model
+        self.light = light
+        self.cost_usd = 0.0  # 이 객체로 쓴 누적 비용 추정 (기록용)
 
     def generate(self, system: str, prompt: str, web_search: bool = False) -> str:
         """web_search=True: Claude 가 직접 웹 검색해서 최신 정보를 확인한 뒤 작성."""
@@ -45,10 +50,12 @@ class AnthropicLLM:
                 max_tokens=16000,
                 system=system,
                 messages=messages,
+                output_config={"effort": self.EFFORT_LIGHT if self.light else self.EFFORT_WRITE},
                 betas=["server-side-fallback-2026-07-01"],
                 fallbacks="default",
                 **({"tools": tools} if tools else {}),
             )
+            self._add_cost(response.usage)
             if response.stop_reason != "pause_turn":
                 break
             # 서버 검색 루프가 한도에 걸려 멈춤 → 응답을 그대로 붙여 보내면 이어서 진행
@@ -58,6 +65,13 @@ class AnthropicLLM:
         if response.stop_reason == "max_tokens":
             raise LLMError("글이 너무 길어 중간에 잘렸습니다 (설정의 글 분량을 줄여보세요)")
         return "".join(b.text for b in response.content if b.type == "text")
+
+    def _add_cost(self, usage) -> None:
+        price_in, price_out = self.PRICE.get(self.model, (2.0, 10.0))
+        searches = getattr(getattr(usage, "server_tool_use", None), "web_search_requests", 0) or 0
+        cached = (getattr(usage, "cache_read_input_tokens", 0) or 0) * 0.1
+        self.cost_usd += ((usage.input_tokens + cached) * price_in + usage.output_tokens * price_out) / 1e6
+        self.cost_usd += searches * 0.01
 
 
 class GeminiLLM:
@@ -173,6 +187,6 @@ def make_llm(provider: str, api_key: str, model: str = "", light: bool = False):
         raise LLMError(f"알 수 없는 AI 제공사: {provider}")
     if not api_key:
         raise LLMError(f"{provider} API 키가 없습니다. 설정 페이지에 입력하세요.")
-    if provider == "gemini":
-        return GeminiLLM(api_key, model, light=light)
+    if provider in ("gemini", "anthropic"):
+        return PROVIDERS[provider](api_key, model, light=light)
     return PROVIDERS[provider](api_key, model)
