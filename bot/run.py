@@ -20,7 +20,7 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import factcheck, polish, related
+from . import factcheck, related
 from .discover import discover
 from .keyword_db import connect, set_status, summary
 from .llm import LLMBusy, make_llm
@@ -93,11 +93,6 @@ def create_one(settings: BotSettings) -> str:
                     status = "draft"  # 확인 못 한 주장이 많으면 자동 발행 대신 초안
             except Exception as e:  # noqa: BLE001 - 검증 실패 시 원문 유지 + 초안
                 status, check_note = "draft", f", 사실검증 실패({str(e)[:60]}) → 검토 필요"
-        try:  # 마지막 교정: 어색한 문장·불일치·반복만 부분 수정 (실패해도 원문으로 진행)
-            article.content_html, polished = polish.polish(llm, article.content_html)
-            check_note += f", 교정 {polished}곳"
-        except Exception as e:  # noqa: BLE001
-            check_note += f", 교정 건너뜀({str(e)[:40]})"
         article.content_html, link_count = related.clean_links(article.content_html, allowed_links)
         post_id, link, image_note = publish(article, status, slug=keyword,
                                             cloudflare=(settings.cf_account_id, settings.cf_api_token),
