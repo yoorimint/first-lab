@@ -73,15 +73,20 @@ def source(settings) -> str:
 
 
 def check_any(settings, keyword: str) -> Competition:
-    """설정에 있는 무료 방법으로 경쟁도 조회."""
+    """설정에 있는 무료 방법으로 경쟁도 조회 (네이버 실패 시 Gemini 로 한 번 더)."""
     if source(settings) == "naver":
         from .naver_search import NaverSearchClient
 
-        client = NaverSearchClient(settings.naver_client_id, settings.naver_client_secret, max_calls=1)
-        domains = client.web_domains(keyword)
-        if not domains:
-            raise RuntimeError("네이버 웹문서 검색 결과가 비어 있습니다")
-        return analyze(domains[:10])
+        try:
+            client = NaverSearchClient(settings.naver_client_id, settings.naver_client_secret, max_calls=1)
+            domains = client.web_domains(keyword)
+            if not domains:
+                raise RuntimeError("네이버 웹문서 검색 결과가 비어 있습니다")
+            return analyze(domains[:10])
+        except Exception as e:  # noqa: BLE001 - 권한 미설정 등
+            if not settings.gemini_key:
+                raise
+            print(f"[경쟁도] 네이버 조회 실패 → Gemini 로 시도: {str(e)[:120]}", flush=True)
     return check(settings.gemini_key, keyword)
 
 
