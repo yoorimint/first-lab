@@ -12,3 +12,6 @@ chmod 600 "$SECRETS"
 cd "$REPO_DIR" && python3 -m bot.keywords 다이어트 --top 5 \
   && echo "네이버 검색광고 API: 정상" \
   || echo "네이버 검색광고 API: 실패 (키 값을 다시 확인하세요)"
+
+echo -e "\n==> 봇 최근 실행 기록 (systemd)"
+journalctl -u firstlab-bot.service -n 15 --no-pager -o cat 2>/dev/null | grep -v "^$" | tail -15 || true
