@@ -25,7 +25,7 @@
 | 파일 | 역할 |
 |---|---|
 | `run.py` | 진입점. systemd 타이머가 1분마다 실행 (수동 요청, 자동 발행 시각, 하루 1회 창고 확장) |
-| `discover.py` | 대규모 키워드 수집 (씨앗 단어 → 눈덩이 확장 → 큰 키워드×수식어 롱테일 조합). 별도 작업 `firstlab-discover` (매일 04시 + 배포 직후) |
+| `discover.py` | 오늘의 키워드 수집: 구글 급상승어 + 씨앗 단어 전부 + 큰 키워드×수식어 롱테일 조합 (하루 1번 최대한). 8일치만 보관. 별도 작업 `firstlab-discover` (매일 04시, 배포 시 오늘 미수집이면 즉시) |
 | `seed_words.py` / `seeds.py` | 씨앗 단어 목록 / 구글 급상승 검색어 |
 | `keyword_db.py` | 키워드 창고 SQLite (`/var/lib/first-lab/bot/keywords.db`) |
 | `scoring.py` | 점수 가중치 (`WEIGHTS`) |

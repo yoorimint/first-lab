@@ -93,11 +93,13 @@ def upsert(conn: sqlite3.Connection, stats: list[KeywordStat]) -> int:
                 (s.keyword, norm(s.keyword), s.total, s.ad_competition, s.ad_clicks, today, today),
             )
             new += 1
-        elif row["last_checked"] <= stale:  # 오래된 값 → 이전 값 보관 후 갱신
+        elif row["last_checked"] <= stale:  # 오래된 값 → 이전 값 보관 후 갱신 (상승 감지)
             conn.execute(
                 "UPDATE keywords SET prev_total=total, total=?, ad_comp=?, ad_clicks=?, last_checked=? WHERE keyword=?",
                 (s.total, s.ad_competition, s.ad_clicks, today, s.keyword),
             )
+        elif row["last_checked"] != today:  # 최근 값 → 오늘 후보에 포함되도록 날짜만 갱신
+            conn.execute("UPDATE keywords SET total=?, last_checked=? WHERE keyword=?", (s.total, today, s.keyword))
     return new
 
 

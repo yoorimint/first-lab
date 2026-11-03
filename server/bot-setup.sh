@@ -35,7 +35,7 @@ systemctl is-active firstlab-bot.timer firstlab-discover.timer
 log "키워드 수집 (오늘 아직 안 했으면 바로 시작, 백그라운드)"
 if systemctl is-active -q firstlab-discover.service; then
   echo "이미 수집 중"
-elif [ "$(cat /var/lib/first-lab/bot/discover-date 2>/dev/null)" = "$(date +%F)" ]; then
+elif [ "$(cat /var/lib/first-lab/bot/discover-date-v2 2>/dev/null)" = "$(date +%F)" ]; then
   echo "오늘 수집 완료 → 건너뜀"
 else
   systemctl start --no-block firstlab-discover.service && echo "수집 시작됨"

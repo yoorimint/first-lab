@@ -1,61 +1,45 @@
-"""키워드 창고 대규모 확장 (네이버 키워드 도구, 무료).
+"""오늘의 키워드 수집 (하루 1번, 네이버 키워드 도구 무료 → 매일 최대한 수집).
 
-한 번 실행에 정해진 API 호출 수를 아래 3가지에 나눠 쓴다.
-  1) 씨앗 단어 (seed_words.py)      : 분야 가리지 않는 일상 단어 → 연관 키워드
-  2) 눈덩이 확장                    : 창고 키워드를 다시 넣어 계속 넓힘
-  3) 롱테일 조합 탐색                : 큰 키워드 + '방법/신청/조건/...' 조합의 실제 검색량 확인
-  + 구글 급상승 검색어
+  1) 출발 단어: 구글 급상승 검색어 + 씨앗 단어 전부(seed_words.py) + 우선 주제
+  2) 롱테일 조합: 오늘 나온 큰 키워드 × '방법/신청/조건/...' 의 실제 검색량 확인 (남은 호출 전부)
+  3) 정리: 8일 지난 후보는 삭제 (7일 전 검색량과 비교해 상승세 감지용으로만 보관)
+     이미 쓴 키워드·부적합·제외 기록은 중복 방지용으로 계속 보관
 
-사용: python -m bot.discover --calls 1000
+사용: python -m bot.discover [--calls 60]
 """
 from __future__ import annotations
 
 import argparse
 import time
 import urllib.error
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
-from .keyword_db import MIN_STORE_VOLUME, connect, norm, summary, upsert
+from .keyword_db import connect, norm, summary, upsert
 from .naver_ads import ads_client
 from .seed_words import SEED_WORDS
 from .seeds import google_trends_kr
 
 BATCH = 5              # API 1회당 출발 키워드 수 (API 최대값)
 PAUSE_SECONDS = 0.3    # 호출 간격
-SHARE = {"seed": 0.2, "snowball": 0.2, "modifier": 0.6}  # 호출 수 배분 (롱테일 조합 위주)
-MAX_KEYWORDS = 100_000  # 창고가 이보다 크면 넓히기(씨앗·눈덩이)는 멈추고 롱테일 조합만 탐색
 MODIFIERS = ["방법", "신청", "조건", "기간", "비용", "서류", "계산", "차이", "뜻", "기준",
              "자격", "대상", "순서", "주의사항", "하는법"]
 HEAD_MIN_VOLUME = 3000  # 롱테일 조합을 만들 '큰 키워드' 기준
-STAMP_FILE = Path("/var/lib/first-lab/bot/discover-date")  # 마지막 수집 날짜
+KEEP_DAYS = 8           # 후보 보관 기간 (상승세 비교용)
+STAMP_FILE = Path("/var/lib/first-lab/bot/discover-date-v2")  # 마지막 수집 날짜 (하루 1회 보장)
 
 
-def _seed_words(conn, limit: int) -> list[str]:
-    used = {r["word"] for r in conn.execute("SELECT word FROM seeds")}
-    words = list(dict.fromkeys(google_trends_kr() + [w for w in SEED_WORDS if w not in used]))
-    if len(words) < limit:  # 다 쓴 씨앗은 오래된 순으로 재사용 (검색량 갱신)
-        words += [r["word"] for r in conn.execute("SELECT word FROM seeds ORDER BY used_date LIMIT ?", (limit,))]
-    return words[:limit]
-
-
-def _snowball(conn, limit: int) -> list[str]:
+def _modifier_heads(conn, today: str, limit_heads: int) -> list[str]:
     rows = conn.execute(
-        "SELECT keyword FROM keywords WHERE expanded=0 AND status NOT IN ('rejected','excluded')"
-        " ORDER BY total DESC LIMIT ?", (limit,))
-    return [r["keyword"] for r in rows]
-
-
-def _modifier_heads(conn, limit_heads: int) -> list[str]:
-    rows = conn.execute(
-        "SELECT keyword FROM keywords WHERE mod_done=0 AND total>=? AND status NOT IN ('rejected','excluded')"
-        " ORDER BY total DESC LIMIT ?", (HEAD_MIN_VOLUME, limit_heads))
+        "SELECT keyword FROM keywords WHERE last_checked=? AND mod_done=0 AND total>=?"
+        " AND status NOT IN ('rejected','excluded') ORDER BY total DESC LIMIT ?",
+        (today, HEAD_MIN_VOLUME, limit_heads))
     return [r["keyword"] for r in rows]
 
 
 def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
     ads = ads_client()
-    stats = {"calls": 0, "new": 0, "errors": 0}
+    stats = {"calls": 0, "new": 0, "errors": 0, "trends": 0}
     today = datetime.now().strftime("%Y-%m-%d")
 
     def run_batch(conn, batch: list[str]) -> bool:
@@ -80,33 +64,21 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
         return True
 
     with connect() as conn:
-        plan = {k: int(calls * v) for k, v in SHARE.items()}
-        if conn.execute("SELECT COUNT(*) FROM keywords").fetchone()[0] >= MAX_KEYWORDS:
-            plan = {"seed": 0, "snowball": 0, "modifier": calls}  # 충분히 넓음 → 롱테일만
-
-        # 1) 씨앗 단어 (+ 힌트, 급상승어)
-        words = list(dict.fromkeys((extra_seeds or []) + _seed_words(conn, plan["seed"] * BATCH))) if plan["seed"] else []
+        # 1) 출발 단어 전부: 급상승어 + 우선 주제 + 씨앗
+        trends = google_trends_kr()
+        stats["trends"] = len(trends)
+        words = list(dict.fromkeys(trends + (extra_seeds or []) + SEED_WORDS))
         for i in range(0, len(words), BATCH):
-            if stats["calls"] >= plan["seed"] or not run_batch(conn, words[i:i + BATCH]):
+            if stats["calls"] >= calls or not run_batch(conn, words[i:i + BATCH]):
                 break
-            conn.executemany("INSERT OR REPLACE INTO seeds (word, used_date) VALUES (?,?)",
-                             [(w, today) for w in words[i:i + BATCH]])
-            conn.commit()
-        print(f"[수집] 씨앗 단계 완료: {stats}", flush=True)
+        conn.executemany("INSERT OR REPLACE INTO seeds (word, used_date) VALUES (?,?)",
+                         [(w, today) for w in words if w in SEED_WORDS])
+        conn.commit()
+        print(f"[수집] 출발 단어 {len(words)}개 (급상승 {len(trends)}): {stats}", flush=True)
 
-        # 2) 눈덩이 확장
-        limit = plan["seed"] + plan["snowball"]
-        while stats["calls"] < limit:
-            batch = _snowball(conn, BATCH)
-            if not batch or not run_batch(conn, batch):
-                break
-            conn.executemany("UPDATE keywords SET expanded=1 WHERE keyword=?", [(k,) for k in batch])
-            conn.commit()
-        print(f"[수집] 눈덩이 단계 완료: {stats}", flush=True)
-
-        # 3) 롱테일 조합: 큰 키워드 × 수식어 → 실제 검색량이 있는 조합만 창고에 들어옴
-        per_head = -(-len(MODIFIERS) // BATCH)  # 키워드 1개당 호출 수
-        for head in _modifier_heads(conn, max(1, (calls - stats["calls"]) // per_head)):
+        # 2) 롱테일 조합: 오늘 나온 큰 키워드 × 수식어
+        per_head = -(-len(MODIFIERS) // BATCH)
+        for head in _modifier_heads(conn, today, max(1, (calls - stats["calls"]) // per_head)):
             if stats["calls"] >= calls:
                 break
             combos = [norm(head) + m for m in MODIFIERS if m not in head]
@@ -115,19 +87,19 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
                     break
             conn.execute("UPDATE keywords SET mod_done=1 WHERE keyword=?", (head,))
             conn.commit()
-        print(f"[수집] 롱테일 조합 단계 완료: {stats}", flush=True)
+        print(f"[수집] 롱테일 조합 완료: {stats}", flush=True)
 
-        pruned = conn.execute(
-            "DELETE FROM keywords WHERE total < ? AND status IN ('new','rejected')", (MIN_STORE_VOLUME,)
-        ).rowcount
+        # 3) 정리: 오래된 후보 삭제 (쓴 것·부적합·제외 기록은 보관)
+        cutoff = (datetime.now() - timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
+        stats["pruned"] = conn.execute(
+            "DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ?", (cutoff,)).rowcount
         conn.commit()
-        stats["pruned"] = pruned
         info = summary(conn)
     return {**stats, **info}
 
 
 def main() -> None:
-    """systemd 일일 작업 진입점: 설정 페이지의 수집량을 사용하고 결과를 봇 기록에 남긴다."""
+    """systemd 일일 작업 진입점: 결과를 봇 기록에 남긴다."""
     from .settings import load_settings
     from .state import add_log, load_state, save_state
 
@@ -135,20 +107,19 @@ def main() -> None:
     parser.add_argument("--calls", type=int, help="API 호출 수 (생략 시 설정 페이지 값)")
     args = parser.parse_args()
     settings = load_settings()
-    calls = args.calls or settings.discover_calls
     started = time.time()
     try:
-        r = discover(calls, settings.hint_keywords)
-        msg = (f"키워드 수집: API {r['calls']}회, 새 키워드 {r['new']:,}개, 오류 {r['errors']}회 "
-               f"(창고 {r['total']:,}개, {int(time.time() - started) // 60}분)")
+        r = discover(args.calls or settings.discover_calls, settings.hint_keywords)
+        msg = (f"오늘의 키워드 수집: API {r['calls']}회, 급상승어 {r['trends']}개 포함, "
+               f"새 키워드 {r['new']:,}개 (보관 {r['total']:,}개, {int(time.time() - started)}초)")
         ok = True
     except Exception as e:  # noqa: BLE001
         msg, ok = f"키워드 수집 실패: {e}", False
     print(msg, flush=True)
-    STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))  # 배포 때 중복 실행 방지용
+    STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
-    state["review_date"] = ""      # 새 키워드로 후보 재검토
+    state["review_date"] = ""      # 오늘 후보로 사전 검토
     state["dashboard_at"] = ""
     save_state(state)
 

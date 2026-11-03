@@ -37,7 +37,7 @@ function firstlab_bot_fields(): array {
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
 		'hint_keywords'  => array( 'label' => '우선 주제 (선택)', 'type' => 'textarea', 'default' => '', 'help' => '비워두면 분야 상관없이 자동 발굴. 입력하면 이 단어가 들어간 키워드를 먼저 씀 (한 줄에 하나)' ),
 		'competition_checks' => array( 'label' => '하루 경쟁도 조회 수', 'type' => 'number', 'default' => 15, 'min' => 0, 'max' => 400, 'help' => 'Gemini 구글 검색 연동(무료 한도 내)으로 후보 키워드의 구글 상위 사이트를 확인. Gemini 키 필요' ),
-		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 150, 'min' => 0, 'max' => 2000, 'help' => '네이버 키워드 도구 호출 수 (무료). 창고가 10만 개를 넘으면 롱테일 조합 탐색만 함. 매일 새벽 자동' ),
+		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 300, 'min' => 100, 'max' => 2000, 'help' => '네이버 키워드 도구 호출 수 (무료). 매일 급상승어 + 씨앗 단어 전부(약 80회) + 나머지는 롱테일 조합 탐색' ),
 		'min_volume'     => array( 'label' => '최소 월간 검색량', 'type' => 'number', 'default' => 500, 'min' => 0, 'max' => 10000000 ),
 		'max_volume'     => array( 'label' => '최대 월간 검색량', 'type' => 'number', 'default' => 30000, 'min' => 0, 'max' => 10000000 ),
 		'blocked_words'  => array( 'label' => '추가 금지어', 'type' => 'textarea', 'default' => '', 'help' => '한 줄에 하나. 기본 금지어(의료·장소·쇼핑)에 추가됨' ),
@@ -203,7 +203,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 		부적합 <?php echo number_format( (int) ( $by['rejected'] ?? 0 ) ); ?> ·
 		글 작성 <?php echo number_format( (int) ( $by['used'] ?? 0 ) ); ?> ·
 		제외 <?php echo number_format( (int) ( $by['excluded'] ?? 0 ) ); ?>
-		<br><span class="description">현황은 1시간마다(또는 글 작성 시) 갱신됩니다. 마지막 갱신: <?php echo esc_html( $state['dashboard_at'] ?? '-' ); ?></span>
+		<br><span class="description">매일 새로 수집한 후보에서 고릅니다. 이미 쓴 키워드 기록(중복 방지) + 최근 8일치(상승세 비교용)만 보관합니다. 현황은 1시간마다 갱신. 마지막 갱신: <?php echo esc_html( $state['dashboard_at'] ?? '-' ); ?></span>
 	</p>
 
 	<details id="candidates" style="margin:1em 0" <?php echo isset( $_GET['excluded'] ) ? 'open' : ''; // 제외 누른 뒤에는 펼친 상태 유지 ?>>

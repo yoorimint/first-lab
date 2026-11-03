@@ -18,18 +18,37 @@ TOO_HARD = 0.8     # 이 이상이면 글감에서 제외 (상위 대부분이 �
 COMP_PER_RUN = 3   # 글 1개 쓸 때 경쟁도를 새로 조회할 최대 후보 수
 
 
+_GENERIC_SUFFIXES = ("하는법", "방법", "총정리", "정리", "알아보기", "알아보자", "안내", "가이드")
+
+
+def _core(n: str) -> str:
+    """의미 없는 꼬리말 제거: '퇴직금계산방법' → '퇴직금계산'."""
+    for suffix in _GENERIC_SUFFIXES:
+        if n.endswith(suffix) and len(n) > len(suffix) + 1:
+            return n[: -len(suffix)]
+    return n
+
+
 def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict]:
     """점수순 후보 (안전 검사 전). 이미 쓴 글과 겹치는 키워드는 제외."""
-    rows = conn.execute(
-        "SELECT * FROM keywords WHERE status IN ('new','ok') AND total BETWEEN ? AND ?",
-        (settings.min_volume, settings.max_volume),
+    latest = conn.execute("SELECT MAX(last_checked) FROM keywords").fetchone()[0]
+    rows = conn.execute(  # 가장 최근 수집일(=오늘)의 키워드만 후보
+        "SELECT * FROM keywords WHERE status IN ('new','ok') AND last_checked=? AND total BETWEEN ? AND ?",
+        (latest, settings.min_volume, settings.max_volume),
     ).fetchall()
     used = [r["norm"] for r in conn.execute("SELECT norm FROM keywords WHERE status='used'")]
     volumes = {r["norm"]: r["total"] for r in conn.execute("SELECT norm, total FROM keywords")}
     hints = [norm(h) for h in settings.hint_keywords]
 
-    def overlaps_used(n: str) -> bool:  # '다이어트식단' vs '다이어트식단표' 같은 중복 방지
-        return any(u in n or n in u for u in used if len(u) >= 3)
+    used_cores = {_core(u) for u in used}
+
+    def overlaps_used(n: str) -> bool:
+        """이미 쓴 글과 '거의 같은' 키워드만 막는다. 더 구체적인 롱테일은 허용 (주제 묶음으로 활용).
+        막음: 퇴직금계산 ↔ 퇴직금계산방법(수식어만 다름), 다이어트식단 ↔ 다이어트식단표(2글자 이내 차이)
+        허용: 퇴직금계산 → 퇴직금계산1년미만"""
+        if _core(n) in used_cores:
+            return True
+        return any((u in n or n in u) and abs(len(n) - len(u)) <= 2 for u in used)
 
     result = []
     for r in rows:
