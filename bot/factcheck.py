@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 SYSTEM = """너는 한국어 정보 글의 검수 편집자다. 발행 전에 아래 네 가지만 점검하고, 문제가 있는 부분만 최소한으로 고친다.
 
@@ -37,6 +37,7 @@ class FactCheck:
     removed: int
     unverified: int
     edits: int = 0  # 사실 외 수정(이해하기 어려운 문장, 말투·수치 불일치)
+    unverified_claims: list[str] = field(default_factory=list)  # 확인 못 한 주장 (기록에 남겨 사람이 볼 수 있게)
 
     @property
     def needs_review(self) -> bool:
@@ -46,6 +47,8 @@ class FactCheck:
     def summary(self) -> str:
         s = (f"검수: 사실 확인 {self.ok}·수정 {self.fixed}·삭제 {self.removed}·미확인 {self.unverified}, "
              f"문장 다듬기 {self.edits}")
+        if self.unverified_claims:
+            s += " [미확인: " + " / ".join(c[:60] for c in self.unverified_claims) + "]"
         return s + (" → 검토 필요" if self.needs_review else "")
 
 
@@ -53,7 +56,9 @@ def verify(llm, keyword: str, content_html: str) -> FactCheck:
     raw = llm.generate(SYSTEM, f"검색 키워드: {keyword}\n\n[검증할 글 HTML]\n{content_html}", web_search=True)
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
     data = json.loads(text[text.find("{"): text.rfind("}") + 1])
-    verdicts = [str(c.get("verdict", "")) for c in data.get("checks", [])]
+    checks = data.get("checks", [])
+    verdicts = [str(c.get("verdict", "")) for c in checks]
+    unverified = [str(c.get("claim", "")) for c in checks if str(c.get("verdict", "")) == "unverified"]
     html = str(data.get("content_html") or "").strip()
     if len(html) < len(content_html) * 0.7:  # 검증자가 글을 크게 줄여버리면 원문 유지
         html = content_html
@@ -62,4 +67,4 @@ def verify(llm, keyword: str, content_html: str) -> FactCheck:
     except (TypeError, ValueError):
         edits = 0
     return FactCheck(html, verdicts.count("ok"), verdicts.count("fixed"),
-                     verdicts.count("removed"), verdicts.count("unverified"), edits)
+                     verdicts.count("removed"), verdicts.count("unverified"), edits, unverified)
