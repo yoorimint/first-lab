@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import random
+import subprocess
 import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -122,7 +123,8 @@ def main() -> None:
             add_log(state, True, f"{reason}: {msg}")
             print(msg)
         except Exception as e:  # noqa: BLE001 - 어떤 오류든 기록하고 다음 실행에 영향 없게
-            add_log(state, False, f"{reason} 실패: {e}")
+            detail = e.stderr if isinstance(e, subprocess.CalledProcessError) and e.stderr else e
+            add_log(state, False, f"{reason} 실패: {detail}")
             print(f"실패: {e}", file=sys.stderr)
         if slot is not None:  # 실패해도 같은 슬롯을 1분마다 재시도하지 않도록 완료 처리
             state["done"][now.strftime("%Y-%m-%d")].append(slot)

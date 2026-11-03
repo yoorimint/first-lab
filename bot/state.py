@@ -35,7 +35,7 @@ def load_state() -> dict:
 def save_state(state: dict) -> None:
     state["used_keywords"] = state["used_keywords"][-MAX_USED:]
     state["log"] = state["log"][:MAX_LOG]
-    wp_cli("option", "update", STATE_OPTION, json.dumps(state, ensure_ascii=False), "--format=json", "--autoload=no")
+    wp_cli("option", "update", STATE_OPTION, json.dumps(state, ensure_ascii=False), "--format=json")
 
 
 def add_log(state: dict, ok: bool, msg: str) -> None:

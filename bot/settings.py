@@ -6,6 +6,7 @@ API 키는 워드프레스 설정 값을 우선 사용하고, 비어 있으면 �
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from dataclasses import dataclass, field
 
@@ -28,16 +29,13 @@ def _lines(text: str) -> list[str]:
 
 
 def _times(text: str) -> list[str]:
-    """'9:00', '20:30' 같은 줄들 → ['09:00', '20:30'] (잘못된 줄은 무시)."""
-    times = []
-    for line in _lines(text):
-        try:
-            h, m = (int(x) for x in line.replace("시", ":").replace("분", "").split(":")[:2])
-        except ValueError:
-            continue
+    """'09:00', '9:00 20:30', '9시 30분' 등 → ['09:00', '20:30'] (형식이 틀린 부분은 무시)."""
+    times = set()
+    for h, m in re.findall(r"(\d{1,2})\s*[:시]\s*(\d{1,2})?", text or ""):
+        h, m = int(h), int(m or 0)
         if 0 <= h < 24 and 0 <= m < 60:
-            times.append(f"{h:02d}:{m:02d}")
-    return sorted(set(times))
+            times.add(f"{h:02d}:{m:02d}")
+    return sorted(times)
 
 
 @dataclass
@@ -82,7 +80,10 @@ class BotSettings:
 def wp_cli(*args: str) -> str:
     """워드프레스 파일 소유자 권한으로 WP-CLI 실행."""
     cmd = ["runuser", "-u", WP_USER, "--", "wp", f"--path={WP_PATH}", *args]
-    return subprocess.run(cmd, check=True, capture_output=True, text=True).stdout
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise subprocess.CalledProcessError(result.returncode, cmd[:7], result.stdout, result.stderr.strip()[:300])
+    return result.stdout
 
 
 def load_settings() -> BotSettings:
