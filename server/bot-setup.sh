@@ -24,7 +24,7 @@ log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
 
 log "systemd 타이머 (1분마다 실행)"
-install -m 644 "$REPO_DIR"/server/systemd/firstlab-{bot,discover}.{service,timer} /etc/systemd/system/
+install -m 644 "$REPO_DIR"/server/systemd/firstlab-{bot,discover,backup}.{service,timer} /etc/systemd/system/
 systemctl daemon-reload
 # 이전 버전 코드로 오래 멈춰 있는 실행이 있으면 정리 (12분 초과)
 if systemctl is-active -q firstlab-bot.service; then
@@ -34,8 +34,9 @@ if systemctl is-active -q firstlab-bot.service; then
     echo "오래 멈춘 봇 실행 정리"; systemctl stop firstlab-bot.service
   fi
 fi
-systemctl enable --now firstlab-bot.timer firstlab-discover.timer
-systemctl is-active firstlab-bot.timer firstlab-discover.timer
+systemctl enable --now firstlab-bot.timer firstlab-discover.timer firstlab-backup.timer
+systemctl is-active firstlab-bot.timer firstlab-discover.timer firstlab-backup.timer
+ls /var/backups/first-lab/wordpress-*.gz &>/dev/null || systemctl start --no-block firstlab-backup.service  # 첫 백업
 
 log "키워드 수집 (오늘 아직 안 했으면 바로 시작, 백그라운드)"
 if systemctl is-active -q firstlab-discover.service; then

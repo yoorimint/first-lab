@@ -29,7 +29,9 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 전문 �
  "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong 태그만 사용, h1 금지)",
  "tags": ["태그1", "태그2", "태그3"],
  "category": "카테고리 하나 (CATEGORY_LIST 중에서만)",
- "image_prompts": ["본문 흐름에 맞는 서로 다른 장면의 이미지 설명 3개 (각각 영어 한 문장, 사람 얼굴 클로즈업·글자 없이. 예: a quiet street in Jeju island with stone walls and tangerine trees)"]}"""
+ "images": [{"prompt": "이미지 생성용 장면 설명 (영어 한 문장, 사람 얼굴 클로즈업·글자 없이. 예: a quiet street in Jeju island with stone walls and tangerine trees)",
+             "alt": "그 이미지가 무엇인지 한국어로 짧게 (검색엔진·시각장애인용 대체 텍스트, 예: 돌담과 귤나무가 있는 제주 골목)"}]
+             ← 본문 흐름에 맞는 서로 다른 장면 3개}"""
 
 
 SYSTEM_PROMPT = SYSTEM_PROMPT.replace("CATEGORY_LIST", " / ".join(CATEGORIES))
@@ -42,6 +44,7 @@ class Article:
     content_html: str
     tags: list[str]
     image_prompts: list[str] = field(default_factory=list)
+    image_alts: list[str] = field(default_factory=list)  # 이미지 대체 텍스트 (한국어)
     category: str = DEFAULT
 
 
@@ -60,6 +63,12 @@ def build_prompt(keyword: str, target_length: int, extra: str = "", persona: str
     return prompt
 
 
+def _images(data: dict) -> list[dict]:
+    """이미지 목록 (예전 형식 image_prompts / image_query 도 허용)."""
+    items = data.get("images") or [{"prompt": p} for p in (data.get("image_prompts") or [data.get("image_query", "")])]
+    return [i for i in items if isinstance(i, dict) and str(i.get("prompt", "")).strip()]
+
+
 def parse_article(raw: str) -> Article:
     text = raw.strip()
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)  # 코드블록으로 감싼 경우 제거
@@ -71,8 +80,8 @@ def parse_article(raw: str) -> Article:
         content_html=str(data["content_html"]).strip(),
         tags=[str(t).strip() for t in data.get("tags", []) if str(t).strip()][:8],
         category=str(data.get("category", DEFAULT)).strip() if data.get("category") in CATEGORIES else DEFAULT,
-        image_prompts=[str(p).strip() for p in (data.get("image_prompts") or [data.get("image_query", "")])
-                       if str(p).strip()][:5],
+        image_prompts=[str(i.get("prompt", "")).strip() for i in _images(data)][:5],
+        image_alts=[str(i.get("alt", "")).strip() for i in _images(data)][:5],
     )
     if len(article.content_html) < 500:
         raise ValueError("본문이 너무 짧습니다")

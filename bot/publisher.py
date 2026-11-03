@@ -36,10 +36,11 @@ def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = 
         return content, "본문 이미지 없음"
     blocks, errors = [], []
     for n, prompt in enumerate(prompts, 1):
+        alt = article.image_alts[n - 1] if n <= len(article.image_alts) and article.image_alts[n - 1] else keyword
         try:
             path = images.cloudflare_image(account_id, token, prompt)
-            _, url = images.import_media(path, f"{keyword} {n}", keyword)
-            blocks.append(images.image_block(url, keyword))
+            _, url = images.import_media(path, alt, alt)
+            blocks.append(images.image_block(url, alt))
         except Exception as e:  # noqa: BLE001
             errors.append(str(e)[:80])
             print(f"[이미지] {n}번 실패: {e}", flush=True)

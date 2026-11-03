@@ -114,6 +114,9 @@ for file in "$REPO_DIR"/wordpress/pages/*.html; do
   fi
 done
 
+# ---------- 플러그인 자동 업데이트 (보안 패치 자동 적용) ----------
+wp plugin auto-updates enable --all >/dev/null 2>&1 || true
+
 # ---------- 페이지 캐시 비우기 (변경 즉시 반영) ----------
 rm -rf /var/cache/nginx/$SITE/*
 

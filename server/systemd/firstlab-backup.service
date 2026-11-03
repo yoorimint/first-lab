@@ -1,0 +1,7 @@
+[Unit]
+Description=First Lab daily backup
+
+[Service]
+Type=oneshot
+ExecStart=/opt/first-lab/server/backup.sh
+Nice=15

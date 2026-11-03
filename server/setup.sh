@@ -72,6 +72,7 @@ systemctl restart php$PHP_VER-fpm
 log "nginx 설정 설치"
 install -m 644 "$REPO_DIR/nginx/$SITE-http.conf" /etc/nginx/conf.d/$SITE-http.conf
 install -m 644 "$REPO_DIR/nginx/$SITE-ssl.conf"  /etc/nginx/snippets/$SITE-ssl.conf
+install -m 644 "$REPO_DIR/nginx/$SITE-headers.conf" /etc/nginx/snippets/$SITE-headers.conf
 install -m 644 "$REPO_DIR/nginx/$SITE.conf"      /etc/nginx/sites-available/$SITE
 ln -sf /etc/nginx/sites-available/$SITE /etc/nginx/sites-enabled/$SITE
 nginx -t
