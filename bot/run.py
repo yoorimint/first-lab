@@ -86,8 +86,8 @@ def create_one(settings: BotSettings) -> str:
         status, check_note = settings.post_status, ""
         if settings.fact_check:
             try:
-                # 검수는 글쓰기와 같은 모델로 (Haiku 는 수치 불일치·말투를 자주 놓침 — 내부 시험 결과)
-                fc = factcheck.verify(llm, keyword, article.content_html)
+                # 검수는 Haiku 로 충분 (내부 블라인드 시험: Sonnet 검수와 품질 차이 없음, 비용은 약 1/20)
+                fc = factcheck.verify(light, keyword, article.content_html)
                 article.content_html, check_note = fc.content_html, ", " + fc.summary
                 if fc.needs_review:
                     status = "draft"  # 확인 못 한 주장이 많으면 자동 발행 대신 초안
