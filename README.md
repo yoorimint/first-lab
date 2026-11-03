@@ -23,5 +23,7 @@
 - 표준 라이브러리만 사용 (서버에 추가 설치 없음)
 - 키는 서버의 `/etc/first-lab/secrets.env` 에만 저장. 입력: `bash /opt/first-lab/server/set-secrets.sh 키이름 ...`
 - 검색량 조회: `cd /opt/first-lab && python3 -m bot.keywords 다이어트`
+- 저경쟁 키워드 찾기: `python3 -m bot.find_keywords 다이어트 홈트` (검색량 ÷ 블로그 글 수, 금지어는 `bot/keyword_filter.py`)
+- 네이버 검색 API 키는 사주데이 애플리케이션과 공유 → 실행당 호출 수 제한(`--check`, 기본 30)
 
 > 공개 저장소이므로 비밀번호·API 키는 절대 커밋하지 않는다.

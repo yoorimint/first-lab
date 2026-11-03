@@ -6,6 +6,7 @@ import argparse
 
 from .config import load_secrets, require
 from .naver_ads import NaverAdsClient
+from .textfmt import ljust, rjust
 
 
 def main() -> None:
@@ -20,9 +21,10 @@ def main() -> None:
     ))
     stats = sorted(client.keyword_stats(args.hints), key=lambda s: s.total, reverse=True)
 
-    print(f"{'키워드':<24}{'월간 합계':>10}{'모바일':>10}{'PC':>9}  광고경쟁")
+    print(ljust("키워드", 24) + rjust("월간합계", 10) + rjust("모바일", 10) + rjust("PC", 9) + "  광고경쟁")
     for s in stats[: args.top]:
-        print(f"{s.keyword:<24}{s.total:>10,}{s.mobile:>10,}{s.pc:>9,}  {s.ad_competition}")
+        print(ljust(s.keyword, 24) + rjust(f"{s.total:,}", 10) + rjust(f"{s.mobile:,}", 10)
+              + rjust(f"{s.pc:,}", 9) + "  " + s.ad_competition)
 
 
 if __name__ == "__main__":
