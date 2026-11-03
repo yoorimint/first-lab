@@ -4,11 +4,19 @@
   - 대표 이미지가 없으면 제목 카드 생성
 """
 import json
+import subprocess
 import urllib.parse
 
 from .blocks import to_blocks
 from .publisher import set_featured_card
 from .settings import wp_cli
+
+
+def _has_thumbnail(pid: str) -> bool:
+    try:
+        return bool(wp_cli("post", "meta", "get", pid, "_thumbnail_id").strip())
+    except subprocess.CalledProcessError:  # 값이 없으면 WP-CLI 가 오류로 끝남
+        return False
 
 
 def main() -> None:
@@ -20,7 +28,9 @@ def main() -> None:
         if "<!-- wp:" not in content and "<h2" in content:
             wp_cli("post", "update", pid, f"--post_content={to_blocks(content)}")
             print(f"[보정] {pid} 블록 형식 변환")
-        if not wp_cli("post", "meta", "get", pid, "_thumbnail_id").strip():
+        else:
+            print(f"[보정] {pid} 블록 형식 (이미 됨)")
+        if not _has_thumbnail(pid):
             keyword = urllib.parse.unquote(p["post_name"]) or p["post_title"]
             set_featured_card(int(pid), p["post_title"], keyword)
             print(f"[보정] {pid} 대표 이미지 추가")
