@@ -23,6 +23,9 @@ STRONG_DOMAINS = {
     "terms.naver.com", "kin.naver.com", "namu.wiki", "daum.net", "kakao.com", "coupang.com",
     "samsung.com", "lg.co.kr", "kbstar.com", "shinhan.com", "wooribank.com", "hanabank.com",
     "toss.im", "banksalad.com", "kakaobank.com", "11st.co.kr", "gmarket.co.kr",
+    # 취업·부동산·생활 대형 서비스
+    "saramin.co.kr", "jobkorea.co.kr", "incruit.com", "albamon.com", "zigbang.com", "dabangapp.com",
+    "hometax.go.kr", "gov.kr", "bokjiro.go.kr",
 }
 # 약한 경쟁자: 개인 블로그 플랫폼
 WEAK_SUFFIXES = ("tistory.com", "blogspot.com", "brunch.co.kr", "velog.io", "blog.naver.com",
