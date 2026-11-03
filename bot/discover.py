@@ -39,11 +39,17 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
                 break
             batch = queue[i:i + BATCH]
             try:
-                new += upsert(conn, ads.keyword_stats(batch))
+                added = upsert(conn, ads.keyword_stats(batch))
+                new += added
+                print(f"[수집] {','.join(batch)} → 새 키워드 {added}개", flush=True)
             except urllib.error.HTTPError as e:  # 특수문자 등으로 거절된 묶음은 건너뜀
                 errors.append(f"{e.code} {','.join(batch)}")
+                print(f"[수집 오류] HTTP {e.code}: {','.join(batch)}", flush=True)
                 if e.code in (401, 403, 429):
                     break
+            except (urllib.error.URLError, TimeoutError) as e:  # 네트워크 오류 → 이번 묶음만 건너뜀
+                errors.append(f"network {e}")
+                print(f"[수집 오류] 네트워크: {e}", flush=True)
             done_calls += 1
             conn.executemany("UPDATE keywords SET expanded=1 WHERE keyword=?", [(k,) for k in batch])
             conn.commit()
