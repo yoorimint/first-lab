@@ -60,8 +60,9 @@ def norm(keyword: str) -> str:
 @contextmanager
 def connect(path: Path = DB_PATH):
     path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path)
+    conn = sqlite3.connect(path, timeout=60)  # 수집 작업과 봇이 동시에 쓸 때 대기
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")  # 읽기와 쓰기가 서로 막지 않게
     conn.executescript(SCHEMA)
     _migrate(conn)
     try:
