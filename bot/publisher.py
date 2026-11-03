@@ -9,27 +9,43 @@ from .writer import Article
 SITE_URL = "https://first-lab.kr"
 
 
-def _insert_photo(content: str, block: str) -> str:
-    """첫 번째 소제목 바로 앞에 사진 넣기 (도입부 다음)."""
+def _insert_images(content: str, blocks: list[str]) -> str:
+    """이미지들을 소제목 앞에 고르게 나눠 넣기 (첫 이미지는 첫 소제목 앞 = 도입부 다음)."""
     marker = "<!-- wp:heading"
-    i = content.find(marker)
-    return content[:i] + block + "\n\n" + content[i:] if i > 0 else block + "\n\n" + content
+    positions, i = [], content.find(marker)
+    while i != -1:
+        positions.append(i)
+        i = content.find(marker, i + 1)
+    if not positions:
+        return "\n\n".join(blocks) + "\n\n" + content
+    step = max(1, len(positions) // len(blocks))
+    chosen = [positions[min(k * step, len(positions) - 1)] for k in range(len(blocks))]
+    for pos, block in sorted(zip(chosen, blocks), reverse=True):  # 뒤에서부터 넣어야 위치가 안 밀림
+        content = content[:pos] + block + "\n\n" + content[pos:]
+    return content
 
 
-def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = ("", "")) -> tuple[str, str]:
+def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = ("", ""),
+                  count: int = 3) -> tuple[str, str]:
     """(블록 본문, 메모). 이미지 실패는 글 저장을 막지 않는다. cloudflare=(계정 ID, API 토큰)"""
     content = to_blocks(article.content_html)
     account_id, token = cloudflare
-    if not (account_id and token and article.image_query):
-        return content, "본문 이미지 없음(Cloudflare 미설정)"
-    try:
-        path = images.cloudflare_image(account_id, token, article.image_query)
-        _, url = images.import_media(path, keyword, keyword)
-        content = _insert_photo(content, images.image_block(url, keyword, "AI 생성 이미지"))
-        return content, "AI 이미지 1장"
-    except Exception as e:  # noqa: BLE001
-        print(f"[이미지] 본문 이미지 실패: {e}", flush=True)
-        return content, f"본문 이미지 실패({e})"
+    prompts = article.image_prompts[:count]
+    if not (account_id and token and prompts):
+        return content, "본문 이미지 없음"
+    blocks, errors = [], []
+    for n, prompt in enumerate(prompts, 1):
+        try:
+            path = images.cloudflare_image(account_id, token, prompt)
+            _, url = images.import_media(path, f"{keyword} {n}", keyword)
+            blocks.append(images.image_block(url, keyword))
+        except Exception as e:  # noqa: BLE001
+            errors.append(str(e)[:80])
+            print(f"[이미지] {n}번 실패: {e}", flush=True)
+    if blocks:
+        content = _insert_images(content, blocks)
+    note = f"AI 이미지 {len(blocks)}장" + (f" (실패 {len(errors)})" if errors else "")
+    return content, note
 
 
 def set_featured_card(post_id: int, title: str, keyword: str) -> None:
@@ -39,9 +55,9 @@ def set_featured_card(post_id: int, title: str, keyword: str) -> None:
 
 
 def publish(article: Article, status: str, slug: str = "",
-            cloudflare: tuple[str, str] = ("", "")) -> tuple[int, str, str]:
+            cloudflare: tuple[str, str] = ("", ""), image_count: int = 3) -> tuple[int, str, str]:
     """slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다."""
-    content, image_note = build_content(article, slug or article.title, cloudflare)
+    content, image_note = build_content(article, slug or article.title, cloudflare, image_count)
     post_id = int(wp_cli(
         "post", "create",
         f"--post_title={article.title}",

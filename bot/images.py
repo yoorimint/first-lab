@@ -129,6 +129,7 @@ def import_media(path: Path, title: str, alt: str) -> tuple[int, str]:
 
 
 def image_block(url: str, alt: str, caption: str = "") -> str:
+    """caption 은 기본으로 비움 (운영자 요청)."""
     cap = f'<figcaption class="wp-element-caption">{caption}</figcaption>' if caption else ""
     return (f'<!-- wp:image {{"sizeSlug":"large"}} -->\n'
             f'<figure class="wp-block-image size-large"><img src="{url}" alt="{alt}"/>{cap}</figure>\n'

@@ -58,6 +58,7 @@ class BotSettings:
     gemini_key: str = ""  # 경쟁도 조회(구글 검색 연동)용 - 글쓰기 AI 와 무관하게 사용
     cf_account_id: str = ""   # 본문 AI 이미지 (Cloudflare Workers AI)
     cf_api_token: str = ""
+    image_count: int = 3       # 글 1개당 본문 이미지 수
     competition_checks: int = 15  # 하루 경쟁도 조회 한도 (Gemini 무료 한도가 작음)
 
     @classmethod
@@ -84,6 +85,7 @@ class BotSettings:
             competition_checks=int(raw.get("competition_checks") or 15),
             cf_account_id=(raw.get("cf_account_id") or "").strip() or secrets.get("CF_ACCOUNT_ID", ""),
             cf_api_token=(raw.get("cf_api_token") or "").strip() or secrets.get("CF_API_TOKEN", ""),
+            image_count=int(raw.get("image_count") if raw.get("image_count") not in (None, "") else 3),
         )
 
 

@@ -79,7 +79,8 @@ def create_one(settings: BotSettings) -> str:
         article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
                                 persona=settings.persona)
         post_id, link, image_note = publish(article, settings.post_status, slug=keyword,
-                                            cloudflare=(settings.cf_account_id, settings.cf_api_token))
+                                            cloudflare=(settings.cf_account_id, settings.cf_api_token),
+                                            image_count=settings.image_count)
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = "발행" if settings.post_status == "publish" else "초안 저장"
     return f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}) {link}"

@@ -2,6 +2,7 @@
 
   - 일반 HTML 본문 → 블록 형식 (앱 편집기에서 표가 '?'로 보이던 문제)
   - 대표 이미지가 없으면 제목 카드 생성
+  - 예전 'AI 생성 이미지' 캡션 제거
 """
 import json
 import subprocess
@@ -25,6 +26,10 @@ def main() -> None:
     for p in posts:
         pid = str(p["ID"])
         content = wp_cli("post", "get", pid, "--field=post_content")
+        if "AI 생성 이미지</figcaption>" in content:  # 예전 캡션 제거 (운영자 요청)
+            content = content.replace('<figcaption class="wp-element-caption">AI 생성 이미지</figcaption>', "")
+            wp_cli("post", "update", pid, f"--post_content={content}")
+            print(f"[보정] {pid} 이미지 캡션 제거")
         if "<!-- wp:" not in content and "<h2" in content:
             wp_cli("post", "update", pid, f"--post_content={to_blocks(content)}")
             print(f"[보정] {pid} 블록 형식 변환")
