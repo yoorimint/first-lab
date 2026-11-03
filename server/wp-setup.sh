@@ -66,12 +66,17 @@ done
 
 # ---------- 카테고리 (bot/categories.py 목록) ----------
 log "카테고리 동기화"
-existing=$(wp term list category --field=slug)
+existing_slugs=$(wp term list category --field=slug)
+existing_names=$(wp term list category --field=name)
 while IFS=$'\t' read -r name slug; do
-  echo "$existing" | grep -qx "$slug" || wp term create category "$name" --slug="$slug" --porcelain
+  if echo "$existing_slugs" | grep -qx "$slug" || echo "$existing_names" | grep -qxF "$name"; then
+    continue  # 이미 있음 (관리자 화면에서 주소를 바꿨어도 이름이 같으면 그대로 둠)
+  fi
+  wp term create category "$name" --slug="$slug" --porcelain
 done < <(cd "$REPO_DIR" && python3 -m bot.categories)
-default_id=$(wp term get category life --by=slug --field=term_id)
-wp option update default_category "$default_id"   # 새 글 기본값 = 생활정보 ('미분류' 대신)
+default_id=$(wp term get category life --by=slug --field=term_id 2>/dev/null \
+  || wp term list category --name="생활정보" --field=term_id | head -1)
+[ -n "$default_id" ] && wp option update default_category "$default_id"   # 새 글 기본값 = 생활정보 ('미분류' 대신)
 
 # ---------- 관리자 로그인 아이디가 글 작성자로 노출되지 않게 ----------
 log "작성자 표시 이름 설정 (로그인 아이디 숨김)"

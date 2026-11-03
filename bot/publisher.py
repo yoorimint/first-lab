@@ -50,6 +50,19 @@ def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = 
     return content, note
 
 
+def _set_category(post_id: int, name: str) -> None:
+    """카테고리 지정: 주소용 이름(slug)으로, 안 되면 이름으로 (관리자 화면에서 주소를 바꾼 경우 대비)."""
+    import subprocess
+
+    try:
+        wp_cli("post", "term", "set", str(post_id), "category", slug_of(name), "--by=slug")
+    except subprocess.CalledProcessError:
+        try:
+            wp_cli("post", "term", "set", str(post_id), "category", name)
+        except subprocess.CalledProcessError as e:
+            print(f"[카테고리] 지정 실패 ({name}): {e.stderr}", flush=True)
+
+
 CARD_VERSION = "2"  # 제목 카드 디자인 버전 (바꾸면 배포 때 기존 글 카드도 다시 생성)
 
 
@@ -75,7 +88,7 @@ def publish(article: Article, status: str, slug: str = "",
         f"--tags_input={','.join(article.tags)}",
         "--porcelain",
     ).strip())
-    wp_cli("post", "term", "set", str(post_id), "category", slug_of(article.category), "--by=slug")
+    _set_category(post_id, article.category)
     try:
         set_featured_card(post_id, article.title, slug or article.title)
     except Exception as e:  # noqa: BLE001 - 대표 이미지 실패가 글 저장을 막지 않게
