@@ -172,3 +172,21 @@ function firstlab_bot_render_page(): void {
 	</div>
 	<?php
 }
+
+// 사이트 화면 상단 관리자 바에 '퍼스트랩 봇' 바로가기 (로그인한 관리자에게만 보임)
+add_action(
+	'admin_bar_menu',
+	static function ( WP_Admin_Bar $bar ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		$bar->add_node(
+			array(
+				'id'    => 'firstlab-bot',
+				'title' => '⚙️ 퍼스트랩 봇',
+				'href'  => admin_url( 'options-general.php?page=firstlab-bot' ),
+			)
+		);
+	},
+	100
+);
