@@ -320,7 +320,17 @@ function firstlab_bot_render_page(): void {
 	?>
 	<div class="wrap">
 		<h1>퍼스트랩 자동 발행 봇</h1>
-		<?php firstlab_bot_render_status(); ?>
+		<?php
+		$providers = firstlab_bot_fields()['provider']['options'];
+		$key_field = $values['provider'] . '_key';
+		printf(
+			'<p style="font-size:1.1em">현재 글쓰기 AI: <strong>%s</strong> (모델: %s) · 키: %s</p>',
+			esc_html( $providers[ $values['provider'] ] ?? $values['provider'] ),
+			esc_html( $values['model'] ? $values['model'] : '자동 선택' ),
+			! empty( $values[ $key_field ] ) ? '✅ 있음' : '❌ 없음'
+		);
+		firstlab_bot_render_status();
+		?>
 		<h2>설정</h2>
 		<p>여기서 바꾼 설정은 다음 실행부터 바로 적용됩니다.</p>
 		<form method="post" action="options.php">
