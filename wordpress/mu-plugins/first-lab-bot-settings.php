@@ -23,6 +23,7 @@ function firstlab_bot_fields(): array {
 			'default' => 'draft',
 			'options' => array( 'draft' => '초안으로 저장 (내가 검토 후 발행)', 'publish' => '바로 발행' ),
 		),
+		'fact_check'     => array( 'label' => '자동 사실 검증', 'type' => 'checkbox', 'default' => 1, 'help' => '글 완성 후 별도 AI 가 핵심 수치를 웹 검색으로 재확인·수정. 확인 못 한 주장이 많으면 자동 발행 대신 초안으로 남김' ),
 		'publish_times'  => array( 'label' => '자동 발행 시각', 'type' => 'textarea', 'default' => "09:00\n20:00", 'help' => '한 줄에 하나 (예: 09:00). 줄 수 = 하루 글 개수' ),
 		'jitter_minutes' => array( 'label' => '랜덤 범위 (± 분)', 'type' => 'number', 'default' => 30, 'min' => 0, 'max' => 180, 'help' => '예: 30 이면 09:00 → 08:30~09:30 사이 무작위 (매일 달라짐)' ),
 		'provider'       => array(

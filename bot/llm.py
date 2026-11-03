@@ -24,6 +24,7 @@ class AnthropicLLM:
     # 추론(생각) 깊이: 높을수록 품질↑·비용↑ (생각한 토큰도 출력 요금). 글쓰기는 medium, 판정 작업은 low
     EFFORT_WRITE, EFFORT_LIGHT = "medium", "low"
     LIGHT_MODEL = "claude-haiku-5-5"
+    FALLBACK_SEARCH_MODEL = "claude-sonnet-5-5"
     PRICE = {"claude-sonnet-5-5": (2.0, 10.0), "claude-opus-5-5": (4.0, 20.0), "claude-haiku-5-5": (0.10, 0.50)}
     MAX_CONTINUATIONS = 4  # 검색이 길어져 중간에 멈춘(pause_turn) 경우 이어서 진행할 최대 횟수
     WEB_SEARCH = {
@@ -43,8 +44,23 @@ class AnthropicLLM:
 
     def generate(self, system: str, prompt: str, web_search: bool = False) -> str:
         """web_search=True: Claude 가 직접 웹 검색해서 최신 정보를 확인한 뒤 작성."""
+        import anthropic
+
+        try:
+            return self._generate(system, prompt, web_search)
+        except anthropic.BadRequestError:
+            if not (web_search and self.model == self.LIGHT_MODEL):
+                raise
+            # Haiku 에서 웹 검색 도구가 거절되면 Sonnet 으로 한 번 더 (낮은 추론 깊이)
+            self.model = self.FALLBACK_SEARCH_MODEL
+            return self._generate(system, prompt, web_search)
+
+    def _generate(self, system: str, prompt: str, web_search: bool) -> str:
         messages = [{"role": "user", "content": prompt}]
-        tools = [self.WEB_SEARCH] if web_search else []
+        tool = dict(self.WEB_SEARCH)
+        if self.model.startswith("claude-haiku"):  # Haiku 는 기본 검색 도구 사용
+            tool["type"] = "web_search_20250305"
+        tools = [tool] if web_search else []
         for _ in range(self.MAX_CONTINUATIONS + 1):
             # 서버측 fallback: 안전 분류기가 거절하면 다른 모델로 자동 재시도
             extra = {"tools": tools} if tools else {}

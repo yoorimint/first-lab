@@ -20,7 +20,7 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import related
+from . import factcheck, related
 from .discover import discover
 from .keyword_db import connect, set_status, summary
 from .llm import LLMBusy, make_llm
@@ -74,22 +74,33 @@ def create_one(settings: BotSettings) -> str:
     with connect() as conn:
         if len(ranked_candidates(conn, settings)) < MIN_POOL:
             discover(5, settings.hint_keywords)
-        keyword = pick_keyword(conn, settings, llm)
+        light = make_llm(settings.provider, settings.api_key, settings.model, light=True)  # 판정·검증용 (저렴)
+        keyword = pick_keyword(conn, settings, light)
         if not keyword:
             raise RuntimeError("안전 검사를 통과한 후보가 없습니다. 새벽 키워드 수집 후 다시 시도됩니다")
         cands = related.candidates(keyword)
         article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
                                 persona=settings.persona, links=related.prompt_section(cands))
-        article.content_html, link_count = related.clean_links(article.content_html, {c["url"] for c in cands})
-        post_id, link, image_note = publish(article, settings.post_status, slug=keyword,
+        allowed_links = {c["url"] for c in cands}
+        status, check_note = settings.post_status, ""
+        if settings.fact_check:
+            try:
+                fc = factcheck.verify(light, keyword, article.content_html)
+                article.content_html, check_note = fc.content_html, ", " + fc.summary
+                if fc.needs_review:
+                    status = "draft"  # 확인 못 한 주장이 많으면 자동 발행 대신 초안
+            except Exception as e:  # noqa: BLE001 - 검증 실패 시 원문 유지 + 초안
+                status, check_note = "draft", f", 사실검증 실패({str(e)[:60]}) → 검토 필요"
+        article.content_html, link_count = related.clean_links(article.content_html, allowed_links)
+        post_id, link, image_note = publish(article, status, slug=keyword,
                                             cloudflare=(settings.cf_account_id, settings.cf_api_token),
                                             image_count=settings.image_count)
         set_status(conn, keyword, "used", f"post {post_id}")
-    kind = "발행" if settings.post_status == "publish" else "초안 저장"
-    cost = getattr(llm, "cost_usd", 0.0)
+    kind = "발행" if status == "publish" else "초안 저장"
+    cost = getattr(llm, "cost_usd", 0.0) + getattr(light, "cost_usd", 0.0)
     cost_note = f", AI 비용 약 ${cost:.2f}(≈{cost * 1400:,.0f}원)" if cost else ""
     return (f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}, "
-            f"내부 링크 {link_count}개{cost_note}) {link}")
+            f"내부 링크 {link_count}개{check_note}{cost_note}) {link}")
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
