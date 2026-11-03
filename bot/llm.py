@@ -13,6 +13,10 @@ class LLMError(RuntimeError):
     pass
 
 
+class LLMBusy(LLMError):
+    """일시적 혼잡·한도 초과 → 나중에 다시 시도하면 되는 오류."""
+
+
 class AnthropicLLM:
     default_model = "claude-opus-5-5"
 
@@ -46,12 +50,14 @@ class GeminiLLM:
     BUSY_CODES = (500, 503, 504)
     QUOTA_CODE = 429  # 하루 무료 한도 초과 → 기다려도 소용없으니 바로 다음 모델
 
-    def __init__(self, api_key: str, model: str = ""):
+    def __init__(self, api_key: str, model: str = "", light: bool = False):
         from google import genai
         from google.genai import types
 
         self.client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=TIMEOUT_SECONDS * 1000))
         self.models = [model] if model else self._flash_models()
+        if light and not model:  # 짧은 판정 작업: lite 모델 먼저 (혼잡 덜하고 한도가 별도)
+            self.models.sort(key=lambda n: "lite" not in n)
         self.model = self.models[0]
 
     def _flash_models(self) -> list[str]:
@@ -106,9 +112,9 @@ class GeminiLLM:
                         break  # 이 모델 포기 → 다음 모델
                     time.sleep(wait)
         if getattr(last_error, "code", None) == self.QUOTA_CODE:
-            raise LLMError("Gemini 무료 하루 한도를 다 썼습니다 (매일 오후 4~5시경 초기화). "
+            raise LLMBusy("Gemini 무료 하루 한도를 다 썼습니다 (매일 오후 4~5시경 초기화). "
                            "설정에서 유료 키 또는 다른 AI로 바꾸면 계속 쓸 수 있습니다")
-        raise LLMError(f"Gemini 서버가 혼잡합니다. 다음 실행에서 다시 시도됩니다 ({last_error})")
+        raise LLMBusy(f"Gemini 서버가 혼잡합니다 ({getattr(last_error, 'code', '')})")
 
 
 class OpenAILLM:
@@ -128,9 +134,12 @@ class OpenAILLM:
 PROVIDERS = {"anthropic": AnthropicLLM, "gemini": GeminiLLM, "openai": OpenAILLM}
 
 
-def make_llm(provider: str, api_key: str, model: str = ""):
+def make_llm(provider: str, api_key: str, model: str = "", light: bool = False):
+    """light=True: 짧은 판정 작업용 (Gemini 는 lite 모델 우선)."""
     if provider not in PROVIDERS:
         raise LLMError(f"알 수 없는 AI 제공사: {provider}")
     if not api_key:
         raise LLMError(f"{provider} API 키가 없습니다. 설정 페이지에 입력하세요.")
+    if provider == "gemini":
+        return GeminiLLM(api_key, model, light=light)
     return PROVIDERS[provider](api_key, model)

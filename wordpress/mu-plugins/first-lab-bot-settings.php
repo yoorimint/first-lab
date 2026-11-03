@@ -265,7 +265,15 @@ function firstlab_bot_render_status(): void {
 		<?php wp_nonce_field( 'firstlab_bot_run_now' ); ?>
 		<?php submit_button( '지금 글 1개 만들기', 'secondary', 'submit', false, $pending ? array( 'disabled' => 'disabled' ) : array() ); ?>
 		<span class="description">
-			<?php echo $pending ? '요청됨 — 1~3분 안에 생성됩니다. 새로고침해서 아래 기록을 확인하세요.' : '설정의 발행 방식(초안/바로 발행)을 따릅니다.'; ?>
+			<?php
+			if ( $pending ) {
+				echo '요청됨 — 1~3분 안에 생성됩니다. 새로고침해서 아래 기록을 확인하세요.';
+			} elseif ( ! empty( $state['manual_next'] ) ) {
+				echo esc_html( 'AI 서버 혼잡으로 ' . substr( $state['manual_next'], 11 ) . '에 자동 재시도 예정입니다.' );
+			} else {
+				echo '설정의 발행 방식(초안/바로 발행)을 따릅니다.';
+			}
+			?>
 		</span>
 	</form>
 

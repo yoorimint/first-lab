@@ -5,7 +5,8 @@ import random
 
 from .competition import check as check_competition
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
-from .keyword_filter import is_allowed
+from .keyword_filter import is_allowed, is_question
+from .llm import LLMBusy
 from .safety import classify
 from .scoring import find_head, score
 from .settings import BotSettings
@@ -97,24 +98,36 @@ def _check_competition(conn, settings: BotSettings, candidates: list[dict], limi
     conn.commit()
 
 
-def _safety_check(conn, llm, batch: list[dict]) -> None:
+def _safety_check(conn, llm, batch: list[dict]) -> bool:
+    """AI 판정 완료면 True, AI 혼잡으로 임시 판정했으면 False."""
     unchecked = [c["keyword"] for c in batch if c["status"] == "new"]
     if not unchecked:
-        return
-    for kw, (ok, reason) in classify(llm, unchecked).items():
+        return True
+    try:
+        results = classify(llm, unchecked)
+    except LLMBusy:
+        # AI 혼잡 → 질문형 롱테일(방법·신청·비용 등)만 임시 통과. 상태는 'new' 로 두어 다음에 AI 가 다시 검사
+        for c in batch:
+            if c["status"] == "new" and is_question(c["keyword"]):
+                c["status"] = "ok"
+        return False
+    for kw, (ok, reason) in results.items():
         set_status(conn, kw, "ok" if ok else "rejected", reason)
         for c in batch:
             if c["keyword"] == kw:
                 c["status"] = "ok" if ok else "rejected"
     conn.commit()
+    return True
 
 
 def review_top(conn, settings: BotSettings, llm, count: int = 10) -> int:
     """하루 1회: 상위 후보를 미리 안전 검사 + 경쟁도 조회 (설정 페이지에서 근거 확인용). 조회 수 반환."""
     before = competition_checks_today(conn)
     candidates = ranked_candidates(conn, settings, limit=count)
-    _safety_check(conn, llm, candidates)
+    safety_done = _safety_check(conn, llm, candidates)
     _check_competition(conn, settings, [c for c in candidates if c["status"] == "ok"], limit=count)
+    if not safety_done:
+        raise LLMBusy("AI 안전검사를 못 했습니다 (Gemini 혼잡)")
     return competition_checks_today(conn) - before
 
 
