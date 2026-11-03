@@ -33,4 +33,5 @@ jobs:
             fi
             bash "$REPO/server/setup.sh"
             bash "$REPO/server/wp-setup.sh"
+            bash "$REPO/server/bot-setup.sh"
             bash "$REPO/server/bot-check.sh"

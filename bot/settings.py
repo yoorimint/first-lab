@@ -27,11 +27,25 @@ def _lines(text: str) -> list[str]:
     return [line.strip() for line in (text or "").splitlines() if line.strip()]
 
 
+def _times(text: str) -> list[str]:
+    """'9:00', '20:30' 같은 줄들 → ['09:00', '20:30'] (잘못된 줄은 무시)."""
+    times = []
+    for line in _lines(text):
+        try:
+            h, m = (int(x) for x in line.replace("시", ":").replace("분", "").split(":")[:2])
+        except ValueError:
+            continue
+        if 0 <= h < 24 and 0 <= m < 60:
+            times.append(f"{h:02d}:{m:02d}")
+    return sorted(set(times))
+
+
 @dataclass
 class BotSettings:
     enabled: bool = False
     post_status: str = "draft"
-    posts_per_day: int = 2
+    publish_times: list[str] = field(default_factory=lambda: ["09:00", "20:00"])
+    jitter_minutes: int = 30
     provider: str = "gemini"
     model: str = ""
     hint_keywords: list[str] = field(default_factory=list)
@@ -49,7 +63,8 @@ class BotSettings:
         return cls(
             enabled=bool(int(raw.get("enabled") or 0)),
             post_status=raw.get("post_status") or "draft",
-            posts_per_day=int(raw.get("posts_per_day") or 2),
+            publish_times=_times(raw.get("publish_times", "09:00\n20:00")),
+            jitter_minutes=int(raw.get("jitter_minutes") or 0),
             provider=provider,
             model=(raw.get("model") or "").strip(),
             hint_keywords=_lines(raw.get("hint_keywords", "")),

@@ -21,6 +21,9 @@
 
 ## 자동 발행 봇 (`bot/`)
 - 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`). 봇은 `bot/settings.py` 로 읽음. 점검: `python3 -m bot.settings`
+- 실행: systemd 타이머가 1분마다 `python -m bot.run` (가상환경 `/opt/first-lab-venv`). 수동 발행 버튼 → 요청 옵션 → 봇이 처리
+- 자동 발행: 설정의 발행 시각 ± 랜덤 분 (날짜별로 고정된 무작위), 실행당 최대 1개
+- 즉시 테스트: `cd /opt/first-lab && /opt/first-lab-venv/bin/python -m bot.run --now`
 - API 키: 설정 페이지 값 우선, 없으면 `/etc/first-lab/secrets.env`
 - 표준 라이브러리만 사용 (서버에 추가 설치 없음)
 - 키는 서버의 `/etc/first-lab/secrets.env` 에만 저장. 입력: `bash /opt/first-lab/server/set-secrets.sh 키이름 ...`

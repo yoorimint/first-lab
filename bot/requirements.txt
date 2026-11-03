@@ -1,0 +1,4 @@
+# AI 제공사 공식 SDK (서버 가상환경 /opt/first-lab-venv 에 설치)
+anthropic>=1,<2
+google-genai>=1
+openai>=1

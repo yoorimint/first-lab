@@ -1,0 +1,10 @@
+[Unit]
+Description=First Lab auto-publish bot (one run)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/first-lab
+ExecStart=/opt/first-lab-venv/bin/python -m bot.run
+TimeoutStartSec=15min
+Nice=10

@@ -23,7 +23,8 @@ function firstlab_bot_fields(): array {
 			'default' => 'draft',
 			'options' => array( 'draft' => '초안으로 저장 (내가 검토 후 발행)', 'publish' => '바로 발행' ),
 		),
-		'posts_per_day'  => array( 'label' => '하루 글 개수', 'type' => 'number', 'default' => 2, 'min' => 1, 'max' => 5 ),
+		'publish_times'  => array( 'label' => '자동 발행 시각', 'type' => 'textarea', 'default' => "09:00\n20:00", 'help' => '한 줄에 하나 (예: 09:00). 줄 수 = 하루 글 개수' ),
+		'jitter_minutes' => array( 'label' => '랜덤 범위 (± 분)', 'type' => 'number', 'default' => 30, 'min' => 0, 'max' => 180, 'help' => '예: 30 이면 09:00 → 08:30~09:30 사이 무작위 (매일 달라짐)' ),
 		'provider'       => array(
 			'label'   => 'AI 제공사',
 			'type'    => 'select',
@@ -148,6 +149,65 @@ function firstlab_bot_render_field( string $key, array $field, array $values ): 
 	}
 }
 
+const FIRSTLAB_BOT_REQUEST = 'firstlab_bot_request'; // 서버 봇(1분마다 실행)이 확인 후 지움
+const FIRSTLAB_BOT_STATE   = 'firstlab_bot_state';   // 봇이 기록하는 오늘 계획·최근 기록
+
+// '지금 글 1개 만들기' → 요청만 남기고, 실제 생성은 서버 봇이 처리 (PHP 에서 외부 명령 실행 금지 정책)
+add_action(
+	'admin_post_firstlab_bot_run_now',
+	static function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '권한이 없습니다.' );
+		}
+		check_admin_referer( 'firstlab_bot_run_now' );
+		update_option( FIRSTLAB_BOT_REQUEST, (string) time(), false );
+		wp_safe_redirect( admin_url( 'options-general.php?page=firstlab-bot&requested=1' ) );
+		exit;
+	}
+);
+
+function firstlab_bot_render_status(): void {
+	$state   = (array) get_option( FIRSTLAB_BOT_STATE, array() );
+	$today   = wp_date( 'Y-m-d' );
+	$plan    = $state['plan'][ $today ] ?? array();
+	$done    = $state['done'][ $today ] ?? array();
+	$pending = get_option( FIRSTLAB_BOT_REQUEST );
+	?>
+	<h2>지금 발행</h2>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<input type="hidden" name="action" value="firstlab_bot_run_now">
+		<?php wp_nonce_field( 'firstlab_bot_run_now' ); ?>
+		<?php submit_button( '지금 글 1개 만들기', 'secondary', 'submit', false, $pending ? array( 'disabled' => 'disabled' ) : array() ); ?>
+		<span class="description">
+			<?php echo $pending ? '요청됨 — 1~3분 안에 생성됩니다. 새로고침해서 아래 기록을 확인하세요.' : '설정의 발행 방식(초안/바로 발행)을 따릅니다.'; ?>
+		</span>
+	</form>
+
+	<h2>오늘 자동 발행 계획</h2>
+	<p>
+		<?php
+		if ( ! $plan ) {
+			echo '아직 계획이 없습니다 (봇이 1분 안에 만듭니다).';
+		}
+		foreach ( $plan as $i => $time ) {
+			echo esc_html( $time ) . ( in_array( $i, $done, true ) ? ' ✅ ' : ' ⏳ ' ) . '&nbsp; ';
+		}
+		?>
+	</p>
+
+	<h2>최근 기록</h2>
+	<ul>
+		<?php foreach ( array_slice( (array) ( $state['log'] ?? array() ), 0, 10 ) as $entry ) : ?>
+			<li><?php echo make_clickable( esc_html( ( $entry['ok'] ? '✅ ' : '❌ ' ) . $entry['time'] . '  ' . $entry['msg'] ) ); ?></li>
+		<?php endforeach; ?>
+		<?php if ( empty( $state['log'] ) ) : ?>
+			<li>기록 없음</li>
+		<?php endif; ?>
+	</ul>
+	<hr>
+	<?php
+}
+
 function firstlab_bot_render_page(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -156,6 +216,8 @@ function firstlab_bot_render_page(): void {
 	?>
 	<div class="wrap">
 		<h1>퍼스트랩 자동 발행 봇</h1>
+		<?php firstlab_bot_render_status(); ?>
+		<h2>설정</h2>
 		<p>여기서 바꾼 설정은 다음 실행부터 바로 적용됩니다.</p>
 		<form method="post" action="options.php">
 			<?php settings_fields( 'firstlab_bot' ); ?>
