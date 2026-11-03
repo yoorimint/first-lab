@@ -11,6 +11,7 @@ from .settings import BotSettings
 
 SAFETY_BATCH = 15  # 한 번의 AI 호출로 검사할 후보 수
 PICK_FROM_TOP = 3  # 통과한 상위 N개 중 무작위 → 매번 같은 유형만 쓰지 않게
+PER_HEAD = 2       # 같은 원 키워드(헤드)에서 나온 후보는 상위 목록에 최대 N개 (주제 쏠림 방지)
 
 
 def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict]:
@@ -37,7 +38,16 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         result.append({"keyword": r["keyword"], "total": r["total"], "score": round(sc, 2),
                        "status": r["status"], "head": head or ""})
     result.sort(key=lambda x: x["score"], reverse=True)
-    return result[:limit]
+    picked, per_head = [], {}
+    for c in result:
+        key = c["head"] or c["keyword"]
+        if per_head.get(key, 0) >= PER_HEAD:
+            continue
+        per_head[key] = per_head.get(key, 0) + 1
+        picked.append(c)
+        if len(picked) >= limit:
+            break
+    return picked
 
 
 def pick_keyword(conn, settings: BotSettings, llm) -> str | None:
