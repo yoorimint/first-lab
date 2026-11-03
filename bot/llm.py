@@ -20,24 +20,43 @@ class LLMBusy(LLMError):
 class AnthropicLLM:
     default_model = "claude-opus-5-5"
 
+    MAX_SEARCHES = 5       # 글 1개당 웹 검색 최대 횟수 (검색당 별도 요금)
+    MAX_CONTINUATIONS = 4  # 검색이 길어져 중간에 멈춘(pause_turn) 경우 이어서 진행할 최대 횟수
+    WEB_SEARCH = {
+        "type": "web_search_20260209", "name": "web_search", "max_uses": MAX_SEARCHES,
+        "user_location": {"type": "approximate", "country": "KR", "timezone": "Asia/Seoul"},
+    }
+
     def __init__(self, api_key: str, model: str = ""):
         import anthropic
 
-        self.client = anthropic.Anthropic(api_key=api_key, timeout=TIMEOUT_SECONDS, max_retries=1)
+        # 웹 검색을 하면 응답이 길어지므로 대기 시간을 넉넉히
+        self.client = anthropic.Anthropic(api_key=api_key, timeout=TIMEOUT_SECONDS * 2, max_retries=1)
         self.model = model or self.default_model
 
-    def generate(self, system: str, prompt: str) -> str:
-        # 서버측 fallback: 안전 분류기가 거절하면 다른 모델로 자동 재시도
-        response = self.client.beta.messages.create(
-            model=self.model,
-            max_tokens=16000,
-            system=system,
-            messages=[{"role": "user", "content": prompt}],
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
-        )
+    def generate(self, system: str, prompt: str, web_search: bool = False) -> str:
+        """web_search=True: Claude 가 직접 웹 검색해서 최신 정보를 확인한 뒤 작성."""
+        messages = [{"role": "user", "content": prompt}]
+        tools = [self.WEB_SEARCH] if web_search else []
+        for _ in range(self.MAX_CONTINUATIONS + 1):
+            # 서버측 fallback: 안전 분류기가 거절하면 다른 모델로 자동 재시도
+            response = self.client.beta.messages.create(
+                model=self.model,
+                max_tokens=16000,
+                system=system,
+                messages=messages,
+                betas=["server-side-fallback-2026-07-01"],
+                fallbacks="default",
+                **({"tools": tools} if tools else {}),
+            )
+            if response.stop_reason != "pause_turn":
+                break
+            # 서버 검색 루프가 한도에 걸려 멈춤 → 응답을 그대로 붙여 보내면 이어서 진행
+            messages = [{"role": "user", "content": prompt}, {"role": "assistant", "content": response.content}]
         if response.stop_reason == "refusal":
             raise LLMError("Claude가 요청을 거절했습니다 (주제를 바꿔보세요)")
+        if response.stop_reason == "max_tokens":
+            raise LLMError("글이 너무 길어 중간에 잘렸습니다 (설정의 글 분량을 줄여보세요)")
         return "".join(b.text for b in response.content if b.type == "text")
 
 
@@ -95,7 +114,7 @@ class GeminiLLM:
             return types.ThinkingConfig(thinking_budget=512)
         return types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW)
 
-    def generate(self, system: str, prompt: str) -> str:
+    def generate(self, system: str, prompt: str, web_search: bool = False) -> str:
         import time
 
         from google.genai import errors, types
@@ -104,7 +123,9 @@ class GeminiLLM:
         for model in self.models[:self.MAX_MODELS]:
             config = types.GenerateContentConfig(
                 system_instruction=system,
-                response_mime_type="application/json",
+                # 구글 검색 연동과 JSON 모드는 함께 못 쓰므로, 검색할 때는 JSON 지정을 뺀다 (지시문으로 JSON 요구)
+                response_mime_type=None if web_search else "application/json",
+                tools=[types.Tool(google_search=types.GoogleSearch())] if web_search else None,
                 thinking_config=self._thinking(model),
             )
             for wait in (*self.RETRY_WAITS, None):
@@ -137,7 +158,8 @@ class OpenAILLM:
         self.client = OpenAI(api_key=api_key, timeout=TIMEOUT_SECONDS, max_retries=1)
         self.model = model
 
-    def generate(self, system: str, prompt: str) -> str:
+    def generate(self, system: str, prompt: str, web_search: bool = False) -> str:
+        # OpenAI 는 웹 검색 미연결 (필요 시 추가)
         response = self.client.responses.create(model=self.model, instructions=system, input=prompt)
         return response.output_text
 
