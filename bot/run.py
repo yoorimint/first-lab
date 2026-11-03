@@ -108,16 +108,28 @@ CACHE_DIR = "/var/cache/nginx/first-lab"
 
 def purge_cache_if_changed(state: dict) -> None:
     """가장 최근 발행·수정 시각이 바뀌었으면 nginx 페이지 캐시 삭제."""
-    import shutil
-
     try:
         latest = wp_cli("post", "list", "--post_type=post,page", "--post_status=publish", "--orderby=modified",
                         "--order=DESC", "--posts_per_page=1", "--field=post_modified").strip()
     except subprocess.CalledProcessError:
         return
     if latest and latest != state.get("last_modified"):
-        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+        clear_cache()
         state["last_modified"] = latest
+
+
+def clear_cache() -> None:
+    """캐시 '내용'만 삭제. 폴더 자체를 지우면 nginx 가 캐시를 못 써서 빈 응답이 나감 (실제 장애 원인)."""
+    import os
+    import shutil
+
+    if not os.path.isdir(CACHE_DIR):
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        shutil.chown(CACHE_DIR, "www-data", "www-data")
+        return
+    for name in os.listdir(CACHE_DIR):
+        path = os.path.join(CACHE_DIR, name)
+        shutil.rmtree(path, ignore_errors=True) if os.path.isdir(path) else os.remove(path)
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
