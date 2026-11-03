@@ -2,6 +2,7 @@
 
 규칙은 아래 목록만 고치면 되도록 데이터로 분리했다.
 """
+from __future__ import annotations
 
 # 의료·의약품: AI 오류 시 실제 피해 + 구글 YMYL 엄격 평가
 MEDICAL = ["병원", "의원", "내과", "외과", "이비인후과", "피부과", "치과", "한의원", "약국",
@@ -14,8 +15,9 @@ SHOPPING = ["가격비교", "최저가", "쿠팡", "구매", "판매", "할인�
 BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING
 
 
-def is_allowed(keyword: str) -> bool:
-    return not any(word in keyword for word in BLOCKED_WORDS)
+def is_allowed(keyword: str, extra_blocked: list[str] | None = None) -> bool:
+    """extra_blocked: 설정 페이지의 '추가 금지어'."""
+    return not any(word in keyword for word in BLOCKED_WORDS + (extra_blocked or []))
 
 
 # 질문형(롱테일) 신호: 정보를 찾는 검색 → 글 한 편으로 답하기 좋음

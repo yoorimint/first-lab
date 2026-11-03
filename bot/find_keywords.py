@@ -13,6 +13,7 @@ import argparse
 from .config import load_secrets, require
 from .keyword_filter import is_allowed, is_question
 from .naver_ads import NaverAdsClient
+from .settings import load_settings
 from .textfmt import ljust, rjust
 
 
@@ -23,20 +24,27 @@ def score(keyword: str, volume: int) -> float:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="발행 후보 키워드 찾기")
-    parser.add_argument("hints", nargs="+", help="힌트 키워드 (최대 5개)")
-    parser.add_argument("--min", type=int, default=500, help="최소 월간 검색량")
-    parser.add_argument("--max", type=int, default=30000, help="최대 월간 검색량")
+    parser.add_argument("hints", nargs="*", help="힌트 키워드 (최대 5개, 생략 시 설정 페이지 값)")
+    parser.add_argument("--min", type=int, help="최소 월간 검색량 (생략 시 설정 페이지 값)")
+    parser.add_argument("--max", type=int, help="최대 월간 검색량 (생략 시 설정 페이지 값)")
     parser.add_argument("--top", type=int, default=30, help="출력 개수")
     args = parser.parse_args()
+
+    settings = load_settings()
+    hints = args.hints or settings.hint_keywords
+    if not hints:
+        raise SystemExit("힌트 키워드가 없습니다. 명령에 적거나 설정 페이지에 입력하세요.")
+    min_v = args.min if args.min is not None else settings.min_volume
+    max_v = args.max if args.max is not None else settings.max_volume
 
     secrets = load_secrets()
     ads = NaverAdsClient(*require(
         secrets, "NAVER_AD_CUSTOMER_ID", "NAVER_AD_ACCESS_LICENSE", "NAVER_AD_SECRET_KEY"
     ))
 
-    stats = ads.keyword_stats(args.hints)
+    stats = ads.keyword_stats(hints)
     candidates = sorted(
-        (s for s in stats if args.min <= s.total <= args.max and is_allowed(s.keyword)),
+        (s for s in stats if min_v <= s.total <= max_v and is_allowed(s.keyword, settings.blocked_words)),
         key=lambda s: score(s.keyword, s.total), reverse=True,
     )
     print(f"연관 키워드 {len(stats)}개 → 조건 통과 {len(candidates)}개\n")

@@ -20,6 +20,8 @@
 필요한 저장소 Secrets: `SERVER_HOST`, `SERVER_USER`, `SERVER_PASSWORD`
 
 ## 자동 발행 봇 (`bot/`)
+- 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`). 봇은 `bot/settings.py` 로 읽음. 점검: `python3 -m bot.settings`
+- API 키: 설정 페이지 값 우선, 없으면 `/etc/first-lab/secrets.env`
 - 표준 라이브러리만 사용 (서버에 추가 설치 없음)
 - 키는 서버의 `/etc/first-lab/secrets.env` 에만 저장. 입력: `bash /opt/first-lab/server/set-secrets.sh 키이름 ...`
 - 검색량 조회: `cd /opt/first-lab && python3 -m bot.keywords 다이어트`
