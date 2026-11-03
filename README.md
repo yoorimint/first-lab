@@ -34,6 +34,7 @@
 | `search_console.py` | 구글 서치콘솔 성과 → 기회 키워드 추가·잘 되는 주제 가산·안 되는 주제 감점 (매일, 키: `/etc/first-lab/gsc-service-account.json`) |
 | `related.py` | 내부 링크: 발행된 글 중 관련 후보 → 글쓰기 AI 가 본문에 1~3개 링크 (목록 외 주소는 제거). 글 하단 '함께 보면 좋은 글'은 `first-lab-related.php` |
 | `factcheck.py` | 자동 사실 검증: 완성된 글의 핵심 수치를 별도 AI(Haiku+웹검색)가 재확인·수정, 미확인 많으면 초안 유지 |
+| `refresh.py` | 발행 글 갱신 (주 5개, 하루 최대 1개): 순위 정체·하락 → 보강, 1·7월 제도 글 / 6개월 지난 글 → 수치 재검증 |
 | `safety.py` | AI 안전 검사 (인물·정치·종교·의료·장소찾기 등 제외) |
 | `select_keyword.py` | 후보 선정. 점검: `python -m bot.select_keyword` |
 | `llm.py` | AI 제공사 교체 (Gemini/Claude/OpenAI) |

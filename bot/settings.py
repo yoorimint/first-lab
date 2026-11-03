@@ -60,6 +60,7 @@ class BotSettings:
     cf_api_token: str = ""
     image_count: int = 3       # 글 1개당 본문 이미지 수
     fact_check: bool = True    # 자동 사실 검증
+    refresh_per_week: int = 5  # 발행 글 갱신 주당 최대 개수
     competition_checks: int = 15  # 하루 경쟁도 조회 한도 (Gemini 무료 한도가 작음)
 
     @classmethod
@@ -87,6 +88,7 @@ class BotSettings:
             cf_account_id=(raw.get("cf_account_id") or "").strip() or secrets.get("CF_ACCOUNT_ID", ""),
             cf_api_token=(raw.get("cf_api_token") or "").strip() or secrets.get("CF_API_TOKEN", ""),
             fact_check=bool(int(raw.get("fact_check", 1) or 0)),
+            refresh_per_week=int(raw.get("refresh_per_week") if raw.get("refresh_per_week") not in (None, "") else 5),
             image_count=int(raw.get("image_count") if raw.get("image_count") not in (None, "") else 3),
         )
 

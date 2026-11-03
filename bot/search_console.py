@@ -32,6 +32,10 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS gsc_queries (   -- 최근 28일 검색어 성과 (매일 덮어씀)
     query TEXT, page TEXT, clicks INTEGER, impressions INTEGER, position REAL
 );
+CREATE TABLE IF NOT EXISTS gsc_page_history (  -- 글 주소별 최근 28일 성과를 매일 기록 (하락 감지용)
+    date TEXT, page TEXT, clicks INTEGER, impressions INTEGER, position REAL,
+    PRIMARY KEY (date, page)
+);
 CREATE TABLE IF NOT EXISTS gsc_signals (   -- 점수 조정 신호
     norm   TEXT PRIMARY KEY,               -- 키워드 또는 헤드 (공백 제거)
     kind   TEXT NOT NULL,                  -- opportunity | good_head | bad_head
@@ -111,10 +115,17 @@ def update_signals(conn, rows: list[dict]) -> dict:
     # 2) 잘 되는 주제 / 3) 안 되는 주제 (우리 글 기준)
     by_page: dict[str, dict] = {}
     for r in rows:
-        p = by_page.setdefault(r["page"], {"clicks": 0, "impressions": 0, "best": 999.0})
+        p = by_page.setdefault(r["page"], {"clicks": 0, "impressions": 0, "best": 999.0, "pos_sum": 0.0})
         p["clicks"] += r["clicks"]
         p["impressions"] += r["impressions"]
         p["best"] = min(p["best"], r["position"])
+        p["pos_sum"] += r["position"] * r["impressions"]  # 노출 가중 평균 순위 계산용
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn.executemany(
+        "INSERT OR REPLACE INTO gsc_page_history VALUES (?,?,?,?,?)",
+        [(today, u, p["clicks"], p["impressions"], round(p["pos_sum"] / max(p["impressions"], 1), 1))
+         for u, p in by_page.items()],
+    )
     performing_pages = [u for u, p in by_page.items() if p["clicks"] > 0 or p["best"] <= GOOD_POSITION]
     stale_cutoff = (datetime.now() - timedelta(days=STALE_DAYS)).strftime("%Y-%m-%d")
     for r in conn.execute("SELECT norm, first_seen FROM keywords WHERE status='used'"):

@@ -135,6 +135,11 @@ def main() -> None:
     STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
+    # 발행된 글 갱신 (서치콘솔 반영 직후, 주당 한도 안에서 하루 최대 1개)
+    from .refresh import run_weekly
+
+    for line in run_weekly(settings, state):
+        add_log(state, "실패" not in line, line)
     state["review_date"] = ""      # 오늘 후보로 사전 검토
     state["dashboard_at"] = ""
     save_state(state)
