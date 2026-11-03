@@ -20,7 +20,10 @@ REVIEW = ["후기", "리뷰", "내돈내산", "솔직", "사용기", "체험"]
 POLITICS_RELIGION = ["대통령", "국회", "정당", "선거", "투표", "탄핵", "민주당", "국민의힘",
                      "교회", "성당", "사찰", "불교", "기독교", "천주교", "이슬람"]  # 애매한 건 AI 안전 검사가 거름
 
-BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING + REVIEW + POLITICS_RELIGION
+# 추천·이벤트형: 상품 고르기·판촉 의도 → 정보 글로 답하기 어렵고 쇼핑·광고 페이지가 상위 (운영자 결정으로 제외)
+PROMOTION = ["추천", "이벤트", "쿠폰", "프로모션", "경품", "사은품", "순위", "랭킹", "베스트"]
+
+BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING + REVIEW + POLITICS_RELIGION + PROMOTION
 
 
 def is_allowed(keyword: str, extra_blocked: list[str] | None = None) -> bool:

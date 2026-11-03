@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from .keyword_filter import is_allowed
 from .naver_ads import KeywordStat
 
 DB_PATH = Path("/var/lib/first-lab/bot/keywords.db")
@@ -83,7 +84,7 @@ def upsert(conn: sqlite3.Connection, stats: list[KeywordStat]) -> int:
     stale = (now - timedelta(days=REFRESH_DAYS)).strftime("%Y-%m-%d")
     new = 0
     for s in stats:
-        if s.total < MIN_STORE_VOLUME:
+        if s.total < MIN_STORE_VOLUME or not is_allowed(s.keyword):  # 금지어 키워드는 창고에 넣지 않음
             continue
         row = conn.execute("SELECT total, last_checked FROM keywords WHERE keyword=?", (s.keyword,)).fetchone()
         if row is None:
