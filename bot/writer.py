@@ -34,8 +34,16 @@ class Article:
     image_query: str = ""
 
 
-def build_prompt(keyword: str, target_length: int, extra: str = "") -> str:
+PERSONA_RULES = """[글쓴이 페르소나 적용 규칙]
+- 아래 페르소나의 말투·관점·관심사로 쓴다 (독자에게 말 걸듯, 실용적인 조언 위주).
+- 단, 직접 해본 경험·후기·구체적 일화는 지어내지 않는다. 경험처럼 꾸민 허위 내용은 금지.
+  대신 '이런 경우가 많습니다', '확인해 보면 좋습니다'처럼 정보와 조언으로 표현한다."""
+
+
+def build_prompt(keyword: str, target_length: int, extra: str = "", persona: str = "") -> str:
     prompt = f"검색 키워드: {keyword}\n분량: 본문 약 {target_length}자\n"
+    if persona.strip():
+        prompt += f"{PERSONA_RULES}\n글쓴이 페르소나: {persona.strip()}\n"
     if extra.strip():
         prompt += f"추가 지시: {extra.strip()}\n"
     return prompt
@@ -58,8 +66,9 @@ def parse_article(raw: str) -> Article:
     return article
 
 
-def write_article(llm, keyword: str, target_length: int, extra: str = "", retries: int = 1) -> Article:
-    prompt = build_prompt(keyword, target_length, extra)
+def write_article(llm, keyword: str, target_length: int, extra: str = "", retries: int = 1,
+                  persona: str = "") -> Article:
+    prompt = build_prompt(keyword, target_length, extra, persona)
     last_error: Exception | None = None
     for _ in range(retries + 1):
         try:

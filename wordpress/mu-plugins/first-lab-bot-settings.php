@@ -43,6 +43,7 @@ function firstlab_bot_fields(): array {
 		'max_volume'     => array( 'label' => '최대 월간 검색량', 'type' => 'number', 'default' => 30000, 'min' => 0, 'max' => 10000000 ),
 		'blocked_words'  => array( 'label' => '추가 금지어', 'type' => 'textarea', 'default' => '', 'help' => '한 줄에 하나. 기본 금지어(의료·장소·쇼핑)에 추가됨' ),
 		'target_length'  => array( 'label' => '글 분량 (자)', 'type' => 'number', 'default' => 3000, 'min' => 1000, 'max' => 10000 ),
+		'persona'        => array( 'label' => '글쓴이 페르소나', 'type' => 'textarea', 'default' => '', 'help' => '예: 30대 직장인, 생활 정보를 꼼꼼히 비교해 정리하는 사람. 친근한 존댓말, 핵심부터 말함. (비우면 중립적인 정보 글. 경험담·후기는 지어내지 않음)' ),
 		'extra_prompt'   => array( 'label' => '추가 작성 지시', 'type' => 'textarea', 'default' => '', 'help' => '예: 말투는 친근하게, 표를 꼭 넣어줘' ),
 	);
 }

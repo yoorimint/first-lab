@@ -46,7 +46,7 @@ mkdir -p "$TMP_DIR" "$CACHE_DIR"
 chown "$WP_USER:$WP_USER" "$TMP_DIR" && chmod 700 "$TMP_DIR"
 chown www-data:www-data "$CACHE_DIR"
 chown -R "$WP_USER:www-data" "$WEB_ROOT"
-find "$WEB_ROOT" -type d -exec chmod 750 {} +
+find "$WEB_ROOT" -type d -exec chmod 2750 {} +  # setgid: 새로 생기는 파일·폴더(업로드 이미지 등)도 그룹 www-data 를 물려받아 nginx 가 읽을 수 있게
 find "$WEB_ROOT" -type f -exec chmod 640 {} +
 
 # ---------- 3. wp-config 보안 상수 ----------

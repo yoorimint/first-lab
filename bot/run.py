@@ -76,7 +76,8 @@ def create_one(settings: BotSettings) -> str:
         keyword = pick_keyword(conn, settings, llm)
         if not keyword:
             raise RuntimeError("안전 검사를 통과한 후보가 없습니다. 새벽 키워드 수집 후 다시 시도됩니다")
-        article = write_article(llm, keyword, settings.target_length, settings.extra_prompt)
+        article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
+                                persona=settings.persona)
         post_id, link = publish(article, settings.post_status, slug=keyword, pexels_key=settings.pexels_key)
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = "발행" if settings.post_status == "publish" else "초안 저장"

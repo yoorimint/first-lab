@@ -53,6 +53,7 @@ class BotSettings:
     blocked_words: list[str] = field(default_factory=list)
     target_length: int = 3000
     extra_prompt: str = ""
+    persona: str = ""
     api_key: str = ""  # 선택된 제공사의 키
     gemini_key: str = ""  # 경쟁도 조회(구글 검색 연동)용 - 글쓰기 AI 와 무관하게 사용
     pexels_key: str = ""  # 본문 사진 (선택)
@@ -76,6 +77,7 @@ class BotSettings:
             blocked_words=_lines(raw.get("blocked_words", "")),
             target_length=int(raw.get("target_length") or 3000),
             extra_prompt=raw.get("extra_prompt") or "",
+            persona=raw.get("persona") or "",
             api_key=(raw.get(wp_field) or "").strip() or secrets.get(env_name, ""),
             gemini_key=(raw.get("gemini_key") or "").strip() or secrets.get("GEMINI_API_KEY", ""),
             competition_checks=int(raw.get("competition_checks") or 15),
