@@ -13,7 +13,8 @@ def main() -> None:
         print("후보 상위 15:", [f"{c['keyword']}({c['total']}{', ←' + c['head'] if c['head'] else ''})" for c in ranked_candidates(conn, settings, 15)])
     print("설정: AI =", settings.provider, "| 키", "있음" if settings.api_key else "없음",
           "| 자동발행", "켜짐" if settings.enabled else "꺼짐", "| 방식", settings.post_status)
-    print("오늘 계획:", state.get("plan"), "완료:", state.get("done"))
+    print("발행 시각 설정:", settings.publish_times, "±", settings.jitter_minutes, "분")
+    print("오늘 계획:", state.get("plan"), "완료:", state.get("done"), "자동 재시도:", state.get("auto_next", "-"))
     for entry in state["log"][:5]:
         print(" ", "✅" if entry["ok"] else "❌", entry["time"], entry["msg"][:200])
 
