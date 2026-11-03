@@ -35,6 +35,7 @@ function firstlab_bot_fields(): array {
 		'gemini_key'     => array( 'label' => 'Gemini API 키', 'type' => 'secret' ),
 		'anthropic_key'  => array( 'label' => 'Claude API 키', 'type' => 'secret' ),
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
+		'pexels_key'     => array( 'label' => 'Pexels API 키 (본문 사진)', 'type' => 'secret' ),
 		'hint_keywords'  => array( 'label' => '우선 주제 (선택)', 'type' => 'textarea', 'default' => '', 'help' => '비워두면 분야 상관없이 자동 발굴. 입력하면 이 단어가 들어간 키워드를 먼저 씀 (한 줄에 하나)' ),
 		'competition_checks' => array( 'label' => '하루 경쟁도 조회 수', 'type' => 'number', 'default' => 15, 'min' => 0, 'max' => 400, 'help' => 'Gemini 구글 검색 연동(무료 한도 내)으로 후보 키워드의 구글 상위 사이트를 확인. Gemini 키 필요' ),
 		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 300, 'min' => 100, 'max' => 2000, 'help' => '네이버 키워드 도구 호출 수 (무료). 매일 급상승어 + 씨앗 단어 전부(약 80회) + 나머지는 롱테일 조합 탐색' ),

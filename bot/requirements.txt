@@ -4,3 +4,4 @@ google-genai>=1
 openai>=1
 google-auth>=2
 requests>=2  # 서치콘솔 API 인증
+pillow>=10  # 대표 이미지(제목 카드) 생성

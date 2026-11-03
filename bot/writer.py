@@ -21,7 +21,8 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 전문 �
 {"title": "검색 결과에 노출될 제목 (40자 이내, 키워드 포함)",
  "excerpt": "검색 결과 설명문 (120자 이내)",
  "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong 태그만 사용, h1 금지)",
- "tags": ["태그1", "태그2", "태그3"]}"""
+ "tags": ["태그1", "태그2", "태그3"],
+ "image_query": "본문에 어울리는 사진 검색어 (영어 2~4단어, 예: jeju island beach)"}"""
 
 
 @dataclass
@@ -30,6 +31,7 @@ class Article:
     excerpt: str
     content_html: str
     tags: list[str]
+    image_query: str = ""
 
 
 def build_prompt(keyword: str, target_length: int, extra: str = "") -> str:
@@ -49,6 +51,7 @@ def parse_article(raw: str) -> Article:
         excerpt=str(data.get("excerpt", "")).strip(),
         content_html=str(data["content_html"]).strip(),
         tags=[str(t).strip() for t in data.get("tags", []) if str(t).strip()][:8],
+        image_query=str(data.get("image_query", "")).strip(),
     )
     if len(article.content_html) < 500:
         raise ValueError("본문이 너무 짧습니다")

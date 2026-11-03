@@ -55,6 +55,7 @@ class BotSettings:
     extra_prompt: str = ""
     api_key: str = ""  # 선택된 제공사의 키
     gemini_key: str = ""  # 경쟁도 조회(구글 검색 연동)용 - 글쓰기 AI 와 무관하게 사용
+    pexels_key: str = ""  # 본문 사진 (선택)
     competition_checks: int = 15  # 하루 경쟁도 조회 한도 (Gemini 무료 한도가 작음)
 
     @classmethod
@@ -78,6 +79,7 @@ class BotSettings:
             api_key=(raw.get(wp_field) or "").strip() or secrets.get(env_name, ""),
             gemini_key=(raw.get("gemini_key") or "").strip() or secrets.get("GEMINI_API_KEY", ""),
             competition_checks=int(raw.get("competition_checks") or 15),
+            pexels_key=(raw.get("pexels_key") or "").strip() or secrets.get("PEXELS_API_KEY", ""),
         )
 
 
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     # 점검용: 키 값은 숨기고 설정만 출력
     s = load_settings()
     shown = {k: v for k, v in vars(s).items() if not k.endswith("key")}
-    for k in ("api_key", "gemini_key"):
+    for k in ("api_key", "gemini_key", "pexels_key"):
         v = getattr(s, k)
         shown[k] = f"있음 (끝자리 {v[-4:]})" if v else "없음"
     for k, v in shown.items():
