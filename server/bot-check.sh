@@ -30,5 +30,3 @@ journalctl -u firstlab-bot.service --since "-5min" --no-pager -o cat 2>/dev/null
   | grep -vE "pam_unix|Starting|Finished|Deactivated|Consumed" | tail -15 || true
 
 
-echo -e "\n==> [임시] 최근 초안 본문 (품질 점검)"
-cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.export_post 59 2>&1 | head -c 12000 || true
