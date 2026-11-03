@@ -32,3 +32,4 @@ jobs:
               git clone -q https://github.com/yoorimint/first-lab "$REPO"
             fi
             bash "$REPO/server/setup.sh"
+            bash "$REPO/server/wp-setup.sh"
