@@ -17,6 +17,8 @@ BACKUP=/root/backup-$SITE-$(date +%Y%m%d-%H%M%S)
 
 log() { echo -e "\n==> $*"; }
 
+log "배포 버전: $(git -C "$REPO_DIR/.." log -1 --format='%h %s' 2>/dev/null || echo unknown)"
+
 # ---------- 백업 & 실패 시 복구 ----------
 log "기존 설정 백업: $BACKUP"
 mkdir -p "$BACKUP"
