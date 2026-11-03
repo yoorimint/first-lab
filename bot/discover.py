@@ -14,6 +14,7 @@ import argparse
 import time
 import urllib.error
 from datetime import datetime
+from pathlib import Path
 
 from .keyword_db import MIN_STORE_VOLUME, connect, norm, summary, upsert
 from .naver_ads import ads_client
@@ -27,6 +28,7 @@ MAX_KEYWORDS = 100_000  # 창고가 이보다 크면 넓히기(씨앗·눈덩이
 MODIFIERS = ["방법", "신청", "조건", "기간", "비용", "서류", "계산", "차이", "뜻", "기준",
              "자격", "대상", "순서", "주의사항", "하는법"]
 HEAD_MIN_VOLUME = 3000  # 롱테일 조합을 만들 '큰 키워드' 기준
+STAMP_FILE = Path("/var/lib/first-lab/bot/discover-date")  # 마지막 수집 날짜
 
 
 def _seed_words(conn, limit: int) -> list[str]:
@@ -143,6 +145,7 @@ def main() -> None:
     except Exception as e:  # noqa: BLE001
         msg, ok = f"키워드 수집 실패: {e}", False
     print(msg, flush=True)
+    STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))  # 배포 때 중복 실행 방지용
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
     state["review_date"] = ""      # 새 키워드로 후보 재검토
