@@ -56,13 +56,14 @@ def due_slot(state: dict, settings: BotSettings, now: datetime) -> int | None:
     """실행할 차례인 슬롯 번호 (없으면 None). 오늘 계획을 상태에 기록한다."""
     today = now.strftime("%Y-%m-%d")
     state["plan"] = {today: plan_for_today(settings, today)}            # 지난 날짜는 정리
-    state["done"] = {today: state["done"].get(today, [])}
+    # 완료 기록은 '예정 시각(HH:MM)'으로 저장 (예전 버전의 회차 번호 기록은 무시)
+    state["done"] = {today: [d for d in state["done"].get(today, []) if isinstance(d, str)]}
     for i, hhmm in enumerate(state["plan"][today]):
-        if i in state["done"][today] or now.strftime("%H:%M") < hhmm:
+        if hhmm in state["done"][today] or now.strftime("%H:%M") < hhmm:
             continue
         due = now.replace(hour=int(hhmm[:2]), minute=int(hhmm[3:]), second=0, microsecond=0)
         if now - due > timedelta(minutes=MAX_LATE_MINUTES):
-            state["done"][today].append(i)  # 너무 늦음 → 건너뜀
+            state["done"][today].append(hhmm)  # 너무 늦음 → 건너뜀
             continue
         return i
     return None
@@ -238,7 +239,7 @@ def main() -> None:
             add_log(state, False, f"{reason} 실패: {detail}")
             print(f"실패: {detail}", file=sys.stderr)
         if slot is not None:  # 실패해도 같은 슬롯을 1분마다 재시도하지 않도록 완료 처리
-            state["done"][today].append(slot)
+            state["done"][today].append(state["plan"][today][slot])
 
     if reason or excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
         refresh_dashboard(state, settings)  # 변화가 있거나 1시간마다

@@ -290,7 +290,7 @@ function firstlab_bot_render_status(): void {
 			echo '아직 계획이 없습니다 (봇이 1분 안에 만듭니다).';
 		}
 		foreach ( $plan as $i => $time ) {
-			echo esc_html( $time ) . ( in_array( $i, $done, true ) ? ' ✅ ' : ' ⏳ ' ) . '&nbsp; ';
+			echo esc_html( $time ) . ( in_array( $time, $done, true ) ? ' ✅ ' : ' ⏳ ' ) . '&nbsp; ';  // 완료 기록 = 예정 시각
 		}
 		?>
 	</p>
