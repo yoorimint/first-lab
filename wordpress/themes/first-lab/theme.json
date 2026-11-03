@@ -1,0 +1,31 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"settings": {
+		"typography": {
+			"fontFamilies": [
+				{
+					"name": "System Korean",
+					"slug": "system-ko",
+					"fontFamily": "-apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", \"Noto Sans KR\", \"Segoe UI\", Roboto, sans-serif"
+				}
+			]
+		}
+	},
+	"styles": {
+		"typography": {
+			"fontFamily": "var:preset|font-family|system-ko",
+			"lineHeight": "1.75"
+		},
+		"elements": {
+			"heading": {
+				"typography": {
+					"fontFamily": "var:preset|font-family|system-ko",
+					"fontWeight": "700",
+					"lineHeight": "1.4"
+				}
+			}
+		},
+		"css": "body{word-break:keep-all;overflow-wrap:break-word}"
+	}
+}

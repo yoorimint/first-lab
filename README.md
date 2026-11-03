@@ -7,6 +7,8 @@
 |---|---|
 | `server/setup.sh` | 서버 설정 적용 스크립트 (여러 번 실행해도 안전, 실패 시 자동 복구) |
 | `server/wp-setup.sh` | 워드프레스 기본·SEO 설정 (WP-CLI). 설정값은 파일 상단에서 수정 |
+| `wordpress/themes/first-lab/` | 자식 테마 (부모: Twenty Twenty-Five). 글꼴·푸터 등 |
+| `wordpress/pages/` | 고정 페이지 내용 (소개·문의·개인정보처리방침). 첫 줄 `<!-- title: 제목 -->` |
 | `wordpress/mu-plugins/` | 사이트 기능 코드 (항상 켜지는 플러그인). 배포 시 자동 설치 |
 | `server/nginx/` | nginx 사이트 설정, 캐시·로그인 제한, SSL |
 | `server/php-fpm/` | 블로그 전용 PHP 풀 (사주데이와 격리, 메모리 절약) |

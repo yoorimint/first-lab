@@ -14,6 +14,9 @@ PERMALINK="/%postname%/"
 # SEO 플러그인: The SEO Framework (가볍고 DB 테이블을 추가하지 않아 SQLite와 궁합이 좋음)
 PLUGINS_INSTALL=(autodescription)
 PLUGINS_REMOVE=(akismet hello)
+# 테마: 저장소의 자식 테마(wordpress/themes/first-lab) 사용. 부모 테마 외 미사용 테마는 삭제
+THEME=first-lab
+PARENT_THEME=twentytwentyfive
 # ====================================
 
 export WP_CLI_CACHE_DIR=/var/lib/$SITE/wp-cli-cache
@@ -60,6 +63,18 @@ MU_DIR=$WEB_ROOT/wp-content/mu-plugins
 install -d -o "$WP_USER" -g www-data -m 750 "$MU_DIR"
 install -o "$WP_USER" -g www-data -m 640 "$REPO_DIR"/wordpress/mu-plugins/*.php "$MU_DIR"/
 
+# ---------- 테마 (wordpress/themes/<THEME> → wp-content/themes/<THEME>) ----------
+log "테마 배포"
+wp theme is-installed "$PARENT_THEME" || wp theme install "$PARENT_THEME"
+THEME_DIR=$WEB_ROOT/wp-content/themes/$THEME
+rm -rf "$THEME_DIR" && cp -r "$REPO_DIR/wordpress/themes/$THEME" "$THEME_DIR"
+chown -R "$WP_USER:www-data" "$THEME_DIR"
+find "$THEME_DIR" -type d -exec chmod 750 {} + && find "$THEME_DIR" -type f -exec chmod 640 {} +
+wp theme is-active "$THEME" || wp theme activate "$THEME"
+for t in $(wp theme list --status=inactive --field=name); do
+  if [ "$t" != "$PARENT_THEME" ]; then wp theme delete "$t"; fi
+done
+
 # ---------- 고정 페이지 (wordpress/pages/<slug>.html → 페이지) ----------
 # 파일 첫 줄 <!-- title: 제목 --> 이 페이지 제목. 없으면 만들고, 있으면 내용을 갱신.
 log "고정 페이지 동기화"
@@ -88,6 +103,7 @@ wp option get blogname
 wp option get timezone_string
 wp option get permalink_structure
 wp plugin list --fields=name,status --format=csv
+wp theme list --fields=name,status --format=csv
 for path in / /sitemap.xml /robots.txt /about/ /contact/ /privacy-policy/; do
   curl -s -o /dev/null -w "$path %{http_code}\n" "https://first-lab.kr$path"
 done
