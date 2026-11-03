@@ -133,3 +133,13 @@ def image_block(url: str, alt: str, caption: str = "") -> str:
     return (f'<!-- wp:image {{"sizeSlug":"large"}} -->\n'
             f'<figure class="wp-block-image size-large"><img src="{url}" alt="{alt}"/>{cap}</figure>\n'
             f'<!-- /wp:image -->')
+
+
+if __name__ == "__main__":
+    # 점검용: python -m bot.images  → Cloudflare 이미지 1장 생성 테스트 (워드프레스에는 올리지 않음)
+    from .settings import load_settings
+
+    s = load_settings()
+    if not (s.cf_account_id and s.cf_api_token):
+        raise SystemExit("설정에 Cloudflare 계정 ID / API 토큰이 없습니다")
+    print("생성됨:", cloudflare_image(s.cf_account_id, s.cf_api_token, "a cozy desk with a laptop and coffee"))
