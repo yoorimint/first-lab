@@ -37,7 +37,7 @@ function firstlab_bot_fields(): array {
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
 		'hint_keywords'  => array( 'label' => '우선 주제 (선택)', 'type' => 'textarea', 'default' => '', 'help' => '비워두면 분야 상관없이 자동 발굴. 입력하면 이 단어가 들어간 키워드를 먼저 씀 (한 줄에 하나)' ),
 		'competition_checks' => array( 'label' => '하루 경쟁도 조회 수', 'type' => 'number', 'default' => 40, 'min' => 0, 'max' => 400, 'help' => 'Gemini 구글 검색 연동(무료 한도 내)으로 후보 키워드의 구글 상위 사이트를 확인. Gemini 키 필요' ),
-		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 50, 'min' => 0, 'max' => 300, 'help' => '네이버 API 호출 수 (1회당 연관 키워드 수백 개). 새벽 4시 이후 하루 1번 수집' ),
+		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 1000, 'min' => 0, 'max' => 5000, 'help' => '네이버 키워드 도구 호출 수 (무료, 1회당 연관 키워드 수백 개). 매일 새벽 + 배포 직후 자동 수집' ),
 		'min_volume'     => array( 'label' => '최소 월간 검색량', 'type' => 'number', 'default' => 500, 'min' => 0, 'max' => 10000000 ),
 		'max_volume'     => array( 'label' => '최대 월간 검색량', 'type' => 'number', 'default' => 30000, 'min' => 0, 'max' => 10000000 ),
 		'blocked_words'  => array( 'label' => '추가 금지어', 'type' => 'textarea', 'default' => '', 'help' => '한 줄에 하나. 기본 금지어(의료·장소·쇼핑)에 추가됨' ),

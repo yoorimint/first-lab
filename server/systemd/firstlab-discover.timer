@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily First Lab keyword discovery
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+RandomizedDelaySec=20min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

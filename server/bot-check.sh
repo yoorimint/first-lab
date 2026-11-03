@@ -14,7 +14,9 @@ cd "$REPO_DIR" && python3 -m bot.keywords 다이어트 --top 5 \
   || echo "네이버 검색광고 API: 실패 (키 값을 다시 확인하세요)"
 
 echo -e "\n==> 봇 프로세스"
-systemctl status firstlab-bot.service --no-pager 2>/dev/null | sed -n '1,6p' || true
+systemctl status firstlab-bot.service --no-pager 2>/dev/null | sed -n '1,4p' || true
+systemctl status firstlab-discover.service --no-pager 2>/dev/null | sed -n '1,4p' || true
+journalctl -u firstlab-discover.service -n 5 --no-pager -o cat 2>/dev/null | grep "\[수집\]\|키워드 수집" || true
 ls -la /var/lib/first-lab/bot/ 2>/dev/null || echo "키워드 창고 폴더 없음"
 
 echo -e "\n==> 봇 상태"

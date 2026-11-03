@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS keywords (
 );
 CREATE INDEX IF NOT EXISTS idx_status ON keywords(status);
 CREATE INDEX IF NOT EXISTS idx_total ON keywords(total);
+CREATE TABLE IF NOT EXISTS seeds (          -- 씨앗 단어 사용 기록
+    word      TEXT PRIMARY KEY,
+    used_date TEXT
+);
 """
 
 
@@ -38,6 +42,7 @@ MIGRATIONS = {
     "difficulty": "REAL",      # 경쟁 난이도 0~1 (구글 상위 사이트 기준)
     "comp_info": "TEXT",       # 경쟁 요약 + 상위 도메인
     "comp_checked": "TEXT",    # 경쟁도 조회 날짜
+    "mod_done": "INTEGER DEFAULT 0",  # 롱테일 조합(키워드+방법/신청/...) 탐색 완료 여부
 }
 
 

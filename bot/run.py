@@ -1,6 +1,7 @@
 """봇 실행 진입점. systemd 타이머가 1분마다 실행한다.
 
-  - 하루 1회(새벽 4시 이후 첫 실행): 키워드 창고 확장
+  - (키워드 수집은 별도 작업 firstlab-discover: 매일 + 배포 직후)
+  - 하루 1회: 상위 후보 사전 검토 (안전 검사 + 경쟁도)
   - 관리자가 '지금 글 1개 만들기'를 눌렀으면 → 1개 생성
   - 자동 발행이 켜져 있고, 오늘의 랜덤 발행 시각이 지난 슬롯이 있으면 → 1개 생성
   - 한 번 실행에 글은 최대 1개 (몰아서 발행 방지)
@@ -31,7 +32,6 @@ from .writer import write_article
 KST = ZoneInfo("Asia/Seoul")
 LOCK_FILE = "/run/firstlab-bot.lock"
 MAX_LATE_MINUTES = 180  # 서버 중단 등으로 이보다 늦어진 슬롯은 건너뜀 (몰아서 발행 방지)
-DISCOVER_HOUR = 4       # 키워드 창고 확장 시각(이후 첫 실행)
 MIN_POOL = 30           # 후보가 이보다 적으면 글 쓰기 전에 창고를 조금 확장
 
 
@@ -110,17 +110,6 @@ def main() -> None:
         with connect() as conn:
             for kw in excluded:
                 set_status(conn, kw, "excluded", "관리자 제외")
-
-    # 하루 1회 키워드 창고 확장
-    print(f"[run] {now:%H:%M} 수집일={state.get('discover_date')} 자동발행={settings.enabled}", flush=True)
-    if state.get("discover_date") != today and now.hour >= DISCOVER_HOUR:
-        try:
-            r = discover(settings.discover_calls, settings.hint_keywords)
-            add_log(state, True, f"키워드 수집: API {r['calls']}회, 새 키워드 {r['new']}개 (창고 {r['total']}개)")
-        except Exception as e:  # noqa: BLE001
-            add_log(state, False, f"키워드 수집 실패: {e}")
-        state["discover_date"] = today
-        state["review_date"] = ""  # 수집 후 후보 재검토
 
     # 하루 1회 상위 후보 사전 검토 (안전 검사 + 구글 상위 사이트 경쟁도) → 설정 페이지에 근거 표시
     if state.get("review_date") != today and settings.api_key:

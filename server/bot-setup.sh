@@ -19,7 +19,7 @@ fi
 "$VENV/bin/pip" list 2>/dev/null | grep -iE "^(anthropic|google-genai|openai) "
 
 log "systemd 타이머 (1분마다 실행)"
-install -m 644 "$REPO_DIR"/server/systemd/firstlab-bot.{service,timer} /etc/systemd/system/
+install -m 644 "$REPO_DIR"/server/systemd/firstlab-{bot,discover}.{service,timer} /etc/systemd/system/
 systemctl daemon-reload
 # 이전 버전 코드로 오래 멈춰 있는 실행이 있으면 정리 (12분 초과)
 if systemctl is-active -q firstlab-bot.service; then
@@ -29,5 +29,12 @@ if systemctl is-active -q firstlab-bot.service; then
     echo "오래 멈춘 봇 실행 정리"; systemctl stop firstlab-bot.service
   fi
 fi
-systemctl enable --now firstlab-bot.timer
-systemctl is-active firstlab-bot.timer
+systemctl enable --now firstlab-bot.timer firstlab-discover.timer
+systemctl is-active firstlab-bot.timer firstlab-discover.timer
+
+log "키워드 수집 (배포 직후 바로 시작, 백그라운드)"
+if systemctl is-active -q firstlab-discover.service; then
+  echo "이미 수집 중"
+else
+  systemctl start --no-block firstlab-discover.service && echo "수집 시작됨"
+fi

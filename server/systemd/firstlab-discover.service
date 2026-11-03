@@ -1,0 +1,10 @@
+[Unit]
+Description=First Lab keyword discovery (Naver keyword tool)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/first-lab
+ExecStart=/opt/first-lab-venv/bin/python -m bot.discover
+TimeoutStartSec=3h
+Nice=15

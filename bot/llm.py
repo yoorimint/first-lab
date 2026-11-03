@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import re
 
-TIMEOUT_SECONDS = 240  # AI 응답 최대 대기. 넘으면 실패 처리 (봇이 멈춰 다음 실행을 막지 않게)
+TIMEOUT_SECONDS = 300  # AI 응답 최대 대기. 넘으면 실패 처리 (봇이 멈춰 다음 실행을 막지 않게)
 
 
 class LLMError(RuntimeError):
@@ -42,7 +42,7 @@ class GeminiLLM:
     '사용량 폭주(503)·한도 초과(429)'면 잠시 기다렸다 재시도하고, 그래도 안 되면 다음 모델로 넘어간다."""
 
     RETRY_WAITS = (15, 45)  # 같은 모델 재시도 전 대기(초)
-    BUSY_CODES = (429, 500, 503)
+    BUSY_CODES = (429, 500, 503, 504)  # 폭주·한도·서버 시간초과 → 재시도/다른 모델
 
     def __init__(self, api_key: str, model: str = ""):
         from google import genai
@@ -66,14 +66,27 @@ class GeminiLLM:
         version = lambda n: [int(x) for x in re.findall(r"\d+", n)]  # noqa: E731
         return sorted(names, key=lambda n: ("lite" in n, [-v for v in version(n)]))
 
+    @staticmethod
+    def _thinking(model: str):
+        """생각(추론) 단계를 줄여 응답 시간 단축 → 서버 시간초과(504) 예방. 모델 세대별 설정 방식이 다름."""
+        from google.genai import types
+
+        if model.startswith("gemini-2"):
+            return types.ThinkingConfig(thinking_budget=512)
+        return types.ThinkingConfig(thinking_level=types.ThinkingLevel.LOW)
+
     def generate(self, system: str, prompt: str) -> str:
         import time
 
         from google.genai import errors, types
 
-        config = types.GenerateContentConfig(system_instruction=system, response_mime_type="application/json")
         last_error: Exception | None = None
         for model in self.models[:3]:
+            config = types.GenerateContentConfig(
+                system_instruction=system,
+                response_mime_type="application/json",
+                thinking_config=self._thinking(model),
+            )
             for wait in (*self.RETRY_WAITS, None):
                 try:
                     response = self.client.models.generate_content(model=model, contents=prompt, config=config)
