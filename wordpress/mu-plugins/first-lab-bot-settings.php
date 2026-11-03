@@ -183,7 +183,7 @@ add_action(
 			$list[] = $keyword;
 			update_option( FIRSTLAB_BOT_EXCLUDED, array_values( array_unique( $list ) ), false );
 		}
-		wp_safe_redirect( admin_url( 'options-general.php?page=firstlab-bot#candidates' ) );
+		wp_safe_redirect( admin_url( 'options-general.php?page=firstlab-bot&excluded=1#candidates' ) );
 		exit;
 	}
 );
@@ -206,8 +206,9 @@ function firstlab_bot_render_keywords( array $state ): void {
 		<br><span class="description">현황은 1시간마다(또는 글 작성 시) 갱신됩니다. 마지막 갱신: <?php echo esc_html( $state['dashboard_at'] ?? '-' ); ?></span>
 	</p>
 
-	<h3 id="candidates">다음 글감 후보 (점수순)</h3>
-	<table class="widefat striped" style="max-width:720px">
+	<details id="candidates" style="margin:1em 0" <?php echo isset( $_GET['excluded'] ) ? 'open' : ''; // 제외 누른 뒤에는 펼친 상태 유지 ?>>
+		<summary style="cursor:pointer;font-weight:600;font-size:1.1em">다음 글감 후보 보기 (점수순 <?php echo count( (array) ( $state['candidates'] ?? array() ) ); ?>개) ▾</summary>
+	<div style="overflow-x:auto"><table class="widefat striped" style="max-width:900px">
 		<thead><tr><th>키워드</th><th>월간 검색</th><th>롱테일의 원 키워드</th><th>구글 상위 경쟁 (난이도 0~1)</th><th>점수</th><th>상태</th><th></th></tr></thead>
 		<tbody>
 		<?php foreach ( (array) ( $state['candidates'] ?? array() ) as $c ) : ?>
@@ -245,8 +246,9 @@ function firstlab_bot_render_keywords( array $state ): void {
 			<tr><td colspan="7">아직 후보가 없습니다. 키워드 수집이 끝나면 표시됩니다.</td></tr>
 		<?php endif; ?>
 		</tbody>
-	</table>
+	</table></div>
 	<p class="description">'미검사' 후보는 글을 쓰기 직전에 AI 안전 검사(인물·정치·종교·의료 등 제외)를 거칩니다. 경쟁 난이도는 구글 상위 출처 중 대형 사이트(정부·위키·언론·대기업) 비율이며, 0.8 이상은 글감에서 제외됩니다.</p>
+	</details>
 	<?php
 }
 
