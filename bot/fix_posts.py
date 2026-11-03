@@ -33,8 +33,8 @@ def _classify_uncategorized(posts: list[dict]) -> None:
 
     targets = []
     for p in posts:
-        cats = wp_cli("post", "term", "list", str(p["ID"]), "category", "--field=slug").split()
-        if not cats or cats == ["uncategorized"]:
+        cats = set(wp_cli("post", "term", "list", str(p["ID"]), "category", "--field=name").split())
+        if cats <= {"미분류", "Uncategorized"}:  # 한국어 설치본은 기본 카테고리 이름이 '미분류'
             targets.append(p)
     if not targets:
         return
