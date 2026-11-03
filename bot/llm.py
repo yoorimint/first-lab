@@ -75,6 +75,18 @@ class GeminiLLM:
         return sorted(names, key=lambda n: ("lite" in n, [-v for v in version(n)]))
 
     @staticmethod
+    def _quota_message(detail: str) -> str:
+        """구글 오류 내용에서 어떤 한도인지 구분 (분당/하루). 한도는 API 키가 아니라 '프로젝트' 단위."""
+        if "PerMinute" in detail:
+            kind = "분당 요청 한도 초과 (잠시 후 풀림)"
+        elif "PerDay" in detail:
+            kind = "하루 무료 한도 소진 (매일 오후 4~5시경 초기화)"
+        else:
+            kind = "사용 한도 초과"
+        quota = re.search(r"quotaId['\"]?:\s*['\"]([^'\"]+)", detail)
+        return f"Gemini {kind}{' [' + quota.group(1) + ']' if quota else ''}. 한도는 키가 아니라 구글 프로젝트 단위입니다"
+
+    @staticmethod
     def _thinking(model: str):
         """생각(추론) 단계를 줄여 응답 시간 단축 → 서버 시간초과(504) 예방. 모델 세대별 설정 방식이 다름."""
         from google.genai import types
@@ -112,8 +124,7 @@ class GeminiLLM:
                         break  # 이 모델 포기 → 다음 모델
                     time.sleep(wait)
         if getattr(last_error, "code", None) == self.QUOTA_CODE:
-            raise LLMBusy("Gemini 무료 하루 한도를 다 썼습니다 (매일 오후 4~5시경 초기화). "
-                           "설정에서 유료 키 또는 다른 AI로 바꾸면 계속 쓸 수 있습니다")
+            raise LLMBusy(self._quota_message(str(last_error)))
         raise LLMBusy(f"Gemini 서버가 혼잡합니다 ({getattr(last_error, 'code', '')})")
 
 
