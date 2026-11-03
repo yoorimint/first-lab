@@ -19,6 +19,7 @@ from .settings import wp_cli
 STATE_OPTION = "firstlab_bot_state"
 REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
+DICT_KEYS = ("plan", "done", "refresh")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
 MAX_LOG = 30
 MAX_USED = 2000
 
@@ -30,6 +31,10 @@ def load_state() -> dict:
         state = {}
     for key, default in (("plan", {}), ("done", {}), ("used_keywords", []), ("log", [])):
         state.setdefault(key, default)
+    # 워드프레스(PHP)를 거치면 빈 사전 {} 이 빈 목록 [] 으로 바뀌어 돌아온다 → 사전으로 되돌림
+    for key in DICT_KEYS:
+        if key in state and not isinstance(state[key], dict):
+            state[key] = {}
     return state
 
 

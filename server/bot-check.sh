@@ -26,6 +26,3 @@ echo -e "\n==> 봇 오류 (systemd, 최근)"
 journalctl -u firstlab-bot.service --since "-5min" --no-pager -o cat 2>/dev/null \
   | grep -vE "pam_unix|Starting|Finished|Deactivated|Consumed" | tail -15 || true
 
-echo -e "\n==> [임시] 키워드 수집 오류 원인 (오늘 로그)"
-journalctl -u firstlab-discover.service --since "today" --no-pager -o short-iso 2>/dev/null | tail -40 || true
-
