@@ -4,7 +4,7 @@ name: Deploy server config
 on:
   push:
     branches: [main]
-    paths: ["server/**", ".github/workflows/deploy.yml"]
+    paths: ["server/**", "wordpress/**", ".github/workflows/deploy.yml"]
   workflow_dispatch: # GitHub 화면에서 수동 실행도 가능
 
 concurrency:

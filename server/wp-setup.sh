@@ -2,6 +2,8 @@
 # first-lab.kr 워드프레스 기본/SEO 설정 (WP-CLI 사용, 여러 번 실행해도 안전)
 set -euo pipefail
 
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
 # ===== 설정값 (여기만 고치면 됨) =====
 SITE=first-lab
 WEB_ROOT=/var/www/$SITE
@@ -51,6 +53,12 @@ for p in "${PLUGINS_INSTALL[@]}"; do
   wp plugin is-installed "$p" || wp plugin install "$p"
   wp plugin is-active "$p"   || wp plugin activate "$p"
 done
+
+# ---------- 저장소의 mu-plugins 배포 (wordpress/mu-plugins → wp-content/mu-plugins) ----------
+log "mu-plugins 배포"
+MU_DIR=$WEB_ROOT/wp-content/mu-plugins
+install -d -o "$WP_USER" -g www-data -m 750 "$MU_DIR"
+install -o "$WP_USER" -g www-data -m 640 "$REPO_DIR"/wordpress/mu-plugins/*.php "$MU_DIR"/
 
 # ---------- 페이지 캐시 비우기 (변경 즉시 반영) ----------
 rm -rf /var/cache/nginx/$SITE/*
