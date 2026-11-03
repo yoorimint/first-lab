@@ -95,6 +95,7 @@ def main() -> None:
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)  # 이전 실행이 아직 작업 중이면 건너뜀
     except BlockingIOError:
+        print("[run] 이전 실행이 아직 진행 중 → 건너뜀", flush=True)
         return
 
     settings = load_settings()
@@ -111,6 +112,7 @@ def main() -> None:
                 set_status(conn, kw, "excluded", "관리자 제외")
 
     # 하루 1회 키워드 창고 확장
+    print(f"[run] {now:%H:%M} 수집일={state.get('discover_date')} 자동발행={settings.enabled}", flush=True)
     if state.get("discover_date") != today and now.hour >= DISCOVER_HOUR:
         try:
             r = discover(settings.discover_calls, settings.hint_keywords)
