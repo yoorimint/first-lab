@@ -207,13 +207,14 @@ function firstlab_bot_render_keywords( array $state ): void {
 
 	<h3 id="candidates">다음 글감 후보 (점수순)</h3>
 	<table class="widefat striped" style="max-width:720px">
-		<thead><tr><th>키워드</th><th>월간 검색</th><th>점수</th><th>상태</th><th></th></tr></thead>
+		<thead><tr><th>키워드</th><th>월간 검색</th><th>롱테일의 원 키워드</th><th>점수</th><th>상태</th><th></th></tr></thead>
 		<tbody>
 		<?php foreach ( (array) ( $state['candidates'] ?? array() ) as $c ) : ?>
 			<?php $is_pending = in_array( $c['keyword'], $pending, true ); ?>
 			<tr>
 				<td><?php echo esc_html( $c['keyword'] ); ?></td>
 				<td><?php echo number_format( (int) $c['total'] ); ?></td>
+				<td><?php echo esc_html( $c['head'] ?? '' ); ?></td>
 				<td><?php echo esc_html( $c['score'] ); ?></td>
 				<td><?php echo esc_html( $labels[ $c['status'] ] ?? $c['status'] ); ?></td>
 				<td>
@@ -231,7 +232,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 			</tr>
 		<?php endforeach; ?>
 		<?php if ( empty( $state['candidates'] ) ) : ?>
-			<tr><td colspan="5">아직 후보가 없습니다. 키워드 수집이 끝나면 표시됩니다.</td></tr>
+			<tr><td colspan="6">아직 후보가 없습니다. 키워드 수집이 끝나면 표시됩니다.</td></tr>
 		<?php endif; ?>
 		</tbody>
 	</table>

@@ -6,7 +6,7 @@ import random
 from .keyword_db import norm, set_status
 from .keyword_filter import is_allowed
 from .safety import classify
-from .scoring import score
+from .scoring import find_head, score
 from .settings import BotSettings
 
 SAFETY_BATCH = 15  # 한 번의 AI 호출로 검사할 후보 수
@@ -20,6 +20,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         (settings.min_volume, settings.max_volume),
     ).fetchall()
     used = [r["norm"] for r in conn.execute("SELECT norm FROM keywords WHERE status='used'")]
+    volumes = {r["norm"]: r["total"] for r in conn.execute("SELECT norm, total FROM keywords")}
     hints = [norm(h) for h in settings.hint_keywords]
 
     def overlaps_used(n: str) -> bool:  # '다이어트식단' vs '다이어트식단표' 같은 중복 방지
@@ -29,10 +30,12 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     for r in rows:
         if not is_allowed(r["keyword"], settings.blocked_words) or overlaps_used(r["norm"]):
             continue
-        sc = score(r["keyword"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"])
+        head = find_head(r["norm"], r["total"], volumes)
+        sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
         if hints and any(h in r["norm"] for h in hints):
             sc += 100  # 힌트 키워드 관련이면 최우선
-        result.append({"keyword": r["keyword"], "total": r["total"], "score": round(sc, 2), "status": r["status"]})
+        result.append({"keyword": r["keyword"], "total": r["total"], "score": round(sc, 2),
+                       "status": r["status"], "head": head or ""})
     result.sort(key=lambda x: x["score"], reverse=True)
     return result[:limit]
 

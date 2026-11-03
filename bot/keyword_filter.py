@@ -12,11 +12,13 @@ LOCAL = ["근처", "주변", "가까운", "맛집", "헬스장", "피트니스",
 # 쇼핑·브랜드: 쇼핑몰/공식 사이트가 상위 독점
 SHOPPING = ["가격비교", "최저가", "쿠팡", "구매", "판매", "할인코드"]
 
+# 경험 후기형: AI가 실제 경험 없이 쓰면 허위 후기가 됨 (구글·공정위 문제)
+REVIEW = ["후기", "리뷰", "내돈내산", "솔직", "사용기", "체험"]
 # 정치·종교: 애드센스 민감 주제 + 운영자 결정으로 제외
 POLITICS_RELIGION = ["대통령", "국회", "정당", "선거", "투표", "탄핵", "민주당", "국민의힘",
                      "교회", "성당", "사찰", "불교", "기독교", "천주교", "이슬람"]  # 애매한 건 AI 안전 검사가 거름
 
-BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING + POLITICS_RELIGION
+BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING + REVIEW + POLITICS_RELIGION
 
 
 def is_allowed(keyword: str, extra_blocked: list[str] | None = None) -> bool:
@@ -26,7 +28,7 @@ def is_allowed(keyword: str, extra_blocked: list[str] | None = None) -> bool:
 
 # 질문형(롱테일) 신호: 정보를 찾는 검색 → 글 한 편으로 답하기 좋음
 QUESTION_WORDS = ["방법", "하는법", "신청", "조건", "자격", "기간", "기준", "차이", "뜻", "의미",
-                  "비용", "순서", "준비물", "종류", "추천", "계산", "정리", "주의사항", "후기", "꿀팁"]
+                  "비용", "순서", "준비물", "계산", "정리", "주의사항", "서류", "기한", "되나요", "가능"]
 
 
 def is_question(keyword: str) -> bool:
