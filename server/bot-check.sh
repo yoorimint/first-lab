@@ -22,6 +22,9 @@ ls -la /var/lib/first-lab/bot/ 2>/dev/null || echo "키워드 창고 폴더 없�
 echo -e "\n==> 봇 상태"
 /opt/first-lab-venv/bin/python -m bot.status 2>&1 | tail -12 || true
 
+echo -e "\n==> [임시] 최근 초안 본문 (품질 점검용)"
+/opt/first-lab-venv/bin/python -m bot.export_post 23 15 2>&1 || true
+
 echo -e "\n==> 봇 오류 (systemd, 최근)"
 journalctl -u firstlab-bot.service --since "-5min" --no-pager -o cat 2>/dev/null \
   | grep -vE "pam_unix|Starting|Finished|Deactivated|Consumed" | tail -15 || true
