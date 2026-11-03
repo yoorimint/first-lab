@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 
-from .keyword_filter import is_question
+from .keyword_filter import is_brand, is_question
 
 WEIGHTS = {
     "volume": 1.0,       # log10(검색량), VOLUME_CAP 이상은 가산 없음
@@ -19,6 +19,7 @@ WEIGHTS = {
     "ad_clicks": 0.3,    # log10(1+광고클릭)
     "rising": 3.0,       # 이전 조회 대비 1.5배 이상 상승 (갑자기 는 수요는 아직 글이 적을 가능성이 큼)
     "head_penalty": -1.5,  # 롱테일이 아닌 큰 키워드 (대형 사이트와 정면 경쟁)
+    "brand": -3.0,       # 브랜드·회사 이름 포함 (가격 변동 잦고 공식 사이트 우세) - 목록은 keyword_filter.BRANDS
 }
 VOLUME_CAP = 3000        # 이 이상 검색량은 점수에 더 반영하지 않음
 LONGTAIL_MAX = 10000     # 이보다 크면 헤드를 포함해도 롱테일로 보지 않음
@@ -53,4 +54,6 @@ def score(keyword: str, norm: str, total: int, ad_comp: str | None, ad_clicks: f
     s += WEIGHTS["ad_clicks"] * math.log10(1 + max(ad_clicks, 0))
     if prev_total and total >= prev_total * 1.5:
         s += WEIGHTS["rising"]
+    if is_brand(keyword):
+        s += WEIGHTS["brand"]
     return round(s, 2)
