@@ -85,4 +85,6 @@ for i in 1 2; do
 done
 systemctl is-active php$PHP_VER-fpm nginx sajuday
 ps -o user=,cmd= -C php-fpm$PHP_VER | sort | uniq -c
+# 오래된 백업 정리 (최근 5개 유지)
+ls -dt /root/backup-$SITE-* 2>/dev/null | tail -n +6 | xargs -r rm -rf
 echo -e "\n완료! (백업 위치: $BACKUP)"
