@@ -19,4 +19,9 @@
 
 필요한 저장소 Secrets: `SERVER_HOST`, `SERVER_USER`, `SERVER_PASSWORD`
 
+## 자동 발행 봇 (`bot/`)
+- 표준 라이브러리만 사용 (서버에 추가 설치 없음)
+- 키는 서버의 `/etc/first-lab/secrets.env` 에만 저장. 입력: `bash /opt/first-lab/server/set-secrets.sh 키이름 ...`
+- 검색량 조회: `cd /opt/first-lab && python3 -m bot.keywords 다이어트`
+
 > 공개 저장소이므로 비밀번호·API 키는 절대 커밋하지 않는다.
