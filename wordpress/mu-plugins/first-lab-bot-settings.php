@@ -216,7 +216,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 			<tr>
 				<td><?php echo esc_html( $c['keyword'] ); ?></td>
 				<td><?php echo number_format( (int) $c['total'] ); ?></td>
-				<td><?php echo esc_html( $c['head'] ?? '' ); ?></td>
+				<td><?php echo esc_html( $c['head'] ?? '' ); ?><?php echo ! empty( $c['gsc'] ) ? '<br><strong>' . esc_html( $c['gsc'] ) . '</strong>' : ''; ?></td>
 				<td>
 					<?php
 					if ( isset( $c['difficulty'] ) && null !== $c['difficulty'] ) {
@@ -291,15 +291,23 @@ function firstlab_bot_render_status(): void {
 
 	<?php firstlab_bot_render_keywords( $state ); ?>
 
-	<h2>최근 기록</h2>
-	<ul>
-		<?php foreach ( array_slice( (array) ( $state['log'] ?? array() ), 0, 10 ) as $entry ) : ?>
-			<li><?php echo make_clickable( esc_html( ( $entry['ok'] ? '✅ ' : '❌ ' ) . $entry['time'] . '  ' . $entry['msg'] ) ); ?></li>
-		<?php endforeach; ?>
-		<?php if ( empty( $state['log'] ) ) : ?>
-			<li>기록 없음</li>
-		<?php endif; ?>
-	</ul>
+	<?php $logs = (array) ( $state['log'] ?? array() ); ?>
+	<details style="margin:1em 0">
+		<summary style="cursor:pointer;font-weight:600;font-size:1.1em">
+			최근 기록 ▾
+			<?php if ( $logs ) : ?>
+				<span style="font-weight:normal"> — <?php echo esc_html( ( $logs[0]['ok'] ? '✅ ' : '❌ ' ) . $logs[0]['time'] . ' ' . mb_substr( $logs[0]['msg'], 0, 40 ) . '…' ); ?></span>
+			<?php endif; ?>
+		</summary>
+		<ul>
+			<?php foreach ( array_slice( $logs, 0, 15 ) as $entry ) : ?>
+				<li><?php echo make_clickable( esc_html( ( $entry['ok'] ? '✅ ' : '❌ ' ) . $entry['time'] . '  ' . $entry['msg'] ) ); ?></li>
+			<?php endforeach; ?>
+			<?php if ( ! $logs ) : ?>
+				<li>기록 없음</li>
+			<?php endif; ?>
+		</ul>
+	</details>
 	<hr>
 	<?php
 }

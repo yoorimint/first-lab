@@ -9,12 +9,14 @@ from .keyword_filter import is_allowed, is_question
 from .llm import LLMBusy
 from .safety import classify
 from .scoring import find_head, score
+from .search_console import load_signals
 from .settings import BotSettings
 
 SAFETY_BATCH = 15  # 한 번의 AI 호출로 검사할 후보 수
 PICK_FROM_TOP = 3  # 통과한 상위 N개 중 무작위 → 매번 같은 유형만 쓰지 않게
 PER_HEAD = 2       # 같은 원 키워드(헤드)에서 나온 후보는 상위 목록에 최대 N개 (주제 쏠림 방지)
 COMP_WEIGHT = 3.0  # 경쟁 난이도 반영: 점수 += COMP_WEIGHT × (0.5 - 난이도)  → 쉬우면 가산, 어려우면 감점
+GSC_BONUS = {"opportunity": 5.0, "good_head": 1.0, "bad_head": -1.5}  # 서치콘솔 성과 반영
 TOO_HARD = 0.8     # 이 이상이면 글감에서 제외 (상위 대부분이 대형 사이트)
 COMP_PER_RUN = 3   # 글 1개 쓸 때 경쟁도를 새로 조회할 최대 후보 수
 
@@ -33,13 +35,16 @@ def _core(n: str) -> str:
 def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict]:
     """점수순 후보 (안전 검사 전). 이미 쓴 글과 겹치는 키워드는 제외."""
     latest = conn.execute("SELECT MAX(last_checked) FROM keywords").fetchone()[0]
-    rows = conn.execute(  # 가장 최근 수집일(=오늘)의 키워드만 후보
-        "SELECT * FROM keywords WHERE status IN ('new','ok') AND last_checked=? AND total BETWEEN ? AND ?",
+    rows = conn.execute(  # 가장 최근 수집일(=오늘)의 키워드 + 서치콘솔 기회 키워드(검색량 범위 무관)
+        "SELECT * FROM keywords WHERE status IN ('new','ok') AND ("
+        " (last_checked=? AND total BETWEEN ? AND ?)"
+        " OR norm IN (SELECT norm FROM gsc_signals WHERE kind='opportunity'))",
         (latest, settings.min_volume, settings.max_volume),
     ).fetchall()
     used = [r["norm"] for r in conn.execute("SELECT norm FROM keywords WHERE status='used'")]
     volumes = {r["norm"]: r["total"] for r in conn.execute("SELECT norm, total FROM keywords")}
     hints = [norm(h) for h in settings.hint_keywords]
+    signals = load_signals(conn)
 
     used_cores = {_core(u) for u in used}
 
@@ -61,11 +66,16 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
             if r["difficulty"] >= TOO_HARD:
                 continue
             sc += COMP_WEIGHT * (0.5 - r["difficulty"])
+        gsc = signals.get(r["norm"]) or signals.get(head or "")
+        if gsc:
+            sc += GSC_BONUS[gsc]
         if hints and any(h in r["norm"] for h in hints):
             sc += 100  # 힌트 키워드 관련이면 최우선
         result.append({"keyword": r["keyword"], "total": r["total"], "score": round(sc, 2),
                        "status": r["status"], "head": head or "",
-                       "difficulty": r["difficulty"], "comp_info": r["comp_info"] or ""})
+                       "difficulty": r["difficulty"], "comp_info": r["comp_info"] or "",
+                       "gsc": {"opportunity": "서치콘솔 기회", "good_head": "잘 되는 주제",
+                               "bad_head": "안 되는 주제"}.get(gsc or "", "")})
     result.sort(key=lambda x: x["score"], reverse=True)
     picked, per_head = [], {}
     for c in result:

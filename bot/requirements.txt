@@ -2,3 +2,5 @@
 anthropic>=1,<2
 google-genai>=1
 openai>=1
+google-auth>=2
+requests>=2  # 서치콘솔 API 인증

@@ -7,10 +7,12 @@ from .writer import Article
 SITE_URL = "https://first-lab.kr"
 
 
-def publish(article: Article, status: str) -> tuple[int, str]:
+def publish(article: Article, status: str, slug: str = "") -> tuple[int, str]:
+    """slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다."""
     post_id = int(wp_cli(
         "post", "create",
         f"--post_title={article.title}",
+        *([f"--post_name={slug}"] if slug else []),
         f"--post_content={article.content_html}",
         f"--post_excerpt={article.excerpt}",
         f"--post_status={status}",

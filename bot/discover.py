@@ -98,6 +98,21 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
     return {**stats, **info}
 
 
+def _apply_search_console() -> str:
+    from . import search_console
+
+    if not search_console.available():
+        return "서치콘솔: 미연동"
+    try:
+        rows = search_console.fetch()
+        with connect() as conn:
+            r = search_console.update_signals(conn, rows)
+        return (f"서치콘솔: 검색어 {r['rows']}건 → 기회 키워드 {r['opportunity']}, "
+                f"잘 되는 주제 {r['good_head']}, 안 되는 주제 {r['bad_head']}")
+    except Exception as e:  # noqa: BLE001 - 서치콘솔 오류가 수집을 막지 않게
+        return f"서치콘솔 오류: {e}"
+
+
 def main() -> None:
     """systemd 일일 작업 진입점: 결과를 봇 기록에 남긴다."""
     from .settings import load_settings
@@ -113,6 +128,7 @@ def main() -> None:
         msg = (f"오늘의 키워드 수집: API {r['calls']}회, 급상승어 {r['trends']}개 포함, "
                f"새 키워드 {r['new']:,}개 (보관 {r['total']:,}개, {int(time.time() - started)}초)")
         ok = True
+        msg += " / " + _apply_search_console()
     except Exception as e:  # noqa: BLE001
         msg, ok = f"키워드 수집 실패: {e}", False
     print(msg, flush=True)
