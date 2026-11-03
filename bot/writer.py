@@ -22,7 +22,7 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 전문 �
  "excerpt": "검색 결과 설명문 (120자 이내)",
  "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong 태그만 사용, h1 금지)",
  "tags": ["태그1", "태그2", "태그3"],
- "image_query": "본문에 어울리는 사진 검색어 (영어 2~4단어, 예: jeju island beach)"}"""
+ "image_query": "본문에 어울리는 이미지 설명 (영어 한 문장, 사람 얼굴 클로즈업·글자 없이. 예: a quiet street in Jeju island with stone walls and tangerine trees)"}"""
 
 
 @dataclass

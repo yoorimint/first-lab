@@ -1,7 +1,8 @@
 """글 이미지.
 
   - 대표 이미지: 제목 카드 자동 생성 (무료, 저작권 걱정 없음, 글마다 고유)
-  - 본문 사진: Pexels 무료 사진 1장 (설정에 Pexels 키가 있을 때만, 상업적 사용 무료)
+  - 본문 이미지: Cloudflare Workers AI (FLUX schnell) 무료 생성 1장 (설정에 Cloudflare 계정 ID·토큰이 있을 때)
+    무료 한도: 하루 10,000 뉴런 (1024px 1장 약 58뉴런 → 하루 100장 이상)
 이미지는 워드프레스 미디어에 직접 올려서 쓴다 (외부 링크 의존 X).
 """
 from __future__ import annotations
@@ -10,7 +11,6 @@ import hashlib
 import json
 import os
 import shutil
-import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -93,22 +93,31 @@ def _save(img, name: str) -> Path:
     return path
 
 
-def pexels_photo(api_key: str, query: str) -> dict | None:
-    """Pexels 에서 가로 사진 1장 검색 → 내려받기. {'path','photographer','url'}"""
-    params = urllib.parse.urlencode({"query": query, "per_page": 5, "orientation": "landscape"})
-    req = urllib.request.Request(f"https://api.pexels.com/v1/search?{params}", headers={"Authorization": api_key})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        photos = json.load(resp).get("photos", [])
-    if not photos:
-        return None
-    photo = photos[0]
-    TMP_DIR.mkdir(parents=True, exist_ok=True)
-    path = TMP_DIR / f"pexels-{photo['id']}.jpg"
-    img_req = urllib.request.Request(photo["src"]["large"], headers={"User-Agent": "first-lab-bot"})
-    with urllib.request.urlopen(img_req, timeout=30) as resp:
-        path.write_bytes(resp.read())
-    shutil.chown(path, WP_USER, WP_USER)
-    return {"path": path, "photographer": photo.get("photographer", ""), "url": photo.get("url", "")}
+CF_MODEL = "@cf/black-forest-labs/flux-1-schnell"
+CF_STEPS = 4            # 생성 단계 (많을수록 품질↑·비용↑, 최대 8)
+BODY_SIZE = (1200, 675)  # 본문 이미지 16:9
+STYLE = ("realistic editorial photo, natural light, clean composition, "
+         "no text, no letters, no watermark, no logo")
+
+
+def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:
+    """Cloudflare Workers AI 로 이미지 생성 → 16:9 로 잘라 저장."""
+    import base64
+    import io
+
+    from PIL import Image, ImageOps
+
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{CF_MODEL}"
+    body = json.dumps({"prompt": f"{prompt}. {STYLE}", "steps": CF_STEPS}).encode()
+    req = urllib.request.Request(url, data=body, method="POST", headers={
+        "Authorization": f"Bearer {api_token}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=90) as resp:
+        data = json.load(resp)
+    if not data.get("success") or not data.get("result", {}).get("image"):
+        raise RuntimeError(f"Cloudflare 이미지 생성 실패: {data.get('errors')}")
+    img = Image.open(io.BytesIO(base64.b64decode(data["result"]["image"]))).convert("RGB")
+    img = ImageOps.fit(img, BODY_SIZE)  # 가운데 기준으로 16:9 자르기
+    return _save(img, f"ai-{hashlib.md5(prompt.encode()).hexdigest()[:10]}.jpg")
 
 
 def import_media(path: Path, title: str, alt: str) -> tuple[int, str]:

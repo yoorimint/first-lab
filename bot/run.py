@@ -78,10 +78,11 @@ def create_one(settings: BotSettings) -> str:
             raise RuntimeError("안전 검사를 통과한 후보가 없습니다. 새벽 키워드 수집 후 다시 시도됩니다")
         article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
                                 persona=settings.persona)
-        post_id, link = publish(article, settings.post_status, slug=keyword, pexels_key=settings.pexels_key)
+        post_id, link, image_note = publish(article, settings.post_status, slug=keyword,
+                                            cloudflare=(settings.cf_account_id, settings.cf_api_token))
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = "발행" if settings.post_status == "publish" else "초안 저장"
-    return f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}) {link}"
+    return f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}) {link}"
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:

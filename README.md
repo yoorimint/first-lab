@@ -35,7 +35,8 @@
 | `safety.py` | AI 안전 검사 (인물·정치·종교·의료·장소찾기 등 제외) |
 | `select_keyword.py` | 후보 선정. 점검: `python -m bot.select_keyword` |
 | `llm.py` | AI 제공사 교체 (Gemini/Claude/OpenAI) |
-| `writer.py` / `publisher.py` | 글 작성(JSON) / 워드프레스 저장 |
+| `writer.py` / `publisher.py` | 글 작성(JSON) / 워드프레스 저장 (블록 형식) |
+| `images.py` / `blocks.py` | 대표 이미지(제목 카드) + 본문 AI 이미지(Cloudflare Workers AI 무료) / HTML→블록 변환 |
 | `settings.py` / `state.py` | 설정 페이지 값 읽기 / 실행 기록·현황 저장 |
 
 - 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`)
