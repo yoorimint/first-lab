@@ -22,6 +22,7 @@ class KeywordStat:
     pc: int
     mobile: int
     ad_competition: str  # 광고 경쟁도(낮음/중간/높음) - 블로그 경쟁도와는 다름
+    ad_clicks: float = 0.0  # 월평균 광고 클릭 수(PC+모바일) - 광고주 관심도 = 애드센스 단가 추정 지표
 
     @property
     def total(self) -> int:
@@ -30,9 +31,19 @@ class KeywordStat:
 
 def _to_int(value) -> int:
     """API는 검색량이 적으면 '< 10' 문자열을 준다 → 5로 간주."""
+    return int(_to_float(value, small=5))
+
+
+def _to_float(value, small: float = 0.0) -> float:
     if isinstance(value, (int, float)):
-        return int(value)
-    return 5 if str(value).strip().startswith("<") else int(value)
+        return float(value)
+    text = str(value).strip()
+    if not text or text.startswith("<"):
+        return small
+    try:
+        return float(text)
+    except ValueError:
+        return 0.0
 
 
 class NaverAdsClient:
@@ -70,6 +81,16 @@ class NaverAdsClient:
                 pc=_to_int(item["monthlyPcQcCnt"]),
                 mobile=_to_int(item["monthlyMobileQcCnt"]),
                 ad_competition=item.get("compIdx", ""),
+                ad_clicks=_to_float(item.get("monthlyAvePcClkCnt")) + _to_float(item.get("monthlyAveMobileClkCnt")),
             )
             for item in data.get("keywordList", [])
         ]
+
+
+def ads_client() -> NaverAdsClient:
+    """서버 secrets.env 의 검색광고 키로 클라이언트 생성."""
+    from .config import load_secrets, require
+
+    return NaverAdsClient(*require(
+        load_secrets(), "NAVER_AD_CUSTOMER_ID", "NAVER_AD_ACCESS_LICENSE", "NAVER_AD_SECRET_KEY"
+    ))

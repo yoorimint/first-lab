@@ -20,16 +20,23 @@
 필요한 저장소 Secrets: `SERVER_HOST`, `SERVER_USER`, `SERVER_PASSWORD`
 
 ## 자동 발행 봇 (`bot/`)
-- 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`). 봇은 `bot/settings.py` 로 읽음. 점검: `python3 -m bot.settings`
-- 실행: systemd 타이머가 1분마다 `python -m bot.run` (가상환경 `/opt/first-lab-venv`). 수동 발행 버튼 → 요청 옵션 → 봇이 처리
-- 글감: 힌트 키워드(선택) 또는 `bot/seeds.py` 기본 주제 풀에서 무작위 → 네이버 연관 키워드·검색량으로 선정. 옵션으로 구글 급상승 검색어 참고
-- 자동 발행: 설정의 발행 시각 ± 랜덤 분 (날짜별로 고정된 무작위), 실행당 최대 1개
-- 즉시 테스트: `cd /opt/first-lab && /opt/first-lab-venv/bin/python -m bot.run --now`
-- API 키: 설정 페이지 값 우선, 없으면 `/etc/first-lab/secrets.env`
-- 표준 라이브러리만 사용 (서버에 추가 설치 없음)
-- 키는 서버의 `/etc/first-lab/secrets.env` 에만 저장. 입력: `bash /opt/first-lab/server/set-secrets.sh 키이름 ...`
-- 검색량 조회: `cd /opt/first-lab && python3 -m bot.keywords 다이어트`
-- 발행 후보 키워드: `python3 -m bot.find_keywords 다이어트 홈트` (검색량 범위 + 질문형 우선, 금지어·질문형 단어는 `bot/keyword_filter.py`)
-- `bot/naver_search.py`: 네이버 검색 API(블로그 글 수). 현재 권한이 없어 미사용, 권한이 생기면 경쟁도 계산에 연결
+흐름: **키워드 창고 확장 → 점수 → AI 안전 검사 → 글쓰기 → 초안/발행**
+
+| 파일 | 역할 |
+|---|---|
+| `run.py` | 진입점. systemd 타이머가 1분마다 실행 (수동 요청, 자동 발행 시각, 하루 1회 창고 확장) |
+| `discover.py` / `seeds.py` | 눈덩이 방식 키워드 발굴 (급상승어 + 창고 키워드 확장, 창고가 작을 땐 시동용 씨앗) |
+| `keyword_db.py` | 키워드 창고 SQLite (`/var/lib/first-lab/bot/keywords.db`) |
+| `scoring.py` | 점수 가중치 (`WEIGHTS`) |
+| `keyword_filter.py` | 금지어·질문형 단어 목록 |
+| `safety.py` | AI 안전 검사 (인물·정치·종교·의료·장소찾기 등 제외) |
+| `select_keyword.py` | 후보 선정. 점검: `python -m bot.select_keyword` |
+| `llm.py` | AI 제공사 교체 (Gemini/Claude/OpenAI) |
+| `writer.py` / `publisher.py` | 글 작성(JSON) / 워드프레스 저장 |
+| `settings.py` / `state.py` | 설정 페이지 값 읽기 / 실행 기록·현황 저장 |
+
+- 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`)
+- 서버 명령 (가상환경): `cd /opt/first-lab && /opt/first-lab-venv/bin/python -m bot.run --now`
+- 키: 설정 페이지 값 우선, 없으면 `/etc/first-lab/secrets.env` (`server/set-secrets.sh` 로 입력)
 
 > 공개 저장소이므로 비밀번호·API 키는 절대 커밋하지 않는다.

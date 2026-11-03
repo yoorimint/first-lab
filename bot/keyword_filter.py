@@ -12,7 +12,11 @@ LOCAL = ["근처", "주변", "가까운", "맛집", "헬스장", "피트니스",
 # 쇼핑·브랜드: 쇼핑몰/공식 사이트가 상위 독점
 SHOPPING = ["가격비교", "최저가", "쿠팡", "구매", "판매", "할인코드"]
 
-BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING
+# 정치·종교: 애드센스 민감 주제 + 운영자 결정으로 제외
+POLITICS_RELIGION = ["대통령", "국회", "정당", "선거", "투표", "탄핵", "민주당", "국민의힘",
+                     "교회", "성당", "사찰", "불교", "기독교", "천주교", "이슬람"]  # 애매한 건 AI 안전 검사가 거름
+
+BLOCKED_WORDS = MEDICAL + LOCAL + SHOPPING + POLITICS_RELIGION
 
 
 def is_allowed(keyword: str, extra_blocked: list[str] | None = None) -> bool:

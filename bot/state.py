@@ -18,6 +18,7 @@ from .settings import wp_cli
 
 STATE_OPTION = "firstlab_bot_state"
 REQUEST_OPTION = "firstlab_bot_request"
+EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
 MAX_LOG = 30
 MAX_USED = 2000
 
@@ -52,3 +53,13 @@ def pop_manual_request() -> bool:
         return False
     wp_cli("option", "delete", REQUEST_OPTION)
     return True
+
+
+def pop_excluded() -> list[str]:
+    try:
+        items = json.loads(wp_cli("option", "get", EXCLUDE_OPTION, "--format=json") or "[]")
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        return []
+    if items:
+        wp_cli("option", "delete", EXCLUDE_OPTION)
+    return [str(x) for x in items] if isinstance(items, list) else []

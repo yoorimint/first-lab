@@ -35,8 +35,8 @@ function firstlab_bot_fields(): array {
 		'gemini_key'     => array( 'label' => 'Gemini API 키', 'type' => 'secret' ),
 		'anthropic_key'  => array( 'label' => 'Claude API 키', 'type' => 'secret' ),
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
-		'hint_keywords'  => array( 'label' => '주제 힌트 키워드', 'type' => 'textarea', 'default' => '', 'help' => '선택 사항. 비워두면 기본 주제 풀(금융·제도, 자동차, 생활, IT, 요리, 여행 등)에서 자동으로 고름. 입력하면 이 주제를 우선' ),
-		'use_trends'     => array( 'label' => '구글 급상승 검색어도 참고', 'type' => 'checkbox', 'default' => 0, 'help' => '켜면 글감 출발점 중 1개를 오늘의 구글 급상승 검색어로 사용. 뉴스·인물 주제가 섞일 수 있음' ),
+		'hint_keywords'  => array( 'label' => '우선 주제 (선택)', 'type' => 'textarea', 'default' => '', 'help' => '비워두면 분야 상관없이 자동 발굴. 입력하면 이 단어가 들어간 키워드를 먼저 씀 (한 줄에 하나)' ),
+		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 50, 'min' => 0, 'max' => 300, 'help' => '네이버 API 호출 수 (1회당 연관 키워드 수백 개). 새벽 4시 이후 하루 1번 수집' ),
 		'min_volume'     => array( 'label' => '최소 월간 검색량', 'type' => 'number', 'default' => 500, 'min' => 0, 'max' => 10000000 ),
 		'max_volume'     => array( 'label' => '최대 월간 검색량', 'type' => 'number', 'default' => 30000, 'min' => 0, 'max' => 10000000 ),
 		'blocked_words'  => array( 'label' => '추가 금지어', 'type' => 'textarea', 'default' => '', 'help' => '한 줄에 하나. 기본 금지어(의료·장소·쇼핑)에 추가됨' ),
@@ -167,6 +167,78 @@ add_action(
 	}
 );
 
+const FIRSTLAB_BOT_EXCLUDED = 'firstlab_bot_excluded'; // 제외할 키워드 (봇이 반영 후 지움)
+
+add_action(
+	'admin_post_firstlab_bot_exclude',
+	static function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '권한이 없습니다.' );
+		}
+		check_admin_referer( 'firstlab_bot_exclude' );
+		$keyword = sanitize_text_field( wp_unslash( $_POST['keyword'] ?? '' ) );
+		if ( '' !== $keyword ) {
+			$list   = (array) get_option( FIRSTLAB_BOT_EXCLUDED, array() );
+			$list[] = $keyword;
+			update_option( FIRSTLAB_BOT_EXCLUDED, array_values( array_unique( $list ) ), false );
+		}
+		wp_safe_redirect( admin_url( 'options-general.php?page=firstlab-bot#candidates' ) );
+		exit;
+	}
+);
+
+function firstlab_bot_render_keywords( array $state ): void {
+	$kw       = (array) ( $state['keywords'] ?? array() );
+	$by       = (array) ( $kw['by_status'] ?? array() );
+	$pending  = (array) get_option( FIRSTLAB_BOT_EXCLUDED, array() );
+	$labels   = array( 'new' => '미검사', 'ok' => '통과' );
+	?>
+	<h2>키워드 창고</h2>
+	<p>
+		전체 <strong><?php echo number_format( (int) ( $kw['total'] ?? 0 ) ); ?></strong>개
+		(오늘 새로 <?php echo number_format( (int) ( $kw['new_today'] ?? 0 ) ); ?>개) ·
+		미검사 <?php echo number_format( (int) ( $by['new'] ?? 0 ) ); ?> ·
+		통과 <?php echo number_format( (int) ( $by['ok'] ?? 0 ) ); ?> ·
+		부적합 <?php echo number_format( (int) ( $by['rejected'] ?? 0 ) ); ?> ·
+		글 작성 <?php echo number_format( (int) ( $by['used'] ?? 0 ) ); ?> ·
+		제외 <?php echo number_format( (int) ( $by['excluded'] ?? 0 ) ); ?>
+		<br><span class="description">현황은 1시간마다(또는 글 작성 시) 갱신됩니다. 마지막 갱신: <?php echo esc_html( $state['dashboard_at'] ?? '-' ); ?></span>
+	</p>
+
+	<h3 id="candidates">다음 글감 후보 (점수순)</h3>
+	<table class="widefat striped" style="max-width:720px">
+		<thead><tr><th>키워드</th><th>월간 검색</th><th>점수</th><th>상태</th><th></th></tr></thead>
+		<tbody>
+		<?php foreach ( (array) ( $state['candidates'] ?? array() ) as $c ) : ?>
+			<?php $is_pending = in_array( $c['keyword'], $pending, true ); ?>
+			<tr>
+				<td><?php echo esc_html( $c['keyword'] ); ?></td>
+				<td><?php echo number_format( (int) $c['total'] ); ?></td>
+				<td><?php echo esc_html( $c['score'] ); ?></td>
+				<td><?php echo esc_html( $labels[ $c['status'] ] ?? $c['status'] ); ?></td>
+				<td>
+					<?php if ( $is_pending ) : ?>
+						제외 예정
+					<?php else : ?>
+						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin:0">
+							<input type="hidden" name="action" value="firstlab_bot_exclude">
+							<input type="hidden" name="keyword" value="<?php echo esc_attr( $c['keyword'] ); ?>">
+							<?php wp_nonce_field( 'firstlab_bot_exclude' ); ?>
+							<button class="button button-small">제외</button>
+						</form>
+					<?php endif; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+		<?php if ( empty( $state['candidates'] ) ) : ?>
+			<tr><td colspan="5">아직 후보가 없습니다. 키워드 수집이 끝나면 표시됩니다.</td></tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+	<p class="description">'미검사' 후보는 글을 쓰기 직전에 AI 안전 검사(인물·정치·종교·의료 등 제외)를 거칩니다.</p>
+	<?php
+}
+
 function firstlab_bot_render_status(): void {
 	$state   = (array) get_option( FIRSTLAB_BOT_STATE, array() );
 	$today   = wp_date( 'Y-m-d' );
@@ -195,6 +267,8 @@ function firstlab_bot_render_status(): void {
 		}
 		?>
 	</p>
+
+	<?php firstlab_bot_render_keywords( $state ); ?>
 
 	<h2>최근 기록</h2>
 	<ul>
