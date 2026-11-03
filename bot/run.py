@@ -114,8 +114,26 @@ def purge_cache_if_changed(state: dict) -> None:
     except subprocess.CalledProcessError:
         return
     if latest and latest != state.get("last_modified"):
+        _sync_recent_cards(state.get("last_modified", ""))
         clear_cache()
         state["last_modified"] = latest
+
+
+def _sync_recent_cards(since: str) -> None:
+    """마지막 확인 이후 수정된 글의 제목 카드 갱신 (제목을 고치면 대표 이미지도 바뀌게)."""
+    import json
+
+    from .fix_posts import sync_card
+
+    try:
+        posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=any", "--orderby=modified",
+                                  "--order=DESC", "--posts_per_page=5", "--fields=ID,post_title,post_name,post_modified",
+                                  "--format=json") or "[]")
+        for p in posts:
+            if p["post_modified"] > since and p["post_title"]:
+                sync_card(p)
+    except Exception as e:  # noqa: BLE001 - 카드 갱신 실패가 봇을 막지 않게
+        print(f"[카드] 갱신 실패: {e}", flush=True)
 
 
 def clear_cache() -> None:

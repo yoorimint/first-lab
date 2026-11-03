@@ -58,6 +58,7 @@ def set_featured_card(post_id: int, title: str, keyword: str) -> None:
     att_id, _ = images.import_media(card, title, title)
     wp_cli("post", "meta", "update", str(post_id), "_thumbnail_id", str(att_id))
     wp_cli("post", "meta", "update", str(post_id), "_firstlab_card", CARD_VERSION)
+    wp_cli("post", "meta", "update", str(post_id), "_firstlab_card_title", title)  # 제목이 바뀌면 다시 만들기 위해
 
 
 def publish(article: Article, status: str, slug: str = "",

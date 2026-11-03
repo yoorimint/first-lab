@@ -1,7 +1,7 @@
 """이미 저장된 글 보정 (배포 때 자동 실행, 여러 번 실행해도 안전).
 
   - 일반 HTML 본문 → 블록 형식 (앱 편집기에서 표가 '?'로 보이던 문제)
-  - 대표 이미지가 없거나 예전 디자인의 제목 카드면 새로 생성 (직접 올린 이미지는 유지)
+  - 대표 이미지가 없거나, 봇 제목 카드가 옛 디자인이거나 글 제목이 바뀌었으면 새로 생성 (직접 올린 이미지는 유지)
   - 예전 'AI 생성 이미지' 캡션 제거
 """
 import json
@@ -65,15 +65,26 @@ def main() -> None:
             print(f"[보정] {pid} 블록 형식 변환")
         else:
             print(f"[보정] {pid} 블록 형식 (이미 됨)")
-        thumb, card = _meta(pid, "_thumbnail_id"), _meta(pid, "_firstlab_card")
-        if not thumb or (card != CARD_VERSION and (card or _is_bot_card(thumb))):
-            keyword = urllib.parse.unquote(p["post_name"]) or p["post_title"]
-            set_featured_card(int(pid), p["post_title"], keyword)
-            print(f"[보정] {pid} 대표 이미지(제목 카드 v{CARD_VERSION})")
+        sync_card(p)
     try:
         _classify_uncategorized(posts)
     except Exception as e:  # noqa: BLE001
         print(f"[보정] 카테고리 분류 실패: {e}")
+
+
+def sync_card(p: dict) -> bool:
+    """대표 이미지가 없거나, 봇이 만든 제목 카드인데 디자인이 옛 버전이거나 제목이 바뀌었으면 다시 생성."""
+    pid = str(p["ID"])
+    thumb, card = _meta(pid, "_thumbnail_id"), _meta(pid, "_firstlab_card")
+    bot_card = bool(card) or (bool(thumb) and _is_bot_card(thumb))
+    title_changed = bot_card and _meta(pid, "_firstlab_card_title") != p["post_title"]
+    if not thumb or (bot_card and (card != CARD_VERSION or title_changed)):
+        keyword = urllib.parse.unquote(p["post_name"]) or p["post_title"]
+        set_featured_card(int(pid), p["post_title"], keyword)
+        print(f"[보정] {pid} 대표 이미지(제목 카드 v{CARD_VERSION})")
+        return True
+    return False
+
 
 
 if __name__ == "__main__":
