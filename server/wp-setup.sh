@@ -39,6 +39,9 @@ fi
 log "기본 설정 (사이트 제목, 시간대, 고유주소, 검색 노출, 핑백 끔)"
 wp option update blogname "$SITE_TITLE"
 wp option update blogdescription "$SITE_TAGLINE"
+# SEO 플러그인(The SEO Framework)의 메인 페이지 설명에도 같은 문구 지정
+wp option patch update autodescription-site-settings homepage_description "$SITE_TAGLINE" 2>/dev/null \
+  || wp option patch insert autodescription-site-settings homepage_description "$SITE_TAGLINE" || true
 wp option update timezone_string "$TIMEZONE"
 wp option update blog_public 1                 # 검색엔진 노출 허용
 wp option update default_pingback_flag 0       # 스팸성 핑백 끔
