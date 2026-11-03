@@ -38,16 +38,23 @@ class AnthropicLLM:
 
 
 class GeminiLLM:
+    """모델명을 비워두면 사용 가능한 Flash 모델을 최신순으로 시도한다.
+    '사용량 폭주(503)·한도 초과(429)'면 잠시 기다렸다 재시도하고, 그래도 안 되면 다음 모델로 넘어간다."""
+
+    RETRY_WAITS = (15, 45)  # 같은 모델 재시도 전 대기(초)
+    BUSY_CODES = (429, 500, 503)
+
     def __init__(self, api_key: str, model: str = ""):
         from google import genai
         from google.genai import types
 
         self.client = genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=TIMEOUT_SECONDS * 1000))
-        self.model = model or self._pick_flash_model()
+        self.models = [model] if model else self._flash_models()
+        self.model = self.models[0]
 
-    def _pick_flash_model(self) -> str:
-        """모델명을 비워두면 사용 가능한 최신 Flash 모델을 자동 선택 (무료 요금제 대상)."""
-        skip = ("lite", "image", "tts", "audio", "live", "embedding", "exp", "preview", "native")
+    def _flash_models(self) -> list[str]:
+        """사용 가능한 Flash 모델 (최신 → 이전, 일반 → lite 순)."""
+        skip = ("image", "tts", "audio", "live", "embedding", "exp", "preview", "native")
         names = []
         for m in self.client.models.list():
             name = (m.name or "").removeprefix("models/")
@@ -57,19 +64,31 @@ class GeminiLLM:
         if not names:
             raise LLMError("사용 가능한 Gemini Flash 모델을 찾지 못했습니다. 설정에서 모델 이름을 직접 입력하세요.")
         version = lambda n: [int(x) for x in re.findall(r"\d+", n)]  # noqa: E731
-        return max(names, key=version)
+        return sorted(names, key=lambda n: ("lite" in n, [-v for v in version(n)]))
 
     def generate(self, system: str, prompt: str) -> str:
-        from google.genai import types
+        import time
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=types.GenerateContentConfig(system_instruction=system, response_mime_type="application/json"),
-        )
-        if not response.text:
-            raise LLMError("Gemini 응답이 비어 있습니다")
-        return response.text
+        from google.genai import errors, types
+
+        config = types.GenerateContentConfig(system_instruction=system, response_mime_type="application/json")
+        last_error: Exception | None = None
+        for model in self.models[:3]:
+            for wait in (*self.RETRY_WAITS, None):
+                try:
+                    response = self.client.models.generate_content(model=model, contents=prompt, config=config)
+                    if not response.text:
+                        raise LLMError("Gemini 응답이 비어 있습니다")
+                    self.model = model  # 실제로 사용한 모델 (기록용)
+                    return response.text
+                except errors.APIError as e:
+                    if e.code not in self.BUSY_CODES:
+                        raise
+                    last_error = e
+                    if wait is None:
+                        break  # 이 모델 포기 → 다음 모델
+                    time.sleep(wait)
+        raise LLMError(f"Gemini 모델들이 모두 사용량 폭주/한도 초과 상태입니다. 나중에 다시 시도됩니다 ({last_error})")
 
 
 class OpenAILLM:
