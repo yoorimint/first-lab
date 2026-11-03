@@ -26,7 +26,7 @@ from .keyword_db import connect, set_status, summary
 from .llm import LLMBusy, make_llm
 from .publisher import publish
 from .select_keyword import pick_keyword, ranked_candidates, review_top
-from .settings import BotSettings, load_settings
+from .settings import BotSettings, load_settings, wp_cli
 from .state import add_log, load_state, pop_excluded, pop_manual_request, save_state
 from .writer import write_article
 
@@ -103,6 +103,23 @@ def create_one(settings: BotSettings) -> str:
             f"내부 링크 {link_count}개{check_note}{cost_note}) {link}")
 
 
+CACHE_DIR = "/var/cache/nginx/first-lab"
+
+
+def purge_cache_if_changed(state: dict) -> None:
+    """가장 최근 발행·수정 시각이 바뀌었으면 nginx 페이지 캐시 삭제."""
+    import shutil
+
+    try:
+        latest = wp_cli("post", "list", "--post_type=post,page", "--post_status=publish", "--orderby=modified",
+                        "--order=DESC", "--posts_per_page=1", "--field=post_modified").strip()
+    except subprocess.CalledProcessError:
+        return
+    if latest and latest != state.get("last_modified"):
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+        state["last_modified"] = latest
+
+
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
     """설정 페이지에 보여줄 창고 현황과 다음 후보 (안전 검사 전 포함)."""
     with connect() as conn:
@@ -127,6 +144,9 @@ def main() -> None:
     before = json.dumps(state, sort_keys=True, ensure_ascii=False)
     now = datetime.now(KST)
     today = now.strftime("%Y-%m-%d")
+
+    # 글이 발행·수정되면 페이지 캐시 비우기 (앱·관리자 화면에서 발행해도 1분 안에 반영)
+    purge_cache_if_changed(state)
 
     # 관리자 '제외' 반영
     excluded = pop_excluded()
