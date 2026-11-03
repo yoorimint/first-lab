@@ -19,6 +19,9 @@ class NaverSearchError(RuntimeError):
     """네이버가 돌려준 오류 코드/메시지를 그대로 담는다."""
 
 
+# 키는 맞지만 애플리케이션에 사용 API 가 하나도 등록되지 않은 경우 (errorCode 024)
+_SCOPE_HINT = "키는 정상이지만 이 애플리케이션에 '검색' API 권한이 없습니다. (내 애플리케이션 → API 설정 확인)"
+
 # 자주 나오는 오류의 원인 안내
 _HINTS = {
     401: "Client ID/Secret 이 틀렸거나 서로 다른 애플리케이션의 값입니다. 다시 입력하세요.",
@@ -49,4 +52,5 @@ class NaverSearchClient:
                 return int(json.load(resp).get("total", 0))
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", "replace")[:200]
-            raise NaverSearchError(f"HTTP {e.code}: {body}\n→ {_HINTS.get(e.code, '')}") from None
+            hint = _SCOPE_HINT if "Scopes are Empty" in body else _HINTS.get(e.code, "")
+            raise NaverSearchError(f"HTTP {e.code}: {body}\n→ {hint}") from None
