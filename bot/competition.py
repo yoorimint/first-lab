@@ -65,6 +65,15 @@ def analyze(domains: list[str]) -> Competition:
     return Competition(round(difficulty, 2), strong, weak, n, domains)
 
 
+def from_urls(urls: list[str]) -> Competition | None:
+    """이미 받은 검색 결과 주소(글쓰기 단계 웹 검색)로 경쟁도 계산. 추가 조회 없음."""
+    from urllib.parse import urlparse
+
+    domains = list(dict.fromkeys(urlparse(u).netloc.lower().removeprefix("www.") for u in urls))
+    domains = [d for d in domains if d][:10]
+    return analyze(domains) if len(domains) >= 3 else None
+
+
 def source(settings) -> str:
     """사용할 수 있는 무료 조회 방법 이름 ('' 이면 조회 불가)."""
     return "gemini" if settings.gemini_key else ""

@@ -41,11 +41,13 @@ class AnthropicLLM:
         self.model = self.LIGHT_MODEL if light else (model or self.default_model)
         self.light = light
         self.cost_usd = 0.0  # 이 객체로 쓴 누적 비용 추정 (기록용)
+        self.search_urls: list[str] = []  # 마지막 generate 의 웹 검색 결과 주소 (순위순, 경쟁도 기록용)
 
     def generate(self, system: str, prompt: str, web_search: bool = False) -> str:
         """web_search=True: Claude 가 직접 웹 검색해서 최신 정보를 확인한 뒤 작성."""
         import anthropic
 
+        self.search_urls = []
         try:
             return self._generate(system, prompt, web_search)
         except anthropic.BadRequestError:
@@ -75,6 +77,7 @@ class AnthropicLLM:
                 **extra,
             )
             self._add_cost(response.usage)
+            self._collect_search_urls(response.content)
             if response.stop_reason != "pause_turn":
                 break
             # 서버 검색 루프가 한도에 걸려 멈춤 → 응답을 그대로 붙여 보내면 이어서 진행
@@ -84,6 +87,13 @@ class AnthropicLLM:
         if response.stop_reason == "max_tokens":
             raise LLMError("글이 너무 길어 중간에 잘렸습니다 (설정의 글 분량을 줄여보세요)")
         return "".join(b.text for b in response.content if b.type == "text")
+
+    def _collect_search_urls(self, blocks) -> None:
+        """웹 검색 결과 블록의 주소를 순서대로 모은다 (오류 결과는 리스트가 아니라 건너뜀)."""
+        for b in blocks:
+            results = getattr(b, "content", None) if getattr(b, "type", "") == "web_search_tool_result" else None
+            if isinstance(results, list):
+                self.search_urls += [u for u in (getattr(r, "url", "") for r in results) if u]
 
     def _add_cost(self, usage) -> None:
         price_in, price_out = self.PRICE.get(self.model, (2.0, 10.0))

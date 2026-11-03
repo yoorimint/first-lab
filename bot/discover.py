@@ -1,7 +1,7 @@
 """오늘의 키워드 수집 (하루 1번, 네이버 키워드 도구 무료 → 매일 최대한 수집).
 
   1) 출발 단어: 구글 급상승 검색어 + 씨앗 단어 전부(seed_words.py) + 우선 주제
-  2) 롱테일 조합: 오늘 나온 큰 키워드 × '방법/신청/조건/...' 의 실제 검색량 확인 (남은 호출 전부)
+  2) 롱테일 조합: 오늘 나온 큰 키워드 × 수식어 전부(MODIFIERS) + 올해·내년 연도의 실제 검색량 확인 (남은 호출 전부)
   3) 정리: 8일 지난 후보는 삭제 (7일 전 검색량과 비교해 상승세 감지용으로만 보관)
      이미 쓴 키워드·부적합·제외 기록은 중복 방지용으로 계속 보관
 
@@ -22,8 +22,35 @@ from .seeds import google_trends_kr
 
 BATCH = 5              # API 1회당 출발 키워드 수 (API 최대값)
 PAUSE_SECONDS = 0.3    # 호출 간격
-MODIFIERS = ["방법", "신청", "조건", "기간", "비용", "서류", "계산", "차이", "뜻", "기준",
-             "자격", "대상", "순서", "주의사항", "하는법"]
+# 롱테일 조합 수식어: 큰 키워드 뒤에 붙여 실제 검색량이 있는 조합을 찾는다 (정보형 위주, 후기·추천·순위 같은 상품형은 제외)
+MODIFIERS = [
+    # 방법·절차
+    "방법", "하는법", "하는방법", "절차", "순서", "과정", "요령", "팁", "주의사항", "체크리스트",
+    # 신청·행정
+    "신청", "신청방법", "신청기간", "신청자격", "신청서류", "접수", "발급", "재발급", "등록", "변경",
+    "해지", "취소", "조회", "확인", "갱신", "연장",
+    # 조건·대상
+    "조건", "자격", "자격조건", "대상", "기준", "나이", "연령", "소득기준",
+    # 돈
+    "비용", "가격", "요금", "금액", "수수료", "지원금", "지원", "환급", "환급금", "계산", "계산기",
+    "계산방법", "할인", "견적", "평균", "시세", "세금",
+    # 시간
+    "기간", "기한", "시기", "시간", "주기", "일정", "마감", "유효기간", "소요기간",
+    # 비교·종류·뜻
+    "차이", "차이점", "비교", "종류", "장단점", "장점", "단점", "뜻", "의미",
+    # 준비
+    "준비물", "준비", "필요서류", "서류", "리스트",
+    # 문제 해결
+    "원인", "증상", "해결", "해결방법", "부작용", "주의점", "불이익", "과태료", "벌금",
+]
+
+
+def _combos(head: str) -> list[str]:
+    """큰 키워드 × 모든 수식어 + 올해·내년 연도 (내년 키워드는 글이 적을 때 미리 선점)."""
+    n, year = norm(head), datetime.now().year
+    combos = [n + m for m in MODIFIERS if m not in n]
+    combos += [f"{y}{n}" for y in (year, year + 1) if str(y) not in n]
+    return list(dict.fromkeys(combos))
 HEAD_MIN_VOLUME = 3000  # 롱테일 조합을 만들 '큰 키워드' 기준
 KEEP_DAYS = 8           # 후보 보관 기간 (상승세 비교용)
 STAMP_FILE = Path("/var/lib/first-lab/bot/discover-date-v2")  # 마지막 수집 날짜 (하루 1회 보장)
@@ -77,11 +104,11 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
         print(f"[수집] 출발 단어 {len(words)}개 (급상승 {len(trends)}): {stats}", flush=True)
 
         # 2) 롱테일 조합: 오늘 나온 큰 키워드 × 수식어
-        per_head = -(-len(MODIFIERS) // BATCH)
+        per_head = -(-len(_combos("가")) // BATCH)
         for head in _modifier_heads(conn, today, max(1, (calls - stats["calls"]) // per_head)):
             if stats["calls"] >= calls:
                 break
-            combos = [norm(head) + m for m in MODIFIERS if m not in head]
+            combos = _combos(head)
             for i in range(0, len(combos), BATCH):
                 if not run_batch(conn, combos[i:i + BATCH]):
                     break

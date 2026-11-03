@@ -126,4 +126,6 @@ def set_competition(conn: sqlite3.Connection, keyword: str, difficulty: float, i
 
 def competition_checks_today(conn: sqlite3.Connection) -> int:
     today = datetime.now().strftime("%Y-%m-%d")
-    return conn.execute("SELECT COUNT(*) FROM keywords WHERE comp_checked=?", (today,)).fetchone()[0]
+    # 글쓰기 검색에서 얻은 경쟁도(무료)는 하루 조회 한도에 넣지 않는다
+    return conn.execute("SELECT COUNT(*) FROM keywords WHERE comp_checked=? AND comp_info NOT LIKE '글쓰기 검색%'",
+                        (today,)).fetchone()[0]

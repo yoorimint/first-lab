@@ -20,9 +20,9 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import factcheck, related
+from . import competition, factcheck, related
 from .discover import discover
-from .keyword_db import connect, set_status, summary
+from .keyword_db import connect, set_competition, set_status, summary
 from .llm import LLMBusy, make_llm
 from .publisher import publish
 from .select_keyword import pick_keyword, ranked_candidates, review_top
@@ -69,6 +69,15 @@ def due_slot(state: dict, settings: BotSettings, now: datetime) -> int | None:
     return None
 
 
+def _record_competition(conn, keyword: str, urls: list[str]) -> None:
+    """글쓰기 때 한 웹 검색 결과로 이 키워드의 경쟁도를 기록 (무료). 같은 주제 키워드 추정에 쓰인다."""
+    comp = competition.from_urls(urls)
+    if comp is None:
+        return
+    set_competition(conn, keyword, comp.difficulty, f"글쓰기 검색: {comp.summary}: {', '.join(comp.domains)}")
+    conn.commit()
+
+
 def create_one(settings: BotSettings) -> str:
     """키워드 선정 → 글 작성 → 워드프레스 저장. 결과 메시지 반환."""
     llm = make_llm(settings.provider, settings.api_key, settings.model)
@@ -83,6 +92,7 @@ def create_one(settings: BotSettings) -> str:
         article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
                                 persona=settings.persona, links=related.prompt_section(cands))
         allowed_links = {c["url"] for c in cands}
+        _record_competition(conn, keyword, getattr(llm, "search_urls", []))
         status, check_note = settings.post_status, ""
         if settings.fact_check:
             try:
