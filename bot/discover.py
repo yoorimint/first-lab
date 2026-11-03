@@ -15,14 +15,15 @@ import time
 import urllib.error
 from datetime import datetime
 
-from .keyword_db import connect, norm, summary, upsert
+from .keyword_db import MIN_STORE_VOLUME, connect, norm, summary, upsert
 from .naver_ads import ads_client
 from .seed_words import SEED_WORDS
 from .seeds import google_trends_kr
 
 BATCH = 5              # API 1회당 출발 키워드 수 (API 최대값)
 PAUSE_SECONDS = 0.3    # 호출 간격
-SHARE = {"seed": 0.25, "snowball": 0.40, "modifier": 0.35}  # 호출 수 배분
+SHARE = {"seed": 0.2, "snowball": 0.2, "modifier": 0.6}  # 호출 수 배분 (롱테일 조합 위주)
+MAX_KEYWORDS = 100_000  # 창고가 이보다 크면 넓히기(씨앗·눈덩이)는 멈추고 롱테일 조합만 탐색
 MODIFIERS = ["방법", "신청", "조건", "기간", "비용", "서류", "계산", "차이", "뜻", "기준",
              "자격", "대상", "순서", "주의사항", "하는법"]
 HEAD_MIN_VOLUME = 3000  # 롱테일 조합을 만들 '큰 키워드' 기준
@@ -78,9 +79,11 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
 
     with connect() as conn:
         plan = {k: int(calls * v) for k, v in SHARE.items()}
+        if conn.execute("SELECT COUNT(*) FROM keywords").fetchone()[0] >= MAX_KEYWORDS:
+            plan = {"seed": 0, "snowball": 0, "modifier": calls}  # 충분히 넓음 → 롱테일만
 
         # 1) 씨앗 단어 (+ 힌트, 급상승어)
-        words = list(dict.fromkeys((extra_seeds or []) + _seed_words(conn, plan["seed"] * BATCH)))
+        words = list(dict.fromkeys((extra_seeds or []) + _seed_words(conn, plan["seed"] * BATCH))) if plan["seed"] else []
         for i in range(0, len(words), BATCH):
             if stats["calls"] >= plan["seed"] or not run_batch(conn, words[i:i + BATCH]):
                 break
@@ -112,6 +115,11 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
             conn.commit()
         print(f"[수집] 롱테일 조합 단계 완료: {stats}", flush=True)
 
+        pruned = conn.execute(
+            "DELETE FROM keywords WHERE total < ? AND status IN ('new','rejected')", (MIN_STORE_VOLUME,)
+        ).rowcount
+        conn.commit()
+        stats["pruned"] = pruned
         info = summary(conn)
     return {**stats, **info}
 

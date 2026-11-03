@@ -37,7 +37,7 @@ function firstlab_bot_fields(): array {
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
 		'hint_keywords'  => array( 'label' => '우선 주제 (선택)', 'type' => 'textarea', 'default' => '', 'help' => '비워두면 분야 상관없이 자동 발굴. 입력하면 이 단어가 들어간 키워드를 먼저 씀 (한 줄에 하나)' ),
 		'competition_checks' => array( 'label' => '하루 경쟁도 조회 수', 'type' => 'number', 'default' => 15, 'min' => 0, 'max' => 400, 'help' => 'Gemini 구글 검색 연동(무료 한도 내)으로 후보 키워드의 구글 상위 사이트를 확인. Gemini 키 필요' ),
-		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 1000, 'min' => 0, 'max' => 5000, 'help' => '네이버 키워드 도구 호출 수 (무료, 1회당 연관 키워드 수백 개). 매일 새벽 + 배포 직후 자동 수집' ),
+		'discover_calls' => array( 'label' => '하루 키워드 수집량', 'type' => 'number', 'default' => 150, 'min' => 0, 'max' => 2000, 'help' => '네이버 키워드 도구 호출 수 (무료). 창고가 10만 개를 넘으면 롱테일 조합 탐색만 함. 매일 새벽 자동' ),
 		'min_volume'     => array( 'label' => '최소 월간 검색량', 'type' => 'number', 'default' => 500, 'min' => 0, 'max' => 10000000 ),
 		'max_volume'     => array( 'label' => '최대 월간 검색량', 'type' => 'number', 'default' => 30000, 'min' => 0, 'max' => 10000000 ),
 		'blocked_words'  => array( 'label' => '추가 금지어', 'type' => 'textarea', 'default' => '', 'help' => '한 줄에 하나. 기본 금지어(의료·장소·쇼핑)에 추가됨' ),
@@ -192,7 +192,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 	$kw       = (array) ( $state['keywords'] ?? array() );
 	$by       = (array) ( $kw['by_status'] ?? array() );
 	$pending  = (array) get_option( FIRSTLAB_BOT_EXCLUDED, array() );
-	$labels   = array( 'new' => '미검사', 'ok' => '통과' );
+	$labels   = array( 'new' => '검사 전', 'ok' => '✅ 통과' );
 	?>
 	<h2>키워드 창고</h2>
 	<p>
@@ -209,7 +209,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 	<details id="candidates" style="margin:1em 0" <?php echo isset( $_GET['excluded'] ) ? 'open' : ''; // 제외 누른 뒤에는 펼친 상태 유지 ?>>
 		<summary style="cursor:pointer;font-weight:600;font-size:1.1em">다음 글감 후보 보기 (점수순 <?php echo count( (array) ( $state['candidates'] ?? array() ) ); ?>개) ▾</summary>
 	<div style="overflow-x:auto"><table class="widefat striped" style="max-width:900px">
-		<thead><tr><th>키워드</th><th>월간 검색</th><th>롱테일의 원 키워드</th><th>구글 상위 경쟁 (난이도 0~1)</th><th>점수</th><th>상태</th><th></th></tr></thead>
+		<thead><tr><th>키워드</th><th>월간 검색</th><th>롱테일의 원 키워드</th><th>구글 상위 경쟁 (난이도 0~1)</th><th>점수</th><th>AI 안전검사</th><th></th></tr></thead>
 		<tbody>
 		<?php foreach ( (array) ( $state['candidates'] ?? array() ) as $c ) : ?>
 			<?php $is_pending = in_array( $c['keyword'], $pending, true ); ?>
@@ -222,7 +222,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 					if ( isset( $c['difficulty'] ) && null !== $c['difficulty'] ) {
 						printf( '<strong>%s</strong> <span class="description">%s</span>', esc_html( $c['difficulty'] ), esc_html( $c['comp_info'] ?? '' ) );
 					} else {
-						echo '<span class="description">미조회</span>';
+						echo '<span class="description">조회 전</span>';
 					}
 					?>
 				</td>
@@ -247,7 +247,7 @@ function firstlab_bot_render_keywords( array $state ): void {
 		<?php endif; ?>
 		</tbody>
 	</table></div>
-	<p class="description">'미검사' 후보는 글을 쓰기 직전에 AI 안전 검사(인물·정치·종교·의료 등 제외)를 거칩니다. 경쟁 난이도는 구글 상위 출처 중 대형 사이트(정부·위키·언론·대기업) 비율이며, 0.8 이상은 글감에서 제외됩니다.</p>
+	<p class="description">'검사 전' 후보는 하루 1번 사전 검토 또는 글을 쓰기 직전에 AI 안전 검사(인물·정치·종교·의료 등 제외)를 거칩니다. 구글 상위 경쟁은 Gemini 무료 한도 안에서 조회합니다. 경쟁 난이도는 구글 상위 출처 중 대형 사이트(정부·위키·언론·대기업) 비율이며, 0.8 이상은 글감에서 제외됩니다.</p>
 	</details>
 	<?php
 }

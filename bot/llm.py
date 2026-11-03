@@ -41,7 +41,8 @@ class GeminiLLM:
     """모델명을 비워두면 사용 가능한 Flash 모델을 최신순으로 시도한다.
     '사용량 폭주(503)·한도 초과(429)'면 잠시 기다렸다 재시도하고, 그래도 안 되면 다음 모델로 넘어간다."""
 
-    RETRY_WAITS = (15, 45)  # 같은 모델 재시도 전 대기(초) - 일시적 폭주(503)·시간초과(504)일 때만
+    RETRY_WAITS = (30,)     # 같은 모델 재시도 1회 (실패한 요청도 무료 한도를 소모하므로 최소화)
+    MAX_MODELS = 2          # 시도할 모델 수
     BUSY_CODES = (500, 503, 504)
     QUOTA_CODE = 429  # 하루 무료 한도 초과 → 기다려도 소용없으니 바로 다음 모델
 
@@ -82,7 +83,7 @@ class GeminiLLM:
         from google.genai import errors, types
 
         last_error: Exception | None = None
-        for model in self.models[:3]:
+        for model in self.models[:self.MAX_MODELS]:
             config = types.GenerateContentConfig(
                 system_instruction=system,
                 response_mime_type="application/json",
