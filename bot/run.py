@@ -19,6 +19,7 @@ from zoneinfo import ZoneInfo
 from .find_keywords import find_candidates
 from .llm import make_llm
 from .publisher import publish
+from .seeds import google_trends_kr, random_seeds
 from .settings import BotSettings, load_settings
 from .state import add_log, load_state, pop_manual_request, save_state
 from .writer import write_article
@@ -56,15 +57,29 @@ def due_slot(state: dict, settings: BotSettings, now: datetime) -> int | None:
     return None
 
 
+def pick_seeds(settings: BotSettings) -> list[str]:
+    """힌트 키워드가 있으면 우선 사용, 없으면 기본 주제 풀. 급상승 옵션이면 1개를 급상승어로 교체."""
+    if settings.hint_keywords:
+        seeds = random.sample(settings.hint_keywords, min(5, len(settings.hint_keywords)))
+    else:
+        seeds = random_seeds(5)
+    if settings.use_trends:
+        trends = google_trends_kr()
+        if trends:
+            seeds[-1] = random.choice(trends)
+    return seeds
+
+
 def create_one(settings: BotSettings, state: dict) -> str:
     """키워드 선정 → 글 작성 → 워드프레스 저장. 결과 메시지 반환."""
-    if not settings.hint_keywords:
-        raise RuntimeError("설정 페이지에 '주제 힌트 키워드'를 입력하세요")
-    hints = random.sample(settings.hint_keywords, min(5, len(settings.hint_keywords)))
-    _, candidates = find_candidates(hints, settings.min_volume, settings.max_volume,
-                                    settings.blocked_words, exclude=set(state["used_keywords"]))
+    for _ in range(3):  # 후보가 없으면 다른 출발 주제로 최대 3번 시도
+        hints = pick_seeds(settings)
+        _, candidates = find_candidates(hints, settings.min_volume, settings.max_volume,
+                                        settings.blocked_words, exclude=set(state["used_keywords"]))
+        if candidates:
+            break
     if not candidates:
-        raise RuntimeError("조건에 맞는 새 키워드가 없습니다 (힌트 키워드를 추가하거나 검색량 범위를 넓히세요)")
+        raise RuntimeError(f"조건에 맞는 새 키워드가 없습니다 (출발 주제: {', '.join(hints)}). 검색량 범위를 넓혀 보세요")
     keyword = random.choice(candidates[:5]).keyword  # 상위 5개 중 랜덤 → 글감이 한쪽으로 쏠리지 않게
 
     llm = make_llm(settings.provider, settings.api_key, settings.model)
@@ -73,7 +88,7 @@ def create_one(settings: BotSettings, state: dict) -> str:
 
     state["used_keywords"].append(keyword)
     kind = "발행" if settings.post_status == "publish" else "초안 저장"
-    return f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}) {link}"
+    return f"[{kind}] '{article.title}' (키워드: {keyword} ← 출발 주제: {', '.join(hints)}, 모델: {llm.model}) {link}"
 
 
 def main() -> None:

@@ -22,6 +22,7 @@
 ## 자동 발행 봇 (`bot/`)
 - 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`). 봇은 `bot/settings.py` 로 읽음. 점검: `python3 -m bot.settings`
 - 실행: systemd 타이머가 1분마다 `python -m bot.run` (가상환경 `/opt/first-lab-venv`). 수동 발행 버튼 → 요청 옵션 → 봇이 처리
+- 글감: 힌트 키워드(선택) 또는 `bot/seeds.py` 기본 주제 풀에서 무작위 → 네이버 연관 키워드·검색량으로 선정. 옵션으로 구글 급상승 검색어 참고
 - 자동 발행: 설정의 발행 시각 ± 랜덤 분 (날짜별로 고정된 무작위), 실행당 최대 1개
 - 즉시 테스트: `cd /opt/first-lab && /opt/first-lab-venv/bin/python -m bot.run --now`
 - API 키: 설정 페이지 값 우선, 없으면 `/etc/first-lab/secrets.env`

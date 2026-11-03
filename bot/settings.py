@@ -49,6 +49,7 @@ class BotSettings:
     provider: str = "gemini"
     model: str = ""
     hint_keywords: list[str] = field(default_factory=list)
+    use_trends: bool = False
     min_volume: int = 500
     max_volume: int = 30000
     blocked_words: list[str] = field(default_factory=list)
@@ -68,6 +69,7 @@ class BotSettings:
             provider=provider,
             model=(raw.get("model") or "").strip(),
             hint_keywords=_lines(raw.get("hint_keywords", "")),
+            use_trends=bool(int(raw.get("use_trends") or 0)),
             min_volume=int(raw.get("min_volume") or 0),
             max_volume=int(raw.get("max_volume") or 0),
             blocked_words=_lines(raw.get("blocked_words", "")),
