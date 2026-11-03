@@ -9,6 +9,7 @@ SITE=first-lab
 WEB_ROOT=/var/www/$SITE
 WP_USER=firstlab
 SITE_TITLE="퍼스트랩"
+SITE_TAGLINE="생활에 필요한 정보를 꼼꼼히 비교해 핵심만 정리하는 블로그"  # 검색결과 사이트 설명
 AUTHOR_NAME="퍼스트랩"      # 글 작성자 표시 이름
 AUTHOR_SLUG="firstlab"      # 작성자 주소(/author/...)에 쓰는 이름
 TIMEZONE="Asia/Seoul"
@@ -37,6 +38,7 @@ fi
 # ---------- 기본 설정 ----------
 log "기본 설정 (사이트 제목, 시간대, 고유주소, 검색 노출, 핑백 끔)"
 wp option update blogname "$SITE_TITLE"
+wp option update blogdescription "$SITE_TAGLINE"
 wp option update timezone_string "$TIMEZONE"
 wp option update blog_public 1                 # 검색엔진 노출 허용
 wp option update default_pingback_flag 0       # 스팸성 핑백 끔

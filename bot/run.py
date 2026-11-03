@@ -20,6 +20,7 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from . import related
 from .discover import discover
 from .keyword_db import connect, set_status, summary
 from .llm import LLMBusy, make_llm
@@ -76,14 +77,17 @@ def create_one(settings: BotSettings) -> str:
         keyword = pick_keyword(conn, settings, llm)
         if not keyword:
             raise RuntimeError("안전 검사를 통과한 후보가 없습니다. 새벽 키워드 수집 후 다시 시도됩니다")
+        cands = related.candidates(keyword)
         article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
-                                persona=settings.persona)
+                                persona=settings.persona, links=related.prompt_section(cands))
+        article.content_html, link_count = related.clean_links(article.content_html, {c["url"] for c in cands})
         post_id, link, image_note = publish(article, settings.post_status, slug=keyword,
                                             cloudflare=(settings.cf_account_id, settings.cf_api_token),
                                             image_count=settings.image_count)
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = "발행" if settings.post_status == "publish" else "초안 저장"
-    return f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}) {link}"
+    return (f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}, "
+            f"내부 링크 {link_count}개) {link}")
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:

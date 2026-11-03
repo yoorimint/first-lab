@@ -32,6 +32,7 @@
 | `keyword_filter.py` | 금지어·질문형 단어 목록 |
 | `competition.py` | 경쟁도: Gemini 구글 검색 연동(무료)으로 상위 출처 도메인 → 대형 사이트 비율 = 난이도. 점검: `python -m bot.competition 키워드` |
 | `search_console.py` | 구글 서치콘솔 성과 → 기회 키워드 추가·잘 되는 주제 가산·안 되는 주제 감점 (매일, 키: `/etc/first-lab/gsc-service-account.json`) |
+| `related.py` | 내부 링크: 발행된 글 중 관련 후보 → 글쓰기 AI 가 본문에 1~3개 링크 (목록 외 주소는 제거). 글 하단 '함께 보면 좋은 글'은 `first-lab-related.php` |
 | `safety.py` | AI 안전 검사 (인물·정치·종교·의료·장소찾기 등 제외) |
 | `select_keyword.py` | 후보 선정. 점검: `python -m bot.select_keyword` |
 | `llm.py` | AI 제공사 교체 (Gemini/Claude/OpenAI) |

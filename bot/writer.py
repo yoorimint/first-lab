@@ -26,7 +26,7 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 전문 �
 [출력 형식] 아래 JSON 하나만 출력한다. 다른 말은 쓰지 않는다.
 {"title": "검색 결과에 노출될 제목 (40자 이내, 키워드 포함)",
  "excerpt": "검색 결과 설명문 (120자 이내)",
- "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong 태그만 사용, h1 금지)",
+ "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong, a 태그만 사용, h1 금지)",
  "tags": ["태그1", "태그2", "태그3"],
  "category": "카테고리 하나 (CATEGORY_LIST 중에서만)",
  "images": [{"prompt": "이미지 생성용 장면 설명 (영어 한 문장, 사람 얼굴 클로즈업·글자 없이. 예: a quiet street in Jeju island with stone walls and tangerine trees)",
@@ -54,8 +54,11 @@ PERSONA_RULES = """[글쓴이 페르소나 적용 규칙]
   대신 '이런 경우가 많습니다', '확인해 보면 좋습니다'처럼 정보와 조언으로 표현한다."""
 
 
-def build_prompt(keyword: str, target_length: int, extra: str = "", persona: str = "") -> str:
+def build_prompt(keyword: str, target_length: int, extra: str = "", persona: str = "",
+                 links: str = "") -> str:
     prompt = f"검색 키워드: {keyword}\n분량: 본문 약 {target_length}자\n"
+    if links:
+        prompt += links
     if persona.strip():
         prompt += f"{PERSONA_RULES}\n글쓴이 페르소나: {persona.strip()}\n"
     if extra.strip():
@@ -89,8 +92,8 @@ def parse_article(raw: str) -> Article:
 
 
 def write_article(llm, keyword: str, target_length: int, extra: str = "", retries: int = 1,
-                  persona: str = "") -> Article:
-    prompt = build_prompt(keyword, target_length, extra, persona)
+                  persona: str = "", links: str = "") -> Article:
+    prompt = build_prompt(keyword, target_length, extra, persona, links)
     last_error: Exception | None = None
     for _ in range(retries + 1):
         try:
