@@ -23,6 +23,7 @@ class AnthropicLLM:
     MAX_SEARCHES = 3       # 글 1개당 웹 검색 최대 횟수 (검색 1회 $0.01 + 검색 결과 읽는 입력 토큰)
     # 추론(생각) 깊이: 높을수록 품질↑·비용↑ (생각한 토큰도 출력 요금). 글쓰기는 medium, 판정 작업은 low
     EFFORT_WRITE, EFFORT_LIGHT = "medium", "low"
+    LIGHT_MODEL = "claude-haiku-5-5"
     PRICE = {"claude-sonnet-5-5": (2.0, 10.0), "claude-opus-5-5": (4.0, 20.0), "claude-haiku-5-5": (0.10, 0.50)}
     MAX_CONTINUATIONS = 4  # 검색이 길어져 중간에 멈춘(pause_turn) 경우 이어서 진행할 최대 횟수
     WEB_SEARCH = {
@@ -35,7 +36,8 @@ class AnthropicLLM:
 
         # 웹 검색을 하면 응답이 길어지므로 대기 시간을 넉넉히
         self.client = anthropic.Anthropic(api_key=api_key, timeout=TIMEOUT_SECONDS * 2, max_retries=1)
-        self.model = model or self.default_model
+        # 짧은 판정 작업(안전검사·분류)은 저렴한 Haiku 로 (Sonnet 대비 약 1/20 가격)
+        self.model = self.LIGHT_MODEL if light else (model or self.default_model)
         self.light = light
         self.cost_usd = 0.0  # 이 객체로 쓴 누적 비용 추정 (기록용)
 
@@ -45,15 +47,16 @@ class AnthropicLLM:
         tools = [self.WEB_SEARCH] if web_search else []
         for _ in range(self.MAX_CONTINUATIONS + 1):
             # 서버측 fallback: 안전 분류기가 거절하면 다른 모델로 자동 재시도
+            extra = {"tools": tools} if tools else {}
+            if not self.model.startswith("claude-haiku"):  # Haiku 는 서버측 fallback 미지원
+                extra.update(betas=["server-side-fallback-2026-07-01"], fallbacks="default")
             response = self.client.beta.messages.create(
                 model=self.model,
                 max_tokens=16000,
                 system=system,
                 messages=messages,
                 output_config={"effort": self.EFFORT_LIGHT if self.light else self.EFFORT_WRITE},
-                betas=["server-side-fallback-2026-07-01"],
-                fallbacks="default",
-                **({"tools": tools} if tools else {}),
+                **extra,
             )
             self._add_cost(response.usage)
             if response.stop_reason != "pause_turn":
