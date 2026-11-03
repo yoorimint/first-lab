@@ -20,6 +20,19 @@ if ! cmp -s "$REQ" "$VENV/.installed-requirements"; then
 fi
 "$VENV/bin/pip" list 2>/dev/null | grep -iE "^(anthropic|google-genai|openai) "
 
+log "봇 설정 일회성 변경 (운영자 승인 항목, 한 번만 적용 → 이후 설정 페이지 값 존중)"
+# 사용: 이름=값 목록. 적용 기록(MARK)이 있으면 건너뛰므로 설정 페이지에서 다시 바꿔도 덮어쓰지 않는다.
+apply_settings_once() {
+  local mark="/var/lib/first-lab/bot/settings-$1.done"; shift
+  [ -f "$mark" ] && return 0
+  for kv in "$@"; do
+    runuser -u firstlab -- wp --path=/var/www/first-lab option patch update firstlab_bot "${kv%%=*}" "${kv#*=}" \
+      || { echo "설정 변경 실패: ${kv%%=*}"; return 0; }
+  done
+  touch "$mark" && echo "적용: $*"
+}
+apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
+
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
 
