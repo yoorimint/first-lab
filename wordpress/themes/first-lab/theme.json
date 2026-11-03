@@ -26,6 +26,6 @@
 				}
 			}
 		},
-		"css": "body{word-break:keep-all;overflow-wrap:break-word}"
+		"css": "body{word-break:keep-all;overflow-wrap:break-word}.wp-block-post-featured-image img{aspect-ratio:auto!important;height:auto!important;object-fit:contain!important}"
 	}
 }

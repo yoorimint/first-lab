@@ -48,10 +48,14 @@ def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = 
     return content, note
 
 
+CARD_VERSION = "2"  # 제목 카드 디자인 버전 (바꾸면 배포 때 기존 글 카드도 다시 생성)
+
+
 def set_featured_card(post_id: int, title: str, keyword: str) -> None:
     card = images.title_card(title, keyword)
     att_id, _ = images.import_media(card, title, title)
     wp_cli("post", "meta", "update", str(post_id), "_thumbnail_id", str(att_id))
+    wp_cli("post", "meta", "update", str(post_id), "_firstlab_card", CARD_VERSION)
 
 
 def publish(article: Article, status: str, slug: str = "",

@@ -1,7 +1,7 @@
 """이미 저장된 글 보정 (배포 때 자동 실행, 여러 번 실행해도 안전).
 
   - 일반 HTML 본문 → 블록 형식 (앱 편집기에서 표가 '?'로 보이던 문제)
-  - 대표 이미지가 없으면 제목 카드 생성
+  - 대표 이미지가 없거나 예전 디자인의 제목 카드면 새로 생성 (직접 올린 이미지는 유지)
   - 예전 'AI 생성 이미지' 캡션 제거
 """
 import json
@@ -9,15 +9,20 @@ import subprocess
 import urllib.parse
 
 from .blocks import to_blocks
-from .publisher import set_featured_card
+from .publisher import CARD_VERSION, set_featured_card
 from .settings import wp_cli
 
 
-def _has_thumbnail(pid: str) -> bool:
+def _meta(pid: str, key: str) -> str:
     try:
-        return bool(wp_cli("post", "meta", "get", pid, "_thumbnail_id").strip())
+        return wp_cli("post", "meta", "get", pid, key).strip()
     except subprocess.CalledProcessError:  # 값이 없으면 WP-CLI 가 오류로 끝남
-        return False
+        return ""
+
+
+def _is_bot_card(att_id: str) -> bool:
+    """봇이 만든 제목 카드인지 (직접 올린 이미지는 건드리지 않음)."""
+    return "/card-" in wp_cli("eval", f"echo wp_get_attachment_url({int(att_id)});")
 
 
 def main() -> None:
@@ -35,10 +40,11 @@ def main() -> None:
             print(f"[보정] {pid} 블록 형식 변환")
         else:
             print(f"[보정] {pid} 블록 형식 (이미 됨)")
-        if not _has_thumbnail(pid):
+        thumb, card = _meta(pid, "_thumbnail_id"), _meta(pid, "_firstlab_card")
+        if not thumb or (card != CARD_VERSION and (card or _is_bot_card(thumb))):
             keyword = urllib.parse.unquote(p["post_name"]) or p["post_title"]
             set_featured_card(int(pid), p["post_title"], keyword)
-            print(f"[보정] {pid} 대표 이미지 추가")
+            print(f"[보정] {pid} 대표 이미지(제목 카드 v{CARD_VERSION})")
 
 
 if __name__ == "__main__":

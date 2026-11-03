@@ -66,21 +66,25 @@ def title_card(title: str, keyword: str, site_name: str = "퍼스트랩") -> Pat
     img = Image.new("RGB", SIZE, bg)
     draw = ImageDraw.Draw(img)
     w, h = SIZE
-    draw.rectangle([0, 0, 18, h], fill=accent)                       # 왼쪽 강조 띠
-    draw.text((80, 60), site_name, font=_font(34), fill=accent)       # 사이트 이름
+    margin = 170  # 테마가 가장자리를 잘라도 글자가 안 잘리도록 넉넉한 여백 + 가운데 정렬
 
-    for size in (76, 68, 60, 52):                                     # 제목이 4줄 안에 들어가는 크기
+    def center(text: str, y: int, font, fill: str) -> None:
+        draw.text(((w - draw.textlength(text, font=font)) / 2, y), text, font=font, fill=fill)
+
+    center(site_name, 70, _font(34), accent)                         # 사이트 이름
+    for size in (72, 64, 56, 50):                                     # 제목이 3줄 안에 들어가는 크기
         font = _font(size)
-        lines = _wrap(draw, title, font, w - 160)
-        if len(lines) <= 4:
+        lines = _wrap(draw, title, font, w - margin * 2)
+        if len(lines) <= 3:
             break
-    lines = lines[:4]
+    lines = lines[:3]
     line_h = int(size * 1.35)
-    y = (h - line_h * len(lines)) // 2 + 10
+    y = (h - line_h * len(lines)) // 2
     for line in lines:
-        draw.text((80, y), line, font=font, fill="#ffffff")
+        center(line, y, font, "#ffffff")
         y += line_h
-    draw.text((80, h - 90), f"# {keyword}", font=_font(30), fill=accent)
+    center(f"# {keyword}", h - 100, _font(30), accent)
+    draw.rectangle([w // 2 - 40, 125, w // 2 + 40, 129], fill=accent)  # 사이트 이름 아래 짧은 선
 
     return _save(img, f"card-{hashlib.md5(title.encode()).hexdigest()[:10]}.jpg")
 

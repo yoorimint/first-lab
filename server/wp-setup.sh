@@ -9,6 +9,8 @@ SITE=first-lab
 WEB_ROOT=/var/www/$SITE
 WP_USER=firstlab
 SITE_TITLE="퍼스트랩"
+AUTHOR_NAME="퍼스트랩"      # 글 작성자 표시 이름
+AUTHOR_SLUG="firstlab"      # 작성자 주소(/author/...)에 쓰는 이름
 TIMEZONE="Asia/Seoul"
 PERMALINK="/%postname%/"
 # SEO 플러그인: The SEO Framework (가볍고 DB 테이블을 추가하지 않아 SQLite와 궁합이 좋음)
@@ -55,6 +57,15 @@ log "SEO 플러그인 설치"
 for p in "${PLUGINS_INSTALL[@]}"; do
   wp plugin is-installed "$p" || wp plugin install "$p"
   wp plugin is-active "$p"   || wp plugin activate "$p"
+done
+
+# ---------- 관리자 로그인 아이디가 글 작성자로 노출되지 않게 ----------
+log "작성자 표시 이름 설정 (로그인 아이디 숨김)"
+for uid in $(wp user list --role=administrator --field=ID); do
+  login=$(wp user get "$uid" --field=user_login)
+  if [ "$(wp user get "$uid" --field=display_name)" = "$login" ] || [ "$(wp user get "$uid" --field=user_nicename)" = "$login" ]; then
+    wp user update "$uid" --display_name="$AUTHOR_NAME" --nickname="$AUTHOR_NAME" --user_nicename="$AUTHOR_SLUG-$uid"
+  fi
 done
 
 # ---------- 저장소의 mu-plugins 배포 (wordpress/mu-plugins → wp-content/mu-plugins) ----------
