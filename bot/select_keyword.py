@@ -32,6 +32,16 @@ def _core(n: str) -> str:
     return n
 
 
+def _head_difficulty(conn, volumes: dict[str, int]) -> dict[str, float]:
+    """조회해 둔 경쟁도를 주제(헤드)별 평균으로 묶는다. 조회 못 한 형제 키워드의 추정값으로 쓴다.
+    예) '한식조리사자격증'이 0.65 → 같은 헤드 '조리사자격증' 아래 키워드들도 0.65 로 추정."""
+    groups: dict[str, list[float]] = {}
+    for r in conn.execute("SELECT norm, total, difficulty FROM keywords WHERE difficulty IS NOT NULL"):
+        for key in {find_head(r["norm"], r["total"], volumes) or r["norm"], r["norm"]}:
+            groups.setdefault(key, []).append(r["difficulty"])
+    return {k: round(sum(v) / len(v), 2) for k, v in groups.items()}
+
+
 def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict]:
     """점수순 후보 (안전 검사 전). 이미 쓴 글과 겹치는 키워드는 제외."""
     latest = conn.execute("SELECT MAX(last_checked) FROM keywords").fetchone()[0]
@@ -47,6 +57,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     signals = load_signals(conn)
 
     used_cores = {_core(u) for u in used}
+    head_difficulty = _head_difficulty(conn, volumes)
 
     def overlaps_used(n: str) -> bool:
         """이미 쓴 글과 '거의 같은' 키워드만 막는다. 더 구체적인 롱테일은 허용 (주제 묶음으로 활용).
@@ -62,10 +73,13 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
             continue
         head = find_head(r["norm"], r["total"], volumes)
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
-        if r["difficulty"] is not None:
-            if r["difficulty"] >= TOO_HARD:
+        difficulty, estimated = r["difficulty"], False
+        if difficulty is None and (head or r["norm"]) in head_difficulty:
+            difficulty, estimated = head_difficulty[head or r["norm"]], True  # 조회 안 한 키워드: 같은 주제로 추정
+        if difficulty is not None:
+            if difficulty >= TOO_HARD:
                 continue
-            sc += COMP_WEIGHT * (0.5 - r["difficulty"])
+            sc += COMP_WEIGHT * (0.5 - difficulty)
         gsc = signals.get(r["norm"]) or signals.get(head or "")
         if gsc:
             sc += GSC_BONUS[gsc]
@@ -73,7 +87,8 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
             sc += 100  # 힌트 키워드 관련이면 최우선
         result.append({"keyword": r["keyword"], "total": r["total"], "score": round(sc, 2),
                        "status": r["status"], "head": head or "",
-                       "difficulty": r["difficulty"], "comp_info": r["comp_info"] or "",
+                       "difficulty": r["difficulty"],
+                       "comp_info": r["comp_info"] or (f"같은 주제 추정 {difficulty}" if estimated else ""),
                        "gsc": {"opportunity": "서치콘솔 기회", "good_head": "잘 되는 주제",
                                "bad_head": "안 되는 주제"}.get(gsc or "", "")})
     result.sort(key=lambda x: x["score"], reverse=True)
@@ -92,7 +107,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
 def _check_competition(conn, settings: BotSettings, candidates: list[dict], limit: int) -> None:
     """경쟁도 미조회 후보를 하루 한도 안에서 조회해 DB·후보 목록에 반영."""
     if not competition.source(settings):
-        print("[경쟁도] 조회 불가: 네이버 검색 API·Gemini 키가 없어 경쟁도 없이 고릅니다", flush=True)
+        print("[경쟁도] 조회 불가: Gemini 키가 없어 같은 주제 추정값만 씁니다", flush=True)
         return
     budget = min(limit, settings.competition_checks - competition_checks_today(conn))
     for c in [c for c in candidates if c["difficulty"] is None][:max(budget, 0)]:

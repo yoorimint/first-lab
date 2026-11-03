@@ -9,7 +9,6 @@ import urllib.parse
 import urllib.request
 
 BLOG_URL = "https://openapi.naver.com/v1/search/blog.json"
-WEB_URL = "https://openapi.naver.com/v1/search/webkr.json"  # 웹문서 검색 (상위 사이트 확인용)
 
 
 class CallLimitExceeded(RuntimeError):
@@ -38,28 +37,20 @@ class NaverSearchClient:
         self.max_calls = max_calls
         self.calls = 0
 
-    def _get(self, url: str, params: dict) -> dict:
+    def blog_total(self, keyword: str) -> int:
+        """키워드로 검색되는 네이버 블로그 글 수."""
         if self.calls >= self.max_calls:
             raise CallLimitExceeded(f"이번 실행의 호출 한도({self.max_calls}회)에 도달")
         self.calls += 1
+        query = urllib.parse.urlencode({"query": keyword, "display": 1})
         req = urllib.request.Request(
-            f"{url}?{urllib.parse.urlencode(params)}",
+            f"{BLOG_URL}?{query}",
             headers={"X-Naver-Client-Id": self.client_id, "X-Naver-Client-Secret": self.client_secret},
         )
         try:
             with urllib.request.urlopen(req, timeout=20) as resp:
-                return json.load(resp)
+                return int(json.load(resp).get("total", 0))
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", "replace")[:200]
             hint = _SCOPE_HINT if "Scopes are Empty" in body else _HINTS.get(e.code, "")
             raise NaverSearchError(f"HTTP {e.code}: {body}\n→ {hint}") from None
-
-    def blog_total(self, keyword: str) -> int:
-        """키워드로 검색되는 네이버 블로그 글 수."""
-        return int(self._get(BLOG_URL, {"query": keyword, "display": 1}).get("total", 0))
-
-    def web_domains(self, keyword: str, count: int = 10) -> list[str]:
-        """네이버 웹문서 검색 상위 결과의 사이트 주소(도메인) 목록 (중복 제거, 순위순)."""
-        items = self._get(WEB_URL, {"query": keyword, "display": count}).get("items", [])
-        domains = [urllib.parse.urlparse(i.get("link", "")).netloc.lower() for i in items]
-        return list(dict.fromkeys(d for d in domains if d))

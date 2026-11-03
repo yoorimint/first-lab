@@ -56,8 +56,6 @@ class BotSettings:
     persona: str = ""
     api_key: str = ""  # 선택된 제공사의 키
     gemini_key: str = ""  # 경쟁도 조회(구글 검색 연동)용 - 글쓰기 AI 와 무관하게 사용
-    naver_client_id: str = ""      # 경쟁도 조회(네이버 검색 API, 무료) - 서버 secrets.env 에만 저장
-    naver_client_secret: str = ""
     cf_account_id: str = ""   # 본문 AI 이미지 (Cloudflare Workers AI)
     cf_api_token: str = ""
     image_count: int = 3       # 글 1개당 본문 이미지 수
@@ -86,8 +84,6 @@ class BotSettings:
             persona=raw.get("persona") or "",
             api_key=(raw.get(wp_field) or "").strip() or secrets.get(env_name, ""),
             gemini_key=(raw.get("gemini_key") or "").strip() or secrets.get("GEMINI_API_KEY", ""),
-            naver_client_id=secrets.get("NAVER_CLIENT_ID", ""),
-            naver_client_secret=secrets.get("NAVER_CLIENT_SECRET", ""),
             competition_checks=int(raw.get("competition_checks") or 15),
             cf_account_id=(raw.get("cf_account_id") or "").strip() or secrets.get("CF_ACCOUNT_ID", ""),
             cf_api_token=(raw.get("cf_api_token") or "").strip() or secrets.get("CF_API_TOKEN", ""),
@@ -118,7 +114,7 @@ if __name__ == "__main__":
     # 점검용: 키 값은 숨기고 설정만 출력
     s = load_settings()
     shown = {k: v for k, v in vars(s).items() if not k.endswith(("key", "token"))}
-    for k in ("api_key", "gemini_key", "cf_api_token", "naver_client_secret"):
+    for k in ("api_key", "gemini_key", "cf_api_token"):
         v = getattr(s, k)
         shown[k] = f"있음 (끝자리 {v[-4:]})" if v else "없음"
     for k, v in shown.items():

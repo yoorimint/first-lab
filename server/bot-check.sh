@@ -13,9 +13,6 @@ cd "$REPO_DIR" && python3 -m bot.keywords 다이어트 --top 5 \
   && echo "네이버 검색광고 API: 정상" \
   || echo "네이버 검색광고 API: 실패 (키 값을 다시 확인하세요)"
 
-echo -e "\n==> 키워드 경쟁도 조회 (무료: 네이버 검색 API → Gemini)"
-cd "$REPO_DIR" && timeout 120 /opt/first-lab-venv/bin/python -m bot.competition 한식조리사자격증 2>&1 | tail -3 || true
-
 echo -e "\n==> 봇 프로세스"
 systemctl status firstlab-bot.service --no-pager 2>/dev/null | sed -n '1,4p' || true
 systemctl status firstlab-discover.service --no-pager 2>/dev/null | sed -n '1,4p' || true

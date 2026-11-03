@@ -1,7 +1,7 @@
-"""키워드 경쟁도: 검색 상위 사이트 구성을 보고 판단 (무료 방법만 사용).
+"""키워드 경쟁도: Gemini 의 '구글 검색 연동(grounding)'으로 실제 구글 상위 사이트를 보고 판단 (무료 한도 내).
 
-조회 순서: 네이버 검색 API(웹문서, 무료·하루 2.5만 회) → 없으면 Gemini 구글 검색 연동(무료 한도 내).
-네이버 순위는 구글과 같지 않지만, '정부·언론·대형 사이트가 상위를 차지하는 주제인가'는 비슷하게 드러난다.
+무료 한도가 하루 20회뿐이라 아껴 쓴다 (하루 사전 검토 + 글 1개당 최대 3회).
+조회 못 한 키워드는 같은 주제(헤드) 키워드의 조회 결과로 추정한다 (select_keyword.py).
 
 상위에 정부·위키·대형 언론·대기업 사이트가 많으면 어려움, 개인 블로그가 많으면 해볼 만함.
 주의: grounding 출처는 Gemini 가 검색 후 참고한 페이지라서 '구글 상위 10개'와 완전히 같지는 않다.
@@ -67,26 +67,10 @@ def analyze(domains: list[str]) -> Competition:
 
 def source(settings) -> str:
     """사용할 수 있는 무료 조회 방법 이름 ('' 이면 조회 불가)."""
-    if settings.naver_client_id and settings.naver_client_secret:
-        return "naver"
     return "gemini" if settings.gemini_key else ""
 
 
 def check_any(settings, keyword: str) -> Competition:
-    """설정에 있는 무료 방법으로 경쟁도 조회 (네이버 실패 시 Gemini 로 한 번 더)."""
-    if source(settings) == "naver":
-        from .naver_search import NaverSearchClient
-
-        try:
-            client = NaverSearchClient(settings.naver_client_id, settings.naver_client_secret, max_calls=1)
-            domains = client.web_domains(keyword)
-            if not domains:
-                raise RuntimeError("네이버 웹문서 검색 결과가 비어 있습니다")
-            return analyze(domains[:10])
-        except Exception as e:  # noqa: BLE001 - 권한 미설정 등
-            if not settings.gemini_key:
-                raise
-            print(f"[경쟁도] 네이버 조회 실패 → Gemini 로 시도: {str(e)[:120]}", flush=True)
     return check(settings.gemini_key, keyword)
 
 
@@ -119,7 +103,7 @@ if __name__ == "__main__":
 
     s = load_settings()
     if not source(s):
-        raise SystemExit("경쟁도 조회 불가: 네이버 검색 API 키(NAVER_CLIENT_ID/SECRET)와 Gemini 키가 모두 없습니다")
+        raise SystemExit("경쟁도 조회 불가: Gemini 키가 없습니다 (설정 페이지)")
     print(f"조회 방법: {source(s)}")
     for kw in sys.argv[1:] or ["퇴직금계산1년미만"]:
         c = check_any(s, kw)
