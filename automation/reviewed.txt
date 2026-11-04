@@ -1,13 +1,21 @@
-# 외부 검수를 마친 글 (wordpress/queue 파일 이름, 감시 세션이 추가)
-yureop-yeohaeng-junbimul-list.json
-jonghap-sodeukse-gyesangi.json
-jutaek-cheongyak-sincheong-bangbeop.json
-jutaekdambo-daechul-ija-gyesangi.json
-bannyeo-dongmul-deungrok-bangbeop.json
-bugagachise-gyesangi.json
-itq-jagyeokjeung-johoe.json
-naeilbaeum-card-gyoyuk-sincheong.json
-sinyongkadeu-balgeup-jogeon.json
-jadongcha-boheom-haljeung-gijun.json
-jadongcha-myeongui-ijeon-bangbeop.json
-jeonse-jageum-daechul-jogeon.json
+# 외부 검수를 마친 글 번호 (줄 맨 앞 숫자, 뒤는 메모). 감시 세션이 검수 후 추가 — automation/unreviewed.py 가 대조
+80 퇴직금 세금 (이전 세션 검수)
+85 하이패스 (이전 세션 검수, 다시 쓰기 대상)
+90 자동차 정기검사 (이전 세션 검수)
+99 중고차 할부 (이전 세션 검수)
+113 내일배움카드 자격 (이전 세션 검수)
+119 베트남 여행 (이전 세션 검수)
+138 실손보험 청구서류 (이전 세션 검수)
+144 건강보험료 환급금 (이전 세션 검수)
+168 유럽 여행 준비물
+176 자동차 명의이전
+204 반려동물 등록
+214 부가가치세 계산기
+217 신용카드 발급 조건
+219 주택담보대출 이자 계산기
+237 전세자금대출 조건
+239 내일배움카드 교육 신청
+241 ITQ 자격증 조회
+243 자동차보험 할증 기준
+247 종합소득세 계산기
+249 주택 청약 신청 방법
