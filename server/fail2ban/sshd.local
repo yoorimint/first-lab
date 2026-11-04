@@ -1,0 +1,10 @@
+# SSH 비밀번호 대입 공격 차단 (setup.sh 가 /etc/fail2ban/jail.d/first-lab-sshd.local 로 설치)
+# 10분 안에 5번 틀리면 그 IP 를 1시간 차단, 반복하면 차단 시간이 점점 늘어난다.
+# 배포(GitHub Actions)는 비밀번호가 맞으므로 차단되지 않는다.
+[sshd]
+enabled = true
+maxretry = 5
+findtime = 10m
+bantime = 1h
+bantime.increment = true
+ignoreip = 127.0.0.1/8 ::1

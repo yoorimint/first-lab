@@ -83,7 +83,18 @@ systemctl reload nginx
 
 trap - ERR
 
-# ---------- 6. 확인 ----------
+# ---------- 6. SSH 대입 공격 차단 (실패해도 사이트에는 영향 없음) ----------
+log "fail2ban (SSH 비밀번호 여러 번 틀린 IP 자동 차단)"
+if dpkg -s fail2ban &>/dev/null || DEBIAN_FRONTEND=noninteractive apt-get install -y -q fail2ban; then
+  install -m 644 "$REPO_DIR/fail2ban/sshd.local" /etc/fail2ban/jail.d/first-lab-sshd.local
+  systemctl enable -q --now fail2ban && systemctl reload fail2ban 2>/dev/null || systemctl restart fail2ban
+  sleep 2
+  fail2ban-client status sshd 2>/dev/null | grep -E "Currently|Total" | sed 's/^/  /' || echo "  fail2ban 상태 확인 실패"
+else
+  echo "  fail2ban 설치 실패 (사이트에는 영향 없음)"
+fi
+
+# ---------- 7. 확인 ----------
 log "확인"
 sleep 1
 for i in 1 2; do
