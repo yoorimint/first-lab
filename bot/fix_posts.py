@@ -87,9 +87,12 @@ def apply_patches() -> None:
             content = wp_cli("post", "get", pid, "--field=post_content")
         except subprocess.CalledProcessError:
             continue
-        content = patch_content(content, patch)
-        if content is None:
+        updated = patch_content(content, patch)
+        if updated is None:
+            if "insert_after" in patch:  # 넣은 블록이 그대로 있는지 확인용 (편집기 저장으로 지워지면 다시 넣음)
+                print(f"[확인] {pid} '{patch['insert_after']}' {content.count(patch['insert_after'])}개", flush=True)
             continue
+        content = updated
         wp_cli("post", "update", pid, f"--post_content={content}")
         kind = "블록 추가" if "insert_after" in patch else "문단 수정"
         print(f"[보정] {pid} {kind}: {patch['why']}")

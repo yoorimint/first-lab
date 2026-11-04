@@ -110,8 +110,11 @@ done
 log "고정 페이지 동기화"
 for file in "$REPO_DIR"/wordpress/pages/*.html; do
   slug=$(basename "$file" .html)
-  title=$(sed -n '1s/^<!-- title: \(.*\) -->$/\1/p' "$file")
-  [ -n "$title" ] || echo "경고: $slug 페이지 제목 줄(<!-- title: ... -->)을 못 읽음"
+  # 서버 로캘과 무관하게 UTF-8 로 읽음 (sed 는 로캘에 따라 한글 제목을 못 읽은 적이 있음)
+  title=$(python3 -c 'import re,sys; m=re.match(r"<!-- title: (.*) -->\s*$", open(sys.argv[1], encoding="utf-8").readline()); print(m.group(1) if m else "")' "$file")
+  if [ -z "$title" ]; then
+    echo "경고: $slug 페이지 제목 줄(<!-- title: ... -->)을 못 읽음 → 이 페이지는 건너뜀"; continue
+  fi
   echo "  페이지 $slug → $title"
   content=$(tail -n +2 "$file")
   id=$(wp post list --post_type=page --name="$slug" --post_status=any --field=ID)
