@@ -15,7 +15,7 @@
 
 ## 지켜 온 결정
 - 글은 Claude 월정액(예약 작업)으로 쓴다. API 비용을 더하지 않는다. 네이버 검색 API 는 쓰지 않는다.
-- 사진은 글마다 AI 대표 사진 1장 (홈 목록·공유 미리보기용). 본문과 글 화면에는 사진을 넣지 않는다 (bot/photo.py).
+- 사진은 글마다 AI 대표 사진 1장 (홈 목록·공유 미리보기용). 본문 안에는 사진을 넣지 않고, 글 화면 맨 위에 대표 사진만 보인다 (bot/photo.py, first-lab-home.php).
 - 저장소는 공개 저장소: 비밀값을 커밋·출력하지 않는다.
 - main 에 올리면 자동 배포된다. 올리기 전에 `python3 -m unittest discover -s tests && node tests/test_calculators.mjs` 종료코드 확인.
 

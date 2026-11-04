@@ -9,7 +9,7 @@
  *
  * 대표 글 순서: ① 관리자가 '맨 위에 고정'한 글 → ② 서치콘솔 클릭 1위 글(봇이 option firstlab_popular_url 에 저장,
  * bot/search_console.py) → ③ 최신 글.
- * 사진: 대표 이미지 (AI 사진 1장, 없으면 제목 카드). 글 화면에서는 대표 이미지를 숨긴다.
+ * 사진: 대표 이미지 (AI 사진 1장, 없으면 제목 카드). 글 화면 맨 위에는 AI 대표 사진만 보인다 (제목 카드는 숨김).
  * 스타일: 테마 assets/feed.css
  */
 
@@ -61,12 +61,14 @@ function firstlab_post_photo( WP_Post $post, string $size, array $attr = array()
 	return get_the_post_thumbnail( $post, $size, $attr + array( 'alt' => '', 'loading' => 'lazy', 'decoding' => 'async' ) );
 }
 
-// 대표 사진은 홈·목록·공유 미리보기용. 글 화면에서는 보이지 않게 (본문에는 사진을 넣지 않는 방침)
+// 글 화면 맨 위: AI 대표 사진만 보인다 (운영자 결정 11/4). 사진이 아직 없어 제목 카드인 글은 제목과 겹치니 숨김.
+// 본문 안에는 사진을 넣지 않는다 (bot/photo.py).
 add_filter(
 	'render_block_core/post-featured-image',
 	static function ( $html, $block, $instance ) {
 		$post_id = (int) ( $instance->context['postId'] ?? 0 );
-		return ( is_singular( 'post' ) && $post_id === get_queried_object_id() ) ? '' : $html;
+		$on_post = is_singular( 'post' ) && $post_id === get_queried_object_id();
+		return ( $on_post && '' === (string) get_post_meta( $post_id, '_firstlab_photo', true ) ) ? '' : $html;
 	},
 	10,
 	3
