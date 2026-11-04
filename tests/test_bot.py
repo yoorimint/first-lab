@@ -545,6 +545,24 @@ class MiscTest(unittest.TestCase):
         self.assertEqual([p for p in ("<p>도입</p>", "<p>중간</p>", "<p>끝</p>") if p in out], ["<p>도입</p>", "<p>중간</p>", "<p>끝</p>"])
         self.assertEqual(migrate_photos.body_photos(out), [])  # 다시 실행해도 아무 일 없음
 
+    def test_migrate_keeps_body_when_no_photo_in_media(self):
+        from bot import images, migrate_photos, photo
+        body = ('<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="'
+                'https://first-lab.kr/wp-content/uploads/2026/11/ai-aaaaaaaaaa.jpg" alt="a"/></figure>\n<!-- /wp:image -->')
+        calls = []
+        with mock.patch.object(images, "attachment_id", return_value=""), \
+             mock.patch.object(photo, "meta", return_value=""), \
+             mock.patch.object(migrate_photos, "wp_cli", side_effect=lambda *a: calls.append(a) or ""):
+            msg = migrate_photos.migrate_post("80", body)
+        self.assertIn("그대로 둠", msg)
+        self.assertFalse(any(c[:2] == ("post", "update") for c in calls))  # 대표 사진을 못 정하면 본문을 지우지 않음
+
+    def test_attachment_lookup_includes_inherit_status(self):
+        from bot import images
+        with mock.patch.object(images, "wp_cli", return_value="501\n") as cli:
+            self.assertEqual(images.attachment_id("ai-aaaaaaaaaa"), "501")
+        self.assertIn("--post_status=inherit", cli.call_args[0])  # 첨부는 inherit 상태라 빼면 못 찾음
+
 
 class GateStructureNumberTest(unittest.TestCase):
     def test_step_counts_in_title_are_not_facts(self):

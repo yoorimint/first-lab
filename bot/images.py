@@ -182,14 +182,21 @@ def import_media(path: Path, title: str, alt: str) -> tuple[int, str]:
     return att_id, url
 
 
+def attachment_id(name: str) -> str:
+    """미디어 첨부 번호 (파일 이름 = 첨부 이름, 예: ai-1b47e7d5a0). 없으면 ''.
+    첨부의 상태는 'inherit' 라서 상태를 지정하지 않으면(기본 publish) 못 찾는다."""
+    ids = wp_cli("post", "list", "--post_type=attachment", "--post_status=inherit", f"--name={name}", "--field=ID").split()
+    return ids[0] if ids else ""
+
+
 def delete_attachment(name: str) -> None:
-    """미디어에서 사진 지우기 (파일 이름 = 첨부 이름, 예: ai-1b47e7d5a0). 없으면 조용히 넘어감."""
+    """미디어에서 사진 지우기. 없으면 조용히 넘어감."""
     import subprocess
 
-    ids = wp_cli("post", "list", "--post_type=attachment", f"--name={name}", "--field=ID").split()
-    if ids:
+    att = attachment_id(name)
+    if att:
         try:
-            wp_cli("post", "delete", ids[0], "--force")
+            wp_cli("post", "delete", att, "--force")
         except subprocess.CalledProcessError:
             pass
 
