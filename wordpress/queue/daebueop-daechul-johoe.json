@@ -1,0 +1,448 @@
+{
+ "title": "대부업 대출 조회 방법: 등록업체 확인·내 대출 열람·연 20% 기준",
+ "excerpt": "대부업 대출 조회는 파인 등록대부업체 통합조회로 업체를, 신용정보원 무료조회로 내 대출을 확인해요. 연 20% 상한과 연 60% 초과 무효 기준, 신고처까지 정리했어요.",
+ "content_html": "<p>대부업 대출 조회는 두 가지예요. <strong>거래할 업체가 등록된 곳인지</strong>는 금융감독원 파인의 '등록대부업체 통합조회'에서 등록증번호·업체명·전화번호로 찾고, <strong>내가 받은 대출 내역</strong>은 한국신용정보원 무료 신용정보 조회로 봐요. 등록업체라도 이자는 연 20%를 넘을 수 없고, 조회가 안 되는 업체라면 바로 상담을 멈추는 게 맞아요.</p>\n\n<h2>1. 등록 대부업체 조회하는 순서</h2>\n<ol>\n<li>금융감독원 금융소비자 정보포털 파인(fine.fss.or.kr)에 들어가요.</li>\n<li>'금융회사 정보' 메뉴에서 '대부업체 조회'를 누르면 등록대부업체 통합조회 화면이 열려요.</li>\n<li>광고나 문자에 적힌 등록증번호, 업체명, 대표자, 전화번호, 광고용 전화번호, 법인등록번호 중 아는 것을 넣어 검색해요. 전화번호는 '-'와 공백을 빼고 입력해요.</li>\n<li>결과에 나온 업체명·등록증번호·소재지·전화번호·운영상태가 광고 내용과 같은지 하나씩 맞춰 봐요.</li>\n</ol>\n<p>조회 화면에서는 등록기관(금융감독원·지방자치단체), 사업내용(금전대부·대부중개·채권추심 등), 지역으로 범위를 좁힐 수 있어요. 결과 목록에는 등록 유효기간도 함께 나오니 기간이 지나지 않았는지도 같이 봐 두면 좋아요.</p>\n\n<h2>2. 조회 결과 읽는 법</h2>\n<table>\n<thead><tr><th>조회 결과</th><th>의미</th><th>할 일</th></tr></thead>\n<tbody>\n<tr><td>정보가 모두 일치</td><td>등록 업체</td><td>금리·계약서 확인 후 진행</td></tr>\n<tr><td>업체는 있으나 전화번호가 다름</td><td>사칭 가능성</td><td>등록된 번호로 직접 연락</td></tr>\n<tr><td>등록증번호·전화번호 조회 안 됨</td><td>미등록 업체 가능성</td><td>즉시 상담 중단, 신고 가능</td></tr>\n</tbody>\n</table>\n<p>금융감독원은 등록대부업체에 문의했는데 다른 업체·다른 번호에서 연락이 오거나, 연 20%를 넘는 대출을 권하면 바로 상담을 멈추라고 안내해요. 실제 피해 사례도 유명 대부광고 사이트에서 등록업체에 연락했는데, 5분 뒤 모르는 번호로 전화가 와 불법 고금리 대출로 이어진 경우였어요.</p>\n\n<h2>3. 내 대부업 대출 내역 조회하기</h2>\n<p>파인의 '내 돈 관리 → 신용정보조회'로 가면 본인의 대출·연체정보, 카드발급·현금서비스 내역, 채권자 변동정보를 무료로 볼 수 있어요. 대출 내역은 한국신용정보원의 신용정보 무료조회에서, 신용평점은 나이스평가정보·코리아크레딧뷰로에서 따로 봐요.</p>\n<p>다만 모든 대부업 대출이 이 조회에 빠짐없이 잡힌다고 장담하기는 어려워요. 작은 업체에서 빌린 돈이 목록에 없으면 계약서와 상환 내역으로 잔액을 정리하고, 그 업체에 남은 원금·이자를 서면으로 받아 두는 게 안전해요.</p>\n\n<h2>4. 금리 기준과 이자 계산 예시</h2>\n<table>\n<thead><tr><th>구분</th><th>기준</th><th>효과</th></tr></thead>\n<tbody>\n<tr><td>법정최고이자율</td><td>연 20%</td><td>초과 이자 수취는 불법</td></tr>\n<tr><td>초고금리 대부계약</td><td>연 60% 초과</td><td>계약 무효(원금·이자 모두)</td></tr>\n<tr><td>미등록 업체 대부</td><td>금리와 무관</td><td>이자 약정 무효</td></tr>\n</tbody>\n</table>\n<p>예를 들어 100만 원을 1년 빌리면 등록업체가 받을 수 있는 이자는 최대 20만 원이에요. 금융감독원 예시처럼 30만 원을 빌리고 일주일 뒤 50만 원을 갚는다면, 이자 20만 원 ÷ 원금 30만 원 ÷ 7일 × 365일로 계산해 연 이자율이 약 3,476.2%예요. 연 60%를 훨씬 넘기 때문에 원금과 이자를 갚을 의무가 없고, 이미 낸 돈은 돌려받을 수 있는 대상이에요.</p>\n<p>선이자, 수수료, 연장비처럼 이름이 달라도 대출과 관련해 낸 돈은 이자로 보고 계산해요. 담보 설정 비용이나 신용조회 비용처럼 법에서 따로 뺀 일부 비용만 예외예요. 금융감독원 '불법사금융 이자율 계산'에 빌린 날·갚은 날·금액을 넣으면 연 이자율이 바로 나와요.</p>\n\n<h2>5. 이런 요구는 바로 끊어야 해요</h2>\n<ul>\n<li>대출해 주는 대가로 중개수수료·작업비·예치금을 먼저 보내라는 요구</li>\n<li>가족·지인 연락처, 신체 사진, 휴대폰 앱 설치 요구</li>\n<li>통장이나 휴대폰을 개통해 넘기라거나 신분증을 맡기라는 요구</li>\n<li>휴대전화 문자, 일수 전단지, 명함으로 들어온 대출광고</li>\n</ul>\n<p>빚을 받으러 오는 쪽도 지켜야 할 선이 있어요. 소속과 이름을 밝히지 않는 추심, 정당한 이유 없이 반복하거나 저녁 9시부터 아침 8시 사이에 전화·방문해 불안감을 주는 행위, 가족이나 직장 동료에게 빚을 알리는 행위는 불법 추심이에요. 통화 녹음, 문자 캡처, 계좌이체 내역을 남겨 두면 신고할 때 증거가 돼요.</p>\n\n<h2>6. 피해가 생겼을 때 연락할 곳</h2>\n<table>\n<thead><tr><th>번호</th><th>하는 일</th></tr></thead>\n<tbody>\n<tr><td>112</td><td>불법사금융 피해 신고</td></tr>\n<tr><td>1332</td><td>불법사금융 상담, 원스톱 피해신고 접수</td></tr>\n<tr><td>132</td><td>법률 상담, 채무자대리인·소송변호사 선임 지원</td></tr>\n<tr><td>1397</td><td>서민금융콜센터, 정책서민금융상품 상담</td></tr>\n</tbody>\n</table>\n<p>불법사채를 해결해 준다며 수수료나 후원금을 요구하는 사설 업체는 정부기관과 관련이 없어요. 급한 돈이 필요하다면 대부업보다 먼저 서민금융진흥원의 햇살론15, 최저신용자 특례보증, 불법사금융 예방대출 같은 정책서민금융상품이 되는지 '서민금융 잇다'나 1397에서 상담받아 보는 게 순서예요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>대부중개업체도 같은 곳에서 조회되나요?</h3>\n<p>네. 등록대부업체 통합조회의 사업내용에서 '대부중개'를 고르면 중개업체도 찾을 수 있어요. 중개업체가 대출받는 사람에게 중개수수료를 받는 것은 불법이에요.</p>\n<h3>등록 정보가 정확한지 더 묻고 싶으면요?</h3>\n<p>조회 결과의 등록기관이 지방자치단체라면, 그 업체 영업소 주소를 관할하는 지방자치단체가 등록 문의를 담당해요. 등록기관이 금융감독원으로 나오면 금융감독원 1332로 물어보면 돼요.</p>\n<h3>주요 대부업체 금리를 비교할 수 있나요?</h3>\n<p>금융감독원 '대부업체 금리비교'에서 주요 등록 대부업체의 분기별 신규취급액 기준 최저·최고금리와 금리별 대출 비중을 볼 수 있어요.</p>\n<h3>계약서는 꼭 받아야 하나요?</h3>\n<p>받아 두세요. 고금리 피해를 신고하거나 소송할 때 증거가 부족해 이자율 위반을 입증하지 못하는 경우가 많아서, 서면 계약서와 갚은 영수증·이체 내역이 가장 중요한 자료예요.</p>\n",
+ "tags": [
+  "대부업 조회",
+  "등록대부업체",
+  "불법사금융"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm young adult sitting at a wooden kitchen table holding a smartphone near a window with soft morning light, viewed from behind",
+   "alt": "아침 창가 식탁에서 휴대폰을 들고 있는 사람의 뒷모습"
+  }
+ ],
+ "review": [
+  {
+   "claim": "제목·요약: 등록업체 확인은 파인 '등록대부업체 통합조회'",
+   "urls": [
+    "https://fine.fss.or.kr/fine/main/main.do",
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제목·요약: 대부업 이자 상한 연 20%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290377&efYd=20261002&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요약: 연 60% 초과 계약 무효",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290377&efYd=20261002&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "내 대출 내역은 한국신용정보원 무료 신용정보 조회로 확인",
+   "urls": [
+    "https://fine.fss.or.kr/fine/main/contents.do?menuNo=900036"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "등록업체 조회는 등록증번호·업체명·전화번호로 검색",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "조회가 안 되는 업체라면 바로 상담 중단",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "파인 주소 fine.fss.or.kr (금융감독원 금융소비자 정보포털)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "'금융회사 정보' 메뉴 → '대부업체 조회' → 등록대부업체 통합조회 화면",
+   "urls": [
+    "https://fine.fss.or.kr/fine/main/main.do",
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "검색 항목: 등록증번호, 업체명, 대표자, 전화번호, 광고용 전화번호, 법인등록번호",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "전화번호는 '-'와 공백을 빼고 입력",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "결과에 업체명·등록증번호·소재지·전화번호·운영상태가 나옴",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "등록기관(금융감독원·지방자치단체)으로 좁힐 수 있음",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사업내용(금전대부·대부중개·채권추심 등), 지역으로 범위 좁히기",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "결과 목록에 등록 유효기간이 함께 나옴",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "조회 결과표: 업체는 있으나 전화번호가 다르면 사칭 가능성, 등록된 번호로 직접 연락",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "조회 결과표: 등록증번호·전화번호 조회 안 되면 미등록 가능성, 즉시 상담 중단·신고 가능",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228",
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201230"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금감원: 다른 업체·다른 번호에서 연락 오거나 연 20% 넘는 대출 권하면 상담 멈추라",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "피해 사례: 유명 대부광고 사이트에서 등록업체에 연락, 5분 뒤 모르는 번호로 전화 → 불법 고금리",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201234"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "파인 '내 돈 관리 → 신용정보조회'에서 대출·연체정보, 카드발급·현금서비스 내역, 채권자 변동정보 무료 조회",
+   "urls": [
+    "https://fine.fss.or.kr/fine/main/contents.do?menuNo=900036"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신용평점은 나이스평가정보·코리아크레딧뷰로에서",
+   "urls": [
+    "https://fine.fss.or.kr/fine/main/contents.do?menuNo=900036"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "모든 대부업 대출이 신용정보원 조회에 빠짐없이 잡힌다고 장담 어려움",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "휴면 금융자산은 '내계좌 한눈에(payinfo.or.kr)'에서 조회",
+   "urls": [
+    "https://www.payinfo.or.kr/"
+   ],
+   "verdict": "확인불가",
+   "action": "삭제"
+  },
+  {
+   "claim": "법정최고이자율 연 20%, 초과 이자 수취는 불법",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290377&efYd=20261002&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연 60% 초과 대부계약은 무효(원금·이자 모두)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290377&efYd=20261002&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "미등록 업체 대부는 금리와 무관하게 이자 약정 무효",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0",
+    "https://www.fss.or.kr/fss/cvpl/ilgPvtFnc/itstCalc.do?menuNo=201252"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "100만 원을 1년 빌리면 등록업체가 받을 수 있는 이자는 최대 20만 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290377&efYd=20261002&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금감원 예시: 30만 원 빌리고 일주일 뒤 50만 원 상환",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201234"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "20만÷30만÷7×365 → 연 약 3,476.2%",
+   "urls": [
+    "https://www.fss.or.kr/fss/cvpl/ilgPvtFnc/itstCalc.do?menuNo=201252",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연 60%를 넘으므로 원금·이자 갚을 의무 없고 이미 낸 돈 반환 대상",
+   "urls": [
+    "https://www.fss.or.kr/fss/cvpl/ilgPvtFnc/itstCalc.do?menuNo=201252",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "선이자·수수료·연장비 등 명칭이 달라도 대출 관련해 낸 돈은 이자로 봄, 담보 설정 비용·신용조회 비용은 예외",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0",
+    "https://www.fss.or.kr/fss/cvpl/ilgPvtFnc/itstCalc.do?menuNo=201252"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "금감원 '불법사금융 이자율 계산'에 빌린 날·갚은 날·금액 넣으면 연 이자율 산출",
+   "urls": [
+    "https://www.fss.or.kr/fss/cvpl/ilgPvtFnc/itstCalc.do?menuNo=201252"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대출 대가로 중개수수료·작업비·예치금 선입금 요구는 끊어야",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201240",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "가족·지인 연락처, 신체 사진, 휴대폰 앱 설치 요구 시 중단",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "통장·휴대폰 개통해 넘기기, 신분증 맡기기 요구 시 중단",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "휴대전화 문자, 일수 전단지, 명함 대출광고는 끊어야",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201234"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소속과 이름을 밝히지 않는 추심은 불법",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201239"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "정당한 이유 없이 반복하거나 저녁 9시~아침 8시에 전화·방문해 불안감을 주는 추심은 불법",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290797&efYd=20261002&chrClsCd=010202&ancYnChk=0",
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201239"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "가족·직장 동료에게 빚을 알리는 행위는 불법 추심",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290797&efYd=20261002&chrClsCd=010202&ancYnChk=0",
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201239"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "통화 녹음·문자 캡처·이체 내역이 신고 증거",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201239"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "112 불법사금융 피해 신고",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201230"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1332 불법사금융 상담, 원스톱 피해신고 접수",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201230"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "132 법률 상담, 채무자대리인·소송변호사 선임 지원",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201230"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1397 서민금융콜센터, 정책서민금융상품 상담",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201227"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "불법사채 해결 명목 수수료·후원금 요구 사설 업체는 정부기관과 무관",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201230"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "서민금융진흥원 햇살론15, 최저신용자 특례보증, 불법사금융 예방대출 상담 ('서민금융 잇다'·1397)",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201227"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 통합조회 사업내용에서 '대부중개' 선택하면 중개업체도 조회",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 중개업체가 대출받는 사람에게 중개수수료 받는 것은 불법",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=277259&efYd=20260102&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "등록기관이 지자체면 영업소 관할 지자체가 등록 문의 담당, 금감원 등록이면 금감원 1332",
+   "urls": [
+    "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "FAQ: 금감원 '대부업체 금리비교'에서 분기별 신규취급액 기준 최저·최고금리, 금리별 대출 비중",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=200930"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 증거 부족으로 이자율 위반 입증 못하는 경우 많아 서면 계약서·영수증·이체 내역 보관",
+   "urls": [
+    "https://www.fss.or.kr/fss/main/contents.do?menuNo=201234"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "금융감독원 파인 등록대부업체 통합조회",
+   "url": "https://fines.fss.or.kr/fines/plis/moneyLenderSearch/MoneyLenderSearch.getMoneyLenderList.do"
+  },
+  {
+   "name": "금융감독원 불법사금융 지킴이 등록대부업체 조회 안내",
+   "url": "https://www.fss.or.kr/fss/main/contents.do?menuNo=201228"
+  },
+  {
+   "name": "금융감독원 파인 신용정보조회 안내",
+   "url": "https://fine.fss.or.kr/fine/main/contents.do?menuNo=900036"
+  }
+ ],
+ "keyword": "대부업대출조회",
+ "status": "auto"
+}
