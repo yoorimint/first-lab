@@ -1,0 +1,34 @@
+/* 퍼스트랩 계산기 공통 모양 (테마 글꼴·색을 따르고 테두리만 옅게) */
+.firstlab-calc {
+	--fc-line: color-mix(in srgb, currentColor 18%, transparent);
+	--fc-soft: color-mix(in srgb, currentColor 5%, transparent);
+	border: 1px solid var(--fc-line);
+	border-radius: 10px;
+	padding: 1.25rem;
+	margin: 2rem 0;
+	background: var(--fc-soft);
+}
+.firstlab-calc__title { font-weight: 700; font-size: 1.15em; margin: 0 0 .25rem; }
+.firstlab-calc__intro { margin: 0 0 1rem; opacity: .8; }
+.firstlab-calc__form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .9rem 1rem; }
+.firstlab-calc__field label { display: block; font-weight: 600; margin-bottom: .3rem; }
+.firstlab-calc__field input,
+.firstlab-calc__field select {
+	width: 100%;
+	box-sizing: border-box;
+	padding: .55rem .6rem;
+	font: inherit;
+	border: 1px solid var(--fc-line);
+	border-radius: 6px;
+	background: var(--wp--preset--color--base, #fff);
+	color: inherit;
+}
+.firstlab-calc__help { font-size: .85em; opacity: .7; margin: .3rem 0 0; }
+.firstlab-calc__result { margin-top: 1.25rem; }
+.firstlab-calc__table { width: 100%; border-collapse: collapse; }
+.firstlab-calc__table th,
+.firstlab-calc__table td { text-align: left; padding: .55rem .4rem; border-top: 1px solid var(--fc-line); vertical-align: top; }
+.firstlab-calc__table th { width: 38%; font-weight: 600; }
+.firstlab-calc__notes { margin: 1rem 0 0; padding-left: 1.2rem; font-size: .92em; }
+.firstlab-calc__hint { margin: 0; opacity: .75; }
+.firstlab-calc__source { font-size: .8em; opacity: .7; margin: 1rem 0 0; }

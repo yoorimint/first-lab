@@ -246,6 +246,12 @@ class MiscTest(unittest.TestCase):
         self.assertEqual(out, "<p>앞</p><p>바뀐 문단</p><p>뒤</p>")
         self.assertIsNone(patch_content(out, {"find": "전국 평균은 17만", "replace_paragraph": "x"}))
 
+    def test_calculator_line_becomes_shortcode_block(self):
+        from bot.blocks import to_blocks
+        out = to_blocks('<p>앞</p>\n<p>[firstlab_calc id="car-inspection"]</p>\n<p>문장 속 [firstlab_calc id="x"] 그대로</p>')
+        self.assertIn('<!-- wp:shortcode -->\n[firstlab_calc id="car-inspection"]\n<!-- /wp:shortcode -->', out)
+        self.assertIn("<p>문장 속 [firstlab_calc", out)
+
     def test_patches_file_valid(self):
         for p in json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")):
             self.assertTrue({"post", "why", "find", "replace_paragraph"} <= set(p))

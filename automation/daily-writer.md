@@ -48,10 +48,25 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 ```
   출력이 `[]` 이어야 한다.
 
+## 4-1. 계산기 (주제에 정해진 계산 공식이 있을 때만)
+수수료표·세율·요율·법령 계산식처럼 **정해진 공식**이 있고, 독자가 자기 값을 넣어볼 이유가 있는 주제면 계산기를 본문에 넣는다.
+공식이 없는 주제(신청 방법, 서류, 절차 안내)는 넣지 않는다.
+- 계산기 폴더: `wordpress/themes/first-lab/calculators/` (구조 설명은 `calc.js` 머리말). 예시: `car-inspection`.
+- 이미 있는 계산기(`defs/*.js`)로 되면 새로 만들지 말고 그걸 넣는다.
+- 없으면 새로 만든다 (id 는 영문 소문자-하이픈):
+  - `defs/<id>.js`: `car-inspection.js` 와 같은 형식 (입력 항목 + compute). 화면 문구는 본문과 같은 말투.
+  - `data/<id>.json`: 요율·금액은 전부 여기에. `basis_date`(오늘), `sources`(조사한 공식 출처 이름·주소)
+  - `tests/<id>.json`: 검증 사례 3개 이상. 기대값은 공식 기관 계산 예시나 법령 문구로 직접 확인한 값만 (계산기로 낸 값을 그대로 기대값으로 쓰지 않는다)
+  - `wordpress/pages/<id>-calculator.html`: 단독 페이지 (첫 줄 `<!-- title: ○○ 계산기 -->`, 짧은 안내 + 계산기 + 결과 읽는 법)
+  - 검사: `node tests/test_calculators.mjs` 가 통과해야 한다
+- 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
+- 본문에 넣는 법: `content_html` 의 계산 예시 근처에 **독립된 줄**로 `<p>[firstlab_calc id="<id>"]</p>`
+- 계산기는 별도 커밋으로 먼저 올린다: `git add wordpress/themes/first-lab/calculators wordpress/pages && git commit -m "계산기: <이름>"`
+
 ## 5. 올리기
 - `wordpress/queue/<영문-슬러그>.json` 으로 저장한다. 4단계 JSON 에 `"keyword": "<후보 원문>"`, `"status": "auto"` 를 더한다
   (auto = 설정 페이지의 발행 방식을 따름).
-- 검사: `python3 -m unittest discover -s tests`
+- 검사: `python3 -m unittest discover -s tests && node tests/test_calculators.mjs`
 - 커밋하고 main 에 올린다 (운영자 승인된 자동 작업): 
   `git add wordpress/queue && git commit -m "매일 글: <키워드>" && git push origin HEAD:main`
 - 배포 결과 확인 (예약 세션엔 GitHub 도구가 없으니 공개 API 사용, 2~5분 걸림):

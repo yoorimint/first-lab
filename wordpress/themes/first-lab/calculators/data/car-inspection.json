@@ -1,0 +1,15 @@
+{
+  "basis_date": "2026-11-04",
+  "sources": [
+    {"name": "한국교통안전공단 수수료 안내", "url": "https://main.kotsa.or.kr/portal/contents.do?menuCode=01010102"},
+    {"name": "강동구 자동차 정기(종합)검사 안내", "url": "https://gangdong.go.kr/web/newportal/contents/gdp_001_003_005"},
+    {"name": "찾기쉬운 생활법령정보 자동차 검사", "url": "https://easylaw.go.kr/CSP/CnpClsMainBtr.laf?popMenu=ov&csmSeq=675&ccfNo=2&cciNo=2&cnpClsNo=1"}
+  ],
+  "window": {"before_days": 90, "after_days": 31},
+  "fee": {
+    "periodic":     {"light": 17000, "small": 23000, "medium": 26500, "large": 29000},
+    "comp_no_load": {"light": 34000, "small": 39000, "medium": 45000, "large": 49000},
+    "comp_load":    {"light": 48000, "small": 54000, "medium": 56000, "large": 65000}
+  },
+  "fine": {"base": 40000, "base_days": 30, "step_from_day": 31, "step_days": 3, "step_amount": 20000, "max": 600000, "max_from_day": 115}
+}

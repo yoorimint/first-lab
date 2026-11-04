@@ -8,6 +8,8 @@ from __future__ import annotations
 import re
 
 _TOP = re.compile(r"<(h2|h3|h4|p|ul|ol|table|figure|blockquote)\b[^>]*>.*?</\1>", re.S | re.I)
+# 계산기 자리 (wordpress/mu-plugins/first-lab-calculators.php). 문단 안에 두면 <p> 안에 <div> 가 들어가므로 따로 뺀다.
+_CALC = re.compile(r"^\s*(\[firstlab_calc\b[^\]]*\])\s*$")
 
 
 def _list(tag: str, html: str) -> str:
@@ -25,6 +27,9 @@ def _block(tag: str, html: str) -> str:
         text = re.sub(rf"^<{tag}\b[^>]*>|</{tag}>$", "", html.strip(), flags=re.I)
         return f'<!-- wp:heading{attrs} -->\n<{tag} class="wp-block-heading">{text}</{tag}>\n<!-- /wp:heading -->'
     if tag == "p":
+        calc = _CALC.match(re.sub(r"^<p\b[^>]*>|</p>$", "", html.strip(), flags=re.I))
+        if calc:
+            return f"<!-- wp:shortcode -->\n{calc.group(1)}\n<!-- /wp:shortcode -->"
         return f"<!-- wp:paragraph -->\n{html.strip()}\n<!-- /wp:paragraph -->"
     if tag in ("ul", "ol"):
         return _list(tag, html)
@@ -41,12 +46,16 @@ def to_blocks(html: str) -> str:
         return html  # 이미 블록 형식
     parts, pos = [], 0
     for m in _TOP.finditer(html):
-        leftover = html[pos:m.start()].strip()
-        if leftover:  # 태그 밖 텍스트는 문단으로
-            parts.append(f"<!-- wp:paragraph -->\n<p>{leftover}</p>\n<!-- /wp:paragraph -->")
+        parts.extend(_loose(html[pos:m.start()]))
         parts.append(_block(m.group(1), m.group(0)))
         pos = m.end()
-    tail = html[pos:].strip()
-    if tail:
-        parts.append(f"<!-- wp:paragraph -->\n<p>{tail}</p>\n<!-- /wp:paragraph -->")
+    parts.extend(_loose(html[pos:]))
     return "\n\n".join(parts)
+
+
+def _loose(text: str) -> list[str]:
+    """태그 밖 텍스트 → 문단 (계산기 자리는 문단으로 감싸지 않음)."""
+    text = text.strip()
+    if not text:
+        return []
+    return [_block("p", f"<p>{text}</p>")]
