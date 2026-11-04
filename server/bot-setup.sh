@@ -38,6 +38,17 @@ apply_settings_once 2026-11-04-direct publish_times=11:00 jitter_minutes=0
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
 
+log "예약 발행 대기열: 기존 직접 작성 초안 넣기 (한 번만, 운영자 요청 2026-11-04)"
+QUEUE_MARK=/var/lib/first-lab/bot/once-2026-11-04-queue-direct.done
+if [ ! -f "$QUEUE_MARK" ]; then
+  for id in 80 85 90 99; do  # 퇴직금 세금, 하이패스, 자동차검사, 중고차 할부 (예전 API 봇 초안은 다시 쓴 뒤 넣음)
+    if [ "$(runuser -u firstlab -- wp --path=/var/www/first-lab post get "$id" --field=post_status 2>/dev/null)" = "draft" ]; then
+      runuser -u firstlab -- wp --path=/var/www/first-lab post meta update "$id" _firstlab_queue ready --quiet && echo "대기열 추가: $id"
+    fi
+  done
+  touch "$QUEUE_MARK"
+fi
+
 log "글쓰기 세션용 API 토큰 (서버 비밀값에만 원문, 워드프레스엔 해시)"
 SECRETS=/etc/first-lab/secrets.env
 if ! grep -q '^FIRSTLAB_API_TOKEN=' "$SECRETS" 2>/dev/null; then

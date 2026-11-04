@@ -19,7 +19,7 @@ from .settings import wp_cli
 STATE_OPTION = "firstlab_bot_state"
 REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
-DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
+DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired", "publish_fired", "continuous")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
 MAX_LOG = 30
 MAX_USED = 2000
 
@@ -80,3 +80,17 @@ def pop_excluded() -> list[str]:
     if items:
         wp_cli("option", "delete", EXCLUDE_OPTION)
     return [str(x) for x in items] if isinstance(items, list) else []
+
+
+CONTINUOUS_OPTION = "firstlab_bot_continuous"  # 설정 페이지 '연속 작성' 시작(1)·정지(0)
+
+
+def continuous_on() -> bool:
+    try:
+        return wp_cli("option", "get", CONTINUOUS_OPTION).strip() == "1"
+    except subprocess.CalledProcessError:
+        return False
+
+
+def set_continuous(on: bool) -> None:
+    wp_cli("option", "update", CONTINUOUS_OPTION, "1" if on else "0")

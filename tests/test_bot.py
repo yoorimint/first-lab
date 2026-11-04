@@ -217,14 +217,25 @@ class DirectRefreshTest(unittest.TestCase):
 
 
 class ScheduleTest(unittest.TestCase):
-    def test_next_free_slot(self):
+    def test_publish_oldest_ready_draft(self):
         from datetime import datetime
-        from bot.schedule import next_slot
-        now = datetime(2026, 11, 5, 7, 40)
-        self.assertEqual(next_slot(["09:00"], now, set()), datetime(2026, 11, 5, 9, 0))
-        self.assertEqual(next_slot(["09:00"], now, {"2026-11-05 09:00"}), datetime(2026, 11, 6, 9, 0))
-        # 10분 안으로 임박한 시각은 건너뛰고, 하루 두 번이면 같은 날 다음 시각
-        self.assertEqual(next_slot(["18:00", "09:00"], datetime(2026, 11, 5, 8, 55), set()), datetime(2026, 11, 5, 18, 0))
+        from zoneinfo import ZoneInfo
+        from bot import schedule
+        calls = []
+
+        def wp(*args):
+            calls.append(args)
+            if args[:2] == ("post", "list"):
+                return "80\n85\n"
+            return "퇴직금 글" if "--field=post_title" in args else ""
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp):
+            msg = schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+        update = next(a for a in calls if a[:2] == ("post", "update"))
+        self.assertEqual(update[2], "80")  # 가장 오래된 것
+        self.assertIn("--post_date_gmt=2026-11-05 00:00:00", update)
+        self.assertIn("대기 1편", msg)
+        with mock.patch.object(schedule, "wp_cli", return_value=""):
+            self.assertIsNone(schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul"))))
 
     def test_settings(self):
         s = BotSettings.from_option({"post_status": "schedule", "schedule_times": "9:00\n18시"}, {})
@@ -235,7 +246,7 @@ class ScheduleTest(unittest.TestCase):
 class DirectRoutineTest(unittest.TestCase):
     def test_due_slot(self):
         from datetime import datetime
-        from bot.routine import due_slot
+        from bot.schedule import due_slot
         times = ["07:40", "13:40"]
         self.assertIsNone(due_slot(times, [], datetime(2026, 11, 5, 7, 39)))
         self.assertEqual(due_slot(times, [], datetime(2026, 11, 5, 7, 40)), "07:40")
@@ -294,6 +305,44 @@ class QualityTest(unittest.TestCase):
         self.assertEqual(refresh._checked_title({"title": "정기검사 비용 23,000원 정리"}, body)[0], "정기검사 비용 23,000원 정리")
         with self.assertRaises(RuntimeError):
             refresh._checked_title({"title": "정기검사 비용 25,000원"}, body)
+
+
+class ContinuousTest(unittest.TestCase):
+    def run_step(self, state, minute, on=True, fire_ok=True):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import run
+        now = datetime(2026, 11, 5, 10, minute, tzinfo=ZoneInfo("Asia/Seoul"))
+        settings = BotSettings.from_option({}, {})
+        with mock.patch.object(run, "continuous_on", return_value=on), \
+                mock.patch.object(run, "set_continuous") as stop, \
+                mock.patch.object(run, "fire_routine", return_value=fire_ok) as fire:
+            run.continuous_step(state, settings, now)
+        return fire, stop
+
+    def test_one_at_a_time_then_next(self):
+        state = {"log": []}
+        fire, _ = self.run_step(state, 0)
+        self.assertEqual(fire.call_count, 1)
+        fire, _ = self.run_step(state, 20)  # 아직 안 올라옴 → 기다림
+        self.assertEqual(fire.call_count, 0)
+        state["log"].insert(0, {"time": "2026-11-05 10:25", "ok": True, "msg": "직접 작성 글: [초안 저장] 'x'"})
+        fire, _ = self.run_step(state, 26)  # 올라옴 → 다음 편
+        self.assertEqual(fire.call_count, 1)
+        self.assertEqual(state["continuous"]["count"], 1)
+
+    def test_stops_after_repeated_failures(self):
+        state = {"log": [], "continuous": {"fired_at": "2026-11-05 08:00", "fails": 2, "count": 3}}
+        fire, stop = self.run_step(state, 0)  # 60분 넘게 안 올라옴 → 3번째 실패 → 정지
+        fire.assert_not_called()
+        stop.assert_called_once_with(False)
+        self.assertFalse(state["log"][0]["ok"])
+
+    def test_off_clears_state(self):
+        state = {"log": [], "continuous": {"fired_at": "2026-11-05 10:00"}}
+        fire, _ = self.run_step(state, 5, on=False)
+        fire.assert_not_called()
+        self.assertNotIn("continuous", state)
 
 
 class FallbackTest(unittest.TestCase):

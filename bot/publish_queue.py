@@ -58,7 +58,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
         notes.append(f"공식 링크 제외 {len(dropped)}개: {'; '.join(dropped)[:150]}")
     post_id, link, image_note = publish(article, status, slug=keyword,
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token),
-                                        image_count=settings.image_count, schedule_times=settings.schedule_times)
+                                        image_count=settings.image_count)
     with connect() as conn:
         exists = conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
         if exists:

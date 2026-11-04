@@ -11,12 +11,10 @@ from __future__ import annotations
 import json
 import urllib.error
 import urllib.request
-from datetime import datetime, timedelta
 
 BETA = "experimental-cc-routine-2026-04-01"
 TIMEOUT = 30
 MANUAL_TEXT = "manual-request"     # '지금 1개 생성' 버튼으로 실행됨 (예약 작업 지시문이 이 값만 인식)
-LATE_LIMIT = timedelta(hours=3)    # 서버가 멈췄다 켜져도 3시간 넘게 지난 시각은 실행하지 않음
 
 
 class RoutineError(RuntimeError):
@@ -44,12 +42,3 @@ def fire(fire_url: str, token: str, text: str = "") -> str:
         raise RoutineError(f"연결 실패: {e}") from e
     return str(data.get("claude_code_session_url") or data.get("session_url") or data.get("session_id") or "실행됨")
 
-
-def due_slot(times: list[str], fired: list[str], now: datetime) -> str | None:
-    """오늘 실행할 '직접 작성 시각' 중 시각이 됐고 아직 실행 안 한 가장 이른 것 (now: 한국 시간, 시간대 정보 없음)."""
-    for t in sorted(times):
-        hour, minute = map(int, t.split(":"))
-        at = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
-        if t not in fired and at <= now < at + LATE_LIMIT:
-            return t
-    return None

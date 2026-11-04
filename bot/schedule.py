@@ -1,33 +1,50 @@
-"""예약 발행: 새 글을 바로 공개하지 않고 '공개 시각' 중 다음 빈 자리에 예약한다.
+"""예약 발행: 글은 초안으로 쌓고, '예약 공개 시각'마다 쌓인 초안 중 가장 오래된 것부터 1편씩 공개한다.
 
 설정 페이지 > 발행 방식 '예약 발행' + 예약 공개 시각(한 줄에 하나, 줄 수 = 하루 공개 글 수).
-글이 쌓이면 다음 빈 시각으로 차례대로 밀린다 (하루에 몰아서 공개되지 않게).
-워드프레스가 그 시각에 공개하고, 1분마다 도는 봇이 워드프레스 예약 작업을 대신 실행해 준다 (run.run_due_wp_cron).
+공개 대기열 = 메타 _firstlab_queue='ready' 인 초안. 새 글이 예약 발행 방식으로 저장될 때 붙는다 (publisher.publish).
+확인이 필요해 초안으로 남긴 글(제목 숫자 불일치·사실 확인 부족)과 예전 API 봇 초안은 대기열에 넣지 않는다.
 """
 from __future__ import annotations
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta, timezone
 
 from .settings import wp_cli
 
-MIN_LEAD = timedelta(minutes=10)   # 너무 임박한 시각은 건너뜀 (이미지 생성 등 처리 시간)
-MAX_DAYS = 365
-_FMT = "%Y-%m-%d %H:%M"
+QUEUE_META = "_firstlab_queue"
+READY = "ready"
+LATE_LIMIT = timedelta(hours=3)  # 서버가 멈췄다 켜져도 3시간 넘게 지난 시각은 실행하지 않음 (몰아서 공개 방지)
 
 
-def next_slot(times: list[str], now: datetime, taken: set[str]) -> datetime:
-    """now(사이트 시간대, 시간대 정보 없음) 이후 공개 시각 중 아직 예약이 없는 가장 이른 시각."""
-    slots = sorted(time(*map(int, t.split(":"))) for t in (times or ["09:00"]))
-    for day in range(MAX_DAYS):
-        date = now.date() + timedelta(days=day)
-        for slot in slots:
-            when = datetime.combine(date, slot)
-            if when >= now + MIN_LEAD and when.strftime(_FMT) not in taken:
-                return when
-    raise RuntimeError("1년 안에 빈 예약 시각이 없음")
+def due_slot(times: list[str], fired: list[str], now: datetime) -> str | None:
+    """오늘의 시각 목록 중 시각이 됐고 아직 처리 안 한 가장 이른 것 (now: 한국 시간, 시간대 정보 없음)."""
+    for t in sorted(times):
+        hour, minute = map(int, t.split(":"))
+        at = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if t not in fired and at <= now < at + LATE_LIMIT:
+            return t
+    return None
 
 
-def scheduled_times() -> set[str]:
-    """이미 예약된 글의 공개 시각 ('YYYY-MM-DD HH:MM')."""
-    out = wp_cli("post", "list", "--post_type=post", "--post_status=future", "--field=post_date", "--posts_per_page=-1")
-    return {line.strip()[:16] for line in out.splitlines() if line.strip()}
+def mark_ready(post_id: int) -> None:
+    wp_cli("post", "meta", "update", str(post_id), QUEUE_META, READY)
+
+
+def ready_drafts() -> list[int]:
+    """공개 대기 중인 초안 번호 (오래된 것부터)."""
+    out = wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--meta_key={QUEUE_META}",
+                 f"--meta_value={READY}", "--orderby=date", "--order=ASC", "--posts_per_page=-1", "--field=ID")
+    return [int(x) for x in out.split()]
+
+
+def publish_next(now_kst: datetime) -> str | None:
+    """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
+    ids = ready_drafts()
+    if not ids:
+        return None
+    post_id = ids[0]
+    now_utc = now_kst.astimezone(timezone.utc)
+    wp_cli("post", "update", str(post_id), "--post_status=publish",
+           f"--post_date={now_kst:%Y-%m-%d %H:%M:%S}", f"--post_date_gmt={now_utc:%Y-%m-%d %H:%M:%S}")
+    wp_cli("post", "meta", "delete", str(post_id), QUEUE_META)
+    title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
+    return f"'{title}' 공개 (대기 {len(ids) - 1}편 남음)"

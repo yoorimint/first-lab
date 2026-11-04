@@ -21,14 +21,15 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import competition, factcheck, related, routine
+from . import competition, factcheck, related, routine, schedule
 from .discover import discover
 from .keyword_db import connect, set_competition, set_status, summary
 from .llm import LLMBusy, make_llm
 from .publisher import STATUS_LABEL, publish
 from .select_keyword import check_top_competition, pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings, wp_cli
-from .state import add_log, add_spend, load_state, pop_excluded, pop_manual_request, save_state, spent_today
+from .state import (add_log, add_spend, continuous_on, load_state, pop_excluded, pop_manual_request, save_state,
+                    set_continuous, spent_today)
 from .writer import align_with_body, write_article
 
 KST = ZoneInfo("Asia/Seoul")
@@ -39,6 +40,8 @@ RETRY_REVIEW_MIN = 20   # AI 혼잡 시 사전 검토 재시도 간격(분)
 RETRY_MANUAL_MIN = 5    # AI 혼잡 시 수동 요청 재시도 간격(분)
 MANUAL_RETRIES = 12     # 수동 요청 최대 재시도 횟수
 RETRY_AUTO_MIN = 10     # AI 혼잡 시 자동 발행 재시도 간격(분)
+CONTINUOUS_TIMEOUT_MIN = 60  # 연속 작성: 한 편이 이 시간 안에 안 올라오면 실패로 보고 다음 편 실행
+CONTINUOUS_MAX_FAILS = 3     # 연속으로 이만큼 실패하면 연속 작성을 자동으로 멈춤 (사용량 한도·후보 소진 등)
 
 
 def plan_for_today(settings: BotSettings, today: str) -> list[str]:
@@ -120,7 +123,7 @@ def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
                 status = "draft"  # 제목 숫자가 본문과 다르면 자동 발행하지 않음
         post_id, link, image_note = publish(article, status, slug=keyword,
                                             cloudflare=(settings.cf_account_id, settings.cf_api_token),
-                                            image_count=settings.image_count, schedule_times=settings.schedule_times)
+                                            image_count=settings.image_count)
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = STATUS_LABEL.get(status, "초안 저장")
     cost = getattr(llm, "cost_usd", 0.0) + getattr(light, "cost_usd", 0.0)
@@ -233,13 +236,45 @@ def daily_review(state: dict, settings: BotSettings, now: datetime) -> None:
     state["dashboard_at"] = ""  # 현황 즉시 갱신
 
 
-def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "") -> None:
+def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "") -> bool:
     """월정액: Claude 예약 작업 실행 (글은 그 세션이 써서 저장소로 올리고, 배포 때 사이트에 반영)."""
     try:
         url = routine.fire(settings.routine_fire_url, settings.routine_token, text)
         add_log(state, True, f"{label}: Claude 글쓰기 작업 시작 {url}")
+        return True
     except routine.RoutineError as e:
         add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패 - {e}")
+        return False
+
+
+def post_arrived_since(state: dict, since: str) -> bool:
+    """since('YYYY-MM-DD HH:MM') 이후 직접 작성 글이 올라왔는지 (publish_queue 기록)."""
+    return any(e.get("ok") and str(e.get("time", "")) >= since and "직접 작성 글:" in str(e.get("msg", ""))
+               for e in state.get("log", []))
+
+
+def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
+    """연속 작성 (설정 페이지 시작·정지): 한 편이 올라오면 바로 다음 편을 실행. 한 번에 한 편씩만.
+    한 편이 60분 안에 안 올라오면 실패로 세고, 3번 연속 실패하면 스스로 멈춘다 (사용량 한도·후보 소진 대비)."""
+    if settings.write_mode != "direct" or not continuous_on():
+        state.pop("continuous", None)
+        return
+    c = state.get("continuous") or {}
+    stamp = now.strftime("%Y-%m-%d %H:%M")
+    fails, count = c.get("fails", 0), c.get("count", 0)
+    if c.get("fired_at"):
+        arrived = post_arrived_since(state, c["fired_at"])
+        started = datetime.strptime(c["fired_at"], "%Y-%m-%d %H:%M").replace(tzinfo=now.tzinfo)
+        if not arrived and now - started < timedelta(minutes=CONTINUOUS_TIMEOUT_MIN):
+            return  # 쓰는 중
+        fails, count = (0, count + 1) if arrived else (fails + 1, count)
+    if fails >= CONTINUOUS_MAX_FAILS:
+        set_continuous(False)
+        state.pop("continuous", None)
+        add_log(state, False, f"연속 작성 자동 정지: {fails}번 연속으로 글이 안 올라옴 (사용량 한도·후보 소진·오류 확인 필요)")
+        return
+    ok = fire_routine(state, settings, f"연속 작성 {count + 1}번째")
+    state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count}
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
@@ -281,10 +316,23 @@ def main() -> None:
     daily_review(state, settings, now)
     stamp = now.strftime("%Y-%m-%d %H:%M")
 
-    # 월정액: 직접 작성 시각이 되면 Claude 예약 작업 실행 (실패해도 같은 시각은 다시 안 함 → 예비 봇이 대신)
-    if settings.write_mode == "direct":
+    # 예약 발행: 공개 시각마다 쌓인 초안 중 가장 오래된 것 1편 공개
+    if settings.post_status == "schedule":
+        fired = state.get("publish_fired", {}).get(today, [])
+        due = schedule.due_slot(settings.schedule_times, fired, now.replace(tzinfo=None))
+        if due:
+            state["publish_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림
+            try:
+                msg = schedule.publish_next(now)
+                add_log(state, True, f"예약 공개 {due}: {msg or '공개할 초안 없음'}")
+            except subprocess.CalledProcessError as e:
+                add_log(state, False, f"예약 공개 {due} 실패: {e.stderr or e}")
+
+    # 월정액: 연속 작성 중이면 그것만, 아니면 직접 작성 시각에 1편 (실패해도 같은 시각은 다시 안 함 → 예비 봇이 대신)
+    continuous_step(state, settings, now)
+    if settings.write_mode == "direct" and not state.get("continuous"):
         fired = state.get("direct_fired", {}).get(today, [])
-        due = routine.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
+        due = schedule.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
         if due:
             state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림
             fire_routine(state, settings, f"직접 작성 {due}")

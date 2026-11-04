@@ -32,11 +32,11 @@ function firstlab_bot_fields(): array {
 			'options' => array(
 				'draft'    => '초안으로 저장 (내가 검토 후 발행)',
 				'publish'  => '바로 발행',
-				'schedule' => '예약 발행 (아래 공개 시각에 하나씩 자동 공개)',
+				'schedule' => '예약 발행 (초안으로 쌓고, 공개 시각마다 오래된 것부터 1편씩 자동 공개)',
 			),
 			'help'    => '직접 작성·봇 글 모두 적용. 사실 확인이 부족하거나 제목 숫자가 본문과 다른 글은 어느 방식이든 초안으로 남김',
 		),
-		'schedule_times' => array( 'label' => '예약 공개 시각', 'type' => 'textarea', 'default' => '09:00', 'help' => '예약 발행일 때만 사용. 한 줄에 하나 (줄 수 = 하루 공개 글 수, 예: 09:00 과 18:00 두 줄이면 하루 2편). 글이 쌓이면 다음 빈 시각으로 차례대로 예약됨' ),
+		'schedule_times' => array( 'label' => '예약 공개 시각', 'type' => 'textarea', 'default' => '09:00', 'help' => '예약 발행일 때만 사용. 한 줄에 하나 (줄 수 = 하루 공개 글 수, 예: 09:00 과 18:00 두 줄이면 하루 2편). 시각마다 공개 대기 초안 중 가장 오래된 것 1편을 공개. 확인이 필요한 초안과 예전 봇 초안은 대기열에 안 들어감' ),
 		'fact_check'     => array( 'label' => '자동 사실 검증', 'type' => 'checkbox', 'default' => 1, 'help' => '글 완성 후 별도 AI 가 핵심 수치를 웹 검색으로 재확인·수정. 확인 못 한 주장이 많으면 자동 발행 대신 초안으로 남김' ),
 		'daily_cost_cap' => array( 'label' => '하루 AI 비용 상한 (달러)', 'type' => 'number', 'default' => 3, 'min' => 0, 'max' => 100, 'help' => '오늘 쓴 AI 비용(글 작성·검수·갱신 합계)이 이 금액에 닿으면 그날은 더 쓰지 않음. 글 1개 약 0.5달러 (0 = 상한 없음)' ),
 		'refresh_per_week' => array( 'label' => '글 갱신 (주당 최대)', 'type' => 'number', 'default' => 5, 'min' => 0, 'max' => 20, 'help' => '순위 정체·하락 글 보강, 1·7월 제도 변경 재검증, 6개월 지난 글 재검증. 하루 최대 1개 (0 = 끔). 월정액 방식이면 서버가 대상만 고르고 매일 글쓰기 세션이 고침 (API 비용 없음)' ),
@@ -189,6 +189,37 @@ add_action(
 	}
 );
 
+const FIRSTLAB_BOT_CONTINUOUS = 'firstlab_bot_continuous'; // 연속 작성 켜짐(1)/꺼짐(0) — 서버 봇이 1분마다 확인 (bot/run.py continuous_step)
+
+// '연속 작성 시작·정지' → 값만 바꾸고, 실제 실행은 서버 봇이 처리
+add_action(
+	'admin_post_firstlab_bot_continuous',
+	static function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '권한이 없습니다.' );
+		}
+		check_admin_referer( 'firstlab_bot_continuous' );
+		update_option( FIRSTLAB_BOT_CONTINUOUS, empty( $_POST['start'] ) ? '0' : '1', false );
+		wp_safe_redirect( admin_url( 'options-general.php?page=firstlab-bot' ) );
+		exit;
+	}
+);
+
+/** 예약 발행 공개 대기 초안 수 (bot/schedule.py 와 같은 메타). */
+function firstlab_bot_ready_count(): int {
+	return count(
+		get_posts(
+			array(
+				'post_status' => 'draft',
+				'meta_key'    => '_firstlab_queue',
+				'meta_value'  => 'ready',
+				'numberposts' => -1,
+				'fields'      => 'ids',
+			)
+		)
+	);
+}
+
 const FIRSTLAB_BOT_EXCLUDED = 'firstlab_bot_excluded'; // 제외할 키워드 (봇이 반영 후 지움)
 
 add_action(
@@ -299,6 +330,34 @@ function firstlab_bot_render_status(): void {
 			?>
 		</span>
 	</form>
+
+	<h2>연속 작성 (월정액)</h2>
+	<?php
+	$running    = '1' === get_option( FIRSTLAB_BOT_CONTINUOUS, '0' );
+	$continuous = (array) ( $state['continuous'] ?? array() );
+	?>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<input type="hidden" name="action" value="firstlab_bot_continuous">
+		<?php wp_nonce_field( 'firstlab_bot_continuous' ); ?>
+		<?php if ( $running ) : ?>
+			<?php submit_button( '정지', 'secondary', 'stop', false ); ?>
+		<?php else : ?>
+			<?php submit_button( '시작', 'primary', 'start', false ); ?>
+		<?php endif; ?>
+		<span class="description">
+			<?php
+			if ( $running ) {
+				printf(
+					'진행 중 — 이번에 %d편 완료. 한 편씩 쓰고(20~40분), 올라오면 바로 다음 편. 정지를 누르면 쓰던 한 편까지만 마치고 멈춤.',
+					(int) ( $continuous['count'] ?? 0 )
+				);
+			} else {
+				echo '멈춤. 시작을 누르면 Claude 가 정지할 때까지 한 편씩 계속 씁니다 (구독 사용량 사용, 한도에 닿거나 3번 연속 실패하면 스스로 멈춤).';
+			}
+			?>
+		</span>
+	</form>
+	<p>예약 발행 공개 대기 초안: <strong><?php echo (int) firstlab_bot_ready_count(); ?>편</strong> (발행 방식이 '예약 발행'일 때 공개 시각마다 오래된 것부터 1편씩 공개)</p>
 
 	<h2>오늘 자동 발행 계획</h2>
 	<p>
