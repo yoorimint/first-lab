@@ -11,6 +11,8 @@ import urllib.parse
 import urllib.request
 
 OFFICIAL_SUFFIXES = (".go.kr", ".or.kr", ".re.kr", ".ac.kr", ".mil.kr")  # 정부·공공기관·공단·연구기관
+# 주소 끝이 위와 다른 공식 기관 (정부 정책브리핑, 공항공사, 도로공사 등). 필요하면 여기에 추가
+OFFICIAL_HOSTS = ("korea.kr", "airport.kr", "airport.co.kr", "ex.co.kr", "hipass.co.kr", "kepco.co.kr")
 MAX_LINKS = 3
 TIMEOUT = 10
 HEADING = "공식 안내 바로가기"
@@ -19,11 +21,15 @@ HEADING = "공식 안내 바로가기"
 def is_official(url: str) -> bool:
     parts = urllib.parse.urlsplit(url.strip())
     host = (parts.hostname or "").lower()
-    return parts.scheme == "https" and any(host.endswith(s) or host == s[1:] for s in OFFICIAL_SUFFIXES)
+    official = any(host.endswith(s) or host == s[1:] for s in OFFICIAL_SUFFIXES)
+    official = official or any(host == h or host.endswith("." + h) for h in OFFICIAL_HOSTS)
+    return parts.scheme == "https" and official
 
 
 def reachable(url: str) -> bool:
     """서버에서 열어 봐서 정상 응답(400 미만)이면 True. 깨진 링크를 싣지 않기 위함."""
+    # 한글 주소(예: law.go.kr/법령/...)는 그대로 요청할 수 없어 인코딩해서 연다 (링크는 원래 주소 그대로 씀)
+    url = urllib.parse.quote(url, safe=":/?#[]@!$&'()*+,;=%")
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (first-lab link check)"})
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:

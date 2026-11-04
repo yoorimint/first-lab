@@ -289,6 +289,9 @@ class QualityTest(unittest.TestCase):
         self.assertNotIn("tistory", html)
         self.assertEqual(len(dropped), 2)
         self.assertEqual(sources.section([{"name": "x", "url": "http://a.go.kr"}], check=lambda u: True)[0], "")  # https 만
+        for url in ("https://www.korea.kr/news/x", "https://www.airport.kr/ap_ko/906/subview.do"):
+            self.assertTrue(sources.is_official(url), url)  # 주소 끝이 .go.kr 이 아닌 공식 기관
+        self.assertFalse(sources.is_official("https://notkorea.kr/a"))
 
     def test_low_ctr_post_gets_retitle(self):
         conn = memory_db([])
