@@ -2,6 +2,7 @@
 실행: python -m unittest discover -s tests -v
 """
 import json
+import re
 import sqlite3
 import sys
 import unittest
@@ -939,6 +940,36 @@ class RegionalSourceGateTest(unittest.TestCase):
         self.assertEqual(g.region_of("https://news.seoul.go.kr/env/archives/1"), ("서울",))
         self.assertIsNone(g.region_of("https://www.nts.go.kr/x"))  # 중앙부처 = 전국 자료
         self.assertIsNone(g.region_of("https://www.seoul.go.kr.evil.com/x"))
+
+
+class ErrorTypeRegistryTest(unittest.TestCase):
+    """고친 것마다 오류 유형이 있고, 유형마다 재발 방지(코드·테스트) 또는 검수로만 잡는 이유가 등록돼 있어야 한다
+    (11/5 운영자: '수정한 모든 것에 재발 방지 대책'). 새 유형이면 automation/error_types.json 에 막는 방법부터 등록."""
+
+    REG = json.loads((ROOT / "automation" / "error_types.json").read_text(encoding="utf-8"))
+    PATCHES = json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8"))
+
+    def test_every_fix_has_registered_type(self):
+        for i, p in enumerate(self.PATCHES):
+            self.assertIn(p.get("type"), self.REG, f"patches.json {i}번(글 {p['post']})에 등록된 오류 유형(type)이 없음")
+
+    def test_every_type_has_prevention_that_exists(self):
+        for key, t in self.REG.items():
+            self.assertTrue(t.get("prevention") or t.get("review_only"), key)
+            if not t.get("review_only"):
+                self.assertTrue(t["checks"], f"{key}: 코드로 막는다면서 확인할 테스트가 없음")
+            for ref in t["checks"]:
+                path, token = ref.split("::", 1)
+                self.assertIn(token, (ROOT / path).read_text(encoding="utf-8"), f"{key}: {ref} 가 실제로 없음")
+
+    def test_no_absence_wording_in_fixes(self):
+        """확인 못 한 것을 '없다·찾지 못했다'로 고치지 않는다 (11/4 #219 파인 대출 계산기)."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        from verify_patches import superseded
+        for i, p in enumerate(self.PATCHES):
+            text = p.get("replace_paragraph", "") + p.get("insert_after", "") + p.get("set_title", "") + p.get("set_excerpt", "")
+            if re.search(r"찾지 못했|못 찾았|확인되지 않았", text) and not superseded(p, self.PATCHES[i + 1:]):
+                self.fail(f"patches.json {i}번(글 {p['post']}): '없음' 단정 문구 — 확인처 안내로 쓰기")
 
 if __name__ == "__main__":
     unittest.main()

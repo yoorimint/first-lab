@@ -1,0 +1,88 @@
+{
+  "unverified": {
+    "name": "공식 근거로 확인 안 된 내용을 단정",
+    "prevention": "관문: 주장마다 공식 기관 근거 필수 + 본문 70자당 주장 1개 검수 / 근거 대조(공식 링크에 숫자 있는지, 기록 중 → 정확도 확인 뒤 보류에 사용)",
+    "checks": [
+      "tests/test_bot.py::def test_gate",
+      "tests/test_bot.py::def test_long_article_needs_claims_for_every_fact_sentence",
+      "tests/test_bot.py::class SourceCheckTest"
+    ]
+  },
+  "no_source": {
+    "name": "출처 없는 수치·표·민간 자료",
+    "prevention": "관문: 공식 기관이 아닌 출처(블로그·민간)만 있는 주장은 보류",
+    "checks": [
+      "tests/test_bot.py::def test_gate",
+      "bot/review_gate.py::공식 기관 출처 없음"
+    ]
+  },
+  "regional": {
+    "name": "지역·일부 기관 기준을 전국 기준처럼",
+    "prevention": "관문: 제목·요약 숫자 근거가 시·도 누리집뿐이면 지역 명시 요구 (시·군·구 누리집·본문 문장은 아직 검수로만)",
+    "checks": [
+      "tests/test_bot.py::class RegionalSourceGateTest"
+    ]
+  },
+  "absence": {
+    "name": "확인 못 한 것을 '없다'고 단정",
+    "prevention": "수정 문구에 '찾지 못했/확인되지 않았' 금지(테스트) + 검수 지시문·감시 절차 규칙",
+    "checks": [
+      "tests/test_bot.py::def test_no_absence_wording_in_fixes",
+      "automation/review-prompt.md::never propose wording that asserts something does NOT exist"
+    ]
+  },
+  "calc": {
+    "name": "계산·계산기 오류",
+    "prevention": "계산기마다 법령대로 손 계산한 사례 + 기준선 사례 2개 이상 필수(없으면 배포 막힘) + 글 검수 때 계산기 코드도 검수 + 검수 기록에 없는 계산기 표시",
+    "checks": [
+      "tests/test_calculators.mjs::MIN_BOUNDARY",
+      "tests/test_bot.py::def test_every_calculator_reviewed_or_listed"
+    ]
+  },
+  "headline": {
+    "name": "제목·요약이 본문·근거와 불일치",
+    "prevention": "관문: 제목·요약 숫자는 검수된 주장 안에 있어야 함 + 본문과 숫자 자동 맞춤",
+    "checks": [
+      "tests/test_bot.py::def test_gate",
+      "tests/test_bot.py::from bot.writer import align_with_body"
+    ]
+  },
+  "my_mistake": {
+    "name": "감시 세션(나)의 수정 실수",
+    "prevention": "고친 내용 서버 반영 전수 확인 + 고친 뒤 원래 문구 남지 않게 + 없음 단정 금지 + 검수 기록은 패치 저장 뒤에만",
+    "checks": [
+      "tests/test_bot.py::class VerifyPatchesTest",
+      "tests/test_bot.py::def test_patches_file_valid",
+      "tests/test_bot.py::def test_no_absence_wording_in_fixes"
+    ]
+  },
+  "wrong_fact": {
+    "name": "사실 자체가 틀림 (기관·명칭·서류·기간 등)",
+    "review_only": "무엇이 사실인지는 코드가 판단할 수 없음 → 외부 검수가 잡고, '틀림' 수정은 근거 원문을 직접 연 뒤에만, 주 1회 표본 감사로 남은 비율 측정",
+    "checks": [
+      "automation/monitor.md::근거 원문을 내가 직접 열어 확인한 뒤에만",
+      "tests/test_bot.py::class AuditSampleTest"
+    ]
+  },
+  "missing_condition": {
+    "name": "조건·예외·범위 누락",
+    "review_only": "어떤 예외가 빠졌는지는 법령 전체를 읽어야 알 수 있어 코드로 판단 불가 → 외부 검수 지시문에 예외·조건 확인 항목, 표본 감사로 측정",
+    "checks": [
+      "automation/review-prompt.md::exceptions",
+      "tests/test_bot.py::class AuditSampleTest"
+    ]
+  },
+  "outdated": {
+    "name": "개정·최신 기준 미반영",
+    "review_only": "근거 페이지의 시행일을 코드가 일반적으로 알 수 없음 → 검수 지시문에 올해 기준·개정 확인, 표본 감사로 측정",
+    "checks": [
+      "automation/review-prompt.md::Year-dependent items must be confirmed",
+      "tests/test_bot.py::class AuditSampleTest"
+    ]
+  },
+  "feature": {
+    "name": "오류 아님 (계산기 추가 등)",
+    "review_only": "오류가 아니라 기능 추가",
+    "checks": []
+  }
+}
