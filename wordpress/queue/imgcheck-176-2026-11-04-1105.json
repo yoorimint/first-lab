@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 176,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "one hand passing a set of car keys to another hand outdoors, a blurred silver sedan in the background, soft daylight",
+   "alt": "자동차 열쇠를 건네는 두 손"
+  }
+ ]
+}
