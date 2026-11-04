@@ -21,12 +21,15 @@ SYSTEM = """너는 한국어 정보 글의 검수 편집자다. 발행 전에 �
 3. 일관성: 글 안에서 같은 대상의 수치가 서로 다르면(본문↔본문, 본문↔표) 근거가 확실한 하나로 맞추고,
    계산 예시는 그 값으로 다시 계산하고, 결론이 앞의 기준과 모순되지 않는지 본다. 표의 열·행 이름, 제목·도입의 'N가지·N단계'가
    실제 내용과 맞는지 확인한다. 말투 혼용과 '자료마다 달라요' 같은 조사 과정 언급도 바로잡는다.
+   제목·요약문도 본문과 같은 수치·내용이어야 한다 (본문을 고쳤으면 제목·요약문도 같이 고친다).
 4. 그 외 문장·구조·HTML·링크·이미지 태그는 그대로 둔다. 출처 표기나 기준일은 넣지 않는다.
 
 최종 답은 JSON 하나만:
 {"checks": [{"claim": "점검한 주장 요약", "verdict": "ok|fixed|softened|removed|unverified"}],
  (softened = 확인 못 해 완화함, unverified = 확인도 완화도 못 하고 그대로 둠 — 가능하면 쓰지 않는다)
  "edits": 사실 외에 고친 곳 수(이해·일관성),
+ "title": "검수 반영된 제목 (고칠 게 없으면 원문 그대로)",
+ "excerpt": "검수 반영된 요약문 (고칠 게 없으면 원문 그대로)",
  "content_html": "검수 반영된 본문 HTML 전체 (고칠 게 없으면 원문 그대로)"}"""
 
 MAX_UNVERIFIED = 2  # 확인 못 한 주장이 이보다 많으면 사람 검토 필요
@@ -42,6 +45,8 @@ class FactCheck:
     edits: int = 0  # 사실 외 수정(이해하기 어려운 문장, 말투·수치 불일치)
     unverified_claims: list[str] = field(default_factory=list)  # 확인 못 하고 그대로 둔 주장 (기록에 남겨 사람이 볼 수 있게)
     softened: list[str] = field(default_factory=list)           # 확인 못 해 표현을 완화한 주장
+    title: str = ""     # 검수가 본문에 맞춰 고친 제목 (빈 값이면 원래 제목 유지)
+    excerpt: str = ""   # 검수가 본문에 맞춰 고친 요약문
 
     @property
     def needs_review(self) -> bool:
@@ -58,8 +63,9 @@ class FactCheck:
         return s + (" → 검토 필요" if self.needs_review else "")
 
 
-def verify(llm, keyword: str, content_html: str) -> FactCheck:
-    raw = llm.generate(SYSTEM, f"검색 키워드: {keyword}\n\n[검증할 글 HTML]\n{content_html}", web_search=True)
+def verify(llm, keyword: str, content_html: str, title: str = "", excerpt: str = "") -> FactCheck:
+    raw = llm.generate(SYSTEM, f"검색 키워드: {keyword}\n제목: {title}\n요약문: {excerpt}\n\n"
+                               f"[검증할 글 HTML]\n{content_html}", web_search=True)
     text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw.strip())
     data = json.loads(text[text.find("{"): text.rfind("}") + 1])
     checks = data.get("checks", [])
@@ -74,4 +80,5 @@ def verify(llm, keyword: str, content_html: str) -> FactCheck:
     except (TypeError, ValueError):
         edits = 0
     return FactCheck(html, verdicts.count("ok"), verdicts.count("fixed"),
-                     verdicts.count("removed"), verdicts.count("unverified"), edits, unverified, softened)
+                     verdicts.count("removed"), verdicts.count("unverified"), edits, unverified, softened,
+                     title=str(data.get("title") or "").strip(), excerpt=str(data.get("excerpt") or "").strip())

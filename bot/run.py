@@ -28,7 +28,7 @@ from .publisher import publish
 from .select_keyword import pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings, wp_cli
 from .state import add_log, add_spend, load_state, pop_excluded, pop_manual_request, save_state, spent_today
-from .writer import write_article
+from .writer import align_with_body, write_article
 
 KST = ZoneInfo("Asia/Seoul")
 LOCK_FILE = "/run/firstlab-bot.lock"
@@ -101,13 +101,22 @@ def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
         if settings.fact_check:
             try:
                 # 검수는 Haiku 로 충분 (내부 블라인드 시험: Sonnet 검수와 품질 차이 없음, 비용은 약 1/20)
-                fc = factcheck.verify(light, keyword, article.content_html)
+                fc = factcheck.verify(light, keyword, article.content_html, article.title, article.excerpt)
                 article.content_html, check_note = fc.content_html, ", " + fc.summary
+                if fc.title and len(fc.title) <= 60:
+                    article.title = fc.title
+                if fc.excerpt:
+                    article.excerpt = fc.excerpt[:200]
                 if fc.needs_review:
                     status = "draft"  # 확인 못 한 주장이 많으면 자동 발행 대신 초안
             except Exception as e:  # noqa: BLE001 - 검증 실패 시 원문 유지 + 초안
                 status, check_note = "draft", f", 사실검증 실패({str(e)[:60]}) → 검토 필요"
         article.content_html, link_count = related.clean_links(article.content_html, allowed_links)
+        aligned = align_with_body(article)  # 마지막 안전장치: 제목·요약문 숫자가 본문과 다르면 바로잡음
+        if aligned:
+            check_note += f", 본문과 숫자 불일치 → {'·'.join(aligned)} 보정"
+            if "제목(확인 필요)" in aligned:
+                status = "draft"  # 제목 숫자가 본문과 다르면 자동 발행하지 않음
         post_id, link, image_note = publish(article, status, slug=keyword,
                                             cloudflare=(settings.cf_account_id, settings.cf_api_token),
                                             image_count=settings.image_count)

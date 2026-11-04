@@ -124,6 +124,36 @@ class FactCheckTest(unittest.TestCase):
         self.assertEqual(fc.content_html, original)
 
 
+class ConsistencyTest(unittest.TestCase):
+    BODY = ("<p>우체국 방문택배 요금은 5,000원에서 14,000원이에요. 미리 결제하면 한 건에 500원 할인돼요. "
+            "집배원이 무게를 다시 재요.</p><table><tr><td>4구간</td><td>14,000원</td></tr></table>")
+
+    def article(self, title, excerpt):
+        from bot.writer import Article
+        return Article(title=title, excerpt=excerpt, content_html=self.BODY, tags=[])
+
+    def test_excerpt_mismatch_replaced_from_body(self):
+        from bot.writer import align_with_body, numbers_match
+        a = self.article("2026 우체국 방문택배 요금", "요금은 5,000~13,000원이고 500원 할인돼요.")
+        self.assertEqual(align_with_body(a), ["요약문"])
+        self.assertTrue(numbers_match(a.excerpt, self.BODY))
+        self.assertLessEqual(len(a.excerpt), 120)
+
+    def test_consistent_untouched_and_title_flagged(self):
+        from bot.writer import align_with_body
+        ok = self.article("우체국 방문택배 요금 정리 (500원 할인)", "요금은 5,000~14,000원이에요.")
+        self.assertEqual(align_with_body(ok), [])
+        bad = self.article("우체국 방문택배 요금 13,000원까지", "요금은 5,000~14,000원이에요.")
+        self.assertEqual(align_with_body(bad), ["제목(확인 필요)"])
+
+    def test_reviewer_title_excerpt_parsed(self):
+        original = "<p>" + "가" * 200 + "</p>"
+        llm = SimpleNamespace(generate=lambda *a, **k: json.dumps(
+            {"checks": [], "edits": 0, "title": "새 제목", "excerpt": "새 요약", "content_html": original}))
+        fc = factcheck.verify(llm, "k", original, "옛 제목", "옛 요약")
+        self.assertEqual((fc.title, fc.excerpt), ("새 제목", "새 요약"))
+
+
 class MiscTest(unittest.TestCase):
     def test_competition_from_urls(self):
         comp = competition.from_urls(["https://www.q-net.or.kr/a", "https://x.tistory.com/1", "https://namu.wiki/w/a"])

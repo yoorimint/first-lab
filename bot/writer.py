@@ -31,8 +31,8 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 작가다
    마지막에 본문에서 다루지 않은, 실제로 많이 묻는 질문 3~5개로 '자주 묻는 질문'을 둔다.
 
 [출력 형식] 검색을 마친 뒤 아래 JSON 하나만 출력한다.
-{"title": "검색 결과에 노출될 제목 (40자 이내, 키워드 포함)",
- "excerpt": "검색 결과 설명문 (120자 이내)",
+{"title": "검색 결과에 노출될 제목 (40자 이내, 키워드 포함, 숫자는 본문과 똑같이)",
+ "excerpt": "검색 결과 설명문 (120자 이내, 숫자는 본문에 있는 그대로)",
  "content_html": "본문 HTML (h2, h3, p, ul, ol, li, table, thead, tbody, tr, th, td, strong, a 태그만 사용, h1 금지)",
  "tags": ["태그1", "태그2", "태그3"],
  "category": "카테고리 하나 (CATEGORY_LIST 중에서만)",
@@ -104,3 +104,46 @@ def write_article(llm, keyword: str, target_length: int, extra: str = "", retrie
         except (ValueError, KeyError, json.JSONDecodeError) as e:  # 형식 오류 → 한 번 더 시도
             last_error = e
     raise ValueError(f"글 형식 오류: {last_error}")
+
+
+EXCERPT_MAX = 120
+_NUM = re.compile(r"\d[\d,]*(?:\.\d+)?")
+
+
+def _numbers(text: str) -> set[str]:
+    return {n.replace(",", "") for n in _NUM.findall(text or "")}
+
+
+def _plain(html: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html or "")).strip()
+
+
+def numbers_match(short_text: str, content_html: str) -> bool:
+    """제목·요약문의 숫자가 모두 본문에 있는지 (검수가 본문만 고쳐 어긋나는 경우를 잡는다).
+    연도(2026 등)는 본문에 '올해'처럼 쓰는 경우가 많아 비교에서 뺀다."""
+    short = {n for n in _numbers(short_text) if not re.fullmatch(r"(19|20)\d\d", n)}
+    return short <= _numbers(_plain(content_html))
+
+
+def excerpt_from_body(content_html: str) -> str:
+    """본문 첫 문단에서 요약문 만들기 (문장 단위로 120자 이내). 본문과 숫자가 어긋날 수 없다."""
+    m = re.search(r"<p[^>]*>(.*?)</p>", content_html or "", re.S)
+    text = _plain(m.group(1) if m else content_html)
+    out = ""
+    for sentence in re.split(r"(?<=[.!?요다])\s+", text):
+        if len(out) + len(sentence) + 1 > EXCERPT_MAX:
+            break
+        out = f"{out} {sentence}".strip()
+    return out or text[:EXCERPT_MAX]
+
+
+def align_with_body(article: "Article") -> list[str]:
+    """제목·요약문의 숫자가 본문과 다르면 바로잡는다 (AI 호출 없음). 바꾼 항목 이름을 돌려준다."""
+    fixed = []
+    if not numbers_match(article.excerpt, article.content_html):
+        article.excerpt = excerpt_from_body(article.content_html)
+        fixed.append("요약문")
+    if not numbers_match(article.title, article.content_html):
+        fixed.append("제목(확인 필요)")  # 제목은 자동으로 만들 수 없어 기록만
+    return fixed
+
