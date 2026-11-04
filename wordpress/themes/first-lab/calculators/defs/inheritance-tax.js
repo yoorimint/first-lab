@@ -67,7 +67,9 @@
       if (heirs !== 'children') {
         const s = d.spouse;
         const share = heirs === 'spouse_only' ? 1 : s.share_spouse / (s.share_spouse + s.share_child * children);
-        const legal = Math.floor((estate - items + gifts) * share);
+        // 한도용 상속재산가액 (시행령 제17조①): 자산총액 − 공과금·채무 + 상속인 사전증여. 장례비는 빼지 않는다
+        // (11/4 외부 검수: 장례비를 빼서 20억 원 예시 배우자공제가 8억 5,500만 원으로 작게 나왔던 오류)
+        const legal = Math.floor((estate - Math.min(num(v.debts), estate) + gifts) * share);
         spouse = Math.max(s.min, Math.min(num(v.spouse_amount), legal, s.max));
       }
 
