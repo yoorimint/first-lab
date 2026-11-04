@@ -1,0 +1,160 @@
+[
+  {
+    "why": "공급가액 100만 원 + 10%(부가가치세율, 국세청) = 110만 원",
+    "input": {
+      "mode": "add",
+      "amount": 1000000,
+      "purchase": 0,
+      "industry": "retail"
+    },
+    "expect": {
+      "supply": 1000000,
+      "tax": 100000,
+      "total": 1100000
+    }
+  },
+  {
+    "why": "공급가액 33,333원: 10% = 3,333.3 → 원 미만 버림 3,333원",
+    "input": {
+      "mode": "add",
+      "amount": 33333,
+      "purchase": 0,
+      "industry": "retail"
+    },
+    "expect": {
+      "supply": 33333,
+      "tax": 3333,
+      "total": 36666
+    }
+  },
+  {
+    "why": "합계 110만 원 ÷ 1.1 = 공급가액 100만 원, 부가세 10만 원 (본문 표)",
+    "input": {
+      "mode": "split",
+      "amount": 1100000,
+      "purchase": 0,
+      "industry": "retail"
+    },
+    "expect": {
+      "supply": 1000000,
+      "tax": 100000,
+      "total": 1100000
+    }
+  },
+  {
+    "why": "합계 1만 원 ÷ 1.1 = 9,090.9 → 9,091원, 부가세 909원 (본문 예시)",
+    "input": {
+      "mode": "split",
+      "amount": 10000,
+      "purchase": 0,
+      "industry": "retail"
+    },
+    "expect": {
+      "supply": 9091,
+      "tax": 909,
+      "total": 10000
+    }
+  },
+  {
+    "why": "합계 1원(극단값): 0.909 → 공급가액 1원, 부가세 0원",
+    "input": {
+      "mode": "split",
+      "amount": 1,
+      "purchase": 0,
+      "industry": "retail"
+    },
+    "expect": {
+      "supply": 1,
+      "tax": 0,
+      "total": 1
+    }
+  },
+  {
+    "why": "일반과세자 매출 공급가액 3,000만 원, 매입세액 180만 원: 300만 - 180만 = 120만 원 (본문 예시)",
+    "input": {
+      "mode": "general",
+      "amount": 30000000,
+      "purchase": 1800000,
+      "industry": "retail"
+    },
+    "expect": {
+      "sales_tax": 3000000,
+      "purchase_tax": 1800000,
+      "pay": 1200000
+    }
+  },
+  {
+    "why": "일반과세자 매입세액이 더 크면 환급: 100만 - 150만 = -50만 원",
+    "input": {
+      "mode": "general",
+      "amount": 10000000,
+      "purchase": 1500000,
+      "industry": "retail"
+    },
+    "expect": {
+      "sales_tax": 1000000,
+      "purchase_tax": 1500000,
+      "pay": -500000
+    }
+  },
+  {
+    "why": "간이 음식점 공급대가 7,000만 원 × 15% × 10% = 105만, 매입 3,000만 × 0.5% = 15만 → 90만 원 (본문 예시)",
+    "input": {
+      "mode": "simple",
+      "amount": 70000000,
+      "purchase": 30000000,
+      "industry": "retail"
+    },
+    "expect": {
+      "gross": 1050000,
+      "credit": 150000,
+      "pay": 900000,
+      "exempt": false
+    }
+  },
+  {
+    "why": "간이 정보통신업(30%) 8,000만 원, 매입 1,000만 원: 240만 - 5만 = 235만 원",
+    "input": {
+      "mode": "simple",
+      "amount": 80000000,
+      "purchase": 10000000,
+      "industry": "construction"
+    },
+    "expect": {
+      "gross": 2400000,
+      "credit": 50000,
+      "pay": 2350000,
+      "exempt": false
+    }
+  },
+  {
+    "why": "간이 공급대가 4,000만 원(4,800만 원 미만): 납부의무 면제 → 0원",
+    "input": {
+      "mode": "simple",
+      "amount": 40000000,
+      "purchase": 0,
+      "industry": "finance"
+    },
+    "expect": {
+      "gross": 1600000,
+      "credit": 0,
+      "pay": 0,
+      "exempt": true
+    }
+  },
+  {
+    "why": "간이 공제가 납부세액보다 커도 환급 없음 → 0원",
+    "input": {
+      "mode": "simple",
+      "amount": 50000000,
+      "purchase": 200000000,
+      "industry": "retail"
+    },
+    "expect": {
+      "gross": 750000,
+      "credit": 1000000,
+      "pay": 0,
+      "exempt": false
+    }
+  }
+]
