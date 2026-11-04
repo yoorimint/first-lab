@@ -36,6 +36,9 @@ apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
 
+log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
+
 log "systemd 타이머 (1분마다 실행)"
 install -m 644 "$REPO_DIR"/server/systemd/firstlab-{bot,discover,backup}.{service,timer} /etc/systemd/system/
 systemctl daemon-reload

@@ -154,6 +154,23 @@ class ConsistencyTest(unittest.TestCase):
         self.assertEqual((fc.title, fc.excerpt), ("새 제목", "새 요약"))
 
 
+class PublishQueueTest(unittest.TestCase):
+    def test_pending_uses_content_hash(self):
+        import tempfile
+        from bot import publish_queue
+        with tempfile.TemporaryDirectory() as tmp:
+            q, done = Path(tmp, "queue"), Path(tmp, "done")
+            q.mkdir(); done.mkdir()
+            f = q / "a.json"
+            f.write_text('{"keyword": "x"}', encoding="utf-8")
+            with mock.patch.object(publish_queue, "QUEUE_DIR", q), mock.patch.object(publish_queue, "DONE_DIR", done):
+                self.assertEqual(publish_queue.pending(), [f])
+                publish_queue._marker(f).touch()
+                self.assertEqual(publish_queue.pending(), [])
+                f.write_text('{"keyword": "x", "v": 2}', encoding="utf-8")  # 내용이 바뀌면 다시 올라감
+                self.assertEqual(publish_queue.pending(), [f])
+
+
 class MiscTest(unittest.TestCase):
     def test_competition_from_urls(self):
         comp = competition.from_urls(["https://www.q-net.or.kr/a", "https://x.tistory.com/1", "https://namu.wiki/w/a"])
