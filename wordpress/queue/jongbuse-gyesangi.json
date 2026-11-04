@@ -1,0 +1,364 @@
+{
+ "title": "종부세 계산기: 1주택 15억이면 69만 1,200원, 공제·세율 정리",
+ "excerpt": "종부세는 공시가격 합계에서 9억 원(1주택 12억 원)을 빼고 60%를 곱해 세율을 매겨요. 1주택 15억이면 69만 1,200원, 2주택 20억이면 313만 9,200원이에요.",
+ "content_html": "<p>종부세는 6월 1일 기준 내 명의 주택 공시가격 합계에서 <strong>9억 원(1세대 1주택자는 12억 원)</strong>을 빼고 60%를 곱한 금액에 세율을 매겨요. 1세대 1주택자 공시가격 15억 원이면 농어촌특별세까지 <strong>69만 1,200원</strong>, 2주택 합계 20억 원이면 <strong>313만 9,200원</strong>이에요. 아래 계산기에 공시가격 합계와 주택 수만 넣으면 바로 나와요.</p>\n<h2>종부세 계산 순서 5단계</h2>\n<ol>\n<li><strong>과세표준</strong>: (공시가격 합계 − 공제 금액) × 공정시장가액비율 60%</li>\n<li><strong>세율 적용</strong>: 과세표준에 아래 누진세율을 곱해요.</li>\n<li><strong>재산세 중복분 공제</strong>: 같은 집에 이미 낸 재산세와 겹치는 부분을 빼요. 표준세율대로 재산세가 나왔다면 과세표준 × 재산세 공정시장가액비율 × 0.4%예요. 2026년 1세대 1주택자의 재산세 비율은 45%(시가표준액 6억 원 초과), 그 밖에는 60%예요.</li>\n<li><strong>1세대 1주택자 세액공제</strong>: 나이·보유 기간 공제율을 합해 최대 80%까지 빼요.</li>\n<li><strong>농어촌특별세</strong>: 낼 종부세의 20%를 더해요.</li>\n</ol>\n<p>[firstlab_calc id=\"property-holding-tax\"]</p>\n<h2>주택분 종부세 세율표</h2>\n<table>\n<thead><tr><th>과세표준</th><th>2주택 이하</th><th>3주택 이상</th></tr></thead>\n<tbody>\n<tr><td>3억 원 이하</td><td>0.5%</td><td>0.5%</td></tr>\n<tr><td>3억~6억 원</td><td>0.7%</td><td>0.7%</td></tr>\n<tr><td>6억~12억 원</td><td>1.0%</td><td>1.0%</td></tr>\n<tr><td>12억~25억 원</td><td>1.3%</td><td>2.0%</td></tr>\n<tr><td>25억~50억 원</td><td>1.5%</td><td>3.0%</td></tr>\n<tr><td>50억~94억 원</td><td>2.0%</td><td>4.0%</td></tr>\n<tr><td>94억 원 초과</td><td>2.7%</td><td>5.0%</td></tr>\n</tbody>\n</table>\n<p>구간마다 해당 세율을 따로 곱해 더하는 누진 방식이에요. 예를 들어 과세표준 6억 6,000만 원이면 6억 원까지 360만 원에 넘는 6,000만 원의 1.0%인 60만 원을 더해 420만 원이에요.</p>\n<h2>상황별 계산 예시</h2>\n<table>\n<thead><tr><th>항목</th><th>1주택 15억</th><th>1주택 20억 (만 66세·12년 보유)</th><th>2주택 합계 20억</th><th>3주택 합계 30억</th></tr></thead>\n<tbody>\n<tr><td>공제 금액</td><td>12억 원</td><td>12억 원</td><td>9억 원</td><td>9억 원</td></tr>\n<tr><td>과세표준</td><td>1억 8,000만 원</td><td>4억 8,000만 원</td><td>6억 6,000만 원</td><td>12억 6,000만 원</td></tr>\n<tr><td>세율 적용 세액</td><td>900,000원</td><td>2,760,000원</td><td>4,200,000원</td><td>10,800,000원</td></tr>\n<tr><td>재산세 중복분 공제</td><td>324,000원</td><td>864,000원</td><td>1,584,000원</td><td>3,024,000원</td></tr>\n<tr><td>고령자·장기보유 공제</td><td>0원</td><td>1,327,200원 (70%)</td><td>해당 없음</td><td>해당 없음</td></tr>\n<tr><td>종부세</td><td>576,000원</td><td>568,800원</td><td>2,616,000원</td><td>7,776,000원</td></tr>\n<tr><td>농어촌특별세</td><td>115,200원</td><td>113,760원</td><td>523,200원</td><td>1,555,200원</td></tr>\n<tr><td>합계</td><td>691,200원</td><td>682,560원</td><td>3,139,200원</td><td>9,331,200원</td></tr>\n</tbody>\n</table>\n<p>같은 20억 원이어도 1주택을 오래 가진 60대는 2주택자의 5분의 1 수준이에요. 공제 금액이 3억 원 더 크고, 세액공제가 붙기 때문이에요. 표는 올해 재산세가 표준세율대로 나왔고 작년 대비 세부담 상한에 걸리지 않는다고 가정한 값이에요.</p>\n<h2>1세대 1주택자 세액공제율</h2>\n<table>\n<thead><tr><th>나이 (6월 1일 기준)</th><th>공제율</th><th>보유 기간</th><th>공제율</th></tr></thead>\n<tbody>\n<tr><td>만 60~64세</td><td>20%</td><td>5~9년</td><td>20%</td></tr>\n<tr><td>만 65~69세</td><td>30%</td><td>10~14년</td><td>40%</td></tr>\n<tr><td>만 70세 이상</td><td>40%</td><td>15년 이상</td><td>50%</td></tr>\n</tbody>\n</table>\n<p>두 공제는 함께 받을 수 있지만 합계는 80%까지예요. 만 72세에 16년 보유했다면 40%+50%=90%가 아니라 80%만 빠져요.</p>\n<h2>계산 결과가 고지서와 다를 수 있는 경우</h2>\n<ul>\n<li><strong>세부담 상한</strong>: 올해 재산세와 종부세를 합친 금액이 작년의 150%를 넘으면 넘는 부분은 내지 않아요.</li>\n<li><strong>재산세 과세표준 상한</strong>: 재산세 과세표준이 상한으로 줄었다면 실제 재산세가 적어져 종부세에서 빼 주는 금액도 조금 달라져요.</li>\n<li><strong>주택 수에서 빠지는 집</strong>: 상속받은 지 5년이 안 된 주택, 지분율 40% 이하 상속주택, 요건을 갖춘 소형 신축·지방 미분양 주택 등은 세율을 정할 때 주택 수에 넣지 않아요.</li>\n<li><strong>법인</strong>: 법인은 공제 없이 2.7% 또는 5.0% 단일세율이라 이 계산기와 다르게 계산해요.</li>\n</ul>\n<h2>납부 기간과 나눠 내기</h2>\n<p>종부세는 매년 12월 1일부터 12월 15일까지 내요. 국세청이 고지서를 보내 주고, 고지 내용과 다르게 직접 신고하고 싶으면 같은 기간에 신고·납부하면 고지는 없던 것으로 돼요. 낼 종부세가 250만 원을 넘으면 일부를 납부기한 뒤 6개월 안에 나눠 낼 수 있어요. 250만~500만 원이면 250만 원을 넘는 금액, 500만 원을 넘으면 세액의 절반까지 미룰 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>6월 2일에 집을 팔았는데 종부세가 나오나요?</h3>\n<p>네, 나와요. 종부세는 6월 1일에 가진 주택을 기준으로 매겨서, 그다음 날 팔아도 올해 종부세는 파는 사람이 내요.</p>\n<h3>부부 공동명의 1주택은 어떻게 계산하나요?</h3>\n<p>기본은 부부가 각자 지분만큼 9억 원씩 공제받아요. 원하면 9월 16일부터 30일까지 신청해 1세대 1주택자처럼 12억 원 공제와 나이·보유 기간 공제를 받을 수 있어요. 어느 쪽이 유리한지는 계산기로 두 번 넣어 비교해 보면 돼요.</p>\n<h3>나이가 많은데 당장 낼 돈이 없으면요?</h3>\n<p>1세대 1주택자로 만 60세 이상이거나 5년 이상 보유했고, 직전 연도 총급여 7,000만 원 이하(종합소득금액 6,000만 원 이하)이며 종부세가 100만 원을 넘으면 납부기한 3일 전까지 납부유예를 신청할 수 있어요. 담보를 내야 하고, 집을 팔거나 물려줄 때 미룬 세금을 이자상당액과 함께 내요.</p>\n<h3>공시가격은 어디서 확인하나요?</h3>\n<p>부동산 공시가격 알리미(realtyprice.kr)에서 주소로 찾을 수 있어요. 아파트는 공동주택가격, 단독주택은 개별주택가격을 넣으면 돼요.</p>",
+ "tags": [
+  "종부세",
+  "종합부동산세",
+  "종부세 계산기",
+  "1세대 1주택"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm view of modern apartment buildings in Seoul under a clear late autumn sky with yellow ginkgo trees",
+   "alt": "맑은 늦가을 하늘 아래 은행나무와 서울 아파트 단지"
+  }
+ ],
+ "keyword": "종부세계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "공시가격 합계에서 9억 원(1세대 1주택자 12억 원)을 뺀다",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공제 후 공정시장가액비율 60%를 곱한다",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290557&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "6월 1일 기준 주택으로 과세",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=282559&efYd=20260701"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주택 15억이면 농어촌특별세까지 69만 1,200원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2주택 합계 20억이면 313만 9,200원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세율 2주택 이하 0.5%·0.7%·1.0%·1.3%·1.5%·2.0%·2.7%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세율 3주택 이상 0.5%·0.7%·1.0%·2.0%·3.0%·4.0%·5.0%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "구간 경계 3억·6억·12억·25억·50억·94억 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "과세표준 6억 6,000만 원이면 360만 원+60만 원=420만 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "재산세 중복분 공제 = 과세표준 × 재산세 공정시장가액비율 × 0.4%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290557&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 1세대 1주택자 재산세 공정시장가액비율 45%(시가표준액 6억 원 초과)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290815&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "그 밖의 주택 재산세 공정시장가액비율 60%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290815&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1세대 1주택 세액공제 합계 최대 80%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "농어촌특별세는 종부세의 20%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285905&efYd=20260512"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주택 15억: 과세표준 1억 8,000만 원, 900,000원, 324,000원, 576,000원, 115,200원, 합계 691,200원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주택 20억 만 66세·12년: 4억 8,000만 원, 2,760,000원, 864,000원, 1,327,200원(70%), 568,800원, 113,760원, 682,560원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2주택 20억: 6억 6,000만 원, 4,200,000원, 1,584,000원, 2,616,000원, 523,200원, 3,139,200원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3주택 30억: 12억 6,000만 원, 10,800,000원, 3,024,000원, 7,776,000원, 1,555,200원, 9,331,200원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주택 오래 가진 60대는 2주택자의 5분의 1 수준, 공제 금액 3억 원 차이",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "나이 공제 만 60~64세 20%, 65~69세 30%, 70세 이상 40%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보유 공제 5~9년 20%, 10~14년 40%, 15년 이상 50%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만 72세·16년 보유면 90%가 아니라 80%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세부담 상한 작년의 150%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "재산세 과세표준 상한이 적용되면 공제할 재산세도 달라짐",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상속 5년 미경과·지분율 40% 이하 상속주택은 주택 수 제외",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290557&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요건 갖춘 소형 신축·지방 미분양 주택 주택 수 제외",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290557&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "법인은 공제 없이 2.7% 또는 5.0% 단일세율",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "납부 12월 1일부터 12월 15일까지, 국세청 고지",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "같은 기간 직접 신고하면 고지는 없던 것으로 됨",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "250만 원을 넘으면 납부기한 뒤 6개월 안에 분납",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "250만~500만 원이면 250만 원 초과분, 500만 원 초과면 절반까지",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290557&efYd=20261001"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "6월 2일에 팔아도 올해 종부세는 파는 사람이 냄",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=282559&efYd=20260701"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "부부 공동명의는 각자 9억 원씩 공제",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "9월 16일부터 30일까지 신청하면 1세대 1주택자처럼 12억 원 공제와 나이·보유 공제",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "납부유예: 1세대 1주택자, 만 60세 이상이거나 5년 이상 보유",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "직전 연도 총급여 7,000만 원 이하(종합소득금액 6,000만 원 이하)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "종부세 100만 원 초과",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "납부기한 3일 전까지 신청, 담보 제공",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "집을 팔거나 물려줄 때 미룬 세금을 이자상당액과 함께 냄",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공시가격은 부동산 공시가격 알리미에서 확인, 아파트는 공동주택가격",
+   "urls": [
+    "https://www.realtyprice.kr/notice/main/mainBody.htm"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "단독주택은 개별주택가격 (개별단독주택가격에서 수정)",
+   "urls": [
+    "https://www.realtyprice.kr/notice/main/mainBody.htm"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 종합부동산세법 (공제 금액·세율·1주택자 세액공제·납부기간)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280417&efYd=20260101"
+  },
+  {
+   "name": "국가법령정보센터 종합부동산세법 시행령 (공정시장가액비율·재산세 공제·분납)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290557&efYd=20261001"
+  },
+  {
+   "name": "국가법령정보센터 지방세법 시행령 (재산세 공정시장가액비율)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=290815&efYd=20261001"
+  }
+ ]
+}
