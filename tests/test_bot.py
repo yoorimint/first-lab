@@ -780,5 +780,24 @@ class ImageCheckTest(unittest.TestCase):
         self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
 
 
+
+class UnreviewedTest(unittest.TestCase):
+    """감시 세션 검수 목록: 글 속 계산기를 찾고, 검수 기록에 없는 계산기를 알려 준다."""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import unreviewed
+        self.u = unreviewed
+
+    def test_finds_calc_in_saved_json(self):
+        raw = json.dumps({"content_html": '<p>x</p>[firstlab_calc id="property-holding-tax"]'})
+        self.assertEqual(self.u.embedded_calcs(raw), ["property-holding-tax"])
+
+    def test_every_calculator_reviewed_or_listed(self):
+        # 계산기 파일 이름이 기록 형식(calc:<이름>)과 맞아야 대조가 된다
+        calcs = self.u.all_calcs()
+        self.assertIn("inheritance-tax", calcs)
+        self.assertTrue(self.u.reviewed_calcs() <= set(calcs), "reviewed.txt 의 calc: 이름이 실제 계산기에 없음")
+
 if __name__ == "__main__":
     unittest.main()

@@ -56,3 +56,14 @@
 441 공인중개사 자격증
 444 내 신용점수 조회
 448 필라테스 자격증
+# 계산기 (calc:<이름>, 11/5 외부 검수: 법령 대조·정답 독립 재계산)
+calc:car-inspection
+calc:car-transfer
+calc:gift-tax
+calc:income-tax
+calc:inheritance-tax
+calc:loan-repayment
+calc:regional-health-insurance
+calc:severance-pay
+calc:unemployment-benefit
+calc:vat

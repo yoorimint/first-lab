@@ -3,6 +3,8 @@
 서버의 공개 대기 글·보류 초안 전체를 글 번호로 automation/reviewed.txt 와 대조한다.
 시각으로 '새 글'을 찾으면 경계에 걸린 글이 빠진다 (11/4 #163 토지 실거래가가 빠졌던 일).
 출력: 글 번호, 제목, 검수자에게 줄 본문 파일 — 서버의 지금 본문(patches·보류 수정 반영)을 받아 OUT_DIR 에 저장.
+계산기도 같이 본다: 글에 들어간 계산기 이름, 그리고 reviewed.txt 의 'calc:<이름>' 줄에 없는 계산기 전부
+(11/5 공인중개사 점수 계산기가 글 검수 뒤에 따로 추가돼 검수에서 빠졌던 일).
 
 사용: FIRSTLAB_API_TOKEN=... python3 automation/unreviewed.py [글번호 ...]
   글 번호를 주면 reviewed.txt 와 상관없이 그 글들의 본문만 받는다 (다시 검수할 때).
@@ -11,6 +13,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 import tempfile
 import urllib.request
@@ -20,16 +23,38 @@ ROOT = Path(__file__).resolve().parent.parent
 REVIEWED = ROOT / "automation" / "reviewed.txt"
 BASE = "https://first-lab.kr/wp-json/firstlab/v1"
 OUT_DIR = Path(tempfile.gettempdir()) / "firstlab-review"  # 검수자에게 줄 본문 (저장소 밖)
+CALC_DIR = ROOT / "wordpress" / "themes" / "first-lab" / "calculators"
+CALC_TAG = re.compile(r'\[firstlab_calc id=\\?"([a-z0-9-]+)\\?"')  # 본문 JSON 안에서는 따옴표가 \" 로 저장됨
+
+
+def _heads() -> list[str]:
+    """reviewed.txt 각 줄의 첫 낱말 (설명 줄 제외)."""
+    lines = REVIEWED.read_text(encoding="utf-8").splitlines()
+    return [line.split()[0] for line in lines if line.strip() and not line.startswith("#")]
 
 
 def reviewed_ids() -> set[int]:
     """reviewed.txt 의 글 번호 (줄 맨 앞 숫자)."""
-    ids = set()
-    for line in REVIEWED.read_text(encoding="utf-8").splitlines():
-        head = line.split()[0] if line.strip() and not line.startswith("#") else ""
-        if head.isdigit():
-            ids.add(int(head))
-    return ids
+    return {int(h) for h in _heads() if h.isdigit()}
+
+
+def reviewed_calcs() -> set[str]:
+    """reviewed.txt 의 'calc:<이름>' 줄 = 검수 마친 계산기."""
+    return {h[5:] for h in _heads() if h.startswith("calc:")}
+
+
+def all_calcs() -> list[str]:
+    return sorted(p.stem for p in (CALC_DIR / "defs").glob("*.js"))
+
+
+def calc_files(calc_id: str) -> str:
+    """검수자에게 줄 계산기 파일 (defs·data·tests 중 있는 것)."""
+    paths = [CALC_DIR / sub / f"{calc_id}{ext}" for sub, ext in (("defs", ".js"), ("data", ".json"), ("tests", ".json"))]
+    return " ".join(str(p) for p in paths if p.exists())
+
+
+def embedded_calcs(text: str) -> list[str]:
+    return sorted(set(CALC_TAG.findall(text)))
 
 
 def _get(path: str) -> dict:
@@ -57,8 +82,13 @@ def main() -> None:
         print(f"# 검수 필요 {len(todo)}편 / 대기·보류 {len(posts)}편")
     for p in todo:
         path = save_body(int(p["post_id"]))
-        title = p.get("title") or json.loads(path.read_text(encoding="utf-8"))["title"]
+        raw = path.read_text(encoding="utf-8")
+        title = p.get("title") or json.loads(raw)["title"]
         print(f"{p['post_id']}\t{title}\t{path}")
+        for calc_id in embedded_calcs(raw):
+            print(f"  계산기 {calc_id}: {calc_files(calc_id)}")
+    todo_calcs = [c for c in all_calcs() if c not in reviewed_calcs()]
+    print(f"# 계산기 검수 필요 {len(todo_calcs)}개" + "".join(f"\n{c}\t{calc_files(c)}" for c in todo_calcs))
 
 
 if __name__ == "__main__":
