@@ -86,6 +86,10 @@ def main() -> None:
     has = [i for i in ids if photo.meta(i, photo.PHOTO_META)]
     waiting = [i for i in ids if i not in has and photo.meta(i, photo.PENDING_META)]
     none = [i for i in ids if i not in has and i not in waiting]
+    from .image_check import CHECKED_META
+    for i in none:  # 대표 사진이 없는데 '검사 끝'이면 사진을 영영 못 받음 → 다시 검사 대상으로
+        if photo.meta(i, CHECKED_META):
+            photo._delete_meta(i, CHECKED_META)
     print(f"[대표 사진] 요약: 사진 {len(has)}개 · 대기 {len(waiting)}개 · 없음(제목 카드) {len(none)}개 {none[:15]}", flush=True)
 
 

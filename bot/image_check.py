@@ -52,5 +52,7 @@ def apply_check(data: dict) -> str:
         photo.make(post_id, new_scene, (s.cf_account_id, s.cf_api_token))  # 실패하면 예외 → 큐 파일을 다음 배포 때 다시
         wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
         return f"글 {post_id} 대표 사진 {'교체' if current else '추가'} → 새 사진 다시 검사"
+    if not current and not remove:  # 대표 사진이 없는 글은 검사 끝으로 치지 않음 → 다음 검사 때 add 로 사진을 받게
+        return f"글 {post_id} 대표 사진 없음 → 다음 사진 검사에서 추가"
     wp_cli("post", "meta", "update", str(post_id), CHECKED_META, "1")
     return f"글 {post_id} 사진 검사 끝" + (" (사진 빼고 제목 카드)" if remove else " (이상 없음)")

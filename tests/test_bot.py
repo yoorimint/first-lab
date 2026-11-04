@@ -631,6 +631,11 @@ class ImageCheckTest(unittest.TestCase):
         self.assertEqual(made, [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}])
         self.assertIn("추가", msg)
 
+    def test_no_photo_is_never_marked_checked(self):
+        _, calls, made, _ = self.run_check({"replace": [], "remove": []}, current="")
+        self.assertEqual(made, [])
+        self.assertFalse(any("_firstlab_img_checked" in c for c in calls))  # 사진 없는 글은 다음 검사에서 add
+
     def test_stale_replace_for_other_photo_is_ignored(self):
         # 예전(본문 사진 시절) 요청: 지금 대표 사진이 아닌 사진 교체 → 대표 사진은 이상 없음으로 검사 끝
         fix = {"old": "ai-zzzzzzzzzz", "prompt": "a lake", "alt": "x", "why": "글자"}
