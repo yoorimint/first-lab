@@ -8,7 +8,8 @@
   const METHODS = {
     // 원리금균등: 매달 같은 금액 = P·r·(1+r)^n / ((1+r)^n − 1), 금리 0%면 P/n
     equal_payment(P, r, n) {
-      const monthly = r === 0 ? P / n : (P * r * (1 + r) ** n) / ((1 + r) ** n - 1);
+      // 같은 공식을 아주 작은 금리에서도 정밀도를 잃지 않는 형태로: P·r / (1 − (1+r)^−n)
+      const monthly = r === 0 ? P / n : (P * r) / -Math.expm1(-n * Math.log1p(r));
       return { first: monthly, last: monthly, interest: monthly * n - P };
     },
     // 원금균등: 원금은 매달 P/n 씩, 이자는 남은 원금에 → 이자 합계 = P·r·(n+1)/2

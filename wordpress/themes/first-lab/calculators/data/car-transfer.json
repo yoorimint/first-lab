@@ -1,12 +1,14 @@
 {
-  "basis_date": "2026-11-04",
+  "basis_date": "2026-11-05",
   "sources": [
-    {"name": "국가법령정보센터 지방세법 (제10조의5 차량 과세표준, 제12조 차량 세율)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282559"},
-    {"name": "국가법령정보센터 지방세특례제한법 (제67조 경형자동차 과세특례)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286607"},
+    {"name": "국가법령정보센터 지방세법 (제10조의5 차량 과세표준, 제12조 차량 세율, 제17조 면세점 50만 원)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282559"},
+    {"name": "국가법령정보센터 지방세특례제한법 (제67조 경형자동차 과세특례, 제177조의2 최소납부세제)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286607"},
     {"name": "국가법령정보센터 자동차관리법 시행령 (별표 3 범칙금액표)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286479"},
     {"name": "국가법령정보센터 자동차등록령 (제26조 이전등록 신청기간)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286481"}
   ],
   "relief_until": "2027년 12월 31일",
+  "tax_free_max": 500000,
+  "min_tax": {"free_max": 2000000, "relief_rate": 0.85},
   "tax": {
     "car":             {"rate": 0.07},
     "light_car":       {"rate": 0.04, "relief": 750000},

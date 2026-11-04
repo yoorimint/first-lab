@@ -36,6 +36,7 @@
       const amount = Number(v.amount);
       const purchase = Number(v.purchase) || 0;
       if (!(amount > 0)) throw new u.InputError('금액을 넣으면 결과가 나와요.');
+      if (!Number.isInteger(amount) || !Number.isInteger(purchase)) throw new u.InputError('금액은 1원 단위 정수로 넣어 주세요.');
       if (purchase < 0) throw new u.InputError('매입 금액은 0 이상으로 넣어 주세요.');
       const notes = [];
       let values;
@@ -76,7 +77,8 @@
         ];
         notes.push('간이과세자는 공제액이 납부세액보다 많아도 환급되지 않아요.');
         notes.push(`1년 매출(공급대가)이 ${u.won(d.simple.exempt_below)} 미만이면 납부의무가 면제돼요.`);
-        if (amount >= d.simple.threshold) notes.push(`직전 연도 공급대가가 ${u.won(d.simple.threshold)} 이상이면 다음 과세기간부터 일반과세자가 돼요.`);
+        notes.push('신용카드·현금영수증 발행 세액공제와 전자세금계산서 발급 공제는 넣지 않았어요.');
+        if (amount >= d.simple.threshold) notes.push(`한 해(1~12월) 공급대가가 ${u.won(d.simple.threshold)} 이상이면 다음 해 7월 1일부터 일반과세자가 돼요 (부동산임대업·과세유흥장소는 4,800만 원 기준, 부가가치세법 제61조·제62조).`);
       } else {
         throw new u.InputError('계산할 항목을 골라 주세요.');
       }

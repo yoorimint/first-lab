@@ -214,5 +214,56 @@
       "penalty": 500000,
       "total": 1550000
     }
+  },
+  {
+    "why": "지방세법 제17조 면세점: 취득가액 50만 원 이하면 취득세 없음 (11/5 외부 검수)",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 500000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 500000,
+      "gross": 0,
+      "relief": 0,
+      "tax": 0,
+      "penalty": 0,
+      "total": 0
+    }
+  },
+  {
+    "why": "면세점 바로 위 50만 1원: 1천분의 70 → 35,000원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 500001,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 500001,
+      "gross": 35000,
+      "relief": 0,
+      "tax": 35000,
+      "penalty": 0,
+      "total": 35000
+    }
+  },
+  {
+    "why": "경형 화물 면제라도 산출세액 200만 원 초과면 85%만 감면 (지방세특례제한법 제177조의2): 6,000만 원 × 4% = 240만, 감면 204만 → 36만",
+    "input": {
+      "cause": "sale",
+      "kind": "light_van_truck",
+      "price": 60000000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "gross": 2400000,
+      "relief": 2040000,
+      "tax": 360000
+    }
   }
 ]

@@ -54,7 +54,7 @@
       const fine = fineFor(lateDays, d.fine);
 
       let status;
-      if (on < start) status = `아직 기간 전이에요 (${u.daysBetween(on, start)}일 뒤부터 받을 수 있어요)`;
+      if (on < start) status = `아직 기간 전이에요 (${u.daysBetween(on, start)}일 뒤부터 기간이 시작돼요. 기간 전에 받으면 다음 만료일이 검사일 기준으로 당겨져요)`;
       else if (on <= end) status = `검사 기간 안이에요 (마감까지 ${u.daysBetween(on, end)}일 남음)`;
       else status = `검사 기간이 ${lateDays}일 지났어요`;
 
@@ -64,6 +64,7 @@
         '재검사 기간 안에 받는 재검사는 수수료가 면제돼요.',
       ];
       if (fine) {
+        notes.push('검사기간이 지난 뒤 명의이전한 차는 이전등록한 날부터 31일 안에 받으면 돼요 (자동차관리법 시행규칙 제77조③).');
         notes.push('과태료는 법령 기준으로 계산한 예상액이에요. 실제 금액은 고지서를 따르고, 의견제출 기한 안에 내면 최대 20%까지 줄어요.');
       }
 
