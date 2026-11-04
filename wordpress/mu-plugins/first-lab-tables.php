@@ -1,7 +1,8 @@
 <?php
 /**
  * Plugin Name: First Lab - 표 모바일 보기
- * Description: 열이 3개 이상인 본문 표는 휴대폰에서 '행마다 카드'로 보이게 한다 (좁은 칸에 긴 글이 세로로 늘어지는 문제).
+ * Description: 열이 3개 이상이고 긴 글이 든 칸이 있는 본문 표는 휴대폰에서 '행마다 카드'로 보이게 한다
+ * (좁은 칸에 긴 글이 세로로 늘어지는 문제). 짧은 숫자만 있는 표는 원래 표가 더 보기 좋아 그대로 둔다.
  *
  * 각 칸에 머리글 이름(data-label)을 붙여 두고, 스타일(테마 assets/tables.css)이 좁은 화면에서
  * "머리글: 값" 줄로 바꿔 보여 준다. 넓은 화면에서는 원래 표 그대로.
@@ -10,6 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_STACK_MIN_COLS = 3;
+const FIRSTLAB_STACK_LONG_CELL = 16; // 이 글자 수를 넘는 칸이 하나라도 있으면 카드로
 
 /** 표 HTML 에 카드 보기용 표시(class fl-stack, data-label)를 붙인다. 머리글이 없거나 열이 적으면 그대로. */
 function firstlab_stack_table( string $html ): string {
@@ -19,6 +21,11 @@ function firstlab_stack_table( string $html ): string {
 	preg_match_all( '#<th\b[^>]*>(.*?)</th>#s', $head[1], $th );
 	$labels = array_map( static fn( $t ) => esc_attr( trim( wp_strip_all_tags( $t ) ) ), $th[1] );
 	if ( count( $labels ) < FIRSTLAB_STACK_MIN_COLS ) {
+		return $html;
+	}
+	preg_match_all( '#<td\b[^>]*>(.*?)</td>#s', $html, $td );
+	$longest = max( array_map( static fn( $t ) => mb_strlen( trim( wp_strip_all_tags( $t ) ) ), $td[1] ?: array( '' ) ) );
+	if ( $longest <= FIRSTLAB_STACK_LONG_CELL ) {
 		return $html;
 	}
 	$html = preg_replace_callback(
