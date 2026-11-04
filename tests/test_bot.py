@@ -322,7 +322,7 @@ class ReviewGateTest(unittest.TestCase):
         self.assertTrue(any("최소" in p for p in problems(ok)))  # 주장 2개뿐
         bad = [{"claim": "75만원", "urls": ["https://x.tistory.com/1"], "verdict": "맞음", "action": "유지"},
                {"claim": "철회 불가", "urls": ["https://a.go.kr"], "verdict": "확인불가", "action": "유지"}]
-        self.assertEqual(len(problems(bad)), 2)
+        self.assertEqual(len(problems(bad)), 3)  # 비공식 출처, 확인불가인데 유지, 주장 수 부족
 
 
 class ContinuousTest(unittest.TestCase):
