@@ -1,0 +1,361 @@
+{
+ "title": "대출 원리금 계산기: 5,000만 원 5년 5%면 월 943,562원",
+ "excerpt": "대출 원리금 계산 공식과 5,000만 원·연 5%·60개월 예시(월 943,562원), 상환 방식·금리·기간별 비교, 거치기간과 DSR, 중도상환수수료 3년 기준까지 정리했어요.",
+ "content_html": "<p>대출 원리금은 <strong>원금 + 이자</strong>를 합친, 매달 실제로 나가는 돈이에요. 가장 흔한 원리금균등 상환이면 월 납입금은 <strong>원금 × 월이율 × (1+월이율)^개월 ÷ ((1+월이율)^개월 − 1)</strong>로 나와요. 예를 들어 <strong>5,000만 원을 연 5%, 5년(60개월)</strong> 빌리면 월 원리금은 <strong>943,562원</strong>, 5년 동안 내는 이자는 <strong>6,613,701원</strong>이에요. 아래 계산기에 내 대출 조건을 넣으면 상환 방식별로 바로 비교할 수 있어요.</p>\n\n<h2>계산기에 넣는 값 4가지</h2>\n<ul>\n<li><strong>대출 원금</strong>: 실제로 빌리는 금액이에요.</li>\n<li><strong>연 금리</strong>: 약정서에 적힌 연 이율이에요. 계산할 때는 12로 나눈 월이율을 써요 (연 5%면 월 약 0.417%).</li>\n<li><strong>기간</strong>: 개월 수로 넣어요. 5년이면 60개월이에요.</li>\n<li><strong>상환 방식</strong>: 원리금균등, 원금균등, 만기일시 중 하나를 골라요.</li>\n</ul>\n\n<p>[firstlab_calc id=\"loan-repayment\"]</p>\n\n<h2>상환 방식 3가지 비교 (5,000만 원·연 5%·60개월)</h2>\n<table>\n<thead><tr><th>상환 방식</th><th>첫 달</th><th>마지막 달</th><th>이자 총액</th><th>총 상환액</th></tr></thead>\n<tbody>\n<tr><td>원리금균등</td><td>943,562원</td><td>943,562원</td><td>6,613,701원</td><td>56,613,701원</td></tr>\n<tr><td>원금균등</td><td>1,041,667원</td><td>836,806원</td><td>6,354,167원</td><td>56,354,167원</td></tr>\n<tr><td>만기일시</td><td>208,333원</td><td>50,208,333원</td><td>12,500,000원</td><td>62,500,000원</td></tr>\n</tbody>\n</table>\n<p>원금균등은 원금이 빨리 줄어서 이자가 가장 적지만 첫 달 부담이 약 10만 원 더 커요. 만기일시는 매달 이자만 내니 월 부담이 가장 작은 대신, 원금이 끝까지 그대로라 이자가 원리금균등의 2배 가까이 돼요. 매달 같은 금액으로 가계부를 맞추고 싶으면 원리금균등, 초반 여유가 있으면 원금균등이 이자를 아끼는 쪽이에요.</p>\n\n<h2>매달 낸 돈이 원금과 이자로 나뉘는 방식</h2>\n<p>이자는 매달 <strong>남은 원금 × 연 금리 ÷ 12</strong>로 붙어요. 원리금균등에서 월 943,562원이 어떻게 나뉘는지 보면 이래요.</p>\n<table>\n<thead><tr><th>회차</th><th>이자</th><th>원금</th><th>남은 원금</th></tr></thead>\n<tbody>\n<tr><td>1회차</td><td>208,333원</td><td>735,228원</td><td>49,264,772원</td></tr>\n<tr><td>2회차</td><td>205,270원</td><td>738,292원</td><td>48,526,480원</td></tr>\n<tr><td>3회차</td><td>202,194원</td><td>741,368원</td><td>47,785,112원</td></tr>\n</tbody>\n</table>\n<p>회차가 갈수록 이자 몫은 줄고 원금 몫은 커져요. 첫 1년 동안 내는 11,322,740원 가운데 이자는 2,294,978원, 원금은 9,027,763원이에요. 엑셀·구글 시트에서는 <strong>=PMT(5%/12, 60, -50000000)</strong>을 넣으면 같은 월 납입금이 나와요.</p>\n\n<h2>금리·기간을 바꾸면 이렇게 달라져요</h2>\n<h3>금리별 (5,000만 원·60개월·원리금균등)</h3>\n<table>\n<thead><tr><th>연 금리</th><th>월 원리금</th><th>이자 총액</th></tr></thead>\n<tbody>\n<tr><td>4%</td><td>920,826원</td><td>5,249,566원</td></tr>\n<tr><td>5%</td><td>943,562원</td><td>6,613,701원</td></tr>\n<tr><td>6%</td><td>966,640원</td><td>7,998,405원</td></tr>\n<tr><td>7%</td><td>990,060원</td><td>9,403,596원</td></tr>\n</tbody>\n</table>\n<p>금리가 1%포인트 오를 때마다 월 원리금은 2만 원대로 늘지만, 5년 이자는 약 136만~141만 원씩 늘어나요. 변동금리라면 지금 금리에 1%포인트를 더해서도 한 번 계산해 두는 게 안전해요.</p>\n<h3>기간별 (5,000만 원·연 5%·원리금균등)</h3>\n<table>\n<thead><tr><th>기간</th><th>월 원리금</th><th>이자 총액</th></tr></thead>\n<tbody>\n<tr><td>3년 (36개월)</td><td>1,498,545원</td><td>3,947,615원</td></tr>\n<tr><td>5년 (60개월)</td><td>943,562원</td><td>6,613,701원</td></tr>\n<tr><td>7년 (84개월)</td><td>706,695원</td><td>9,362,418원</td></tr>\n<tr><td>10년 (120개월)</td><td>530,328원</td><td>13,639,309원</td></tr>\n</tbody>\n</table>\n<p>5년을 10년으로 늘리면 월 부담은 41만 원 넘게 줄지만 이자는 2배 이상이 돼요. 매달 낼 수 있는 금액 안에서 가장 짧은 기간을 고르는 게 이자를 줄이는 기본이에요.</p>\n\n<h2>거치기간이 있으면 이자가 더 늘어요</h2>\n<p>거치기간은 처음 얼마 동안 이자만 내고 원금은 나중에 갚는 기간이에요. 같은 5,000만 원·연 5%·5년을 <strong>1년 거치 후 4년 원리금균등</strong>으로 갚으면 이렇게 돼요.</p>\n<ul>\n<li>처음 12개월: 이자만 매달 208,333원</li>\n<li>나머지 48개월: 매달 1,151,465원</li>\n<li>이자 총액: 7,770,305원 (거치 없이 갚을 때보다 약 116만 원 많음)</li>\n</ul>\n<p>거치가 있는 대출은 이자만 내는 기간과 원리금을 갚는 기간을 나눠서 계산하면 돼요. 금융감독원 파인의 대출이자계산기에서는 거치 후 원리금균등·원금균등 방식도 고를 수 있어요.</p>\n\n<h2>원리금은 대출 한도(DSR)에도 쓰여요</h2>\n<p>금융사는 대출 심사 때 <strong>DSR(총부채원리금상환비율)</strong>, 즉 1년 동안 갚을 모든 대출 원리금이 연소득에서 차지하는 비율을 봐요. 위 예시처럼 1년 원리금이 11,322,740원이고 연소득이 4,000만 원이면 이 대출 하나로 DSR은 약 28.3%예요. 2025년 7월 1일부터 시행된 3단계 스트레스 DSR은 한도를 계산할 때만 실제 금리에 스트레스 금리를 더해 보는 제도예요. 2025년 10월 16일부터 수도권·규제지역 주택담보대출에는 3% 이상이 붙고, 신용대출은 잔액이 1억 원을 넘을 때만 붙어요. 실제로 내는 이자는 약정 금리 그대로예요.</p>\n\n<h2>미리 갚을 때 중도상환수수료</h2>\n<p>중도상환수수료는 원칙적으로 금지돼 있고, <strong>대출일부터 3년 이내</strong>에 갚을 때만 받을 수 있어요. 2025년 1월 13일 이후 새로 맺은 계약은 수수료를 금융사의 실제 비용 범위 안에서만 받을 수 있게 바뀌었어요. 그래서 3년이 지난 뒤 여유 자금이 생기면 수수료 없이 원금을 줄여 이후 이자를 아낄 수 있어요. 농협·수협·산림조합도 2026년 1월 1일부터 취급하는 대출에 같은 실비용 방식이 적용됐고, 신협은 이미 적용하고 있어요. 그 밖의 금융사라면 약정서의 수수료 조항을 먼저 보는 게 좋아요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>계산기 금액과 은행 청구액이 조금 다른 이유는 뭔가요?</h3>\n<p>실제 이자는 월별 날짜 수에 따라 조금씩 달라지고 원 단위 이하를 처리하는 방식도 달라서, 계산기 값과 약간 차이가 날 수 있어요.</p>\n<h3>일부만 미리 갚으면 월 납입금이 줄어드나요?</h3>\n<p>금융사마다 처리 방식이 달라요. 미리 갚을 때 월 납입금을 줄이는지, 기간을 줄이는지 고를 수 있는지 물어보세요.</p>\n<h3>마이너스통장도 이 계산기로 계산되나요?</h3>\n<p>매달 이자만 내는 구조라면, 실제로 쓴 금액을 원금으로 넣고 만기일시 방식을 고르면 매달 이자를 대략 가늠해 볼 수 있어요. 정확한 이자 계산 방식은 약정서 기준이에요.</p>\n<h3>원리금균등과 원금균등 중 첫해 부담이 큰 쪽은요?</h3>\n<p>원금균등이에요. 초반에 원금을 많이 갚아서 첫해 원리금 합계가 더 커요. 위 예시에서 첫 1년 원리금은 원리금균등 11,322,740원, 원금균등 12,270,833원이에요.</p>",
+ "tags": [
+  "대출원리금계산기",
+  "원리금균등",
+  "대출이자계산"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a ceramic piggy bank beside a small potted plant and a cup of coffee on a wooden desk by a window in soft morning light",
+   "alt": "창가 나무 책상 위의 돼지 저금통과 화분, 커피잔"
+  }
+ ],
+ "keyword": "대출원리금계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "5,000만 원·연 5%·5년(60개월) 원리금균등 월 943,562원 (재계산, 파인 계산기 방식)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5년 이자 총액 6,613,701원, 총 상환액 56,613,701원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원리금균등 공식 원금×월이율×(1+월이율)^개월÷((1+월이율)^개월−1) (재계산으로 표 값 재현)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연 5%의 월이율 약 0.417% (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5년 = 60개월",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상환 방식 원리금균등·원금균등·만기일시",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등 첫 달 1,041,667원·마지막 달 836,806원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등 이자 6,354,167원·총 56,354,167원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만기일시 매달 208,333원·마지막 달 50,208,333원·이자 12,500,000원·총 62,500,000원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등이 이자가 가장 적고 첫 달 부담이 약 10만 원 더 큼 (재계산 98,105원)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만기일시는 매달 이자만 내고 만기에 원금, 이자가 원리금균등의 2배 가까이 (재계산 1.89배)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "이자 = 남은 원금 × 연 금리 ÷ 12 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1회차 이자 208,333원·원금 735,228원·남은 원금 49,264,772원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2회차 205,270원·738,292원·48,526,480원, 3회차 202,194원·741,368원·47,785,112원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "회차가 갈수록 이자 몫 감소·원금 몫 증가 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "첫 1년 11,322,740원 중 이자 2,294,978원·원금 9,027,763원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "엑셀 =PMT(5%/12, 60, -50000000) 결과가 월 납입금과 같음 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금리 4% 월 920,826원·이자 5,249,566원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금리 6% 966,640원·7,998,405원, 7% 990,060원·9,403,596원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금리 1%포인트당 월 원리금 2만 원대 증가, 5년 이자 약 136만~141만 원 증가 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "틀림",
+   "action": "수정"
+  },
+  {
+   "claim": "3년(36개월) 1,498,545원·3,947,615원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "7년(84개월) 706,695원·9,362,418원, 10년(120개월) 530,328원·13,639,309원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5년→10년이면 월 부담 41만 원 넘게 감소, 이자 2배 이상 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 거치 중 이자만 매달 208,333원 (12개월) (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "거치 후 48개월 매달 1,151,465원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 거치 이자 총액 7,770,305원, 거치 없을 때보다 약 116만 원 많음 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융감독원 파인 대출이자계산기는 거치 후 원리금균등·원금균등 방식 선택 가능",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "DSR(총부채원리금상환비율) = 1년 동안 갚을 대출 원리금 ÷ 연소득",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 원리금 11,322,740원, 연소득 4,000만 원이면 DSR 약 28.3% (재계산)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3단계 스트레스 DSR 2025년 7월 1일 시행",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "스트레스 금리는 한도 계산에만, 실제 이자는 약정 금리 그대로",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2025년 10월 16일부터 수도권·규제지역 주택담보대출 스트레스 금리 3% 이상 (검수: 1.5% 단정은 틀림 → 수정)",
+   "urls": [
+    "https://fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "틀림",
+   "action": "수정"
+  },
+  {
+   "claim": "신용대출은 잔액 1억 원을 넘을 때만 스트레스 금리",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중도상환수수료는 원칙적으로 금지",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/83833",
+    "https://www.fsc.go.kr/po010105/82646"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대출일부터 3년 이내 상환 때만 부과 가능, 3년 지나면 수수료 없이 상환",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/83833"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2025년 1월 13일 이후 신규 계약은 실비용 범위 안에서만 수수료",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/83833",
+    "https://www.fsc.go.kr/po010105/82646"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "농협·수협·산림조합은 2026년 1월 1일부터 취급하는 대출에 실비용 방식, 신협은 이미 적용 (검수: 상호금융 다를 수 있음 → 수정)",
+   "urls": [
+    "https://fsc.go.kr/no010101/85455"
+   ],
+   "verdict": "틀림",
+   "action": "수정"
+  },
+  {
+   "claim": "실제 이자는 월별 날짜 수·원 단위 이하 처리로 계산기 값과 약간 차이",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "일부 상환 시 월 납입금 감소/기간 단축은 금융사마다 다름 → 단정 빼고 문의 안내",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "마이너스통장 이자: 이자만 내는 구조라면 만기일시로 대략 가늠, 정확한 방식은 약정서 기준",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "첫 1년 원리금 원리금균등 11,322,740원, 원금균등 12,270,833원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "금융감독원 파인 대출이자계산기",
+   "url": "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+  },
+  {
+   "name": "금융위원회 중도상환수수료 개편 안내",
+   "url": "https://www.fsc.go.kr/no010101/83833"
+  },
+  {
+   "name": "금융위원회 3단계 스트레스 DSR 시행방안",
+   "url": "https://www.fsc.go.kr/no010101/84617"
+  }
+ ]
+}
