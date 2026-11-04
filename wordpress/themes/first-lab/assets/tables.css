@@ -1,0 +1,33 @@
+/* 본문 표: 열 3개 이상인 표(fl-stack)는 휴대폰에서 행마다 카드로 (wordpress/mu-plugins/first-lab-tables.php) */
+@media (max-width: 600px) {
+	.wp-block-table table.fl-stack { table-layout: auto; border: 0; }
+	.fl-stack thead { display: none; }
+	.fl-stack tr {
+		display: block;
+		margin: 0 0 0.75rem;
+		border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+		border-radius: 8px;
+		overflow: hidden;
+	}
+	.fl-stack td {
+		display: flex;
+		gap: 0.75rem;
+		border: 0;
+		border-top: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+		padding: 0.55rem 0.8rem;
+		text-align: left;
+	}
+	.fl-stack td::before {
+		content: attr(data-label);
+		flex: 0 0 34%;
+		font-weight: 700;
+		color: color-mix(in srgb, currentColor 65%, transparent);
+	}
+	/* 첫 칸은 카드 제목 */
+	.fl-stack td:first-child {
+		border-top: 0;
+		font-weight: 700;
+		background: color-mix(in srgb, currentColor 6%, transparent);
+	}
+	.fl-stack td:first-child::before { display: none; }
+}
