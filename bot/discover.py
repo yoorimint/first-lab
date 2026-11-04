@@ -121,6 +121,15 @@ def _apply_search_console() -> str:
         return f"서치콘솔 오류: {e}"
 
 
+def already_ran_today(today: str | None = None) -> bool:
+    """오늘 이미 수집했는지. 배포 때 시작한 수집과 새벽 4시 예약 수집이 같은 날 두 번 돌던 일 방지 (11/5)."""
+    today = today or datetime.now().strftime("%Y-%m-%d")
+    try:
+        return STAMP_FILE.read_text().strip() == today
+    except OSError:
+        return False
+
+
 def main() -> None:
     """systemd 일일 작업 진입점: 결과를 봇 기록에 남긴다."""
     from .settings import load_settings
@@ -128,7 +137,11 @@ def main() -> None:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--calls", type=int, help="API 호출 수 (생략 시 설정 페이지 값)")
+    parser.add_argument("--force", action="store_true", help="오늘 이미 수집했어도 다시")
     args = parser.parse_args()
+    if not args.force and already_ran_today():
+        print("오늘 수집 완료 → 건너뜀", flush=True)
+        return
     settings = load_settings()
     started = time.time()
     try:

@@ -645,6 +645,19 @@ class OfficialHostTest(unittest.TestCase):
         self.assertFalse(is_official("https://notkorcham.net/x"))  # 이름만 비슷한 주소는 아님
 
 
+class DiscoverOncePerDayTest(unittest.TestCase):
+    def test_second_run_same_day_is_skipped(self):
+        import tempfile
+        from bot import discover
+        with tempfile.TemporaryDirectory() as tmp:
+            stamp = Path(tmp, "stamp")
+            with mock.patch.object(discover, "STAMP_FILE", stamp):
+                self.assertFalse(discover.already_ran_today("2026-11-05"))  # 표시 없음 → 실행
+                stamp.write_text("2026-11-05")
+                self.assertTrue(discover.already_ran_today("2026-11-05"))   # 오늘 이미 함 → 건너뜀
+                self.assertFalse(discover.already_ran_today("2026-11-06"))  # 다음 날 → 실행
+
+
 class SimilarTopicTest(unittest.TestCase):
     def run_similar(self, keyword, slugs):
         import urllib.parse
