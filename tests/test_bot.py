@@ -631,6 +631,23 @@ class ImageCheckTest(unittest.TestCase):
         self.assertEqual(made, [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}])
         self.assertIn("추가", msg)
 
+    def test_quota_turns_request_into_waiting_not_error(self):
+        from bot import image_check, images, photo
+        fix = {"old": "ai-aaaaaaaaaa", "prompt": "a quiet street", "alt": "거리", "why": "글자"}
+        calls = []
+
+        def fake_cli(*args):
+            calls.append(args)
+            return "ai-aaaaaaaaaa" if args[:3] == ("post", "meta", "get") and args[4] == photo.PHOTO_META else ""
+        with mock.patch.object(image_check, "wp_cli", side_effect=fake_cli), \
+             mock.patch.object(photo, "wp_cli", side_effect=fake_cli), \
+             mock.patch.object(image_check, "load_settings", return_value=mock.Mock(cf_account_id="a", cf_api_token="t")), \
+             mock.patch.object(photo, "make", side_effect=images.QuotaExceeded("한도")):
+            msg = image_check.apply_check({"type": "image_check", "post_id": 176, "replace": [fix]})  # 예외 없이 끝나야 함
+        self.assertIn("오전 9시", msg)
+        wait = next(c for c in calls if c[:3] == ("post", "meta", "update") and c[4] == photo.PENDING_META)
+        self.assertIn('"replace": "ai-aaaaaaaaaa"', wait[5])  # 사진 채우기가 이 사진을 바꿈
+
     def test_no_photo_is_never_marked_checked(self):
         _, calls, made, _ = self.run_check({"replace": [], "remove": []}, current="")
         self.assertEqual(made, [])

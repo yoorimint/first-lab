@@ -10,6 +10,7 @@
 """
 from __future__ import annotations
 
+import json
 import urllib.parse
 
 from . import images, photo
@@ -49,8 +50,15 @@ def apply_check(data: dict) -> str:
         _to_title_card(post_id, current)
     elif new_scene:
         s = load_settings()
-        photo.make(post_id, new_scene, (s.cf_account_id, s.cf_api_token))  # 실패하면 예외 → 큐 파일을 다음 배포 때 다시
-        wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
+        try:
+            photo.make(post_id, new_scene, (s.cf_account_id, s.cf_api_token))  # 다른 오류면 예외 → 다음 배포 때 다시
+            wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
+        except images.QuotaExceeded:
+            wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
+            # 한도 소진: 사진 채우기 대기로 넘김 (대기 중인 글은 검사 목록에서 빠져 같은 요청이 쌓이지 않음)
+            wait = {"prompt": new_scene["prompt"], "alt": new_scene.get("alt", ""), "replace": current}
+            wp_cli("post", "meta", "update", str(post_id), photo.PENDING_META, json.dumps([wait], ensure_ascii=False))
+            return f"글 {post_id} 대표 사진 {'교체' if current else '추가'}: 한도 소진 → 오전 9시 이후 자동"
         return f"글 {post_id} 대표 사진 {'교체' if current else '추가'} → 새 사진 다시 검사"
     if not current and not remove:  # 대표 사진이 없는 글은 검사 끝으로 치지 않음 → 다음 검사 때 add 로 사진을 받게
         return f"글 {post_id} 대표 사진 없음 → 다음 사진 검사에서 추가"

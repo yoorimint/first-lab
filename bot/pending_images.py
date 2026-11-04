@@ -29,11 +29,13 @@ def fill_post(post_id: str, cloudflare: tuple[str, str]) -> str:
     """글 하나의 대표 사진 만들기. 한도가 또 차면 그대로 두고 다음에."""
     scenes = json.loads(photo.meta(post_id, photo.PENDING_META) or "[]")
     scene = photo.first_scene([s.get("prompt", "") for s in scenes], [s.get("alt", "") for s in scenes])
-    if scene and not photo.meta(post_id, photo.PHOTO_META):
+    current = photo.meta(post_id, photo.PHOTO_META)
+    target = scenes[0].get("replace", "") if scenes else ""  # 사진 검사에서 바꾸기로 한 사진 (image_check)
+    if scene and (not current or (target and target == current)):
         photo.make(post_id, scene, cloudflare)  # QuotaExceeded 면 메타를 남긴 채 위로 전달
         wp_cli("post", "meta", "delete", post_id, photo.PENDING_META)
         photo._delete_meta(post_id, CHECKED_META)  # 새 사진도 사진 검사 받게
-        return f"글 {post_id} 대표 사진 추가"
+        return f"글 {post_id} 대표 사진 {'교체' if current else '추가'}"
     wp_cli("post", "meta", "delete", post_id, photo.PENDING_META)
     return f"글 {post_id} 대기 정리 (이미 사진 있음·쓸 장면 없음)"
 
