@@ -52,7 +52,10 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 검사: `python3 -m unittest discover -s tests`
 - 커밋하고 main 에 올린다 (운영자 승인된 자동 작업): 
   `git add wordpress/queue && git commit -m "매일 글: <키워드>" && git push origin HEAD:main`
-- GitHub Actions 의 "Deploy server config" 실행이 성공했는지 확인한다. 실패하면 원인만 기록하고 끝낸다.
+- 배포 결과 확인 (예약 세션엔 GitHub 도구가 없으니 공개 API 사용, 2~5분 걸림):
+  `curl -s "https://api.github.com/repos/yoorimint/first-lab/actions/runs?head_sha=$(git rev-parse HEAD)" | python3 -c "import json,sys;[print(r['name'],r['status'],r['conclusion']) for r in json.load(sys.stdin)['workflow_runs']]"`
+  conclusion 이 success 면 끝. failure 면 원인만 보고하고 끝낸다.
+- push 가 권한 문제로 실패하면 다른 방법을 찾지 말고 "push 실패"로 보고하고 끝낸다.
 
 ## 6. 마무리 보고 (세션 마지막 메시지)
 - 고른 키워드와 건너뛴 후보(이유), 제목, 확인 못 한 주장, 배포 결과를 짧게 적는다.
