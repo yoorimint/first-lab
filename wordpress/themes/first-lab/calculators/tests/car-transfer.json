@@ -1,0 +1,218 @@
+[
+  {
+    "why": "매매 승용 1,500만 원: 지방세법 제12조 비영업용 승용 1천분의 70 → 105만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 15000000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 15000000,
+      "gross": 1050000,
+      "relief": 0,
+      "tax": 1050000,
+      "penalty": 0,
+      "total": 1050000
+    }
+  },
+  {
+    "why": "매매 경형 승용 800만 원: 1천분의 40 = 32만 원, 지특법 제67조 75만 원 이하 면제 → 0원",
+    "input": {
+      "cause": "sale",
+      "kind": "light_car",
+      "price": 8000000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 8000000,
+      "gross": 320000,
+      "relief": 320000,
+      "tax": 0,
+      "penalty": 0,
+      "total": 0
+    }
+  },
+  {
+    "why": "매매 경형 승용 2,000만 원: 80만 원 - 75만 원 공제 = 5만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "light_car",
+      "price": 20000000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 20000000,
+      "gross": 800000,
+      "relief": 750000,
+      "tax": 50000,
+      "penalty": 0,
+      "total": 50000
+    }
+  },
+  {
+    "why": "증여 승용 시가표준액 1,000만 원: 무상취득은 시가표준액(지방세법 제10조의5) → 70만 원",
+    "input": {
+      "cause": "gift",
+      "kind": "car",
+      "price": 0,
+      "standard": 10000000,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 10000000,
+      "gross": 700000,
+      "relief": 0,
+      "tax": 700000,
+      "penalty": 0,
+      "total": 700000
+    }
+  },
+  {
+    "why": "매매 신고가 500만 원 < 시가표준액 700만 원: 시가표준액으로 과세 → 49만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 5000000,
+      "standard": 7000000,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 7000000,
+      "gross": 490000,
+      "relief": 0,
+      "tax": 490000,
+      "penalty": 0,
+      "total": 490000
+    }
+  },
+  {
+    "why": "매매 승합·화물 비영업용 2,000만 원: 1천분의 50 → 100만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "van_truck",
+      "price": 20000000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 20000000,
+      "gross": 1000000,
+      "relief": 0,
+      "tax": 1000000,
+      "penalty": 0,
+      "total": 1000000
+    }
+  },
+  {
+    "why": "경형 화물 1,000만 원: 지특법 제67조 제2항 면제 → 0원",
+    "input": {
+      "cause": "sale",
+      "kind": "light_van_truck",
+      "price": 10000000,
+      "standard": 0,
+      "late_days": 0
+    },
+    "expect": {
+      "base": 10000000,
+      "gross": 400000,
+      "relief": 400000,
+      "tax": 0,
+      "penalty": 0,
+      "total": 0
+    }
+  },
+  {
+    "why": "지연 10일: 별표 3 10일 이내 10만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 15000000,
+      "standard": 0,
+      "late_days": 10
+    },
+    "expect": {
+      "base": 15000000,
+      "gross": 1050000,
+      "relief": 0,
+      "tax": 1050000,
+      "penalty": 100000,
+      "total": 1150000
+    }
+  },
+  {
+    "why": "지연 11일: 10만 원 + 11일째부터 1일 1만 원 → 11만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 15000000,
+      "standard": 0,
+      "late_days": 11
+    },
+    "expect": {
+      "base": 15000000,
+      "gross": 1050000,
+      "relief": 0,
+      "tax": 1050000,
+      "penalty": 110000,
+      "total": 1160000
+    }
+  },
+  {
+    "why": "지연 30일: 10만 원 + 20일 × 1만 원 = 30만 원 (본문 예시와 같음)",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 15000000,
+      "standard": 0,
+      "late_days": 30
+    },
+    "expect": {
+      "base": 15000000,
+      "gross": 1050000,
+      "relief": 0,
+      "tax": 1050000,
+      "penalty": 300000,
+      "total": 1350000
+    }
+  },
+  {
+    "why": "지연 49일: 49만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 15000000,
+      "standard": 0,
+      "late_days": 49
+    },
+    "expect": {
+      "base": 15000000,
+      "gross": 1050000,
+      "relief": 0,
+      "tax": 1050000,
+      "penalty": 490000,
+      "total": 1540000
+    }
+  },
+  {
+    "why": "지연 50일 이상: 50만 원",
+    "input": {
+      "cause": "sale",
+      "kind": "car",
+      "price": 15000000,
+      "standard": 0,
+      "late_days": 50
+    },
+    "expect": {
+      "base": 15000000,
+      "gross": 1050000,
+      "relief": 0,
+      "tax": 1050000,
+      "penalty": 500000,
+      "total": 1550000
+    }
+  }
+]

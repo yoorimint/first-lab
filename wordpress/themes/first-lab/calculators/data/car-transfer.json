@@ -1,0 +1,17 @@
+{
+  "basis_date": "2026-11-04",
+  "sources": [
+    {"name": "국가법령정보센터 지방세법 (제10조의5 차량 과세표준, 제12조 차량 세율)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282559"},
+    {"name": "국가법령정보센터 지방세특례제한법 (제67조 경형자동차 과세특례)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286607"},
+    {"name": "국가법령정보센터 자동차관리법 시행령 (별표 3 범칙금액표)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286479"},
+    {"name": "국가법령정보센터 자동차등록령 (제26조 이전등록 신청기간)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286481"}
+  ],
+  "relief_until": "2027년 12월 31일",
+  "tax": {
+    "car":             {"rate": 0.07},
+    "light_car":       {"rate": 0.04, "relief": 750000},
+    "van_truck":       {"rate": 0.05},
+    "light_van_truck": {"rate": 0.04, "exempt": true}
+  },
+  "penalty": {"base": 100000, "base_days": 10, "per_day": 10000, "max": 500000, "max_from_day": 50}
+}
