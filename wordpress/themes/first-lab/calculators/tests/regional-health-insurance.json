@@ -1,0 +1,125 @@
+[
+  {
+    "why": "소득·재산 없음: 소득월액 28만 원 이하 → 하한 20,160원(공단 2026 고시), 장기요양 20,160×0.9448/7.19=2,649.1 → 2,649원",
+    "input": {
+      "income_full": 0,
+      "income_half": 0,
+      "tax_base": 0,
+      "deposit": 0,
+      "rent": 0
+    },
+    "expect": {
+      "income_month": 0,
+      "income_premium": 20160,
+      "points": 0,
+      "property_premium": 0,
+      "health": 20160,
+      "ltc": 2649,
+      "total": 22809
+    }
+  },
+  {
+    "why": "사업소득 2,400만 원·과표 2억 원: 200만×7.19%=143,800, 1억 원(별표4 18등급 439점)×211.5=92,848.5→92,848 (본문 예시)",
+    "input": {
+      "income_full": 24000000,
+      "income_half": 0,
+      "tax_base": 200000000,
+      "deposit": 0,
+      "rent": 0
+    },
+    "expect": {
+      "income_month": 2000000,
+      "income_premium": 143800,
+      "points": 439,
+      "property_premium": 92848,
+      "health": 236648,
+      "ltc": 31096,
+      "total": 267744
+    }
+  },
+  {
+    "why": "연금 3,600만 원(50% 반영)·전세 3억 원: 150만×7.19%=107,850, 보증금 30%=9,000만 원은 1억 원 공제 안쪽 → 재산 0점 (본문 예시)",
+    "input": {
+      "income_full": 0,
+      "income_half": 36000000,
+      "tax_base": 0,
+      "deposit": 300000000,
+      "rent": 0
+    },
+    "expect": {
+      "income_month": 1500000,
+      "income_premium": 107850,
+      "points": 0,
+      "property_premium": 0,
+      "health": 107850,
+      "ltc": 14172,
+      "total": 122022
+    }
+  },
+  {
+    "why": "사업소득 10억 원: 5,991,666원 → 상한 4,591,740원(공단 2026 고시)",
+    "input": {
+      "income_full": 1000000000,
+      "income_half": 0,
+      "tax_base": 0,
+      "deposit": 0,
+      "rent": 0
+    },
+    "expect": {
+      "income_premium": 5991666,
+      "health": 4591740,
+      "ltc": 603376,
+      "total": 5195116
+    }
+  },
+  {
+    "why": "사업소득 300만 원(월 25만 원, 28만 원 이하): 하한 20,160원 (시행규칙 제44조③)",
+    "input": {
+      "income_full": 3000000,
+      "income_half": 0,
+      "tax_base": 0,
+      "deposit": 0,
+      "rent": 0
+    },
+    "expect": {
+      "income_month": 250000,
+      "income_premium": 20160,
+      "health": 20160
+    }
+  },
+  {
+    "why": "과표 1억 450만 원: 공제 후 450만 원 = 별표4 1등급 22점 × 211.5 = 4,653원",
+    "input": {
+      "income_full": 0,
+      "income_half": 0,
+      "tax_base": 104500000,
+      "deposit": 0,
+      "rent": 0
+    },
+    "expect": {
+      "points": 22,
+      "property_premium": 4653,
+      "health": 24813,
+      "ltc": 3260,
+      "total": 28073
+    }
+  },
+  {
+    "why": "근로 3,000만 원·보증금 1억+월세 100만 원: 125만×7.19%=89,875, (1억+4,000만)×30%=4,200만 → 0점",
+    "input": {
+      "income_full": 0,
+      "income_half": 30000000,
+      "tax_base": 0,
+      "deposit": 100000000,
+      "rent": 1000000
+    },
+    "expect": {
+      "income_month": 1250000,
+      "income_premium": 89875,
+      "points": 0,
+      "health": 89875,
+      "ltc": 11810,
+      "total": 101685
+    }
+  }
+]
