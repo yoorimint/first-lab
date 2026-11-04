@@ -1,0 +1,442 @@
+{
+ "title": "상속세 계산기: 자녀만 10억이면 8,633만 원, 공제·세율 정리",
+ "excerpt": "상속세는 (과세가액 − 상속공제) × 세율 − 누진공제로 계산해요. 10억 원을 자녀 2명이 받으면 8,633만 원, 배우자도 함께 받으면 0원이에요.",
+ "content_html": "<p>상속세는 <strong>(상속재산 − 빚·장례비 + 미리 증여한 재산 − 상속공제) × 세율 − 누진공제</strong>로 계산하고, 기한 안에 신고하면 여기서 3%를 더 빼요. 고인의 재산 10억 원을 자녀 2명만 받으면 일괄공제 5억 원을 빼고 <strong>8,633만 원</strong>을 내요. 같은 10억 원이라도 배우자가 함께 상속받으면 배우자 공제 5억 원이 더해져 <strong>0원</strong>이에요. 아래 계산기에 재산 합계와 상속인 구성만 넣으면 바로 나와요.</p>\n<p>[firstlab_calc id=\"inheritance-tax\"]</p>\n<h2>계산 순서 5단계</h2>\n<ol>\n<li><strong>상속재산 더하기</strong>: 사망일 기준 시가로 부동산·예금·주식 등 고인의 재산을 모두 더해요.</li>\n<li><strong>빼는 것</strong>: 고인의 빚, 사망일까지 내야 했던 세금·공공요금(공과금), 장례비를 빼요.</li>\n<li><strong>더하는 것</strong>: 사망 전 10년 안에 상속인에게, 5년 안에 상속인이 아닌 사람에게 준 재산을 다시 더해요. 여기까지가 과세가액이에요.</li>\n<li><strong>상속공제 빼기</strong>: 일괄공제, 배우자 공제, 금융재산 공제 등을 빼면 과세표준이 나와요.</li>\n<li><strong>세율 곱하고 세액공제 빼기</strong>: 과세표준에 세율을 곱하고 누진공제를 뺀 뒤, 미리 증여할 때 계산된 증여세(산출세액)와 신고세액공제 3%를 빼요.</li>\n</ol>\n<h2>상속공제 종류와 금액</h2>\n<table><thead><tr><th>공제</th><th>금액</th></tr></thead><tbody>\n<tr><td>일괄공제</td><td>5억 원 (기초 2억 원 + 인적공제 합계가 더 크면 그 금액)</td></tr>\n<tr><td>배우자 공제</td><td>최소 5억 원, 최대 30억 원</td></tr>\n<tr><td>금융재산 공제</td><td>순금융재산 20% (최소 2,000만 원, 최대 2억 원)</td></tr>\n<tr><td>동거주택 공제</td><td>주택가액 100%, 최대 6억 원</td></tr>\n<tr><td>장례비</td><td>500만~1,000만 원 + 봉안시설 500만 원까지</td></tr>\n</tbody></table>\n<p>인적공제는 자녀 1명당 5,000만 원, 65세 이상 상속인·동거가족(배우자 제외) 1명당 5,000만 원이에요. 자녀가 2명이면 기초공제와 합쳐도 3억 원이라 대부분 일괄공제 5억 원이 더 커요. 다만 배우자 혼자 상속받으면 일괄공제를 받을 수 없고 기초공제와 인적공제만 받아요. 순금융재산이 2,000만 원 이하면 전액을 빼 줘요.</p>\n<p>배우자 공제는 배우자가 실제로 받은 금액을 빼 주는데, 법정상속분만큼이 한도예요. 자녀가 2명이면 배우자 몫은 3/7이에요. 실제로 받은 금액이 없거나 5억 원보다 적어도 5억 원은 빼 줘요. 5억 원 넘게 공제받으려면 신고기한 다음 날부터 9개월 안에 배우자 몫을 나눠 등기 등을 마치고 신고해야 해요.</p>\n<h2>상속세 세율표</h2>\n<table><thead><tr><th>과세표준</th><th>세율</th><th>누진공제</th></tr></thead><tbody>\n<tr><td>1억 원 이하</td><td>10%</td><td>없음</td></tr>\n<tr><td>5억 원 이하</td><td>20%</td><td>1,000만 원</td></tr>\n<tr><td>10억 원 이하</td><td>30%</td><td>6,000만 원</td></tr>\n<tr><td>30억 원 이하</td><td>40%</td><td>1억 6,000만 원</td></tr>\n<tr><td>30억 원 초과</td><td>50%</td><td>4억 6,000만 원</td></tr>\n</tbody></table>\n<h2>상황별 계산 예시</h2>\n<p>고인이 국내 거주자이고, 빚과 미리 증여한 재산이 없으며, 장례비는 최소 인정액 500만 원만 빼고 기한 안에 신고한다고 가정했어요.</p>\n<table><thead><tr><th>상황</th><th>공제 합계</th><th>과세표준</th><th>낼 상속세</th></tr></thead><tbody>\n<tr><td>자녀 1명, 5억 원</td><td>4억 9,500만 원</td><td>0원</td><td>0원</td></tr>\n<tr><td>배우자·자녀 2명, 10억 원 (배우자 5억 원)</td><td>9억 9,500만 원</td><td>0원</td><td>0원</td></tr>\n<tr><td>자녀 2명, 10억 원</td><td>5억 원</td><td>4억 9,500만 원</td><td>8,633만 원</td></tr>\n<tr><td>자녀 2명, 15억 원 (그중 예금 3억 원)</td><td>5억 6,000만 원</td><td>9억 3,500만 원</td><td>2억 1,388만 5,000원</td></tr>\n<tr><td>배우자·자녀 2명, 20억 원 (배우자 10억 원)</td><td>13억 5,500만 원</td><td>6억 4,000만 원</td><td>1억 2,804만 원</td></tr>\n</tbody></table>\n<p>자녀 2명이 10억 원을 받는 경우는 과세표준 4억 9,500만 원에 20%를 곱하고 1,000만 원을 빼 산출세액 8,900만 원, 신고세액공제 267만 원을 빼서 8,633만 원이에요. 20억 원 예시는 배우자가 10억 원을 받아도 법정상속분(3/7) 한도인 8억 5,500만 원까지만 공제돼요. 공제 합계는 과세가액을 넘을 수 없어서 5억 원 예시는 4억 9,500만 원만 빠졌어요.</p>\n<h2>미리 증여한 재산이 있으면</h2>\n<p>사망 전 10년 안에 자녀에게 준 재산은 상속재산에 다시 더해요. 대신 그때 계산된 증여세 산출세액은 상속세에서 빼 줘요 (증여재산이 과세표준에서 차지하는 비율만큼이 한도). 과세가액이 5억 원을 넘으면 더한 증여재산(그때 공제받은 금액은 빼고)만큼 상속공제 한도가 줄어들어요. 예를 들어 배우자와 자녀 1명이 6억 원을 상속받고, 4억 원을 미리 증여하며 5,000만 원을 공제받았다면 공제 10억 원 중 6억 4,500만 원만 빠져 산출세액이 6,000만 원이 돼요. 여기서 그때 증여세 산출세액 6,000만 원을 빼면 더 낼 상속세는 0원이에요.</p>\n<h2>신고 기한과 내는 방법</h2>\n<p>사망일이 속하는 달의 말일부터 6개월 안에 신고하고 내요. 고인이나 상속인이 외국에 주소를 두었으면 9개월이에요. 예를 들어 11월 4일에 돌아가셨다면 2027년 5월 31일까지예요. 낼 세금이 1,000만 원을 넘으면 일부를 납부기한이 지난 뒤 2개월 안에 나눠 낼 수 있고, 2,000만 원을 넘으면 허가를 받아 최대 10년(가업상속은 더 길게) 동안 나눠 내는 연부연납도 신청할 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>상속세를 안 내도 되는 금액이면 신고하지 않아도 되나요?</h3>\n<p>낼 세금이 없으면 무신고 가산세도 없지만, 나중에 집을 팔 때 취득가액이 상속 때 평가액으로 정해지니 감정가 등으로 신고해 두는 게 유리할 수 있어요.</p>\n<h3>신고를 늦게 하면 어떻게 되나요?</h3>\n<p>기한 안에 신고하지 않으면 신고세액공제 3%를 못 받고, 무신고 가산세로 낼 세액의 20%가 붙어요.</p>\n<h3>동거주택 공제는 누가 받나요?</h3>\n<p>고인과 상속인이 10년 이상 한집에서 살았고 그 기간 1세대 1주택이었으며, 함께 산 무주택 직계비속이 집을 물려받을 때 받을 수 있어요. 상속인이 미성년자였던 기간은 함께 산 기간에 넣지 않고, 집에 담보된 고인의 빚은 주택가액에서 빼요. 요건이 까다로우니 조건을 하나씩 맞춰 보는 게 안전해요.</p>\n",
+ "tags": [
+  "상속세",
+  "상속세 계산",
+  "일괄공제",
+  "배우자 상속공제"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm traditional Korean hanok courtyard with a wooden veranda and a persimmon tree in soft autumn light, no people",
+   "alt": "감나무가 있는 고요한 한옥 마당"
+  }
+ ],
+ "keyword": "상속세계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "자녀만 10억이면 8,633만 원 (제목·도입: 자녀 2명, 10억 원, 일괄공제 5억 원)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002100000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상속세 = (과세가액 − 상속공제) × 세율 − 누진공제 (요약문)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "10억 원을 자녀 2명이 받으면 8,633만 원, 배우자도 함께 받으면 0원 (요약문)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기한 안에 신고하면 3%를 더 빼 줌 (신고세액공제)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006900000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자가 함께 상속받으면 배우자 공제 5억 원이 더해져 0원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상속재산은 사망일 기준 시가로 평가해 모두 더함",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고인의 빚, 공과금, 장례비를 뺌",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6526&cntntsId=7954"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사망 전 10년 안에 상속인에게, 5년 안에 상속인이 아닌 사람에게 준 재산을 더함",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상속공제를 빼면 과세표준",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "증여세 산출세액과 신고세액공제 3%를 뺌",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002800000&mode=11",
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006900000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "일괄공제 5억 원 (기초 2억 원 + 인적공제 합계가 더 크면 그 금액)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002100000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자 공제 최소 5억 원, 최대 30억 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융재산 공제: 순금융재산 20%, 최소 2,000만 원, 최대 2억 원, 2,000만 원 이하면 전액",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002200000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동거주택 공제: 주택가액 100%, 최대 6억 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002302&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "장례비 500만~1,000만 원 + 봉안시설 500만 원까지",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법시행령&joNo=000900000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6526&cntntsId=7954"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "인적공제 자녀 1명당 5,000만 원",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "65세 이상 상속인·동거가족(배우자 제외) 1명당 5,000만 원",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "자녀 2명이면 기초공제와 합쳐 3억 원이라 일괄공제 5억 원이 더 큼",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자 혼자 상속받으면 일괄공제 불가, 기초공제와 인적공제만",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자 공제는 실제로 받은 금액, 법정상속분이 한도",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "자녀 2명이면 배우자 몫은 3/7",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "실제로 받은 금액이 없거나 5억 원보다 적어도 5억 원 공제",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5억 원 넘게 공제받으려면 신고기한 다음 날부터 9개월 안에 분할",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세율표: 1억 원 이하 10%, 5억 원 이하 20% (1,000만 원), 10억 원 이하 30% (6,000만 원), 30억 원 이하 40% (1억 6,000만 원), 30억 원 초과 50% (4억 6,000만 원)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시 가정: 국내 거주자, 장례비 최소 인정액 500만 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법시행령&joNo=000900000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6526&cntntsId=7954"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "자녀 1명, 5억 원: 공제 합계 4억 9,500만 원, 상속세 0원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002400000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자·자녀 2명, 10억 원: 공제 합계 9억 9,500만 원, 0원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "자녀 2명, 10억 원: 과세표준 4억 9,500만 원, 산출세액 8,900만 원, 신고세액공제 267만 원, 8,633만 원",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720",
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006900000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "자녀 2명, 15억 원(예금 3억 원): 공제 합계 5억 6,000만 원, 과세표준 9억 3,500만 원, 2억 1,388만 5,000원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002200000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자·자녀 2명, 20억 원: 배우자 공제 8억 5,500만 원(3/7 한도), 공제 합계 13억 5,500만 원, 과세표준 6억 4,000만 원, 1억 2,804만 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=001900000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공제 합계는 과세가액을 넘을 수 없음",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002400000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "10년 안에 자녀에게 준 재산은 다시 더함",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "그때 계산된 증여세 산출세액은 상속세에서 빼 줌 (비율만큼 한도)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002800000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "과세가액 5억 원 초과 시 더한 증여재산(공제받은 금액 뺀 금액)만큼 공제 한도가 줄어듦",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002400000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사전증여 예시: 공제 10억 원 중 6억 4,500만 원만 빠져 산출세액 6,000만 원",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002400000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사전증여 예시: 증여세 산출세액 6,000만 원을 빼면 더 낼 상속세 0원 (검수 전 5,820만 원은 틀림)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002800000&mode=11",
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006900000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "사망일이 속하는 달의 말일부터 6개월 안에 신고·납부",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006700000&mode=11",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7719&mi=2324"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고인이나 상속인이 외국에 주소를 두면 9개월",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006700000&mode=11",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "11월 4일 사망이면 2027년 5월 31일까지",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006700000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1,000만 원 넘으면 납부기한 지난 뒤 2개월 안에 분납",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=007000000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2,000만 원 넘으면 허가를 받아 최대 10년 연부연납 (가업상속은 더 길게)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=007100000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "낼 세금이 없으면 무신고 가산세도 없음",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=국세기본법&joNo=004702&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "집을 팔 때 취득가액은 상속 때 평가액",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=소득세법시행령&joNo=016300000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기한 안에 신고하지 않으면 신고세액공제 3%를 못 받음",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=006900000&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "무신고 가산세 낼 세액의 20%",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=국세기본법&joNo=004702&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동거주택 요건: 10년 이상 동거, 1세대 1주택, 무주택 직계비속 상속",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002302&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상속인이 미성년자였던 기간은 동거 기간에서 빠지고, 담보된 빚은 주택가액에서 뺌",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLinkProc.do?lsNm=상속세및증여세법&joNo=002302&mode=11"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국세청 상속세 세액계산 흐름도 (일괄공제·세율·누진공제)",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"
+  },
+  {
+   "name": "국세청 상속공제 항목별 설명 (기초·인적·일괄·동거주택 공제)",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6528&cntntsId=7956"
+  },
+  {
+   "name": "국세청 공과금·장례비용·채무 공제액",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6526&cntntsId=7954"
+  }
+ ]
+}
