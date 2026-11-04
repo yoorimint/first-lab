@@ -307,6 +307,18 @@ class QualityTest(unittest.TestCase):
             refresh._checked_title({"title": "정기검사 비용 25,000원"}, body)
 
 
+class ReviewGateTest(unittest.TestCase):
+    def test_gate(self):
+        from bot.review_gate import problems
+        ok = [{"claim": "수수료 23,000원", "urls": ["https://main.kotsa.or.kr/a"], "verdict": "맞음", "action": "유지"},
+              {"claim": "철회 불가", "urls": [], "verdict": "확인불가", "action": "완화"}]
+        self.assertEqual(problems(ok), [])
+        self.assertEqual(problems(None), ["검수 기록 없음"])
+        bad = [{"claim": "75만원", "urls": ["https://x.tistory.com/1"], "verdict": "맞음", "action": "유지"},
+               {"claim": "철회 불가", "urls": ["https://a.go.kr"], "verdict": "확인불가", "action": "유지"}]
+        self.assertEqual(len(problems(bad)), 2)
+
+
 class ContinuousTest(unittest.TestCase):
     def run_step(self, state, minute, on=True, fire_ok=True):
         from datetime import datetime

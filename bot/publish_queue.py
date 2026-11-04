@@ -3,7 +3,8 @@
 봇의 AI 작성 단계만 건너뛰고, 나머지는 봇과 똑같이 처리한다:
 제목·요약문 숫자 점검 → 링크 정리 → AI 이미지·대표 카드·카테고리·작성자 → 키워드 '사용됨' 기록.
 파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish|schedule|auto, 기본 draft),
-  "sources"(선택, [{"name", "url"}] → 글 끝 '공식 안내 바로가기', sources.py).
+  "sources"(선택, [{"name", "url"}] → 글 끝 '공식 안내 바로가기', sources.py),
+  "review"(독립 검수 기록 → review_gate.py. 통과 못 하면 공개하지 않고 초안 보류).
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
 후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}]} → 글쓰기 세션이 부적합하다고 본 후보를 다시 안 뜨게 함
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
@@ -14,7 +15,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import refresh, related, sources
+from . import refresh, related, review_gate, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, publish
 from .settings import load_settings
@@ -45,6 +46,11 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
         status = "draft"
     article = parse_article(json.dumps(data, ensure_ascii=False))
     notes = []
+    # 초안 저장 관문: 검수를 통과 못 한 글은 공개(바로·예약)하지 않고 초안으로만 둔다
+    failed = review_gate.problems(data.get("review"))
+    if failed:
+        notes.append(f"검수 미통과 → 초안 보류: {'; '.join(failed)[:200]}")
+        status = "draft"
     aligned = align_with_body(article)
     if aligned:
         notes.append(f"본문과 숫자 불일치 → {'·'.join(aligned)} 보정")
