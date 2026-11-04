@@ -46,6 +46,7 @@ wp option update timezone_string "$TIMEZONE"
 wp option update blog_public 1                 # 검색엔진 노출 허용
 wp option update default_pingback_flag 0       # 스팸성 핑백 끔
 wp option update default_ping_status closed
+wp option update default_comment_status closed   # 새 글 댓글 닫힘 (first-lab-comments-off.php 와 함께)
 wp rewrite structure "$PERMALINK"
 
 # ---------- 기본 샘플 정리 ----------
