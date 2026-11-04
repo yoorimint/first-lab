@@ -14,6 +14,8 @@ SYSTEM = """너는 한국어 정보 글의 검수 편집자다. 발행 전에 �
 
 1. 사실: 독자가 의사결정에 쓰는 핵심 주장(금액·비율·기간·조건·제도) 최대 8개를 웹 검색으로 확인.
    틀리면 확인한 값으로 고친다. 확인할 수 없는 수치는 검색으로 확인되는 값으로 바꾸고, 그래도 없으면 범위로 넓힌다.
+   확인할 수 없는 절차·조건 단정은 독자가 손해 보지 않는 쪽으로 완화한다
+   (예: '신분증 없이 가능' → '신분증을 챙기는 게 안전해요', '항상 ~' → '대부분 ~'). 확인 못 한 주장을 단정형으로 남겨 두지 않는다.
    삭제는 최후 수단이며, 삭제 때문에 핵심 질문(비용·수익·조건 등)의 답이 빠지면 안 된다.
 2. 이해: 기준 없이 나열된 숫자, 한 번 읽어 이해되지 않는 문장은 쉬운 설명으로 바꾸거나 삭제.
 3. 일관성: 글 안에서 같은 대상의 수치가 서로 다르면(본문↔본문, 본문↔표) 근거가 확실한 하나로 맞추고,
@@ -22,7 +24,8 @@ SYSTEM = """너는 한국어 정보 글의 검수 편집자다. 발행 전에 �
 4. 그 외 문장·구조·HTML·링크·이미지 태그는 그대로 둔다. 출처 표기나 기준일은 넣지 않는다.
 
 최종 답은 JSON 하나만:
-{"checks": [{"claim": "점검한 주장 요약", "verdict": "ok|fixed|removed|unverified"}],
+{"checks": [{"claim": "점검한 주장 요약", "verdict": "ok|fixed|softened|removed|unverified"}],
+ (softened = 확인 못 해 완화함, unverified = 확인도 완화도 못 하고 그대로 둠 — 가능하면 쓰지 않는다)
  "edits": 사실 외에 고친 곳 수(이해·일관성),
  "content_html": "검수 반영된 본문 HTML 전체 (고칠 게 없으면 원문 그대로)"}"""
 
@@ -37,7 +40,8 @@ class FactCheck:
     removed: int
     unverified: int
     edits: int = 0  # 사실 외 수정(이해하기 어려운 문장, 말투·수치 불일치)
-    unverified_claims: list[str] = field(default_factory=list)  # 확인 못 한 주장 (기록에 남겨 사람이 볼 수 있게)
+    unverified_claims: list[str] = field(default_factory=list)  # 확인 못 하고 그대로 둔 주장 (기록에 남겨 사람이 볼 수 있게)
+    softened: list[str] = field(default_factory=list)           # 확인 못 해 표현을 완화한 주장
 
     @property
     def needs_review(self) -> bool:
@@ -47,6 +51,8 @@ class FactCheck:
     def summary(self) -> str:
         s = (f"검수: 사실 확인 {self.ok}·수정 {self.fixed}·삭제 {self.removed}·미확인 {self.unverified}, "
              f"문장 다듬기 {self.edits}")
+        if self.softened:
+            s += f", 완화 {len(self.softened)}"
         if self.unverified_claims:
             s += " [미확인: " + " / ".join(c[:60] for c in self.unverified_claims) + "]"
         return s + (" → 검토 필요" if self.needs_review else "")
@@ -59,6 +65,7 @@ def verify(llm, keyword: str, content_html: str) -> FactCheck:
     checks = data.get("checks", [])
     verdicts = [str(c.get("verdict", "")) for c in checks]
     unverified = [str(c.get("claim", "")) for c in checks if str(c.get("verdict", "")) == "unverified"]
+    softened = [str(c.get("claim", "")) for c in checks if str(c.get("verdict", "")) == "softened"]
     html = str(data.get("content_html") or "").strip()
     if len(html) < len(content_html) * 0.7:  # 검증자가 글을 크게 줄여버리면 원문 유지
         html = content_html
@@ -67,4 +74,4 @@ def verify(llm, keyword: str, content_html: str) -> FactCheck:
     except (TypeError, ValueError):
         edits = 0
     return FactCheck(html, verdicts.count("ok"), verdicts.count("fixed"),
-                     verdicts.count("removed"), verdicts.count("unverified"), edits, unverified)
+                     verdicts.count("removed"), verdicts.count("unverified"), edits, unverified, softened)
