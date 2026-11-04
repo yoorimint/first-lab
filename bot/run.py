@@ -203,9 +203,23 @@ def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "")
         return False
 
 
-def post_arrived_since(state: dict, since: str) -> bool:
-    """since('YYYY-MM-DD HH:MM') 이후 직접 작성 글이 올라왔는지 (publish_queue 기록)."""
-    return any(e.get("ok") and str(e.get("time", "")) >= since and "직접 작성 글:" in str(e.get("msg", ""))
+def latest_post_log(state: dict) -> str:
+    """가장 최근 '직접 작성 글' 기록 (시각+내용). 없으면 ''."""
+    for e in state.get("log", []):  # 최신이 앞
+        if e.get("ok") and "직접 작성 글:" in str(e.get("msg", "")):
+            return f"{e.get('time', '')} {e.get('msg', '')}"
+    return ""
+
+
+def post_arrived_since(state: dict, since: str, seen: str | None = None) -> bool:
+    """시작한 뒤 새 글이 올라왔는지 (publish_queue 기록).
+    seen = 시작할 때의 최근 글 기록. 그와 다른 새 기록이 있어야 '올라옴' — 기록 시각이 분 단위라
+    직전 글과 시작이 같은 분이면 직전 글을 새 글로 착각해 두 편을 동시에 돌린 일이 있었음 (11/4 22:05).
+    seen 이 없는 예전 상태만 시각 비교(초과)로 판단."""
+    if seen is not None:
+        latest = latest_post_log(state)
+        return bool(latest) and latest != seen
+    return any(e.get("ok") and str(e.get("time", "")) > since and "직접 작성 글:" in str(e.get("msg", ""))
                for e in state.get("log", []))
 
 
@@ -219,7 +233,7 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
     stamp = now.strftime("%Y-%m-%d %H:%M")
     fails, count = c.get("fails", 0), c.get("count", 0)
     if c.get("fired_at"):
-        arrived = post_arrived_since(state, c["fired_at"])
+        arrived = post_arrived_since(state, c["fired_at"], c.get("seen"))
         started = datetime.strptime(c["fired_at"], "%Y-%m-%d %H:%M").replace(tzinfo=now.tzinfo)
         if not arrived and now - started < timedelta(minutes=CONTINUOUS_TIMEOUT_MIN):
             return  # 쓰는 중
@@ -230,7 +244,8 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
         add_log(state, False, f"연속 작성 자동 정지: {fails}번 연속으로 글이 안 올라옴 (사용량 한도·후보 소진·오류 확인 필요)")
         return
     ok = fire_routine(state, settings, f"연속 작성 {count + 1}번째")
-    state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count}
+    state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count,
+                           "seen": latest_post_log(state)}
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:

@@ -413,6 +413,17 @@ class ContinuousTest(unittest.TestCase):
         self.assertEqual(fire.call_count, 1)
         self.assertEqual(state["continuous"]["count"], 1)
 
+    def test_same_minute_previous_post_is_not_new(self):
+        # 11/4 22:05: 직전 글 기록과 다음 편 시작이 같은 분 → 직전 글을 새 글로 착각해 두 편이 동시에 돎
+        state = {"log": [{"time": "2026-11-05 10:05", "ok": True, "msg": "직접 작성 글: [공개 대기] '앞 글'"}]}
+        fire, _ = self.run_step(state, 5)   # 10:05 다음 편 시작
+        self.assertEqual(fire.call_count, 1)
+        fire, _ = self.run_step(state, 6)   # 10:06 아직 새 글 없음 → 기다려야 함
+        self.assertEqual(fire.call_count, 0)
+        state["log"].insert(0, {"time": "2026-11-05 10:20", "ok": True, "msg": "직접 작성 글: [공개 대기] '새 글'"})
+        fire, _ = self.run_step(state, 21)  # 새 글 올라옴 → 다음 편
+        self.assertEqual(fire.call_count, 1)
+
     def test_stops_after_repeated_failures(self):
         state = {"log": [], "continuous": {"fired_at": "2026-11-05 08:00", "fails": 2, "count": 3}}
         fire, stop = self.run_step(state, 0)  # 60분 넘게 안 올라옴 → 3번째 실패 → 정지
