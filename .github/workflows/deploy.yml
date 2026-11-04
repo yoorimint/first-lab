@@ -6,14 +6,32 @@ on:
     branches: [main]
     paths: ["server/**", "wordpress/**", "bot/**", "tests/**", ".github/workflows/deploy.yml"]
   workflow_dispatch: # GitHub 화면에서 수동 실행도 가능
+  schedule:
+    # 따라잡기: GitHub 오류로 push 배포가 시작되지 않는 일이 있었음 (11/4) → 15분마다 서버 버전이 main 과 다르면 배포
+    - cron: "*/15 * * * *"
 
 concurrency:
   group: deploy
   cancel-in-progress: false
 
 jobs:
+  gate:
+    # 예약 실행일 때만: 서버에 반영된 버전(배포 끝에 기록)이 main 과 같으면 건너뜀
+    runs-on: ubuntu-latest
+    outputs:
+      need: ${{ steps.cmp.outputs.need }}
+    steps:
+      - id: cmp
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "need=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          deployed=$(curl -fsS --max-time 20 https://first-lab.kr/deployed-version.txt || echo none)
+          echo "서버 버전: $deployed / main: ${{ github.sha }}"
+          if [ "$deployed" = "${{ github.sha }}" ]; then echo "need=false" >> "$GITHUB_OUTPUT"; else echo "need=true" >> "$GITHUB_OUTPUT"; fi
+
   check:
     # 서버에 올리기 전 검사: 하나라도 실패하면 배포하지 않는다 (운영 중인 봇이 멈추는 것 방지)
+    needs: gate
+    if: needs.gate.outputs.need == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,3 +77,4 @@ jobs:
             bash "$REPO/server/wp-setup.sh"
             bash "$REPO/server/bot-setup.sh"
             bash "$REPO/server/bot-check.sh"
+            echo "${{ github.sha }}" > /var/www/first-lab/deployed-version.txt   # 따라잡기(gate)가 비교하는 값
