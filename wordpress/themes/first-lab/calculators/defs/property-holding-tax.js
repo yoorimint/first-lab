@@ -4,6 +4,7 @@
 
   const KIND = [
     ['one', '1세대 1주택자 (공제 12억 원)'],
+    ['joint', '부부 공동명의 1주택 (각자 지분, 공제 9억 원)'],
     ['two', '2주택 이하 (공제 9억 원)'],
     ['three', '3주택 이상 (공제 9억 원)'],
   ];
@@ -28,7 +29,7 @@
     title: '종부세 계산기 (주택분)',
     intro: '주택 공시가격 합계와 주택 수를 넣으면 과세표준, 재산세 공제, 1주택자 세액공제, 농어촌특별세까지 계산해요.',
     inputs: [
-      { name: 'price', label: '주택 공시가격 합계 (원)', type: 'number', min: 0, step: 10000000, help: '6월 1일 기준 내 명의 주택의 공시가격을 모두 더해요. 공동명의는 내 지분만큼만 넣어요.' },
+      { name: 'price', label: '주택 공시가격 합계 (원)', type: 'number', min: 0, step: 10000000, help: '6월 1일 기준 내 명의 주택의 공시가격을 모두 더해요. 부부 공동명의 1주택은 기본이면 내 지분만큼, 특례(1세대 1주택자 계산)를 신청했다면 집 전체 공시가격을 1세대 1주택자로 넣어요.' },
       { name: 'kind', label: '주택 수', type: 'select', default: 'one', options: KIND },
       { name: 'age', label: '만 나이 (1세대 1주택자만)', type: 'number', min: 0, step: 1, default: 0, help: '6월 1일 기준 만 나이. 60세 미만이면 0 그대로 둬요.' },
       { name: 'years', label: '보유 기간 (년, 1세대 1주택자만)', type: 'number', min: 0, step: 1, default: 0, help: '6월 1일까지 그 집을 가진 햇수예요.' },
@@ -46,7 +47,8 @@
       const deduction = d.deduction[kind];
       const base = Math.floor((Math.max(0, price - deduction) * d.fair_ratio_pct) / 100);
       const tax = progressive(base, d.brackets[kind === 'three' ? 'three' : 'two']);
-      const ratio = kind === 'one' ? d.property_tax.ratio_pct_one : d.property_tax.ratio_pct_other;
+      // 재산세 공정시장가액비율: 공동명의여도 재산세는 1세대 1주택(지방세법 시행령 제109조①2호) → 45%
+      const ratio = kind === 'one' || kind === 'joint' ? d.property_tax.ratio_pct_one : d.property_tax.ratio_pct_other;
       const propertyCredit = Math.min(tax, Math.floor((base * ratio * d.property_tax.top_rate_permille) / 100000));
       const calcTax = tax - propertyCredit;
       let creditPct = 0;

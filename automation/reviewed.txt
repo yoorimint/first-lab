@@ -69,3 +69,5 @@ calc:unemployment-benefit
 calc:vat
 462 내가 가입한 보험 조회
 calc:realtor-exam-score
+451 종부세 계산기
+calc:property-holding-tax
