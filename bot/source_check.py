@@ -44,10 +44,7 @@ def key_numbers(claim: str) -> list[str]:
 
 def readable_url(url: str) -> str:
     """같은 내용을 본문째 주는 주소로: 법령 lsInfoP(껍데기) → lsInfoR(조문 본문)."""
-    url = url.replace("/LSW/lsInfoP.do", "/LSW/lsInfoR.do")
-    if "/LSW/lsInfoR.do" in url and "chrClsCd=" not in url:  # 없으면 빈 페이지가 오는 경우가 있음 (11/5 도시가스사업법)
-        url += ("&" if "?" in url else "?") + "chrClsCd=010202"
-    return url
+    return url.replace("/LSW/lsInfoP.do", "/LSW/lsInfoR.do")
 
 
 def page_text(raw: bytes, charset: str | None) -> str:

@@ -851,7 +851,7 @@ class SourceCheckTest(unittest.TestCase):
         self.assertFalse(sc.has_number("1천분의 50", "0.5"))
         self.assertTrue(sc.has_number("총급여액 7천만원 이하", "7000"))  # 7,000만 원
         self.assertEqual(sc.readable_url("https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=1"),
-                         "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=1&chrClsCd=010202")
+                         "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=1")
 
     def test_number_missing_from_page(self):
         from bot import source_check as sc
