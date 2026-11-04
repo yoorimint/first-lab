@@ -1,0 +1,37 @@
+[
+  {
+    "why": "교과서 예시: 1,200만원·연 12%(월 1%)·12개월 원리금균등 = 1,066,185.46원 (손 계산 P·r·(1+r)^n/((1+r)^n−1))",
+    "input": {"principal": "12000000", "rate": "12", "months": "12", "method": "equal_payment"},
+    "expect": {"first": 1066185, "last": 1066185, "interest": 794226}
+  },
+  {
+    "why": "무이자(0%)면 원금 ÷ 개월 수, 이자 0",
+    "input": {"principal": "12000000", "rate": "0", "months": "12", "method": "equal_payment"},
+    "expect": {"first": 1000000, "interest": 0, "total": 12000000}
+  },
+  {
+    "why": "원금균등: 첫 달 = P/n + P·r = 1,000,000 + 120,000, 마지막 달 = 1,000,000 × 1.01, 이자 = P·r·(n+1)/2",
+    "input": {"principal": "12000000", "rate": "12", "months": "12", "method": "equal_principal"},
+    "expect": {"first": 1120000, "last": 1010000, "interest": 780000}
+  },
+  {
+    "why": "만기일시: 매달 이자 120,000원, 12개월 이자 1,440,000원, 마지막 달 원금 포함",
+    "input": {"principal": "12000000", "rate": "12", "months": "12", "method": "bullet"},
+    "expect": {"first": 120000, "last": 12120000, "interest": 1440000}
+  },
+  {
+    "why": "중고차 할부 글(#99) 본문 표와 같아야 함: 1,200만원·연 9%·48개월 = 298,621원 (엑셀 PMT 와 동일)",
+    "input": {"principal": "12000000", "rate": "9", "months": "48", "method": "equal_payment"},
+    "expect": {"first": 298621}
+  },
+  {
+    "why": "#99 본문 표: 연 9%·60개월 249,100원",
+    "input": {"principal": "12000000", "rate": "9", "months": "60", "method": "equal_payment"},
+    "expect": {"first": 249100}
+  },
+  {
+    "why": "#99 본문 표: 연 15%·48개월 333,969원",
+    "input": {"principal": "12000000", "rate": "15", "months": "48", "method": "equal_payment"},
+    "expect": {"first": 333969}
+  }
+]

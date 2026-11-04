@@ -28,5 +28,11 @@
     "why": "자동차검사 계산기 추가 (과태료 설명 문단 뒤)",
     "find": "최고 과태료 60만 원은",
     "insert_after": "[firstlab_calc id=\"car-inspection\"]"
+  },
+  {
+    "post": 99,
+    "why": "할부·대출 상환 계산기 추가 (첫 문단 뒤, 키워드가 '계산기')",
+    "find": "계약 전에 아래 표로 내 조건을 먼저 맞춰 보는 게 좋아요",
+    "insert_after": "[firstlab_calc id=\"loan-repayment\"]"
   }
 ]

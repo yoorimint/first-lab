@@ -69,17 +69,22 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 4단계의 숫자 일치 확인(`align_with_body`)을 다시 돌린다.
 
 ## 4-2. 계산기 (주제에 정해진 계산 공식이 있을 때만)
-수수료표·세율·요율·법령 계산식처럼 **정해진 공식**이 있고, 독자가 자기 값을 넣어볼 이유가 있는 주제면 계산기를 본문에 넣는다.
+수수료표·세율·요율·법령 계산식이나 대출 상환 같은 **정해진 공식**이 있고, 독자가 자기 값을 넣어볼 이유가 있는 주제면 계산기를 본문에 넣는다.
+**키워드에 '계산기'가 들어 있으면 반드시 넣는다** (검색한 사람이 원하는 게 계산기다).
 공식이 없는 주제(신청 방법, 서류, 절차 안내)는 넣지 않는다.
-- 계산기 폴더: `wordpress/themes/first-lab/calculators/` (구조 설명은 `calc.js` 머리말). 예시: `car-inspection`.
+- 계산기 폴더: `wordpress/themes/first-lab/calculators/` (구조 설명은 `calc.js` 머리말).
+  있는 계산기: `car-inspection`(자동차검사 기간·수수료·과태료), `loan-repayment`(할부·대출 상환).
 - 이미 있는 계산기(`defs/*.js`)로 되면 새로 만들지 말고 그걸 넣는다.
 - 없으면 새로 만든다 (id 는 영문 소문자-하이픈):
   - `defs/<id>.js`: `car-inspection.js` 와 같은 형식 (입력 항목 + compute). 화면 문구는 본문과 같은 말투.
   - `data/<id>.json`: 요율·금액은 전부 여기에. `basis_date`(오늘), `sources`(조사한 공식 출처 이름·주소)
-  - `tests/<id>.json`: 검증 사례 3개 이상. 기대값은 공식 기관 계산 예시나 법령 문구로 직접 확인한 값만 (계산기로 낸 값을 그대로 기대값으로 쓰지 않는다)
+  - `tests/<id>.json`: 검증 사례 3개 이상. 계산기로 낸 값을 그대로 기대값으로 쓰지 않는다. 기대값 만드는 법은 두 종류:
+    - **기관이 정한 값**(요금표·세율·공제·과태료 기준): 공식 기관 계산 예시나 법령 문구로 직접 확인한 값
+    - **표준 수학 공식**(대출 상환, 비율·단위 환산 등): 공식을 Python 으로 따로 계산한 값 + 극단값(금리 0%, 1개월 등) + 본문 표의 숫자와 같은지
   - `wordpress/pages/<id>-calculator.html`: 단독 페이지 (첫 줄 `<!-- title: ○○ 계산기 -->`, 짧은 안내 + 계산기 + 결과 읽는 법)
   - 검사: `node tests/test_calculators.mjs` 가 통과해야 한다
-- 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
+- 기관이 정한 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
+  표준 수학 공식은 공식 기관의 계산 예시가 없어도 위 방법으로 검증해 만든다.
 - 본문에 넣는 법: `content_html` 의 계산 예시 근처에 **독립된 줄**로 `<p>[firstlab_calc id="<id>"]</p>`
 - 계산기는 별도 커밋으로 먼저 올린다: `git add wordpress/themes/first-lab/calculators wordpress/pages && git commit -m "계산기: <이름>"`
 
