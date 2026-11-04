@@ -42,6 +42,8 @@ EOF
 ## 4. 작성
 - 출력 형식은 작가 규칙의 JSON 그대로 (title, excerpt, content_html, tags, category, images 3개).
 - 계산 예시는 Python 으로 계산해서 그 결과를 그대로 쓴다. 표의 합계는 항목 합과 같아야 한다.
+- 내부 링크: 1단계 응답 `recent_posts` 중 `url` 이 있는(발행된) 글이 본문과 실제로 관련 있으면, 관련 문장 안에
+  `<a href="<url>">자연스러운 문구</a>` 로 1~3개 건다. 관련 없으면 걸지 않는다. 목록에 없는 주소·외부 사이트 주소는 서버가 링크를 지운다.
 - 다 쓰면 숫자 일치를 확인한다 (False 면 고친다):
 ```
 python3 -c "import json;from bot.writer import parse_article,align_with_body;a=parse_article(open('ARTICLE.json').read());print(align_with_body(a))"

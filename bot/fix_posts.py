@@ -55,10 +55,23 @@ def _classify_uncategorized(posts: list[dict]) -> None:
 PATCHES = Path(__file__).resolve().parent.parent / "wordpress" / "patches.json"
 
 
+_PARA_END = "<!-- /wp:paragraph -->"
+
+
 def patch_content(content: str, patch: dict) -> str | None:
-    """'find' 가 들어 있는 문단(<p>…</p>) 전체를 교체한 본문. 해당 문단이 없으면(이미 바뀜) None."""
+    """'find' 가 들어 있는 문단(<p>…</p>)을 고친 본문. 고칠 게 없으면(이미 적용됨) None.
+
+    replace_paragraph: 문단 전체를 이 문장으로 교체
+    insert_after: 문단(블록) 바로 뒤에 이 내용을 블록으로 추가 (예: 계산기 [firstlab_calc id="..."])
+    """
     # 문단 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
     m = re.search(r"<p>(?:(?!</p>).)*?" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
+    if "insert_after" in patch:
+        if not m or patch["insert_after"] in content:
+            return None
+        end = content.find(_PARA_END, m.end())
+        at = end + len(_PARA_END) if end != -1 and not content[m.end():end].strip() else m.end()
+        return f"{content[:at]}\n\n{to_blocks('<p>' + patch['insert_after'] + '</p>')}{content[at:]}"
     if not m:
         return None
     return content.replace(m.group(0), f"<p>{patch['replace_paragraph']}</p>")
@@ -78,7 +91,8 @@ def apply_patches() -> None:
         if content is None:
             continue
         wp_cli("post", "update", pid, f"--post_content={content}")
-        print(f"[보정] {pid} 문단 수정: {patch['why']}")
+        kind = "블록 추가" if "insert_after" in patch else "문단 수정"
+        print(f"[보정] {pid} {kind}: {patch['why']}")
 
 
 _SET_AUTHOR_PHP = r"""

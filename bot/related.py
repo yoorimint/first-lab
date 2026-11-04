@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import urllib.parse
 
 from .keyword_db import norm
 from .settings import wp_cli
@@ -21,6 +22,12 @@ foreach ( get_posts( array( 'post_status' => 'publish', 'numberposts' => 300 ) )
         'url'   => get_permalink( $p ),
         'cats'  => wp_get_post_categories( $p->ID, array( 'fields' => 'names' ) ),
     );
+}
+// 계산기 단독 페이지(슬러그 ...-calculator)도 링크 후보
+foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => 100 ) ) as $p ) {
+    if ( str_ends_with( $p->post_name, '-calculator' ) ) {
+        $out[] = array( 'title' => $p->post_title, 'slug' => $p->post_name, 'url' => get_permalink( $p ), 'cats' => array() );
+    }
 }
 echo wp_json_encode( $out );
 """
@@ -59,15 +66,26 @@ def prompt_section(cands: list[dict]) -> str:
             "관련 없으면 링크하지 않는다. 목록에 없는 주소는 절대 만들지 않는다.\n" + lines + "\n")
 
 
+def _url_key(url: str) -> str:
+    """한글 주소가 인코딩돼 있든 아니든, 끝 '/' 가 있든 없든 같은 주소로 본다."""
+    return urllib.parse.unquote(url.strip()).rstrip("/")
+
+
+def allowed_urls(posts: list[dict] | None = None) -> set[str]:
+    """링크를 남겨도 되는 주소: 우리 사이트의 발행 글·계산기 페이지."""
+    return {p["url"] for p in (published_posts() if posts is None else posts)}
+
+
 def clean_links(html: str, allowed: set[str]) -> tuple[str, int]:
     """AI 가 넣은 링크 중 우리 글 목록에 있는 주소만 남김 (지어낸 주소·외부 링크 제거). (본문, 남은 링크 수)"""
     import re
 
     kept = 0
+    allowed_keys = {_url_key(u) for u in allowed}
 
     def repl(m: "re.Match") -> str:
         nonlocal kept
-        if m.group(1) in allowed:
+        if _url_key(m.group(1)) in allowed_keys:
             kept += 1
             return m.group(0)
         return m.group(2)  # 링크만 풀고 문구는 유지

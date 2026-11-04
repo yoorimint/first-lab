@@ -254,7 +254,26 @@ class MiscTest(unittest.TestCase):
 
     def test_patches_file_valid(self):
         for p in json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")):
-            self.assertTrue({"post", "why", "find", "replace_paragraph"} <= set(p))
+            self.assertTrue({"post", "why", "find"} <= set(p))
+            self.assertTrue({"replace_paragraph", "insert_after"} & set(p))
+
+    def test_patch_insert_calculator_after_paragraph(self):
+        html = "<!-- wp:paragraph -->\n<p>과태료는 <strong>4만</strong>원부터</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->"
+        patch = {"find": "과태료는", "insert_after": '[firstlab_calc id="car-inspection"]'}
+        out = patch_content(html, patch)
+        self.assertIn('<!-- /wp:paragraph -->\n\n<!-- wp:shortcode -->\n[firstlab_calc id="car-inspection"]', out)
+        self.assertTrue(out.endswith("<!-- wp:heading -->"))
+        self.assertIsNone(patch_content(out, patch))  # 이미 넣었으면 다시 넣지 않음
+
+    def test_internal_links_kept_regardless_of_encoding(self):
+        from bot.related import clean_links
+        allowed = {"https://first-lab.kr/%ec%9e%90%eb%8f%99%ec%b0%a8/", "https://first-lab.kr/car-inspection-calculator/"}
+        html = ('<p><a href="https://first-lab.kr/자동차">보험</a> <a href="https://first-lab.kr/car-inspection-calculator/">계산기</a> '
+                '<a href="https://example.com/x">외부</a></p>')
+        out, kept = clean_links(html, allowed)
+        self.assertEqual(kept, 2)
+        self.assertNotIn("example.com", out)
+        self.assertIn("> 외부</p>", out)  # 외부 링크는 풀고 문구만 남김
 
     def test_settings_defaults(self):
         s = BotSettings.from_option({}, {})

@@ -32,7 +32,7 @@ def pending() -> list[Path]:
     return [p for p in sorted(QUEUE_DIR.glob("*.json")) if not _marker(p).exists()]
 
 
-def publish_file(path: Path, settings) -> str:
+def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
     keyword = str(data["keyword"]).strip()
     # status: draft | publish | auto(설정 페이지의 발행 방식을 따름)
@@ -48,7 +48,7 @@ def publish_file(path: Path, settings) -> str:
         notes.append(f"본문과 숫자 불일치 → {'·'.join(aligned)} 보정")
         if "제목(확인 필요)" in aligned:
             status = "draft"
-    article.content_html, _ = related.clean_links(article.content_html, set())
+    article.content_html, _ = related.clean_links(article.content_html, allowed_links)
     post_id, link, image_note = publish(article, status, slug=keyword,
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token),
                                         image_count=settings.image_count)
@@ -69,6 +69,7 @@ def main() -> None:
         return
     settings = load_settings()
     state = load_state()
+    allowed_links = related.allowed_urls()  # 우리 발행 글·계산기 페이지 링크만 남김
     DONE_DIR.mkdir(parents=True, exist_ok=True)
     for path in files:
         # 로그 머리말 '직접 작성 글:' 은 봇이 예비 발행을 건너뛰는 기준이라 새 글에만 쓴다 (run.direct_post_today)
@@ -79,7 +80,7 @@ def main() -> None:
                 label = "글 갱신(직접)"
                 msg = refresh.apply_direct(data, state)
             else:
-                msg = publish_file(path, settings)
+                msg = publish_file(path, settings, allowed_links)
             _marker(path).touch()
             msg = f"{label}: {msg}"
             add_log(state, True, msg)

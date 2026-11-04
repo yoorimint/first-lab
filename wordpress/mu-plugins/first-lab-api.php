@@ -27,7 +27,12 @@ add_action(
 					$settings = (array) get_option( 'firstlab_bot', array() );
 					$recent   = array();
 					foreach ( get_posts( array( 'numberposts' => 30, 'post_status' => array( 'publish', 'draft' ) ) ) as $p ) {
-						$recent[] = array( 'title' => $p->post_title, 'slug' => urldecode( $p->post_name ), 'status' => $p->post_status );
+						$recent[] = array(
+								'title'  => $p->post_title,
+								'slug'   => urldecode( $p->post_name ),
+								'status' => $p->post_status,
+								'url'    => 'publish' === $p->post_status ? urldecode( get_permalink( $p ) ) : '', // 내부 링크용 (발행 글만)
+							);
 					}
 					return array(
 						'write_mode'    => (string) ( $settings['write_mode'] ?? 'direct' ),
