@@ -41,6 +41,7 @@ def _times(text: str) -> list[str]:
 @dataclass
 class BotSettings:
     write_mode: str = "direct"  # direct = 월정액 직접 작성(봇은 예비) | bot = API 봇이 작성
+    maint_times: list[str] = field(default_factory=lambda: ["06:10"])  # 매일 점검 시각 (비우면 안 함)
     direct_enabled: bool = True  # '글 작성 시각 사용' (끄면 정해진 시각에 자동으로 쓰지 않음)
     direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 글 작성 시각 (월정액: Claude, API 봇: API)
     routine_fire_url: str = ""  # 월정액: Claude 예약 작업 실행 주소·토큰 (secrets.env, bot/routine.py)
@@ -75,6 +76,7 @@ class BotSettings:
         wp_field, env_name = _KEY_SOURCES.get(provider, ("", ""))
         return cls(
             write_mode="bot" if raw.get("write_mode") == "bot" else "direct",
+            maint_times=_times(raw.get("maint_times", "06:10")),
             direct_enabled=bool(int(raw.get("direct_enabled", 1) or 0)),
             direct_times=_times(raw.get("direct_times", "07:40")),
             routine_fire_url=secrets.get("CLAUDE_ROUTINE_FIRE_URL", ""),

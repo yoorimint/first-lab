@@ -17,11 +17,7 @@ add_action(
 			'/next',
 			array(
 				'methods'             => 'GET',
-				'permission_callback' => static function ( WP_REST_Request $request ) {
-					$hash  = (string) get_option( 'firstlab_api_token_hash', '' );
-					$token = (string) $request->get_header( 'x-firstlab-token' );
-					return '' !== $hash && '' !== $token && hash_equals( $hash, hash( 'sha256', $token ) );
-				},
+				'permission_callback' => 'firstlab_api_allowed',
 				'callback'            => static function () {
 					$state    = (array) get_option( 'firstlab_bot_state', array() );
 					$settings = (array) get_option( 'firstlab_bot', array() );
@@ -46,6 +42,16 @@ add_action(
 						'post_status'   => (string) ( $settings['post_status'] ?? 'draft' ),
 					);
 				},
+			)
+		);
+		// 매일 점검(automation/maintenance.md): 최근 봇 기록·상태
+		register_rest_route(
+			'firstlab/v1',
+			'/maintenance',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => 'firstlab_api_allowed',
+				'callback'            => 'firstlab_api_maintenance',
 			)
 		);
 	}
@@ -95,4 +101,28 @@ function firstlab_api_held_drafts(): array {
 		);
 	}
 	return $out;
+}
+
+/** 토큰 확인 (원문은 서버 비밀값, 워드프레스에는 해시만). */
+function firstlab_api_allowed( WP_REST_Request $request ): bool {
+	$hash  = (string) get_option( 'firstlab_api_token_hash', '' );
+	$token = (string) $request->get_header( 'x-firstlab-token' );
+	return '' !== $hash && '' !== $token && hash_equals( $hash, hash( 'sha256', $token ) );
+}
+
+/**
+ * 매일 점검용: 최근 봇 기록, 연속 작성 상태, 공개 대기 수, 보류 초안(이유).
+ */
+function firstlab_api_maintenance(): array {
+	$state = (array) get_option( 'firstlab_bot_state', array() );
+	$held  = array_map(
+		static fn( $h ) => array( 'post_id' => $h['post_id'], 'title' => $h['title'], 'reason' => $h['reason'] ),
+		firstlab_api_held_drafts()
+	);
+	return array(
+		'log'         => array_slice( (array) ( $state['log'] ?? array() ), 0, 40 ),
+		'continuous'  => get_option( 'firstlab_bot_continuous', '0' ),
+		'ready_count' => count( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_queue', 'meta_value' => 'ready', 'numberposts' => -1, 'fields' => 'ids' ) ) ),
+		'held_drafts' => $held,
+	);
 }

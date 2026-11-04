@@ -14,7 +14,8 @@ import urllib.request
 
 BETA = "experimental-cc-routine-2026-04-01"
 TIMEOUT = 30
-MANUAL_TEXT = "manual-request"     # '지금 1개 생성' 버튼으로 실행됨 (예약 작업 지시문이 이 값만 인식)
+MANUAL_TEXT = "manual-request"     # '지금 1개 생성' 버튼으로 실행됨
+MAINT_TEXT = "maintenance-check"   # 매일 점검으로 실행됨 → 예약 작업이 글 대신 automation/maintenance.md 를 따름
 
 
 class RoutineError(RuntimeError):

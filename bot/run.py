@@ -289,6 +289,14 @@ def main() -> None:
     else:
         state["plan"], state["done"] = {}, {}
 
+    # 매일 점검: 공개 대기 글 재검수·기록 점검 (Claude 예약 작업을 점검 모드로 실행, automation/maintenance.md)
+    if settings.write_mode == "direct" and settings.maint_times:
+        fired = state.get("maint_fired", {}).get(today, [])
+        due = schedule.due_slot(settings.maint_times, fired, now.replace(tzinfo=None))
+        if due:
+            state["maint_fired"] = {today: fired + [due]}
+            fire_routine(state, settings, f"매일 점검 {due}", routine.MAINT_TEXT)
+
     # 글 생성: 수동 요청, 연속 작성, 글 작성 시각 (월정액 → Claude, API 봇 방식 + 'API 봇 사용' → API)
     reason = None
     if pop_manual_request():
