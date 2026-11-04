@@ -50,6 +50,7 @@ EOF
   원문을 못 찾은 주장은 장부에 넣지 말고 글에서도 단정하지 않는다.
 
 ## 4. 작성
+- 쓰기 전에 `automation/common-errors.md` 를 읽는다 — 지금까지 외부 검수에서 실제로 틀린 유형과 예. 같은 유형을 내지 않게 쓴다.
 - 출력 형식은 작가 규칙의 JSON 그대로 (title, excerpt, content_html, tags, category, images 1개 = 대표 사진 장면).
 - 계산 예시는 Python 으로 계산해서 그 결과를 그대로 쓴다. 표의 합계는 항목 합과 같아야 한다.
 - 내부 링크: 1단계 응답 `recent_posts` 중 `url` 이 있는(발행된) 글이 본문과 실제로 관련 있으면, 관련 문장 안에
