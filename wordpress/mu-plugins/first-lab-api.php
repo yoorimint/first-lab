@@ -45,6 +45,16 @@ add_action(
 				},
 			)
 		);
+		// 감시 세션 외부 검수용: 글 번호로 지금 본문 (patches·보류 수정이 반영된 실제 내용, automation/unreviewed.py)
+		register_rest_route(
+			'firstlab/v1',
+			'/post/(?P<id>\d+)',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => 'firstlab_api_allowed',
+				'callback'            => 'firstlab_api_post',
+			)
+		);
 		// 매일 점검(automation/maintenance.md): 최근 봇 기록·상태
 		register_rest_route(
 			'firstlab/v1',
@@ -141,6 +151,21 @@ function firstlab_api_image_checks(): array {
 		);
 	}
 	return $out;
+}
+
+/** 글 번호로 지금 본문 (제목·요약문·본문, 블록 주석 제외). */
+function firstlab_api_post( WP_REST_Request $request ) {
+	$post = get_post( (int) $request['id'] );
+	if ( ! $post || 'post' !== $post->post_type ) {
+		return new WP_Error( 'not_found', '글 없음', array( 'status' => 404 ) );
+	}
+	return array(
+		'post_id'      => $post->ID,
+		'status'       => $post->post_status,
+		'title'        => $post->post_title,
+		'excerpt'      => $post->post_excerpt,
+		'content_html' => trim( preg_replace( '/<!--.*?-->/s', '', $post->post_content ) ),
+	);
 }
 
 /** 토큰 확인 (원문은 서버 비밀값, 워드프레스에는 해시만). */

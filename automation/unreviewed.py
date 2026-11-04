@@ -2,21 +2,24 @@
 
 서버의 공개 대기 글·보류 초안 전체를 글 번호로 automation/reviewed.txt 와 대조한다.
 시각으로 '새 글'을 찾으면 경계에 걸린 글이 빠진다 (11/4 #163 토지 실거래가가 빠졌던 일).
-출력: 글 번호, 제목, 검수자에게 줄 최신 본문 파일 (보류 수정본 fixhold 가 있으면 그것).
+출력: 글 번호, 제목, 검수자에게 줄 본문 파일 — 서버의 지금 본문(patches·보류 수정 반영)을 받아 OUT_DIR 에 저장.
 
-사용: FIRSTLAB_API_TOKEN=... python3 automation/unreviewed.py
+사용: FIRSTLAB_API_TOKEN=... python3 automation/unreviewed.py [글번호 ...]
+  글 번호를 주면 reviewed.txt 와 상관없이 그 글들의 본문만 받는다 (다시 검수할 때).
 """
 from __future__ import annotations
 
 import json
 import os
+import sys
+import tempfile
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-QUEUE = ROOT / "wordpress" / "queue"
 REVIEWED = ROOT / "automation" / "reviewed.txt"
-API = "https://first-lab.kr/wp-json/firstlab/v1/maintenance"
+BASE = "https://first-lab.kr/wp-json/firstlab/v1"
+OUT_DIR = Path(tempfile.gettempdir()) / "firstlab-review"  # 검수자에게 줄 본문 (저장소 밖)
 
 
 def reviewed_ids() -> set[int]:
@@ -29,32 +32,33 @@ def reviewed_ids() -> set[int]:
     return ids
 
 
-def body_file(post_id: int, slug: str) -> Path | None:
-    """최신 본문: fixhold-<번호>-*.json (가장 최근) → 키워드가 주소와 같은 새 글 파일."""
-    fixes = sorted(QUEUE.glob(f"fixhold-{post_id}-*.json"))
-    if fixes:
-        return fixes[-1]
-    for path in QUEUE.glob("*.json"):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if not data.get("type") and str(data.get("keyword", "")).strip() == slug:
-            return path
-    return None
+def _get(path: str) -> dict:
+    req = urllib.request.Request(BASE + path, headers={"X-Firstlab-Token": os.environ["FIRSTLAB_API_TOKEN"]})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.load(resp)
+
+
+def save_body(post_id: int) -> Path:
+    """서버의 지금 본문을 JSON 파일로 (title, excerpt, content_html)."""
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    path = OUT_DIR / f"post-{post_id}.json"
+    path.write_text(json.dumps(_get(f"/post/{post_id}"), ensure_ascii=False), encoding="utf-8")
+    return path
 
 
 def main() -> None:
-    req = urllib.request.Request(API, headers={"X-Firstlab-Token": os.environ["FIRSTLAB_API_TOKEN"]})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        state = json.load(resp)
-    done = reviewed_ids()
-    posts = state.get("ready_posts", []) + state.get("held_drafts", [])
-    todo = [p for p in posts if int(p["post_id"]) not in done]
+    if len(sys.argv) > 1:
+        todo = [{"post_id": int(x), "title": ""} for x in sys.argv[1:]]
+    else:
+        state = _get("/maintenance")
+        done = reviewed_ids()
+        posts = state.get("ready_posts", []) + state.get("held_drafts", [])
+        todo = [p for p in posts if int(p["post_id"]) not in done]
+        print(f"# 검수 필요 {len(todo)}편 / 대기·보류 {len(posts)}편")
     for p in todo:
-        f = body_file(int(p["post_id"]), str(p.get("slug", "")))
-        print(f"{p['post_id']}\t{p['title']}\t{f.relative_to(ROOT) if f else '본문 파일 없음(서버 본문 확인)'}")
-    print(f"# 검수 필요 {len(todo)}편 / 대기·보류 {len(posts)}편")
+        path = save_body(int(p["post_id"]))
+        title = p.get("title") or json.loads(path.read_text(encoding="utf-8"))["title"]
+        print(f"{p['post_id']}\t{title}\t{path}")
 
 
 if __name__ == "__main__":
