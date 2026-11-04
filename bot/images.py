@@ -182,12 +182,16 @@ def import_media(path: Path, title: str, alt: str) -> tuple[int, str]:
     return att_id, url
 
 
-def image_block(url: str, alt: str, caption: str = "") -> str:
-    """caption 은 기본으로 비움 (운영자 요청)."""
-    cap = f'<figcaption class="wp-element-caption">{caption}</figcaption>' if caption else ""
-    return (f'<!-- wp:image {{"sizeSlug":"large"}} -->\n'
-            f'<figure class="wp-block-image size-large"><img src="{url}" alt="{alt}"/>{cap}</figure>\n'
-            f'<!-- /wp:image -->')
+def delete_attachment(name: str) -> None:
+    """미디어에서 사진 지우기 (파일 이름 = 첨부 이름, 예: ai-1b47e7d5a0). 없으면 조용히 넘어감."""
+    import subprocess
+
+    ids = wp_cli("post", "list", "--post_type=attachment", f"--name={name}", "--field=ID").split()
+    if ids:
+        try:
+            wp_cli("post", "delete", ids[0], "--force")
+        except subprocess.CalledProcessError:
+            pass
 
 
 if __name__ == "__main__":

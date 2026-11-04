@@ -50,7 +50,7 @@ EOF
   원문을 못 찾은 주장은 장부에 넣지 말고 글에서도 단정하지 않는다.
 
 ## 4. 작성
-- 출력 형식은 작가 규칙의 JSON 그대로 (title, excerpt, content_html, tags, category, images 3개).
+- 출력 형식은 작가 규칙의 JSON 그대로 (title, excerpt, content_html, tags, category, images 1개 = 대표 사진 장면).
 - 계산 예시는 Python 으로 계산해서 그 결과를 그대로 쓴다. 표의 합계는 항목 합과 같아야 한다.
 - 내부 링크: 1단계 응답 `recent_posts` 중 `url` 이 있는(발행된) 글이 본문과 실제로 관련 있으면, 관련 문장 안에
   `<a href="<url>">자연스러운 문구</a>` 로 1~3개 건다. 관련 없으면 걸지 않는다. 목록에 없는 주소·외부 사이트 주소는 서버가 링크를 지운다.
@@ -130,12 +130,13 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   제목·요약문을 바꿨으면 `"title"`, `"excerpt"` 도 넣는다. 서버가 다시 관문 검사 → 통과하면 공개 대기열.
 - 5단계와 같이 검사 → 커밋(`보류 수정: <글 제목>`) → main 에 올림.
 
-## 5-2. 사진 검사 (있을 때만, 실행 1번에 응답의 글 전부)
-1단계 응답의 `image_checks` 각 글의 `images` 를 하나씩 받아(`curl -s -o /tmp/<name>.jpg <url>`) 직접 열어 본다.
-- 나쁜 사진: 글자·숫자·로고처럼 보이는 것이 있음(엉터리 글자 포함), 손·얼굴이 일그러짐, 글 내용과 상관없는 장면.
+## 5-2. 대표 사진 검사 (있을 때만, 실행 1번에 응답의 글 전부)
+글마다 AI 사진 1장이 대표 사진(홈 목록·공유 미리보기)이다. 본문에는 사진을 넣지 않는다.
+1단계 응답의 `image_checks` 각 글의 `images`(대표 사진, 0~1장)를 받아(`curl -s -o /tmp/<name>.jpg <url>`) 직접 열어 본다.
+- 나쁜 사진: 글자·숫자·로고처럼 보이는 것이 있음(엉터리 글자 포함), 손·얼굴이 일그러짐, 글 주제와 상관없는 장면.
 - 나쁜 사진은 `replace` 에 새 장면을 적는다: 영어 한 문장, 서류·영수증·간판·달력·책·화면·공항·역·키오스크가 없는 장면.
-  `round` 가 2 이상이면 `replace` 대신 `remove` 에 이름만 넣는다 (서버가 사진을 뺌).
-- `images` 가 빈 목록이면(사진 생성 실패) 글 내용에 맞는 장면 3개를 `add` 에 `{"prompt", "alt"}` 로 적는다 (장면 조건은 위와 같음).
+  `round` 가 2 이상이면 `replace` 대신 `remove` 에 이름만 넣는다 (서버가 사진을 빼고 제목 카드로).
+- `images` 가 빈 목록이면(사진 생성 실패) 글 주제에 맞는 장면 1개를 `add` 에 `{"prompt", "alt"}` 로 적는다.
 - `wordpress/queue/imgcheck-<post_id>-<날짜시각>.json` 으로 저장 (이상 없으면 replace·remove·add 를 빈 목록으로 → 검사 끝 표시):
   `{"type": "image_check", "post_id": <id>, "replace": [{"old": "<name>", "prompt": "...", "alt": "한국어 대체 텍스트", "why": "한 줄"}], "remove": [], "add": []}`
 - 5단계 커밋에 같이 넣는다 (새 글이 없으면 `사진 검사: <글 번호들>` 로 커밋 → main 에 올림).

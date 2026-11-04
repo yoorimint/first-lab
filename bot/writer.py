@@ -40,7 +40,7 @@ SYSTEM_PROMPT = """너는 한국어 정보 블로그 '퍼스트랩'의 작가다
  "category": "카테고리 하나 (CATEGORY_LIST 중에서만)",
  "images": [{"prompt": "이미지 생성용 장면 설명 (영어 한 문장, 사람 얼굴 클로즈업 없이. 서류·영수증·간판·달력·책·화면처럼 글자가 있는 물건은 넣지 않는다. 예: a quiet street in Jeju island with stone walls and tangerine trees)",
              "alt": "그 이미지가 무엇인지 한국어로 짧게 (검색엔진·시각장애인용 대체 텍스트, 예: 돌담과 귤나무가 있는 제주 골목)"}]
-             ← 본문 흐름에 맞는 서로 다른 장면 3개}"""
+             ← 글 주제를 대표하는 장면 1개 (대표 사진: 홈 목록·공유 미리보기용, 본문에는 넣지 않음)}"""
 
 SYSTEM_PROMPT = SYSTEM_PROMPT.replace("CATEGORY_LIST", " / ".join(CATEGORIES))
 

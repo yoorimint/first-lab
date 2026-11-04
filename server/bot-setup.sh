@@ -35,8 +35,8 @@ apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
 
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
-log "글자 들어간 AI 사진 교체 (wordpress/image-fixes.json, 이미 바꾼 건 건너뜀)"
-(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_images) || echo "사진 교체 실패 (봇 동작에는 영향 없음)"
+log "본문 AI 사진 → 대표 사진 1장으로 정리 (이미 정리된 글은 건너뜀)"
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.migrate_photos) || echo "사진 정리 실패 (봇 동작에는 영향 없음)"
 
 log "예약 발행 대기열: 운영자 승인한 초안 넣기 (항목마다 한 번만)"
 # 사용: queue_once <기록이름> <글번호...> — 아직 초안인 글만 공개 대기열에 넣는다

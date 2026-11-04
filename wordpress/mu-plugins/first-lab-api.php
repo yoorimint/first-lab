@@ -105,7 +105,7 @@ function firstlab_api_held_drafts(): array {
 }
 
 /**
- * 사진 검사가 안 끝난 글 (오래된 것부터 2개, AI 사진이 없는 글 포함) — 글쓰기 세션이 사진을 직접 보고 결과를 올린다 (bot/image_check.py).
+ * 대표 사진 검사가 안 끝난 글 (오래된 것부터 2개, 대표 사진이 없는 글 포함) — 글쓰기 세션이 사진을 직접 보고 결과를 올린다 (bot/image_check.py).
  * round: 이 글 사진을 이미 바꾼 횟수 (bot/image_check.py MAX_ROUND 에 닿으면 서버가 교체 대신 뺀다).
  */
 function firstlab_api_image_checks(): array {
@@ -119,27 +119,26 @@ function firstlab_api_image_checks(): array {
 			),
 			'orderby'     => 'date',
 			'order'       => 'ASC',
-			'numberposts' => -1, // 사진 없는 옛 글이 앞을 막지 않게 전부 훑음 (글 수가 적어 부담 없음)
+			'numberposts' => 2,
 		)
 	);
 	foreach ( $posts as $post ) {
 		$images = array();
-		preg_match_all( '#<img\b[^>]*>#', $post->post_content, $tags );
-		foreach ( $tags[0] as $tag ) {
-			if ( preg_match( '#src="([^"]+/(ai-[0-9a-f]+)(?:-\d+x\d+)?\.jpg)"#', $tag, $src ) ) {
-				preg_match( '#alt="([^"]*)"#', $tag, $alt );
-				$images[] = array( 'name' => $src[2], 'url' => $src[1], 'alt' => $alt[1] ?? '' );
-			}
+		$name   = (string) get_post_meta( $post->ID, '_firstlab_photo', true ); // 대표 사진 (bot/photo.py)
+		$thumb  = (int) get_post_thumbnail_id( $post );
+		if ( '' !== $name && $thumb ) {
+			$images[] = array(
+				'name' => $name,
+				'url'  => (string) wp_get_attachment_url( $thumb ),
+				'alt'  => (string) get_post_meta( $thumb, '_wp_attachment_image_alt', true ),
+			);
 		}
-		$out[] = array( // 사진이 하나도 없으면(생성 실패 등) images 가 빈 목록 → 세션이 add 로 새 사진 요청
+		$out[] = array( // 대표 사진이 없으면(생성 실패 등) images 가 빈 목록 → 세션이 add 로 새 사진 요청
 			'post_id' => $post->ID,
 			'title'   => $post->post_title,
 			'round'   => (int) get_post_meta( $post->ID, '_firstlab_img_round', true ),
 			'images'  => $images,
 		);
-		if ( count( $out ) >= 2 ) {
-			break;
-		}
 	}
 	return $out;
 }

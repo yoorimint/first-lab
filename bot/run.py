@@ -90,8 +90,7 @@ def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
             if "제목(확인 필요)" in aligned:
                 status = "draft"  # 제목 숫자가 본문과 다르면 자동 발행하지 않음
         post_id, link, image_note = publish(article, status, slug=keyword,
-                                            cloudflare=(settings.cf_account_id, settings.cf_api_token),
-                                            image_count=settings.image_count)
+                                            cloudflare=(settings.cf_account_id, settings.cf_api_token))
         set_status(conn, keyword, "used", f"post {post_id}")
     kind = STATUS_LABEL.get(status, "초안 저장")
     cost = getattr(llm, "cost_usd", 0.0) + getattr(light, "cost_usd", 0.0)
@@ -289,10 +288,10 @@ def main() -> None:
     else:
         state["plan"], state["done"] = {}, {}
 
-    # 한도 소진으로 못 만든 본문 사진 채우기 (5분마다, 한도 초기화 후 공개 대기열 글부터)
+    # 한도 소진으로 못 만든 대표 사진 채우기 (5분마다, 한도 초기화 후 공개 대기열 글부터)
     if now.minute % 5 == 0:
         try:
-            for msg in pending_images.fill(settings.cf_account_id, settings.cf_api_token):
+            for msg in pending_images.fill((settings.cf_account_id, settings.cf_api_token)):
                 add_log(state, True, f"사진 채우기: {msg}")
         except Exception as e:  # noqa: BLE001 - 사진 실패가 글 작성·공개를 막지 않게
             add_log(state, False, f"사진 채우기 실패: {str(e)[:150]}")

@@ -1,9 +1,7 @@
-"""워드프레스에 글 저장 (WP-CLI): 블록 형식 변환 + 대표 이미지(제목 카드) + 본문 AI 이미지."""
+"""워드프레스에 글 저장 (WP-CLI): 블록 형식 변환 + 대표 사진(AI 1장, 실패하면 제목 카드). 본문에는 사진을 넣지 않는다."""
 from __future__ import annotations
 
-import json
-
-from . import images
+from . import images, photo
 from .blocks import to_blocks
 from .categories import slug_of
 from .schedule import mark_ready
@@ -12,61 +10,6 @@ from .writer import Article
 
 SITE_URL = "https://first-lab.kr"
 STATUS_LABEL = {"publish": "발행", "draft": "초안 저장", "schedule": "공개 대기"}
-
-
-def _insert_images(content: str, blocks: list[str]) -> str:
-    """이미지들을 소제목 앞에 고르게 나눠 넣기 (첫 이미지는 첫 소제목 앞 = 도입부 다음)."""
-    marker = "<!-- wp:heading"
-    positions, i = [], content.find(marker)
-    while i != -1:
-        positions.append(i)
-        i = content.find(marker, i + 1)
-    if not positions:
-        return "\n\n".join(blocks) + "\n\n" + content
-    step = max(1, len(positions) // len(blocks))
-    chosen = [positions[min(k * step, len(positions) - 1)] for k in range(len(blocks))]
-    for pos, block in sorted(zip(chosen, blocks), reverse=True):  # 뒤에서부터 넣어야 위치가 안 밀림
-        content = content[:pos] + block + "\n\n" + content[pos:]
-    return content
-
-
-PENDING_META = "_firstlab_img_pending"  # 한도 소진으로 못 만든 사진 [{"prompt", "alt"}] → pending_images.py 가 나중에 채움
-
-
-def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = ("", ""),
-                  count: int = 3) -> tuple[str, str, list[dict]]:
-    """(블록 본문, 메모, 나중에 만들 사진). 이미지 실패는 글 저장을 막지 않는다. cloudflare=(계정 ID, API 토큰)"""
-    content = to_blocks(article.content_html)
-    account_id, token = cloudflare
-    prompts = article.image_prompts[:count]
-    if not (account_id and token and prompts):
-        return content, "본문 이미지 없음", []
-    blocks, errors, skipped, pending = [], [], [], []
-    for n, prompt in enumerate(prompts, 1):
-        alt = article.image_alts[n - 1] if n <= len(article.image_alts) and article.image_alts[n - 1] else keyword
-        word = images.text_prone(prompt)
-        if word:
-            skipped.append(word)
-            print(f"[이미지] {n}번 건너뜀: 글자가 생기기 쉬운 장면 ('{word}')", flush=True)
-            continue
-        if pending:  # 한도가 이미 다 됐으면 나머지도 나중에
-            pending.append({"prompt": prompt, "alt": alt})
-            continue
-        try:
-            path = images.cloudflare_image(account_id, token, prompt)
-            _, url = images.import_media(path, alt, alt)
-            blocks.append(images.image_block(url, alt))
-        except images.QuotaExceeded:
-            pending.append({"prompt": prompt, "alt": alt})
-        except Exception as e:  # noqa: BLE001
-            errors.append(str(e)[:80])
-            print(f"[이미지] {n}번 실패: {e}", flush=True)
-    if blocks:
-        content = _insert_images(content, blocks)
-    note = (f"AI 이미지 {len(blocks)}장" + (f" (실패 {len(errors)})" if errors else "")
-            + (f" (글자 장면 건너뜀: {', '.join(skipped)})" if skipped else "")
-            + (f" (한도 소진 → {len(pending)}장은 오전 9시 이후 자동 추가)" if pending else ""))
-    return content, note, pending
 
 
 def _set_category(post_id: int, name: str) -> None:
@@ -99,12 +42,12 @@ def site_author_id() -> str:
     return ids[0] if ids else ""
 
 
-def publish(article: Article, status: str, slug: str = "", cloudflare: tuple[str, str] = ("", ""),
-            image_count: int = 3) -> tuple[int, str, str]:
+def publish(article: Article, status: str, slug: str = "",
+            cloudflare: tuple[str, str] = ("", "")) -> tuple[int, str, str]:
     """status: publish | draft | schedule (초안으로 저장 + 공개 대기열, schedule.py 가 공개 시각마다 오래된 것부터 공개)
     slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다.
     반환: (글 번호, 주소, 처리 메모)"""
-    content, image_note, pending = build_content(article, slug or article.title, cloudflare, image_count)
+    content = to_blocks(article.content_html)
     queued = status == "schedule"
     if queued:
         status = "draft"
@@ -120,14 +63,15 @@ def publish(article: Article, status: str, slug: str = "", cloudflare: tuple[str
         "--porcelain",
     ).strip())
     _set_category(post_id, article.category)
-    if pending:
-        wp_cli("post", "meta", "update", str(post_id), PENDING_META, json.dumps(pending, ensure_ascii=False))
     if queued:
         mark_ready(post_id)
-    try:
-        set_featured_card(post_id, article.title, slug or article.title)
-    except Exception as e:  # noqa: BLE001 - 대표 이미지 실패가 글 저장을 막지 않게
-        print(f"[이미지] 대표 이미지 실패: {e}", flush=True)
+    scene = photo.first_scene(article.image_prompts, article.image_alts)
+    image_note = photo.make_or_wait(post_id, scene, cloudflare)
+    if not photo.meta(post_id, photo.PHOTO_META):  # 사진이 없으면 우선 제목 카드
+        try:
+            set_featured_card(post_id, article.title, slug or article.title)
+        except Exception as e:  # noqa: BLE001 - 대표 이미지 실패가 글 저장을 막지 않게
+            print(f"[이미지] 제목 카드 실패: {e}", flush=True)
     if status == "publish":
         link = wp_cli("eval", f"echo get_permalink({post_id});").strip()
     else:  # 초안은 아직 공개 주소가 없으므로 편집 화면 주소

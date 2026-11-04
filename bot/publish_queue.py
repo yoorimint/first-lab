@@ -65,8 +65,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     if dropped:
         notes.append(f"공식 링크 제외 {len(dropped)}개: {'; '.join(dropped)[:150]}")
     post_id, link, image_note = publish(article, status, slug=keyword,
-                                        cloudflare=(settings.cf_account_id, settings.cf_api_token),
-                                        image_count=settings.image_count)
+                                        cloudflare=(settings.cf_account_id, settings.cf_api_token))
     if failed:  # 설정 페이지 '검수 보류 초안' 목록에 이유와 함께 보이게
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
     with connect() as conn:

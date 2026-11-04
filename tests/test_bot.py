@@ -254,24 +254,19 @@ class ScheduleTest(unittest.TestCase):
             schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
         self.assertEqual(next(a for a in calls if a[:2] == ("post", "update"))[2], "85")
 
-    def test_quota_exceeded_saves_remaining_photos_for_later(self):
-        from bot import images, publisher
-        from bot.writer import Article
-        art = Article(title="t", excerpt="e", content_html="<p>도입</p><h2>a</h2><p>b</p>", tags=[], category="생활",
-                      image_prompts=["a quiet street", "a sunny park", "a calm lake"], image_alts=["거리", "공원", "호수"])
-        made = iter(["/tmp/1.jpg"])
-
-        def fake_cf(acc, tok, prompt):
-            try:
-                return next(made)
-            except StopIteration:
-                raise images.QuotaExceeded("한도") from None
-        with mock.patch.object(images, "cloudflare_image", side_effect=fake_cf), \
-             mock.patch.object(images, "import_media", return_value=(1, "https://x/ai-1111111111.jpg")):
-            content, note, pending = publisher.build_content(art, "kw", ("a", "t"), 3)
-        self.assertIn("ai-1111111111", content)
-        self.assertEqual(pending, [{"prompt": "a sunny park", "alt": "공원"}, {"prompt": "a calm lake", "alt": "호수"}])
+    def test_quota_exceeded_saves_scene_for_later(self):
+        from bot import images, photo
+        calls = []
+        with mock.patch.object(images, "cloudflare_image", side_effect=images.QuotaExceeded("한도")), \
+             mock.patch.object(photo, "wp_cli", side_effect=lambda *a: calls.append(a) or ""):
+            note = photo.make_or_wait(219, {"prompt": "a calm lake", "alt": "호수"}, ("a", "t"))
         self.assertIn("오전 9시", note)
+        self.assertIn(("post", "meta", "update", "219", photo.PENDING_META, '[{"prompt": "a calm lake", "alt": "호수"}]'), calls)
+
+    def test_first_scene_skips_text_prone(self):
+        from bot import photo
+        scene = photo.first_scene(["a printed contract on a desk", "a quiet street"], ["계약서", "거리"])
+        self.assertEqual(scene, {"prompt": "a quiet street", "alt": "거리"})
 
     def test_settings(self):
         s = BotSettings.from_option({"post_status": "schedule", "schedule_times": "9:00\n18시"}, {})
@@ -534,22 +529,21 @@ class MiscTest(unittest.TestCase):
         self.assertEqual(images.text_prone("a toll gate with green overhead signs"), "signs")
         self.assertEqual(images.text_prone("a quiet street in Jeju with stone walls on a wooden table"), "")
 
-    def test_image_swap_replaces_all_sizes_and_alt(self):
-        from bot import fix_images
-        old = "ai-1b47e7d5a0"
-        html = ('<figure><img src="https://first-lab.kr/wp-content/uploads/2026/11/ai-1b47e7d5a0.jpg" alt="노트북"/></figure>'
-                '<img src="https://first-lab.kr/wp-content/uploads/2026/11/ai-9999999999.jpg" alt="다른 사진"/>')
-        out = fix_images.swap(html, old, "https://first-lab.kr/new.jpg", "아파트 단지")
-        self.assertFalse(fix_images.uses(out, old))  # 다시 실행해도 아무 일 없음
-        self.assertIn('src="https://first-lab.kr/new.jpg" alt="아파트 단지"', out)
-        self.assertIn('alt="다른 사진"', out)  # 다른 사진은 그대로
-        self.assertTrue(fix_images.uses("x/ai-1b47e7d5a0-300x169.jpg y", old) is False)  # 주소 형식이 아니면 무시
-
-    def test_image_fixes_file_prompts_are_text_free(self):
-        from bot import fix_images, images
-        for fix in json.loads(fix_images.FIXES.read_text(encoding="utf-8")):
-            self.assertEqual(images.text_prone(fix["prompt"]), "", fix["old"])
-
+    def test_migrate_moves_body_photos_out(self):
+        from bot import migrate_photos
+        url = "https://first-lab.kr/wp-content/uploads/2026/11/{}.jpg"
+        body = ('<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n'
+                '<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="'
+                + url.format("ai-aaaaaaaaaa") + '" alt="a"/></figure>\n<!-- /wp:image -->\n\n'
+                '<!-- wp:paragraph -->\n<p>중간</p>\n<!-- /wp:paragraph -->\n\n'
+                '<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="'
+                + url.format("ai-bbbbbbbbbb") + '" alt="b"/></figure>\n<!-- /wp:image -->\n\n'
+                '<!-- wp:paragraph -->\n<p>끝</p>\n<!-- /wp:paragraph -->')
+        self.assertEqual(migrate_photos.body_photos(body), ["ai-aaaaaaaaaa", "ai-bbbbbbbbbb"])
+        out = migrate_photos.strip_photos(body)
+        self.assertNotIn("wp:image", out)
+        self.assertEqual([p for p in ("<p>도입</p>", "<p>중간</p>", "<p>끝</p>") if p in out], ["<p>도입</p>", "<p>중간</p>", "<p>끝</p>"])
+        self.assertEqual(migrate_photos.body_photos(out), [])  # 다시 실행해도 아무 일 없음
 
 
 class GateStructureNumberTest(unittest.TestCase):
@@ -563,75 +557,65 @@ class GateStructureNumberTest(unittest.TestCase):
 
 
 class ImageCheckTest(unittest.TestCase):
-    URL = "https://first-lab.kr/wp-content/uploads/2026/11/{}.jpg"
-    BODY = ('<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n'
-            '<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large">'
-            '<img src="' + URL.format("ai-aaaaaaaaaa") + '" alt="서류"/></figure>\n<!-- /wp:image -->\n\n'
-            '<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large">'
-            '<img src="' + URL.format("ai-bbbbbbbbbb") + '" alt="거리"/></figure>\n<!-- /wp:image -->\n\n'
-            '<!-- wp:paragraph -->\n<p>끝</p>\n<!-- /wp:paragraph -->')
+    """대표 사진 검사 반영 (bot/image_check.py)."""
 
-    def run_check(self, data, rounds="0"):
-        from bot import image_check
-        calls, saved = [], {}
+    def run_check(self, data, current="ai-aaaaaaaaaa", rounds="0"):
+        from bot import image_check, photo
+        calls = []
+        metas = {photo.PHOTO_META: current, image_check.ROUND_META: rounds}
 
         def fake_cli(*args):
             calls.append(args)
-            if args[:2] == ("post", "get"):
-                return self.BODY
             if args[:3] == ("post", "meta", "get"):
-                return rounds
-            if args[:2] == ("post", "update"):
-                saved["content"] = args[3].split("=", 1)[1]
-            if args[:2] == ("post", "list"):
-                return "501"
+                return metas.get(args[4], "")
             return ""
-
+        made = []
         with mock.patch.object(image_check, "wp_cli", side_effect=fake_cli), \
-             mock.patch("bot.fix_images.wp_cli", side_effect=fake_cli), \
+             mock.patch.object(photo, "wp_cli", side_effect=fake_cli), \
              mock.patch.object(image_check, "load_settings", return_value=mock.Mock(cf_account_id="a", cf_api_token="t")), \
-             mock.patch.object(image_check.images, "cloudflare_image", return_value="/tmp/x.jpg"), \
-             mock.patch.object(image_check.images, "import_media", return_value=(9, self.URL.format("ai-cccccccccc"))):
+             mock.patch.object(photo, "make", side_effect=lambda pid, scene, cf: made.append(scene) or "ai-cccccccccc"), \
+             mock.patch.object(image_check, "_to_title_card") as card:
             msg = image_check.apply_check({"type": "image_check", "post_id": 176, **data})
-        return msg, calls, saved.get("content", "")
+        return msg, calls, made, card
 
     def test_clean_post_marked_checked(self):
-        msg, calls, _ = self.run_check({"replace": [], "remove": []})
+        msg, calls, made, card = self.run_check({"replace": [], "remove": []})
         self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
+        self.assertEqual(made, [])
         self.assertIn("이상 없음", msg)
 
-    def test_replace_swaps_and_rechecks(self):
+    def test_replace_makes_new_photo_and_rechecks(self):
         fix = {"old": "ai-aaaaaaaaaa", "prompt": "a quiet street with trees", "alt": "가로수 길", "why": "글자"}
-        msg, calls, content = self.run_check({"replace": [fix], "remove": []})
-        self.assertNotIn("ai-aaaaaaaaaa", content)
-        self.assertIn('ai-cccccccccc.jpg" alt="가로수 길"', content)
+        msg, calls, made, card = self.run_check({"replace": [fix]})
+        self.assertEqual(made, [fix])
         self.assertIn(("post", "meta", "update", "176", "_firstlab_img_round", "1"), calls)  # 새 사진도 다시 검사
         self.assertFalse(any("_firstlab_img_checked" in c for c in calls))
 
-    def test_after_max_rounds_image_is_removed(self):
+    def test_after_max_rounds_photo_becomes_title_card(self):
         fix = {"old": "ai-aaaaaaaaaa", "prompt": "a quiet street with trees", "alt": "x", "why": "글자"}
-        msg, calls, content = self.run_check({"replace": [fix], "remove": []}, rounds="2")
-        self.assertNotIn("ai-aaaaaaaaaa", content)
-        self.assertNotIn("ai-cccccccccc", content)
-        self.assertIn("ai-bbbbbbbbbb", content)  # 다른 사진·문단은 그대로
-        self.assertIn("<p>끝</p>", content)
+        msg, calls, made, card = self.run_check({"replace": [fix]}, rounds="2")
+        self.assertEqual(made, [])
+        card.assert_called_once()
         self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
 
-    def test_add_images_to_post_without_photos(self):
-        from bot import image_check
-        no_photo = '<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>소제목</h2>\n<!-- /wp:heading -->'
-        with mock.patch.object(self, "BODY", no_photo):
-            add = [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}]
-            msg, calls, content = self.run_check({"replace": [], "remove": [], "add": add})
-        self.assertIn('ai-cccccccccc.jpg" alt="잔디밭 강아지"', content)
-        self.assertLess(content.index("ai-cccccccccc"), content.index("<h2>"))  # 첫 소제목 앞에 들어감
-        self.assertIn(("post", "meta", "update", "176", image_check.ROUND_META, "1"), calls)  # 새 사진도 다시 검사
-
-    def test_text_prone_new_prompt_is_removed_instead(self):
+    def test_text_prone_new_scene_becomes_title_card(self):
         fix = {"old": "ai-aaaaaaaaaa", "prompt": "a printed contract on a desk", "alt": "x", "why": "글자"}
-        _, _, content = self.run_check({"replace": [fix], "remove": []})
-        self.assertNotIn("ai-aaaaaaaaaa", content)
-        self.assertNotIn("ai-cccccccccc", content)
+        _, _, made, card = self.run_check({"replace": [fix]})
+        self.assertEqual(made, [])
+        card.assert_called_once()
+
+    def test_add_photo_when_none(self):
+        add = [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}]
+        msg, calls, made, card = self.run_check({"add": add}, current="")
+        self.assertEqual(made, [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}])
+        self.assertIn("추가", msg)
+
+    def test_stale_replace_for_other_photo_is_ignored(self):
+        # 예전(본문 사진 시절) 요청: 지금 대표 사진이 아닌 사진 교체 → 대표 사진은 이상 없음으로 검사 끝
+        fix = {"old": "ai-zzzzzzzzzz", "prompt": "a lake", "alt": "x", "why": "글자"}
+        _, calls, made, _ = self.run_check({"replace": [fix]})
+        self.assertEqual(made, [])
+        self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
 
 
 if __name__ == "__main__":
