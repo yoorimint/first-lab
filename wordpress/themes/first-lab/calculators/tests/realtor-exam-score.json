@@ -1,0 +1,27 @@
+[
+  {
+    "why": "1차 55·70점: 과락 없음, 평균 62.5 ≥ 60 → 합격 (큐넷 합격기준, 본문 표)",
+    "input": {"stage": "first", "s1": 55, "s2": 70},
+    "expect": {"avg1": 62.5, "fail1": 0, "pass1": true, "final": false}
+  },
+  {
+    "why": "2차 80·38·75점: 평균 64.33이지만 38점 과락 → 불합격 (본문 표 2차 A)",
+    "input": {"stage": "second", "s3": 80, "s4": 38, "s5": 75},
+    "expect": {"avg2": 64.33, "fail2": 1, "pass2": false, "final": false}
+  },
+  {
+    "why": "2차 65·45·70점: 평균 60.0 = 기준선 → 합격 (본문 표 2차 B)",
+    "input": {"stage": "second", "s3": 65, "s4": 45, "s5": 70},
+    "expect": {"avg2": 60, "fail2": 0, "pass2": true, "final": true}
+  },
+  {
+    "why": "동시 응시 1차 50·60(평균 55 미달) → 2차 70·70·70이어도 시행령 제5조제3항에 따라 무효",
+    "input": {"stage": "both", "s1": 50, "s2": 60, "s3": 70, "s4": 70, "s5": 70},
+    "expect": {"avg1": 55, "pass1": false, "avg2": 70, "pass2": false, "final": false}
+  },
+  {
+    "why": "극단값: 40·80 → 과락 아님(40점 이상), 평균 60 → 합격 / 2차 39.5 과락",
+    "input": {"stage": "both", "s1": 40, "s2": 80, "s3": 100, "s4": 100, "s5": 39.5},
+    "expect": {"avg1": 60, "fail1": 0, "pass1": true, "fail2": 1, "pass2": false, "final": false}
+  }
+]

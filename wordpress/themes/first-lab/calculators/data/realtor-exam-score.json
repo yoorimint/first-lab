@@ -1,0 +1,10 @@
+{
+  "basis_date": "2026-11-04",
+  "sources": [
+    {"name": "한국산업인력공단 큐넷 공인중개사 시험정보 (시험과목·합격기준)", "url": "https://www.q-net.or.kr/crf005.do?id=crf00503&gSite=L&gId=08&gbnn=gbnSubtab1"},
+    {"name": "국가법령정보센터 공인중개사법 시행령 제5조 (1차 불합격자 2차 무효, 1차 면제)", "url": "https://www.law.go.kr/법령/공인중개사법시행령"}
+  ],
+  "full_score": 100,
+  "subject_min": 40,
+  "average_min": 60
+}
