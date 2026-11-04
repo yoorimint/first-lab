@@ -1,0 +1,21 @@
+{
+  "basis_date": "2026-11-04",
+  "sources": [
+    {"name": "국세청 종합소득세 세율 (2023~2025년 귀속 세율표·계산 예시)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2227&cntntsId=7667"},
+    {"name": "국세청 종합소득세 세액계산 흐름도", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2226&cntntsId=7666"},
+    {"name": "국회 입법예고 소득세법 일부개정법률안 (현행 기본공제 1명당 150만원)", "url": "https://opinion.lawmaking.go.kr/gcom/nsmLmSts/out/2200113/detailRP"},
+    {"name": "서울특별시 개인지방소득세(종합소득) 신고 안내 (종합소득세액의 10%)", "url": "https://news.seoul.go.kr/gov/archives/233993"}
+  ],
+  "basic_deduction_per_person": 1500000,
+  "local_ratio_div": 10,
+  "brackets": [
+    {"upto": 14000000, "rate_pct": 6, "deduction": 0},
+    {"upto": 50000000, "rate_pct": 15, "deduction": 1260000},
+    {"upto": 88000000, "rate_pct": 24, "deduction": 5760000},
+    {"upto": 150000000, "rate_pct": 35, "deduction": 15440000},
+    {"upto": 300000000, "rate_pct": 38, "deduction": 19940000},
+    {"upto": 500000000, "rate_pct": 40, "deduction": 25940000},
+    {"upto": 1000000000, "rate_pct": 42, "deduction": 35940000},
+    {"upto": null, "rate_pct": 45, "deduction": 65940000}
+  ]
+}
