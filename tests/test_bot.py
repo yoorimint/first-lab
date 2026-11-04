@@ -962,6 +962,14 @@ class ErrorTypeRegistryTest(unittest.TestCase):
                 path, token = ref.split("::", 1)
                 self.assertIn(token, (ROOT / path).read_text(encoding="utf-8"), f"{key}: {ref} 가 실제로 없음")
 
+    def test_common_errors_checklist_is_current(self):
+        """글쓰기 독립 검수자가 읽는 '자주 틀린 유형' 표가 지금 수정 기록과 같아야 한다 (고친 뒤 다시 만들기)."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import common_errors
+        self.assertEqual((ROOT / "automation" / "common-errors.md").read_text(encoding="utf-8"), common_errors.build(),
+                         "python3 automation/common_errors.py 로 다시 만들기")
+        self.assertIn("common-errors.md", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
     def test_no_absence_wording_in_fixes(self):
         """확인 못 한 것을 '없다·찾지 못했다'로 고치지 않는다 (11/4 #219 파인 대출 계산기)."""
         sys.path.insert(0, str(ROOT / "automation"))
