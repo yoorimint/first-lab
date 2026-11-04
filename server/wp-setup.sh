@@ -111,6 +111,8 @@ log "고정 페이지 동기화"
 for file in "$REPO_DIR"/wordpress/pages/*.html; do
   slug=$(basename "$file" .html)
   title=$(sed -n '1s/^<!-- title: \(.*\) -->$/\1/p' "$file")
+  [ -n "$title" ] || echo "경고: $slug 페이지 제목 줄(<!-- title: ... -->)을 못 읽음"
+  echo "  페이지 $slug → $title"
   content=$(tail -n +2 "$file")
   id=$(wp post list --post_type=page --name="$slug" --post_status=any --field=ID)
   if [ -z "$id" ]; then
