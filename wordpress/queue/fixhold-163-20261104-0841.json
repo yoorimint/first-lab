@@ -1,0 +1,171 @@
+{
+ "type": "fix_hold",
+ "post_id": 163,
+ "base_modified": "2026-11-04 17:29:08",
+ "excerpt": "토지 실거래가 조회는 국토교통부 실거래가 공개시스템에서 해요. 지도 조회 순서, 엑셀·CSV 다운, 지번 첫째 자리 공개, 계약일 30일 신고 시차, ㎡당 가격 비교법까지 정리했어요.",
+ "content_html": "<p>토지 실거래가 조회는 <strong>국토교통부 실거래가 공개시스템(rt.molit.go.kr)</strong>에서 할 수 있어요. 상단 메뉴에서 <strong>토지</strong>를 고르고 시도·시군구·읍면동을 지정하면 지도 위에 거래 내역이 뜨고, 여러 건을 한 번에 보려면 <strong>자료제공</strong> 메뉴에서 계약일 범위를 정해 엑셀·CSV로 내려받으면 돼요. 공개 대상은 2006년 1월 이후 신고된 매매 거래이고, 신고 다음 날 계약일 기준으로 올라와요. 다만 토지는 개인정보 보호 때문에 <strong>지번 첫째 자리까지만</strong> 보여서, 특정 필지 하나의 거래가를 정확히 집어내기는 어려워요.</p>\n\n\n\n<figure class=\"wp-block-image size-large\"><img src=\"https://first-lab.kr/wp-content/uploads/2026/11/ai-639b039237.jpg\" alt=\"도시 외곽의 논밭과 빈 땅 필지 항공 사진\"/></figure>\n\n\n\n<h2 class=\"wp-block-heading\">토지 실거래가 조회 순서 (지도로 보기)</h2>\n\n\n\n<ol class=\"wp-block-list\">\n\n<li>실거래가 공개시스템에 접속해 상단 메뉴에서 <strong>토지</strong>를 눌러요.</li>\n\n\n<li>기준년도(2006년~올해)를 고르고, 지번주소 기준으로 시도명·시군구명·읍면동명을 차례로 선택해요.</li>\n\n\n<li>지도에 표시된 거래를 누르면 면적, 거래금액, 계약일 같은 상세 내용이 나와요.</li>\n\n\n<li>같은 화면의 <strong>전산공부</strong>에서 토지이용계획 확인원, 토지대장 정보도 이어서 볼 수 있어요.</li>\n\n</ol>\n\n\n\n<p>붉은색 바탕으로 표시된 거래는 계약이 <strong>해제 신고된 거래</strong>예요. 시세를 가늠할 때는 이 거래를 빼고 보는 게 맞아요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">여러 건을 한 번에: 엑셀·CSV 내려받기</h2>\n\n\n\n<p>동네 땅값 흐름을 보고 싶다면 지도보다 <strong>자료제공(조건별 자료제공)</strong> 메뉴가 편해요. 부동산 종류에서 토지, 거래 구분에서 매매를 고른 뒤 계약일자와 지역(시도·시군구·읍면동)을 지정하고 <strong>EXCEL 다운</strong> 또는 <strong>CSV 다운</strong>을 누르면 돼요. 시도 단위로 받을 때 계약일자 범위는 <strong>최대 1년</strong>이고, 전국 단위는 그보다 짧게 제한될 수 있어요. 몇 년 치를 보려면 지역을 좁히거나 기간을 나눠 받는 게 편해요. 같은 자료를 대량·반복으로 쓰려면 사이트를 긁어 오는 대신 공공데이터포털(data.go.kr)의 <strong>국토교통부_토지 매매 실거래가 자료</strong> 오픈API를 쓰라고 안내하고 있어요. 이 API는 무료이고, 법정동 코드 앞 5자리와 계약년월 6자리로 지역·기간을 지정해요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">토지 실거래가에 나오는 항목</h2>\n\n\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\">\n<thead><tr><th>항목</th><th>내용</th></tr></thead>\n<tbody>\n<tr><td>주소</td><td>지번 첫째 자리까지</td></tr>\n<tr><td>지목</td><td>전·답·대 등 토지 종류</td></tr>\n<tr><td>용도지역</td><td>토지 이용 용도 구분</td></tr>\n<tr><td>면적</td><td>거래 면적(㎡)</td></tr>\n<tr><td>도로조건</td><td>접한 도로 상태(범주화)</td></tr>\n<tr><td>계약일·거래금액</td><td>계약일 기준 실제 거래가</td></tr>\n<tr><td>해제여부</td><td>계약 해제 신고 여부</td></tr>\n<tr><td>거래유형·중개사소재지</td><td>거래 방식, 중개사 지역</td></tr>\n<tr><td>지분구분</td><td>지분 거래 여부</td></tr>\n</tbody>\n</table></figure>\n\n\n\n<p>거래한 사람의 인적사항은 공개되지 않아요. 아파트·오피스텔은 동·호수만 빼고 지번까지 나오지만, 토지·단독주택·상가처럼 물건이 바로 특정될 수 있는 부동산은 지번 일부만 나와요. 그래서 보통은 같은 읍면동, 같은 지목·용도지역, 비슷한 면적의 거래를 모아 비교하는 식으로 써요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">계약일 기준이라 생기는 시차</h2>\n\n\n\n<p>토지 매매 계약을 하면 거래당사자(중개를 거쳤다면 개업공인중개사)가 <strong>계약일부터 30일 이내</strong>에 시·군·구에 실거래가를 신고해야 해요. 공개는 신고 다음 날 이뤄지지만 날짜는 <strong>계약일 기준</strong>으로 들어가요. 예를 들어 7월에 계약하고 8월에 신고했다면 7월 거래로 표시돼요. 그래서 이번 달·지난달 거래 건수는 아직 신고가 덜 들어와 적게 보일 수 있고, 한 달쯤 지나 다시 보면 늘어나 있어요.</p>\n\n\n\n<p>계약이 해제·무효·취소되면 확정된 날부터 30일 이내에 해제 신고를 해야 하고, 이렇게 신고된 거래가 앞에서 말한 붉은색 표시 거래예요. 거래 신고나 해제 신고를 하지 않으면 각각 500만 원 이하의 과태료 대상이에요.</p>\n\n\n\n<figure class=\"wp-block-image size-large\"><img src=\"https://first-lab.kr/wp-content/uploads/2026/11/ai-81137731bf.jpg\" alt=\"노트북 화면에 띄운 필지 지도와 메모 노트\"/></figure>\n\n\n\n<h2 class=\"wp-block-heading\">공개되지 않는 거래</h2>\n\n\n\n<ul class=\"wp-block-list\">\n\n<li>매매가 아닌 판결, 교환, 증여, 신탁 등으로 소유권이 넘어간 경우는 실거래 신고가 아니라 검인 대상이라 공개되지 않아요.</li>\n\n\n<li>2006년 1월 이전 거래는 공개 대상이 아니에요.</li>\n\n</ul>\n\n\n\n<p>그래서 우리 땅 주변에 거래가 한 건도 안 보인다면, 실제로 매매가 없었거나 증여처럼 공개 대상이 아닌 방식의 이전만 있었을 수 있어요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">실거래가를 ㎡당 가격으로 바꿔 비교하기</h2>\n\n\n\n<p>토지는 면적이 제각각이라 총액만 보면 비싼지 싼지 알기 어려워요. <strong>거래금액 ÷ 면적</strong>으로 ㎡당 가격을 내서 비교하는 게 기본이에요. 비교 기준으로는 부동산공시가격 알리미(realtyprice.kr)에서 볼 수 있는 <strong>개별공시지가</strong>를 많이 써요. 개별공시지가는 국토교통부가 매년 공시하는 표준지공시지가를 기준으로 시장·군수·구청장이 결정·공시하는 개별 토지의 ㎡당 가격이에요. 재산세·취득세 같은 토지 관련 세금과 개발부담금 등 각종 부담금의 부과 기준으로 쓰여요.</p>\n\n\n\n<p>아래는 이해를 돕기 위한 가정 예시예요. 면적 600㎡ 토지가 1억 5,000만 원에 거래됐고, 그 필지의 개별공시지가가 ㎡당 12만 원이라고 해 볼게요.</p>\n\n\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\">\n<thead><tr><th>구분</th><th>계산</th><th>결과</th></tr></thead>\n<tbody>\n<tr><td>㎡당 거래가</td><td>1억 5,000만 원 ÷ 600㎡</td><td>25만 원</td></tr>\n<tr><td>공시지가 총액</td><td>12만 원 × 600㎡</td><td>7,200만 원</td></tr>\n<tr><td>실거래가 ÷ 공시지가</td><td>1억 5,000만 원 ÷ 7,200만 원</td><td>약 2.08배</td></tr>\n</tbody>\n</table></figure>\n\n\n\n<p>이렇게 주변 거래 몇 건을 같은 방식으로 계산해 보면, 관심 있는 땅의 호가가 주변 거래보다 높은지 낮은지 감이 와요. 다만 같은 동네라도 도로에 접했는지, 용도지역이 무엇인지에 따라 가격 차이가 크니 이 두 항목이 같은 거래끼리 비교하는 게 좋아요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">함께 확인하면 좋은 자료</h2>\n\n\n\n<ul class=\"wp-block-list\">\n\n<li><strong>토지이용계획</strong>: 용도지역과 지역·지구 지정 여부를 확인해요. 실거래가 공개시스템 지도 화면의 전산공부에서 바로 열 수 있어요.</li>\n\n\n<li><strong>개별공시지가</strong>: 부동산공시가격 알리미의 개별지 공시지가 열람에서 조회해요.</li>\n\n\n<li><strong>등기부등본</strong>: 소유자와 권리관계는 등기부등본으로 확인하는 게 안전해요. 발급 방법은 <a href=\"https://first-lab.kr/건물등기부등본발급/\">등기부등본 발급 방법과 수수료 정리</a>에 정리해 두었어요.</li>\n\n</ul>\n\n\n\n<h2 class=\"wp-block-heading\">자주 묻는 질문</h2>\n\n\n\n<figure class=\"wp-block-image size-large\"><img src=\"https://first-lab.kr/wp-content/uploads/2026/11/ai-1e245b3bc9.jpg\" alt=\"시골 포장도로 옆 측량 말뚝이 박힌 빈 땅\"/></figure>\n\n\n\n<h3 class=\"wp-block-heading\">실거래가와 일반 시세는 왜 다른가요?</h3>\n\n\n\n<p>실거래가는 신고 의무자가 직접 신고한 실제 거래금액이고, 일반 시세는 시장에서 거래될 수 있는 수준의 가격이에요. 그래서 둘 사이에 차이가 있을 수 있어요. 특히 토지는 거래가 드물어 몇 건만으로 시세를 판단하면 오차가 커요.</p>\n\n\n\n<h3 class=\"wp-block-heading\">휴대폰으로도 조회할 수 있나요?</h3>\n\n\n\n<p>네, 실거래가 공개시스템은 스마트폰에 설치해 쓰는 앱도 제공해요. 공식 사이트 첫 화면의 앱 바로가기에서 내려받을 수 있어요.</p>\n\n\n\n<h3 class=\"wp-block-heading\">실거래가 공개시스템 거래 건수와 통계 수치가 다른 이유는요?</h3>\n\n\n\n<p>실거래가 공개시스템은 계약일 기준으로 신고 다음 날 공개하고, 한국부동산원 부동산통계정보시스템(R-ONE)의 거래현황 통계는 신고일을 기준으로 매월 말 기준으로 취합해 공표해요. 집계 기준이 달라 숫자가 맞지 않을 수 있어요.</p>\n\n\n\n<h3 class=\"wp-block-heading\">조회 내용이 틀린 것 같으면 어디에 묻나요?</h3>\n\n\n\n<p>실거래가 공개시스템 콜센터 1533-2949(평일 09:00~18:00, 점심시간 12:00~13:00 제외)로 문의할 수 있어요. 공개된 정보는 법적 효력이 없는 참고 자료라는 점도 알아 두면 좋아요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">공식 안내 바로가기</h2>\n\n\n\n<ul class=\"wp-block-list\">\n\n<li><a href=\"https://rt.molit.go.kr/pt/info/info.do\" target=\"_blank\" rel=\"noopener\">국토교통부 실거래가 공개시스템 공개안내</a></li>\n\n\n<li><a href=\"https://rt.molit.go.kr/pt/gis/gis.do?srhThingSecd=G&amp;mobileAt=\" target=\"_blank\" rel=\"noopener\">국토교통부 실거래가 공개시스템 토지 조회(GIS)</a></li>\n\n\n<li><a href=\"https://www.data.go.kr/data/15126466/openapi.do\" target=\"_blank\" rel=\"noopener\">공공데이터포털 국토교통부 토지 매매 실거래가 자료</a></li>\n\n</ul>",
+ "review": [
+  {
+   "claim": "공개 대상은 2006년 1월 이후 신고된 토지 등 매매 거래",
+   "urls": [
+    "https://rt.molit.go.kr/pt/info/info.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신고 다음 날 공개, 계약일 기준 (7월 계약·8월 신고 → 7월 거래)",
+   "urls": [
+    "https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "토지는 지번 첫째 자리까지만 공개, 지목·용도지역·면적·도로조건·계약일·거래금액·해제여부·거래유형·중개사소재지·지분구분",
+   "urls": [
+    "https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "아파트·오피스텔은 동·호 제외 지번, 토지 등은 지번 일부만 공개, 인적사항 비공개",
+   "urls": [
+    "https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "판결·교환·증여·신탁은 검인 대상이라 공개되지 않음",
+   "urls": [
+    "https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계약일부터 30일 이내 시·군·구 신고, 중개 시 개업공인중개사가 신고",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=259641"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "해제·무효·취소 확정일부터 30일 이내 해제 신고",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=259641"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "거래 신고·해제 신고 미이행 시 각각 500만 원 이하의 과태료 (제28조②)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=259641"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "붉은색 바탕은 해제 신고된 거래",
+   "urls": [
+    "https://rt.molit.go.kr/pt/gis/gis.do?srhThingSecd=G&mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준년도 2006년~올해, 시도·시군구·읍면동 선택, 전산공부에서 토지이용계획 확인원·토지대장",
+   "urls": [
+    "https://rt.molit.go.kr/pt/gis/gis.do?srhThingSecd=G&mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "자료제공 시도별 계약일자 범위 최대 1년(전국은 더 짧게 제한될 수 있음), 엑셀·CSV 다운",
+   "urls": [
+    "https://rt.molit.go.kr/pt/xls/xls.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "대량·반복 이용은 공공데이터포털 국토교통부_토지 매매 실거래가 자료 오픈API, 무료, 법정동 코드 앞 5자리·계약년월 6자리",
+   "urls": [
+    "https://rt.molit.go.kr/pt/info/info.do",
+    "https://www.data.go.kr/data/15126466/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "실거래가 공개시스템은 계약일 기준 익일 공개, R-ONE은 신고일 기준 매월 말 기준 취합 공표",
+   "urls": [
+    "https://rt.molit.go.kr/pt/info/info.do",
+    "https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "실거래가는 신고의무자가 직접 신고한 실제 거래금액으로 일반 시세와 차이가 있을 수 있음",
+   "urls": [
+    "https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt="
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "콜센터 1533-2949, 평일 09:00~18:00, 점심시간 12:00~13:00",
+   "urls": [
+    "https://rt.molit.go.kr/pt/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공개 정보는 법적 효력 없는 참고 자료, 스마트폰 앱 제공",
+   "urls": [
+    "https://rt.molit.go.kr/pt/xls/xls.do?mobileAt=",
+    "https://rt.molit.go.kr/pt/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "개별공시지가는 국토교통부가 매년 공시하는 표준지공시지가를 기준으로 시장·군수·구청장이 결정·공시하는 개별 토지 ㎡당 가격, 재산세·취득세 등 세금과 개발부담금 등 부담금 부과 기준",
+   "urls": [
+    "https://www.ddm.go.kr/www/contents.do?key=62",
+    "https://www.paju.go.kr/www/www_02/housing/housing_property/housing_property_03.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "계산 예시: 1억 5,000만 원 ÷ 600㎡ = 25만 원, 12만 원 × 600㎡ = 7,200만 원, 약 2.08배 (가정 예시, 개별공시지가 원/㎡ 단위 기준, Python 재계산)",
+   "urls": [
+    "https://www.ddm.go.kr/www/contents.do?key=62",
+    "https://www.paju.go.kr/www/www_02/housing/housing_property/housing_property_03.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "부동산공시가격 알리미(realtyprice.kr) 개별지 공시지가 열람 메뉴",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "토지 거래가 드물어 오차가 큼, 도로조건·용도지역이 같은 거래끼리 비교 등 일반 설명",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "완화"
+  }
+ ],
+ "changes": "개별공시지가 정의를 지자체 공식 안내(동대문구·파주시) 원문대로 보강, 계산 예시 근거 보강, 자료제공 1년 범위를 시도 단위 조건으로 정정, 과태료 문장 명확화, 요약문의 '최대 1년 단위' 삭제"
+}
