@@ -232,6 +232,38 @@ class ScheduleTest(unittest.TestCase):
         self.assertEqual(BotSettings.from_option({}, {}).schedule_times, ["09:00"])
 
 
+class DirectRoutineTest(unittest.TestCase):
+    def test_due_slot(self):
+        from datetime import datetime
+        from bot.routine import due_slot
+        times = ["07:40", "13:40"]
+        self.assertIsNone(due_slot(times, [], datetime(2026, 11, 5, 7, 39)))
+        self.assertEqual(due_slot(times, [], datetime(2026, 11, 5, 7, 40)), "07:40")
+        self.assertIsNone(due_slot(times, ["07:40"], datetime(2026, 11, 5, 9, 0)))
+        self.assertIsNone(due_slot(times, [], datetime(2026, 11, 5, 11, 0)))  # 3시간 넘게 지난 시각은 건너뜀
+        self.assertEqual(due_slot(times, ["07:40"], datetime(2026, 11, 5, 13, 41)), "13:40")
+
+    def test_fire_without_token_is_logged_not_crash(self):
+        from bot import run
+        state = {"log": []}
+        run.fire_routine(state, BotSettings.from_option({}, {}), "직접 작성 07:40")
+        self.assertFalse(state["log"][0]["ok"])
+        self.assertIn("CLAUDE_ROUTINE_TOKEN", state["log"][0]["msg"])
+        self.assertNotIn("직접 작성 글:", state["log"][0]["msg"])  # 예비 봇 판단에 섞이지 않음
+
+    def test_skip_file_rejects_keywords(self):
+        from bot import publish_queue
+        conn = memory_db([("알뜰폰무제한요금제", 3370, "new", None), ("하이패스카드신청", 5000, "new", None)])
+        with mock.patch.object(publish_queue, "connect", return_value=conn):
+            msg = publish_queue.skip_keywords({"type": "skip", "keywords": [{"keyword": "알뜰폰무제한요금제", "why": "상품 비교"}]})
+        self.assertIn("1개", msg)
+        row = conn.execute("SELECT status, reason FROM keywords WHERE keyword='알뜰폰무제한요금제'").fetchone()
+        self.assertEqual(row["status"], "rejected")
+        self.assertIn("상품 비교", row["reason"])
+        picked = [c["keyword"] for c in ranked_candidates(conn, SelectionTest().settings())]
+        self.assertNotIn("알뜰폰무제한요금제", picked)
+
+
 class FallbackTest(unittest.TestCase):
     def test_direct_post_today(self):
         from bot.run import direct_post_today

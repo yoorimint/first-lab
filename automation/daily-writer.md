@@ -1,9 +1,11 @@
 # 매일 글쓰기 (예약 세션용 작업 지시서)
 
-매일 아침 예약 작업으로 시작되는 Claude Code 세션이 이 문서대로 새 글 1편을 써서 올리고, 갱신할 글이 있으면 1개 고친다.
-이 문서를 고치면 다음 날부터 바로 반영된다 (예약 작업은 "이 문서를 따르라"고만 한다).
+Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1편**을 써서 올리고, 갱신할 글이 있으면 (하루 1개까지) 고친다.
+실행은 사이트 서버가 시킨다: 설정의 "직접 작성 시각"마다 1번, "지금 글 1개 만들기" 버튼을 누를 때 1번 (`bot/routine.py`).
+그래서 실행 1번 = 새 글 1편이다 (하루에 여러 번 실행될 수 있음).
+이 문서를 고치면 다음 실행부터 바로 반영된다 (예약 작업은 "이 문서를 따르라"고만 한다).
 
-새 글이 실패하면 아무것도 올리지 말고 넘어간다. 11:00에 서버 봇(API)이 대신 1편을 쓴다 (`bot/run.py`의 예비 동작).
+새 글이 실패하면 아무것도 올리지 말고 넘어간다 (설정에서 예비 봇을 켜 두었으면 봇이 대신 쓴다).
 갱신은 예비가 없다 (실패하면 다음 날 서버가 다시 고름).
 
 ## 0. 준비
@@ -21,6 +23,9 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
   - 특정 회사·브랜드 상품 비교, 추천·순위·이벤트, 의료·건강 진단, 정치·종교
   - `recent_posts` 에 이미 같은 주제(앞뒤 수식어만 다른 것)가 있는 키워드
 - 처음으로 통과한 후보 1개를 고른다. 후보 키워드(`keyword`)는 띄어쓰기 없는 원문 그대로 쓴다.
+- 위 기준으로 **건너뛴 후보**는 다시 안 뜨게 기록한다 (`recent_posts` 와 겹쳐서 건너뛴 것은 제외. 서버가 이미 막음):
+  `wordpress/queue/skip-<날짜>-<시각>.json` = `{"type": "skip", "keywords": [{"keyword": "<원문>", "why": "<이유 한 줄>"}]}`
+  새 글과 같은 커밋에 넣는다. 건너뛴 게 없으면 만들지 않는다.
 
 ## 2. 쓰기 규칙 불러오기
 봇과 같은 작가·검수 규칙을 쓴다 (저장소의 코드가 기준):
@@ -71,6 +76,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 검사: `python3 -m unittest discover -s tests && node tests/test_calculators.mjs`
 - 커밋하고 main 에 올린다 (운영자 승인된 자동 작업): 
   `git add wordpress/queue && git commit -m "매일 글: <키워드>" && git push origin HEAD:main`
+- push 가 다른 실행과 겹쳐 거절되면(non-fast-forward) `git pull --rebase origin main` 후 한 번 더 push 한다.
 - 배포 결과 확인 (예약 세션엔 GitHub 도구가 없으니 공개 API 사용, 2~5분 걸림):
   `curl -s "https://api.github.com/repos/yoorimint/first-lab/actions/runs?head_sha=$(git rev-parse HEAD)" | python3 -c "import json,sys;[print(r['name'],r['status'],r['conclusion']) for r in json.load(sys.stdin)['workflow_runs']]"`
   conclusion 이 success 면 끝. failure 면 원인만 보고하고 끝낸다.

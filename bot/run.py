@@ -1,9 +1,10 @@
 """봇 실행 진입점. systemd 타이머가 1분마다 실행한다.
 
   - (키워드 수집은 별도 작업 firstlab-discover: 매일 + 배포 직후)
-  - 하루 1회: 상위 후보 사전 검토 (안전 검사 + 경쟁도)
-  - 관리자가 '지금 글 1개 만들기'를 눌렀으면 → 1개 생성
-  - 자동 발행이 켜져 있고, 오늘의 랜덤 발행 시각이 지난 슬롯이 있으면 → 1개 생성
+  - 하루 1회: 상위 후보 사전 검토 (API 봇: 안전 검사 + 경쟁도 / 월정액: 경쟁도만)
+  - 월정액: '직접 작성 시각'이 되면 Claude 예약 작업 실행 (bot/routine.py, API 요금 없음)
+  - 관리자가 '지금 글 1개 만들기'를 눌렀으면 → 월정액: Claude 예약 작업 실행 / API 봇: 1개 생성
+  - 자동 발행이 켜져 있고, 오늘의 랜덤 발행 시각이 지난 슬롯이 있으면 → 1개 생성 (월정액에선 예비)
   - 한 번 실행에 글은 최대 1개 (몰아서 발행 방지)
 
 사용: python3 -m bot.run            (평소: 할 일이 있을 때만 실행)
@@ -20,12 +21,12 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import competition, factcheck, related
+from . import competition, factcheck, related, routine
 from .discover import discover
 from .keyword_db import connect, set_competition, set_status, summary
 from .llm import LLMBusy, make_llm
 from .publisher import STATUS_LABEL, publish
-from .select_keyword import pick_keyword, ranked_candidates, review_top
+from .select_keyword import check_top_competition, pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings, wp_cli
 from .state import add_log, add_spend, load_state, pop_excluded, pop_manual_request, save_state, spent_today
 from .writer import align_with_body, write_article
@@ -200,6 +201,47 @@ def direct_post_today(state: dict, today: str) -> bool:
                for e in state.get("log", []))
 
 
+def daily_review(state: dict, settings: BotSettings, now: datetime) -> None:
+    """하루 1회 상위 후보 사전 검토 → 설정 페이지에 근거 표시.
+    API 봇: AI 안전 검사 + 경쟁도 / 월정액: 경쟁도만 (Gemini 무료. 안전 판단은 글쓰기 세션이 하고 제외 목록을 올림)"""
+    today, stamp = now.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d %H:%M")
+    if state.get("review_date") == today or stamp < state.get("review_retry_at", ""):
+        return
+    if settings.write_mode == "direct":
+        try:
+            with connect() as conn:
+                n = check_top_competition(conn, settings)
+            add_log(state, True, f"후보 검토: 경쟁도 {n}건 조회 (월정액: 안전 판단은 글쓰기 세션이 함)")
+        except Exception as e:  # noqa: BLE001
+            add_log(state, False, f"후보 검토 실패: {e}")
+        state["review_date"], state["dashboard_at"] = today, ""
+        return
+    if not settings.api_key:
+        return
+    try:
+        with connect() as conn:
+            llm = make_llm(settings.provider, settings.api_key, settings.model, light=True)
+            n = review_top(conn, settings, llm)
+        add_log(state, True, f"후보 검토: 상위 후보 안전 검사 + 경쟁도 {n}건 조회")
+        state["review_date"] = today
+    except LLMBusy as e:  # 혼잡 → 20분 뒤 다시 (오늘 안에)
+        state["review_retry_at"] = (now + timedelta(minutes=RETRY_REVIEW_MIN)).strftime("%Y-%m-%d %H:%M")
+        add_log(state, False, f"후보 검토 보류: {e} → {state['review_retry_at'][11:]}에 다시 시도")
+    except Exception as e:  # noqa: BLE001
+        add_log(state, False, f"후보 검토 실패: {e}")
+        state["review_date"] = today
+    state["dashboard_at"] = ""  # 현황 즉시 갱신
+
+
+def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "") -> None:
+    """월정액: Claude 예약 작업 실행 (글은 그 세션이 써서 저장소로 올리고, 배포 때 사이트에 반영)."""
+    try:
+        url = routine.fire(settings.routine_fire_url, settings.routine_token, text)
+        add_log(state, True, f"{label}: Claude 글쓰기 작업 시작 {url}")
+    except routine.RoutineError as e:
+        add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패 - {e}")
+
+
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
     """설정 페이지에 보여줄 창고 현황과 다음 후보 (안전 검사 전 포함)."""
     with connect() as conn:
@@ -236,28 +278,25 @@ def main() -> None:
             for kw in excluded:
                 set_status(conn, kw, "excluded", "관리자 제외")
 
-    # 하루 1회 상위 후보 사전 검토 (안전 검사 + 구글 상위 사이트 경쟁도) → 설정 페이지에 근거 표시
+    daily_review(state, settings, now)
     stamp = now.strftime("%Y-%m-%d %H:%M")
-    if state.get("review_date") != today and settings.api_key and stamp >= state.get("review_retry_at", ""):
-        try:
-            with connect() as conn:
-                llm = make_llm(settings.provider, settings.api_key, settings.model, light=True)
-                n = review_top(conn, settings, llm)
-            add_log(state, True, f"후보 검토: 상위 후보 안전 검사 + 경쟁도 {n}건 조회")
-            state["review_date"] = today
-        except LLMBusy as e:  # 혼잡 → 20분 뒤 다시 (오늘 안에)
-            state["review_retry_at"] = (now + timedelta(minutes=RETRY_REVIEW_MIN)).strftime("%Y-%m-%d %H:%M")
-            add_log(state, False, f"후보 검토 보류: {e} → {state['review_retry_at'][11:]}에 다시 시도")
-        except Exception as e:  # noqa: BLE001
-            add_log(state, False, f"후보 검토 실패: {e}")
-            state["review_date"] = today
-        state["dashboard_at"] = ""  # 현황 즉시 갱신
+
+    # 월정액: 직접 작성 시각이 되면 Claude 예약 작업 실행 (실패해도 같은 시각은 다시 안 함 → 예비 봇이 대신)
+    if settings.write_mode == "direct":
+        fired = state.get("direct_fired", {}).get(today, [])
+        due = routine.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
+        if due:
+            state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림
+            fire_routine(state, settings, f"직접 작성 {due}")
 
     # 글 생성 (수동 요청 또는 자동 발행 시각)
     reason, slot = None, None
     if pop_manual_request():
-        state["manual_attempts"], state["manual_next"] = 0, ""
-        reason = "수동"
+        if settings.write_mode == "direct":  # 월정액: API 대신 Claude 가 씀
+            fire_routine(state, settings, "수동 요청", routine.MANUAL_TEXT)
+        else:
+            state["manual_attempts"], state["manual_next"] = 0, ""
+            reason = "수동"
     elif args.now or (state.get("manual_next") and stamp >= state["manual_next"]):
         reason = "수동(재시도)" if not args.now else "수동"
     slot_candidate = due_slot(state, settings, now)

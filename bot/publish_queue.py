@@ -4,6 +4,7 @@
 제목·요약문 숫자 점검 → 링크 정리 → AI 이미지·대표 카드·카테고리·작성자 → 키워드 '사용됨' 기록.
 파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish|auto, 기본 draft).
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
+후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}]} → 글쓰기 세션이 부적합하다고 본 후보를 다시 안 뜨게 함
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
 from __future__ import annotations
@@ -62,6 +63,16 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     return f"[{kind}] '{article.title}' (키워드: {keyword}, 직접 작성, {image_note}{extra}) {link}"
 
 
+def skip_keywords(data: dict) -> str:
+    """글쓰기 세션이 건너뛴 후보를 '부적합'으로 기록 (월정액 방식의 후보 안전 검사 대신)."""
+    items = [i for i in data.get("keywords", []) if str(i.get("keyword", "")).strip()]
+    with connect() as conn:
+        for item in items:
+            set_status(conn, str(item["keyword"]).strip(), "rejected", f"글쓰기 세션 제외: {str(item.get('why', ''))[:80]}")
+        conn.commit()
+    return f"{len(items)}개 ({', '.join(str(i['keyword']) for i in items[:5])}{' 등' if len(items) > 5 else ''})"
+
+
 def main() -> None:
     files = pending()
     if not files:
@@ -79,6 +90,9 @@ def main() -> None:
             if data.get("type") == "refresh":
                 label = "글 갱신(직접)"
                 msg = refresh.apply_direct(data, state)
+            elif data.get("type") == "skip":
+                label = "후보 제외(직접)"
+                msg = skip_keywords(data)
             else:
                 msg = publish_file(path, settings, allowed_links)
             _marker(path).touch()

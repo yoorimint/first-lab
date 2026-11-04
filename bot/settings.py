@@ -41,6 +41,9 @@ def _times(text: str) -> list[str]:
 @dataclass
 class BotSettings:
     write_mode: str = "direct"  # direct = 월정액 직접 작성(봇은 예비) | bot = API 봇이 작성
+    direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 월정액: Claude 예약 작업 실행 시각
+    routine_fire_url: str = ""  # 월정액: Claude 예약 작업 실행 주소·토큰 (secrets.env, bot/routine.py)
+    routine_token: str = ""
     enabled: bool = False
     post_status: str = "draft"   # draft | publish | schedule(예약 발행)
     schedule_times: list[str] = field(default_factory=lambda: ["09:00"])  # 예약 발행 공개 시각
@@ -72,6 +75,9 @@ class BotSettings:
         wp_field, env_name = _KEY_SOURCES.get(provider, ("", ""))
         return cls(
             write_mode="bot" if raw.get("write_mode") == "bot" else "direct",
+            direct_times=_times(raw.get("direct_times", "07:40")),
+            routine_fire_url=secrets.get("CLAUDE_ROUTINE_FIRE_URL", ""),
+            routine_token=secrets.get("CLAUDE_ROUTINE_TOKEN", ""),
             enabled=bool(int(raw.get("enabled") or 0)),
             post_status=raw.get("post_status") or "draft",
             schedule_times=_times(raw.get("schedule_times", "09:00")) or ["09:00"],
@@ -120,7 +126,7 @@ if __name__ == "__main__":
     # 점검용: 키 값은 숨기고 설정만 출력
     s = load_settings()
     shown = {k: v for k, v in vars(s).items() if not k.endswith(("key", "token"))}
-    for k in ("api_key", "gemini_key", "cf_api_token"):
+    for k in ("api_key", "gemini_key", "cf_api_token", "routine_token"):
         v = getattr(s, k)
         shown[k] = f"있음 (끝자리 {v[-4:]})" if v else "없음"
     for k, v in shown.items():

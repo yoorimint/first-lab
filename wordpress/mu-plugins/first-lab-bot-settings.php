@@ -21,8 +21,9 @@ function firstlab_bot_fields(): array {
 			'type'    => 'select',
 			'default' => 'direct',
 			'options' => array( 'direct' => '월정액 (Claude 구독으로 매일 아침 직접 작성)', 'bot' => 'API 봇 (발행 시각마다 봇이 작성, API 비용)' ),
-			'help'    => '월정액: 매일 아침 Claude 예약 작업(07:37, 시각은 claude.ai 예약 작업에서 변경)이 1편을 쓰고, 봇은 아래 "봇 작성 시각"에 예비로만 씀 (그날 직접 쓴 글이 있으면 건너뜀. 예비도 끄려면 자동 발행 사용 해제). API 봇: 예약 작업은 쉬고 봇이 작성 시각마다 씀',
+			'help'    => '월정액: 아래 "직접 작성 시각"마다 서버가 Claude 예약 작업을 실행 → Claude 가 1편씩 써서 올림 (API 요금 없음, 구독 사용량). 후보 안전 검사도 Claude 가 함. "지금 글 1개 만들기"도 Claude 가 씀. 봇은 "봇 작성 시각"에 예비로만 씀 (예비도 끄려면 자동 발행 사용 해제). API 봇: 전부 API 로 씀',
 		),
+		'direct_times'   => array( 'label' => '직접 작성 시각 (월정액)', 'type' => 'textarea', 'default' => '07:40', 'help' => '한 줄에 하나 (줄 수 = 하루 작성 편수, 예: 07:40 과 13:40 두 줄이면 하루 2편). 서버에 Claude 예약 작업 토큰이 있어야 동작 (bot/routine.py). 공개 시각은 발행 방식을 따름' ),
 		'enabled'        => array( 'label' => '자동 발행 사용', 'type' => 'checkbox', 'default' => 0 ),
 		'post_status'    => array(
 			'label'   => '발행 방식',
@@ -287,11 +288,13 @@ function firstlab_bot_render_status(): void {
 		<span class="description">
 			<?php
 			if ( $pending ) {
-				echo '요청됨 — 1~3분 안에 생성됩니다. 새로고침해서 아래 기록을 확인하세요.';
+				echo '요청됨 — 1분 안에 처리를 시작합니다. 새로고침해서 아래 기록을 확인하세요.';
 			} elseif ( ! empty( $state['manual_next'] ) ) {
 				echo esc_html( 'AI 서버 혼잡으로 ' . substr( $state['manual_next'], 11 ) . '에 자동 재시도 예정입니다.' );
+			} elseif ( 'bot' !== ( firstlab_bot_get()['write_mode'] ?? 'direct' ) ) {
+				echo '월정액 방식: Claude 예약 작업을 바로 실행합니다 (글은 20~40분 뒤 배포와 함께 올라옴). 발행 방식(초안/바로/예약)을 따릅니다.';
 			} else {
-				echo '설정의 발행 방식(초안/바로 발행)을 따릅니다.';
+				echo 'API 봇이 1~3분 안에 씁니다. 발행 방식(초안/바로/예약)을 따릅니다.';
 			}
 			?>
 		</span>

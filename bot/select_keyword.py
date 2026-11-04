@@ -159,6 +159,13 @@ def review_top(conn, settings: BotSettings, llm, count: int = 10) -> int:
     return competition_checks_today(conn) - before
 
 
+def check_top_competition(conn, settings: BotSettings, count: int = 10) -> int:
+    """월정액 방식의 하루 1회 검토: 상위 후보의 경쟁도만 조회 (Gemini 무료, Claude API 안 씀). 조회 수 반환."""
+    before = competition_checks_today(conn)
+    _check_competition(conn, settings, ranked_candidates(conn, settings, limit=count), limit=count)
+    return competition_checks_today(conn) - before
+
+
 def pick_keyword(conn, settings: BotSettings, llm) -> str | None:
     """안전 검사 통과 → 경쟁도 조회 → 너무 어려운 것 제외 → 최종 점수 상위 중 무작위."""
     candidates = ranked_candidates(conn, settings, limit=SAFETY_BATCH * 2)
