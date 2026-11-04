@@ -1,0 +1,182 @@
+[
+  {
+    "why": "부모→성년 자녀 5억: 과표 4억5천 ×20% −1천만 = 8,000만, 3% 240만 → 7,760만 (본문 표)",
+    "input": {
+      "price": 500000000,
+      "relation": "parent_adult",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 50000000,
+      "extra": 0,
+      "base": 450000000,
+      "rate": 20,
+      "tax": 80000000,
+      "surcharge": 0,
+      "credit": 2400000,
+      "pay": 77600000
+    }
+  },
+  {
+    "why": "부모→성년 자녀 5억 + 혼인공제 1억: 과표 3억5천 → 6,000만, 3% 180만 → 5,820만 (본문 표)",
+    "input": {
+      "price": 500000000,
+      "relation": "parent_adult",
+      "used": 0,
+      "marriage": 100000000,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 50000000,
+      "extra": 100000000,
+      "base": 350000000,
+      "rate": 20,
+      "tax": 60000000,
+      "surcharge": 0,
+      "credit": 1800000,
+      "pay": 58200000
+    }
+  },
+  {
+    "why": "부모→성년 자녀 10억: 과표 9억5천 ×30% −6천만 = 2억2,500만, 3% 675만 → 2억1,825만 (본문 표)",
+    "input": {
+      "price": 1000000000,
+      "relation": "parent_adult",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 50000000,
+      "extra": 0,
+      "base": 950000000,
+      "rate": 30,
+      "tax": 225000000,
+      "surcharge": 0,
+      "credit": 6750000,
+      "pay": 218250000
+    }
+  },
+  {
+    "why": "부모→미성년 3억: 공제 2천만, 과표 2억8천 → 4,600만, 3% 138만 → 4,462만 (본문 표)",
+    "input": {
+      "price": 300000000,
+      "relation": "parent_minor",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 20000000,
+      "extra": 0,
+      "base": 280000000,
+      "rate": 20,
+      "tax": 46000000,
+      "surcharge": 0,
+      "credit": 1380000,
+      "pay": 44620000
+    }
+  },
+  {
+    "why": "조부모→성년 손자녀 3억: 과표 2억5천 → 4,000만, 할증 30% 1,200만, 3% 156만 → 5,044만 (본문 표)",
+    "input": {
+      "price": 300000000,
+      "relation": "grandparent_adult",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 50000000,
+      "extra": 0,
+      "base": 250000000,
+      "rate": 20,
+      "tax": 40000000,
+      "surcharge": 12000000,
+      "credit": 1560000,
+      "pay": 50440000
+    }
+  },
+  {
+    "why": "배우자 5억(극단값): 공제 6억 한도 안 → 과표 0, 세금 0",
+    "input": {
+      "price": 500000000,
+      "relation": "spouse",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 500000000,
+      "extra": 0,
+      "base": 0,
+      "rate": 10,
+      "tax": 0,
+      "surcharge": 0,
+      "credit": 0,
+      "pay": 0
+    }
+  },
+  {
+    "why": "부모→성년 자녀 1억, 10년 안에 공제 5천만 다 씀, 기한 후: 과표 1억 ×10% = 1,000만, 공제 없음",
+    "input": {
+      "price": 100000000,
+      "relation": "parent_adult",
+      "used": 50000000,
+      "marriage": 0,
+      "on_time": "no"
+    },
+    "expect": {
+      "basic": 0,
+      "extra": 0,
+      "base": 100000000,
+      "rate": 10,
+      "tax": 10000000,
+      "surcharge": 0,
+      "credit": 0,
+      "pay": 10000000
+    }
+  },
+  {
+    "why": "조부모→미성년 25억(20억 초과): 공제 2천만, 과표 24억8천 ×40% −1억6천 = 8억3,200만, 할증 40% 3억3,280만, 3% 3,494만4천",
+    "input": {
+      "price": 2500000000,
+      "relation": "grandparent_minor",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 20000000,
+      "extra": 0,
+      "base": 2480000000,
+      "rate": 40,
+      "tax": 832000000,
+      "surcharge": 332800000,
+      "credit": 34944000,
+      "pay": 1129856000
+    }
+  },
+  {
+    "why": "친족 아닌 사람 3억: 공제 0, 과표 3억 → 5,000만, 3% 150만 → 4,850만",
+    "input": {
+      "price": 300000000,
+      "relation": "other",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "basic": 0,
+      "extra": 0,
+      "base": 300000000,
+      "rate": 20,
+      "tax": 50000000,
+      "surcharge": 0,
+      "credit": 1500000,
+      "pay": 48500000
+    }
+  }
+]

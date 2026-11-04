@@ -1,0 +1,28 @@
+{
+  "basis_date": "2026-11-04",
+  "sources": [
+    {"name": "국세청 증여세 세액계산 흐름도 (세율·누진공제, 증여재산공제, 세대생략 할증)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2340&cntntsId=7728"},
+    {"name": "국세청 증여세 신고시 유의사항 (신고기한 3개월, 신고세액공제 3%)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2342&cntntsId=7730"},
+    {"name": "정책브리핑 혼인·출산 증여재산공제 1억 원 (기획재정부)", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148924238"}
+  ],
+  "brackets": [
+    {"upto": 100000000, "rate_pct": 10, "deduction": 0},
+    {"upto": 500000000, "rate_pct": 20, "deduction": 10000000},
+    {"upto": 1000000000, "rate_pct": 30, "deduction": 60000000},
+    {"upto": 3000000000, "rate_pct": 40, "deduction": 160000000},
+    {"upto": null, "rate_pct": 50, "deduction": 460000000}
+  ],
+  "deductions": {
+    "spouse": 600000000,
+    "parent_adult": 50000000,
+    "parent_minor": 20000000,
+    "grandparent_adult": 50000000,
+    "grandparent_minor": 20000000,
+    "child": 50000000,
+    "relative": 10000000,
+    "other": 0
+  },
+  "marriage_birth_max": 100000000,
+  "skip_generation": {"rate_pct": 30, "minor_over_pct": 40, "minor_over_amount": 2000000000},
+  "filing_credit_pct": 3
+}
