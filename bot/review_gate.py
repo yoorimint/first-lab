@@ -3,7 +3,8 @@
 글은 초안 단계에서 완성돼 있어야 한다 (공개는 시간이 되면 내보내기만 함).
 검수 기록(queue JSON 의 "review")은 주장마다:
   {"claim": "글의 주장 요지", "urls": ["확인한 주소", ...], "verdict": "맞음|틀림|확인불가", "action": "유지|수정|완화|삭제"}
-통과 조건: 주장 5개 이상, 본문에 단정형으로 남긴 주장(유지·수정)은 모두 '맞음' + 공식 기관 주소 1개 이상,
+통과 조건: 주장 5개 이상, 본문에 단정형으로 남긴 주장은 '맞음+유지' 또는 '틀림+수정'(공식 출처대로 고침)이어야 하고
+공식 기관 주소 1개 이상,
 제목·요약문의 숫자는 모두 '맞음'인 주장 안에 있어야 함.
 완화·삭제한 주장은 본문에 단정형으로 없으므로 통과. 기록이 없으면 검수 안 한 글로 본다.
 기록은 세션이 쓰는 것이라 완벽하지 않다 → 목적은 '검수를 깜빡하고 넘어간 글'이 공개되지 않게 하는 것.
@@ -26,6 +27,12 @@ def _numbers(text: str) -> set[str]:
     return {n for n in nums if n and not re.fullmatch(r"(19|20)\d\d", n)}
 
 
+def _ok(item: dict) -> bool:
+    """본문에 남겨도 되는 주장: 맞아서 유지 / 틀려서 공식 출처대로 고침 (확인 못 한 것은 완화·삭제해야 함)."""
+    pair = (str(item.get("verdict", "")).strip(), str(item.get("action", "")).strip())
+    return pair in (("맞음", "유지"), ("맞음", "수정"), ("틀림", "수정"))
+
+
 def problems(review: list[dict] | None, title: str = "", excerpt: str = "") -> list[str]:
     """통과 못 한 이유 목록 (빈 목록이면 통과).
     제목·요약문의 숫자는 독자가 가장 먼저 믿는 값이라, 검수된(맞음) 주장 안에 있어야 한다."""
@@ -34,8 +41,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "") -> l
     out = []
     if len(review) < MIN_CLAIMS:
         out.append(f"검수한 주장이 {len(review)}개뿐 (최소 {MIN_CLAIMS}개)")
-    verified = " ".join(str(i.get("claim", "")) for i in review
-                        if str(i.get("action", "")).strip() in KEPT and str(i.get("verdict", "")).strip() == "맞음")
+    verified = " ".join(str(i.get("claim", "")) for i in review if _ok(i))
     missing = (_numbers(title) | _numbers(excerpt)) - _numbers(verified)
     if missing:
         out.append(f"제목·요약문 숫자 {', '.join(sorted(missing))} 가 검수된 주장에 없음")
@@ -44,8 +50,8 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "") -> l
             continue  # 완화·삭제: 본문에 단정형으로 남지 않음
         claim = str(item.get("claim", ""))[:30]
         verdict = str(item.get("verdict", "")).strip()
-        if verdict != "맞음":
-            out.append(f"'{claim}' 판정 {verdict or '없음'}인데 그대로 씀")
+        if not _ok(item):
+            out.append(f"'{claim}' 판정 {verdict or '없음'}인데 {item.get('action')}")
         elif not any(is_official(str(u)) for u in item.get("urls", [])):
             out.append(f"'{claim}' 공식 기관 출처 없음")
     return out

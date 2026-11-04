@@ -317,6 +317,8 @@ class ReviewGateTest(unittest.TestCase):
               {"claim": "철회 불가", "urls": [], "verdict": "확인불가", "action": "완화"}]
         self.assertEqual(problems(None), ["검수 기록 없음"])
         ok5 = ok + [{"claim": f"항목 {i}", "urls": ["https://a.go.kr"], "verdict": "맞음", "action": "유지"} for i in range(3)]
+        fixed = ok5 + [{"claim": "고친 주장", "urls": ["https://www.gov.kr/x"], "verdict": "틀림", "action": "수정"}]
+        self.assertEqual(problems(fixed), [])  # 틀려서 공식 출처(정부24)대로 고친 것은 통과
         self.assertEqual(problems(ok5, "검사 비용 23,000원", "수수료 23,000원이에요"), [])
         self.assertTrue(any("25000" in p for p in problems(ok5, "검사 비용 25,000원")))  # 제목 숫자가 검수 안 됨
         self.assertTrue(any("최소" in p for p in problems(ok)))  # 주장 2개뿐

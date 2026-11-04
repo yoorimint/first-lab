@@ -12,7 +12,7 @@ import urllib.request
 
 OFFICIAL_SUFFIXES = (".go.kr", ".or.kr", ".re.kr", ".ac.kr", ".mil.kr")  # 정부·공공기관·공단·연구기관
 # 주소 끝이 위와 다른 공식 기관 (정부 정책브리핑, 공항공사, 도로공사 등). 필요하면 여기에 추가
-OFFICIAL_HOSTS = ("korea.kr", "airport.kr", "airport.co.kr", "ex.co.kr", "hipass.co.kr", "kepco.co.kr")
+OFFICIAL_HOSTS = ("korea.kr", "gov.kr", "airport.kr", "airport.co.kr", "ex.co.kr", "hipass.co.kr", "kepco.co.kr")
 MAX_LINKS = 3
 TIMEOUT = 10
 HEADING = "공식 안내 바로가기"
