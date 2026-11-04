@@ -1,0 +1,309 @@
+[
+  {
+    "why": "배우자+자녀2, 10억, 배우자 5억: 일괄 5억+배우자 5억 → 과표 0 (본문 표)",
+    "input": {
+      "estate": 1000000000,
+      "heirs": "spouse_children",
+      "children": 2,
+      "spouse_amount": 500000000,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 995000000,
+      "personal": 500000000,
+      "spouse": 500000000,
+      "financial": 0,
+      "total": 995000000,
+      "base": 0,
+      "rate": 10,
+      "tax": 0,
+      "credit": 0,
+      "pay": 0
+    }
+  },
+  {
+    "why": "자녀2, 10억: 장례 최소 500만, 과세가액 9억9,500만 − 일괄 5억 = 4억9,500만 ×20% −1천만 = 8,900만, 3% 267만 → 8,633만 (본문 표)",
+    "input": {
+      "estate": 1000000000,
+      "heirs": "children",
+      "children": 2,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 995000000,
+      "personal": 500000000,
+      "spouse": 0,
+      "financial": 0,
+      "total": 500000000,
+      "base": 495000000,
+      "rate": 20,
+      "tax": 89000000,
+      "credit": 2670000,
+      "pay": 86330000
+    }
+  },
+  {
+    "why": "자녀1, 5억(극단값): 과세가액 4억9,500만 < 일괄 5억 → 0 (본문 표)",
+    "input": {
+      "estate": 500000000,
+      "heirs": "children",
+      "children": 1,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 495000000,
+      "personal": 500000000,
+      "spouse": 0,
+      "financial": 0,
+      "total": 495000000,
+      "base": 0,
+      "rate": 10,
+      "tax": 0,
+      "credit": 0,
+      "pay": 0
+    }
+  },
+  {
+    "why": "자녀2, 15억 중 금융 3억: 금융공제 20% 6천만, 과표 9억3,500만 ×30% −6천만 = 2억2,050만 → 2억1,388만5천 (본문 표)",
+    "input": {
+      "estate": 1500000000,
+      "heirs": "children",
+      "children": 2,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 300000000,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 1495000000,
+      "personal": 500000000,
+      "spouse": 0,
+      "financial": 60000000,
+      "total": 560000000,
+      "base": 935000000,
+      "rate": 30,
+      "tax": 220500000,
+      "credit": 6615000,
+      "pay": 213885000
+    }
+  },
+  {
+    "why": "배우자+자녀2, 20억, 배우자 10억: 법정상속분 3/7 한도 8억5,500만, 과표 6억4,000만 → 1억3,200만 → 1억2,804만 (본문 표)",
+    "input": {
+      "estate": 2000000000,
+      "heirs": "spouse_children",
+      "children": 2,
+      "spouse_amount": 1000000000,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 1995000000,
+      "personal": 500000000,
+      "spouse": 855000000,
+      "financial": 0,
+      "total": 1355000000,
+      "base": 640000000,
+      "rate": 30,
+      "tax": 132000000,
+      "credit": 3960000,
+      "pay": 128040000
+    }
+  },
+  {
+    "why": "자녀2, 10억, 빚 1억·장례 1,200만(→1천만)·봉안 300만: 과표 3억8,700만 → 6,740만 → 6,537만8천",
+    "input": {
+      "estate": 1000000000,
+      "heirs": "children",
+      "children": 2,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 100000000,
+      "funeral": 12000000,
+      "bongan": 3000000,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 13000000,
+      "taxable": 887000000,
+      "personal": 500000000,
+      "spouse": 0,
+      "financial": 0,
+      "total": 500000000,
+      "base": 387000000,
+      "rate": 20,
+      "tax": 67400000,
+      "credit": 2022000,
+      "pay": 65378000
+    }
+  },
+  {
+    "why": "배우자 혼자 3억: 일괄공제 없음(기초 2억) + 배우자 최소 5억 → 0",
+    "input": {
+      "estate": 300000000,
+      "heirs": "spouse_only",
+      "children": 0,
+      "spouse_amount": 300000000,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 295000000,
+      "personal": 200000000,
+      "spouse": 500000000,
+      "financial": 0,
+      "total": 295000000,
+      "base": 0,
+      "rate": 10,
+      "tax": 0,
+      "credit": 0,
+      "pay": 0
+    }
+  },
+  {
+    "why": "자녀1, 8억 + 사전증여 2억(공제 5천만, 증여세 1,000만), 기한 후: 과표 4억9,500만 → 8,900만 − 1,000만 = 7,900만 (증여세액공제 한도 8,900만×1억5천/4억9,500만=2,696만 > 1,000만)",
+    "input": {
+      "estate": 800000000,
+      "heirs": "children",
+      "children": 1,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 200000000,
+      "gift_deducted": 50000000,
+      "gift_tax_paid": 10000000,
+      "on_time": "no"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 995000000,
+      "personal": 500000000,
+      "spouse": 0,
+      "financial": 0,
+      "total": 500000000,
+      "base": 495000000,
+      "rate": 20,
+      "tax": 89000000,
+      "credit": 0,
+      "pay": 79000000,
+      "gift_credit": 10000000
+    }
+  },
+  {
+    "why": "배우자+자녀1, 6억 + 사전증여 4억(공제 5천만, 증여세 산출 6,000만): 공제 한도 6억4,500만, 과표 3억5,000만 → 6,000만 − 증여세액공제 6,000만(한도 6,000만) → 0 (본문)",
+    "input": {
+      "estate": 600000000,
+      "heirs": "spouse_children",
+      "children": 1,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 400000000,
+      "gift_deducted": 50000000,
+      "gift_tax_paid": 60000000,
+      "on_time": "yes"
+    },
+    "expect": {
+      "funeral": 5000000,
+      "taxable": 995000000,
+      "personal": 500000000,
+      "spouse": 500000000,
+      "financial": 0,
+      "total": 645000000,
+      "base": 350000000,
+      "rate": 20,
+      "tax": 60000000,
+      "credit": 0,
+      "pay": 0,
+      "gift_credit": 60000000
+    }
+  },
+  {
+    "why": "자녀1, 3억 + 사전증여 1억(공제 5천만, 증여세 산출 500만): 과세가액 3억9,500만 ≤ 5억 → 증여세액공제 없음, 일괄공제로 과표 0",
+    "input": {
+      "estate": 300000000,
+      "heirs": "children",
+      "children": 1,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 100000000,
+      "gift_deducted": 50000000,
+      "gift_tax_paid": 5000000,
+      "on_time": "yes"
+    },
+    "expect": {
+      "taxable": 395000000,
+      "total": 395000000,
+      "base": 0,
+      "tax": 0,
+      "gift_credit": 0,
+      "pay": 0
+    }
+  }
+]
