@@ -1,0 +1,2 @@
+# 외부 검수를 마친 글 (wordpress/queue 파일 이름, 감시 세션이 추가)
+yureop-yeohaeng-junbimul-list.json
