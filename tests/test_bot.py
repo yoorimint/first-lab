@@ -908,7 +908,7 @@ class AuditSampleTest(unittest.TestCase):
         self.assertEqual(self.a.sentences(body), ["3만 원 이하는 영수증만 내면 돼요."])
 
     def test_one_per_post_and_repeatable(self):
-        posts = {i: {"title": str(i), "content_html": f"<p>수수료는 {i}만 원이에요. 기한은 {i}일 안이에요.</p>"} for i in range(1, 6)}
+        posts = {i: {"title": str(i), "content_html": f"<p>신청 수수료는 한 번에 {i}만 원이에요. 신청 기한은 사유가 생긴 날부터 {i}일 안이에요.</p>"} for i in range(1, 6)}
         first = self.a.sample(posts, 3, "seed")
         self.assertEqual(len({pid for pid, _, _ in first}), 3)
         self.assertEqual(first, self.a.sample(posts, 3, "seed"))
