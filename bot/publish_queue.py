@@ -6,6 +6,7 @@
   "sources"(선택, [{"name", "url"}] → 글 끝 '공식 안내 바로가기', sources.py),
   "review"(독립 검수 기록 → review_gate.py. 통과 못 하면 공개하지 않고 초안 보류).
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
+보류 초안 수정 파일: {"type": "fix_hold", ...} → hold.apply_fix (다시 관문 검사 후 대기열)
 후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}]} → 글쓰기 세션이 부적합하다고 본 후보를 다시 안 뜨게 함
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
@@ -15,7 +16,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import refresh, related, review_gate, sources
+from . import hold, refresh, related, review_gate, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, publish
 from .settings import load_settings, wp_cli
@@ -104,6 +105,9 @@ def main() -> None:
             if data.get("type") == "refresh":
                 label = "글 갱신(직접)"
                 msg = refresh.apply_direct(data, state)
+            elif data.get("type") == "fix_hold":
+                label = "보류 초안 수정"
+                msg = hold.apply_fix(data)
             elif data.get("type") == "skip":
                 label = "후보 제외(직접)"
                 msg = skip_keywords(data)

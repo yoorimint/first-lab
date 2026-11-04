@@ -116,6 +116,15 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   conclusion 이 success 면 끝. failure 면 원인만 보고하고 끝낸다.
 - push 가 권한 문제로 실패하면 다른 방법을 찾지 말고 "push 실패"로 보고하고 끝낸다.
 
+## 5-1. 검수 보류 초안 고치기 (있을 때만, 실행 1번에 1개)
+1단계 응답의 `held_drafts` 가 비어 있지 않으면 첫 번째 글을 고친다. `reason` 이 서버 관문에서 막힌 이유다.
+- 이유가 된 주장을 3단계처럼 공식 출처로 다시 조사해 보강하거나, 안 되면 빼거나 완화한다. 나머지 본문·이미지(figure)는 그대로.
+- 4-1단계 독립 검수를 고친 본문 전체에 다시 하고, 검수 기록을 새로 만든다.
+- `wordpress/queue/fixhold-<post_id>-<날짜시각>.json` 으로 저장:
+  `{"type": "fix_hold", "post_id": <id>, "base_modified": "<응답 값 그대로>", "content_html": "<고친 본문 전체>", "review": [...], "changes": "<한 줄>"}`
+  제목·요약문을 바꿨으면 `"title"`, `"excerpt"` 도 넣는다. 서버가 다시 관문 검사 → 통과하면 공개 대기열.
+- 5단계와 같이 검사 → 커밋(`보류 수정: <글 제목>`) → main 에 올림.
+
 ## 6. 글 갱신 (있는 날만)
 1단계 응답의 `refresh_target` 이 `null` 이면 건너뛴다. 있으면 그 글 1개를 고친다 (새 글이 실패했어도 따로 진행).
 - `mode` 가 `"enhance"`(보강): `bot.refresh.ENHANCE_SYSTEM` 규칙대로. `siblings` 는 이 글에서 함께 답할 검색어다.

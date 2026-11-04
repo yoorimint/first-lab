@@ -327,6 +327,37 @@ class ReviewGateTest(unittest.TestCase):
         self.assertEqual(len(problems(bad)), 3)  # 비공식 출처, 확인불가인데 유지, 주장 수 부족
 
 
+class HoldFixTest(unittest.TestCase):
+    BODY = "<p>" + "수수료는 23,000원이에요. " * 20 + "</p>"
+
+    def run_fix(self, review):
+        from bot import hold, schedule
+        calls = []
+
+        def wp(*args):
+            calls.append(args)
+            field = next((a for a in args if a.startswith("--field=")), "")
+            return {"--field=post_status": "draft", "--field=post_modified": "2026-11-04 10:00:00",
+                    "--field=post_content": self.BODY, "--field=post_title": "검사 비용 23,000원",
+                    "--field=post_excerpt": "수수료 23,000원"}.get(field, "")
+        with mock.patch.object(hold, "wp_cli", side_effect=wp), mock.patch.object(schedule, "wp_cli", side_effect=wp):
+            msg = hold.apply_fix({"post_id": 144, "base_modified": "2026-11-04 10:00:00",
+                                  "content_html": self.BODY, "review": review})
+        return msg, calls
+
+    def test_pass_goes_to_queue(self):
+        review = [{"claim": f"수수료 23,000원 {i}", "urls": ["https://main.kotsa.or.kr/a"], "verdict": "맞음", "action": "유지"}
+                  for i in range(5)]
+        msg, calls = self.run_fix(review)
+        self.assertIn("공개 대기열", msg)
+        self.assertIn(("post", "meta", "update", "144", "_firstlab_queue", "ready"), calls)
+
+    def test_fail_stays_held(self):
+        msg, calls = self.run_fix([{"claim": "x", "urls": [], "verdict": "확인불가", "action": "유지"}])
+        self.assertIn("계속 보류", msg)
+        self.assertFalse(any(c[:3] == ("post", "meta", "update") and "_firstlab_queue" in c for c in calls))
+
+
 class ContinuousTest(unittest.TestCase):
     def run_step(self, state, minute, on=True, fire_ok=True):
         from datetime import datetime

@@ -37,6 +37,7 @@ add_action(
 					return array(
 						'write_mode'    => (string) ( $settings['write_mode'] ?? 'direct' ),
 						'refresh_target' => firstlab_api_refresh_target( $state ),
+						'held_drafts'    => firstlab_api_held_drafts(),
 						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 20 ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
@@ -64,4 +65,34 @@ function firstlab_api_refresh_target( array $state ): ?array {
 		'base_modified' => $post->post_modified,
 		'content_html'  => trim( preg_replace( '/<!--.*?-->/s', '', $post->post_content ) ),
 	);
+}
+
+/**
+ * 검수 관문에서 막힌 초안 (오래된 것부터 3개) — 글쓰기 세션이 고쳐서 다시 올린다 (bot/hold.py).
+ */
+function firstlab_api_held_drafts(): array {
+	$out   = array();
+	$posts = get_posts(
+		array(
+			'post_status' => 'draft',
+			'meta_key'    => '_firstlab_hold',
+			'orderby'     => 'date',
+			'order'       => 'ASC',
+			'numberposts' => 10,
+		)
+	);
+	foreach ( $posts as $post ) {
+		if ( 'ready' === get_post_meta( $post->ID, '_firstlab_queue', true ) || count( $out ) >= 3 ) {
+			continue;
+		}
+		$out[] = array(
+			'post_id'       => $post->ID,
+			'title'         => $post->post_title,
+			'excerpt'       => $post->post_excerpt,
+			'reason'        => (string) get_post_meta( $post->ID, '_firstlab_hold', true ),
+			'base_modified' => $post->post_modified,
+			'content_html'  => trim( preg_replace( '/<!--.*?-->/s', '', $post->post_content ) ),
+		);
+	}
+	return $out;
 }
