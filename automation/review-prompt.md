@@ -17,4 +17,4 @@ For each 틀림/확인불가:
 - 판정 + 근거 (URL + 원문 인용, or why it couldn't be confirmed)
 - 수정안: corrected wording (틀림) or softened wording / "삭제" (확인불가). Keep the ~해요 tone. Write the FULL replacement inner HTML of the whole containing element (keep <strong> etc.).
 - 요소: tag name (p/li/tr) and the element's full original HTML (verbatim, copied exactly from content_html).
-End each article with counts 맞음/틀림/확인불가. Be strictly honest: unopened source → 확인불가, never guess. Do not report pure style issues.
+End each article with counts 맞음/틀림/확인불가. Be strictly honest: unopened source → 확인불가, never guess. For 확인불가, never propose wording that asserts something does NOT exist ("없어요", "찾지 못했어요") — propose neutral wording that tells the reader where to check. Do not report pure style issues.
