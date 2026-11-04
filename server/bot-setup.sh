@@ -60,16 +60,3 @@ else
   systemctl start --no-block firstlab-discover.service && echo "수집 시작됨"
 fi
 
-log "운영자 요청 일회성 작업: 수정 반영 확인용 재수집 → 끝나면 글 1개 작성 요청"
-ONCE=/var/lib/first-lab/bot/once-2026-11-04-recollect.done
-if [ ! -f "$ONCE" ] && ! systemctl is-active -q firstlab-discover.service; then
-  touch "$ONCE"
-  systemctl start --no-block firstlab-discover.service
-  # 수집이 끝나면 '지금 글 1개 만들기' 요청을 넣는다 (배포 세션과 무관하게 서버에서 계속 실행)
-  systemd-run --unit=firstlab-once-write-after-discover --collect bash -c \
-    'sleep 20; while systemctl is-active -q firstlab-discover.service; do sleep 30; done;
-     runuser -u firstlab -- wp --path=/var/www/first-lab option update firstlab_bot_request "$(date +%s)"' \
-    && echo "재수집 시작 + 수집 후 글 작성 예약"
-else
-  echo "이미 실행함 → 건너뜀"
-fi
