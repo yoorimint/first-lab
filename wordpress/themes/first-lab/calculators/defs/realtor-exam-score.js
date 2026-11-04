@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  const fmt = (n) => `${Math.round(n * 100) / 100}점`;
+  const fmt = (n) => `${n}점`;  // judge 에서 이미 소수 둘째 자리 내림
 
   FirstLabCalc.register({
     id: 'realtor-exam-score',
@@ -29,21 +29,26 @@
       if (!['both', 'first', 'second'].includes(stage)) throw new u.InputError('응시한 시험을 골라 주세요.');
       const read = (keys, name) => keys.map((k) => {
         const raw = v[k];
-        if (raw === undefined || raw === null || raw === '') throw new u.InputError(`${name} 과목 점수를 모두 넣어 주세요.`);
+        if (raw === undefined || raw === null || String(raw).trim() === '') throw new u.InputError(`${name} 과목 점수를 모두 넣어 주세요.`);
         const n = Number(raw);
         if (!Number.isFinite(n) || n < 0 || n > d.full_score) throw new u.InputError(`점수는 0~${d.full_score}점 사이로 넣어 주세요.`);
         return n;
       });
       const judge = (scores) => {
-        const avg = Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 100) / 100;
+        // 판정은 반올림 전 합계로 (59.996점을 60점으로 올려 합격 처리하면 안 됨), 표시는 소수 둘째 자리 내림
+        const sum = scores.reduce((a, b) => a + b, 0);
+        const avg = Math.floor((sum / scores.length) * 100 + 1e-9) / 100;
         const fails = scores.filter((s) => s < d.subject_min).length;
-        return { avg, fails, pass: fails === 0 && avg >= d.average_min };
+        return { avg, fails, pass: fails === 0 && sum >= d.average_min * scores.length };
       };
       const label = (r) => (r.pass ? '합격' : r.fails ? `불합격 (${d.subject_min}점 미만 ${r.fails}과목)` : `불합격 (평균 ${d.average_min}점 미만)`);
 
       const values = {};
       const rows = [];
-      const notes = [`차수마다 매 과목 ${d.subject_min}점 이상, 전 과목 평균 ${d.average_min}점 이상이면 합격이에요.`];
+      const notes = [
+        `차수마다 매 과목 ${d.subject_min}점 이상, 전 과목 평균 ${d.average_min}점 이상이면 합격이에요.`,
+        '2차는 선발예정인원을 미리 공고한 회차에는 고득점순으로 정할 수 있으니, 그 회차 시행공고를 큐넷에서 확인해요.',
+      ];
 
       if (stage !== 'second') {
         const r1 = judge(read(['s1', 's2'], '1차'));

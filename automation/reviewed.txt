@@ -67,3 +67,5 @@ calc:regional-health-insurance
 calc:severance-pay
 calc:unemployment-benefit
 calc:vat
+462 내가 가입한 보험 조회
+calc:realtor-exam-score
