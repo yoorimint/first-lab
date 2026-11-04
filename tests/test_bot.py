@@ -629,11 +629,13 @@ class ImageCheckTest(unittest.TestCase):
         card.assert_called_once()
         self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
 
-    def test_text_prone_new_scene_becomes_title_card(self):
+    def test_text_prone_new_scene_keeps_photo_and_asks_again(self):
         fix = {"old": "ai-aaaaaaaaaa", "prompt": "a printed contract on a desk", "alt": "x", "why": "글자"}
-        _, _, made, card = self.run_check({"replace": [fix]})
+        msg, calls, made, card = self.run_check({"replace": [fix]})
         self.assertEqual(made, [])
-        card.assert_called_once()
+        card.assert_not_called()  # 장면 단어 때문에 사진을 빼지 않음 (11/4 #168)
+        self.assertFalse(any("_firstlab_img_checked" in c for c in calls))  # 다음 검사에서 다시
+        self.assertIn(("post", "meta", "update", "176", "_firstlab_img_round", "1"), calls)  # 반복은 MAX_ROUND 에서 멈춤
 
     def test_add_photo_when_none(self):
         add = [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}]

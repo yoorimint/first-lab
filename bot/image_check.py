@@ -37,12 +37,19 @@ def apply_check(data: dict) -> str:
     rounds = int(photo.meta(post_id, ROUND_META) or 0)
     new_scene = None
     remove = bool(current) and current in (data.get("remove") or [])
+    retry = False  # 새 장면이 글자 생기기 쉬움 → 사진은 그대로 두고 다음 검사에서 다른 장면을 받음
     for r in data.get("replace") or []:
         if r.get("old") == current:
-            if rounds >= MAX_ROUND or images.text_prone(r.get("prompt", "")):
-                remove = True  # 바꿔도 계속 나쁘거나 새 장면도 글자 생기기 쉬움 → 뺌
+            if rounds >= MAX_ROUND:
+                remove = True  # 여러 번 바꿔도 계속 나쁨 → 뺌
+            elif images.text_prone(r.get("prompt", "")):
+                retry = True
             else:
                 new_scene = r
+    if retry and not new_scene and not remove:
+        # 11/4 #168: 장면 단어 때문에 멀쩡히 바꿀 수 있던 사진을 빼 버린 일 → 횟수만 올리고 다시 검사 대상으로 둠
+        wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
+        return f"글 {post_id} 새 장면이 글자 생기기 쉬움 → 다음 사진 검사에서 다른 장면으로"
     if not current and data.get("add"):
         new_scene = photo.first_scene([a.get("prompt", "") for a in data["add"]], [a.get("alt", "") for a in data["add"]])
 
