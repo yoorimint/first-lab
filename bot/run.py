@@ -27,7 +27,7 @@ from .llm import LLMBusy, make_llm
 from .publisher import publish
 from .select_keyword import pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings, wp_cli
-from .state import add_log, load_state, pop_excluded, pop_manual_request, save_state
+from .state import add_log, add_spend, load_state, pop_excluded, pop_manual_request, save_state, spent_today
 from .writer import write_article
 
 KST = ZoneInfo("Asia/Seoul")
@@ -78,13 +78,17 @@ def _record_competition(conn, keyword: str, urls: list[str]) -> None:
     conn.commit()
 
 
-def create_one(settings: BotSettings) -> str:
-    """키워드 선정 → 글 작성 → 워드프레스 저장. 결과 메시지 반환."""
+def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
+    """키워드 선정 → 글 작성 → 워드프레스 저장. 결과 메시지 반환.
+    used_llms: 만든 AI 객체를 담아 돌려줌 → 실패해도 호출한 쪽에서 쓴 비용을 셀 수 있게."""
+    used_llms = used_llms if used_llms is not None else []
     llm = make_llm(settings.provider, settings.api_key, settings.model)
+    used_llms.append(llm)
     with connect() as conn:
         if len(ranked_candidates(conn, settings)) < MIN_POOL:
             discover(5, settings.hint_keywords)
         light = make_llm(settings.provider, settings.api_key, settings.model, light=True)  # 판정·검증용 (저렴)
+        used_llms.append(light)
         keyword = pick_keyword(conn, settings, light)
         if not keyword:
             raise RuntimeError("안전 검사를 통과한 후보가 없습니다. 새벽 키워드 수집 후 다시 시도됩니다")
@@ -225,9 +229,17 @@ def main() -> None:
     if reason is None and settings.enabled and slot_candidate is not None and stamp >= state.get("auto_next", ""):
         reason, slot = f"자동 {slot_candidate + 1}회차", slot_candidate
 
+    cap = settings.daily_cost_cap
+    if reason and cap > 0 and spent_today(state) >= cap:
+        add_log(state, False, f"{reason} 건너뜀: 오늘 AI 비용 ${spent_today(state):.2f} → 하루 상한 ${cap:.0f} 도달 (내일 다시)")
+        state["manual_next"] = ""
+        if slot is not None:
+            state["done"][today].append(state["plan"][today][slot])
+        reason = None
     if reason:
+        used_llms: list = []
         try:
-            msg = create_one(settings)
+            msg = create_one(settings, used_llms)
             add_log(state, True, f"{reason}: {msg}")
             state["manual_next"] = ""
             print(msg)
@@ -249,6 +261,7 @@ def main() -> None:
             detail = e.stderr if isinstance(e, subprocess.CalledProcessError) and e.stderr else e
             add_log(state, False, f"{reason} 실패: {detail}")
             print(f"실패: {detail}", file=sys.stderr)
+        add_spend(state, sum(getattr(x, "cost_usd", 0.0) for x in used_llms))  # 실패해도 쓴 비용은 반영
         if slot is not None:  # 실패해도 같은 슬롯을 1분마다 재시도하지 않도록 완료 처리
             state["done"][today].append(state["plan"][today][slot])
 

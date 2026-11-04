@@ -55,6 +55,15 @@ def _classify_uncategorized(posts: list[dict]) -> None:
 PATCHES = Path(__file__).resolve().parent.parent / "wordpress" / "patches.json"
 
 
+def patch_content(content: str, patch: dict) -> str | None:
+    """'find' 가 들어 있는 문단(<p>…</p>) 전체를 교체한 본문. 해당 문단이 없으면(이미 바뀜) None."""
+    # 문단 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
+    m = re.search(r"<p>(?:(?!</p>).)*?" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
+    if not m:
+        return None
+    return content.replace(m.group(0), f"<p>{patch['replace_paragraph']}</p>")
+
+
 def apply_patches() -> None:
     """wordpress/patches.json 의 글 수정 적용. 'find' 가 들어 있는 문단 전체를 교체 (이미 바뀌었으면 건너뜀)."""
     if not PATCHES.exists():
@@ -65,11 +74,9 @@ def apply_patches() -> None:
             content = wp_cli("post", "get", pid, "--field=post_content")
         except subprocess.CalledProcessError:
             continue
-        # 문단 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
-        m = re.search(r"<p>(?:(?!</p>).)*?" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
-        if not m:
+        content = patch_content(content, patch)
+        if content is None:
             continue
-        content = content.replace(m.group(0), f"<p>{patch['replace_paragraph']}</p>")
         wp_cli("post", "update", pid, f"--post_content={content}")
         print(f"[보정] {pid} 문단 수정: {patch['why']}")
 

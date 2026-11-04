@@ -62,6 +62,7 @@ class BotSettings:
     fact_check: bool = True    # 자동 사실 검증
     refresh_per_week: int = 5  # 발행 글 갱신 주당 최대 개수
     competition_checks: int = 15  # 하루 경쟁도 조회 한도 (Gemini 무료 한도가 작음)
+    daily_cost_cap: float = 3.0   # 하루 AI 비용 상한 (달러, 0 = 없음)
 
     @classmethod
     def from_option(cls, raw: dict, secrets: dict[str, str]) -> "BotSettings":
@@ -85,6 +86,7 @@ class BotSettings:
             api_key=(raw.get(wp_field) or "").strip() or secrets.get(env_name, ""),
             gemini_key=(raw.get("gemini_key") or "").strip() or secrets.get("GEMINI_API_KEY", ""),
             competition_checks=int(raw.get("competition_checks") or 15),
+            daily_cost_cap=float(raw.get("daily_cost_cap") if raw.get("daily_cost_cap") not in (None, "") else 3),
             cf_account_id=(raw.get("cf_account_id") or "").strip() or secrets.get("CF_ACCOUNT_ID", ""),
             cf_api_token=(raw.get("cf_api_token") or "").strip() or secrets.get("CF_API_TOKEN", ""),
             fact_check=bool(int(raw.get("fact_check", 1) or 0)),

@@ -5,7 +5,7 @@ import random
 
 from . import competition
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
-from .keyword_filter import is_allowed, is_question
+from .keyword_filter import is_allowed, is_question, subject
 from .llm import LLMBusy
 from .safety import classify
 from .scoring import find_head, score
@@ -57,13 +57,15 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     signals = load_signals(conn)
 
     used_cores = {_core(u) for u in used}
+    used_subjects = {subject(u) for u in used}  # 이미 쓴 글의 주제 → 같은 주제 키워드는 새 글 대신 그 글 보강(refresh.py)
     head_difficulty = _head_difficulty(conn, volumes)
 
     def overlaps_used(n: str) -> bool:
-        """이미 쓴 글과 '거의 같은' 키워드만 막는다. 더 구체적인 롱테일은 허용 (주제 묶음으로 활용).
-        막음: 퇴직금계산 ↔ 퇴직금계산방법(수식어만 다름), 다이어트식단 ↔ 다이어트식단표(2글자 이내 차이)
+        """이미 쓴 글과 같은 주제인 키워드를 막는다 (같은 주제 글이 여러 개면 서로 순위를 깎아 먹음).
+        막음: 퇴직금계산 ↔ 퇴직금계산방법, 자동차정기검사비용 ↔ 자동차정기검사조회(주제가 같고 수식어만 다름),
+              다이어트식단 ↔ 다이어트식단표(2글자 이내 차이)
         허용: 퇴직금계산 → 퇴직금계산1년미만"""
-        if _core(n) in used_cores:
+        if _core(n) in used_cores or subject(n) in used_subjects:
             return True
         return any((u in n or n in u) and abs(len(n) - len(u)) <= 2 for u in used)
 

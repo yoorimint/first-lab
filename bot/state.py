@@ -19,7 +19,7 @@ from .settings import wp_cli
 STATE_OPTION = "firstlab_bot_state"
 REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
-DICT_KEYS = ("plan", "done", "refresh")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
+DICT_KEYS = ("plan", "done", "refresh", "spend")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
 MAX_LOG = 30
 MAX_USED = 2000
 
@@ -42,6 +42,18 @@ def save_state(state: dict) -> None:
     state["used_keywords"] = state["used_keywords"][-MAX_USED:]
     state["log"] = state["log"][:MAX_LOG]
     wp_cli("option", "update", STATE_OPTION, json.dumps(state, ensure_ascii=False), "--format=json")
+
+
+def add_spend(state: dict, usd: float) -> None:
+    """오늘 쓴 AI 비용 누적 (하루 상한 판단용). 지난 날짜는 지운다."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    spend = state.get("spend") if isinstance(state.get("spend"), dict) else {}
+    state["spend"] = {today: round(spend.get(today, 0.0) + usd, 4)}
+
+
+def spent_today(state: dict) -> float:
+    spend = state.get("spend") if isinstance(state.get("spend"), dict) else {}
+    return spend.get(datetime.now().strftime("%Y-%m-%d"), 0.0)
 
 
 def add_log(state: dict, ok: bool, msg: str) -> None:

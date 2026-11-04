@@ -1,10 +1,10 @@
-# main 브랜치에 server/ 변경이 push 되면 서버에 자동 적용
+# main 브랜치에 변경이 push 되면: 1) 자동 검사 → 2) 통과했을 때만 서버에 적용
 name: Deploy server config
 
 on:
   push:
     branches: [main]
-    paths: ["server/**", "wordpress/**", "bot/**", ".github/workflows/deploy.yml"]
+    paths: ["server/**", "wordpress/**", "bot/**", "tests/**", ".github/workflows/deploy.yml"]
   workflow_dispatch: # GitHub 화면에서 수동 실행도 가능
 
 concurrency:
@@ -12,7 +12,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    # 서버에 올리기 전 검사: 하나라도 실패하면 배포하지 않는다 (운영 중인 봇이 멈추는 것 방지)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"   # 서버(Ubuntu 22.04)와 같은 버전
+      - name: Install bot dependencies
+        run: pip install -q -r bot/requirements.txt
+      - name: Python syntax
+        run: python -m compileall -q bot tests
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Shell syntax
+        run: for f in server/*.sh; do bash -n "$f"; done
+      - name: PHP syntax
+        run: for f in wordpress/mu-plugins/*.php; do php -l "$f"; done
+      - name: JSON files
+        run: python -c "import json; json.load(open('wordpress/patches.json', encoding='utf-8'))"
+
   deploy:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - name: Apply on server
@@ -27,7 +49,7 @@ jobs:
             REPO=/opt/first-lab
             if [ -d "$REPO/.git" ]; then
               git -C "$REPO" fetch -q origin main
-              git -C "$REPO" reset -q --hard origin/main
+              git -C "$REPO" reset -q --hard ${{ github.sha }}   # 검사를 통과한 바로 그 버전
             else
               git clone -q https://github.com/yoorimint/first-lab "$REPO"
             fi
