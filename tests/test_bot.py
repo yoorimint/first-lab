@@ -515,5 +515,68 @@ class MiscTest(unittest.TestCase):
             self.assertEqual(images.text_prone(fix["prompt"]), "", fix["old"])
 
 
+
+class ImageCheckTest(unittest.TestCase):
+    URL = "https://first-lab.kr/wp-content/uploads/2026/11/{}.jpg"
+    BODY = ('<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n'
+            '<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large">'
+            '<img src="' + URL.format("ai-aaaaaaaaaa") + '" alt="서류"/></figure>\n<!-- /wp:image -->\n\n'
+            '<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large">'
+            '<img src="' + URL.format("ai-bbbbbbbbbb") + '" alt="거리"/></figure>\n<!-- /wp:image -->\n\n'
+            '<!-- wp:paragraph -->\n<p>끝</p>\n<!-- /wp:paragraph -->')
+
+    def run_check(self, data, rounds="0"):
+        from bot import image_check
+        calls, saved = [], {}
+
+        def fake_cli(*args):
+            calls.append(args)
+            if args[:2] == ("post", "get"):
+                return self.BODY
+            if args[:3] == ("post", "meta", "get"):
+                return rounds
+            if args[:2] == ("post", "update"):
+                saved["content"] = args[3].split("=", 1)[1]
+            if args[:2] == ("post", "list"):
+                return "501"
+            return ""
+
+        with mock.patch.object(image_check, "wp_cli", side_effect=fake_cli), \
+             mock.patch("bot.fix_images.wp_cli", side_effect=fake_cli), \
+             mock.patch.object(image_check, "load_settings", return_value=mock.Mock(cf_account_id="a", cf_api_token="t")), \
+             mock.patch.object(image_check.images, "cloudflare_image", return_value="/tmp/x.jpg"), \
+             mock.patch.object(image_check.images, "import_media", return_value=(9, self.URL.format("ai-cccccccccc"))):
+            msg = image_check.apply_check({"type": "image_check", "post_id": 176, **data})
+        return msg, calls, saved.get("content", "")
+
+    def test_clean_post_marked_checked(self):
+        msg, calls, _ = self.run_check({"replace": [], "remove": []})
+        self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
+        self.assertIn("이상 없음", msg)
+
+    def test_replace_swaps_and_rechecks(self):
+        fix = {"old": "ai-aaaaaaaaaa", "prompt": "a quiet street with trees", "alt": "가로수 길", "why": "글자"}
+        msg, calls, content = self.run_check({"replace": [fix], "remove": []})
+        self.assertNotIn("ai-aaaaaaaaaa", content)
+        self.assertIn('ai-cccccccccc.jpg" alt="가로수 길"', content)
+        self.assertIn(("post", "meta", "update", "176", "_firstlab_img_round", "1"), calls)  # 새 사진도 다시 검사
+        self.assertFalse(any("_firstlab_img_checked" in c for c in calls))
+
+    def test_after_max_rounds_image_is_removed(self):
+        fix = {"old": "ai-aaaaaaaaaa", "prompt": "a quiet street with trees", "alt": "x", "why": "글자"}
+        msg, calls, content = self.run_check({"replace": [fix], "remove": []}, rounds="2")
+        self.assertNotIn("ai-aaaaaaaaaa", content)
+        self.assertNotIn("ai-cccccccccc", content)
+        self.assertIn("ai-bbbbbbbbbb", content)  # 다른 사진·문단은 그대로
+        self.assertIn("<p>끝</p>", content)
+        self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
+
+    def test_text_prone_new_prompt_is_removed_instead(self):
+        fix = {"old": "ai-aaaaaaaaaa", "prompt": "a printed contract on a desk", "alt": "x", "why": "글자"}
+        _, _, content = self.run_check({"replace": [fix], "remove": []})
+        self.assertNotIn("ai-aaaaaaaaaa", content)
+        self.assertNotIn("ai-cccccccccc", content)
+
+
 if __name__ == "__main__":
     unittest.main()

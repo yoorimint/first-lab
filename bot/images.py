@@ -12,6 +12,7 @@ import json
 import os
 import re
 import shutil
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -129,8 +130,11 @@ def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:
     body = json.dumps({"prompt": f"{prompt}. {STYLE}", "steps": CF_STEPS}).encode()
     req = urllib.request.Request(url, data=body, method="POST", headers={
         "Authorization": f"Bearer {api_token}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=90) as resp:
-        data = json.load(resp)
+    try:
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            data = json.load(resp)
+    except urllib.error.HTTPError as e:  # 429 등: 한도 초과인지 알 수 있게 응답 내용도 남김
+        raise RuntimeError(f"Cloudflare HTTP {e.code}: {e.read()[:200].decode(errors='replace')}") from None
     if not data.get("success") or not data.get("result", {}).get("image"):
         raise RuntimeError(f"Cloudflare 이미지 생성 실패: {data.get('errors')}")
     img = Image.open(io.BytesIO(base64.b64decode(data["result"]["image"]))).convert("RGB")

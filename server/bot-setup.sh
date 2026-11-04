@@ -61,6 +61,16 @@ if [ ! -f "$UNQUEUE_MARK" ]; then
   touch "$UNQUEUE_MARK"
 fi
 
+# 사진을 사람이 이미 눈으로 확인한 글 → 자동 사진 검사(bot/image_check.py) 대상에서 뺌 (한 번만)
+IMGCHECK_MARK=/var/lib/first-lab/bot/once-2026-11-04-img-checked.done
+if [ ! -f "$IMGCHECK_MARK" ]; then
+  for id in 34 65 80 85 90 99 113 119 138 144 163; do
+    runuser -u firstlab -- wp --path=/var/www/first-lab post meta update "$id" _firstlab_img_checked 1 --quiet 2>/dev/null || true
+  done
+  echo "사진 확인 완료 표시: 34 65 80 85 90 99 113 119 138 144 163"
+  touch "$IMGCHECK_MARK"
+fi
+
 log "글쓰기 세션용 API 토큰 (서버 비밀값에만 원문, 워드프레스엔 해시)"
 SECRETS=/etc/first-lab/secrets.env
 if ! grep -q '^FIRSTLAB_API_TOKEN=' "$SECRETS" 2>/dev/null; then

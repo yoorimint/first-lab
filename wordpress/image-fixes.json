@@ -10,9 +10,5 @@
   {"old": "ai-51f789c614", "prompt": "a quiet hospital corridor with soft daylight and empty wooden benches", "alt": "햇살이 드는 조용한 병원 복도", "why": "영수증에 엉터리 글자"},
   {"old": "ai-40f59eaf6c", "prompt": "a calm clinic waiting area with green plants and wooden benches in soft daylight", "alt": "화분이 있는 병원 대기실", "why": "간판에 엉터리 글자"},
   {"old": "ai-2bb891bf09", "prompt": "neat stacks of coins growing in height on a wooden table with soft daylight and a plain background", "alt": "점점 높아지는 동전 더미", "why": "세금 서류에 엉터리 글자"},
-  {"old": "ai-36429c64f4", "prompt": "a car key and a cup of coffee on a wooden desk in soft morning light", "alt": "책상 위 자동차 열쇠와 커피", "why": "달력에 엉터리 글자"},
-  {"old": "ai-22f585f3c1", "prompt": "an airplane wing above white clouds seen through a cabin window at sunrise", "alt": "비행기 창밖으로 보이는 구름과 날개", "why": "공항 안내판에 엉터리 글자"},
-  {"old": "ai-723c96c208", "prompt": "a silver sedan parked on a quiet tree-lined street on a clear day", "alt": "가로수 길에 세워 둔 은색 승용차", "why": "건물 간판에 엉터리 글자"},
-  {"old": "ai-1ca58d79b9", "prompt": "close-up of two hands passing a car key over a wooden desk, shallow depth of field, no faces", "alt": "자동차 열쇠를 건네는 두 손", "why": "종이에 엉터리 글자"},
-  {"old": "ai-7956d3ddb6", "prompt": "a car key with a leather keychain on a clean wooden desk next to a small potted plant in soft daylight", "alt": "책상 위 자동차 열쇠와 화분", "why": "서류에 엉터리 글자"}
+  {"old": "ai-36429c64f4", "prompt": "a car key and a cup of coffee on a wooden desk in soft morning light", "alt": "책상 위 자동차 열쇠와 커피", "why": "달력에 엉터리 글자"}
 ]

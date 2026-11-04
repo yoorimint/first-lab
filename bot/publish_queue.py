@@ -8,6 +8,7 @@
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
 보류 초안 수정 파일: {"type": "fix_hold", ...} → hold.apply_fix (다시 관문 검사 후 대기열)
 후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}]} → 글쓰기 세션이 부적합하다고 본 후보를 다시 안 뜨게 함
+사진 검사 파일: {"type": "image_check", "post_id", "replace", "remove"} → image_check.apply_check (엉터리 글자 사진 교체)
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
 from __future__ import annotations
@@ -16,7 +17,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import hold, refresh, related, review_gate, sources
+from . import hold, image_check, refresh, related, review_gate, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, publish
 from .settings import load_settings, wp_cli
@@ -111,6 +112,9 @@ def main() -> None:
             elif data.get("type") == "skip":
                 label = "후보 제외(직접)"
                 msg = skip_keywords(data)
+            elif data.get("type") == "image_check":
+                label = "사진 검사"
+                msg = image_check.apply_check(data)
             else:
                 msg = publish_file(path, settings, allowed_links)
             _marker(path).touch()

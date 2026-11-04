@@ -103,6 +103,46 @@ function firstlab_api_held_drafts(): array {
 	return $out;
 }
 
+/**
+ * 사진 검사가 안 끝난 글 (오래된 것부터 2개) — 글쓰기 세션이 사진을 직접 보고 결과를 올린다 (bot/image_check.py).
+ * round: 이 글 사진을 이미 바꾼 횟수 (bot/image_check.py MAX_ROUND 에 닿으면 서버가 교체 대신 뺀다).
+ */
+function firstlab_api_image_checks(): array {
+	$out   = array();
+	$posts = get_posts(
+		array(
+			'post_status' => array( 'draft', 'publish', 'future' ),
+			'meta_query'  => array( array( 'key' => '_firstlab_img_checked', 'compare' => 'NOT EXISTS' ) ),
+			'orderby'     => 'date',
+			'order'       => 'ASC',
+			'numberposts' => -1, // 사진 없는 옛 글이 앞을 막지 않게 전부 훑음 (글 수가 적어 부담 없음)
+		)
+	);
+	foreach ( $posts as $post ) {
+		$images = array();
+		preg_match_all( '#<img\b[^>]*>#', $post->post_content, $tags );
+		foreach ( $tags[0] as $tag ) {
+			if ( preg_match( '#src="([^"]+/(ai-[0-9a-f]+)(?:-\d+x\d+)?\.jpg)"#', $tag, $src ) ) {
+				preg_match( '#alt="([^"]*)"#', $tag, $alt );
+				$images[] = array( 'name' => $src[2], 'url' => $src[1], 'alt' => $alt[1] ?? '' );
+			}
+		}
+		if ( ! $images ) {
+			continue;
+		}
+		$out[] = array(
+			'post_id' => $post->ID,
+			'title'   => $post->post_title,
+			'round'   => (int) get_post_meta( $post->ID, '_firstlab_img_round', true ),
+			'images'  => $images,
+		);
+		if ( count( $out ) >= 2 ) {
+			break;
+		}
+	}
+	return $out;
+}
+
 /** 토큰 확인 (원문은 서버 비밀값, 워드프레스에는 해시만). */
 function firstlab_api_allowed( WP_REST_Request $request ): bool {
 	$hash  = (string) get_option( 'firstlab_api_token_hash', '' );

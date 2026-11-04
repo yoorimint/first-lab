@@ -130,6 +130,15 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   제목·요약문을 바꿨으면 `"title"`, `"excerpt"` 도 넣는다. 서버가 다시 관문 검사 → 통과하면 공개 대기열.
 - 5단계와 같이 검사 → 커밋(`보류 수정: <글 제목>`) → main 에 올림.
 
+## 5-2. 사진 검사 (있을 때만, 실행 1번에 응답의 글 전부)
+1단계 응답의 `image_checks` 각 글의 `images` 를 하나씩 받아(`curl -s -o /tmp/<name>.jpg <url>`) 직접 열어 본다.
+- 나쁜 사진: 글자·숫자·로고처럼 보이는 것이 있음(엉터리 글자 포함), 손·얼굴이 일그러짐, 글 내용과 상관없는 장면.
+- 나쁜 사진은 `replace` 에 새 장면을 적는다: 영어 한 문장, 서류·영수증·간판·달력·책·화면·공항·역·키오스크가 없는 장면.
+  `round` 가 2 이상이면 `replace` 대신 `remove` 에 이름만 넣는다 (서버가 사진을 뺌).
+- `wordpress/queue/imgcheck-<post_id>-<날짜시각>.json` 으로 저장 (이상 없으면 replace·remove 를 빈 목록으로 → 검사 끝 표시):
+  `{"type": "image_check", "post_id": <id>, "replace": [{"old": "<name>", "prompt": "...", "alt": "한국어 대체 텍스트", "why": "한 줄"}], "remove": []}`
+- 5단계 커밋에 같이 넣는다 (새 글이 없으면 `사진 검사: <글 번호들>` 로 커밋 → main 에 올림).
+
 ## 6. 글 갱신 (있는 날만)
 1단계 응답의 `refresh_target` 이 `null` 이면 건너뛴다. 있으면 그 글 1개를 고친다 (새 글이 실패했어도 따로 진행).
 - `mode` 가 `"enhance"`(보강): `bot.refresh.ENHANCE_SYSTEM` 규칙대로. `siblings` 는 이 글에서 함께 답할 검색어다.
