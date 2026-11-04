@@ -1,6 +1,8 @@
 """발행된 글 갱신 (주당 개수 제한, 갱신할 가치가 있는 글만).
 
 우선순위
+  0) 제목 클릭률 낮음 (서치콘솔): 평균 10위 안 + 노출 100회 이상 + 클릭률 2% 미만 → 제목·요약문만 다시 쓰기
+     (순위는 괜찮은데 검색 결과에서 안 눌리는 글. 실제 검색어를 보고 제목을 맞춘다. 기준값은 경험칙)
   1) 순위 정체·하락 (서치콘솔): 평균 5~20위 + 노출 30회 이상, 또는 28일 전보다 노출 30%↓ → 내용 보강
   2) 같은 주제 검색어가 쌓인 글: 새 글 대신 이 글에 답을 보강 (select_keyword 가 같은 주제 새 글을 막음)
   3) 해마다 바뀌는 정보: 1월·7월에 세금·지원금·요금 등 → 수치 재검증
@@ -25,11 +27,16 @@ from .keyword_filter import subject
 from .llm import make_llm
 from .search_console import SCHEMA as GSC_SCHEMA
 from .settings import BotSettings, wp_cli
+from .writer import numbers_match
 from .state import add_spend, spent_today
 
 META_KEY = "_firstlab_refreshed"   # 마지막 갱신 날짜
 MIN_KEEP_RATIO = 0.8              # 고친 본문이 기존의 80% 미만이면 반영하지 않음 (내용 유실 방지)
 MIN_DAYS_BETWEEN = 60              # 같은 글은 이 기간 안에 다시 갱신하지 않음
+RETITLE_MAX_POSITION = 10
+RETITLE_MIN_IMPRESSIONS = 100
+RETITLE_MAX_CTR = 0.02
+TITLE_MAX = 60
 STUCK_POSITION = (5, 20)
 STUCK_MIN_IMPRESSIONS = 30
 DECLINE_RATIO = 0.7                # 28일 전 대비 노출이 70% 이하로 떨어지면 하락
@@ -85,8 +92,16 @@ def siblings(conn, post_url: str, limit: int = 8) -> list[tuple[str, int]]:
     return [(r["keyword"], r["total"]) for r in rows if subject(r["norm"]) == subj][:limit]
 
 
+def top_queries(conn, page: str, limit: int = 5) -> list[dict]:
+    """이 글로 실제 들어온 검색어 (최근 28일, 노출 많은 순)."""
+    conn.executescript(GSC_SCHEMA)
+    rows = conn.execute("SELECT query, clicks, impressions, position FROM gsc_queries WHERE page=?"
+                        " ORDER BY impressions DESC LIMIT ?", (page, limit)).fetchall()
+    return [dict(r) for r in rows]
+
+
 def pick_targets(conn, limit: int) -> list[tuple[dict, str, str]]:
-    """(글, 방식 'enhance'|'recheck', 이유) 목록."""
+    """(글, 방식 'retitle'|'enhance'|'recheck', 이유) 목록."""
     conn.executescript(GSC_SCHEMA)
     posts = json.loads(wp_cli("eval", _POSTS_PHP) or "[]")
     now = datetime.now()
@@ -100,7 +115,10 @@ def pick_targets(conn, limit: int) -> list[tuple[dict, str, str]]:
         sib_volume = sum(v for _, v in p["siblings"])
         imp = latest["impressions"] if latest else 0
         pos = latest["position"] if latest else 999
-        if latest and imp >= STUCK_MIN_IMPRESSIONS and STUCK_POSITION[0] <= pos <= STUCK_POSITION[1]:
+        ctr = (latest["clicks"] / imp) if latest and imp else 0.0
+        if latest and imp >= RETITLE_MIN_IMPRESSIONS and pos <= RETITLE_MAX_POSITION and ctr < RETITLE_MAX_CTR:
+            picks.append((0, p, "retitle", f"평균 {pos:.0f}위인데 클릭률 {ctr:.1%} (노출 {imp})"))
+        elif latest and imp >= STUCK_MIN_IMPRESSIONS and STUCK_POSITION[0] <= pos <= STUCK_POSITION[1]:
             picks.append((1, p, "enhance", f"평균 {pos:.0f}위 정체 (노출 {imp})"))
         elif latest and older and older["impressions"] >= STUCK_MIN_IMPRESSIONS and imp <= older["impressions"] * DECLINE_RATIO:
             picks.append((1, p, "enhance", f"노출 하락 {older['impressions']}→{imp}"))
@@ -117,6 +135,18 @@ def pick_targets(conn, limit: int) -> list[tuple[dict, str, str]]:
     return [(p, mode, why) for _, p, mode, why in picks[:limit]]
 
 
+RETITLE_SYSTEM = """너는 한국어 정보 블로그 편집자다. 검색 순위는 괜찮은데 검색 결과에서 잘 안 눌리는 글의 제목과 요약문을 다시 쓴다.
+1. 실제 검색어 목록을 보고, 검색한 사람이 찾는 답이 이 글에 있다는 게 제목에서 바로 보이게 쓴다.
+2. 제목과 요약문의 숫자는 본문에 있는 숫자만 쓴다. 본문에 없는 내용·과장·낚시성 표현은 쓰지 않는다.
+3. 제목은 60자 이내, 요약문은 120자 이내.
+최종 답은 JSON 하나만: {"title": "...", "excerpt": "...", "changes": "무엇을 바꿨는지 한 줄"}"""
+
+
+def _queries_text(queries: list[dict]) -> str:
+    return "\n".join(f"- {q['query']} (노출 {q['impressions']}, 클릭 {q['clicks']}, 평균 {q['position']:.0f}위)"
+                     for q in queries) or "- (검색어 기록 없음)"
+
+
 def _html(content: str) -> str:
     return re.sub(r"<!--.*?-->", "", content, flags=re.S).strip()
 
@@ -124,6 +154,15 @@ def _html(content: str) -> str:
 def refresh_post(post: dict, mode: str, settings: BotSettings) -> tuple[str, float]:
     """(결과 설명, 쓴 비용 달러)"""
     content = _html(wp_cli("post", "get", str(post["id"]), "--field=post_content"))
+    if mode == "retitle":
+        llm = make_llm(settings.provider, settings.api_key, settings.model)
+        raw = llm.generate(RETITLE_SYSTEM, f"현재 제목: {post['title']}\n[실제 검색어]\n{_queries_text(post.get('queries', []))}"
+                                           f"\n\n[본문 HTML]\n{content}")
+        data = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
+        title, excerpt = _checked_title(data, content)
+        _save(post["id"], None, title, excerpt)
+        cost = getattr(llm, "cost_usd", 0.0)
+        return f"제목 수정 → '{title}' (약 ${cost:.2f})", cost
     if mode == "recheck":
         llm = make_llm(settings.provider, settings.api_key, settings.model, light=True)
         fc = factcheck.verify(llm, post["title"], content)
@@ -144,10 +183,25 @@ def refresh_post(post: dict, mode: str, settings: BotSettings) -> tuple[str, flo
     return f"{'수정' if changed else '변경 없음'} - {note} (약 ${cost:.2f})", cost
 
 
-def _save(post_id: int, new_html: str | None) -> None:
-    """본문 반영(None 이면 본문은 그대로) + 갱신 날짜 기록."""
+def _checked_title(data: dict, content: str) -> tuple[str, str]:
+    """새 제목·요약문 검사: 길이, 숫자가 본문에 있는지. 통과 못 하면 RuntimeError (반영 안 함)."""
+    title, excerpt = str(data.get("title") or "").strip(), str(data.get("excerpt") or "").strip()
+    if not title or len(title) > TITLE_MAX:
+        raise RuntimeError(f"새 제목이 비었거나 {TITLE_MAX}자 초과 → 반영 안 함")
+    for label, text in (("제목", title), ("요약문", excerpt)):
+        if text and not numbers_match(text, content):
+            raise RuntimeError(f"새 {label}의 숫자가 본문에 없음 ('{text[:40]}') → 반영 안 함")
+    return title, excerpt
+
+
+def _save(post_id: int, new_html: str | None, title: str = "", excerpt: str = "") -> None:
+    """본문(None 이면 그대로)·제목·요약문(빈 값이면 그대로) 반영 + 갱신 날짜 기록.
+    제목이 바뀌면 대표 이미지(제목 카드)는 1분마다 도는 봇이 다시 만든다 (run._sync_recent_cards)."""
     if new_html is not None:
         wp_cli("post", "update", str(post_id), f"--post_content={to_blocks(new_html)}")
+    fields = [f"--post_title={title}"] * bool(title) + [f"--post_excerpt={excerpt}"] * bool(excerpt)
+    if fields:
+        wp_cli("post", "update", str(post_id), *fields)
     wp_cli("post", "meta", "update", str(post_id), META_KEY, datetime.now().strftime("%Y-%m-%d"))
 
 
@@ -168,22 +222,30 @@ def plan_direct(state: dict) -> list[str]:
         state.pop("refresh_target", None)
         return []
     post, mode, why = targets[0]
+    with connect() as conn:
+        queries = top_queries(conn, post["url"])
     state["refresh_target"] = {"id": post["id"], "title": post["title"], "url": post["url"], "mode": mode,
-                               "why": why, "siblings": [k for k, _ in post.get("siblings", [])]}
+                               "why": why, "siblings": [k for k, _ in post.get("siblings", [])], "queries": queries}
     return [f"글 갱신 대상 준비 (매일 글쓰기 세션이 처리): '{post['title']}' - {why}"]
 
 
 def apply_direct(data: dict, state: dict) -> str:
-    """글쓰기 세션이 올린 갱신 본문 반영. 그 사이 글이 수정됐거나 본문이 크게 줄었으면 반영하지 않는다."""
+    """글쓰기 세션이 올린 갱신 반영 (본문 / 제목·요약문, 있는 것만).
+    그 사이 글이 수정됐거나, 본문이 크게 줄었거나, 새 제목 숫자가 본문에 없으면 반영하지 않는다."""
     post_id = int(data["post_id"])
     modified = wp_cli("post", "get", str(post_id), "--field=post_modified").strip()
     if data.get("base_modified") and data["base_modified"] != modified:
         raise RuntimeError(f"글 {post_id} 이 그 사이 수정됨 ({modified}) → 반영 안 함")
     old = _html(wp_cli("post", "get", str(post_id), "--field=post_content"))
-    new_html = str(data.get("content_html") or "")
-    if len(new_html) < len(old) * MIN_KEEP_RATIO:
-        raise RuntimeError(f"고친 본문이 너무 짧음 ({len(new_html)}자 < 기존 {len(old)}자의 80%) → 반영 안 함")
-    _save(post_id, new_html)
+    new_html = data.get("content_html")
+    if new_html is not None:
+        new_html = str(new_html)
+        if len(new_html) < len(old) * MIN_KEEP_RATIO:
+            raise RuntimeError(f"고친 본문이 너무 짧음 ({len(new_html)}자 < 기존 {len(old)}자의 80%) → 반영 안 함")
+    title, excerpt = _checked_title(data, new_html or old) if data.get("title") else ("", "")
+    if new_html is None and not title:
+        raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음")
+    _save(post_id, new_html, title, excerpt)
     _count_done(state)
     target = state.get("refresh_target") or {}
     if target.get("id") == post_id:
@@ -206,12 +268,15 @@ def run_weekly(settings: BotSettings, state: dict) -> list[str]:
         return [f"글 갱신 건너뜀: 오늘 AI 비용 하루 상한 ${settings.daily_cost_cap:.0f} 도달"]
     with connect() as conn:
         targets = pick_targets(conn, 1)
+        for post, _, _ in targets:
+            post["queries"] = top_queries(conn, post["url"])
     logs = []
     for post, mode, why in targets:
         try:
             result, cost = refresh_post(post, mode, settings)
             add_spend(state, cost)
-            logs.append(f"글 갱신({'보강' if mode == 'enhance' else '재검증'}): '{post['title']}' - {why} → {result}")
+            kind = {"retitle": "제목", "enhance": "보강"}.get(mode, "재검증")
+            logs.append(f"글 갱신({kind}): '{post['title']}' - {why} → {result}")
         except Exception as e:  # noqa: BLE001
             logs.append(f"글 갱신 실패: '{post['title']}' - {e}")
         _count_done(state)

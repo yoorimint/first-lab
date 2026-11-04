@@ -2,7 +2,8 @@
 
 봇의 AI 작성 단계만 건너뛰고, 나머지는 봇과 똑같이 처리한다:
 제목·요약문 숫자 점검 → 링크 정리 → AI 이미지·대표 카드·카테고리·작성자 → 키워드 '사용됨' 기록.
-파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish|auto, 기본 draft).
+파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish|schedule|auto, 기본 draft),
+  "sources"(선택, [{"name", "url"}] → 글 끝 '공식 안내 바로가기', sources.py).
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
 후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}]} → 글쓰기 세션이 부적합하다고 본 후보를 다시 안 뜨게 함
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
@@ -13,7 +14,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import refresh, related
+from . import refresh, related, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, publish
 from .settings import load_settings
@@ -50,6 +51,11 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
         if "제목(확인 필요)" in aligned:
             status = "draft"
     article.content_html, _ = related.clean_links(article.content_html, allowed_links)
+    # 글 끝 '공식 안내 바로가기' (세션이 확인한 공식 페이지 중 실제로 열리는 것만)
+    official, dropped = sources.section(data.get("sources", []))
+    article.content_html += official
+    if dropped:
+        notes.append(f"공식 링크 제외 {len(dropped)}개: {'; '.join(dropped)[:150]}")
     post_id, link, image_note = publish(article, status, slug=keyword,
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token),
                                         image_count=settings.image_count, schedule_times=settings.schedule_times)

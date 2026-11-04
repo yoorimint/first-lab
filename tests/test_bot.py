@@ -264,6 +264,38 @@ class DirectRoutineTest(unittest.TestCase):
         self.assertNotIn("알뜰폰무제한요금제", picked)
 
 
+class QualityTest(unittest.TestCase):
+    def test_official_sources_section(self):
+        from bot import sources
+        items = [{"name": "공단 수수료", "url": "https://main.kotsa.or.kr/a"},
+                 {"name": "블로그", "url": "https://x.tistory.com/1"},
+                 {"name": "깨진 링크", "url": "https://www.gangdong.go.kr/broken"},
+                 {"name": "<생활법령>", "url": "https://easylaw.go.kr/b"}]
+        html, dropped = sources.section(items, check=lambda u: "broken" not in u)
+        self.assertIn("공식 안내 바로가기", html)
+        self.assertIn("main.kotsa.or.kr", html)
+        self.assertIn("&lt;생활법령&gt;", html)  # 이름은 이스케이프
+        self.assertNotIn("tistory", html)
+        self.assertEqual(len(dropped), 2)
+        self.assertEqual(sources.section([{"name": "x", "url": "http://a.go.kr"}], check=lambda u: True)[0], "")  # https 만
+
+    def test_low_ctr_post_gets_retitle(self):
+        conn = memory_db([])
+        conn.executescript(refresh.GSC_SCHEMA)
+        url = "https://first-lab.kr/a/"
+        conn.execute("INSERT INTO gsc_page_history VALUES ('2026-11-04', ?, 2, 300, 6.0)", (url,))
+        posts = json.dumps([{"id": 7, "title": "t", "url": url, "date": "2026-09-01", "refreshed": "", "has_number": True}])
+        with mock.patch.object(refresh, "wp_cli", return_value=posts):
+            picks = refresh.pick_targets(conn, 1)
+        self.assertEqual(picks[0][1], "retitle")
+
+    def test_retitle_numbers_must_be_in_body(self):
+        body = "<p>승용차 정기검사 수수료는 23,000원이에요.</p>"
+        self.assertEqual(refresh._checked_title({"title": "정기검사 비용 23,000원 정리"}, body)[0], "정기검사 비용 23,000원 정리")
+        with self.assertRaises(RuntimeError):
+            refresh._checked_title({"title": "정기검사 비용 25,000원"}, body)
+
+
 class FallbackTest(unittest.TestCase):
     def test_direct_post_today(self):
         from bot.run import direct_post_today
