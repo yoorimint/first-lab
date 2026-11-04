@@ -4,6 +4,7 @@
  * Description: 홈은 '큰 대표 글 1개 + 사진 목록', 카테고리 목록은 '사진 목록'. 계산기 모음 숏코드.
  *
  * [firstlab_feed]      : 현재 목록(메인 쿼리)을 사진 목록으로 출력. 홈 첫 페이지면 대표 글을 크게.
+ *                        템플릿에서는 wp:html 블록에 넣는다 (wp:shortcode 블록은 자동 <p> 를 끼워 넣음).
  * [firstlab_calc_list] : 발행된 계산기 페이지(주소가 -calculator 로 끝남) 목록.
  *
  * 대표 글 순서: ① 관리자가 '맨 위에 고정'한 글 → ② 서치콘솔 클릭 1위 글(봇이 option firstlab_popular_url 에 저장,
