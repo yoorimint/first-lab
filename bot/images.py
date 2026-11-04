@@ -107,7 +107,8 @@ STYLE = ("realistic editorial photo, natural light, clean composition, "
 TEXT_PRONE = re.compile(
     r"\b(documents?|papers?|paperwork|receipts?|contracts?|forms?|schedules?|signs?|signage|calendars?|"
     r"labels?|certificates?|newspapers?|menus?|books?|envelopes?|bills?|statements?|invoices?|tickets?|"
-    r"letters?|posters?|brochures?|leaflets?|websites?|charts?|printed|showing|displaying|interface)\b",
+    r"letters?|posters?|brochures?|leaflets?|websites?|charts?|printed|showing|displaying|interface|"
+    r"kiosks?|airports?|terminals?|stations?|storefronts?|government building)\b",  # 안내판·간판이 따라 나오는 곳
     re.IGNORECASE)
 
 
