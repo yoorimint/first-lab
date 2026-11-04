@@ -116,6 +116,8 @@ def main() -> None:
             msg = f"{label} 실패 ({path.name}): {e}"
             add_log(state, False, msg)
         print(msg, flush=True)
+    # 새 글(키워드 사용됨)·후보 제외가 반영됐으니 1분 안에 후보 목록을 새로 만들게 함 (읽기 API 가 옛 후보를 주지 않도록)
+    state["dashboard_at"] = ""
     save_state(state)
 
 
