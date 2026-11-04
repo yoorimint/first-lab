@@ -36,6 +36,18 @@ def set_featured_card(post_id: int, title: str, keyword: str) -> None:
     wp_cli("post", "meta", "update", str(post_id), "_firstlab_card_title", title)  # 제목이 바뀌면 다시 만들기 위해
 
 
+_FIND_PHP = ('$p = get_page_by_path( sanitize_title( base64_decode( "%s" ) ), OBJECT, "post" ); '
+             'echo $p ? $p->ID : "";')
+
+
+def existing_post_id(slug: str) -> str:
+    """이 주소(키워드)로 이미 있는 글 번호 (휴지통 제외 모든 상태). 없으면 ''."""
+    import base64
+
+    key = base64.b64encode(slug.strip().encode()).decode()
+    return wp_cli("eval", _FIND_PHP % key).strip()
+
+
 def site_author_id() -> str:
     """글 작성자로 쓸 계정 (첫 관리자, 화면 표시 이름은 wp-setup.sh 가 '퍼스트랩'으로 설정). 없으면 ''."""
     ids = wp_cli("user", "list", "--role=administrator", "--orderby=ID", "--order=ASC", "--field=ID").split()

@@ -618,6 +618,24 @@ class MiscTest(unittest.TestCase):
         self.assertFalse(any(a.startswith("--name=") for a in args))
 
 
+class DuplicateKeywordTest(unittest.TestCase):
+    def test_same_keyword_is_not_published_twice(self):
+        # 11/4: 동시 실행 두 갈래가 같은 후보로 글을 써서 '고용보험실업급여조건' 글이 두 편 생김
+        import tempfile
+        from bot import publish_queue
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Path(tmp, "a.json")
+            f.write_text(json.dumps({"keyword": "고용보험실업급여조건", "title": "t", "excerpt": "e",
+                                     "content_html": "<p>x</p>", "tags": [], "category": "생활"}, ensure_ascii=False),
+                         encoding="utf-8")
+            with mock.patch.object(publish_queue, "existing_post_id", return_value="376"), \
+                 mock.patch.object(publish_queue, "publish") as pub:
+                msg = publish_queue.publish_file(f, mock.Mock(post_status="schedule"), set())
+        pub.assert_not_called()
+        self.assertIn("중복 키워드", msg)
+        self.assertIn("376", msg)
+
+
 class GateCoverageTest(unittest.TestCase):
     def test_long_article_needs_claims_for_every_fact_sentence(self):
         from bot import review_gate

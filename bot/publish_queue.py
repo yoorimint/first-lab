@@ -19,7 +19,7 @@ from pathlib import Path
 
 from . import hold, image_check, refresh, related, review_gate, sources
 from .keyword_db import connect, norm, set_status
-from .publisher import STATUS_LABEL, publish
+from .publisher import STATUS_LABEL, existing_post_id, publish
 from .settings import load_settings, wp_cli
 from .state import add_log, load_state, save_state
 from .writer import align_with_body, parse_article
@@ -40,6 +40,10 @@ def pending() -> list[Path]:
 def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
     keyword = str(data["keyword"]).strip()
+    # 같은 키워드 글이 이미 있으면 새로 만들지 않음 (11/4 연속 작성 동시 실행으로 실업급여 글이 두 편 생긴 일)
+    duplicate = existing_post_id(keyword)
+    if duplicate:
+        return f"[건너뜀] 중복 키워드 '{keyword}' — 글 {duplicate} 이 이미 있음"
     # status: draft | publish | auto(설정 페이지의 발행 방식을 따름)
     status = data.get("status", "draft")
     if status == "auto":

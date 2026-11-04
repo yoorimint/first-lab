@@ -61,6 +61,13 @@ if [ ! -f "$UNQUEUE_MARK" ]; then
   touch "$UNQUEUE_MARK"
 fi
 
+# 11/4 연속 작성 동시 실행으로 생긴 중복 글(고용보험 실업급여 조건 #379, #376 과 같은 키워드) → 휴지통 (되돌릴 수 있음)
+DUP_MARK=/var/lib/first-lab/bot/once-2026-11-04-dup-379.done
+if [ ! -f "$DUP_MARK" ]; then
+  runuser -u firstlab -- wp --path=/var/www/first-lab post delete 379 --quiet && echo "중복 글 휴지통: 379"
+  touch "$DUP_MARK"
+fi
+
 # 사진을 사람이 이미 눈으로 확인한 글 → 자동 사진 검사(bot/image_check.py) 대상에서 뺌 (한 번만)
 IMGCHECK_MARK=/var/lib/first-lab/bot/once-2026-11-04-img-checked.done
 if [ ! -f "$IMGCHECK_MARK" ]; then

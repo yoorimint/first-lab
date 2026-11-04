@@ -6,12 +6,12 @@ Cloudflare 무료 한도(하루 10,000 뉴런 ≈ 사진 50장)가 다 되면 �
 """
 from __future__ import annotations
 
-import base64
 import json
 from pathlib import Path
 
 from . import images, photo
 from .image_check import CHECKED_META
+from .publisher import existing_post_id
 from .schedule import QUEUE_META, READY
 from .settings import wp_cli
 
@@ -52,10 +52,6 @@ def fill(cloudflare: tuple[str, str], max_posts: int = 2) -> list[str]:
     return out
 
 
-_FIND_PHP = ('$p = get_page_by_path( sanitize_title( base64_decode( "%s" ) ), OBJECT, "post" ); '
-             'echo $p ? $p->ID : "";')
-
-
 def backfill_from_queue() -> list[str]:
     """대표 사진 없이(제목 카드로) 저장된 직접 작성 글: 큐 파일의 장면 설명으로 대기 표시."""
     out = []
@@ -66,8 +62,7 @@ def backfill_from_queue() -> list[str]:
             continue
         if data.get("type") or not data.get("images") or not data.get("keyword"):
             continue
-        key = base64.b64encode(str(data["keyword"]).strip().encode()).decode()
-        post_id = wp_cli("eval", _FIND_PHP % key).strip()
+        post_id = existing_post_id(str(data["keyword"]))
         if not post_id or photo.meta(post_id, photo.PHOTO_META) or photo.meta(post_id, photo.PENDING_META):
             continue
         scene = photo.first_scene([i.get("prompt", "") for i in data["images"]], [i.get("alt", "") for i in data["images"]])
