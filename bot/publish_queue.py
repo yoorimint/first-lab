@@ -95,7 +95,7 @@ def main() -> None:
     allowed_links = related.allowed_urls()  # 우리 발행 글·계산기 페이지 링크만 남김
     DONE_DIR.mkdir(parents=True, exist_ok=True)
     for path in files:
-        # 로그 머리말 '직접 작성 글:' 은 봇이 예비 발행을 건너뛰는 기준이라 새 글에만 쓴다 (run.direct_post_today)
+        # 로그 머리말 '직접 작성 글:' 은 연속 작성이 '한 편 완료'를 아는 기준이라 새 글에만 쓴다 (run.post_arrived_since)
         label = "직접 작성 글"
         try:
             data = json.loads(path.read_text(encoding="utf-8"))

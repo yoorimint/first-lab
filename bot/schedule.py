@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import random
 from datetime import datetime, timedelta, timezone
 
 from .settings import wp_cli
@@ -13,6 +14,17 @@ from .settings import wp_cli
 QUEUE_META = "_firstlab_queue"
 READY = "ready"
 LATE_LIMIT = timedelta(hours=3)  # 서버가 멈췄다 켜져도 3시간 넘게 지난 시각은 실행하지 않음 (몰아서 공개 방지)
+
+
+def plan_times(times: list[str], jitter_minutes: int, today: str) -> list[str]:
+    """오늘 실제 시각 = 설정 시각 ± 랜덤(분). 날짜로 시드를 고정해 하루 동안 같은 값, 날짜를 넘지 않게 00:00~23:59."""
+    plan = []
+    for i, hhmm in enumerate(sorted(times)):
+        base = datetime.strptime(f"{today} {hhmm}", "%Y-%m-%d %H:%M")
+        offset = random.Random(f"{today}-{i}-{hhmm}").randint(-jitter_minutes, jitter_minutes) if jitter_minutes else 0
+        day_start = base.replace(hour=0, minute=0)
+        plan.append(min(max(base + timedelta(minutes=offset), day_start), day_start.replace(hour=23, minute=59)).strftime("%H:%M"))
+    return sorted(plan)
 
 
 def due_slot(times: list[str], fired: list[str], now: datetime) -> str | None:

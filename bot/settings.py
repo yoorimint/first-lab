@@ -41,14 +41,13 @@ def _times(text: str) -> list[str]:
 @dataclass
 class BotSettings:
     write_mode: str = "direct"  # direct = 월정액 직접 작성(봇은 예비) | bot = API 봇이 작성
-    direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 월정액: Claude 예약 작업 실행 시각
+    direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 글 작성 시각 (월정액: Claude, API 봇: API)
     routine_fire_url: str = ""  # 월정액: Claude 예약 작업 실행 주소·토큰 (secrets.env, bot/routine.py)
     routine_token: str = ""
     enabled: bool = False
     post_status: str = "draft"   # draft | publish | schedule(예약 발행)
     schedule_times: list[str] = field(default_factory=lambda: ["09:00"])  # 예약 발행 공개 시각
-    publish_times: list[str] = field(default_factory=lambda: ["09:00", "20:00"])
-    jitter_minutes: int = 30
+    jitter_minutes: int = 30    # 예약 공개 시각 ± 랜덤(분)
     provider: str = "gemini"
     model: str = ""
     hint_keywords: list[str] = field(default_factory=list)
@@ -81,7 +80,6 @@ class BotSettings:
             enabled=bool(int(raw.get("enabled") or 0)),
             post_status=raw.get("post_status") or "draft",
             schedule_times=_times(raw.get("schedule_times", "09:00")) or ["09:00"],
-            publish_times=_times(raw.get("publish_times", "09:00\n20:00")),
             jitter_minutes=int(raw.get("jitter_minutes") or 0),
             provider=provider,
             model=(raw.get("model") or "").strip(),

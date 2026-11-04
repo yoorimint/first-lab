@@ -21,10 +21,10 @@ function firstlab_bot_fields(): array {
 			'type'    => 'select',
 			'default' => 'direct',
 			'options' => array( 'direct' => '월정액 (Claude 구독으로 매일 아침 직접 작성)', 'bot' => 'API 봇 (발행 시각마다 봇이 작성, API 비용)' ),
-			'help'    => '월정액: 아래 "직접 작성 시각"마다 서버가 Claude 예약 작업을 실행 → Claude 가 1편씩 써서 올림 (API 요금 없음, 구독 사용량). 후보 안전 검사도 Claude 가 함. "지금 글 1개 만들기"도 Claude 가 씀. 봇은 "봇 작성 시각"에 예비로만 씀 (예비도 끄려면 API 봇 사용 해제). API 봇: 전부 API 로 씀',
+			'help'    => '월정액: "글 작성 시각"·연속 작성·"지금 글 1개 만들기" 모두 Claude 가 씀 (API 요금 없음, 구독 사용량). 후보 안전 검사도 Claude 가 함. API 봇: 전부 API 로 씀 (API 봇 사용을 켜야 글 작성 시각에 씀)',
 		),
-		'direct_times'   => array( 'label' => '직접 작성 시각 (월정액)', 'type' => 'textarea', 'default' => '07:40', 'help' => '한 줄에 하나 (줄 수 = 하루 작성 편수, 예: 07:40 과 13:40 두 줄이면 하루 2편). 서버에 Claude 예약 작업 토큰이 있어야 동작 (bot/routine.py). 공개 시각은 발행 방식을 따름' ),
-		'enabled'        => array( 'label' => 'API 봇 사용', 'type' => 'checkbox', 'default' => 0, 'help' => 'API(유료)로 글을 쓰는 봇. 월정액 방식에서는 직접 쓴 글이 없는 날 아래 "봇 작성 시각"에 예비로만 씀. 공개(발행 방식·예약 공개)와는 상관없음' ),
+		'direct_times'   => array( 'label' => '글 작성 시각', 'type' => 'textarea', 'default' => '07:40', 'help' => '한 줄에 하나 (줄 수 = 하루 작성 편수, 예: 07:40 과 13:40 두 줄이면 하루 2편). 월정액: Claude 가 씀 (서버에 Claude 예약 작업 토큰 필요). API 봇: API 봇 사용이 켜져 있을 때 API 로 씀. 연속 작성 중에는 쉼. 공개는 발행 방식을 따름' ),
+		'enabled'        => array( 'label' => 'API 봇 사용', 'type' => 'checkbox', 'default' => 0, 'help' => '글 작성 방식이 API 봇일 때만 의미 있음: 켜면 글 작성 시각마다 API(유료)로 씀. 월정액 방식에서는 쓰지 않음. 공개(발행 방식·예약 공개)와는 상관없음' ),
 		'post_status'    => array(
 			'label'   => '발행 방식',
 			'type'    => 'select',
@@ -40,8 +40,7 @@ function firstlab_bot_fields(): array {
 		'fact_check'     => array( 'label' => '자동 사실 검증', 'type' => 'checkbox', 'default' => 1, 'help' => '글 완성 후 별도 AI 가 핵심 수치를 웹 검색으로 재확인·수정. 확인 못 한 주장이 많으면 자동 발행 대신 초안으로 남김' ),
 		'daily_cost_cap' => array( 'label' => '하루 AI 비용 상한 (달러)', 'type' => 'number', 'default' => 3, 'min' => 0, 'max' => 100, 'help' => '오늘 쓴 AI 비용(글 작성·검수·갱신 합계)이 이 금액에 닿으면 그날은 더 쓰지 않음. 글 1개 약 0.5달러 (0 = 상한 없음)' ),
 		'refresh_per_week' => array( 'label' => '글 갱신 (주당 최대)', 'type' => 'number', 'default' => 5, 'min' => 0, 'max' => 20, 'help' => '순위 정체·하락 글 보강, 1·7월 제도 변경 재검증, 6개월 지난 글 재검증. 하루 최대 1개 (0 = 끔). 월정액 방식이면 서버가 대상만 고르고 매일 글쓰기 세션이 고침 (API 비용 없음)' ),
-		'publish_times'  => array( 'label' => '봇 작성 시각', 'type' => 'textarea', 'default' => "09:00\n20:00", 'help' => 'API 봇이 글을 쓰는 시각. 한 줄에 하나 (줄 수 = 하루 글 개수). 월정액 방식에서는 예비용 (그날 직접 쓴 글이 있으면 건너뜀). 공개 여부는 발행 방식을 따름' ),
-		'jitter_minutes' => array( 'label' => '랜덤 범위 (± 분)', 'type' => 'number', 'default' => 30, 'min' => 0, 'max' => 180, 'help' => '예: 30 이면 09:00 → 08:30~09:30 사이 무작위 (매일 달라짐)' ),
+		'jitter_minutes' => array( 'label' => '공개 시각 랜덤 범위 (± 분)', 'type' => 'number', 'default' => 30, 'min' => 0, 'max' => 180, 'help' => '예약 공개 시각에 적용. 예: 30 이면 09:00 → 08:30~09:30 사이 무작위 (매일 달라짐)' ),
 		'provider'       => array(
 			'label'   => 'AI 제공사',
 			'type'    => 'select',
@@ -359,11 +358,11 @@ function firstlab_bot_render_status(): void {
 	</form>
 	<p>예약 발행 공개 대기 초안: <strong><?php echo (int) firstlab_bot_ready_count(); ?>편</strong> (발행 방식이 '예약 발행'일 때 공개 시각마다 오래된 것부터 1편씩 공개)</p>
 
-	<h2>오늘 자동 발행 계획</h2>
+	<h2>오늘 공개 계획 (예약 발행)</h2>
 	<p>
 		<?php
 		if ( ! $plan ) {
-			echo '아직 계획이 없습니다 (봇이 1분 안에 만듭니다).';
+			echo '예약 발행이 아니거나 아직 계획이 없습니다 (봇이 1분 안에 만듭니다).';
 		}
 		foreach ( $plan as $i => $time ) {
 			echo esc_html( $time ) . ( in_array( $time, $done, true ) ? ' ✅ ' : ' ⏳ ' ) . '&nbsp; ';  // 완료 기록 = 예정 시각

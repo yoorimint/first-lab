@@ -357,22 +357,19 @@ class ContinuousTest(unittest.TestCase):
         self.assertNotIn("continuous", state)
 
 
-class FallbackTest(unittest.TestCase):
-    def test_direct_post_today(self):
-        from bot.run import direct_post_today
-        log = [{"time": "2026-11-05 08:20", "ok": True, "msg": "직접 작성 글: [발행] 'x'"}]
-        self.assertTrue(direct_post_today({"log": log}, "2026-11-05"))
-        self.assertFalse(direct_post_today({"log": log}, "2026-11-06"))
-        bad = [{"time": "2026-11-05 08:20", "ok": False, "msg": "직접 작성 글 실패 (a.json)"}]
-        self.assertFalse(direct_post_today({"log": bad}, "2026-11-05"))
+class PlanTest(unittest.TestCase):
+    def test_publish_plan_jitter(self):
+        from bot.schedule import plan_times
+        plan = plan_times(["09:00", "18:00"], 30, "2026-11-05")
+        self.assertEqual(plan, plan_times(["18:00", "09:00"], 30, "2026-11-05"))  # 하루 동안 같은 값
+        h, m = map(int, plan[0].split(":"))
+        self.assertTrue(8 * 60 + 30 <= h * 60 + m <= 9 * 60 + 30)
+        self.assertEqual(plan_times(["09:00"], 0, "2026-11-05"), ["09:00"])
+        self.assertEqual(plan_times(["00:05"], 30, "2026-11-05")[0][:2], "00")  # 전날로 넘어가지 않음
 
-    def test_write_mode(self):
-        from bot.run import yields_to_direct
-        log = {"log": [{"time": "2026-11-05 08:20", "ok": True, "msg": "직접 작성 글: [발행] 'x'"}]}
-        direct, bot = BotSettings.from_option({}, {}), BotSettings.from_option({"write_mode": "bot"}, {})
-        self.assertEqual((direct.write_mode, bot.write_mode), ("direct", "bot"))
-        self.assertTrue(yields_to_direct(direct, log, "2026-11-05"))
-        self.assertFalse(yields_to_direct(bot, log, "2026-11-05"))  # 봇 방식은 직접 글이 있어도 그대로 씀
+    def test_write_mode_setting(self):
+        self.assertEqual(BotSettings.from_option({}, {}).write_mode, "direct")
+        self.assertEqual(BotSettings.from_option({"write_mode": "bot"}, {}).write_mode, "bot")
 
 
 class MiscTest(unittest.TestCase):

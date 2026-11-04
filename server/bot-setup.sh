@@ -32,8 +32,6 @@ apply_settings_once() {
   touch "$mark" && echo "적용: $*"
 }
 apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
-# 직접 작성(예약 세션 매일 07:37)으로 전환: 봇 자동 발행은 11:00 예비 (그 전에 직접 작성 글이 올라오면 건너뜀)
-apply_settings_once 2026-11-04-direct publish_times=11:00 jitter_minutes=0
 
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"

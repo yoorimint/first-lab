@@ -2,9 +2,9 @@
 
   - (키워드 수집은 별도 작업 firstlab-discover: 매일 + 배포 직후)
   - 하루 1회: 상위 후보 사전 검토 (API 봇: 안전 검사 + 경쟁도 / 월정액: 경쟁도만)
-  - 월정액: '직접 작성 시각'이 되면 Claude 예약 작업 실행 (bot/routine.py, API 요금 없음)
-  - 관리자가 '지금 글 1개 만들기'를 눌렀으면 → 월정액: Claude 예약 작업 실행 / API 봇: 1개 생성
-  - 자동 발행이 켜져 있고, 오늘의 랜덤 발행 시각이 지난 슬롯이 있으면 → 1개 생성 (월정액에선 예비)
+  - 예약 발행: 오늘의 공개 시각(설정 ± 랜덤)마다 가장 오래된 대기 초안 1편 공개 (bot/schedule.py)
+  - '글 작성 시각'·'지금 글 1개 만들기'·연속 작성 → 월정액: Claude 예약 작업 실행 (bot/routine.py, API 요금 없음)
+    / API 봇 방식('API 봇 사용' 켜짐): API 로 1개 생성
   - 한 번 실행에 글은 최대 1개 (몰아서 발행 방지)
 
 사용: python3 -m bot.run            (평소: 할 일이 있을 때만 실행)
@@ -15,7 +15,6 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
-import random
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -34,43 +33,12 @@ from .writer import align_with_body, write_article
 
 KST = ZoneInfo("Asia/Seoul")
 LOCK_FILE = "/run/firstlab-bot.lock"
-MAX_LATE_MINUTES = 180  # 서버 중단 등으로 이보다 늦어진 슬롯은 건너뜀 (몰아서 발행 방지)
 MIN_POOL = 30           # 후보가 이보다 적으면 글 쓰기 전에 창고를 조금 확장
 RETRY_REVIEW_MIN = 20   # AI 혼잡 시 사전 검토 재시도 간격(분)
 RETRY_MANUAL_MIN = 5    # AI 혼잡 시 수동 요청 재시도 간격(분)
 MANUAL_RETRIES = 12     # 수동 요청 최대 재시도 횟수
-RETRY_AUTO_MIN = 10     # AI 혼잡 시 자동 발행 재시도 간격(분)
 CONTINUOUS_TIMEOUT_MIN = 60  # 연속 작성: 한 편이 이 시간 안에 안 올라오면 실패로 보고 다음 편 실행
 CONTINUOUS_MAX_FAILS = 3     # 연속으로 이만큼 실패하면 연속 작성을 자동으로 멈춤 (사용량 한도·후보 소진 등)
-
-
-def plan_for_today(settings: BotSettings, today: str) -> list[str]:
-    """오늘의 발행 시각 = 설정 시각 ± 랜덤(분). 날짜로 시드를 고정해 하루 동안 같은 값."""
-    plan = []
-    for i, hhmm in enumerate(settings.publish_times):
-        base = datetime.strptime(f"{today} {hhmm}", "%Y-%m-%d %H:%M")
-        offset = random.Random(f"{today}-{i}-{hhmm}").randint(-settings.jitter_minutes, settings.jitter_minutes)
-        day_start = base.replace(hour=0, minute=0)
-        t = min(max(base + timedelta(minutes=offset), day_start), day_start.replace(hour=23, minute=59))
-        plan.append(t.strftime("%H:%M"))  # 날짜를 넘어가지 않게 00:00~23:59 로 제한
-    return plan
-
-
-def due_slot(state: dict, settings: BotSettings, now: datetime) -> int | None:
-    """실행할 차례인 슬롯 번호 (없으면 None). 오늘 계획을 상태에 기록한다."""
-    today = now.strftime("%Y-%m-%d")
-    state["plan"] = {today: plan_for_today(settings, today)}            # 지난 날짜는 정리
-    # 완료 기록은 '예정 시각(HH:MM)'으로 저장 (예전 버전의 회차 번호 기록은 무시)
-    state["done"] = {today: [d for d in state["done"].get(today, []) if isinstance(d, str)]}
-    for i, hhmm in enumerate(state["plan"][today]):
-        if hhmm in state["done"][today] or now.strftime("%H:%M") < hhmm:
-            continue
-        due = now.replace(hour=int(hhmm[:2]), minute=int(hhmm[3:]), second=0, microsecond=0)
-        if now - due > timedelta(minutes=MAX_LATE_MINUTES):
-            state["done"][today].append(hhmm)  # 너무 늦음 → 건너뜀
-            continue
-        return i
-    return None
 
 
 def _record_competition(conn, keyword: str, urls: list[str]) -> None:
@@ -193,17 +161,6 @@ def clear_cache() -> None:
         shutil.rmtree(path, ignore_errors=True) if os.path.isdir(path) else os.remove(path)
 
 
-def yields_to_direct(settings: BotSettings, state: dict, today: str) -> bool:
-    """월정액(직접 작성) 방식이고 오늘 직접 쓴 글이 올라왔으면 봇 자동 발행은 쉰다."""
-    return settings.write_mode == "direct" and direct_post_today(state, today)
-
-
-def direct_post_today(state: dict, today: str) -> bool:
-    """예약 글쓰기 세션이 오늘 글을 올렸는지 (publish_queue 기록 기준)."""
-    return any(e.get("ok") and str(e.get("time", "")).startswith(today) and "직접 작성 글:" in str(e.get("msg", ""))
-               for e in state.get("log", []))
-
-
 def daily_review(state: dict, settings: BotSettings, now: datetime) -> None:
     """하루 1회 상위 후보 사전 검토 → 설정 페이지에 근거 표시.
     API 봇: AI 안전 검사 + 경쟁도 / 월정액: 경쟁도만 (Gemini 무료. 안전 판단은 글쓰기 세션이 하고 제외 목록을 올림)"""
@@ -316,29 +273,24 @@ def main() -> None:
     daily_review(state, settings, now)
     stamp = now.strftime("%Y-%m-%d %H:%M")
 
-    # 예약 발행: 공개 시각마다 쌓인 초안 중 가장 오래된 것 1편 공개
+    # 예약 발행: 오늘의 공개 시각(설정 ± 랜덤)마다 가장 오래된 대기 초안 1편 공개
     if settings.post_status == "schedule":
-        fired = state.get("publish_fired", {}).get(today, [])
-        due = schedule.due_slot(settings.schedule_times, fired, now.replace(tzinfo=None))
+        plan = schedule.plan_times(settings.schedule_times, settings.jitter_minutes, today)
+        done = [t for t in state.get("done", {}).get(today, []) if isinstance(t, str)]
+        state["plan"], state["done"] = {today: plan}, {today: done}  # 지난 날짜는 정리 (설정 페이지 '오늘 공개 계획')
+        due = schedule.due_slot(plan, done, now.replace(tzinfo=None))
         if due:
-            state["publish_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림
+            done.append(due)
             try:
                 msg = schedule.publish_next(now)
                 add_log(state, True, f"예약 공개 {due}: {msg or '공개할 초안 없음'}")
             except subprocess.CalledProcessError as e:
                 add_log(state, False, f"예약 공개 {due} 실패: {e.stderr or e}")
+    else:
+        state["plan"], state["done"] = {}, {}
 
-    # 월정액: 연속 작성 중이면 그것만, 아니면 직접 작성 시각에 1편 (실패해도 같은 시각은 다시 안 함 → 예비 봇이 대신)
-    continuous_step(state, settings, now)
-    if settings.write_mode == "direct" and not state.get("continuous"):
-        fired = state.get("direct_fired", {}).get(today, [])
-        due = schedule.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
-        if due:
-            state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림
-            fire_routine(state, settings, f"직접 작성 {due}")
-
-    # 글 생성 (수동 요청 또는 자동 발행 시각)
-    reason, slot = None, None
+    # 글 생성: 수동 요청, 연속 작성, 글 작성 시각 (월정액 → Claude, API 봇 방식 + 'API 봇 사용' → API)
+    reason = None
     if pop_manual_request():
         if settings.write_mode == "direct":  # 월정액: API 대신 Claude 가 씀
             fire_routine(state, settings, "수동 요청", routine.MANUAL_TEXT)
@@ -347,20 +299,21 @@ def main() -> None:
             reason = "수동"
     elif args.now or (state.get("manual_next") and stamp >= state["manual_next"]):
         reason = "수동(재시도)" if not args.now else "수동"
-    slot_candidate = due_slot(state, settings, now)
-    if reason is None and settings.enabled and slot_candidate is not None and stamp >= state.get("auto_next", ""):
-        reason, slot = f"자동 {slot_candidate + 1}회차", slot_candidate
+    continuous_step(state, settings, now)
+    if not state.get("continuous"):
+        fired = state.get("direct_fired", {}).get(today, [])
+        due = schedule.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
+        if due:
+            state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림, 실패해도 같은 시각은 다시 안 함
+            if settings.write_mode == "direct":
+                fire_routine(state, settings, f"글 작성 {due}")
+            elif settings.enabled and reason is None:
+                reason = f"자동 {due}"
 
-    if reason and slot is not None and yields_to_direct(settings, state, today):
-        add_log(state, True, f"{reason} 건너뜀: 오늘 직접 작성 글이 이미 올라옴 (봇은 예비)")
-        state["done"][today].append(state["plan"][today][slot])
-        reason = None
     cap = settings.daily_cost_cap
     if reason and cap > 0 and spent_today(state) >= cap:
         add_log(state, False, f"{reason} 건너뜀: 오늘 AI 비용 ${spent_today(state):.2f} → 하루 상한 ${cap:.0f} 도달 (내일 다시)")
         state["manual_next"] = ""
-        if slot is not None:
-            state["done"][today].append(state["plan"][today][slot])
         reason = None
     if reason:
         used_llms: list = []
@@ -375,10 +328,6 @@ def main() -> None:
                 state["manual_attempts"] = attempts
                 state["manual_next"] = (now + timedelta(minutes=RETRY_MANUAL_MIN)).strftime("%Y-%m-%d %H:%M")
                 add_log(state, False, f"{reason} 보류: {e} → {state['manual_next'][11:]}에 자동 재시도 ({attempts}/{MANUAL_RETRIES})")
-            elif slot is not None:  # 자동 발행: 10분 뒤 같은 회차 재시도 (예정 시각 3시간 지나면 포기)
-                state["auto_next"] = (now + timedelta(minutes=RETRY_AUTO_MIN)).strftime("%Y-%m-%d %H:%M")
-                add_log(state, False, f"{reason} 보류: {e} → {state['auto_next'][11:]}에 재시도")
-                slot = None  # 완료 처리하지 않음
             else:
                 state["manual_next"] = ""
                 add_log(state, False, f"{reason} 실패: {e}")
@@ -388,8 +337,6 @@ def main() -> None:
             add_log(state, False, f"{reason} 실패: {detail}")
             print(f"실패: {detail}", file=sys.stderr)
         add_spend(state, sum(getattr(x, "cost_usd", 0.0) for x in used_llms))  # 실패해도 쓴 비용은 반영
-        if slot is not None:  # 실패해도 같은 슬롯을 1분마다 재시도하지 않도록 완료 처리
-            state["done"][today].append(state["plan"][today][slot])
 
     if reason or excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
         refresh_dashboard(state, settings)  # 변화가 있거나 1시간마다
