@@ -386,6 +386,17 @@ class MiscTest(unittest.TestCase):
             self.assertTrue({"post", "why", "find"} <= set(p))
             self.assertTrue({"replace_paragraph", "insert_after"} & set(p))
 
+    def test_patches_apply_only_once(self):
+        """교체 문장에 find 가 남아 있으면 배포마다 다시 고쳐지므로 금지."""
+        for p in json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")):
+            if "replace_paragraph" in p:
+                self.assertNotIn(p["find"], p["replace_paragraph"], p["why"])
+
+    def test_patch_list_item(self):
+        html = "<ul><li>앞</li><li><strong>철회</strong>: 대상이 아니에요.</li></ul>"
+        out = patch_content(html, {"tag": "li", "find": "대상이 아니에요", "replace_paragraph": "완화"})
+        self.assertEqual(out, "<ul><li>앞</li><li>완화</li></ul>")
+
     def test_patch_insert_calculator_after_paragraph(self):
         html = "<!-- wp:paragraph -->\n<p>과태료는 <strong>4만</strong>원부터</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->"
         patch = {"find": "과태료는", "insert_after": '[firstlab_calc id="car-inspection"]'}

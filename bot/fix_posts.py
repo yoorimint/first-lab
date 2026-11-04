@@ -61,11 +61,12 @@ _PARA_END = "<!-- /wp:paragraph -->"
 def patch_content(content: str, patch: dict) -> str | None:
     """'find' 가 들어 있는 문단(<p>…</p>)을 고친 본문. 고칠 게 없으면(이미 적용됨) None.
 
-    replace_paragraph: 문단 전체를 이 문장으로 교체
+    replace_paragraph: 문단 전체를 이 문장으로 교체 ("tag": "li" 면 목록 항목 하나를 교체)
     insert_after: 문단(블록) 바로 뒤에 이 내용을 블록으로 추가 (예: 계산기 [firstlab_calc id="..."])
     """
-    # 문단 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
-    m = re.search(r"<p>(?:(?!</p>).)*?" + re.escape(patch["find"]) + r".*?</p>", content, flags=re.S)
+    tag = patch.get("tag", "p")
+    # 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
+    m = re.search(rf"<{tag}>(?:(?!</{tag}>).)*?" + re.escape(patch["find"]) + rf".*?</{tag}>", content, flags=re.S)
     if "insert_after" in patch:
         if not m or patch["insert_after"] in content:
             return None
@@ -74,7 +75,7 @@ def patch_content(content: str, patch: dict) -> str | None:
         return f"{content[:at]}\n\n{to_blocks('<p>' + patch['insert_after'] + '</p>')}{content[at:]}"
     if not m:
         return None
-    return content.replace(m.group(0), f"<p>{patch['replace_paragraph']}</p>")
+    return content.replace(m.group(0), f"<{tag}>{patch['replace_paragraph']}</{tag}>")
 
 
 def apply_patches() -> None:
