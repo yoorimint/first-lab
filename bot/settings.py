@@ -42,7 +42,8 @@ def _times(text: str) -> list[str]:
 class BotSettings:
     write_mode: str = "direct"  # direct = 월정액 직접 작성(봇은 예비) | bot = API 봇이 작성
     enabled: bool = False
-    post_status: str = "draft"
+    post_status: str = "draft"   # draft | publish | schedule(예약 발행)
+    schedule_times: list[str] = field(default_factory=lambda: ["09:00"])  # 예약 발행 공개 시각
     publish_times: list[str] = field(default_factory=lambda: ["09:00", "20:00"])
     jitter_minutes: int = 30
     provider: str = "gemini"
@@ -73,6 +74,7 @@ class BotSettings:
             write_mode="bot" if raw.get("write_mode") == "bot" else "direct",
             enabled=bool(int(raw.get("enabled") or 0)),
             post_status=raw.get("post_status") or "draft",
+            schedule_times=_times(raw.get("schedule_times", "09:00")) or ["09:00"],
             publish_times=_times(raw.get("publish_times", "09:00\n20:00")),
             jitter_minutes=int(raw.get("jitter_minutes") or 0),
             provider=provider,

@@ -24,7 +24,7 @@ from . import competition, factcheck, related
 from .discover import discover
 from .keyword_db import connect, set_competition, set_status, summary
 from .llm import LLMBusy, make_llm
-from .publisher import publish
+from .publisher import STATUS_LABEL, publish
 from .select_keyword import pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings, wp_cli
 from .state import add_log, add_spend, load_state, pop_excluded, pop_manual_request, save_state, spent_today
@@ -119,9 +119,9 @@ def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
                 status = "draft"  # 제목 숫자가 본문과 다르면 자동 발행하지 않음
         post_id, link, image_note = publish(article, status, slug=keyword,
                                             cloudflare=(settings.cf_account_id, settings.cf_api_token),
-                                            image_count=settings.image_count)
+                                            image_count=settings.image_count, schedule_times=settings.schedule_times)
         set_status(conn, keyword, "used", f"post {post_id}")
-    kind = "발행" if status == "publish" else "초안 저장"
+    kind = STATUS_LABEL.get(status, "초안 저장")
     cost = getattr(llm, "cost_usd", 0.0) + getattr(light, "cost_usd", 0.0)
     cost_note = f", AI 비용 약 ${cost:.2f}(≈{cost * 1400:,.0f}원)" if cost else ""
     return (f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}, "
@@ -131,17 +131,31 @@ def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
 CACHE_DIR = "/var/cache/nginx/first-lab"
 
 
+def _latest(orderby: str, field: str) -> str:
+    return wp_cli("post", "list", "--post_type=post,page", "--post_status=publish", f"--orderby={orderby}",
+                  "--order=DESC", "--posts_per_page=1", f"--field={field}").strip()
+
+
 def purge_cache_if_changed(state: dict) -> None:
-    """가장 최근 발행·수정 시각이 바뀌었으면 nginx 페이지 캐시 삭제."""
+    """가장 최근 수정 시각이나 공개 시각이 바뀌었으면 nginx 페이지 캐시 삭제.
+    (예약 글이 공개될 때는 수정 시각이 그대로일 수 있어 공개 시각도 본다)"""
     try:
-        latest = wp_cli("post", "list", "--post_type=post,page", "--post_status=publish", "--orderby=modified",
-                        "--order=DESC", "--posts_per_page=1", "--field=post_modified").strip()
+        modified = _latest("modified", "post_modified")
+        signature = f"{modified}|{_latest('date', 'post_date')}"
     except subprocess.CalledProcessError:
         return
-    if latest and latest != state.get("last_modified"):
+    if modified and signature != state.get("cache_signature"):
         _sync_recent_cards(state.get("last_modified", ""))
         clear_cache()
-        state["last_modified"] = latest
+        state["last_modified"], state["cache_signature"] = modified, signature
+
+
+def run_due_wp_cron() -> None:
+    """워드프레스 예약 작업(예약 글 공개 등) 실행. 방문이 적거나 캐시된 페이지만 보면 워드프레스가 스스로 못 돌림."""
+    try:
+        wp_cli("cron", "event", "run", "--due-now", "--quiet")
+    except subprocess.CalledProcessError as e:
+        print(f"[run] 워드프레스 예약 작업 실패: {e.stderr}", flush=True)
 
 
 def _sync_recent_cards(since: str) -> None:
@@ -211,7 +225,8 @@ def main() -> None:
     now = datetime.now(KST)
     today = now.strftime("%Y-%m-%d")
 
-    # 글이 발행·수정되면 페이지 캐시 비우기 (앱·관리자 화면에서 발행해도 1분 안에 반영)
+    # 예약 글 공개 → 글이 발행·수정되면 페이지 캐시 비우기 (앱·관리자 화면에서 발행해도 1분 안에 반영)
+    run_due_wp_cron()
     purge_cache_if_changed(state)
 
     # 관리자 '제외' 반영

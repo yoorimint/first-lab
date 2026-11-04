@@ -14,7 +14,7 @@ from pathlib import Path
 
 from . import refresh, related
 from .keyword_db import connect, norm, set_status
-from .publisher import publish
+from .publisher import STATUS_LABEL, publish
 from .settings import load_settings
 from .state import add_log, load_state, save_state
 from .writer import align_with_body, parse_article
@@ -39,7 +39,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     status = data.get("status", "draft")
     if status == "auto":
         status = settings.post_status
-    if status not in ("draft", "publish"):
+    if status not in STATUS_LABEL:
         status = "draft"
     article = parse_article(json.dumps(data, ensure_ascii=False))
     notes = []
@@ -51,13 +51,13 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     article.content_html, _ = related.clean_links(article.content_html, allowed_links)
     post_id, link, image_note = publish(article, status, slug=keyword,
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token),
-                                        image_count=settings.image_count)
+                                        image_count=settings.image_count, schedule_times=settings.schedule_times)
     with connect() as conn:
         exists = conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
         if exists:
             set_status(conn, keyword, "used", f"post {post_id} (직접 작성)")
             conn.commit()
-    kind = "발행" if status == "publish" else "초안 저장"
+    kind = STATUS_LABEL[status]
     extra = f", {', '.join(notes)}" if notes else ""
     return f"[{kind}] '{article.title}' (키워드: {keyword}, 직접 작성, {image_note}{extra}) {link}"
 

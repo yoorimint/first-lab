@@ -26,7 +26,7 @@ add_action(
 					$state    = (array) get_option( 'firstlab_bot_state', array() );
 					$settings = (array) get_option( 'firstlab_bot', array() );
 					$recent   = array();
-					foreach ( get_posts( array( 'numberposts' => 30, 'post_status' => array( 'publish', 'draft' ) ) ) as $p ) {
+					foreach ( get_posts( array( 'numberposts' => 30, 'post_status' => array( 'publish', 'future', 'draft' ) ) ) as $p ) {
 						$recent[] = array(
 								'title'  => $p->post_title,
 								'slug'   => urldecode( $p->post_name ),

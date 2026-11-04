@@ -216,6 +216,22 @@ class DirectRefreshTest(unittest.TestCase):
             self.assertFalse(any(a[:2] == ("post", "update") for a in calls))
 
 
+class ScheduleTest(unittest.TestCase):
+    def test_next_free_slot(self):
+        from datetime import datetime
+        from bot.schedule import next_slot
+        now = datetime(2026, 11, 5, 7, 40)
+        self.assertEqual(next_slot(["09:00"], now, set()), datetime(2026, 11, 5, 9, 0))
+        self.assertEqual(next_slot(["09:00"], now, {"2026-11-05 09:00"}), datetime(2026, 11, 6, 9, 0))
+        # 10분 안으로 임박한 시각은 건너뛰고, 하루 두 번이면 같은 날 다음 시각
+        self.assertEqual(next_slot(["18:00", "09:00"], datetime(2026, 11, 5, 8, 55), set()), datetime(2026, 11, 5, 18, 0))
+
+    def test_settings(self):
+        s = BotSettings.from_option({"post_status": "schedule", "schedule_times": "9:00\n18시"}, {})
+        self.assertEqual((s.post_status, s.schedule_times), ("schedule", ["09:00", "18:00"]))
+        self.assertEqual(BotSettings.from_option({}, {}).schedule_times, ["09:00"])
+
+
 class FallbackTest(unittest.TestCase):
     def test_direct_post_today(self):
         from bot.run import direct_post_today

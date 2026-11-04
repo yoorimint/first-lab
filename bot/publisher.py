@@ -1,13 +1,19 @@
 """워드프레스에 글 저장 (WP-CLI): 블록 형식 변환 + 대표 이미지(제목 카드) + 본문 AI 이미지."""
 from __future__ import annotations
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from . import images
 from .blocks import to_blocks
 from .categories import slug_of
+from .schedule import next_slot, scheduled_times
 from .settings import wp_cli
 from .writer import Article
 
 SITE_URL = "https://first-lab.kr"
+SITE_TZ = ZoneInfo("Asia/Seoul")  # 워드프레스 timezone_string 과 같게 (server/wp-setup.sh)
+STATUS_LABEL = {"publish": "발행", "draft": "초안 저장", "schedule": "예약"}
 
 
 def _insert_images(content: str, blocks: list[str]) -> str:
@@ -80,10 +86,17 @@ def site_author_id() -> str:
     return ids[0] if ids else ""
 
 
-def publish(article: Article, status: str, slug: str = "",
-            cloudflare: tuple[str, str] = ("", ""), image_count: int = 3) -> tuple[int, str, str]:
-    """slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다."""
+def publish(article: Article, status: str, slug: str = "", cloudflare: tuple[str, str] = ("", ""),
+            image_count: int = 3, schedule_times: list[str] | None = None) -> tuple[int, str, str]:
+    """status: publish | draft | schedule (예약 공개 시각 중 다음 빈 자리, schedule.py)
+    slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다.
+    반환: (글 번호, 주소, 처리 메모)"""
     content, image_note = build_content(article, slug or article.title, cloudflare, image_count)
+    date_args: list[str] = []
+    if status == "schedule":
+        when = next_slot(schedule_times or [], datetime.now(SITE_TZ).replace(tzinfo=None), scheduled_times())
+        status, date_args = "future", [f"--post_date={when:%Y-%m-%d %H:%M:%S}"]
+        image_note += f", {when:%m/%d %H:%M} 공개 예정"
     post_id = int(wp_cli(
         "post", "create",
         f"--post_title={article.title}",
@@ -91,6 +104,7 @@ def publish(article: Article, status: str, slug: str = "",
         f"--post_content={content}",
         f"--post_excerpt={article.excerpt}",
         f"--post_status={status}",
+        *date_args,
         *([f"--post_author={author}"] if (author := site_author_id()) else []),  # 비우면 작성자 없음(0)으로 저장돼 화면에 빈칸
         f"--tags_input={','.join(article.tags)}",
         "--porcelain",
@@ -102,6 +116,6 @@ def publish(article: Article, status: str, slug: str = "",
         print(f"[이미지] 대표 이미지 실패: {e}", flush=True)
     if status == "publish":
         link = wp_cli("eval", f"echo get_permalink({post_id});").strip()
-    else:  # 초안은 공개 주소가 없으므로 편집 화면 주소
+    else:  # 초안·예약 글은 아직 공개 주소가 없으므로 편집 화면 주소
         link = f"{SITE_URL}/wp-admin/post.php?post={post_id}&action=edit"
     return post_id, link, image_note
