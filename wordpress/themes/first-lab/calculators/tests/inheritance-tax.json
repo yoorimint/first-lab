@@ -90,7 +90,8 @@
       "tax": 0,
       "credit": 0,
       "pay": 0
-    }
+    },
+    "boundary": true
   },
   {
     "why": "자녀2, 15억 중 금융 3억: 금융공제 20% 6천만, 과표 9억3,500만 ×30% −6천만 = 2억2,050만 → 2억1,388만5천 (본문 표)",
@@ -390,7 +391,8 @@
       "tax": 0,
       "credit": 0,
       "pay": 0
-    }
+    },
+    "boundary": true
   },
   {
     "why": "법정상속분 정수 계산: 18억 4,800만 × 3/11 = 5억 400만 (소수 곱셈이면 1원 모자람)",
@@ -446,5 +448,32 @@
       "credit": 0,
       "pay": 438000000
     }
+  },
+  {
+    "why": "과세표준 딱 50만 원이면 부과 (제25조② '50만원 미만'만 제외): 자녀1 5억 550만 − 장례 최소 500만 − 일괄 5억 = 50만 × 10% = 5만, 신고공제 1,500 → 48,500 (손 계산)",
+    "input": {
+      "estate": 505500000,
+      "heirs": "children",
+      "children": 1,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gifts_nonheir": 0,
+      "spouse_gift_base": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "base": 500000,
+      "tax": 50000,
+      "credit": 1500,
+      "pay": 48500
+    },
+    "boundary": true
   }
 ]

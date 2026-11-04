@@ -194,6 +194,25 @@
       "surcharge": 0,
       "credit": 0,
       "pay": 0
-    }
+    },
+    "boundary": true
+  },
+  {
+    "why": "과세표준 딱 50만 원이면 부과 (제55조② '50만원 미만'만 제외): 5,050만 − 5,000만 = 50만 × 10% = 5만, 신고공제 3% 1,500 → 48,500 (손 계산)",
+    "input": {
+      "price": 50500000,
+      "relation": "parent_adult",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "base": 500000,
+      "tax": 50000,
+      "surcharge": 0,
+      "credit": 1500,
+      "pay": 48500
+    },
+    "boundary": true
   }
 ]

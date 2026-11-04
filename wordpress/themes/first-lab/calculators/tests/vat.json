@@ -67,7 +67,8 @@
       "supply": 1,
       "tax": 0,
       "total": 1
-    }
+    },
+    "boundary": true
   },
   {
     "why": "일반과세자 매출 공급가액 3,000만 원, 매입세액 180만 원: 300만 - 180만 = 120만 원 (본문 예시)",
@@ -140,7 +141,8 @@
       "credit": 0,
       "pay": 0,
       "exempt": true
-    }
+    },
+    "boundary": true
   },
   {
     "why": "간이 공제가 납부세액보다 커도 환급 없음 → 0원",
@@ -156,5 +158,21 @@
       "pay": 0,
       "exempt": false
     }
+  },
+  {
+    "why": "간이 공급대가 딱 4,800만 원: 면제는 '4,800만 원 미만'만 (부가가치세법 제69조) → 4,800만 × 15% × 10% = 72만 원 (손 계산)",
+    "input": {
+      "mode": "simple",
+      "amount": 48000000,
+      "purchase": 0,
+      "industry": "retail"
+    },
+    "expect": {
+      "gross": 720000,
+      "credit": 0,
+      "pay": 720000,
+      "exempt": false
+    },
+    "boundary": true
   }
 ]

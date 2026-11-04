@@ -1,37 +1,119 @@
 [
   {
     "why": "국세청 예시: 과세표준 30,000,000원 × 15% - 1,260,000원 = 3,240,000원 (종합소득금액 3,150만 - 기본공제 150만)",
-    "input": {"income": 31500000, "people": 1, "other_deduction": 0, "credit": 0, "prepaid": 0},
-    "expect": {"base": 30000000, "rate": 15, "tax": 3240000, "determined": 3240000, "local": 324000}
+    "input": {
+      "income": 31500000,
+      "people": 1,
+      "other_deduction": 0,
+      "credit": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "base": 30000000,
+      "rate": 15,
+      "tax": 3240000,
+      "determined": 3240000,
+      "local": 324000
+    }
   },
   {
     "why": "세율표 첫 구간 끝: 과세표준 1,400만 원 × 6% = 84만 원",
-    "input": {"income": 15500000, "people": 1, "other_deduction": 0, "credit": 0, "prepaid": 0},
-    "expect": {"base": 14000000, "rate": 6, "tax": 840000}
+    "input": {
+      "income": 15500000,
+      "people": 1,
+      "other_deduction": 0,
+      "credit": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "base": 14000000,
+      "rate": 6,
+      "tax": 840000
+    },
+    "boundary": true
   },
   {
     "why": "세율표 15% 구간 끝: 5,000만 × 15% - 126만 = 624만 원 (24% 구간 5,000만 × 24% - 576만 = 624만과 같음)",
-    "input": {"income": 51500000, "people": 1, "other_deduction": 0, "credit": 0, "prepaid": 0},
-    "expect": {"base": 50000000, "rate": 15, "tax": 6240000}
+    "input": {
+      "income": 51500000,
+      "people": 1,
+      "other_deduction": 0,
+      "credit": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "base": 50000000,
+      "rate": 15,
+      "tax": 6240000
+    },
+    "boundary": true
   },
   {
     "why": "세율표 35% 구간: 과세표준 1억 원 × 35% - 1,544만 = 1,956만 원",
-    "input": {"income": 101500000, "people": 1, "other_deduction": 0, "credit": 0, "prepaid": 0},
-    "expect": {"base": 100000000, "rate": 35, "tax": 19560000, "local": 1956000}
+    "input": {
+      "income": 101500000,
+      "people": 1,
+      "other_deduction": 0,
+      "credit": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "base": 100000000,
+      "rate": 35,
+      "tax": 19560000,
+      "local": 1956000
+    }
   },
   {
     "why": "본문 예시: 3,600만 - 기본공제 2명 300만 = 3,300만 → 369만, 세액공제 10만 → 359만, 이미 낸 150만 → 209만, 지방 35만 9천 - 15만 = 20만 9천",
-    "input": {"income": 36000000, "people": 2, "other_deduction": 0, "credit": 100000, "prepaid": 1500000},
-    "expect": {"deduction": 3000000, "base": 33000000, "tax": 3690000, "determined": 3590000, "due": 2090000, "local": 359000, "local_due": 209000}
+    "input": {
+      "income": 36000000,
+      "people": 2,
+      "other_deduction": 0,
+      "credit": 100000,
+      "prepaid": 1500000
+    },
+    "expect": {
+      "deduction": 3000000,
+      "base": 33000000,
+      "tax": 3690000,
+      "determined": 3590000,
+      "due": 2090000,
+      "local": 359000,
+      "local_due": 209000
+    }
   },
   {
     "why": "공제가 소득보다 크면 과세표준 0원, 이미 낸 30만 원은 전액 환급(-30만), 지방 -3만",
-    "input": {"income": 2000000, "people": 2, "other_deduction": 0, "credit": 0, "prepaid": 300000},
-    "expect": {"base": 0, "tax": 0, "determined": 0, "due": -300000, "local_due": -30000}
+    "input": {
+      "income": 2000000,
+      "people": 2,
+      "other_deduction": 0,
+      "credit": 0,
+      "prepaid": 300000
+    },
+    "expect": {
+      "base": 0,
+      "tax": 0,
+      "determined": 0,
+      "due": -300000,
+      "local_due": -30000
+    },
+    "boundary": true
   },
   {
     "why": "최고 구간: 과세표준 20억 원 × 45% - 6,594만 = 8억 3,406만 원",
-    "input": {"income": 2001500000, "people": 1, "other_deduction": 0, "credit": 0, "prepaid": 0},
-    "expect": {"base": 2000000000, "rate": 45, "tax": 834060000}
+    "input": {
+      "income": 2001500000,
+      "people": 1,
+      "other_deduction": 0,
+      "credit": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "base": 2000000000,
+      "rate": 45,
+      "tax": 834060000
+    }
   }
 ]

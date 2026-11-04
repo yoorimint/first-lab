@@ -819,5 +819,52 @@ class FaviconTest(unittest.TestCase):
         for name in ("/favicon.ico", "favicon.svg", "icon-192.png", "apple-touch-icon.png"):
             self.assertIn(name, site)
 
+
+class SourceCheckTest(unittest.TestCase):
+    """근거 대조(기록만): 글쓴이가 단 공식 링크에 주장 숫자가 실제로 있는지 (11/5 운영자 승인)."""
+
+    REVIEW = [
+        {"claim": "1·2차 동시 응시료 28,000원", "urls": ["https://www.q-net.or.kr/a"], "verdict": "맞음", "action": "유지"},
+        {"claim": "민간자격 238건", "urls": ["https://www.pqi.or.kr/b"], "verdict": "맞음", "action": "유지"},
+        {"claim": "상담 ARS 126-1-1", "urls": ["https://www.nts.go.kr/c"], "verdict": "맞음", "action": "유지"},
+        {"claim": "수수료 13,700원", "urls": ["https://blog.naver.com/x"], "verdict": "맞음", "action": "유지"},
+        {"claim": "확인 못 한 3,000원", "urls": ["https://www.q-net.or.kr/a"], "verdict": "확인불가", "action": "완화"},
+    ]
+
+    def test_statuses(self):
+        from bot import source_check as sc
+        pages = {"https://www.q-net.or.kr/a": sc.page_text("<p>1, 2차 동시 응시자: 28,000원</p>".encode(), "utf-8"),
+                 "https://www.pqi.or.kr/b": None}
+        result = sc.check(self.REVIEW, fetcher=lambda u: pages.get(u))
+        # 공식 주소 없는 주장(블로그), 완화한 주장은 대조하지 않음. 못 연 페이지(pqi, nts) → '못 엶'
+        self.assertEqual(result["counts"], {sc.FOUND: 1, sc.MISSING: 0, sc.UNOPENED: 2})
+        self.assertEqual([c["claim"] for c in result["claims"]], ["민간자격 238건", "상담 ARS 126-1-1"])
+        self.assertEqual(sc.key_numbers("5일 안에 12억 원"), [])  # 짧은 수는 어디에나 있어 제외
+        self.assertIn("확인 1", sc.summary(result))
+        self.assertEqual(sc.key_numbers("15억이면 691,200원"), [])  # 계산 결과는 출처에 없음
+        self.assertEqual(sc.key_numbers("과표 1억 8,000만 원, 900,000원, 324,000원, 576,000원"), [])  # 계산 과정 나열
+
+    def test_law_notation(self):
+        from bot import source_check as sc
+        self.assertTrue(sc.has_number("세율은 1천분의 5", "0.5"))     # 0.5%
+        self.assertTrue(sc.has_number("100분의 20을 곱한", "20"))
+        self.assertFalse(sc.has_number("1천분의 50", "0.5"))
+        self.assertTrue(sc.has_number("총급여액 7천만원 이하", "7000"))  # 7,000만 원
+
+    def test_number_missing_from_page(self):
+        from bot import source_check as sc
+        page = sc.page_text("<p>응시수수료 14,300원, 2,800원</p>".encode(), "utf-8")
+        result = sc.check(self.REVIEW[:1], fetcher=lambda u: page)
+        self.assertEqual(result["claims"][0]["status"], sc.MISSING)  # 28000 이 280000·2800 안에 있다고 보면 안 됨
+        self.assertEqual(result["claims"][0]["missing"], ["28000"])
+
+    def test_never_blocks_publishing(self):
+        from bot import source_check as sc
+        saved = []
+        with mock.patch.object(sc, "check", side_effect=RuntimeError("network")):
+            msg = sc.record(1, self.REVIEW, lambda *a: saved.append(a))
+        self.assertIn("실패", msg)
+        self.assertEqual(saved, [])
+
 if __name__ == "__main__":
     unittest.main()

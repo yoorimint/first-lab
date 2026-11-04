@@ -1,37 +1,105 @@
 [
   {
     "why": "검사 기간 = 만료일 전 90일 ~ 후 31일 (자동차관리법 시행규칙 제77조 제2항), 승용 정기검사 23,000원 (공단 수수료표)",
-    "input": {"expiry": "2026-12-31", "on": "2026-11-04", "kind": "periodic", "size": "small"},
-    "expect": {"start": "2026-10-02", "end": "2027-01-31", "fee": 23000, "late_days": 0, "fine": 0}
+    "input": {
+      "expiry": "2026-12-31",
+      "on": "2026-11-04",
+      "kind": "periodic",
+      "size": "small"
+    },
+    "expect": {
+      "start": "2026-10-02",
+      "end": "2027-01-31",
+      "fee": 23000,
+      "late_days": 0,
+      "fine": 0
+    }
   },
   {
     "why": "기간 시작 전이어도 과태료 없음, 종합검사(무부하) 소형 39,000원",
-    "input": {"expiry": "2026-03-01", "on": "2025-11-01", "kind": "comp_no_load", "size": "small"},
-    "expect": {"start": "2025-12-01", "end": "2026-04-01", "fee": 39000, "fine": 0}
+    "input": {
+      "expiry": "2026-03-01",
+      "on": "2025-11-01",
+      "kind": "comp_no_load",
+      "size": "small"
+    },
+    "expect": {
+      "start": "2025-12-01",
+      "end": "2026-04-01",
+      "fee": 39000,
+      "fine": 0
+    }
   },
   {
     "why": "지연 1일: 30일 이내 4만원",
-    "input": {"expiry": "2026-06-30", "on": "2026-08-01", "kind": "comp_load", "size": "large"},
-    "expect": {"end": "2026-07-31", "fee": 65000, "late_days": 1, "fine": 40000}
+    "input": {
+      "expiry": "2026-06-30",
+      "on": "2026-08-01",
+      "kind": "comp_load",
+      "size": "large"
+    },
+    "expect": {
+      "end": "2026-07-31",
+      "fee": 65000,
+      "late_days": 1,
+      "fine": 40000
+    }
   },
   {
     "why": "지연 33일: 31일째부터 3일 '초과'해야 가산되므로 아직 4만원",
-    "input": {"expiry": "2026-06-30", "on": "2026-09-02", "kind": "periodic", "size": "light"},
-    "expect": {"fee": 17000, "late_days": 33, "fine": 40000}
+    "input": {
+      "expiry": "2026-06-30",
+      "on": "2026-09-02",
+      "kind": "periodic",
+      "size": "light"
+    },
+    "expect": {
+      "fee": 17000,
+      "late_days": 33,
+      "fine": 40000
+    },
+    "boundary": true
   },
   {
     "why": "지연 34일: 첫 가산 2만원 → 6만원",
-    "input": {"expiry": "2026-06-30", "on": "2026-09-03", "kind": "periodic", "size": "medium"},
-    "expect": {"fee": 26500, "late_days": 34, "fine": 60000}
+    "input": {
+      "expiry": "2026-06-30",
+      "on": "2026-09-03",
+      "kind": "periodic",
+      "size": "medium"
+    },
+    "expect": {
+      "fee": 26500,
+      "late_days": 34,
+      "fine": 60000
+    },
+    "boundary": true
   },
   {
     "why": "지연 114일: 4만원 + 2만원×27 = 58만원",
-    "input": {"expiry": "2026-06-30", "on": "2026-11-22", "kind": "periodic", "size": "small"},
-    "expect": {"late_days": 114, "fine": 580000}
+    "input": {
+      "expiry": "2026-06-30",
+      "on": "2026-11-22",
+      "kind": "periodic",
+      "size": "small"
+    },
+    "expect": {
+      "late_days": 114,
+      "fine": 580000
+    }
   },
   {
     "why": "지연 115일 이상: 60만원 (상한)",
-    "input": {"expiry": "2026-06-30", "on": "2027-02-16", "kind": "periodic", "size": "small"},
-    "expect": {"late_days": 200, "fine": 600000}
+    "input": {
+      "expiry": "2026-06-30",
+      "on": "2027-02-16",
+      "kind": "periodic",
+      "size": "small"
+    },
+    "expect": {
+      "late_days": 200,
+      "fine": 600000
+    },
+    "boundary": true
   }
 ]

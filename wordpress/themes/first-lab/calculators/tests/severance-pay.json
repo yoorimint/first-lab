@@ -54,7 +54,8 @@
       "avg_daily": 98901,
       "eligible": false,
       "severance": 0
-    }
+    },
+    "boundary": true
   },
   {
     "why": "3개월 전 2월 31일 없음 → 3월 1일부터 91일, 평균 90,659원 < 통상 120,000원 → 통상임금 적용 (근로기준법 제2조②)",
@@ -92,6 +93,7 @@
       "avg_daily": 97826,
       "eligible": true,
       "severance": 2934782
-    }
+    },
+    "boundary": true
   }
 ]

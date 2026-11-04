@@ -25,7 +25,8 @@
       "first": 1000000,
       "interest": 0,
       "total": 12000000
-    }
+    },
+    "boundary": true
   },
   {
     "why": "원금균등: 첫 달 = P/n + P·r = 1,000,000 + 120,000, 마지막 달 = 1,000,000 × 1.01, 이자 = P·r·(n+1)/2",
@@ -102,6 +103,7 @@
     "expect": {
       "first": 16667,
       "interest": 0
-    }
+    },
+    "boundary": true
   }
 ]

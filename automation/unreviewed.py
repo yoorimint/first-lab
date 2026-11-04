@@ -87,6 +87,10 @@ def main() -> None:
         print(f"{p['post_id']}\t{title}\t{path}")
         for calc_id in embedded_calcs(raw):
             print(f"  계산기 {calc_id}: {calc_files(calc_id)}")
+        check = json.loads(raw).get("source_check") or {}
+        if check.get("counts"):  # 서버 근거 대조(기록만, bot/source_check.py) — 외부 검수 결과와 비교해 정확도를 잰다
+            missing = [c["claim"][:40] for c in check.get("claims", []) if c.get("status") == "페이지에 없음"]
+            print(f"  근거 대조 {check['counts']}" + (f" 없음: {' / '.join(missing)}" if missing else ""))
     todo_calcs = [c for c in all_calcs() if c not in reviewed_calcs()]
     print(f"# 계산기 검수 필요 {len(todo_calcs)}개" + "".join(f"\n{c}\t{calc_files(c)}" for c in todo_calcs))
 

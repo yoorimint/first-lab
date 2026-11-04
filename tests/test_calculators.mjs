@@ -1,6 +1,8 @@
 // 계산기 배포 전 검사 (GitHub Actions). 실행: node tests/test_calculators.mjs
 // 계산기마다 defs/<id>.js + data/<id>.json(기준일·출처) + tests/<id>.json(사례 3개 이상)이 있어야 하고,
 // 사례의 expect 값이 compute() 의 values 와 모두 같아야 한다. 하나라도 틀리면 배포가 막힌다.
+// 기준선 사례("boundary": true)가 2개 이상 있어야 한다: 공제액·과락 점수·면세점·구간 경계·상한/하한에 딱 맞는 값과
+// 바로 아래/위 값 (11/5 새 계산기 2개 모두 기준선에서 틀림: 평균 59.996 을 60 으로 올려 합격, 공동명의 비율).
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -9,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = path.join(ROOT, 'wordpress/themes/first-lab/calculators');
 const MIN_CASES = 3;
+const MIN_BOUNDARY = 2;
 
 const context = vm.createContext({ console });
 const load = (file) => vm.runInContext(fs.readFileSync(file, 'utf8'), context, { filename: file });
@@ -41,6 +44,9 @@ for (const id of ids) {
     fail(id, 'data.sources 에 이름과 https 주소가 있는 출처가 필요함');
   }
   if (!Array.isArray(cases) || cases.length < MIN_CASES) fail(id, `검증 사례가 ${MIN_CASES}개 이상 필요함`);
+  else if (cases.filter((c) => c.boundary === true).length < MIN_BOUNDARY) {
+    fail(id, `기준선 사례("boundary": true)가 ${MIN_BOUNDARY}개 이상 필요함 — 공제액·합격 점수·면세점·세율 구간·상한/하한에 딱 맞는 값과 바로 아래/위 값을, 계산기 말고 법령대로 손으로 계산해 넣기`);
+  }
 
   for (const [i, c] of (cases || []).entries()) {
     let out;

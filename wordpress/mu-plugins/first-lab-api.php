@@ -166,6 +166,8 @@ function firstlab_api_post( WP_REST_Request $request ) {
 		'title'        => $post->post_title,
 		'excerpt'      => $post->post_excerpt,
 		'content_html' => trim( preg_replace( '/<!--.*?-->/s', '', $post->post_content ) ),
+		// 근거 대조 결과 (bot/source_check.py, 기록만): 감시 세션이 외부 검수 결과와 비교
+		'source_check' => json_decode( (string) get_post_meta( $post->ID, '_firstlab_source_check', true ), true ),
 	);
 }
 
