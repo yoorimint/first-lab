@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: First Lab - 표 모바일 보기
- * Description: 열이 3개 이상이고 긴 글이 든 칸이 있는 본문 표는 휴대폰에서 '행마다 카드'로 보이게 한다
- * (좁은 칸에 긴 글이 세로로 늘어지는 문제). 짧은 숫자만 있는 표는 원래 표가 더 보기 좋아 그대로 둔다.
+ * Description: 휴대폰 폭에 다 안 들어가는 본문 표(열 3개 이상)는 휴대폰에서 '행마다 카드'로 보이게 한다
+ * (좁은 칸에서 '1,000 / 원'처럼 글자가 끊기거나 세로로 늘어지는 문제). 폭에 들어가는 표는 원래 표 그대로.
  *
  * 각 칸에 머리글 이름(data-label)을 붙여 두고, 스타일(테마 assets/tables.css)이 좁은 화면에서
  * "머리글: 값" 줄로 바꿔 보여 준다. 넓은 화면에서는 원래 표 그대로.
@@ -11,7 +11,30 @@
 defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_STACK_MIN_COLS = 3;
-const FIRSTLAB_STACK_LONG_CELL = 16; // 이 글자 수를 넘는 칸이 하나라도 있으면 카드로
+const FIRSTLAB_STACK_MAX_WIDTH = 330; // 휴대폰(390px)에서 표가 쓸 수 있는 폭(px). 예상 폭이 이보다 크면 카드로
+const FIRSTLAB_STACK_CELL_PAD  = 24;  // 칸마다 좌우 여백(px)
+
+/** 글 한 줄 예상 폭(px): 한글 16, 숫자·영문·기호 9. */
+function firstlab_text_width( string $text ): int {
+	$width = 0;
+	foreach ( mb_str_split( $text ) as $ch ) {
+		$width += ( mb_ord( $ch ) >= 0x1100 ) ? 16 : 9;
+	}
+	return $width;
+}
+
+/** 표 예상 폭: 열마다 가장 넓은 칸(줄바꿈 없이) + 여백의 합. */
+function firstlab_table_width( string $html ): int {
+	$cols = array();
+	preg_match_all( '#<tr\b[^>]*>(.*?)</tr>#s', $html, $rows );
+	foreach ( $rows[1] as $row ) {
+		preg_match_all( '#<t[hd]\b[^>]*>(.*?)</t[hd]>#s', $row, $cells );
+		foreach ( $cells[1] as $i => $cell ) {
+			$cols[ $i ] = max( $cols[ $i ] ?? 0, firstlab_text_width( trim( wp_strip_all_tags( $cell ) ) ) );
+		}
+	}
+	return array_sum( $cols ) + count( $cols ) * FIRSTLAB_STACK_CELL_PAD;
+}
 
 /** 표 HTML 에 카드 보기용 표시(class fl-stack, data-label)를 붙인다. 머리글이 없거나 열이 적으면 그대로. */
 function firstlab_stack_table( string $html ): string {
@@ -23,10 +46,8 @@ function firstlab_stack_table( string $html ): string {
 	if ( count( $labels ) < FIRSTLAB_STACK_MIN_COLS ) {
 		return $html;
 	}
-	preg_match_all( '#<td\b[^>]*>(.*?)</td>#s', $html, $td );
-	$longest = max( array_map( static fn( $t ) => mb_strlen( trim( wp_strip_all_tags( $t ) ) ), $td[1] ?: array( '' ) ) );
-	if ( $longest <= FIRSTLAB_STACK_LONG_CELL ) {
-		return $html;
+	if ( firstlab_table_width( $html ) <= FIRSTLAB_STACK_MAX_WIDTH ) {
+		return $html; // 휴대폰 폭에 들어가면 원래 표가 더 보기 좋음
 	}
 	$html = preg_replace_callback(
 		'#<tbody>(.*?)</tbody>#s',
