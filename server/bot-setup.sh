@@ -44,6 +44,7 @@ queue_once() {
   for id in "$@"; do
     if [ "$(runuser -u firstlab -- wp --path=/var/www/first-lab post get "$id" --field=post_status 2>/dev/null)" = "draft" ]; then
       runuser -u firstlab -- wp --path=/var/www/first-lab post meta update "$id" _firstlab_queue ready --quiet && echo "대기열 추가: $id"
+      runuser -u firstlab -- wp --path=/var/www/first-lab post meta delete "$id" _firstlab_hold --quiet 2>/dev/null || true  # 보류 표시 지움
     fi
   done
   touch "$mark"

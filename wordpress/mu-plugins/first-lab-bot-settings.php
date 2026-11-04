@@ -360,7 +360,10 @@ function firstlab_bot_render_status(): void {
 	<p>예약 발행 공개 대기 초안: <strong><?php echo (int) firstlab_bot_ready_count(); ?>편</strong> (발행 방식이 '예약 발행'일 때 공개 시각마다 오래된 것부터 1편씩 공개)</p>
 	<?php
 	// 검수 관문에서 막힌 초안 (bot/review_gate.py) — 이유를 보고 고치거나, 잘못 막힌 것이면 알려 주세요
-	$held = get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_hold', 'numberposts' => 20 ) );
+	$held = array_filter(
+		get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_hold', 'numberposts' => 20 ) ),
+		static fn( $p ) => 'ready' !== get_post_meta( $p->ID, '_firstlab_queue', true ) // 확인 후 대기열에 넣은 글은 제외
+	);
 	if ( $held ) :
 		?>
 		<p><strong>검수 보류 초안 <?php echo count( $held ); ?>편</strong> (공개 대기열에 안 들어감)</p>
