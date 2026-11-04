@@ -74,6 +74,12 @@ def set_featured_card(post_id: int, title: str, keyword: str) -> None:
     wp_cli("post", "meta", "update", str(post_id), "_firstlab_card_title", title)  # 제목이 바뀌면 다시 만들기 위해
 
 
+def site_author_id() -> str:
+    """글 작성자로 쓸 계정 (첫 관리자, 화면 표시 이름은 wp-setup.sh 가 '퍼스트랩'으로 설정). 없으면 ''."""
+    ids = wp_cli("user", "list", "--role=administrator", "--orderby=ID", "--order=ASC", "--field=ID").split()
+    return ids[0] if ids else ""
+
+
 def publish(article: Article, status: str, slug: str = "",
             cloudflare: tuple[str, str] = ("", ""), image_count: int = 3) -> tuple[int, str, str]:
     """slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다."""
@@ -85,6 +91,7 @@ def publish(article: Article, status: str, slug: str = "",
         f"--post_content={content}",
         f"--post_excerpt={article.excerpt}",
         f"--post_status={status}",
+        *([f"--post_author={author}"] if (author := site_author_id()) else []),  # 비우면 작성자 없음(0)으로 저장돼 화면에 빈칸
         f"--tags_input={','.join(article.tags)}",
         "--porcelain",
     ).strip())

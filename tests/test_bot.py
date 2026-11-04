@@ -145,6 +145,13 @@ class MiscTest(unittest.TestCase):
         self.assertEqual(s.daily_cost_cap, 3)
         self.assertEqual(BotSettings.from_option({"daily_cost_cap": "0"}, {}).daily_cost_cap, 0)
 
+    def test_site_author_id(self):
+        from bot import publisher
+        with mock.patch.object(publisher, "wp_cli", return_value="1\n3\n"):
+            self.assertEqual(publisher.site_author_id(), "1")
+        with mock.patch.object(publisher, "wp_cli", return_value=""):
+            self.assertEqual(publisher.site_author_id(), "")
+
     def test_refresh_siblings(self):
         conn = memory_db([("자동차정기검사비용", 5380, "used", None), ("자동차정기검사조회", 9820, "new", None),
                           ("자동차정기검사기간", 3000, "new", None), ("자동차종합검사비용", 6500, "new", None)])

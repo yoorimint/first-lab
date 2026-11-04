@@ -11,7 +11,7 @@ import urllib.parse
 from pathlib import Path
 
 from .blocks import to_blocks
-from .publisher import CARD_VERSION, set_featured_card
+from .publisher import CARD_VERSION, set_featured_card, site_author_id
 from .settings import wp_cli
 
 
@@ -81,8 +81,27 @@ def apply_patches() -> None:
         print(f"[보정] {pid} 문단 수정: {patch['why']}")
 
 
+_SET_AUTHOR_PHP = r"""
+global $wpdb;
+$n = $wpdb->update( $wpdb->posts, array( 'post_author' => %d ), array( 'post_author' => 0, 'post_type' => 'post' ) );
+wp_cache_flush();
+echo (int) $n;
+"""
+
+
+def fill_missing_author() -> None:
+    """작성자 없이(0) 저장된 글에 사이트 작성자 지정. DB 직접 수정 → '마지막 업데이트' 날짜는 바뀌지 않음."""
+    author = site_author_id()
+    if not author:
+        return
+    n = wp_cli("eval", _SET_AUTHOR_PHP % int(author)).strip()
+    if n not in ("", "0"):
+        print(f"[보정] 작성자 없는 글 {n}개 → 사이트 작성자 지정")
+
+
 def main() -> None:
     apply_patches()
+    fill_missing_author()
     posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=any",
                               "--fields=ID,post_title,post_name", "--format=json") or "[]")
     for p in posts:
