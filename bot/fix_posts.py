@@ -63,7 +63,12 @@ def patch_content(content: str, patch: dict) -> str | None:
 
     replace_paragraph: 문단 전체를 이 문장으로 교체 ("tag": "li" 면 목록 항목 하나를 교체)
     insert_after: 문단(블록) 바로 뒤에 이 내용을 블록으로 추가 (예: 계산기 [firstlab_calc id="..."])
+    remove_block: true 면 find 가 든 블록(<!-- wp:… --> … <!-- /wp:… -->) 통째로 삭제 (근거 없는 표 등)
     """
+    if patch.get("remove_block"):
+        block = re.search(r"<!-- wp:(?P<kind>[a-z/-]+)\b[^>]*-->(?:(?!<!-- /wp:(?P=kind) -->).)*?"
+                          + re.escape(patch["find"]) + r".*?<!-- /wp:(?P=kind) -->\s*", content, flags=re.S)
+        return content.replace(block.group(0), "", 1) if block else None
     tag = patch.get("tag", "p")
     # 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
     m = re.search(rf"<{tag}>(?:(?!</{tag}>).)*?" + re.escape(patch["find"]) + rf".*?</{tag}>", content, flags=re.S)
@@ -84,6 +89,9 @@ def apply_patches() -> None:
         return
     for patch in json.loads(PATCHES.read_text(encoding="utf-8")):
         pid = str(patch["post"])
+        if "set_title" in patch or "set_excerpt" in patch:
+            _patch_fields(pid, patch)
+            continue
         try:
             content = wp_cli("post", "get", pid, "--field=post_content")
         except subprocess.CalledProcessError:
@@ -97,6 +105,20 @@ def apply_patches() -> None:
         wp_cli("post", "update", pid, f"--post_content={content}")
         kind = "블록 추가" if "insert_after" in patch else "문단 수정"
         print(f"[보정] {pid} {kind}: {patch['why']}")
+
+
+def _patch_fields(pid: str, patch: dict) -> None:
+    """제목·요약문 고치기: 지금 값이 from_title/from_excerpt 와 같을 때만 (나중에 다른 이유로 바뀐 값은 되돌리지 않음)."""
+    for field, frm, to in (("post_title", "from_title", "set_title"), ("post_excerpt", "from_excerpt", "set_excerpt")):
+        if to not in patch:
+            continue
+        try:
+            current = wp_cli("post", "get", pid, f"--field={field}").strip()
+        except subprocess.CalledProcessError:
+            return
+        if current == patch.get(frm, "").strip() and current != patch[to]:
+            wp_cli("post", "update", pid, f"--{field}={patch[to]}")
+            print(f"[보정] {pid} {'제목' if field == 'post_title' else '요약문'} 수정: {patch['why']}", flush=True)
 
 
 _SET_AUTHOR_PHP = r"""

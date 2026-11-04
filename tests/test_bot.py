@@ -467,8 +467,23 @@ class MiscTest(unittest.TestCase):
 
     def test_patches_file_valid(self):
         for p in json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")):
+            if "set_title" in p or "set_excerpt" in p:  # 제목·요약문 수정: 원래 값(from_…)이 있어야 한 번만 적용됨
+                self.assertTrue({"post", "why"} <= set(p))
+                self.assertTrue(("set_title" not in p or "from_title" in p) and ("set_excerpt" not in p or "from_excerpt" in p))
+                continue
             self.assertTrue({"post", "why", "find"} <= set(p))
-            self.assertTrue({"replace_paragraph", "insert_after"} & set(p))
+            self.assertTrue({"replace_paragraph", "insert_after", "remove_block"} & set(p))
+
+    def test_patch_remove_block(self):
+        from bot.fix_posts import patch_content
+        body = ('<!-- wp:paragraph -->\n<p>앞</p>\n<!-- /wp:paragraph -->\n\n'
+                '<!-- wp:table -->\n<figure class="wp-block-table"><table><tr><td>경차·소형</td><td>40~60만 원</td></tr></table></figure>\n<!-- /wp:table -->\n\n'
+                '<!-- wp:paragraph -->\n<p>뒤</p>\n<!-- /wp:paragraph -->')
+        out = patch_content(body, {"find": "<td>40~60만 원</td>", "remove_block": True})
+        self.assertNotIn("wp:table", out)
+        self.assertIn("<p>앞</p>", out)
+        self.assertIn("<p>뒤</p>", out)
+        self.assertIsNone(patch_content(out, {"find": "<td>40~60만 원</td>", "remove_block": True}))  # 한 번만
 
     def test_patches_apply_only_once(self):
         """교체 문장에 find 가 남아 있으면 배포마다 다시 고쳐지므로 금지."""
