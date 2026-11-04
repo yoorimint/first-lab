@@ -1,0 +1,499 @@
+{
+ "title": "고용노동부 퇴직금 계산기 사용법: 퇴직일·상여금 3/12 입력법",
+ "excerpt": "고용노동부 퇴직금 계산기 입력 순서와 계산식(1일 평균임금 × 30일 × 재직일수 ÷ 365)을 정리했어요. 월 300만 원, 1,340일이면 10,774,270원이에요.",
+ "content_html": "<p>고용노동부 퇴직금 계산기는 <strong>입사일, 퇴직일(마지막 근무일 다음 날), 퇴직 전 3개월 임금, 1년 동안 받은 상여금·연차수당</strong>만 넣으면 법정 퇴직금을 계산해 줘요. 계산식은 <strong>1일 평균임금 × 30일 × 재직일수 ÷ 365</strong>이고, 상여금과 연차수당은 1년 치의 3/12만 평균임금에 더해요. 예를 들어 월 300만 원을 받고 1,340일 일했다면 퇴직금은 세전 10,774,270원이에요.</p>\n\n<h2>퇴직금 계산기에 넣는 값</h2>\n<table>\n<thead><tr><th>입력 칸</th><th>넣는 값</th></tr></thead>\n<tbody>\n<tr><td>입사일</td><td>처음 출근한 날</td></tr>\n<tr><td>퇴직일</td><td>마지막 근무일 다음 날</td></tr>\n<tr><td>기본급·기타수당</td><td>퇴직 전 3개월 동안 기간별로 받은 세전 금액</td></tr>\n<tr><td>연간 상여금 총액</td><td>퇴직 전 1년 동안 받은 상여금 전체</td></tr>\n<tr><td>연차수당</td><td>퇴직 전전년도에 생긴 연차 중 전년도에 못 써서 받은 수당</td></tr>\n<tr><td>미산입기간</td><td>육아휴직 등 평균임금 계산에서 빼는 기간</td></tr>\n<tr><td>근무제외기간</td><td>개인 휴직 등 근속기간에서 빠지는 기간</td></tr>\n</tbody>\n</table>\n<p>가장 많이 틀리는 곳이 퇴직일이에요. 10월 31일까지 일했다면 퇴직일은 11월 1일로 넣어요. 그래야 재직일수와 3개월 기간이 맞게 잡혀요.</p>\n\n<h2>입력 순서 4단계</h2>\n<ol>\n<li>입사일과 퇴직일을 넣어요.</li>\n<li>미산입기간·근무제외기간이 있으면 먼저 넣고 '평균임금계산기간보기'를 눌러요. 그러면 퇴직 전 3개월이 기간별로 나뉘어 나와요.</li>\n<li>나뉜 기간마다 기본급과 기타수당을 넣어요.</li>\n<li>연간 상여금 총액과 연차수당을 넣고 계산해요.</li>\n</ol>\n<p>재직일수를 직접 고친 뒤에 '평균임금계산기간보기'를 누르면 재직일수가 다시 처음 값으로 돌아가요. 그래서 기간 버튼을 먼저 누르고 나머지를 채우는 순서가 편해요.</p>\n\n<h2>1일 평균임금은 이렇게 나와요</h2>\n<p>평균임금은 퇴직일 이전 3개월 동안 받은 임금 총액을 그 3개월의 달력 일수(보통 89~92일)로 나눈 금액이에요. 여기에 상여금과 연차수당은 1년 치를 12로 나눈 뒤 3개월분만 더해요.</p>\n<ul>\n<li><strong>1일 평균임금</strong> = (3개월 임금 + 연간 상여금 × 3/12 + 연차수당 × 3/12) ÷ 3개월 일수</li>\n<li>이렇게 낸 평균임금이 1일 통상임금보다 적으면 통상임금으로 계산해요.</li>\n<li>수습을 시작한 날부터 3개월 안의 기간, 회사 사정으로 쉰 휴업 기간, 출산전후휴가, 업무상 부상·질병으로 쉰 기간, 육아휴직 기간 등은 그 기간과 그때 받은 임금을 모두 빼고 계산해요.</li>\n</ul>\n\n<h2>직접 계산해 보기</h2>\n<p>2023년 3월 2일에 입사해 2026년 10월 31일까지 일하고, 매달 세전 300만 원을 받은 경우예요.</p>\n<table>\n<thead><tr><th>항목</th><th>값</th></tr></thead>\n<tbody>\n<tr><td>퇴직일</td><td>2026년 11월 1일</td></tr>\n<tr><td>재직일수</td><td>1,340일</td></tr>\n<tr><td>3개월 기간</td><td>8월 1일~10월 31일, 92일</td></tr>\n<tr><td>3개월 임금</td><td>9,000,000원</td></tr>\n<tr><td>1일 평균임금</td><td>97,826원</td></tr>\n<tr><td>퇴직금 (세전)</td><td>10,774,270원</td></tr>\n</tbody>\n</table>\n<p>9,000,000원 ÷ 92일 = 97,826원(원 미만 버림)이고, 나누기 결과를 그대로 넣어 × 30 × 1,340 ÷ 365를 하면 10,774,270원(원 미만 버림)이에요. 고용노동부 계산기는 평균임금을 소수 둘째 자리에서 올리고 퇴직금을 반올림해서 10,774,271원처럼 1원 정도 많게 나올 수 있어요. 같은 사람이 1년 동안 상여금 400만 원을 받았다면 3/12인 100만 원이 더해져 평균임금은 108,695원, 퇴직금은 11,971,411원으로 올라가요. 상여금 입력을 빠뜨리면 이 사례에서만 약 120만 원이 덜 나오는 셈이에요.</p>\n<p>내 값으로 바로 계산해 보려면 아래 계산기에 넣어 보세요.</p>\n<p>[firstlab_calc id=\"severance-pay\"]</p>\n\n<h2>퇴직금을 받을 수 있는 사람</h2>\n<ul>\n<li><strong>계속근로 1년 이상</strong>: 1년이 안 되면 법정 퇴직금 대상이 아니에요.</li>\n<li><strong>4주 평균 주 15시간 이상</strong>: 4주를 평균해 1주 소정근로시간이 15시간 미만이면 대상이 아니에요.</li>\n<li><strong>사업장 규모 상관없음</strong>: 근로자가 1명뿐인 사업장도 적용돼요. 동거하는 친족만 쓰는 사업과 가구 내 고용활동은 빠져요.</li>\n</ul>\n\n<h2>받는 시기와 방법</h2>\n<p>회사는 퇴직한 날부터 14일 안에 퇴직금을 줘야 해요. 특별한 사정이 있으면 서로 합의해서 날짜를 미룰 수 있어요. 퇴직금은 내가 지정한 개인형퇴직연금(IRP) 계좌(또는 중소기업퇴직연금기금 계정)로 들어가고, 계좌를 지정하지 않으면 내 이름의 IRP 계좌로 옮겨져요. 55세 이후에 퇴직한 경우, 금액이 고용노동부가 정한 금액 이하인 경우 등은 IRP가 아닌 방법으로 받을 수 있어요. 퇴직금을 받을 권리는 3년 동안 쓰지 않으면 사라져요.</p>\n\n<h2>퇴직 전에 미리 받는 중간정산</h2>\n<p>중간정산은 근로자가 요구하고 아래 사유에 해당할 때만 할 수 있어요. 중간정산을 받으면 그 뒤 퇴직금의 근속기간은 정산한 때부터 새로 계산해요.</p>\n<ul>\n<li>무주택자가 본인 명의로 집을 사는 경우</li>\n<li>무주택자가 살 집의 전세금·보증금을 내는 경우 (한 회사에서 1번)</li>\n<li>본인·배우자·부양가족이 6개월 이상 요양해야 해서 의료비가 연간 임금총액의 12.5%를 넘는 경우</li>\n<li>신청일 기준 5년 안에 파산선고나 개인회생절차개시 결정을 받은 경우</li>\n<li>정년을 연장·보장하는 조건으로 임금피크제를 시행하거나, 합의로 소정근로시간을 1일 1시간 또는 1주 5시간 이상 줄여 3개월 이상 계속 일하기로 한 경우</li>\n<li>근로시간 단축 법 개정(법률 제15513호) 시행으로 근로시간이 줄어 퇴직금이 감소하는 경우</li>\n<li>재난으로 피해를 입어 고용노동부 고시 사유에 해당하는 경우</li>\n</ul>\n\n<h2>자주 묻는 질문</h2>\n<h3>계산기 결과가 실제로 받는 돈인가요?</h3>\n<p>아니에요. 퇴직소득세를 떼기 전 금액이에요. 세금은 국세청 홈택스의 퇴직소득 세액계산 프로그램으로 따로 계산할 수 있어요. 회사에 퇴직금 규정이 따로 있으면 금액이 조금 다를 수 있어요.</p>\n<h3>퇴사할 때 한꺼번에 받는 미사용 연차수당도 넣나요?</h3>\n<p>계산기의 연차수당 칸에는 퇴직 전전년도에 생긴 연차 중 전년도에 쓰지 못해 받은 수당을 넣어요. 퇴직하면서 처음 생긴 미사용 연차수당은 넣지 않는 게 기본이에요.</p>\n<h3>육아휴직을 했으면 어떻게 넣나요?</h3>\n<p>퇴직 전 3개월 안에 육아휴직 기간이 있으면 '미산입기간'에 그 기간을 넣어요. 그러면 그 기간과 그때 받은 임금을 빼고 평균임금을 계산해요. 이때 상여금·연차수당 가산액도 남은 일수 비율만큼 줄어들어요.</p>\n<h3>11개월만 일하고 그만두면 퇴직금이 하나도 없나요?</h3>\n<p>법정 퇴직금은 계속근로 1년 이상일 때 생겨요. 다만 회사 규정이나 근로계약에서 1년 미만도 주기로 정했다면 그 규정을 따라요.</p>\n",
+ "tags": [
+  "퇴직금",
+  "퇴직금 계산기",
+  "평균임금",
+  "고용노동부"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm office desk by a window with a cardboard box of personal belongings and a potted plant, soft afternoon light",
+   "alt": "퇴사 짐을 정리한 창가 사무실 책상"
+  }
+ ],
+ "keyword": "고용노동부퇴직금계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 고용노동부 퇴직금 계산기에서 퇴직일·상여금 3/12 입력",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 계산식 1일 평균임금 × 30일 × 재직일수 ÷ 365",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 월 300만 원, 1,340일이면 10,774,270원",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기는 입사일·퇴직일·3개월 임금·1년 상여금·연차수당만 넣으면 법정 퇴직금 계산",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상여금·연차수당은 1년 치의 3/12만 평균임금에 더함",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 월 300만 원, 1,340일 → 세전 10,774,270원(도입부)",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 입사일 = 처음 출근한 날",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 퇴직일 = 마지막 근무일 다음 날",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 기본급·기타수당 = 퇴직 전 3개월 기간별 세전 금액",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 연간 상여금 총액 = 퇴직 전 1년 동안 받은 상여금 전체",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 연차수당 = 퇴직 전전년도 발생 연차 중 전년도 미사용분 수당",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 미산입기간 = 육아휴직 등 평균임금 계산에서 빼는 기간",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[표] 근무제외기간 = 개인 휴직 등 근속기간에서 빠지는 기간",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "10월 31일까지 일했으면 퇴직일은 11월 1일로 입력",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "입력 순서 1: 입사일·퇴직일 입력",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "입력 순서 2: 미산입·근무제외기간 먼저 넣고 '평균임금계산기간보기' → 3개월이 기간별로 나뉨",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "입력 순서 3: 나뉜 기간마다 기본급·기타수당 입력",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "입력 순서 4: 연간 상여금 총액·연차수당 입력 후 계산",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "재직일수를 직접 고친 뒤 '평균임금계산기간보기'를 누르면 재직일수가 처음 값으로 돌아감",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "평균임금 = 퇴직일 이전 3개월 임금 총액 ÷ 그 3개월 달력 일수",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285279&efYd=20261008&chrClsCd=010202&ancYnChk=0",
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3개월 일수는 보통 89~92일",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1일 평균임금 = (3개월 임금 + 상여금×3/12 + 연차수당×3/12) ÷ 3개월 일수",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "평균임금이 1일 통상임금보다 적으면 통상임금으로 계산",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285279&efYd=20261008&chrClsCd=010202&ancYnChk=0",
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수습 시작일부터 3개월, 회사 사정 휴업, 출산전후휴가, 업무상 부상·질병 휴업, 육아휴직 등은 기간·임금 모두 빼고 계산",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=270551&efYd=20251023&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 2023.3.2 입사·2026.10.31 마지막 근무 → 퇴직일 2026.11.1",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 재직일수 1,340일",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 3개월 기간 8월 1일~10월 31일, 92일",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 3개월 임금 9,000,000원",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 1일 평균임금 97,826원",
+   "urls": [
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 9,000,000원 ÷ 92일 = 97,826원(원 미만 버림)",
+   "urls": [
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js",
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "틀림",
+   "action": "수정"
+  },
+  {
+   "claim": "[예시] 나누기 결과 그대로 × 30 × 1,340 ÷ 365 = 10,774,270원(원 미만 버림), 고용노동부 계산기는 소수 둘째 자리 올림·반올림으로 10,774,271원",
+   "urls": [
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js",
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 상여금 400만 원이면 3/12인 100만 원 더해져 평균임금 108,695원",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[예시] 상여금 포함 퇴직금 11,971,411원",
+   "urls": [
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상여금 입력을 빠뜨리면 약 120만 원 덜 나옴",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사이트 계산기([firstlab_calc id=\"severance-pay\"])로 바로 계산 가능",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계속근로 1년 미만이면 법정 퇴직금 대상 아님",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4주 평균 1주 소정근로시간 15시간 미만이면 대상 아님",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사업장 규모 상관없음, 근로자 1명 사업장도 적용; 동거 친족만 쓰는 사업·가구 내 고용활동은 제외",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직한 날부터 14일 안에 지급, 특별한 사정 있으면 합의로 연장",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285279&efYd=20261008&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직금은 지정한 IRP 계좌(또는 중소기업퇴직연금기금 계정)로, 지정 안 하면 내 이름의 IRP 계좌로 이전",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "55세 이후 퇴직, 고용노동부 고시 금액 이하 등은 IRP 아닌 방법으로 받을 수 있음",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직금 받을 권리는 3년 동안 안 쓰면 소멸",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산은 근로자가 요구하고 정해진 사유일 때만 가능",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 후 근속기간은 정산 시점부터 새로 계산",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유: 무주택자 본인 명의 주택 구입",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유: 무주택자 전세금·보증금 (한 회사에서 1번)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유: 본인·배우자·부양가족 6개월 이상 요양, 의료비가 연간 임금총액의 12.5% 초과",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유: 신청일 기준 5년 안에 파산선고 또는 개인회생절차개시 결정",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유: 임금피크제 시행, 또는 합의로 1일 1시간·1주 5시간 이상 단축해 3개월 이상 계속 근로",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유: 재난 피해로 고용노동부 고시 사유에 해당",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간정산 사유 목록에 6의3호(법률 제15513호 근로시간 단축으로 퇴직금 감소) 추가, 임금피크제는 정년 연장·보장 조건 명시",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284693&efYd=20260324&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "틀림",
+   "action": "수정"
+  },
+  {
+   "claim": "계산기 결과는 퇴직소득세 떼기 전 금액, 세금은 홈택스 퇴직소득 세액계산 프로그램으로",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "회사 퇴직금 규정이 따로 있으면 금액이 다를 수 있음",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직하면서 처음 생긴 미사용 연차수당은 계산기 연차수당 칸에 넣지 않는 게 기본",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "육아휴직이 3개월 안에 있으면 '미산입기간'에 넣고, 그 기간·임금을 빼고 평균임금 계산, 상여금·연차수당 가산액도 남은 일수 비율만큼 줄어듦",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=270551&efYd=20251023&chrClsCd=010202&ancYnChk=0",
+    "https://www.moel.go.kr/assets/calc/js/retire_cal.js"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "법정 퇴직금은 계속근로 1년 이상일 때 생기고, 회사 규정·계약으로 1년 미만도 주기로 했으면 그 규정을 따름",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285279&efYd=20261008&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "고용노동부 퇴직금 계산기",
+   "url": "https://www.moel.go.kr/retirementpayCal.do"
+  },
+  {
+   "name": "국가법령정보센터 근로자퇴직급여 보장법 (퇴직금 30일분·14일 지급·시효 3년)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+  },
+  {
+   "name": "국가법령정보센터 근로기준법 (평균임금 정의)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285279&efYd=20261008&chrClsCd=010202&ancYnChk=0"
+  }
+ ]
+}
