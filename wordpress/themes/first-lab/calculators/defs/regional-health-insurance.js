@@ -41,7 +41,8 @@
 
       const sum = incomePremium + propertyPremium;
       const capped = sum > d.monthly_max;
-      const health = Math.min(sum, d.monthly_max);
+      // 상한·하한은 소득+재산 합계에 적용 (국민건강보험법 제69조⑤⑥, 시행령 제32조 2호 나목) — 11/5 외부 검수: 하한을 소득 보험료에만 적용했던 오류
+      const health = Math.min(Math.max(sum, d.monthly_min), d.monthly_max);
       const ltc = Math.floor((health * d.ltc_rate_per_1000000) / (d.rate_per_10000 * 100));
       const total = health + ltc;
 

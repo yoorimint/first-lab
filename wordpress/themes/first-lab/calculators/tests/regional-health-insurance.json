@@ -121,5 +121,23 @@
       "ltc": 11810,
       "total": 101685
     }
+  },
+  {
+    "why": "소득월액 280,001원: 소득 보험료 20,132원 < 월별 보험료 하한 20,160원 → 합계에 하한 적용 (시행령 제32조 2호 나목, 11/5 외부 검수)",
+    "input": {
+      "income_full": 3360012,
+      "income_half": 0,
+      "tax_base": 0,
+      "deposit": 0,
+      "rent": 0
+    },
+    "expect": {
+      "income_month": 280001,
+      "income_premium": 20132,
+      "points": 0,
+      "health": 20160,
+      "ltc": 2649,
+      "total": 22809
+    }
   }
 ]

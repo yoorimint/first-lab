@@ -9,7 +9,7 @@
     inputs: [
       { name: 'wage_3m', label: '퇴사 전 3개월 임금 합계 (세전, 원)', type: 'number', min: 0, step: 1, default: 9000000, help: '기본급·수당·상여금 등 세금 떼기 전 금액이에요. 3개월 동안 받은 임금을 모두 더해요.' },
       { name: 'days_3m', label: '그 3개월의 달력 일수', type: 'number', min: 89, max: 92, step: 1, default: 92, help: '퇴사일 전날부터 거꾸로 3개월의 날수예요. 보통 89~92일이에요.' },
-      { name: 'hours', label: '하루 소정근로시간 (시간)', type: 'number', min: 1, max: 8, step: 1, default: 8, help: '주 40시간 근무면 8시간이에요. 하한액을 정할 때 써요.' },
+      { name: 'hours', label: '하루 소정근로시간 (시간)', type: 'number', min: 1, max: 8, step: 0.1, default: 8, help: '주 40시간 근무면 8시간이에요. 주 단위로 정해졌다면 주 소정근로시간 ÷ 48 × 8 (예: 주 15시간 → 2.5) 처럼 넣어요. 하한액을 정할 때 써요.' },
       { name: 'age50', label: '퇴사일 기준 나이', type: 'select', default: 'under50', options: [['under50', '50세 미만'], ['over50', '50세 이상 (장애인 포함)']] },
       { name: 'period', label: '고용보험 가입 기간 (이번 회사)', type: 'select', default: '1', options: [['0', '1년 미만'], ['1', '1년 이상 3년 미만'], ['2', '3년 이상 5년 미만'], ['3', '5년 이상 10년 미만'], ['4', '10년 이상']] },
     ],
