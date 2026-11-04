@@ -1,0 +1,194 @@
+{
+ "title": "부가가치세 계산기: 공급가액×10%, 합계÷1.1 계산법과 간이과세",
+ "excerpt": "부가세는 공급가액의 10%, 포함 금액은 1.1로 나누면 공급가액이에요. 일반과세자 납부세액, 간이과세자 업종별 부가가치율 15~40% 계산, 신고 기한까지 정리했어요.",
+ "content_html": "<p>부가가치세 계산은 공식 두 개면 끝나요. 부가세 <strong>별도</strong> 금액(공급가액)이면 <strong>공급가액 × 10%</strong>가 부가세이고, 부가세 <strong>포함</strong> 금액(합계)이면 <strong>합계 ÷ 1.1</strong>이 공급가액, 합계에서 공급가액을 뺀 나머지가 부가세예요. 예를 들어 공급가액 100만 원이면 부가세 10만 원, 합계 110만 원이에요. 사업자가 실제로 내는 세금은 일반과세자는 매출세액에서 매입세액을 뺀 금액, 간이과세자는 업종별 부가가치율(15~40%)을 곱해 훨씬 적게 계산해요. 아래 계산기에 금액만 넣으면 바로 나와요.</p>\n\n<p>[firstlab_calc id=\"vat\"]</p>\n\n<h2 class=\"wp-block-heading\">부가세 별도·포함 금액 계산법</h2>\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>알고 있는 금액</th><th>계산식</th><th>예시</th></tr></thead><tbody><tr><td>공급가액 (부가세 별도)</td><td>부가세 = 공급가액 × 10%<br>합계 = 공급가액 × 1.1</td><td>100만 원 → 부가세 10만 원, 합계 110만 원</td></tr><tr><td>합계금액 (부가세 포함)</td><td>공급가액 = 합계 ÷ 1.1<br>부가세 = 합계 - 공급가액</td><td>110만 원 → 공급가액 100만 원, 부가세 10만 원</td></tr></tbody></table></figure>\n\n<p>자주 헷갈리는 게 포함 금액에서 10%를 바로 빼는 실수예요. 합계 110만 원에서 10%를 빼면 99만 원이 되는데, 이건 틀린 값이에요. 부가세는 공급가액의 10%라서, 합계는 공급가액의 110%예요. 그래서 반드시 1.1로 나눠야 해요. 부가세만 빨리 알고 싶으면 <strong>합계 ÷ 11</strong>로도 같은 값이 나와요.</p>\n\n<p>나누어떨어지지 않으면 원 단위 끝수가 생겨요. 합계 1만 원이면 10,000 ÷ 1.1 = 9,090.9…라서 공급가액 9,091원, 부가세 909원이 돼요. 영수증이나 프로그램마다 끝자리를 반올림·버림하는 방식이 달라 1원 차이가 나는 경우가 있어요.</p>\n\n<h2 class=\"wp-block-heading\">일반과세자 납부세액 계산</h2>\n\n<p>일반과세자는 <strong>매출세액 - 매입세액</strong>을 내요. 매출세액은 매출 공급가액의 10%이고, 매입세액은 사업용으로 물건·서비스를 사면서 세금계산서 등으로 받은 부가세예요. 매입세액이 매출세액보다 크면 차액을 환급받아요.</p>\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>항목</th><th>금액</th></tr></thead><tbody><tr><td>매출 공급가액 (6개월)</td><td>3,000만 원</td></tr><tr><td>매출세액 (× 10%)</td><td>300만 원</td></tr><tr><td>매입세액 (세금계산서 합계)</td><td>180만 원</td></tr><tr><td>낼 세액 (300만 - 180만)</td><td>120만 원</td></tr></tbody></table></figure>\n\n<p>여기서 신용카드·현금영수증 발행 세액공제나 예정고지로 미리 낸 세액이 있으면 그만큼 더 줄어요. 주로 소비자를 상대하는 업종의 개인사업자는 신용카드매출전표·현금영수증 발행금액의 1.3%를 연간 1,000만 원 한도로 공제받을 수 있어요. 이 비율과 한도는 2026년 12월 31일까지 적용되는 특례이고, 직전 연도 공급가액이 10억 원을 넘는 사업자는 제외돼요.</p>\n\n<h2 class=\"wp-block-heading\">간이과세자 납부세액과 업종별 부가가치율</h2>\n\n<p>간이과세자는 직전 연도 공급대가(부가세 포함 매출)가 <strong>1억 400만 원 미만</strong>인 개인사업자예요. 계산식은 <strong>1년 매출(공급대가) × 업종별 부가가치율 × 10% - 매입 공급대가 × 0.5%</strong>예요. 공제액이 더 커도 환급은 없고, 그 해 공급대가가 <strong>4,800만 원 미만</strong>이면 납부의무가 면제돼요.</p>\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>업종</th><th>부가가치율</th><th>실제 세 부담 (매출 대비)</th></tr></thead><tbody><tr><td>소매업, 음식점업, 재생용 재료수집 및 판매업</td><td>15%</td><td>1.5%</td></tr><tr><td>제조업, 농업·임업·어업, 소화물 전문 운송업</td><td>20%</td><td>2%</td></tr><tr><td>숙박업</td><td>25%</td><td>2.5%</td></tr><tr><td>건설업, 운수 및 창고업, 정보통신업, 그 밖의 서비스업</td><td>30%</td><td>3%</td></tr><tr><td>금융·보험, 전문·과학·기술서비스, 사업시설관리·임대서비스, 부동산 관련 서비스·임대업</td><td>40%</td><td>4%</td></tr></tbody></table></figure>\n\n<h2 class=\"wp-block-heading\">같은 매출, 일반과세와 간이과세 비교</h2>\n\n<p>1년 매출(부가세 포함) 7,000만 원, 사업용 매입(부가세 포함, 모두 세금계산서 수취) 3,000만 원인 음식점을 가정해 계산해 봤어요.</p>\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>구분</th><th>계산</th><th>1년 납부세액</th></tr></thead><tbody><tr><td>일반과세자</td><td>매출세액 6,363,636원 - 매입세액 2,727,273원</td><td>3,636,363원</td></tr><tr><td>간이과세자</td><td>7,000만 원 × 15% × 10% = 105만 원, 매입 공제 3,000만 원 × 0.5% = 15만 원</td><td>90만 원</td></tr></tbody></table></figure>\n\n<p>일반과세자는 합계 7,000만 원을 1.1로 나눈 공급가액 63,636,364원의 10%, 매입도 3,000만 원을 1.1로 나눈 공급가액 27,272,727원의 10%로 계산했어요. 간이과세자가 세금은 적지만, 공제가 더 커도 환급이 안 되니 창업 초기에 시설·장비를 크게 사는 경우에는 일반과세가 유리할 수 있어요. 또 직전 연도 매출이 4,800만 원 미만인 간이과세자와 신규 간이과세자는 세금계산서를 발급할 수 없어서, 거래처가 세금계산서를 요구하는 업종이면 이 점도 따져 봐야 해요.</p>\n\n<h2 class=\"wp-block-heading\">부가가치세 신고·납부 기한</h2>\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>구분</th><th>과세기간</th><th>신고·납부 기한</th></tr></thead><tbody><tr><td>개인 일반과세자 1기</td><td>1월 1일~6월 30일</td><td>7월 25일</td></tr><tr><td>개인 일반과세자 2기</td><td>7월 1일~12월 31일</td><td>다음 해 1월 25일</td></tr><tr><td>법인 예정신고</td><td>1~3월 / 7~9월</td><td>4월 25일 / 10월 25일</td></tr><tr><td>법인 확정신고</td><td>4~6월 / 10~12월</td><td>7월 25일 / 다음 해 1월 25일</td></tr><tr><td>간이과세자</td><td>1월 1일~12월 31일</td><td>다음 해 1월 25일</td></tr></tbody></table></figure>\n\n<p>개인 일반과세자는 4월과 10월에 직전 과세기간 납부세액의 50%를 예정고지서로 먼저 내요. 고지할 금액이 50만 원 미만이면 예정고지를 하지 않아요. 법인도 직전 과세기간 공급가액이 1억 5천만 원 미만이면 예정신고 대신 예정고지를 받아요. 간이과세자 중 1~6월에 세금계산서를 발급했거나 7월 1일에 일반과세자로 바뀐 사업자는 1~6월분을 7월 25일까지 신고해요.</p>\n\n<h2 class=\"wp-block-heading\">자주 묻는 질문</h2>\n\n<h3 class=\"wp-block-heading\">수출하면 부가세도 10%인가요?</h3><p>수출하는 재화 등은 영세율이 적용돼 매출세액이 10%가 아니라 0원으로 계산될 수 있어요. 수출 거래가 있다면 매입세액 공제·환급 요건을 신고 전에 홈택스나 관할 세무서에서 확인하는 게 안전해요.</p>\n\n<h3 class=\"wp-block-heading\">면세 사업자는 부가세 계산이 필요한가요?</h3><p>미가공 식료품 판매, 의료·교육 용역처럼 법령에 열거된 면세 사업만 하면 부가가치세 신고·납부 의무가 없어요. 대신 매입 때 낸 부가세도 공제받지 못해요.</p>\n\n<h3 class=\"wp-block-heading\">간이과세자에서 일반과세자로 언제 바뀌나요?</h3><p>1년 공급대가가 1억 400만 원 이상이 되면 다음 해 7월 1일부터 일반과세자로 바뀌어요. 이때부터는 6개월마다 신고하고 매입세액을 전액 공제받아요.</p>\n\n<h3 class=\"wp-block-heading\">직장인도 부가세를 내나요?</h3><p>근로소득만 있는 직장인은 부가세를 신고하지 않아요. 물건을 살 때 가격에 포함된 부가세를 이미 부담하고 있는 거예요. 부업으로 사업자등록을 했다면 그 사업분은 신고 대상이에요.</p>",
+ "tags": [
+  "부가가치세",
+  "부가세 계산",
+  "간이과세자"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a small cafe counter with a coffee machine and pastries in warm morning light",
+   "alt": "아침 햇살이 드는 작은 카페 계산대"
+  },
+  {
+   "prompt": "a calculator, a pen and a cup of tea on a wooden desk near a window, top view",
+   "alt": "창가 나무 책상 위의 계산기와 펜, 찻잔"
+  },
+  {
+   "prompt": "a cozy small restaurant kitchen with neatly arranged pots and fresh vegetables",
+   "alt": "냄비와 신선한 채소가 정리된 작은 식당 주방"
+  }
+ ],
+ "keyword": "부가가치세계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "부가세 = 공급가액 × 10% (일반과세자 세율 10%)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2275&cntntsId=7696",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "합계 ÷ 1.1 = 공급가액, 합계 - 공급가액 = 부가세 (합계 ÷ 11), 합계 1만 원 → 9,091원·909원",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2275&cntntsId=7696"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공급가액 100만 원 → 부가세 10만 원, 합계 110만 원",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2275&cntntsId=7696"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "일반과세자 납부세액 = 매출세액 - 매입세액, 매입세액이 크면 환급 (3,000만 원 × 10% = 300만 원 - 180만 원 = 120만 원)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2274&cntntsId=7695"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신용카드매출전표·현금영수증 발행금액 1.3%, 연간 1,000만 원 한도, 2026년 12월 31일까지 특례, 직전 연도 공급가액 10억 원 초과 제외",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsLawLinkInfo.do?lsJoLnkSeq=900315855&lsId=001571&chrClsCd=010202&print=print",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2469&cntntsId=7794"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "간이과세자 = 직전 연도 공급대가 1억 400만 원 미만 개인사업자",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "간이과세 납부세액 = 공급대가 × 업종별 부가가치율 × 10% - 매입 공급대가 × 0.5%, 환급 없음",
+   "urls": [
+    "https://www.law.go.kr/LSW//lsSideInfoP.do?lsiSeq=276117&joNo=0063&joBrNo=00&docCls=jo&urlMode=lsScJoRltInfoR",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2274&cntntsId=7695"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공급대가 4,800만 원 미만이면 납부의무 면제",
+   "urls": [
+    "https://www.law.go.kr/LSW//lsSideInfoP.do?lsiSeq=276117&joNo=0069&joBrNo=00&docCls=jo&urlMode=lsScJoRltInfoR"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "업종별 부가가치율 15~40%: 소매·음식점 15%, 제조·농림어업·소화물 운송 20%, 숙박 25%, 건설·운수창고·정보통신·그 밖의 서비스 30%, 금융보험·전문과학기술·사업시설관리·부동산 40% (1.5%·2%·2.5%·3%·4%)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2275&cntntsId=7696"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교 예시: 일반 6,363,636원 - 2,727,273원 = 3,636,363원, 간이 7,000만 원 × 15% × 10% = 105만 원 - 15만 원 = 90만 원",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2275&cntntsId=7696",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2274&cntntsId=7695"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "직전 연도 4,800만 원 미만 간이과세자·신규 간이과세자는 세금계산서 발급 불가",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "개인 일반과세자 1기 7월 25일, 2기 다음 해 1월 25일; 법인 예정 4월 25일·10월 25일; 간이 다음 해 1월 25일",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "개인 일반과세자 4월·10월 예정고지 50%, 50만 원 미만 미고지, 법인 공급가액 1억 5천만 원 미만 예정고지",
+   "urls": [
+    "https://www.law.go.kr/LSW//lsSideInfoP.do?lsiSeq=276117&joNo=0048&joBrNo=00&docCls=jo&urlMode=lsScJoRltInfoR",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "수정"
+  },
+  {
+   "claim": "1~6월 세금계산서 발급 간이과세자·7월 1일 전환 사업자는 7월 25일 신고",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1억 400만 원 이상이면 다음 해 7월 1일부터 일반과세자",
+   "urls": [
+    "https://www.law.go.kr/LSW//lsSideInfoP.do?lsiSeq=276117&joNo=0062&joBrNo=00&docCls=jo&urlMode=lsScJoRltInfoR",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "면세 사업만 하면 신고·납부 의무 없음",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수출 영세율 0%, 매입세액 환급",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2274&cntntsId=7695"
+   ],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "근로소득만 있는 직장인은 부가세 신고 대상 아님 (납세의무자는 사업자)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국세청 부가가치세 기본정보 (과세유형·신고기한)",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"
+  },
+  {
+   "name": "국세청 부가가치세 세율 (간이과세자 업종별 부가가치율)",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2275&cntntsId=7696"
+  },
+  {
+   "name": "국세청 부가가치세 세액계산 흐름도",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2274&cntntsId=7695"
+  }
+ ]
+}
