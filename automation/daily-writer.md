@@ -135,8 +135,9 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 나쁜 사진: 글자·숫자·로고처럼 보이는 것이 있음(엉터리 글자 포함), 손·얼굴이 일그러짐, 글 내용과 상관없는 장면.
 - 나쁜 사진은 `replace` 에 새 장면을 적는다: 영어 한 문장, 서류·영수증·간판·달력·책·화면·공항·역·키오스크가 없는 장면.
   `round` 가 2 이상이면 `replace` 대신 `remove` 에 이름만 넣는다 (서버가 사진을 뺌).
-- `wordpress/queue/imgcheck-<post_id>-<날짜시각>.json` 으로 저장 (이상 없으면 replace·remove 를 빈 목록으로 → 검사 끝 표시):
-  `{"type": "image_check", "post_id": <id>, "replace": [{"old": "<name>", "prompt": "...", "alt": "한국어 대체 텍스트", "why": "한 줄"}], "remove": []}`
+- `images` 가 빈 목록이면(사진 생성 실패) 글 내용에 맞는 장면 3개를 `add` 에 `{"prompt", "alt"}` 로 적는다 (장면 조건은 위와 같음).
+- `wordpress/queue/imgcheck-<post_id>-<날짜시각>.json` 으로 저장 (이상 없으면 replace·remove·add 를 빈 목록으로 → 검사 끝 표시):
+  `{"type": "image_check", "post_id": <id>, "replace": [{"old": "<name>", "prompt": "...", "alt": "한국어 대체 텍스트", "why": "한 줄"}], "remove": [], "add": []}`
 - 5단계 커밋에 같이 넣는다 (새 글이 없으면 `사진 검사: <글 번호들>` 로 커밋 → main 에 올림).
 
 ## 6. 글 갱신 (있는 날만)

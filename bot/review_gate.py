@@ -27,6 +27,13 @@ def _numbers(text: str) -> set[str]:
     return {n for n in nums if n and not re.fullmatch(r"(19|20)\d\d", n)}
 
 
+_STRUCTURE = re.compile(r"\d+\s*(?:단계|가지)")  # '4단계', '5가지' = 글을 나눈 개수 (검수할 사실이 아님)
+
+
+def _headline_numbers(text: str) -> set[str]:
+    return _numbers(_STRUCTURE.sub("", text or ""))
+
+
 def _ok(item: dict) -> bool:
     """본문에 남겨도 되는 주장: 맞아서 유지 / 틀려서 공식 출처대로 고침 (확인 못 한 것은 완화·삭제해야 함)."""
     pair = (str(item.get("verdict", "")).strip(), str(item.get("action", "")).strip())
@@ -42,7 +49,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "") -> l
     if len(review) < MIN_CLAIMS:
         out.append(f"검수한 주장이 {len(review)}개뿐 (최소 {MIN_CLAIMS}개)")
     verified = " ".join(str(i.get("claim", "")) for i in review if _ok(i))
-    missing = (_numbers(title) | _numbers(excerpt)) - _numbers(verified)
+    missing = (_headline_numbers(title) | _headline_numbers(excerpt)) - _numbers(verified)
     if missing:
         out.append(f"제목·요약문 숫자 {', '.join(sorted(missing))} 가 검수된 주장에 없음")
     for item in review:

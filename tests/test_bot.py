@@ -516,6 +516,16 @@ class MiscTest(unittest.TestCase):
 
 
 
+class GateStructureNumberTest(unittest.TestCase):
+    def test_step_counts_in_title_are_not_facts(self):
+        from bot import review_gate
+        review = [{"claim": f"등록 기한 30일, 과태료 100만 원 {i}", "urls": ["https://www.animal.go.kr/a"],
+                   "verdict": "맞음", "action": "유지"} for i in range(5)]
+        self.assertEqual(review_gate.problems(review, "반려동물 등록 방법 4단계, 30일 기한·과태료 100만 원"), [])
+        # 사실 숫자는 계속 확인: 기한이 검수 안 된 값이면 막힘
+        self.assertTrue(review_gate.problems(review, "반려동물 등록 4단계, 60일 기한"))
+
+
 class ImageCheckTest(unittest.TestCase):
     URL = "https://first-lab.kr/wp-content/uploads/2026/11/{}.jpg"
     BODY = ('<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n'
@@ -570,6 +580,16 @@ class ImageCheckTest(unittest.TestCase):
         self.assertIn("ai-bbbbbbbbbb", content)  # 다른 사진·문단은 그대로
         self.assertIn("<p>끝</p>", content)
         self.assertIn(("post", "meta", "update", "176", "_firstlab_img_checked", "1"), calls)
+
+    def test_add_images_to_post_without_photos(self):
+        from bot import image_check
+        no_photo = '<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2>소제목</h2>\n<!-- /wp:heading -->'
+        with mock.patch.object(self, "BODY", no_photo):
+            add = [{"prompt": "a puppy on a sunny lawn", "alt": "잔디밭 강아지"}]
+            msg, calls, content = self.run_check({"replace": [], "remove": [], "add": add})
+        self.assertIn('ai-cccccccccc.jpg" alt="잔디밭 강아지"', content)
+        self.assertLess(content.index("ai-cccccccccc"), content.index("<h2>"))  # 첫 소제목 앞에 들어감
+        self.assertIn(("post", "meta", "update", "176", image_check.ROUND_META, "1"), calls)  # 새 사진도 다시 검사
 
     def test_text_prone_new_prompt_is_removed_instead(self):
         fix = {"old": "ai-aaaaaaaaaa", "prompt": "a printed contract on a desk", "alt": "x", "why": "글자"}

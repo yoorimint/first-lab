@@ -34,6 +34,7 @@ add_action(
 						'write_mode'    => (string) ( $settings['write_mode'] ?? 'direct' ),
 						'refresh_target' => firstlab_api_refresh_target( $state ),
 						'held_drafts'    => firstlab_api_held_drafts(),
+						'image_checks'   => firstlab_api_image_checks(), // 사진 검사할 글 (daily-writer.md 5-2)
 						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 20 ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
@@ -104,7 +105,7 @@ function firstlab_api_held_drafts(): array {
 }
 
 /**
- * 사진 검사가 안 끝난 글 (오래된 것부터 2개) — 글쓰기 세션이 사진을 직접 보고 결과를 올린다 (bot/image_check.py).
+ * 사진 검사가 안 끝난 글 (오래된 것부터 2개, AI 사진이 없는 글 포함) — 글쓰기 세션이 사진을 직접 보고 결과를 올린다 (bot/image_check.py).
  * round: 이 글 사진을 이미 바꾼 횟수 (bot/image_check.py MAX_ROUND 에 닿으면 서버가 교체 대신 뺀다).
  */
 function firstlab_api_image_checks(): array {
@@ -127,10 +128,7 @@ function firstlab_api_image_checks(): array {
 				$images[] = array( 'name' => $src[2], 'url' => $src[1], 'alt' => $alt[1] ?? '' );
 			}
 		}
-		if ( ! $images ) {
-			continue;
-		}
-		$out[] = array(
+		$out[] = array( // 사진이 하나도 없으면(생성 실패 등) images 가 빈 목록 → 세션이 add 로 새 사진 요청
 			'post_id' => $post->ID,
 			'title'   => $post->post_title,
 			'round'   => (int) get_post_meta( $post->ID, '_firstlab_img_round', true ),
