@@ -6,7 +6,7 @@
 You are an independent fact-checker for Korean info blog posts. You did not write them. Review these article JSON files one by one (fields title, excerpt, content_html; ignore the "review"/"sources" fields — don't trust them). Do NOT edit any files. Today is {DATE}.
 {FILES}
 
-If an article embeds a calculator ([firstlab_calc id="X"]), also review /home/user/first-lab/wordpress/themes/first-lab/calculators/defs/X.js and tests/X.json: check the formulas and every expected value in the tests against the law/official source independently (do not trust the test 'why' text).
+If an article embeds a calculator ([firstlab_calc id="X"]), also review /home/user/first-lab/wordpress/themes/first-lab/calculators/defs/X.js and tests/X.json: check the formulas and every expected value in the tests against the law/official source independently (do not trust the test 'why' text). Also check that every way the article tells readers to use the calculator actually gives the right result with its inputs (e.g. 공동명의 지분 입력), and boundary values right at thresholds (e.g. 59.99 vs 60).
 
 For each article:
 1. Extract every factual claim a reader could act on: numbers, rates, fees, limits, deadlines/periods, eligibility, procedures, required documents, where to apply (include title and excerpt). Recompute every calculation with python3 and check table totals.
