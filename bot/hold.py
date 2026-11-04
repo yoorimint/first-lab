@@ -37,7 +37,7 @@ def apply_fix(data: dict) -> str:
 
     wp_cli("post", "update", str(post_id), f"--post_content={to_blocks(new_html)}",
            f"--post_title={title}", f"--post_excerpt={excerpt}")
-    failed = review_gate.problems(data.get("review"), title, excerpt)
+    failed = review_gate.problems(data.get("review"), title, excerpt, new_html)
     if failed:
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
         return f"'{title}' 고쳤지만 재검사 미통과 → 계속 보류: {'; '.join(failed)[:150]}"

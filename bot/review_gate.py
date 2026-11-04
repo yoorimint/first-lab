@@ -18,6 +18,9 @@ from .sources import is_official
 KEPT = ("유지", "수정")
 HOLD_META = "_firstlab_hold"  # 관문에서 막힌 초안의 이유 (설정 페이지 '검수 보류 초안')
 MIN_CLAIMS = 5  # 이보다 적으면 검수를 제대로 안 한 것으로 본다
+# 본문 길이에 비례한 최소 주장 수: 공백 뺀 글자 70자당 1개 (보통 글 2,100~2,400자 → 30~34개).
+# 11/4 외부 검수: 글쓰기 검수는 글 1편에 주장 11~26개만 확인, 외부 검수는 같은 글에서 40~60개 → 틀린 곳은 모두 확인 안 한 문장에서 나옴.
+CHARS_PER_CLAIM = 70
 _NUM = re.compile(r"\d[\d,.]*")
 
 
@@ -40,14 +43,21 @@ def _ok(item: dict) -> bool:
     return pair in (("맞음", "유지"), ("맞음", "수정"), ("틀림", "수정"))
 
 
-def problems(review: list[dict] | None, title: str = "", excerpt: str = "") -> list[str]:
+def min_claims(body_html: str) -> int:
+    """본문 글자 수(태그 뺌)에 맞는 최소 검수 주장 수."""
+    text = re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", body_html or ""))
+    return max(MIN_CLAIMS, len(text) // CHARS_PER_CLAIM)
+
+
+def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body_html: str = "") -> list[str]:
     """통과 못 한 이유 목록 (빈 목록이면 통과).
     제목·요약문의 숫자는 독자가 가장 먼저 믿는 값이라, 검수된(맞음) 주장 안에 있어야 한다."""
     if not review:
         return ["검수 기록 없음"]
     out = []
-    if len(review) < MIN_CLAIMS:
-        out.append(f"검수한 주장이 {len(review)}개뿐 (최소 {MIN_CLAIMS}개)")
+    need = min_claims(body_html)
+    if len(review) < need:
+        out.append(f"검수한 주장이 {len(review)}개뿐 (본문 길이 기준 최소 {need}개 — 글의 모든 사실 문장을 검수)")
     verified = " ".join(str(i.get("claim", "")) for i in review if _ok(i))
     missing = (_headline_numbers(title) | _headline_numbers(excerpt)) - _numbers(verified)
     if missing:

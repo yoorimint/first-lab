@@ -8,3 +8,6 @@ bugagachise-gyesangi.json
 itq-jagyeokjeung-johoe.json
 naeilbaeum-card-gyoyuk-sincheong.json
 sinyongkadeu-balgeup-jogeon.json
+jadongcha-boheom-haljeung-gijun.json
+jadongcha-myeongui-ijeon-bangbeop.json
+jeonse-jageum-daechul-jogeon.json

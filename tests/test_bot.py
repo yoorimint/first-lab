@@ -567,6 +567,16 @@ class MiscTest(unittest.TestCase):
         self.assertFalse(any(a.startswith("--name=") for a in args))
 
 
+class GateCoverageTest(unittest.TestCase):
+    def test_long_article_needs_claims_for_every_fact_sentence(self):
+        from bot import review_gate
+        body = "<p>" + "가" * 2100 + "</p>"  # 공백 뺀 2,100자 → 30개
+        ok = [{"claim": f"사실 {i}", "urls": ["https://www.nts.go.kr/a"], "verdict": "맞음", "action": "유지"} for i in range(30)]
+        self.assertEqual(review_gate.problems(ok, body_html=body), [])
+        few = ok[:16]  # 11/4 자동차보험 글처럼 일부만 검수 → 막힘
+        self.assertTrue(any("최소 30개" in p for p in review_gate.problems(few, body_html=body)))
+
+
 class GateStructureNumberTest(unittest.TestCase):
     def test_step_counts_in_title_are_not_facts(self):
         from bot import review_gate
