@@ -1,2 +1,10 @@
 # 외부 검수를 마친 글 (wordpress/queue 파일 이름, 감시 세션이 추가)
 yureop-yeohaeng-junbimul-list.json
+jonghap-sodeukse-gyesangi.json
+jutaek-cheongyak-sincheong-bangbeop.json
+jutaekdambo-daechul-ija-gyesangi.json
+bannyeo-dongmul-deungrok-bangbeop.json
+bugagachise-gyesangi.json
+itq-jagyeokjeung-johoe.json
+naeilbaeum-card-gyoyuk-sincheong.json
+sinyongkadeu-balgeup-jogeon.json
