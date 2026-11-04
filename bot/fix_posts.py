@@ -64,14 +64,17 @@ def patch_content(content: str, patch: dict) -> str | None:
     replace_paragraph: 문단 전체를 이 문장으로 교체 ("tag": "li" 면 목록 항목 하나를 교체)
     insert_after: 문단(블록) 바로 뒤에 이 내용을 블록으로 추가 (예: 계산기 [firstlab_calc id="..."])
     remove_block: true 면 find 가 든 블록(<!-- wp:… --> … <!-- /wp:… -->) 통째로 삭제 (근거 없는 표 등)
+    remove_element: true 면 find 가 든 요소(tag, 예: 표의 한 줄 tr)만 삭제
     """
     if patch.get("remove_block"):
         block = re.search(r"<!-- wp:(?P<kind>[a-z/-]+)\b[^>]*-->(?:(?!<!-- /wp:(?P=kind) -->).)*?"
                           + re.escape(patch["find"]) + r".*?<!-- /wp:(?P=kind) -->\s*", content, flags=re.S)
         return content.replace(block.group(0), "", 1) if block else None
     tag = patch.get("tag", "p")
-    # 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지
-    m = re.search(rf"<{tag}>(?:(?!</{tag}>).)*?" + re.escape(patch["find"]) + rf".*?</{tag}>", content, flags=re.S)
+    # 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지.
+    # 여는 태그의 속성(<h2 class="wp-block-heading"> 등)은 그대로 둔다
+    m = re.search(rf"<{tag}(?P<attrs>\s[^>]*)?>(?:(?!</{tag}>).)*?" + re.escape(patch["find"]) + rf".*?</{tag}>",
+                  content, flags=re.S)
     if "insert_after" in patch:
         if not m or patch["insert_after"] in content:
             return None
@@ -80,7 +83,9 @@ def patch_content(content: str, patch: dict) -> str | None:
         return f"{content[:at]}\n\n{to_blocks('<p>' + patch['insert_after'] + '</p>')}{content[at:]}"
     if not m:
         return None
-    return content.replace(m.group(0), f"<{tag}>{patch['replace_paragraph']}</{tag}>")
+    if patch.get("remove_element"):  # 그 요소(표의 한 줄, 목록 한 항목 등)만 삭제
+        return content.replace(m.group(0), "", 1)
+    return content.replace(m.group(0), f"<{tag}{m.group('attrs') or ''}>{patch['replace_paragraph']}</{tag}>")
 
 
 def apply_patches() -> None:

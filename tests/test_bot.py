@@ -472,7 +472,18 @@ class MiscTest(unittest.TestCase):
                 self.assertTrue(("set_title" not in p or "from_title" in p) and ("set_excerpt" not in p or "from_excerpt" in p))
                 continue
             self.assertTrue({"post", "why", "find"} <= set(p))
-            self.assertTrue({"replace_paragraph", "insert_after", "remove_block"} & set(p))
+            self.assertTrue({"replace_paragraph", "insert_after", "remove_block", "remove_element"} & set(p))
+
+    def test_patch_keeps_tag_attributes_and_removes_row(self):
+        from bot.fix_posts import patch_content
+        body = ('<h2 class="wp-block-heading">신청 방법 3가지 비교</h2>'
+                '<table><tr><td>인터넷</td></tr><tr><td>전화</td><td>콜센터 1588-1300</td></tr></table>')
+        out = patch_content(body, {"tag": "h2", "find": "신청 방법 3가지", "replace_paragraph": "신청 방법 비교"})
+        self.assertIn('<h2 class="wp-block-heading">신청 방법 비교</h2>', out)
+        out = patch_content(out, {"tag": "tr", "find": "<td>콜센터 1588-1300</td>", "remove_element": True})
+        self.assertNotIn("1588-1300", out)
+        self.assertIn("<td>인터넷</td>", out)
+        self.assertEqual(patch_content("<pre>x</pre><p>x</p>", {"find": "x", "replace_paragraph": "y"}), "<pre>x</pre><p>y</p>")
 
     def test_patch_remove_block(self):
         from bot.fix_posts import patch_content
