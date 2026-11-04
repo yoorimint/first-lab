@@ -11,15 +11,17 @@ import re
 from . import images, photo
 from .settings import wp_cli
 
-_AI_SRC = r'https?://[^"\s]*/(ai-[0-9a-f]{10})(?:-\d+x\d+)?\.jpg'
-_BLOCK = re.compile(r"<!-- wp:image\b(?:(?!<!-- /wp:image -->).)*?" + _AI_SRC + r".*?<!-- /wp:image -->\s*", re.S)
+_AI_SRC = r'https?://[^"\s]*/(?P<name>ai-[0-9a-f]{10})(?:-\d+x\d+)?\.jpg'
+# 사진 블록(wp:image)뿐 아니라 HTML 블록(wp:html)에 든 사진도 — 보류 수정본은 figure 가 HTML 블록으로 저장됨 (11/4 #163)
+_BLOCK = re.compile(r"<!-- wp:(?P<kind>image|html)\b(?:(?!<!-- /wp:(?P=kind) -->).)*?" + _AI_SRC
+                    + r".*?<!-- /wp:(?P=kind) -->\s*", re.S)
 _ANY_SRC = re.compile(_AI_SRC)
 SCANNED_META = "_firstlab_photo_scanned2"  # 수정 기록을 뒤져 봤는데 사진이 없던 글 (1차는 첨부 찾기 오류라 다시 확인)
 
 
 def body_photos(content: str) -> list[str]:
     """본문 AI 사진 이름 (순서대로)."""
-    return [m.group(1) for m in _BLOCK.finditer(content)]
+    return [m.group("name") for m in _BLOCK.finditer(content)]
 
 
 def strip_photos(content: str) -> str:
@@ -40,7 +42,7 @@ def _from_revisions(post_id: str) -> list[str]:
     revs = wp_cli("post", "list", "--post_type=revision", "--post_status=inherit", f"--post_parent={post_id}",
                   "--orderby=ID", "--order=DESC", "--field=ID").split()
     for rev in revs:
-        names = _ANY_SRC.findall(wp_cli("post", "get", rev, "--field=post_content"))
+        names = [m.group("name") for m in _ANY_SRC.finditer(wp_cli("post", "get", rev, "--field=post_content"))]
         if names:
             return names
     return []
@@ -90,7 +92,9 @@ def main() -> None:
     for i in none:  # 대표 사진이 없는데 '검사 끝'이면 사진을 영영 못 받음 → 다시 검사 대상으로
         if photo.meta(i, CHECKED_META):
             photo._delete_meta(i, CHECKED_META)
-    print(f"[대표 사진] 요약: 사진 {len(has)}개 · 대기 {len(waiting)}개 · 없음(제목 카드) {len(none)}개 {none[:15]}", flush=True)
+    left = [i for i in ids if _ANY_SRC.search(wp_cli("post", "get", i, "--field=post_content"))]  # 0 이어야 정상
+    print(f"[대표 사진] 요약: 사진 {len(has)}개 · 대기 {len(waiting)}개 · 없음(제목 카드) {len(none)}개 {none[:15]}"
+          f" · 본문에 AI 사진 남은 글 {len(left)}개 {left[:15]}", flush=True)
 
 
 if __name__ == "__main__":

@@ -545,6 +545,20 @@ class MiscTest(unittest.TestCase):
         self.assertEqual([p for p in ("<p>도입</p>", "<p>중간</p>", "<p>끝</p>") if p in out], ["<p>도입</p>", "<p>중간</p>", "<p>끝</p>"])
         self.assertEqual(migrate_photos.body_photos(out), [])  # 다시 실행해도 아무 일 없음
 
+    def test_migrate_strips_photos_inside_html_blocks(self):
+        # 보류 수정본은 figure 가 HTML 블록으로 저장됨 → 이것도 빼야 함 (11/4 #163 본문에 사진이 남은 문제)
+        from bot import migrate_photos
+        body = ('<!-- wp:paragraph -->\n<p>도입</p>\n<!-- /wp:paragraph -->\n\n'
+                '<!-- wp:html -->\n<figure class="wp-block-image size-large"><img src="'
+                'https://first-lab.kr/wp-content/uploads/2026/11/ai-639b039237.jpg" alt="논밭"/></figure>\n<!-- /wp:html -->\n\n'
+                '<!-- wp:html -->\n<div class="note">사진 없는 HTML 블록</div>\n<!-- /wp:html -->\n\n'
+                '<!-- wp:paragraph -->\n<p>끝</p>\n<!-- /wp:paragraph -->')
+        self.assertEqual(migrate_photos.body_photos(body), ["ai-639b039237"])
+        out = migrate_photos.strip_photos(body)
+        self.assertNotIn("ai-639b039237", out)
+        self.assertIn("사진 없는 HTML 블록", out)  # 다른 HTML 블록은 그대로
+        self.assertIn("<p>끝</p>", out)
+
     def test_migrate_keeps_body_when_no_photo_in_media(self):
         from bot import images, migrate_photos, photo
         body = ('<!-- wp:image {"sizeSlug":"large"} -->\n<figure class="wp-block-image size-large"><img src="'
