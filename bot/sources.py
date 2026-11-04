@@ -12,7 +12,8 @@ import urllib.request
 
 OFFICIAL_SUFFIXES = (".go.kr", ".or.kr", ".re.kr", ".ac.kr", ".mil.kr")  # 정부·공공기관·공단·연구기관
 # 주소 끝이 위와 다른 공식 기관 (정부 정책브리핑, 공항공사, 도로공사 등). 필요하면 여기에 추가
-OFFICIAL_HOSTS = ("korea.kr", "gov.kr", "airport.kr", "airport.co.kr", "ex.co.kr", "hipass.co.kr", "kepco.co.kr")
+OFFICIAL_HOSTS = ("korea.kr", "gov.kr", "airport.kr", "airport.co.kr", "ex.co.kr", "hipass.co.kr", "kepco.co.kr",
+                  "korcham.net")  # korcham.net: 대한상공회의소(법정단체) 자격평가사업단 — 컴활·워드 국가기술자격 시행기관 (11/5 #431 오탐)
 MAX_LINKS = 3
 TIMEOUT = 10
 HEADING = "공식 안내 바로가기"

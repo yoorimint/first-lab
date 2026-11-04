@@ -636,6 +636,15 @@ class DuplicateKeywordTest(unittest.TestCase):
         self.assertIn("376", msg)
 
 
+class OfficialHostTest(unittest.TestCase):
+    def test_exam_bodies_are_official(self):
+        from bot.sources import is_official
+        self.assertTrue(is_official("https://license.korcham.net/co/examguide.do?mm=21&cd=0103"))  # 컴활 시행기관
+        self.assertTrue(is_official("https://www.q-net.or.kr/crf005.do"))
+        self.assertFalse(is_official("https://blog.naver.com/x"))
+        self.assertFalse(is_official("https://notkorcham.net/x"))  # 이름만 비슷한 주소는 아님
+
+
 class GateCoverageTest(unittest.TestCase):
     def test_long_article_needs_claims_for_every_fact_sentence(self):
         from bot import review_gate
