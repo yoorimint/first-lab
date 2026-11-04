@@ -175,6 +175,11 @@ def clear_cache() -> None:
         shutil.rmtree(path, ignore_errors=True) if os.path.isdir(path) else os.remove(path)
 
 
+def yields_to_direct(settings: BotSettings, state: dict, today: str) -> bool:
+    """월정액(직접 작성) 방식이고 오늘 직접 쓴 글이 올라왔으면 봇 자동 발행은 쉰다."""
+    return settings.write_mode == "direct" and direct_post_today(state, today)
+
+
 def direct_post_today(state: dict, today: str) -> bool:
     """예약 글쓰기 세션이 오늘 글을 올렸는지 (publish_queue 기록 기준)."""
     return any(e.get("ok") and str(e.get("time", "")).startswith(today) and "직접 작성 글:" in str(e.get("msg", ""))
@@ -244,7 +249,7 @@ def main() -> None:
     if reason is None and settings.enabled and slot_candidate is not None and stamp >= state.get("auto_next", ""):
         reason, slot = f"자동 {slot_candidate + 1}회차", slot_candidate
 
-    if reason and slot is not None and direct_post_today(state, today):
+    if reason and slot is not None and yields_to_direct(settings, state, today):
         add_log(state, True, f"{reason} 건너뜀: 오늘 직접 작성 글이 이미 올라옴 (봇은 예비)")
         state["done"][today].append(state["plan"][today][slot])
         reason = None

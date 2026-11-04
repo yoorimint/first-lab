@@ -40,6 +40,7 @@ def _times(text: str) -> list[str]:
 
 @dataclass
 class BotSettings:
+    write_mode: str = "direct"  # direct = 월정액 직접 작성(봇은 예비) | bot = API 봇이 작성
     enabled: bool = False
     post_status: str = "draft"
     publish_times: list[str] = field(default_factory=lambda: ["09:00", "20:00"])
@@ -69,6 +70,7 @@ class BotSettings:
         provider = raw.get("provider") or "gemini"
         wp_field, env_name = _KEY_SOURCES.get(provider, ("", ""))
         return cls(
+            write_mode="bot" if raw.get("write_mode") == "bot" else "direct",
             enabled=bool(int(raw.get("enabled") or 0)),
             post_status=raw.get("post_status") or "draft",
             publish_times=_times(raw.get("publish_times", "09:00\n20:00")),

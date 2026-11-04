@@ -30,6 +30,7 @@ add_action(
 						$recent[] = array( 'title' => $p->post_title, 'slug' => urldecode( $p->post_name ), 'status' => $p->post_status );
 					}
 					return array(
+						'write_mode'    => (string) ( $settings['write_mode'] ?? 'direct' ),
 						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 20 ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),

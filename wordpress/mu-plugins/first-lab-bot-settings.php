@@ -16,6 +16,13 @@ const FIRSTLAB_BOT_OPTION = 'firstlab_bot';
  */
 function firstlab_bot_fields(): array {
 	return array(
+		'write_mode'     => array(
+			'label'   => '글 작성 방식',
+			'type'    => 'select',
+			'default' => 'direct',
+			'options' => array( 'direct' => '월정액 (Claude 구독으로 매일 아침 직접 작성)', 'bot' => 'API 봇 (발행 시각마다 봇이 작성, API 비용)' ),
+			'help'    => '월정액: 예약 세션이 매일 1편을 쓰고, 봇은 아래 발행 시각에 예비로만 씀 (그날 직접 쓴 글이 있으면 건너뜀. 예비도 끄려면 자동 발행 사용 해제). API 봇: 예약 세션은 쉬고 봇이 발행 시각마다 씀',
+		),
 		'enabled'        => array( 'label' => '자동 발행 사용', 'type' => 'checkbox', 'default' => 0 ),
 		'post_status'    => array(
 			'label'   => '발행 방식',

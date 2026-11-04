@@ -14,6 +14,7 @@
 ```
 curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/firstlab/v1/next
 ```
+- 응답의 `write_mode` 가 `"direct"` 가 아니면(설정 페이지에서 "API 봇" 선택) 글을 쓰지 말고 "봇 방식이라 쉼"으로 끝낸다.
 - `candidates` 는 점수순 후보다. 위에서부터 보고 아래에 해당하면 건너뛴다:
   - 날마다 값이 바뀌는 시세·가격(예: 오늘의 금 시세, 농산물 가격) — 글이 금방 틀린 정보가 됨
   - 특정 회사·브랜드 상품 비교, 추천·순위·이벤트, 의료·건강 진단, 정치·종교

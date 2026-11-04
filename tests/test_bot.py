@@ -180,6 +180,14 @@ class FallbackTest(unittest.TestCase):
         bad = [{"time": "2026-11-05 08:20", "ok": False, "msg": "직접 작성 글 실패 (a.json)"}]
         self.assertFalse(direct_post_today({"log": bad}, "2026-11-05"))
 
+    def test_write_mode(self):
+        from bot.run import yields_to_direct
+        log = {"log": [{"time": "2026-11-05 08:20", "ok": True, "msg": "직접 작성 글: [발행] 'x'"}]}
+        direct, bot = BotSettings.from_option({}, {}), BotSettings.from_option({"write_mode": "bot"}, {})
+        self.assertEqual((direct.write_mode, bot.write_mode), ("direct", "bot"))
+        self.assertTrue(yields_to_direct(direct, log, "2026-11-05"))
+        self.assertFalse(yields_to_direct(bot, log, "2026-11-05"))  # 봇 방식은 직접 글이 있어도 그대로 씀
+
 
 class MiscTest(unittest.TestCase):
     def test_competition_from_urls(self):
