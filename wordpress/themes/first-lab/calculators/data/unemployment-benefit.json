@@ -1,0 +1,19 @@
+{
+  "basis_date": "2026-11-04",
+  "sources": [
+    {"name": "고용보험법 (제40조 수급 요건, 제45조 기초일액, 제46조 구직급여일액 60%·80%, 제50조·별표 1 소정급여일수)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0"},
+    {"name": "고용보험법 시행령 제68조 (급여기초 임금일액 상한 11만3500원)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0"},
+    {"name": "고용노동부 2026년 적용 최저임금 시간급 10,320원", "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=18144"},
+    {"name": "대한민국 정책브리핑 구직급여 상한액 6만 6000원 → 6만 8100원", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148956574"}
+  ],
+  "benefit_rate": 0.6,
+  "min_rate": 0.8,
+  "min_wage_hour": 10320,
+  "daily_wage_cap": 113500,
+  "max_hours": 8,
+  "days_table": {
+    "under50": [120, 150, 180, 210, 240],
+    "over50": [120, 180, 210, 240, 270]
+  },
+  "period_labels": ["1년 미만", "1년 이상 3년 미만", "3년 이상 5년 미만", "5년 이상 10년 미만", "10년 이상"]
+}
