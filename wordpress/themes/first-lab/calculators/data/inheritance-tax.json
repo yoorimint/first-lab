@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04",
+  "basis_date": "2026-11-05",
   "sources": [
     {"name": "상속세 및 증여세법 (2026. 1. 1. 시행) 제13조·제14조·제18조~제22조·제24조·제26조·제69조", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280353&efYd=20260101"},
     {"name": "국세청 상속세 세액계산 흐름도 (일괄공제 5억 원, 세율·누진공제)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2326&cntntsId=7720"},
@@ -20,5 +20,6 @@
   "spouse": {"min": 500000000, "max": 3000000000, "share_spouse": 1.5, "share_child": 1},
   "financial": {"full_upto": 20000000, "rate_pct": 20, "min": 20000000, "max": 200000000},
   "limit_gift_over": 500000000,
-  "filing_credit_pct": 3
+  "filing_credit_pct": 3,
+  "min_taxable_base": 500000
 }

@@ -9,8 +9,8 @@
     ['grandparent_adult', '조부모 → 성년 손자녀 (할증)'],
     ['grandparent_minor', '조부모 → 미성년 손자녀 (할증)'],
     ['child', '자녀(직계비속) → 부모'],
-    ['relative', '그 밖의 친족'],
-    ['other', '친족이 아닌 사람'],
+    ['relative', '4촌 이내 혈족·3촌 이내 인척'],
+    ['other', '그 밖의 사람 (5촌 이상 친척 포함)'],
   ];
   const ASCENDANT = ['parent_adult', 'parent_minor', 'grandparent_adult', 'grandparent_minor'];
 
@@ -45,7 +45,9 @@
       const basic = Math.min(Math.max(0, limit - used), price);
       const extra = Math.min(marriage, price - basic);
       const base = price - basic - extra;
-      const { tax, rate } = baseTax(base, d.brackets);
+      const raw = baseTax(base, d.brackets);
+      const rate = raw.rate;
+      const tax = base < d.min_taxable_base ? 0 : raw.tax; // 과세표준 50만 원 미만이면 부과하지 않음 (제55조②)
       let surchargePct = 0;
       if (v.relation.startsWith('grandparent')) {
         surchargePct = v.relation === 'grandparent_minor' && price > d.skip_generation.minor_over_amount

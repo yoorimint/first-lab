@@ -178,5 +178,22 @@
       "credit": 1500000,
       "pay": 48500000
     }
+  },
+  {
+    "why": "과세표준 50만 원 미만이면 부과 안 함 (제55조②): 성년 자녀 5,040만 원 − 공제 5,000만 = 40만 → 0 (11/5 외부 검수)",
+    "input": {
+      "price": 50400000,
+      "relation": "parent_adult",
+      "used": 0,
+      "marriage": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "base": 400000,
+      "tax": 0,
+      "surcharge": 0,
+      "credit": 0,
+      "pay": 0
+    }
   }
 ]

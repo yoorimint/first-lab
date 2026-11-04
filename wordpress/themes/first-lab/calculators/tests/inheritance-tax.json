@@ -305,5 +305,146 @@
       "gift_credit": 0,
       "pay": 0
     }
+  },
+  {
+    "why": "배우자 사전증여 과세표준(E)을 배우자공제 한도에서 뺌 (제19조①): 20억, 배우자 15억, 배우자에게 10억 증여(공제 6억, 과표 4억): 한도 (20억+10억)×3/7 − 4억 = 885,714,285 (11/5 외부 검수)",
+    "input": {
+      "estate": 2000000000,
+      "heirs": "spouse_children",
+      "children": 2,
+      "spouse_amount": 1500000000,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 1000000000,
+      "gifts_nonheir": 0,
+      "spouse_gift_base": 400000000,
+      "gift_deducted": 600000000,
+      "gift_tax_paid": 70000000,
+      "on_time": "yes"
+    },
+    "expect": {
+      "spouse": 885714285,
+      "total": 1385714285,
+      "base": 1609285715,
+      "rate": 40,
+      "tax": 483714286,
+      "gift_credit": 70000000,
+      "credit": 12411428,
+      "pay": 401302858
+    }
+  },
+  {
+    "why": "상속인 아닌 사람에게 준 증여는 배우자공제 한도 C에서 빠짐 (제19조①, 제13조①1호만): 한도 20억×3/7 = 857,142,857 (11/5 외부 검수)",
+    "input": {
+      "estate": 2000000000,
+      "heirs": "spouse_children",
+      "children": 2,
+      "spouse_amount": 1500000000,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 500000000,
+      "gifts_nonheir": 500000000,
+      "spouse_gift_base": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 90000000,
+      "on_time": "yes"
+    },
+    "expect": {
+      "spouse": 857142857,
+      "total": 1357142857,
+      "base": 1137857143,
+      "rate": 40,
+      "tax": 295142857,
+      "gift_credit": 90000000,
+      "credit": 6154285,
+      "pay": 198988572
+    }
+  },
+  {
+    "why": "과세표준 50만 원 미만이면 부과 안 함 (제25조②): 5억 540만 원 → 과표 40만 원 → 0",
+    "input": {
+      "estate": 505400000,
+      "heirs": "children",
+      "children": 1,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gifts_nonheir": 0,
+      "spouse_gift_base": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "base": 400000,
+      "tax": 0,
+      "credit": 0,
+      "pay": 0
+    }
+  },
+  {
+    "why": "법정상속분 정수 계산: 18억 4,800만 × 3/11 = 5억 400만 (소수 곱셈이면 1원 모자람)",
+    "input": {
+      "estate": 1848000000,
+      "heirs": "spouse_children",
+      "children": 4,
+      "spouse_amount": 1000000000,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gifts_nonheir": 0,
+      "spouse_gift_base": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "yes"
+    },
+    "expect": {
+      "spouse": 504000000,
+      "total": 1004000000,
+      "base": 839000000,
+      "tax": 191700000,
+      "credit": 5751000,
+      "pay": 185949000
+    }
+  },
+  {
+    "why": "무신고면 일괄공제 5억만 (제21조① 단서): 자녀 10명이어도 기초 2억+인적 5억=7억 대신 5억",
+    "input": {
+      "estate": 2000000000,
+      "heirs": "children",
+      "children": 10,
+      "spouse_amount": 0,
+      "elderly": 0,
+      "financial": 0,
+      "debts": 0,
+      "funeral": 0,
+      "bongan": 0,
+      "gifts": 0,
+      "gifts_nonheir": 0,
+      "spouse_gift_base": 0,
+      "gift_deducted": 0,
+      "gift_tax_paid": 0,
+      "on_time": "none"
+    },
+    "expect": {
+      "personal": 500000000,
+      "base": 1495000000,
+      "tax": 438000000,
+      "credit": 0,
+      "pay": 438000000
+    }
   }
 ]

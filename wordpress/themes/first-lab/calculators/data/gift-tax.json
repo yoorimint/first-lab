@@ -24,5 +24,6 @@
   },
   "marriage_birth_max": 100000000,
   "skip_generation": {"rate_pct": 30, "minor_over_pct": 40, "minor_over_amount": 2000000000},
-  "filing_credit_pct": 3
+  "filing_credit_pct": 3,
+  "min_taxable_base": 500000
 }
