@@ -31,6 +31,7 @@ add_action(
 					}
 					return array(
 						'write_mode'    => (string) ( $settings['write_mode'] ?? 'direct' ),
+						'refresh_target' => firstlab_api_refresh_target( $state ),
 						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 20 ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
@@ -43,3 +44,19 @@ add_action(
 		);
 	}
 );
+
+/**
+ * 오늘 갱신할 글 (월정액 방식에서 봇이 새벽에 골라 둔 것) + 현재 본문.
+ * base_modified 는 반영할 때 그 사이 글이 수정됐는지 확인하는 값 (bot/refresh.py apply_direct).
+ */
+function firstlab_api_refresh_target( array $state ): ?array {
+	$target = (array) ( $state['refresh_target'] ?? array() );
+	$post   = empty( $target['id'] ) ? null : get_post( (int) $target['id'] );
+	if ( ! $post || 'publish' !== $post->post_status ) {
+		return null;
+	}
+	return $target + array(
+		'base_modified' => $post->post_modified,
+		'content_html'  => trim( preg_replace( '/<!--.*?-->/s', '', $post->post_content ) ),
+	);
+}

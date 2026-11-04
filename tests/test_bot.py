@@ -171,6 +171,51 @@ class PublishQueueTest(unittest.TestCase):
                 self.assertEqual(publish_queue.pending(), [f])
 
 
+class DirectRefreshTest(unittest.TestCase):
+    POST = {"id": 59, "title": "t", "url": "u", "siblings": [("a", 100)]}
+
+    def test_direct_mode_only_plans(self):
+        s = BotSettings.from_option({"write_mode": "direct"}, {})
+        state = {"refresh": {}}
+        with mock.patch.object(refresh, "pick_targets", return_value=[(self.POST, "enhance", "정체")]), \
+                mock.patch.object(refresh, "refresh_post") as api_call, mock.patch.object(refresh, "connect"):
+            logs = refresh.run_weekly(s, state)
+        api_call.assert_not_called()  # API 로 고치지 않음
+        self.assertEqual(state["refresh_target"]["id"], 59)
+        self.assertEqual(state["refresh_target"]["siblings"], ["a"])
+        self.assertIn("대상 준비", logs[0])
+
+    def fake_wp(self, modified="2026-11-04 10:00:00", content="<p>" + "가" * 100 + "</p>"):
+        calls = []
+
+        def wp(*args):
+            calls.append(args)
+            field = next((a for a in args if a.startswith("--field=")), "")
+            return {"--field=post_modified": modified, "--field=post_content": content,
+                    "--field=post_title": "제목"}.get(field, "")
+        return wp, calls
+
+    def test_apply_direct(self):
+        wp, calls = self.fake_wp()
+        state = {"refresh": {}, "refresh_target": {"id": 59, "why": "정체"}}
+        data = {"post_id": 59, "base_modified": "2026-11-04 10:00:00", "content_html": "<p>" + "나" * 120 + "</p>"}
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp):
+            msg = refresh.apply_direct(data, state)
+        self.assertTrue(any(a[:2] == ("post", "update") for a in calls))
+        self.assertNotIn("refresh_target", state)
+        self.assertEqual(sum(state["refresh"].values()), 1)
+        self.assertIn("정체", msg)
+
+    def test_apply_direct_refuses_conflict_and_shrink(self):
+        for modified, html in (("2026-11-05 09:00:00", "<p>" + "나" * 120 + "</p>"),  # 그 사이 수정됨
+                               ("2026-11-04 10:00:00", "<p>짧음</p>")):                  # 본문이 크게 줄어듦
+            wp, calls = self.fake_wp(modified=modified)
+            data = {"post_id": 59, "base_modified": "2026-11-04 10:00:00", "content_html": html}
+            with mock.patch.object(refresh, "wp_cli", side_effect=wp), self.assertRaises(RuntimeError):
+                refresh.apply_direct(data, {"refresh": {}})
+            self.assertFalse(any(a[:2] == ("post", "update") for a in calls))
+
+
 class FallbackTest(unittest.TestCase):
     def test_direct_post_today(self):
         from bot.run import direct_post_today

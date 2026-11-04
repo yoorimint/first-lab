@@ -7,6 +7,9 @@
   4) 오래된 글: 발행 180일 이상 + 최근 노출 있음 + 수치 포함 → 수치 재검증
 건드리지 않음: 3위 안에 드는 글(1번 예외 없음), 노출 없는 글, 최근 갱신한 글
 비용: 재검증 = Haiku + 검색 (약 30~70원), 보강 = 글쓰기 모델 + 검색 (Opus 기준 약 700원)
+
+작성 방식이 월정액(direct)이면 API 를 쓰지 않는다: 대상만 골라 state["refresh_target"] 에 두고,
+매일 글쓰기 세션이 읽기 API 로 받아 고친 본문을 wordpress/queue 에 올리면 publish_queue 가 apply_direct 로 반영한다.
 """
 from __future__ import annotations
 
@@ -25,6 +28,7 @@ from .settings import BotSettings, wp_cli
 from .state import add_spend, spent_today
 
 META_KEY = "_firstlab_refreshed"   # 마지막 갱신 날짜
+MIN_KEEP_RATIO = 0.8              # 고친 본문이 기존의 80% 미만이면 반영하지 않음 (내용 유실 방지)
 MIN_DAYS_BETWEEN = 60              # 같은 글은 이 기간 안에 다시 갱신하지 않음
 STUCK_POSITION = (5, 20)
 STUCK_MIN_IMPRESSIONS = 30
@@ -133,20 +137,70 @@ def refresh_post(post: dict, mode: str, settings: BotSettings) -> tuple[str, flo
                            web_search=True)
         data = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
         new_html = str(data.get("content_html") or "")
-        changed = len(new_html) >= len(content) * 0.8  # 글이 크게 줄었으면 반영하지 않음
+        changed = len(new_html) >= len(content) * MIN_KEEP_RATIO
         note = str(data.get("changes", ""))[:80]
-    if changed:
-        wp_cli("post", "update", str(post["id"]), f"--post_content={to_blocks(new_html)}")
-    wp_cli("post", "meta", "update", str(post["id"]), META_KEY, datetime.now().strftime("%Y-%m-%d"))
+    _save(post["id"], new_html if changed else None)
     cost = getattr(llm, "cost_usd", 0.0)
     return f"{'수정' if changed else '변경 없음'} - {note} (약 ${cost:.2f})", cost
 
 
+def _save(post_id: int, new_html: str | None) -> None:
+    """본문 반영(None 이면 본문은 그대로) + 갱신 날짜 기록."""
+    if new_html is not None:
+        wp_cli("post", "update", str(post_id), f"--post_content={to_blocks(new_html)}")
+    wp_cli("post", "meta", "update", str(post_id), META_KEY, datetime.now().strftime("%Y-%m-%d"))
+
+
+def _week() -> str:
+    return datetime.now().strftime("%G-W%V")
+
+
+def _count_done(state: dict) -> None:
+    week = _week()
+    state["refresh"] = {week: state.get("refresh", {}).get(week, 0) + 1}
+
+
+def plan_direct(state: dict) -> list[str]:
+    """월정액 방식: 오늘 갱신할 글을 골라 두기만 한다 (매일 글쓰기 세션이 처리)."""
+    with connect() as conn:
+        targets = pick_targets(conn, 1)
+    if not targets:
+        state.pop("refresh_target", None)
+        return []
+    post, mode, why = targets[0]
+    state["refresh_target"] = {"id": post["id"], "title": post["title"], "url": post["url"], "mode": mode,
+                               "why": why, "siblings": [k for k, _ in post.get("siblings", [])]}
+    return [f"글 갱신 대상 준비 (매일 글쓰기 세션이 처리): '{post['title']}' - {why}"]
+
+
+def apply_direct(data: dict, state: dict) -> str:
+    """글쓰기 세션이 올린 갱신 본문 반영. 그 사이 글이 수정됐거나 본문이 크게 줄었으면 반영하지 않는다."""
+    post_id = int(data["post_id"])
+    modified = wp_cli("post", "get", str(post_id), "--field=post_modified").strip()
+    if data.get("base_modified") and data["base_modified"] != modified:
+        raise RuntimeError(f"글 {post_id} 이 그 사이 수정됨 ({modified}) → 반영 안 함")
+    old = _html(wp_cli("post", "get", str(post_id), "--field=post_content"))
+    new_html = str(data.get("content_html") or "")
+    if len(new_html) < len(old) * MIN_KEEP_RATIO:
+        raise RuntimeError(f"고친 본문이 너무 짧음 ({len(new_html)}자 < 기존 {len(old)}자의 80%) → 반영 안 함")
+    _save(post_id, new_html)
+    _count_done(state)
+    target = state.get("refresh_target") or {}
+    if target.get("id") == post_id:
+        state.pop("refresh_target", None)
+    title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
+    return f"'{title}' - {target.get('why', '')} → 수정 - {str(data.get('changes', ''))[:80]}"
+
+
 def run_weekly(settings: BotSettings, state: dict) -> list[str]:
     """하루 1번 호출. 이번 주(월요일 시작) 갱신 수가 한도 미만이면 최대 1개 갱신 (주중에 고르게 분산)."""
-    week = datetime.now().strftime("%G-W%V")
-    done = state.setdefault("refresh", {}).get(week, 0)
-    if settings.refresh_per_week <= done or not settings.api_key:
+    done = state.setdefault("refresh", {}).get(_week(), 0)
+    if settings.refresh_per_week <= done:
+        state.pop("refresh_target", None)
+        return []
+    if settings.write_mode == "direct":
+        return plan_direct(state)
+    if not settings.api_key:
         return []
     if settings.daily_cost_cap > 0 and spent_today(state) >= settings.daily_cost_cap:
         return [f"글 갱신 건너뜀: 오늘 AI 비용 하루 상한 ${settings.daily_cost_cap:.0f} 도달"]
@@ -160,5 +214,5 @@ def run_weekly(settings: BotSettings, state: dict) -> list[str]:
             logs.append(f"글 갱신({'보강' if mode == 'enhance' else '재검증'}): '{post['title']}' - {why} → {result}")
         except Exception as e:  # noqa: BLE001
             logs.append(f"글 갱신 실패: '{post['title']}' - {e}")
-        state["refresh"] = {week: done + 1}
+        _count_done(state)
     return logs

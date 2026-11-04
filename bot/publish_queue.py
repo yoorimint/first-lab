@@ -3,6 +3,7 @@
 봇의 AI 작성 단계만 건너뛰고, 나머지는 봇과 똑같이 처리한다:
 제목·요약문 숫자 점검 → 링크 정리 → AI 이미지·대표 카드·카테고리·작성자 → 키워드 '사용됨' 기록.
 파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish|auto, 기본 draft).
+글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
 from __future__ import annotations
@@ -11,7 +12,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import related
+from . import refresh, related
 from .keyword_db import connect, norm, set_status
 from .publisher import publish
 from .settings import load_settings
@@ -70,12 +71,20 @@ def main() -> None:
     state = load_state()
     DONE_DIR.mkdir(parents=True, exist_ok=True)
     for path in files:
+        # 로그 머리말 '직접 작성 글:' 은 봇이 예비 발행을 건너뛰는 기준이라 새 글에만 쓴다 (run.direct_post_today)
+        label = "직접 작성 글"
         try:
-            msg = publish_file(path, settings)
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if data.get("type") == "refresh":
+                label = "글 갱신(직접)"
+                msg = refresh.apply_direct(data, state)
+            else:
+                msg = publish_file(path, settings)
             _marker(path).touch()
-            add_log(state, True, f"직접 작성 글: {msg}")
-        except Exception as e:  # noqa: BLE001 - 한 파일 실패가 배포를 막지 않게
-            msg = f"직접 작성 글 실패 ({path.name}): {e}"
+            msg = f"{label}: {msg}"
+            add_log(state, True, msg)
+        except Exception as e:  # noqa: BLE001 - 한 파일 실패가 배포를 막지 않게 (다음 배포 때 다시 시도)
+            msg = f"{label} 실패 ({path.name}): {e}"
             add_log(state, False, msg)
         print(msg, flush=True)
     save_state(state)

@@ -32,7 +32,7 @@ function firstlab_bot_fields(): array {
 		),
 		'fact_check'     => array( 'label' => '자동 사실 검증', 'type' => 'checkbox', 'default' => 1, 'help' => '글 완성 후 별도 AI 가 핵심 수치를 웹 검색으로 재확인·수정. 확인 못 한 주장이 많으면 자동 발행 대신 초안으로 남김' ),
 		'daily_cost_cap' => array( 'label' => '하루 AI 비용 상한 (달러)', 'type' => 'number', 'default' => 3, 'min' => 0, 'max' => 100, 'help' => '오늘 쓴 AI 비용(글 작성·검수·갱신 합계)이 이 금액에 닿으면 그날은 더 쓰지 않음. 글 1개 약 0.5달러 (0 = 상한 없음)' ),
-		'refresh_per_week' => array( 'label' => '글 갱신 (주당 최대)', 'type' => 'number', 'default' => 5, 'min' => 0, 'max' => 20, 'help' => '순위 정체·하락 글 보강, 1·7월 제도 변경 재검증, 6개월 지난 글 재검증. 하루 최대 1개 (0 = 끔)' ),
+		'refresh_per_week' => array( 'label' => '글 갱신 (주당 최대)', 'type' => 'number', 'default' => 5, 'min' => 0, 'max' => 20, 'help' => '순위 정체·하락 글 보강, 1·7월 제도 변경 재검증, 6개월 지난 글 재검증. 하루 최대 1개 (0 = 끔). 월정액 방식이면 서버가 대상만 고르고 매일 글쓰기 세션이 고침 (API 비용 없음)' ),
 		'publish_times'  => array( 'label' => '자동 발행 시각', 'type' => 'textarea', 'default' => "09:00\n20:00", 'help' => '한 줄에 하나 (예: 09:00). 줄 수 = 하루 글 개수' ),
 		'jitter_minutes' => array( 'label' => '랜덤 범위 (± 분)', 'type' => 'number', 'default' => 30, 'min' => 0, 'max' => 180, 'help' => '예: 30 이면 09:00 → 08:30~09:30 사이 무작위 (매일 달라짐)' ),
 		'provider'       => array(
