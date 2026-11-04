@@ -50,6 +50,12 @@ queue_once() {
 }
 queue_once 2026-11-04-queue-direct 80 85 90 99   # 기존 직접 작성 초안 (예전 API 봇 초안은 다시 쓴 뒤 넣음)
 queue_once 2026-11-04-queue-119 119             # 베트남 여행 준비물: 공식 기관 목록 누락(korea.kr·airport.kr)으로 잘못 보류됐던 글
+# 독립 검수에서 핵심(단말기 부담금·지원 기간)을 확인 못 한 글 → 다시 쓸 때까지 대기열에서 뺌 (초안으로 남김)
+UNQUEUE_MARK=/var/lib/first-lab/bot/once-2026-11-04-unqueue-85.done
+if [ ! -f "$UNQUEUE_MARK" ]; then
+  runuser -u firstlab -- wp --path=/var/www/first-lab post meta delete 85 _firstlab_queue --quiet && echo "대기열 제외: 85"
+  touch "$UNQUEUE_MARK"
+fi
 
 log "글쓰기 세션용 API 토큰 (서버 비밀값에만 원문, 워드프레스엔 해시)"
 SECRETS=/etc/first-lab/secrets.env
