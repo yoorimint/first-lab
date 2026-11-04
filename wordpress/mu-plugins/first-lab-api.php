@@ -113,7 +113,10 @@ function firstlab_api_image_checks(): array {
 	$posts = get_posts(
 		array(
 			'post_status' => array( 'draft', 'publish', 'future' ),
-			'meta_query'  => array( array( 'key' => '_firstlab_img_checked', 'compare' => 'NOT EXISTS' ) ),
+			'meta_query'  => array(
+				array( 'key' => '_firstlab_img_checked', 'compare' => 'NOT EXISTS' ),
+				array( 'key' => '_firstlab_img_pending', 'compare' => 'NOT EXISTS' ), // 한도 소진으로 사진을 기다리는 글은 채운 뒤에 검사
+			),
 			'orderby'     => 'date',
 			'order'       => 'ASC',
 			'numberposts' => -1, // 사진 없는 옛 글이 앞을 막지 않게 전부 훑음 (글 수가 적어 부담 없음)

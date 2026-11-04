@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import random
+import subprocess
 from datetime import datetime, timedelta, timezone
 
 from .settings import wp_cli
@@ -48,12 +49,20 @@ def ready_drafts() -> list[int]:
     return [int(x) for x in out.split()]
 
 
+def _has_pending_images(post_id) -> bool:
+    """한도 소진으로 아직 사진을 못 넣은 글인지 (publisher.PENDING_META)."""
+    try:
+        return bool(wp_cli("post", "meta", "get", str(post_id), "_firstlab_img_pending").strip())
+    except subprocess.CalledProcessError:
+        return False
+
+
 def publish_next(now_kst: datetime) -> str | None:
     """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
     ids = ready_drafts()
     if not ids:
         return None
-    post_id = ids[0]
+    post_id = next((i for i in ids if not _has_pending_images(i)), ids[0])  # 사진이 다 들어간 글 먼저
     now_utc = now_kst.astimezone(timezone.utc)
     wp_cli("post", "update", str(post_id), "--post_status=publish",
            f"--post_date={now_kst:%Y-%m-%d %H:%M:%S}", f"--post_date_gmt={now_utc:%Y-%m-%d %H:%M:%S}")

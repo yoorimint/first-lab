@@ -20,7 +20,7 @@ import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import competition, factcheck, related, routine, schedule
+from . import competition, factcheck, pending_images, related, routine, schedule
 from .discover import discover
 from .keyword_db import connect, set_competition, set_status, summary
 from .llm import LLMBusy, make_llm
@@ -288,6 +288,14 @@ def main() -> None:
                 add_log(state, False, f"예약 공개 {due} 실패: {e.stderr or e}")
     else:
         state["plan"], state["done"] = {}, {}
+
+    # 한도 소진으로 못 만든 본문 사진 채우기 (5분마다, 한도 초기화 후 공개 대기열 글부터)
+    if now.minute % 5 == 0:
+        try:
+            for msg in pending_images.fill(settings.cf_account_id, settings.cf_api_token):
+                add_log(state, True, f"사진 채우기: {msg}")
+        except Exception as e:  # noqa: BLE001 - 사진 실패가 글 작성·공개를 막지 않게
+            add_log(state, False, f"사진 채우기 실패: {str(e)[:150]}")
 
     # 매일 점검: 공개 대기 글 재검수·기록 점검 (Claude 예약 작업을 점검 모드로 실행, automation/maintenance.md)
     if settings.write_mode == "direct" and settings.maint_times:

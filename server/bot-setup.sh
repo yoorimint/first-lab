@@ -83,6 +83,7 @@ echo "토큰 준비됨 (끝자리 $(grep '^FIRSTLAB_API_TOKEN=' "$SECRETS" | tai
 
 log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.pending_images) || echo "사진 없는 글 표시 실패 (봇 동작에는 영향 없음)"
 
 log "systemd 타이머 (1분마다 실행)"
 install -m 644 "$REPO_DIR"/server/systemd/firstlab-{bot,discover,backup}.{service,timer} /etc/systemd/system/

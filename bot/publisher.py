@@ -1,6 +1,8 @@
 """워드프레스에 글 저장 (WP-CLI): 블록 형식 변환 + 대표 이미지(제목 카드) + 본문 AI 이미지."""
 from __future__ import annotations
 
+import json
+
 from . import images
 from .blocks import to_blocks
 from .categories import slug_of
@@ -28,15 +30,18 @@ def _insert_images(content: str, blocks: list[str]) -> str:
     return content
 
 
+PENDING_META = "_firstlab_img_pending"  # 한도 소진으로 못 만든 사진 [{"prompt", "alt"}] → pending_images.py 가 나중에 채움
+
+
 def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = ("", ""),
-                  count: int = 3) -> tuple[str, str]:
-    """(블록 본문, 메모). 이미지 실패는 글 저장을 막지 않는다. cloudflare=(계정 ID, API 토큰)"""
+                  count: int = 3) -> tuple[str, str, list[dict]]:
+    """(블록 본문, 메모, 나중에 만들 사진). 이미지 실패는 글 저장을 막지 않는다. cloudflare=(계정 ID, API 토큰)"""
     content = to_blocks(article.content_html)
     account_id, token = cloudflare
     prompts = article.image_prompts[:count]
     if not (account_id and token and prompts):
-        return content, "본문 이미지 없음"
-    blocks, errors, skipped = [], [], []
+        return content, "본문 이미지 없음", []
+    blocks, errors, skipped, pending = [], [], [], []
     for n, prompt in enumerate(prompts, 1):
         alt = article.image_alts[n - 1] if n <= len(article.image_alts) and article.image_alts[n - 1] else keyword
         word = images.text_prone(prompt)
@@ -44,18 +49,24 @@ def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = 
             skipped.append(word)
             print(f"[이미지] {n}번 건너뜀: 글자가 생기기 쉬운 장면 ('{word}')", flush=True)
             continue
+        if pending:  # 한도가 이미 다 됐으면 나머지도 나중에
+            pending.append({"prompt": prompt, "alt": alt})
+            continue
         try:
             path = images.cloudflare_image(account_id, token, prompt)
             _, url = images.import_media(path, alt, alt)
             blocks.append(images.image_block(url, alt))
+        except images.QuotaExceeded:
+            pending.append({"prompt": prompt, "alt": alt})
         except Exception as e:  # noqa: BLE001
             errors.append(str(e)[:80])
             print(f"[이미지] {n}번 실패: {e}", flush=True)
     if blocks:
         content = _insert_images(content, blocks)
     note = (f"AI 이미지 {len(blocks)}장" + (f" (실패 {len(errors)})" if errors else "")
-            + (f" (글자 장면 건너뜀: {', '.join(skipped)})" if skipped else ""))
-    return content, note
+            + (f" (글자 장면 건너뜀: {', '.join(skipped)})" if skipped else "")
+            + (f" (한도 소진 → {len(pending)}장은 오전 9시 이후 자동 추가)" if pending else ""))
+    return content, note, pending
 
 
 def _set_category(post_id: int, name: str) -> None:
@@ -93,7 +104,7 @@ def publish(article: Article, status: str, slug: str = "", cloudflare: tuple[str
     """status: publish | draft | schedule (초안으로 저장 + 공개 대기열, schedule.py 가 공개 시각마다 오래된 것부터 공개)
     slug: 글 주소(키워드). 짧은 키워드 주소는 SEO 에 유리하고, 서치콘솔 성과를 글과 연결하는 데 쓴다.
     반환: (글 번호, 주소, 처리 메모)"""
-    content, image_note = build_content(article, slug or article.title, cloudflare, image_count)
+    content, image_note, pending = build_content(article, slug or article.title, cloudflare, image_count)
     queued = status == "schedule"
     if queued:
         status = "draft"
@@ -109,6 +120,8 @@ def publish(article: Article, status: str, slug: str = "", cloudflare: tuple[str
         "--porcelain",
     ).strip())
     _set_category(post_id, article.category)
+    if pending:
+        wp_cli("post", "meta", "update", str(post_id), PENDING_META, json.dumps(pending, ensure_ascii=False))
     if queued:
         mark_ready(post_id)
     try:

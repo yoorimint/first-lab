@@ -237,6 +237,42 @@ class ScheduleTest(unittest.TestCase):
         with mock.patch.object(schedule, "wp_cli", return_value=""):
             self.assertIsNone(schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul"))))
 
+    def test_publish_skips_post_still_waiting_for_photos(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import schedule
+        calls = []
+
+        def wp(*args):
+            calls.append(args)
+            if args[:2] == ("post", "list"):
+                return "80\n85\n"
+            if args[:3] == ("post", "meta", "get"):
+                return '[{"prompt": "x"}]' if args[3] == "80" else ""  # 80 은 사진 대기 중
+            return "글" if "--field=post_title" in args else ""
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp):
+            schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+        self.assertEqual(next(a for a in calls if a[:2] == ("post", "update"))[2], "85")
+
+    def test_quota_exceeded_saves_remaining_photos_for_later(self):
+        from bot import images, publisher
+        from bot.writer import Article
+        art = Article(title="t", excerpt="e", content_html="<p>도입</p><h2>a</h2><p>b</p>", tags=[], category="생활",
+                      image_prompts=["a quiet street", "a sunny park", "a calm lake"], image_alts=["거리", "공원", "호수"])
+        made = iter(["/tmp/1.jpg"])
+
+        def fake_cf(acc, tok, prompt):
+            try:
+                return next(made)
+            except StopIteration:
+                raise images.QuotaExceeded("한도") from None
+        with mock.patch.object(images, "cloudflare_image", side_effect=fake_cf), \
+             mock.patch.object(images, "import_media", return_value=(1, "https://x/ai-1111111111.jpg")):
+            content, note, pending = publisher.build_content(art, "kw", ("a", "t"), 3)
+        self.assertIn("ai-1111111111", content)
+        self.assertEqual(pending, [{"prompt": "a sunny park", "alt": "공원"}, {"prompt": "a calm lake", "alt": "호수"}])
+        self.assertIn("오전 9시", note)
+
     def test_settings(self):
         s = BotSettings.from_option({"post_status": "schedule", "schedule_times": "9:00\n18시"}, {})
         self.assertEqual((s.post_status, s.schedule_times), ("schedule", ["09:00", "18:00"]))

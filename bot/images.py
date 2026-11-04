@@ -119,6 +119,32 @@ def text_prone(prompt: str) -> str:
     return m.group(0) if m else ""
 
 
+class QuotaExceeded(RuntimeError):
+    """Cloudflare 하루 무료 한도 소진 (매일 00:00 UTC = 오전 9시 초기화). 못 만든 사진은 pending_images 가 나중에 채움."""
+
+
+QUOTA_FILE = Path("/var/lib/first-lab/bot/cf-quota-until")  # 한도 소진 시 초기화 시각(UTC ISO)을 적어 둠 → 그때까지 호출 안 함
+
+
+def _block_until_reset() -> None:
+    from datetime import datetime, timedelta, timezone
+
+    reset = (datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=5, microsecond=0)
+    try:
+        QUOTA_FILE.write_text(reset.isoformat())
+    except OSError:
+        pass
+
+
+def quota_blocked() -> bool:
+    from datetime import datetime, timezone
+
+    try:
+        return datetime.now(timezone.utc) < datetime.fromisoformat(QUOTA_FILE.read_text().strip())
+    except (OSError, ValueError):
+        return False
+
+
 def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:
     """Cloudflare Workers AI 로 이미지 생성 → 16:9 로 잘라 저장."""
     import base64
@@ -126,6 +152,8 @@ def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:
 
     from PIL import Image, ImageOps
 
+    if quota_blocked():
+        raise QuotaExceeded("Cloudflare 하루 무료 한도 소진 상태 → 오전 9시 초기화 후 자동으로 채움")
     url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{CF_MODEL}"
     body = json.dumps({"prompt": f"{prompt}. {STYLE}", "steps": CF_STEPS}).encode()
     req = urllib.request.Request(url, data=body, method="POST", headers={
@@ -134,7 +162,11 @@ def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:
         with urllib.request.urlopen(req, timeout=90) as resp:
             data = json.load(resp)
     except urllib.error.HTTPError as e:  # 429 등: 한도 초과인지 알 수 있게 응답 내용도 남김
-        raise RuntimeError(f"Cloudflare HTTP {e.code}: {e.read()[:200].decode(errors='replace')}") from None
+        body = e.read()[:300].decode(errors="replace")
+        if e.code == 429 and "daily free allocation" in body:
+            _block_until_reset()
+            raise QuotaExceeded("Cloudflare 하루 무료 한도(10,000 뉴런) 소진 → 오전 9시 초기화 후 자동으로 채움") from None
+        raise RuntimeError(f"Cloudflare HTTP {e.code}: {body[:200]}") from None
     if not data.get("success") or not data.get("result", {}).get("image"):
         raise RuntimeError(f"Cloudflare 이미지 생성 실패: {data.get('errors')}")
     img = Image.open(io.BytesIO(base64.b64decode(data["result"]["image"]))).convert("RGB")
