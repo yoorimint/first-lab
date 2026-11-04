@@ -14,7 +14,7 @@ from .settings import wp_cli
 _AI_SRC = r'https?://[^"\s]*/(ai-[0-9a-f]{10})(?:-\d+x\d+)?\.jpg'
 _BLOCK = re.compile(r"<!-- wp:image\b(?:(?!<!-- /wp:image -->).)*?" + _AI_SRC + r".*?<!-- /wp:image -->\s*", re.S)
 _ANY_SRC = re.compile(_AI_SRC)
-SCANNED_META = "_firstlab_photo_scanned"  # 수정 기록을 뒤져 봤는데 사진이 없던 글
+SCANNED_META = "_firstlab_photo_scanned2"  # 수정 기록을 뒤져 봤는데 사진이 없던 글 (1차는 첨부 찾기 오류라 다시 확인)
 
 
 def body_photos(content: str) -> list[str]:

@@ -183,9 +183,12 @@ def import_media(path: Path, title: str, alt: str) -> tuple[int, str]:
 
 
 def attachment_id(name: str) -> str:
-    """미디어 첨부 번호 (파일 이름 = 첨부 이름, 예: ai-1b47e7d5a0). 없으면 ''.
-    첨부의 상태는 'inherit' 라서 상태를 지정하지 않으면(기본 publish) 못 찾는다."""
-    ids = wp_cli("post", "list", "--post_type=attachment", "--post_status=inherit", f"--name={name}", "--field=ID").split()
+    """미디어 첨부 번호 (사진 파일 이름으로 찾음, 예: ai-1b47e7d5a0 → …/2026/11/ai-1b47e7d5a0.jpg). 없으면 ''.
+    - 첨부 '이름'(post_name)은 올릴 때 준 제목(한국어 대체 텍스트)으로 정해져 파일 이름과 다르다 → 파일 경로로 찾는다.
+    - 첨부 상태는 'inherit' 라서 상태를 지정하지 않으면(기본 publish) 못 찾는다."""
+    ids = wp_cli("post", "list", "--post_type=attachment", "--post_status=inherit",
+                 "--meta_key=_wp_attached_file", "--meta_compare=LIKE", f"--meta_value=/{name}.jpg",
+                 "--field=ID").split()
     return ids[0] if ids else ""
 
 

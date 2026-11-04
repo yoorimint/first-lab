@@ -561,7 +561,10 @@ class MiscTest(unittest.TestCase):
         from bot import images
         with mock.patch.object(images, "wp_cli", return_value="501\n") as cli:
             self.assertEqual(images.attachment_id("ai-aaaaaaaaaa"), "501")
-        self.assertIn("--post_status=inherit", cli.call_args[0])  # 첨부는 inherit 상태라 빼면 못 찾음
+        args = cli.call_args[0]
+        self.assertIn("--post_status=inherit", args)  # 첨부는 inherit 상태라 빼면 못 찾음
+        self.assertIn("--meta_value=/ai-aaaaaaaaaa.jpg", args)  # 첨부 이름은 한국어 제목 → 파일 경로로 찾아야 함
+        self.assertFalse(any(a.startswith("--name=") for a in args))
 
 
 class GateStructureNumberTest(unittest.TestCase):
