@@ -1,32 +1,12 @@
 <!-- wp:template-part {"slug":"header"} /-->
 
-<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"var:preset|spacing|50","bottom":"var:preset|spacing|50"}}},"layout":{"type":"constrained","wideSize":"1100px"}} -->
-<main class="wp-block-group" style="padding-top:var(--wp--preset--spacing--50);padding-bottom:var(--wp--preset--spacing--50)">
+<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|50"}}},"layout":{"type":"constrained","contentSize":"860px"}} -->
+<main class="wp-block-group" style="padding-top:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--50)">
 	<!-- wp:query-title {"type":"archive","level":1} /-->
 
-	<!-- wp:query {"queryId":1,"query":{"perPage":12,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":true},"align":"wide"} -->
-	<div class="wp-block-query alignwide">
-		<!-- wp:post-template {"layout":{"type":"grid","minimumColumnWidth":"18rem"}} -->
-			<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"1200/630","style":{"border":{"radius":"8px"}}} /-->
-			<!-- wp:post-terms {"term":"category","fontSize":"small"} /-->
-			<!-- wp:post-title {"isLink":true,"level":2,"fontSize":"large"} /-->
-			<!-- wp:post-excerpt {"excerptLength":40,"fontSize":"small"} /-->
-			<!-- wp:post-date {"fontSize":"small"} /-->
-		<!-- /wp:post-template -->
-
-		<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"}} -->
-			<!-- wp:query-pagination-previous /-->
-			<!-- wp:query-pagination-numbers /-->
-			<!-- wp:query-pagination-next /-->
-		<!-- /wp:query-pagination -->
-
-		<!-- wp:query-no-results -->
-			<!-- wp:paragraph -->
-			<p>아직 글이 없습니다.</p>
-			<!-- /wp:paragraph -->
-		<!-- /wp:query-no-results -->
-	</div>
-	<!-- /wp:query -->
+	<!-- wp:shortcode -->
+	[firstlab_feed]
+	<!-- /wp:shortcode -->
 </main>
 <!-- /wp:group -->
 

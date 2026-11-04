@@ -27,6 +27,8 @@ OPPORTUNITY_POSITION = (8, 30)
 GOOD_POSITION = 15
 STALE_DAYS = 21          # 발행 후 이 기간이 지나도 노출이 없으면 '안 되는 주제'
 STALE_MAX_IMPRESSIONS = 5
+POPULAR_MIN_CLICKS = 5   # 홈 대표 글로 올릴 최소 클릭 (28일)
+POPULAR_OPTION = "firstlab_popular_url"  # wordpress/mu-plugins/first-lab-home.php 가 읽음
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS gsc_queries (   -- 최근 28일 검색어 성과 (매일 덮어씀)
@@ -142,6 +144,32 @@ def update_signals(conn, rows: list[dict]) -> dict:
     kinds = [k for k, _ in signals.values()]
     return {"rows": len(rows), "opportunity": kinds.count("opportunity"),
             "good_head": kinds.count("good_head"), "bad_head": kinds.count("bad_head")}
+
+
+def top_page(rows: list[dict], min_clicks: int = POPULAR_MIN_CLICKS) -> str:
+    """최근 28일 클릭이 가장 많은 글 주소 (min_clicks 미만이면 빈 문자열)."""
+    clicks: dict[str, int] = {}
+    for r in rows:
+        clicks[r["page"]] = clicks.get(r["page"], 0) + r["clicks"]
+    best = max(clicks, key=clicks.get, default="")
+    return best if best and clicks[best] >= min_clicks else ""
+
+
+def save_popular(rows: list[dict]) -> str:
+    """홈 대표 글 후보를 워드프레스 옵션에 저장 (없으면 지워서 최신 글이 대표 글이 되게)."""
+    import subprocess
+
+    from .settings import wp_cli
+
+    url = top_page(rows)
+    if url:
+        wp_cli("option", "update", POPULAR_OPTION, url)
+    else:
+        try:
+            wp_cli("option", "delete", POPULAR_OPTION)
+        except subprocess.CalledProcessError:
+            pass  # 원래 없음
+    return url
 
 
 def load_signals(conn) -> dict[str, str]:

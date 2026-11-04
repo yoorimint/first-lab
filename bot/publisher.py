@@ -36,9 +36,14 @@ def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = 
     prompts = article.image_prompts[:count]
     if not (account_id and token and prompts):
         return content, "본문 이미지 없음"
-    blocks, errors = [], []
+    blocks, errors, skipped = [], [], []
     for n, prompt in enumerate(prompts, 1):
         alt = article.image_alts[n - 1] if n <= len(article.image_alts) and article.image_alts[n - 1] else keyword
+        word = images.text_prone(prompt)
+        if word:
+            skipped.append(word)
+            print(f"[이미지] {n}번 건너뜀: 글자가 생기기 쉬운 장면 ('{word}')", flush=True)
+            continue
         try:
             path = images.cloudflare_image(account_id, token, prompt)
             _, url = images.import_media(path, alt, alt)
@@ -48,7 +53,8 @@ def build_content(article: Article, keyword: str, cloudflare: tuple[str, str] = 
             print(f"[이미지] {n}번 실패: {e}", flush=True)
     if blocks:
         content = _insert_images(content, blocks)
-    note = f"AI 이미지 {len(blocks)}장" + (f" (실패 {len(errors)})" if errors else "")
+    note = (f"AI 이미지 {len(blocks)}장" + (f" (실패 {len(errors)})" if errors else "")
+            + (f" (글자 장면 건너뜀: {', '.join(skipped)})" if skipped else ""))
     return content, note
 
 

@@ -486,6 +486,34 @@ class MiscTest(unittest.TestCase):
         url = "https://first-lab.kr/" + urllib.parse.quote("자동차정기검사비용") + "/"
         self.assertEqual([k for k, _ in refresh.siblings(conn, url)], ["자동차정기검사조회", "자동차정기검사기간"])
 
+    def test_popular_page_sums_clicks_per_page(self):
+        rows = [{"page": "a", "clicks": 3}, {"page": "b", "clicks": 4}, {"page": "a", "clicks": 3}]
+        self.assertEqual(search_console.top_page(rows, min_clicks=5), "a")
+        self.assertEqual(search_console.top_page(rows, min_clicks=7), "")  # 클릭이 적으면 최신 글이 대표
+        self.assertEqual(search_console.top_page([], min_clicks=1), "")
+
+    def test_text_prone_image_prompts_skipped(self):
+        from bot import images
+        self.assertEqual(images.text_prone("a printed loan payment schedule on a desk"), "printed")
+        self.assertEqual(images.text_prone("a toll gate with green overhead signs"), "signs")
+        self.assertEqual(images.text_prone("a quiet street in Jeju with stone walls on a wooden table"), "")
+
+    def test_image_swap_replaces_all_sizes_and_alt(self):
+        from bot import fix_images
+        old = "ai-1b47e7d5a0"
+        html = ('<figure><img src="https://first-lab.kr/wp-content/uploads/2026/11/ai-1b47e7d5a0.jpg" alt="노트북"/></figure>'
+                '<img src="https://first-lab.kr/wp-content/uploads/2026/11/ai-9999999999.jpg" alt="다른 사진"/>')
+        out = fix_images.swap(html, old, "https://first-lab.kr/new.jpg", "아파트 단지")
+        self.assertFalse(fix_images.uses(out, old))  # 다시 실행해도 아무 일 없음
+        self.assertIn('src="https://first-lab.kr/new.jpg" alt="아파트 단지"', out)
+        self.assertIn('alt="다른 사진"', out)  # 다른 사진은 그대로
+        self.assertTrue(fix_images.uses("x/ai-1b47e7d5a0-300x169.jpg y", old) is False)  # 주소 형식이 아니면 무시
+
+    def test_image_fixes_file_prompts_are_text_free(self):
+        from bot import fix_images, images
+        for fix in json.loads(fix_images.FIXES.read_text(encoding="utf-8")):
+            self.assertEqual(images.text_prone(fix["prompt"]), "", fix["old"])
+
 
 if __name__ == "__main__":
     unittest.main()

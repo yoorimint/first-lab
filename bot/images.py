@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import urllib.request
 from pathlib import Path
@@ -102,6 +103,18 @@ CF_STEPS = 4            # 생성 단계 (많을수록 품질↑·비용↑, 최�
 BODY_SIZE = (1200, 675)  # 본문 이미지 16:9
 STYLE = ("realistic editorial photo, natural light, clean composition, "
          "no text, no letters, no watermark, no logo")
+# '글자 없이'라고 써도 이 모델은 서류·간판·화면이 나오면 엉터리 글자를 그린다 → 그런 장면은 아예 만들지 않는다
+TEXT_PRONE = re.compile(
+    r"\b(documents?|papers?|paperwork|receipts?|contracts?|forms?|schedules?|signs?|signage|calendars?|"
+    r"labels?|certificates?|newspapers?|menus?|books?|envelopes?|bills?|statements?|invoices?|tickets?|"
+    r"letters?|posters?|brochures?|leaflets?|websites?|charts?|printed|showing|displaying|interface)\b",
+    re.IGNORECASE)
+
+
+def text_prone(prompt: str) -> str:
+    """글자가 그려지기 쉬운 물건이 들어간 장면이면 그 단어, 아니면 빈 문자열."""
+    m = TEXT_PRONE.search(prompt)
+    return m.group(0) if m else ""
 
 
 def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:

@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import time
 import urllib.error
+import urllib.parse
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -112,8 +113,10 @@ def _apply_search_console() -> str:
         rows = search_console.fetch()
         with connect() as conn:
             r = search_console.update_signals(conn, rows)
+        popular = search_console.save_popular(rows)
         return (f"서치콘솔: 검색어 {r['rows']}건 → 기회 키워드 {r['opportunity']}, "
-                f"잘 되는 주제 {r['good_head']}, 안 되는 주제 {r['bad_head']}")
+                f"잘 되는 주제 {r['good_head']}, 안 되는 주제 {r['bad_head']}, "
+                f"홈 대표 글 {urllib.parse.unquote(popular) if popular else '최신 글'}")
     except Exception as e:  # noqa: BLE001 - 서치콘솔 오류가 수집을 막지 않게
         return f"서치콘솔 오류: {e}"
 
