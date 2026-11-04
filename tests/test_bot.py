@@ -893,5 +893,25 @@ class VerifyPatchesTest(unittest.TestCase):
                    {"post": 1, "find": "B 문장이에요", "replace_paragraph": "C 문장이에요"}]
         self.assertEqual(self.v.problems(patches, {1: self.post("<p>C 문장이에요</p>")}), [])
 
+
+class AuditSampleTest(unittest.TestCase):
+    """주 1회 표본 감사: 숫자가 든 사실 문장만, 글마다 하나씩 (11/5 운영자 승인)."""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import audit_sample
+        self.a = audit_sample
+
+    def test_sentences(self):
+        body = ("<p>실손24에서 청구해요. 3만 원 이하는 영수증만 내면 돼요.</p>[firstlab_calc id=\"vat\"]"
+                "<h2>공식 안내 바로가기</h2><ul><li>국세청 2026 안내 페이지 링크</li></ul>")
+        self.assertEqual(self.a.sentences(body), ["3만 원 이하는 영수증만 내면 돼요."])
+
+    def test_one_per_post_and_repeatable(self):
+        posts = {i: {"title": str(i), "content_html": f"<p>수수료는 {i}만 원이에요. 기한은 {i}일 안이에요.</p>"} for i in range(1, 6)}
+        first = self.a.sample(posts, 3, "seed")
+        self.assertEqual(len({pid for pid, _, _ in first}), 3)
+        self.assertEqual(first, self.a.sample(posts, 3, "seed"))
+
 if __name__ == "__main__":
     unittest.main()
