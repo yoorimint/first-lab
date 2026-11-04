@@ -799,5 +799,25 @@ class UnreviewedTest(unittest.TestCase):
         self.assertIn("inheritance-tax", calcs)
         self.assertTrue(self.u.reviewed_calcs() <= set(calcs), "reviewed.txt 의 calc: 이름이 실제 계산기에 없음")
 
+
+class FaviconTest(unittest.TestCase):
+    """파비콘이 없으면 구글 검색 결과에 지구본 기본 아이콘이 뜬다 (11/5 운영자 지적)."""
+
+    ICONS = ROOT / "wordpress" / "themes" / "first-lab" / "assets" / "icons"
+
+    def test_icon_files(self):
+        for name in ("favicon.ico", "favicon.svg", "icon-192.png", "apple-touch-icon.png"):
+            self.assertTrue((self.ICONS / name).stat().st_size > 0, name)
+        # favicon.ico 머리: 예약 0, 형식 1(ico), 그림 수 3 (16·32·48px)
+        head = (self.ICONS / "favicon.ico").read_bytes()[:6]
+        self.assertEqual(head, bytes([0, 0, 1, 0, 3, 0]))
+
+    def test_served_and_linked(self):
+        setup = (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8")
+        self.assertIn('assets/icons/favicon.ico" "$WEB_ROOT/favicon.ico"', setup)
+        site = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        for name in ("/favicon.ico", "favicon.svg", "icon-192.png", "apple-touch-icon.png"):
+            self.assertIn(name, site)
+
 if __name__ == "__main__":
     unittest.main()

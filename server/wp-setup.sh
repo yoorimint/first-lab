@@ -102,6 +102,8 @@ rm -rf "$THEME_DIR" && cp -r "$REPO_DIR/wordpress/themes/$THEME" "$THEME_DIR"
 chown -R "$WP_USER:www-data" "$THEME_DIR"
 find "$THEME_DIR" -type d -exec chmod 750 {} + && find "$THEME_DIR" -type f -exec chmod 640 {} +
 wp theme is-active "$THEME" || wp theme activate "$THEME"
+# 파비콘: 구글·브라우저는 /favicon.ico 를 먼저 찾는다 (없으면 검색 결과에 지구본 기본 아이콘)
+install -o "$WP_USER" -g www-data -m 644 "$THEME_DIR/assets/icons/favicon.ico" "$WEB_ROOT/favicon.ico"
 for t in $(wp theme list --status=inactive --field=name); do
   if [ "$t" != "$PARENT_THEME" ]; then wp theme delete "$t"; fi
 done

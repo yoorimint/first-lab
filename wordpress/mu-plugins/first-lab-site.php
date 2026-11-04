@@ -17,3 +17,23 @@ add_shortcode(
 		return sprintf( '<a href="mailto:%1$s">%1$s</a>', $email );
 	}
 );
+
+/**
+ * 사이트 아이콘(파비콘): 구글 검색 결과·브라우저 탭·휴대폰 홈 화면에 보인다.
+ * 파일은 server/make-icons.py 로 만든 테마 assets/icons/. /favicon.ico 는 배포 때 웹 루트에 복사(server/wp-setup.sh).
+ * 관리자 '사이트 아이콘'을 따로 정하면 워드프레스가 그것을 쓰므로 여기서는 내보내지 않는다(중복 방지).
+ */
+add_action(
+	'wp_head',
+	static function () {
+		if ( has_site_icon() ) {
+			return;
+		}
+		$dir = get_stylesheet_directory_uri() . '/assets/icons/';
+		printf( '<link rel="icon" href="%s" sizes="48x48">' . "\n", esc_url( home_url( '/favicon.ico' ) ) );
+		printf( '<link rel="icon" href="%s" type="image/svg+xml">' . "\n", esc_url( $dir . 'favicon.svg' ) );
+		printf( '<link rel="icon" href="%s" type="image/png" sizes="192x192">' . "\n", esc_url( $dir . 'icon-192.png' ) );
+		printf( '<link rel="apple-touch-icon" href="%s">' . "\n", esc_url( $dir . 'apple-touch-icon.png' ) );
+	},
+	2
+);
