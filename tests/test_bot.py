@@ -915,5 +915,30 @@ class AuditSampleTest(unittest.TestCase):
         self.assertEqual(len({pid for pid, _, _ in first}), 3)
         self.assertEqual(first, self.a.sample(posts, 3, "seed"))
 
+
+class RegionalSourceGateTest(unittest.TestCase):
+    """11/5 #482 도시가스: 전북 공급규정만 보고 '전출은 3일 전'을 전국 기준처럼 제목에 씀 → 관문이 막는다."""
+
+    JEONBUK = "https://www.jeonbuk.go.kr/upload_data/board_data/BBS_0000017/1.pdf"
+    CLAIM = {"claim": "폐지 3일 전 통지", "urls": [JEONBUK], "verdict": "맞음", "action": "유지"}
+
+    def test_regional_only_number_in_title_is_held(self):
+        from bot import review_gate as g
+        out = g._regional_only([self.CLAIM], "도시가스 신청: 전출은 3일 전")
+        self.assertEqual(len(out), 1)
+        self.assertIn("전북", out[0])
+
+    def test_passes_when_region_named_or_national_source(self):
+        from bot import review_gate as g
+        self.assertEqual(g._regional_only([self.CLAIM], "도시가스 신청: 전북은 전출 3일 전"), [])
+        national = dict(self.CLAIM, urls=[self.JEONBUK, "https://www.law.go.kr/법령/도시가스사업법"])
+        self.assertEqual(g._regional_only([national], "도시가스 신청: 전출은 3일 전"), [])
+
+    def test_region_hosts(self):
+        from bot import review_gate as g
+        self.assertEqual(g.region_of("https://news.seoul.go.kr/env/archives/1"), ("서울",))
+        self.assertIsNone(g.region_of("https://www.nts.go.kr/x"))  # 중앙부처 = 전국 자료
+        self.assertIsNone(g.region_of("https://www.seoul.go.kr.evil.com/x"))
+
 if __name__ == "__main__":
     unittest.main()

@@ -7,6 +7,8 @@
 공식 기관 주소 1개 이상,
 제목·요약문의 숫자는 모두 '맞음'인 주장 안에 있어야 함.
 완화·삭제한 주장은 본문에 단정형으로 없으므로 통과. 기록이 없으면 검수 안 한 글로 본다.
+제목·요약문 숫자의 근거가 특정 시·도 사이트뿐이면 제목·요약문에 그 지역을 밝혀야 한다
+(11/5 #482 도시가스: 전북 공급규정만 보고 '전출은 3일 전'을 전국 기준처럼 제목에 씀).
 기록은 세션이 쓰는 것이라 완벽하지 않다 → 목적은 '검수를 깜빡하고 넘어간 글'이 공개되지 않게 하는 것.
 """
 from __future__ import annotations
@@ -22,6 +24,15 @@ MIN_CLAIMS = 5  # 이보다 적으면 검수를 제대로 안 한 것으로 본�
 # 11/4 외부 검수: 글쓰기 검수는 글 1편에 주장 11~26개만 확인, 외부 검수는 같은 글에서 40~60개 → 틀린 곳은 모두 확인 안 한 문장에서 나옴.
 CHARS_PER_CLAIM = 70
 _NUM = re.compile(r"\d[\d,.]*")
+# 광역 시·도 누리집 주소 → 제목·요약에 밝혀야 할 지역 이름 (하위 주소 포함, 예: news.seoul.go.kr)
+REGION_HOSTS = {
+    "seoul.go.kr": ("서울",), "busan.go.kr": ("부산",), "daegu.go.kr": ("대구",), "incheon.go.kr": ("인천",),
+    "gwangju.go.kr": ("광주",), "daejeon.go.kr": ("대전",), "ulsan.go.kr": ("울산",), "sejong.go.kr": ("세종",),
+    "gg.go.kr": ("경기",), "gangwon.go.kr": ("강원",), "provin.gangwon.kr": ("강원",),
+    "chungbuk.go.kr": ("충북", "충청북도"), "chungnam.go.kr": ("충남", "충청남도"),
+    "jeonbuk.go.kr": ("전북", "전라북도"), "jeonnam.go.kr": ("전남", "전라남도"),
+    "gb.go.kr": ("경북", "경상북도"), "gyeongnam.go.kr": ("경남", "경상남도"), "jeju.go.kr": ("제주",),
+}
 
 
 def _numbers(text: str) -> set[str]:
@@ -35,6 +46,27 @@ _STRUCTURE = re.compile(r"\d+\s*(?:단계|가지)")  # '4단계', '5가지' = �
 
 def _headline_numbers(text: str) -> set[str]:
     return _numbers(_STRUCTURE.sub("", text or ""))
+
+
+def region_of(url: str) -> tuple[str, ...] | None:
+    """시·도 누리집이면 그 지역 이름들, 아니면(법령·중앙부처·공단 등 전국 자료) None."""
+    host = (re.sub(r"^https?://", "", url.strip()).split("/")[0].split(":")[0]).lower()
+    for domain, names in REGION_HOSTS.items():
+        if host == domain or host.endswith("." + domain):
+            return names
+    return None
+
+
+def _regional_only(review: list[dict], headline: str) -> list[str]:
+    """제목·요약 숫자 중 근거가 시·도 자료뿐인데 제목·요약에 그 지역이 없는 것."""
+    out = []
+    for n in sorted(_headline_numbers(headline)):
+        urls = [str(u) for i in review if _ok(i) and n in _numbers(str(i.get("claim", "")))
+                for u in i.get("urls", []) if is_official(str(u))]
+        regions = [region_of(u) for u in urls]
+        if urls and all(regions) and not any(name in headline for r in regions for name in r):
+            out.append(f"제목·요약문 숫자 {n} 의 근거가 {regions[0][0]} 자료뿐 — 지역 기준이면 제목·요약문에 지역을 밝히거나 전국 공통 근거(법령 등) 확인")
+    return out
 
 
 def _ok(item: dict) -> bool:
@@ -62,6 +94,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     missing = (_headline_numbers(title) | _headline_numbers(excerpt)) - _numbers(verified)
     if missing:
         out.append(f"제목·요약문 숫자 {', '.join(sorted(missing))} 가 검수된 주장에 없음")
+    out += _regional_only(review, f"{title} {excerpt}")
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:
             continue  # 완화·삭제: 본문에 단정형으로 남지 않음
