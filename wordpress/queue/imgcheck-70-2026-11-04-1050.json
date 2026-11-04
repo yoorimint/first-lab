@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 70,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a neatly taped plain brown cardboard box placed in front of an apartment door on a clean hallway floor, soft light",
+   "alt": "아파트 현관 앞에 놓인 포장된 택배 상자"
+  }
+ ]
+}
