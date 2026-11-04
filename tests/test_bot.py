@@ -315,8 +315,11 @@ class ReviewGateTest(unittest.TestCase):
         from bot.review_gate import problems
         ok = [{"claim": "수수료 23,000원", "urls": ["https://main.kotsa.or.kr/a"], "verdict": "맞음", "action": "유지"},
               {"claim": "철회 불가", "urls": [], "verdict": "확인불가", "action": "완화"}]
-        self.assertEqual(problems(ok), [])
         self.assertEqual(problems(None), ["검수 기록 없음"])
+        ok5 = ok + [{"claim": f"항목 {i}", "urls": ["https://a.go.kr"], "verdict": "맞음", "action": "유지"} for i in range(3)]
+        self.assertEqual(problems(ok5, "검사 비용 23,000원", "수수료 23,000원이에요"), [])
+        self.assertTrue(any("25000" in p for p in problems(ok5, "검사 비용 25,000원")))  # 제목 숫자가 검수 안 됨
+        self.assertTrue(any("최소" in p for p in problems(ok)))  # 주장 2개뿐
         bad = [{"claim": "75만원", "urls": ["https://x.tistory.com/1"], "verdict": "맞음", "action": "유지"},
                {"claim": "철회 불가", "urls": ["https://a.go.kr"], "verdict": "확인불가", "action": "유지"}]
         self.assertEqual(len(problems(bad)), 2)

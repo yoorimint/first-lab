@@ -18,7 +18,7 @@ from pathlib import Path
 from . import refresh, related, review_gate, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, publish
-from .settings import load_settings
+from .settings import load_settings, wp_cli
 from .state import add_log, load_state, save_state
 from .writer import align_with_body, parse_article
 
@@ -47,7 +47,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     article = parse_article(json.dumps(data, ensure_ascii=False))
     notes = []
     # 초안 저장 관문: 검수를 통과 못 한 글은 공개(바로·예약)하지 않고 초안으로만 둔다
-    failed = review_gate.problems(data.get("review"))
+    failed = review_gate.problems(data.get("review"), article.title, article.excerpt)
     if failed:
         notes.append(f"검수 미통과 → 초안 보류: {'; '.join(failed)[:200]}")
         status = "draft"
@@ -65,6 +65,8 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     post_id, link, image_note = publish(article, status, slug=keyword,
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token),
                                         image_count=settings.image_count)
+    if failed:  # 설정 페이지 '검수 보류 초안' 목록에 이유와 함께 보이게
+        wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
     with connect() as conn:
         exists = conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
         if exists:
