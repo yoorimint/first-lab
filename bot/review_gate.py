@@ -6,7 +6,7 @@
 통과 조건: 주장 5개 이상, 본문에 단정형으로 남긴 주장은 '맞음+유지' 또는 '틀림+수정'(공식 출처대로 고침)이어야 하고
 공식 기관 주소 1개 이상,
 제목·요약문의 숫자는 모두 '맞음'인 주장 안에 있어야 함.
-완화·삭제한 주장은 본문에 단정형으로 없으므로 통과. 기록이 없으면 검수 안 한 글로 본다.
+완화·삭제한 주장은 본문에 단정형으로 없으므로 통과. 고친(action 수정) 주장은 검수자가 다시 확인했다는 "rechecked": true 가 있어야 한다. 기록이 없으면 검수 안 한 글로 본다.
 제목·요약문 숫자의 근거가 특정 시·도 사이트뿐이면 제목·요약문에 그 지역을 밝혀야 한다
 (11/5 #482 도시가스: 전북 공급규정만 보고 '전출은 3일 전'을 전국 기준처럼 제목에 씀).
 기록은 세션이 쓰는 것이라 완벽하지 않다 → 목적은 '검수를 깜빡하고 넘어간 글'이 공개되지 않게 하는 것.
@@ -102,6 +102,9 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
         verdict = str(item.get("verdict", "")).strip()
         if not _ok(item):
             out.append(f"'{claim}' 판정 {verdict or '없음'}인데 {item.get('action')}")
+        elif str(item.get("action", "")).strip() == "수정" and item.get("rechecked") is not True:
+            # 고친 문장은 독립 검수자가 다시 확인한 뒤에만 맞음 (11/5 재확인 결과가 오기 전에 올려 지적이 안 고쳐진 일)
+            out.append(f"'{claim}' 고친 주장인데 검수자 재확인 기록(rechecked: true) 없음")
         elif not any(is_official(str(u)) for u in item.get("urls", [])):
             out.append(f"'{claim}' 공식 기관 출처 없음")
     return out
