@@ -15,7 +15,7 @@ add_filter(
 		$updated = get_the_modified_date( 'Y년 n월 j일' );
 		$box     = sprintf(
 			'<aside class="firstlab-author-box" style="margin-top:2.5em;padding:1em 1.2em;border-top:1px solid #ddd;font-size:0.9em;line-height:1.7;color:#555">'
-			. '<p style="margin:0"><strong>퍼스트랩</strong> · 정부·공공기관 안내와 최신 자료를 바탕으로 정리하고, 발행 전에 핵심 내용을 다시 확인합니다. <a href="%s">글을 만드는 과정</a></p>'
+			. '<p style="margin:0"><strong>퍼스트랩</strong> · 정부·공공기관 안내와 최신 자료를 바탕으로 정리하고, 발행 전에 핵심 내용을 다시 확인합니다. <a href="%s">퍼스트랩 소개</a></p>'
 			. '<p style="margin:0.4em 0 0">마지막 업데이트: %s · 잘못된 내용 제보: <a href="%s">문의하기</a></p>'
 			. '</aside>',
 			esc_url( home_url( '/about/' ) ),
