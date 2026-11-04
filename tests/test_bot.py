@@ -367,6 +367,11 @@ class PlanTest(unittest.TestCase):
         self.assertEqual(plan_times(["09:00"], 0, "2026-11-05"), ["09:00"])
         self.assertEqual(plan_times(["00:05"], 30, "2026-11-05")[0][:2], "00")  # 전날로 넘어가지 않음
 
+    def test_direct_enabled_setting(self):
+        self.assertTrue(BotSettings.from_option({}, {}).direct_enabled)  # 기존 설정(값 없음)은 켜짐
+        self.assertFalse(BotSettings.from_option({"direct_enabled": "0"}, {}).direct_enabled)
+        self.assertEqual(BotSettings.from_option({"direct_times": "7:40\n13:40"}, {}).direct_times, ["07:40", "13:40"])
+
     def test_write_mode_setting(self):
         self.assertEqual(BotSettings.from_option({}, {}).write_mode, "direct")
         self.assertEqual(BotSettings.from_option({"write_mode": "bot"}, {}).write_mode, "bot")

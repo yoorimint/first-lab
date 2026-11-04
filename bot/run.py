@@ -300,7 +300,7 @@ def main() -> None:
     elif args.now or (state.get("manual_next") and stamp >= state["manual_next"]):
         reason = "수동(재시도)" if not args.now else "수동"
     continuous_step(state, settings, now)
-    if not state.get("continuous"):
+    if settings.direct_enabled and not state.get("continuous"):
         fired = state.get("direct_fired", {}).get(today, [])
         due = schedule.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
         if due:

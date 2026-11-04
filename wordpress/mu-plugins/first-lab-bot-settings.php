@@ -23,6 +23,7 @@ function firstlab_bot_fields(): array {
 			'options' => array( 'direct' => '월정액 (Claude 구독으로 매일 아침 직접 작성)', 'bot' => 'API 봇 (발행 시각마다 봇이 작성, API 비용)' ),
 			'help'    => '월정액: "글 작성 시각"·연속 작성·"지금 글 1개 만들기" 모두 Claude 가 씀 (API 요금 없음, 구독 사용량). 후보 안전 검사도 Claude 가 함. API 봇: 전부 API 로 씀 (API 봇 사용을 켜야 글 작성 시각에 씀)',
 		),
+		'direct_enabled' => array( 'label' => '글 작성 시각 사용', 'type' => 'checkbox', 'default' => 1, 'help' => '끄면 아래 시각에 자동으로 쓰지 않음 (연속 작성·지금 글 1개 만들기는 그대로 동작)' ),
 		'direct_times'   => array( 'label' => '글 작성 시각', 'type' => 'textarea', 'default' => '07:40', 'help' => '한 줄에 하나 (줄 수 = 하루 작성 편수, 예: 07:40 과 13:40 두 줄이면 하루 2편). 월정액: Claude 가 씀 (서버에 Claude 예약 작업 토큰 필요). API 봇: API 봇 사용이 켜져 있을 때 API 로 씀. 연속 작성 중에는 쉼. 공개는 발행 방식을 따름' ),
 		'enabled'        => array( 'label' => 'API 봇 사용', 'type' => 'checkbox', 'default' => 0, 'help' => '글 작성 방식이 API 봇일 때만 의미 있음: 켜면 글 작성 시각마다 API(유료)로 씀. 월정액 방식에서는 쓰지 않음. 공개(발행 방식·예약 공개)와는 상관없음' ),
 		'post_status'    => array(
