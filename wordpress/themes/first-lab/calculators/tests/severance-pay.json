@@ -1,0 +1,97 @@
+[
+  {
+    "why": "고용노동부 퇴직금 계산기 예제: 재직 1,080일, 3개월 92일, (7,080,000+1,000,000+75,000)/92 = 88,641원 31전 → ×30×1080/365",
+    "input": {
+      "start": "2014-10-02",
+      "end": "2017-09-16",
+      "wage_3m": 7080000,
+      "bonus_year": 4000000,
+      "leave_pay": 300000,
+      "ordinary_daily": 0
+    },
+    "expect": {
+      "tenure_days": 1080,
+      "days_3m": 92,
+      "wage_total": 8155000.0,
+      "avg_daily": 88641,
+      "eligible": true,
+      "severance": 7868433
+    }
+  },
+  {
+    "why": "본문 예시: 월 300만 원, 2026-08-01~10-31 92일 → 97,826원 × 30 × 1,340/365",
+    "input": {
+      "start": "2023-03-02",
+      "end": "2026-11-01",
+      "wage_3m": 9000000,
+      "bonus_year": 0,
+      "leave_pay": 0,
+      "ordinary_daily": 0
+    },
+    "expect": {
+      "tenure_days": 1340,
+      "days_3m": 92,
+      "wage_total": 9000000.0,
+      "avg_daily": 97826,
+      "eligible": true,
+      "severance": 10774270
+    }
+  },
+  {
+    "why": "1년 미만(11개월): 법 제4조 단서로 퇴직금 0",
+    "input": {
+      "start": "2026-01-02",
+      "end": "2026-12-01",
+      "wage_3m": 9000000,
+      "bonus_year": 0,
+      "leave_pay": 0,
+      "ordinary_daily": 0
+    },
+    "expect": {
+      "tenure_days": 333,
+      "days_3m": 91,
+      "wage_total": 9000000.0,
+      "avg_daily": 98901,
+      "eligible": false,
+      "severance": 0
+    }
+  },
+  {
+    "why": "3개월 전 2월 31일 없음 → 3월 1일부터 91일, 평균 90,659원 < 통상 120,000원 → 통상임금 적용 (근로기준법 제2조②)",
+    "input": {
+      "start": "2021-05-31",
+      "end": "2026-05-31",
+      "wage_3m": 7500000,
+      "bonus_year": 3000000,
+      "leave_pay": 0,
+      "ordinary_daily": 120000
+    },
+    "expect": {
+      "tenure_days": 1826,
+      "days_3m": 91,
+      "wage_total": 8250000.0,
+      "avg_daily": 90659,
+      "eligible": true,
+      "severance": 18009863
+    }
+  },
+  {
+    "why": "딱 1년(365일): 퇴직금 대상, 97,826.08 × 30 × 365/365",
+    "input": {
+      "start": "2025-11-01",
+      "end": "2026-11-01",
+      "wage_3m": 9000000,
+      "bonus_year": 0,
+      "leave_pay": 0,
+      "ordinary_daily": 0
+    },
+    "expect": {
+      "tenure_days": 365,
+      "days_3m": 92,
+      "wage_total": 9000000.0,
+      "avg_daily": 97826,
+      "eligible": true,
+      "severance": 2934782
+    }
+  }
+]
