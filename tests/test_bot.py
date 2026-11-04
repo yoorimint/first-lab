@@ -171,6 +171,16 @@ class PublishQueueTest(unittest.TestCase):
                 self.assertEqual(publish_queue.pending(), [f])
 
 
+class FallbackTest(unittest.TestCase):
+    def test_direct_post_today(self):
+        from bot.run import direct_post_today
+        log = [{"time": "2026-11-05 08:20", "ok": True, "msg": "직접 작성 글: [발행] 'x'"}]
+        self.assertTrue(direct_post_today({"log": log}, "2026-11-05"))
+        self.assertFalse(direct_post_today({"log": log}, "2026-11-06"))
+        bad = [{"time": "2026-11-05 08:20", "ok": False, "msg": "직접 작성 글 실패 (a.json)"}]
+        self.assertFalse(direct_post_today({"log": bad}, "2026-11-05"))
+
+
 class MiscTest(unittest.TestCase):
     def test_competition_from_urls(self):
         comp = competition.from_urls(["https://www.q-net.or.kr/a", "https://x.tistory.com/1", "https://namu.wiki/w/a"])

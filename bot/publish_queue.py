@@ -2,7 +2,7 @@
 
 봇의 AI 작성 단계만 건너뛰고, 나머지는 봇과 똑같이 처리한다:
 제목·요약문 숫자 점검 → 링크 정리 → AI 이미지·대표 카드·카테고리·작성자 → 키워드 '사용됨' 기록.
-파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish, 기본 draft).
+파일 형식: 글쓰기 AI 출력과 같은 JSON + "keyword"(필수), "status"(draft|publish|auto, 기본 draft).
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
 from __future__ import annotations
@@ -34,7 +34,12 @@ def pending() -> list[Path]:
 def publish_file(path: Path, settings) -> str:
     data = json.loads(path.read_text(encoding="utf-8"))
     keyword = str(data["keyword"]).strip()
-    status = data.get("status", "draft") if data.get("status") in ("draft", "publish") else "draft"
+    # status: draft | publish | auto(설정 페이지의 발행 방식을 따름)
+    status = data.get("status", "draft")
+    if status == "auto":
+        status = settings.post_status
+    if status not in ("draft", "publish"):
+        status = "draft"
     article = parse_article(json.dumps(data, ensure_ascii=False))
     notes = []
     aligned = align_with_body(article)

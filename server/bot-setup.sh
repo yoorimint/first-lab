@@ -32,9 +32,21 @@ apply_settings_once() {
   touch "$mark" && echo "적용: $*"
 }
 apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
+# 직접 작성(예약 세션 08:00)으로 전환: 봇 자동 발행은 11:00 예비 (그 전에 직접 작성 글이 올라오면 건너뜀)
+apply_settings_once 2026-11-04-direct publish_times=11:00 jitter_minutes=0
 
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
+
+log "글쓰기 세션용 API 토큰 (서버 비밀값에만 원문, 워드프레스엔 해시)"
+SECRETS=/etc/first-lab/secrets.env
+if ! grep -q '^FIRSTLAB_API_TOKEN=' "$SECRETS" 2>/dev/null; then
+  echo "FIRSTLAB_API_TOKEN=$(openssl rand -hex 24)" >> "$SECRETS" && chmod 600 "$SECRETS" && echo "새 토큰 생성됨"
+fi
+TOKEN_HASH=$(grep '^FIRSTLAB_API_TOKEN=' "$SECRETS" | tail -1 | cut -d= -f2- | tr -d '\n' | sha256sum | cut -d' ' -f1)
+runuser -u firstlab -- wp --path=/var/www/first-lab option update firstlab_api_token_hash "$TOKEN_HASH" --quiet 2>/dev/null \
+  || runuser -u firstlab -- wp --path=/var/www/first-lab option add firstlab_api_token_hash "$TOKEN_HASH" --quiet || true
+echo "토큰 준비됨 (끝자리 $(grep '^FIRSTLAB_API_TOKEN=' "$SECRETS" | tail -1 | tail -c 5))"
 
 log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"

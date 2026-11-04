@@ -175,6 +175,12 @@ def clear_cache() -> None:
         shutil.rmtree(path, ignore_errors=True) if os.path.isdir(path) else os.remove(path)
 
 
+def direct_post_today(state: dict, today: str) -> bool:
+    """예약 글쓰기 세션이 오늘 글을 올렸는지 (publish_queue 기록 기준)."""
+    return any(e.get("ok") and str(e.get("time", "")).startswith(today) and "직접 작성 글:" in str(e.get("msg", ""))
+               for e in state.get("log", []))
+
+
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
     """설정 페이지에 보여줄 창고 현황과 다음 후보 (안전 검사 전 포함)."""
     with connect() as conn:
@@ -238,6 +244,10 @@ def main() -> None:
     if reason is None and settings.enabled and slot_candidate is not None and stamp >= state.get("auto_next", ""):
         reason, slot = f"자동 {slot_candidate + 1}회차", slot_candidate
 
+    if reason and slot is not None and direct_post_today(state, today):
+        add_log(state, True, f"{reason} 건너뜀: 오늘 직접 작성 글이 이미 올라옴 (봇은 예비)")
+        state["done"][today].append(state["plan"][today][slot])
+        reason = None
     cap = settings.daily_cost_cap
     if reason and cap > 0 and spent_today(state) >= cap:
         add_log(state, False, f"{reason} 건너뜀: 오늘 AI 비용 ${spent_today(state):.2f} → 하루 상한 ${cap:.0f} 도달 (내일 다시)")
