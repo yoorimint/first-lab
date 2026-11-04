@@ -866,5 +866,32 @@ class SourceCheckTest(unittest.TestCase):
         self.assertIn("실패", msg)
         self.assertEqual(saved, [])
 
+
+class VerifyPatchesTest(unittest.TestCase):
+    """감시: 고친 내용이 서버 글에 실제로 들어갔는지 (11/5 운영자 '최종 검토가 틀렸을 가능성' 질문 → 전수 확인 도구)."""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import verify_patches
+        self.v = verify_patches
+
+    def post(self, body):
+        return {"status": "draft", "title": "t", "excerpt": "e", "content_html": body}
+
+    def test_detects_unapplied_and_accepts_applied(self):
+        patches = [{"post": 1, "find": "옛 문장", "replace_paragraph": "새 문장이에요"}]
+        self.assertEqual(len(self.v.problems(patches, {1: self.post("<p>옛 문장</p>")})), 1)
+        self.assertEqual(self.v.problems(patches, {1: self.post("<p>새 문장이에요</p>")}), [])
+
+    def test_table_cell_compared_with_tags(self):
+        patches = [{"post": 1, "find": "<td>궐련</td><td>200개비</td>",
+                    "replace_paragraph": "<td>궐련</td><td>200개비(확인)</td>", "tag": "tr"}]
+        self.assertEqual(self.v.problems(patches, {1: self.post("<tr><td>궐련</td><td>200개비(확인)</td></tr>")}), [])
+
+    def test_later_patch_supersedes(self):
+        patches = [{"post": 1, "find": "A 문장", "replace_paragraph": "B 문장이에요"},
+                   {"post": 1, "find": "B 문장이에요", "replace_paragraph": "C 문장이에요"}]
+        self.assertEqual(self.v.problems(patches, {1: self.post("<p>C 문장이에요</p>")}), [])
+
 if __name__ == "__main__":
     unittest.main()
