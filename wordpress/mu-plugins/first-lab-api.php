@@ -22,7 +22,8 @@ add_action(
 					$state    = (array) get_option( 'firstlab_bot_state', array() );
 					$settings = (array) get_option( 'firstlab_bot', array() );
 					$recent   = array();
-					foreach ( get_posts( array( 'numberposts' => 30, 'post_status' => array( 'publish', 'future', 'draft' ) ) ) as $p ) {
+					// 전체 글 (30편으로 자르면 오래된 글과 같은 주제를 또 씀 — 11/5 대부업 대출 조회 중복)
+						foreach ( get_posts( array( 'numberposts' => -1, 'post_status' => array( 'publish', 'future', 'draft' ) ) ) as $p ) {
 						$recent[] = array(
 								'title'  => $p->post_title,
 								'slug'   => urldecode( $p->post_name ),

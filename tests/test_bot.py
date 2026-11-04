@@ -645,6 +645,22 @@ class OfficialHostTest(unittest.TestCase):
         self.assertFalse(is_official("https://notkorcham.net/x"))  # 이름만 비슷한 주소는 아님
 
 
+class SimilarTopicTest(unittest.TestCase):
+    def run_similar(self, keyword, slugs):
+        import urllib.parse
+        from bot import publisher
+        rows = [{"ID": i + 1, "post_name": urllib.parse.quote(s)} for i, s in enumerate(slugs)]
+        with mock.patch.object(publisher, "wp_cli", return_value=json.dumps(rows)):
+            return publisher.similar_post(keyword)
+
+    def test_near_same_keyword_is_blocked(self):
+        self.assertEqual(self.run_similar("대부업체대출조회", ["대부업대출조회", "고용보험가입기간"])[0], "1")
+
+    def test_different_topics_pass(self):
+        self.assertEqual(self.run_similar("해외여행준비물리스트", ["유럽여행준비물리스트", "베트남여행준비물"]), ("", ""))
+        self.assertEqual(self.run_similar("고용보험가입기간", ["고용보험실업급여조건"]), ("", ""))
+
+
 class GateCoverageTest(unittest.TestCase):
     def test_long_article_needs_claims_for_every_fact_sentence(self):
         from bot import review_gate

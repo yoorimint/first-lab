@@ -68,6 +68,13 @@ if [ ! -f "$DUP_MARK" ]; then
   touch "$DUP_MARK"
 fi
 
+# 11/5 대부업체 대출 조회 #436 은 #283(대부업 대출 조회)과 같은 주제 → 휴지통 (되돌릴 수 있음)
+DUP436_MARK=/var/lib/first-lab/bot/once-2026-11-05-dup-436.done
+if [ ! -f "$DUP436_MARK" ]; then
+  runuser -u firstlab -- wp --path=/var/www/first-lab post delete 436 --quiet && echo "중복 글 휴지통: 436"
+  touch "$DUP436_MARK"
+fi
+
 # 사진을 사람이 이미 눈으로 확인한 글 → 자동 사진 검사(bot/image_check.py) 대상에서 뺌 (한 번만)
 IMGCHECK_MARK=/var/lib/first-lab/bot/once-2026-11-04-img-checked.done
 if [ ! -f "$IMGCHECK_MARK" ]; then

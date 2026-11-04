@@ -48,6 +48,25 @@ def existing_post_id(slug: str) -> str:
     return wp_cli("eval", _FIND_PHP % key).strip()
 
 
+SIMILAR_RATIO = 0.85  # 키워드가 이만큼 비슷하면 같은 주제로 봄 ('대부업체대출조회'·'대부업대출조회' 0.93, '해외여행준비물'·'유럽여행준비물' 0.8)
+
+
+def similar_post(keyword: str) -> tuple[str, str]:
+    """키워드가 거의 같은 기존 글 (글 번호, 주소 키워드). 없으면 ('', '')."""
+    import json
+    import urllib.parse
+    from difflib import SequenceMatcher
+
+    key = keyword.replace(" ", "")
+    posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=publish,future,draft",
+                              "--fields=ID,post_name", "--format=json") or "[]")
+    for p in posts:
+        slug = urllib.parse.unquote(p["post_name"]).replace("-", "")
+        if slug and SequenceMatcher(None, key, slug).ratio() >= SIMILAR_RATIO:
+            return str(p["ID"]), slug
+    return "", ""
+
+
 def site_author_id() -> str:
     """글 작성자로 쓸 계정 (첫 관리자, 화면 표시 이름은 wp-setup.sh 가 '퍼스트랩'으로 설정). 없으면 ''."""
     ids = wp_cli("user", "list", "--role=administrator", "--orderby=ID", "--order=ASC", "--field=ID").split()

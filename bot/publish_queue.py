@@ -19,7 +19,7 @@ from pathlib import Path
 
 from . import hold, image_check, refresh, related, review_gate, sources
 from .keyword_db import connect, norm, set_status
-from .publisher import STATUS_LABEL, existing_post_id, publish
+from .publisher import STATUS_LABEL, existing_post_id, publish, similar_post
 from .settings import load_settings, wp_cli
 from .state import add_log, load_state, save_state
 from .writer import align_with_body, parse_article
@@ -44,6 +44,9 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     duplicate = existing_post_id(keyword)
     if duplicate:
         return f"[건너뜀] 중복 키워드 '{keyword}' — 글 {duplicate} 이 이미 있음"
+    similar, slug = similar_post(keyword)
+    if similar:  # 글자 몇 개만 다른 같은 주제 (11/5 '대부업체대출조회' ↔ '대부업대출조회')
+        return f"[건너뜀] 비슷한 주제 '{keyword}' — 글 {similar}({slug}) 이 이미 있음"
     # status: draft | publish | auto(설정 페이지의 발행 방식을 따름)
     status = data.get("status", "draft")
     if status == "auto":
