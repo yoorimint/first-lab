@@ -838,12 +838,27 @@ class SourceCheckTest(unittest.TestCase):
                  "https://www.pqi.or.kr/b": None}
         result = sc.check(self.REVIEW, fetcher=lambda u: pages.get(u))
         # 공식 주소 없는 주장(블로그), 완화한 주장은 대조하지 않음. 못 연 페이지(pqi, nts) → '못 엶'
-        self.assertEqual(result["counts"], {sc.FOUND: 1, sc.MISSING: 0, sc.UNOPENED: 2})
+        self.assertEqual(result["counts"], {sc.FOUND: 1, sc.MISSING: 0, sc.UNOPENED: 2, sc.UNREADABLE: 0})
         self.assertEqual([c["claim"] for c in result["claims"]], ["민간자격 238건", "상담 ARS 126-1-1"])
         self.assertEqual(sc.key_numbers("5일 안에 12억 원"), [])  # 짧은 수는 어디에나 있어 제외
         self.assertIn("확인 1", sc.summary(result))
         self.assertEqual(sc.key_numbers("15억이면 691,200원"), [])  # 계산 결과는 출처에 없음
         self.assertEqual(sc.key_numbers("과표 1억 8,000만 원, 900,000원, 324,000원, 576,000원"), [])  # 계산 과정 나열
+
+    def test_unreadable_source_for_plain_claim(self):
+        """11/5 #484: 메뉴·화면 주장의 근거가 스크립트로 채우는 페이지(심평원 npay)뿐 → 글쓴이도 원문을 못 봤을 것."""
+        from bot import source_check as sc
+        review = [{"claim": "예방접종료 → 인플루엔자 선택", "urls": ["https://www.hira.or.kr/npay/index.do"], "verdict": "맞음", "action": "유지"},
+                  {"claim": "주소지와 관계없이 접종", "urls": ["https://www.kdca.go.kr/a"], "verdict": "맞음", "action": "유지"}]
+        result = sc.check(review, fetcher=lambda u: None if "hira" in u else "본문")
+        self.assertEqual(result["counts"][sc.UNREADABLE], 1)
+        self.assertEqual(result["claims"][0]["claim"], "예방접종료 → 인플루엔자 선택")
+
+    def test_law_shell_to_body_url(self):
+        from bot import source_check as sc
+        shell = '<a href="/LSW/lsInfoP.do?lsiSeq=284381&amp;chrClsCd=010202&amp;urlMode=lsInfoP&amp;efYd=20260918">'
+        self.assertEqual(sc.law_body_url(shell),
+                         "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284381&chrClsCd=010202&urlMode=lsInfoP&efYd=20260918")
 
     def test_law_notation(self):
         from bot import source_check as sc

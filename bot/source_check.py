@@ -29,6 +29,8 @@ MAX_URLS = 30          # 글 한 편에서 여는 근거 페이지 수 상한 (�
 MAX_BYTES = 3_000_000
 WORKERS = 8
 FOUND, MISSING, UNOPENED = "확인", "페이지에 없음", "못 엶"
+UNREADABLE = "근거 못 읽음"  # 숫자 없는 주장(메뉴·절차 등)인데 근거 페이지를 하나도 읽을 수 없음 (11/5 #484 심평원 스크립트 화면)
+MAX_ALL_URLS = 40
 MIN_KOREAN = 1500      # 한글이 이보다 적으면 본문 없는 껍데기 페이지(화면을 스크립트로 채움) → 못 엶
 CALC_MARKS = ("이면", "=", "×", "계산", "합계", "→")  # 계산 결과 주장 표시
 MAX_NUMBERS = 3        # 숫자가 이보다 많은 주장은 계산 과정 나열로 보고 대조하지 않음 (예: 사례별 세액 목록)
@@ -63,15 +65,44 @@ def page_text(raw: bytes, charset: str | None) -> str:
     return text.replace(",", "")
 
 
+def law_body_url(shell_html: str) -> str | None:
+    """law.go.kr '/법령/이름' 껍데기 페이지 → 조문 본문 주소 (lsInfoR.do + 시행일 포함 값). 11/5 확인한 방법."""
+    m = re.search(r"lsiSeq=\d+[^\"'<>\s]*?efYd=\d+", html.unescape(shell_html))
+    return f"https://www.law.go.kr/LSW/lsInfoR.do?{m.group(0)}" if m else None
+
+
+def _raw(url: str) -> tuple[bytes, str | None, str] | None:
+    quoted = urllib.parse.quote(url, safe=":/?#[]@!$&'()*+,;=%")
+    req = urllib.request.Request(quoted, headers={"User-Agent": "Mozilla/5.0 (first-lab source check)"})
+    try:
+        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+            if resp.status >= 400:
+                return None
+            return resp.read(MAX_BYTES), resp.headers.get_content_charset(), resp.headers.get("Content-Type", "")
+    except (urllib.error.URLError, TimeoutError, ValueError, ConnectionError, OSError):
+        return None
+
+
 def fetch(url: str) -> str | None:
-    """공식 페이지 글자. 못 열거나 HTML 이 아니면(PDF 등) None."""
+    """공식 페이지 글자. 못 열거나 껍데기 페이지면 None, PDF 등 문서면 "". 법령 이름 주소는 본문 주소로 한 번 더 연다."""
+    plain_url = urllib.parse.unquote(url)
+    if "law.go.kr/" in plain_url and "/법령/" in plain_url:
+        # '/법령/이름/제3조' 껍데기에는 본문 주소가 없어 '/법령/이름' 껍데기에서 찾는다
+        for candidate in (url, re.sub(r"(/법령/[^/?#]+)/.*$", r"\1", plain_url)):
+            got = _raw(candidate)
+            body = law_body_url(got[0].decode("utf-8", "ignore")) if got else None
+            if body:
+                url = body
+                break
     quoted = urllib.parse.quote(readable_url(url), safe=":/?#[]@!$&'()*+,;=%")
     req = urllib.request.Request(quoted, headers={"User-Agent": "Mozilla/5.0 (first-lab source check)"})
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             ctype = resp.headers.get("Content-Type", "")
-            if resp.status >= 400 or ("html" not in ctype and "text" not in ctype):
+            if resp.status >= 400:
                 return None
+            if "html" not in ctype and "text" not in ctype:
+                return ""  # PDF 등 문서: 열리긴 함(숫자 대조는 못 함, '근거 못 읽음'으로 세지 않음)
             text = page_text(resp.read(MAX_BYTES), resp.headers.get_content_charset())
             return text if len(re.findall(r"[가-힣]", text)) >= MIN_KOREAN else None
     except (urllib.error.URLError, TimeoutError, ValueError, ConnectionError, OSError):
@@ -101,14 +132,14 @@ def has_number(text: str, number: str) -> bool:
 
 
 def check(review: list[dict] | None, fetcher=fetch) -> dict:
-    """주장마다 확인 / 페이지에 없음 / 못 엶. 숫자 없는 주장은 대조하지 않는다."""
-    items = []
+    """숫자 주장: 확인 / 페이지에 없음 / 못 엶. 숫자 없는 주장: 근거 페이지를 하나도 못 읽으면 '근거 못 읽음'."""
+    items, plain = [], []
     for item in review or []:
         nums = key_numbers(str(item.get("claim", "")))
         urls = [str(u).strip() for u in item.get("urls", []) if is_official(str(u))]
-        if _ok(item) and nums and urls:
-            items.append((str(item.get("claim", "")), nums, urls))
-    unique = list(dict.fromkeys(u for _, _, urls in items for u in urls))[:MAX_URLS]
+        if _ok(item) and urls:
+            (items if nums else plain).append((str(item.get("claim", "")), nums, urls))
+    unique = list(dict.fromkeys(u for _, _, urls in items + plain for u in urls))[:MAX_ALL_URLS]
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         pages = dict(zip(unique, pool.map(fetcher, unique)))
     claims = []
@@ -120,7 +151,10 @@ def check(review: list[dict] | None, fetcher=fetch) -> dict:
             missing = [n for n in nums if not any(has_number(t, n) for t in texts)]
             status = MISSING if missing else FOUND
         claims.append({"claim": claim[:120], "numbers": nums, "missing": missing, "status": status, "urls": urls[:3]})
-    counts = {s: sum(c["status"] == s for c in claims) for s in (FOUND, MISSING, UNOPENED)}
+    for claim, _, urls in plain:
+        if all(u in pages and pages[u] is None for u in urls):  # 근거가 전부 못 여는·껍데기 페이지 (PDF 는 제외)
+            claims.append({"claim": claim[:120], "numbers": [], "missing": [], "status": UNREADABLE, "urls": urls[:3]})
+    counts = {s: sum(c["status"] == s for c in claims) for s in (FOUND, MISSING, UNOPENED, UNREADABLE)}
     return {"counts": counts, "claims": [c for c in claims if c["status"] != FOUND]}
 
 
@@ -129,7 +163,8 @@ def summary(result: dict) -> str:
     total = sum(c.values())
     if not total:
         return "근거 대조(기록만): 대조할 숫자 주장 없음"
-    return f"근거 대조(기록만): 숫자 주장 {total}개 중 확인 {c[FOUND]} · {MISSING} {c[MISSING]} · {UNOPENED} {c[UNOPENED]}"
+    return (f"근거 대조(기록만): 숫자 주장 {total - c[UNREADABLE]}개 중 확인 {c[FOUND]} · {MISSING} {c[MISSING]} · {UNOPENED} {c[UNOPENED]}"
+            f" / 숫자 없는 주장 중 {UNREADABLE} {c[UNREADABLE]}")
 
 
 def record(post_id: int | str, review: list[dict] | None, save) -> str:
