@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 247,
+ "replace": [
+  {
+   "old": "ai-e15133863a",
+   "prompt": "a calm wooden desk by a sunny window with a plain unmarked ceramic mug of coffee, a pen and a small potted plant",
+   "alt": "햇살 드는 창가 나무 책상 위의 커피잔과 펜, 작은 화분",
+   "why": "머그잔에 로고 같은 글자 모양이 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
