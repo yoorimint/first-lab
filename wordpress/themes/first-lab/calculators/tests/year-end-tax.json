@@ -172,10 +172,10 @@
     "boundary": true
   },
   {
-    "why": "세액공제가 산출세액보다 많음: 총급여 2,000만·자녀 3명(55만+40만) → 결정세액 0원, 떼인 10만 원 전액 환급 (제59조의2①3)",
+    "why": "세액공제가 산출세액보다 많음: 총급여 2,000만·자녀 3명(55만+40만) → 결정세액 0원, 떼인 10만 원 전액 환급 (제59조의2①3) / 입력 모순(기본공제 2명에 자녀 3명) 바로잡음: 기본공제 5명 (11/5 검수)",
     "input": {
       "salary": 20000000,
-      "people": 2,
+      "people": 5,
       "other_deduction": 1000000,
       "children": 3,
       "other_credit": 0,
@@ -185,10 +185,10 @@
     "expect": {
       "wage_deduction": 8250000,
       "earned": 11750000,
-      "base": 7750000,
+      "base": 3250000,
       "rate": 6,
-      "tax": 465000,
-      "wage_credit": 255750,
+      "tax": 195000,
+      "wage_credit": 107250,
       "wage_limit": 740000,
       "child_credit": 950000,
       "standard_credit": 0,
@@ -198,5 +198,102 @@
       "local_due": -10000,
       "total": -110000
     }
+  },
+  {
+    "why": "추가 납부 끝수: 결정세액 2,283,224 − 1,500,000 = 783,224 → 783,220 (10원 미만 버림), 지방 78,322 → 78,320",
+    "boundary": true,
+    "input": {
+      "special": "yes",
+      "other_credit": 0,
+      "children": 0,
+      "people": 1,
+      "salary": 45678900,
+      "other_deduction": 4123457,
+      "prepaid": 1500000
+    },
+    "expect": {
+      "wage_deduction": 12033945,
+      "base": 28021498,
+      "tax": 2943224,
+      "determined": 2283224,
+      "due": 783220,
+      "local_due": 78320,
+      "total": 861540
+    }
+  },
+  {
+    "why": "환급 끝수: 563,625 − 745,000 = −181,375 → −181,370 (0 쪽으로 버림, 환급액이 커지지 않게)",
+    "boundary": true,
+    "input": {
+      "special": "yes",
+      "other_credit": 0,
+      "children": 0,
+      "people": 1,
+      "salary": 30000000,
+      "other_deduction": 2000000,
+      "prepaid": 745000
+    },
+    "expect": {
+      "wage_deduction": 9750000,
+      "base": 16750000,
+      "tax": 1252500,
+      "determined": 563625,
+      "due": -181370,
+      "local_due": -18130,
+      "total": -199500
+    }
+  },
+  {
+    "why": "근로소득세액공제 한도 1.2억 원 경계: 한도 50만 원",
+    "boundary": true,
+    "input": {
+      "special": "yes",
+      "other_credit": 0,
+      "children": 0,
+      "people": 1,
+      "salary": 120000000,
+      "other_deduction": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "wage_deduction": 15150000,
+      "base": 103350000,
+      "tax": 20732500,
+      "determined": 20232500,
+      "total": 22255750
+    }
+  },
+  {
+    "why": "1.2억 원 바로 위 120,000,010: 결정세액 20,232,508 → 더 낼 세금 20,232,500 (끝수 버림)",
+    "boundary": true,
+    "input": {
+      "special": "yes",
+      "other_credit": 0,
+      "children": 0,
+      "people": 1,
+      "salary": 120000010,
+      "other_deduction": 0,
+      "prepaid": 0
+    },
+    "expect": {
+      "determined": 20232508,
+      "due": 20232500,
+      "local_due": 2023250,
+      "total": 22255750
+    }
+  },
+  {
+    "why": "모순: 기본공제 1명(본인)인데 자녀 2명 → 안내",
+    "expect_error": true,
+    "input": {
+      "special": "yes",
+      "other_credit": 0,
+      "children": 2,
+      "people": 1,
+      "salary": 30000000,
+      "other_deduction": 0,
+      "prepaid": 0
+    },
+    "expect": {}
   }
 ]

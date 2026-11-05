@@ -83,6 +83,11 @@ for (const id of ids) {
       continue;
     }
     if (c.expect_error === true) { fail(id, `사례 ${i + 1} (${c.why}): 잘못된 입력인데 안내 문장(InputError) 없이 계산됨`); continue; }
+    // 세금·보험료 징수액은 10원 미만 끝수를 버림 (국고금관리법 제47조①) — data.won10_keys 에 적은 값은 10원 단위여야 함
+    // (11/5 실수령액·연말정산 계산기 둘 다 1원 단위로 계산해 틀림)
+    for (const key of data.won10_keys || []) {
+      if (typeof out.values[key] === 'number' && out.values[key] % 10 !== 0) fail(id, `사례 ${i + 1}: ${key} = ${out.values[key]} — 10원 미만 끝수를 버려야 함`);
+    }
     for (const [key, want] of Object.entries(c.expect || {})) {
       const got = out.values[key];
       if (got !== want) fail(id, `사례 ${i + 1} (${c.why}): ${key} = ${JSON.stringify(got)}, 기대값 ${JSON.stringify(want)}`);

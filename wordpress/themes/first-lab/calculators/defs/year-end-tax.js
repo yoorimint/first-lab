@@ -44,6 +44,7 @@
       {
         name: 'special', label: '건강·고용보험료·주택자금 소득공제, 보험료·의료비·교육비·기부금·월세 세액공제', type: 'select', default: 'yes',
         options: [['yes', '하나라도 받는다'], ['no', '하나도 안 받는다 (표준세액공제 13만 원)']],
+        help: "'하나도 안 받는다'를 고르면 위 두 칸에 건강·고용보험료·주택자금 공제와 보험료·의료비·교육비·기부금·월세 공제를 넣지 않아요 (같이 받을 수 없음, 소득세법 제59조의4⑨).",
       },
       { name: 'prepaid', label: '1년 동안 떼인 소득세 (원)', type: 'number', min: 0, step: 1000, default: 0, help: '기납부세액: 매달 월급에서 원천징수된 소득세 합계 (지방소득세는 빼고)' },
     ],
@@ -59,20 +60,24 @@
       if (!Number.isInteger(people) || people < 1) throw new u.InputError('기본공제 인원은 본인 포함 1명 이상으로 넣어 주세요.');
       if (!Number.isInteger(children) || children < 0) throw new u.InputError('자녀 수는 0 이상 정수로 넣어 주세요.');
       if (other < 0 || otherCredit < 0 || prepaid < 0) throw new u.InputError('공제와 떼인 세금은 0 이상으로 넣어 주세요.');
+      // 자녀세액공제는 '기본공제대상자인 자녀'만 (제59조의2①) → 자녀 수는 기본공제 인원 − 본인을 넘을 수 없음 (11/5 검수)
+      if (children > people - 1) throw new u.InputError('자녀세액공제 대상 자녀는 기본공제 인원에도 넣어 주세요 (자녀 수는 기본공제 인원 − 1명까지).');
 
       const wageDed = wageDeduction(salary, d);
       const earned = salary - wageDed;
       const deduction = people * d.basic_deduction_per_person + other;
-      const base = Math.max(0, earned - deduction);
+      const base = Math.max(0, Math.floor(earned - deduction)); // 과세표준 1원 미만 버림 (국고금관리법 제47조②)
       const { tax, rate } = baseTax(base, d.brackets);
       const { credit: wage, limit } = wageCredit(tax, salary, d.wage_credit);
       const child = childCredit(children, d.child_credit);
       const standard = v.special === 'no' ? d.standard_credit : 0;
       const credits = wage + child + standard + otherCredit;
       const determined = Math.max(0, tax - credits);
-      const due = determined - prepaid;
+      // 더 낼·돌려받을 금액은 10원 미만 버림 (국고금관리법 제47조①, 지방세기본법 제59조) — 환급은 0 쪽으로 버려야 환급액이 커지지 않음
+      const trunc10 = (n) => Math.trunc(n / 10) * 10;
+      const due = trunc10(determined - prepaid);
       const local = Math.floor(determined / d.local_ratio_div);
-      const localDue = local - Math.floor(prepaid / d.local_ratio_div);
+      const localDue = trunc10(local - Math.floor(prepaid / d.local_ratio_div));
       const total = due + localDue;
 
       const rows = [

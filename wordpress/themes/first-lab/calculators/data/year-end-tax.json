@@ -1,5 +1,6 @@
 {
   "basis_date": "2026-11-05",
+  "won10_keys": ["due", "local_due", "total"],
   "sources": [
     {"name": "국가법령정보센터 소득세법 제47조 (근로소득공제)", "url": "https://www.law.go.kr/법령/소득세법/제47조"},
     {"name": "국가법령정보센터 소득세법 제55조 (세율)", "url": "https://www.law.go.kr/법령/소득세법/제55조"},

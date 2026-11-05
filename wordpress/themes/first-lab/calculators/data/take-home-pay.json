@@ -1,5 +1,6 @@
 {
  "basis_date": "2026-11-05",
+ "won10_keys": ["pension", "health", "income_tax", "local_tax"],
  "sources": [
   {
    "name": "소득세법 시행령 별표 2 근로소득 간이세액표 (2026. 2. 27. 개정, 시행 2026. 10. 1. 판 원문 PDF)",
