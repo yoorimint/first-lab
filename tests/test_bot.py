@@ -1603,21 +1603,18 @@ class NaverHubTest(unittest.TestCase):
         self.assertIn(7, low)
         self.assertEqual(h.season({"2026-01": 50.0}), ([], []))  # 1년치 안 되면 계절 판단 안 함
         g = h.gold_score
-        self.assertAlmostEqual(g({"docs": 400000, "hits": 2, "old": 0}, 5000), 3.699 * 28 / 30, places=2)  # 정면 경쟁 2개
-        self.assertAlmostEqual(g({"docs": 400000, "hits": 25, "old": 0}, 5000), 3.699 * 5 / 30, places=2)  # 포화
-        self.assertAlmostEqual(g({"docs": 400000, "hits": 2, "old": 2}, 5000), 3.699 * 28 / 30 + 0.5, places=2)  # 경쟁 글이 다 낡음
-        self.assertGreater(g({"docs": 900, "hits": 3}, 5000), g({"docs": 900, "hits": 3}, 50))  # 같은 경쟁이면 검색량 큰 쪽
-        self.assertEqual(g({"docs": 0, "hits": 0}, 9000), 0.0)        # 글 0개(성인어 등)는 가짜 황금
-        self.assertAlmostEqual(g({"docs": 400000}, 5000), 3.699 * (5000 / 400000) / 0.3, places=3)  # 정면 경쟁 모르면 표준 황금지수만
-        self.assertAlmostEqual(g({"docs": 1000, "hits": 25, "old": 0}, 5000), 3.699, places=2)   # 황금지수 5(≥0.3) → 둘 중 좋은 쪽
-        self.assertEqual(h.gold_label({"docs": 600000, "hits": 25}, 5000), "포화")             # 둘 다 나쁠 때만 포화 (지수 0.008·경쟁 25)
-        self.assertEqual(h.gold_label({"docs": 400000, "hits": 25}, 5000), "보통")             # 지수 0.0125 는 포화 아님
-        self.assertEqual(h.gold_label({"docs": 10000, "hits": 25}, 5000), "황금")              # 황금지수 0.5 → 황금
-        self.assertEqual(h.gold_label({"docs": 5000, "hits": 2}, 1000), "황금")
-        self.assertEqual(h.gold_label({"docs": 5000, "hits": 3}, 1000), "좋음")
-        self.assertEqual(h.gold_label({"docs": 50000, "hits": 9}, 1000), "보통")
-        self.assertEqual(h.gold_label({"docs": 5000, "hits": 25}, 1000), "좋음")   # 정면 경쟁은 많아도 황금지수 0.2
-        self.assertEqual(h.gold_label({"docs": 5, "hits": 0}, 1000), "확인 필요(글 거의 없음)")
+        self.assertAlmostEqual(g({"docs": 1000}, 5000), 3.699, places=2)               # 황금지수 5 (≥0.3) → 만점
+        self.assertAlmostEqual(g({"docs": 50000}, 5000), 3.699 * (0.1 / 0.3), places=2)  # 지수 0.1
+        self.assertAlmostEqual(g({"docs": 500000}, 20000), 4.301 * (0.04 / 0.3), places=2)
+        self.assertGreater(g({"docs": 1000}, 5000), g({"docs": 10}, 50))               # 같은 지수면 검색량 큰 쪽 (검색 50·글 10 이 1등 아님)
+        self.assertEqual(g({"docs": 0, "hits": 0}, 9000), 0.0)                        # 글 0개(성인어 등)는 가짜 황금
+        self.assertAlmostEqual(g({"docs": 1000, "hits": 30, "old": 30}, 5000), g({"docs": 1000}, 5000))  # 제목 일치는 참고만 (점수 무관)
+        self.assertEqual(h.gold_label({"docs": 3000}, 1000), "황금")     # 지수 0.33
+        self.assertEqual(h.gold_label({"docs": 3334}, 1000), "좋음")     # 지수 0.2999 (0.3 경계 바로 아래)
+        self.assertEqual(h.gold_label({"docs": 10000}, 1000), "좋음")    # 지수 0.1 경계
+        self.assertEqual(h.gold_label({"docs": 10001}, 1000), "보통")
+        self.assertEqual(h.gold_label({"docs": 100001}, 1000), "포화")   # 지수 0.01 미만
+        self.assertEqual(h.gold_label({"docs": 5}, 1000), "확인 필요(글 거의 없음)")
         for product in ("스케쳐스윈터부츠", "아크테릭스세륨후디", "카시오F91W", "캐나다구스롯지"):  # 11/5 첫 조회에서 황금으로 올라온 상품명
             self.assertFalse(h.is_info(product), product)
         for info in ("연차개수계산기", "육아휴직급여신청", "실업급여조건", "근로장려금"):
@@ -1626,13 +1623,13 @@ class NaverHubTest(unittest.TestCase):
         self.assertTrue(h.is_navigational("홈택스 로그인"))
         self.assertTrue(h.is_navigational("국민연금공단고객센터전화번호"))
         self.assertFalse(h.is_navigational("연말정산 계산기"))
-        sig = {"docs": 50000, "hits": 6, "old": 3, "peak": "1,2", "low": "6,7,8"}
-        gs = 3 * (1 - 6 / 30) + 0.5 * 3 / 6
+        sig = {"docs": 5000, "hits": 6, "old": 3, "peak": "1,2", "low": "6,7,8"}
+        gs = 3 * (0.2 / 0.3)                                                   # 검색 1,000 ÷ 글 5,000 = 지수 0.2
         self.assertAlmostEqual(h.signal_score(sig, 1000, 12), 2 * gs + 1.0)    # 황금 점수×2 + 다음 달 성수기
         self.assertAlmostEqual(h.signal_score(sig, 1000, 12, "홈택스 로그인"), 1.0)   # 사이트 찾아가는 검색은 황금 가점 없음
-        self.assertAlmostEqual(h.signal_score({"docs": 50000, "hits": 30, "old": 0, "low": "7"}, 1000, 7), 2 * 3 * (0.02 / 0.3) - 0.5)  # 지수 0.02·경쟁 30 → 지수 쪽만
+        self.assertAlmostEqual(h.signal_score({"docs": 50000, "low": "7"}, 1000, 7), 2 * 3 * (0.02 / 0.3) - 0.5)
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
-        self.assertEqual(h.describe(sig, 1000), f"좋음 {gs:.1f} / 성수기 1·2월 / 황금지수 0.02(검색 1,000/글 50,000) / 상위 30개 중 정면 경쟁 6개(1년 넘은 글 3개)")
+        self.assertEqual(h.describe(sig, 1000), f"좋음 {gs:.1f} / 성수기 1·2월 / 황금지수 0.20(검색 1,000/글 5,000) / 참고: 상위 30개 중 제목 일치 6개(1년 넘은 글 3개)")
 
     def test_daily_limit_per_kind(self):
         import datetime as dt
@@ -1681,7 +1678,7 @@ class NaverHubTest(unittest.TestCase):
             msg = h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=("i", "k"))
         self.assertEqual(sorted(saved_batches[0]), ["근로장려금 신청", "연말정산 계산기"])  # 돈·계산기 먼저, 캠핑은 다음 날, 로그인은 안 봄
         self.assertIn("황금 1개", msg)                                       # 연말정산 계산기: 검색 1회당 0.2개
-        self.assertIn("연말정산계산기 3.7(검색 5,000/정면 경쟁 1개)", msg)   # 황금지수 5 → 만점
+        self.assertIn("연말정산계산기 3.7(검색 5,000/글 1,000)", msg)   # 황금지수 5 → 만점
         got = {c["keyword"]: c for c in select_keyword.ranked_candidates(conn, settings, limit=10)}
         self.assertIn("연말정산 계산기", got)                                # 오늘 수집분이 아니어도 황금이면 후보
         self.assertTrue(got["연말정산 계산기"]["naver"].startswith("황금 3.7"))
@@ -1693,15 +1690,16 @@ class NaverHubTest(unittest.TestCase):
         conn = self._db()
         h.load(conn)
         conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES ('육아휴직급여','육아휴직급여',1500,'2026-10-01','2026-10-01')")
-        conn.execute("INSERT INTO naver_signals(norm, docs, hits, docs_checked) VALUES ('육아휴직급여', 3000, 4, '2026-11-05')")  # 좋음, 검색 1,500
+        conn.execute("INSERT INTO naver_signals(norm, docs, hits, docs_checked) VALUES ('육아휴직급여', 3000, 4, '2026-11-05')")  # 지수 0.5 황금, 검색 1,500
         heads = discover._modifier_heads(conn, "2026-11-05", 10)
         self.assertEqual(heads[0], "육아휴직급여")      # 오늘 수집분·3,000 미만이어도 황금·좋음이면 롱테일 조합 먼저
         conn.execute("DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ? AND norm NOT IN ("
-                     " SELECT norm FROM naver_signals WHERE hits IS NOT NULL AND hits <= ?)", ("2026-11-03", h.GOOD_HITS))
+                     " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm WHERE n.docs IS NOT NULL AND k.total >= n.docs * ?)",
+                     ("2026-11-03", h.GOOD_INDEX))
         left = {r[0] for r in conn.execute("SELECT norm FROM keywords")}
         self.assertIn("육아휴직급여", left)               # 오래됐어도 황금·좋음은 남김
         self.assertNotIn("캠핑준비물", left)
-        self.assertIn("(n.hits <= ? OR k.total >= n.docs * ?)", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("k.total >= n.docs * ?", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
 
     def test_blog_totals_saves_chunks_and_stops_on_429(self):
         import datetime as dt

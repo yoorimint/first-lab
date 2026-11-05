@@ -38,17 +38,14 @@ CHECK_TOP = 60               # 성수기를 볼 상위 후보 수 (+ 그 대표 
 REFRESH_DAYS = 30            # 같은 키워드는 이 기간 지나야 다시 조회
 TREND_MONTHS = 24
 PEAK, LOW = 0.8, 0.4         # 월평균이 최고 달의 80% 이상이면 성수기, 40% 이하면 비수기
-# 황금 점수 = log10(월 검색량) × max(표준 황금지수 쪽, 정면 경쟁 쪽) + 낡은 경쟁 가점 — '검색은 어느 정도 있는데 글은 적은 것'.
-#   ① 표준 황금지수 = 검색량 ÷ 네이버 블로그 문서 수 (한국 키워드 도구들의 방식) → min(지수 ÷ 0.3, 1)
-#      약점: 네이버 문서 수는 단어가 모두 든 글을 세서 붙여 쓴 롱테일을 부풀림 ('주휴수당계산' 수십만, 11/5) → 황금을 놓침
-#   ② 정면 경쟁 = 네이버 상위 SAMPLE 개 중 제목에 키워드가 그대로 든 글 수 (해외 KGR 의 'allintitle' 과 같은 생각) → 1 − 수 ÷ 30
-#      약점: 같은 뜻을 다른 말로 쓴 제목은 못 셈 → 경쟁을 낮게 볼 수 있음
-#   둘이 서로 약점을 메워서 하나라도 기회면 인정 (11/5 운영자 '공부하고 와라' → 업계 방식 조사 후 결정).
-#   12월 서치콘솔 노출·클릭으로 어느 쪽이 더 잘 맞혔는지 비교해 비중 조정 (automation/operator-notes.md).
+# 황금 점수 = log10(월 검색량) × min(황금지수 ÷ 0.3, 1) — 운영자 결정(11/5): 중요한 건 '검색량 대비 글 수'.
+#   황금지수 = 검색량 ÷ 네이버 블로그 문서 수 (한국 키워드 도구들의 표준 방식, 0.3 이상 황금·0.1 이상 좋음).
+#   검색량 크기를 곱해 검색 50·글 5 같은 작은 키워드가 1등이 되지 않게 함.
+#   상위 SAMPLE 개 중 제목에 키워드가 그대로 든 '정면 경쟁' 글 수·그중 1년 넘은 글 수는 참고로만 보여 줌 (점수에 안 씀).
+#   한계: 네이버는 단어가 모두 든 글을 세서 붙여 쓴 롱테일은 글 수가 부풀어 보임 (다른 도구도 같음) — 12월 서치콘솔로 검증.
 GOLD_WEIGHT = 2.0            # 글감 점수에 더하는 배수 (운영자 지시: 황금 점수 높은 것부터)
-GOLD_HITS, GOOD_HITS, SAT_HITS = 2, 8, 25  # 상위 SAMPLE 개 중 정면 경쟁 글 수: 2개 이하 황금, 8개 이하 좋음, 25개 이상 포화
 GOLD_INDEX, GOOD_INDEX, SAT_INDEX = 0.3, 0.1, 0.01  # 표준 황금지수(검색량 ÷ 문서 수): 0.3 이상 황금(키워드파인더 '×100 ≥ 30'), 0.1 이상 좋음
-OLD_DAYS, OLD_BONUS = 365, 0.5  # 정면 경쟁 글이 1년 넘게 낡았으면 최신 기준 글이 이길 여지 → 가점(낡은 비율 × 0.5)
+OLD_DAYS = 365              # 정면 경쟁 글 중 1년 넘은 글 수 (참고 표시용)
 FEW_DOCS = 10                # 글이 이보다 적으면 검색 도구가 만든 어색한 조합일 수도 → '확인 필요' 표시 (점수는 그대로)
 # 사이트를 찾아가는 검색: 검색량은 커도 사람들이 공식 사이트로 바로 가서 글을 안 읽음 → 황금 찾기·가점에서 뺌
 NAVIGATIONAL = ("로그인", "홈페이지", "바로가기", "사이트", "고객센터", "전화번호", "콜센터", "앱다운", "어플다운",
@@ -201,29 +198,24 @@ def gold_index(sig: dict | None, total: int) -> float | None:
 
 
 def gold_score(sig: dict | None, total: int) -> float:
-    """황금 점수 = log10(검색량) × max(min(황금지수 ÷ 0.3, 1), 1 − 정면 경쟁 ÷ 30) + 낡은 경쟁 가점."""
+    """황금 점수 = log10(검색량) × min(황금지수 ÷ 0.3, 1)."""
     if not sig or sig.get("docs") is None or total <= 0 or sig["docs"] < FEW_DOCS:
         return 0.0  # 글이 거의 없으면(성인어·어색한 조합 등 네이버가 0으로 보이는 말) 가점 안 줌 — 가짜 황금 방지
-    by_index = min(gold_index(sig, total) / GOLD_INDEX, 1.0)
-    hits = sig.get("hits")
-    by_title = 1 - min(hits, SAMPLE) / SAMPLE if hits is not None else 0.0
-    bonus = OLD_BONUS * (sig.get("old") or 0) / hits if hits else 0.0
-    return math.log10(max(total, 1)) * max(by_index, by_title) + bonus
+    return math.log10(max(total, 1)) * min(gold_index(sig, total) / GOLD_INDEX, 1.0)
 
 
 def gold_label(sig: dict | None, total: int) -> str:
-    """둘 중 더 좋은 쪽 기준 등급. 포화는 둘 다 나쁠 때만."""
+    """황금지수 등급: 0.3 이상 황금, 0.1 이상 좋음, 0.01 미만 포화."""
     index = gold_index(sig, total)
     if index is None:
         return ""
     if sig["docs"] < FEW_DOCS:
         return "확인 필요(글 거의 없음)"
-    hits = sig.get("hits")
-    if index >= GOLD_INDEX or (hits is not None and hits <= GOLD_HITS):
+    if index >= GOLD_INDEX:
         return "황금"
-    if index >= GOOD_INDEX or (hits is not None and hits <= GOOD_HITS):
+    if index >= GOOD_INDEX:
         return "좋음"
-    return "포화" if index < SAT_INDEX and (hits is None or hits >= SAT_HITS) else "보통"
+    return "포화" if index < SAT_INDEX else "보통"
 
 
 def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") -> float:
@@ -253,8 +245,8 @@ def describe(sig: dict | None, total: int) -> str:
     index = gold_index(sig, total)
     if index is not None:
         parts.append(f"황금지수 {index:.2f}(검색 {total:,}/글 {sig['docs']:,})")
-    if sig.get("hits") is not None:
-        parts.append(f"상위 {SAMPLE}개 중 정면 경쟁 {sig['hits']}개" + (f"(1년 넘은 글 {sig['old']}개)" if sig.get("old") else ""))
+    if sig.get("hits") is not None:  # 참고
+        parts.append(f"참고: 상위 {SAMPLE}개 중 제목 일치 {sig['hits']}개" + (f"(1년 넘은 글 {sig['old']}개)" if sig.get("old") else ""))
     return " / ".join(parts)
 
 
@@ -325,7 +317,7 @@ def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
 
     def stale(n: str) -> bool:
         sig = known.get(n) or {}
-        return (sig.get("docs_checked") or "") < cutoff or sig.get("hits") is None  # 정면 경쟁 없이 본 옛 조회는 다시
+        return (sig.get("docs_checked") or "") < cutoff
 
     fresh = [r for r in rows if stale(r["norm"]) and is_allowed(r["keyword"], settings.blocked_words) and is_info(r["keyword"])]
     fresh.sort(key=lambda r: (topic_weight(r["norm"]), r["total"]), reverse=True)
@@ -351,12 +343,12 @@ def golden_report(conn, rows=None, top_n: int = 5) -> str:
     scored = []
     for r in rows:
         sig = sigs.get(r["norm"])
-        if sig and sig.get("hits") is not None and is_info(r["keyword"]):
-            scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], sig.get("hits")))
+        if sig and sig.get("docs") is not None and is_info(r["keyword"]):
+            scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], sig["docs"]))
     scored.sort(reverse=True)
     gold = [x for x in scored if x[1] == "황금"]
     shown = [x for x in scored if x[1] in ("황금", "좋음")]  # '확인 필요(글 거의 없음)'·포화는 목록에서 뺌
-    top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/정면 경쟁 {h}개)" for g, _, n, t, h in shown[:top_n])
+    top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/글 {d:,})" for g, _, n, t, d in shown[:top_n])
     return f"조회 {len(scored):,}개 중 황금 {len(gold):,}개 — 황금 점수 상위: {top or '없음'}"
 
 
