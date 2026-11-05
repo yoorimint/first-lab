@@ -29,7 +29,9 @@ jobs:
           if [ "${{ github.event_name }}" = "push" ]; then
             echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"; echo "need=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          main=$(git ls-remote "https://github.com/${{ github.repository }}" refs/heads/main | cut -f1)
+          # 비공개 저장소라 인증 필요 (작업 토큰)
+          main=$(curl -fsS --max-time 20 -H "Authorization: Bearer ${{ github.token }}" \
+            "https://api.github.com/repos/${{ github.repository }}/commits/main" | python3 -c "import json,sys; print(json.load(sys.stdin)['sha'])" || true)
           [ -n "$main" ] || { echo "main 버전을 못 읽음"; exit 1; }
           echo "sha=$main" >> "$GITHUB_OUTPUT"
           deployed=$(curl -fsS --max-time 20 https://first-lab.kr/deployed-version.txt || echo none)

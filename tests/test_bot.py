@@ -1606,7 +1606,8 @@ class DeploySpeedTest(unittest.TestCase):
         wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
         gate, rest = wf.split("\n  check:")
         check, deploy = rest.split("\n  deploy:")
-        self.assertIn("refs/heads/main", gate)
+        self.assertIn("/commits/main", gate)
+        self.assertIn("github.token", gate)   # 비공개 저장소: 인증 없이 읽으면 실패
         self.assertIn("ref: ${{ needs.gate.outputs.sha }}", check)
         self.assertNotIn("github.sha", deploy)
         self.assertEqual(deploy.count("needs.gate.outputs.sha"), 2)
@@ -2296,6 +2297,24 @@ class DeployWatchTest(unittest.TestCase):
         self.assertNotIn("deploy_alert", state)
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=80), "ccc", "ddd"))
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=125), "ddd", "eee"))     # 배포가 진행 중이면 알림 없음
+
+    def test_reads_main_via_repo_origin_and_logs_failure(self):
+        """11/6: 비공개 저장소를 주소만으로 ls-remote → 빈 값 → 75분 막혀도 알림 없음. 배포가 쓰는 origin 으로 읽고, 못 읽으면 기록."""
+        from datetime import datetime
+        from bot import deploy_watch as dw
+        calls = []
+        fake = mock.Mock(stdout="")
+        with mock.patch.object(dw.subprocess, "run", side_effect=lambda a, **k: calls.append(a) or fake):
+            self.assertEqual(dw.main_sha(), "")
+        self.assertEqual(calls[0][:4], ["git", "-C", str(dw.REPO), "ls-remote"])
+        self.assertIn("origin", calls[0])
+        state, logs = {}, []
+        with mock.patch.object(dw, "main_sha", return_value=""), \
+                mock.patch.object(dw, "DEPLOYED") as dep, \
+                mock.patch("bot.state.add_log", side_effect=lambda st, ok, msg: logs.append(msg)):
+            dep.read_text.return_value = "aaa"
+            dw.run(state, datetime(2026, 11, 6, 7, 0))
+        self.assertEqual(logs, [dw.READ_FAIL])
 
     def test_kst_aware_time_from_bot(self):
         """봇은 datetime.now(KST)(시간대 있음)를 넘김 — 11/5 검토에서 TypeError 로 봇이 멈출 뻔함."""

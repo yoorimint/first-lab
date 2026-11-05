@@ -12,12 +12,15 @@ from datetime import datetime
 from pathlib import Path
 
 DEPLOYED = Path("/var/www/first-lab/deployed-version.txt")
-REMOTE = "https://github.com/yoorimint/first-lab"
+REPO = Path(__file__).resolve().parents[1]   # 서버 /opt/first-lab — 배포가 쓰는 origin(인증 설정 포함)을 그대로 씀
 LIMIT_MIN = 60   # 15분 따라잡기가 네 번 돌아도 안 올라가면
+READ_FAIL = "배포 감지 실패: main 버전을 못 읽음 (git ls-remote origin)"
 
 
 def main_sha() -> str:
-    out = subprocess.run(["git", "ls-remote", REMOTE, "refs/heads/main"], capture_output=True, text=True, timeout=30).stdout
+    # 저장소가 비공개라 주소만으로는 못 읽음 — 11/6 배포가 75분 막혔는데 조용히 빈 값 → 알림 없음
+    out = subprocess.run(["git", "-C", str(REPO), "ls-remote", "origin", "refs/heads/main"],
+                         capture_output=True, text=True, timeout=30).stdout
     return out.split()[0] if out.strip() else ""
 
 
@@ -50,9 +53,9 @@ def run(state: dict, now: datetime | None = None) -> None:
     try:
         deployed = DEPLOYED.read_text(encoding="utf-8").strip()
         main = main_sha()
-        alert = check(state, now, deployed, main)
+        alert = check(state, now, deployed, main) if main else READ_FAIL   # 못 읽으면 조용히 넘기지 않고 기록
     except Exception:  # noqa: BLE001 - 배포 감지가 1분 봇(공개·실행)을 멈추면 안 됨
-        return
+        alert = READ_FAIL
     if alert and state.get("deploy_alert_logged", "")[:13] != now.strftime("%Y-%m-%d %H"):
         add_log(state, False, alert)   # 한 시간에 한 번만 기록
         state["deploy_alert_logged"] = now.strftime("%Y-%m-%d %H:%M")
