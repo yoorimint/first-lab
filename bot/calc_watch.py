@@ -12,6 +12,10 @@
 값이 바뀌면 글쓰기 세션이 그 시행일로 scheduled 를 넣고, 계산기와 상관없는 개정이면 data 의 "law_checked" 에 그 key 를 적는다.
 숫자를 코드가 직접 바꾸지 않는 이유: 조문 문장에서 어느 값이 계산기의 어느 키인지 기계로 확실히 짝지을 수 없음 → 확인은 글쓰기 세션.
 
+기관 안내 페이지 (요금표·수수료처럼 법령이 아닌 출처): 계산기 data 의 숫자 중 출처 페이지에 실제로 적혀 있는 것을 '기준 숫자'로 저장해 두고
+(data 의 basis_date 가 바뀌면 새로 저장), 매일 그 페이지를 열어 기준 숫자가 사라지면 calc_yearly 에 넣는다 (source_changed).
+페이지를 못 열면 판단하지 않는다.
+
 값이 바뀌는 날(scheduled 의 from) 이 되면: 옛 값을 그대로 적은 글(공개·예약·초안)에 표시(bot/changed.py)
 → 공개 글은 재검증, 초안은 공개 직전 보류. 금액은 '10,320원' 처럼 원 단위로 찾고, 비율(0.0475 → 4.75%)은
 흔한 숫자라 그 계산기가 들어간 글에서만 찾는다. 한 번 한 전환은 state["calc_switch_done"] 에 남겨 다시 안 함.
@@ -80,6 +84,63 @@ def law_due(today: dt.date, upcoming: list[dict], data_dir: Path = DATA_DIR) -> 
                     and any(_same_law(item.get("law", ""), law) for law in laws[path.stem])):
                 out.append({"id": path.stem, "law_change": item["key"], "date": item["date"],
                             "articles": item.get("articles", [])[:8]})
+    return out
+
+
+ANCHORS = Path("/var/lib/first-lab/bot/calc-anchors.json")  # id → {basis_date, pages: {주소: [기준 숫자]}}
+MIN_ANCHOR = 100   # 이보다 작은 수(1·2·30 같은)는 페이지 어디에나 있어 기준이 안 됨
+
+
+def data_numbers(data, out=None) -> set[str]:
+    """data 안의 금액·기준값 (출처·기준일·검사용 키 제외)."""
+    out = set() if out is None else out
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if k not in ("sources", "basis_date", "scheduled", "won10_keys", "yearly_checked", "yearly_recheck", "laws", "law_checked"):
+                data_numbers(v, out)
+    elif isinstance(data, list):
+        for v in data:
+            data_numbers(v, out)
+    elif isinstance(data, (int, float)) and not isinstance(data, bool) and data >= MIN_ANCHOR and float(data).is_integer():
+        out.add(str(int(data)))  # source_check.has_number 형식 (쉼표 없이 — 페이지의 쉼표는 has_number 가 맞춰 봄)
+    return out
+
+
+def source_changes(data_dir: Path = DATA_DIR, fetcher=None, anchors_file: Path = ANCHORS) -> list[dict]:
+    """기관 안내 페이지에서 기준 숫자가 사라진 계산기. 처음 보거나 data 를 고친 뒤면 기준만 새로 저장."""
+    from . import source_check
+    fetcher = fetcher or source_check.fetch
+    try:
+        saved = json.loads(anchors_file.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        saved = {}
+    from concurrent.futures import ThreadPoolExecutor
+    files = {path: json.loads(path.read_text(encoding="utf-8")) for path in sorted(data_dir.glob("*.json"))}
+    urls = sorted({s["url"] for d in files.values() for s in d.get("sources", []) if s.get("url") and "law.go.kr" not in s["url"]})
+    with ThreadPoolExecutor(max_workers=8) as pool:  # 페이지 60여 개를 하나씩 열면 몇 분 걸림
+        texts = dict(zip(urls, pool.map(fetcher, urls)))
+    out = []
+    for path, data in files.items():
+        nums = data_numbers(data)
+        pages = [s["url"] for s in data.get("sources", []) if s.get("url") and "law.go.kr" not in s["url"]]
+        if not nums or not pages:
+            continue
+        old = saved.get(path.stem) or {}
+        fresh = old.get("basis_date") != data.get("basis_date")
+        keep = {} if fresh else dict(old.get("pages") or {})
+        for url in pages:
+            text = texts.get(url)
+            if not text:
+                continue  # 못 엶·문서 → 판단 안 함 (기준도 그대로)
+            if fresh or url not in keep:
+                keep[url] = sorted(n for n in nums if source_check.has_number(text, n))
+                continue
+            gone = [n for n in keep[url] if not source_check.has_number(text, n)]
+            if gone:
+                out.append({"id": path.stem, "source_changed": url, "missing": gone[:8]})
+        saved[path.stem] = {"basis_date": data.get("basis_date"), "pages": keep}
+    anchors_file.parent.mkdir(parents=True, exist_ok=True)
+    anchors_file.write_text(json.dumps(saved, ensure_ascii=False), encoding="utf-8")
     return out
 
 
@@ -156,13 +217,17 @@ def run(today: dt.date | None = None) -> str:
     today = today or dt.date.today()
     state = load_state()
     items = due(today) + law_due(today, (state.get("law_changes") or {}).get("upcoming", []))
+    try:
+        items += source_changes()
+    except Exception as e:  # noqa: BLE001 - 페이지 확인이 실패해도 나머지는 넘김
+        items.append({"id": "-", "error": f"기관 페이지 확인 실패: {e}"[:120]})
     state["calc_yearly"] = items
     try:
         switched = mark_switches(today, state)
     except Exception as e:  # noqa: BLE001 - 표시가 실패해도 연초 확인 목록은 저장 (다음 날 다시)
         switched = [f"값 전환 표시 실패: {e}"]
     msg = (f"계산기 연초 값·근거 법령 개정: 확인 필요 {len(items)}건"
-           + (f" — {', '.join(i['id'] + (' ' + i['law_change'] if 'law_change' in i else '') for i in items[:6])}" if items else " (모두 확인됨)")
+           + (f" — {', '.join(i['id'] + (' ' + i['law_change'] if 'law_change' in i else '') + (' 기관 페이지 숫자 바뀜' if 'source_changed' in i else '') for i in items[:6])}" if items else " (모두 확인됨)")
            + "".join(f" / {x}" for x in switched))
     add_log(state, not items or (today.month, today.day) < (12, 15), msg)  # 12/15 넘도록 남아 있으면 오류로 표시
     save_state(state)

@@ -1965,6 +1965,54 @@ class LearnedBrandTest(unittest.TestCase):
         kf._learned_cache.clear()
 
 
+class SourceRecheckTest(unittest.TestCase):
+    """공개 뒤에도 근거를 다시 봄 (11/5 운영자 '어느 법령·규정으로 만들어졌고 바뀌면 고치는 게 시스템화돼 있나')."""
+
+    def test_calc_source_page_number_disappears(self):
+        import tempfile
+        from bot import calc_watch
+        d = Path(tempfile.mkdtemp())
+        anchors = d / "anchors.json"
+        data = {"basis_date": "2026-11-05", "fee": 300, "max_day": 10000, "rate": 0.5,
+                "sources": [{"name": "공항 요금표", "url": "https://airport.example/fee"}, {"name": "법", "url": "https://www.law.go.kr/x"}]}
+        (d / "parking.json").write_text(json.dumps(data), encoding="utf-8")
+        page = {"text": "기본 30분 900원 매 10분 300원 24시간 10000원"}
+        fetch = lambda url: page["text"] if "airport" in url else None  # noqa: E731
+        self.assertEqual(calc_watch.source_changes(d, fetch, anchors), [])          # 처음: 기준만 저장 (300·10000)
+        self.assertEqual(json.loads(anchors.read_text())["parking"]["pages"]["https://airport.example/fee"], ["10000", "300"])
+        self.assertEqual(calc_watch.source_changes(d, fetch, anchors), [])          # 그대로면 없음
+        page["text"] = "기본 30분 1000원 매 10분 400원 24시간 12000원"
+        got = calc_watch.source_changes(d, fetch, anchors)
+        self.assertEqual([(g["id"], sorted(g["missing"])) for g in got], [("parking", ["10000", "300"])])
+        self.assertEqual(calc_watch.source_changes(d, lambda url: None, anchors), [])  # 못 열면 판단 안 함
+        data.update(basis_date="2026-11-20", fee=400, max_day=12000)                 # 글쓰기 세션이 고침 → 기준 새로
+        (d / "parking.json").write_text(json.dumps(data), encoding="utf-8")
+        self.assertEqual(calc_watch.source_changes(d, fetch, anchors), [])
+
+    def test_published_posts_rechecked_in_turn(self):
+        import datetime as dt
+        from bot import changed, freshness, recheck, source_check
+        self.assertEqual(recheck.batch(["5", "1", "9", "3"], "3", 2), ["5", "9"])
+        self.assertEqual(recheck.batch(["5", "1", "9", "3"], "9", 2), ["1", "3"])   # 끝까지 가면 처음부터
+        record = {"found": [{"claim": "주차 10분 300원", "numbers": ["300"], "urls": ["https://airport.example/fee"]}]}
+        metas = {("7", source_check.META): json.dumps(record), ("7", freshness.VERIFIED_META): "2026-11-01"}
+        store = {}
+
+        def wp(*a):
+            if a[2] == "get":
+                return store.get(a[3]) if a[4] == changed.META and a[3] in store else metas.get((a[3], a[4]), "")
+            store[a[3]] = a[5]
+            return ""
+        bulk = {"7": {"status": "publish", "name": "x", "title": "", "content": ""}, "8": {"status": "draft", "name": "y"}}
+        state = {"log": []}
+        with mock.patch("bot.state.load_state", return_value=state), mock.patch("bot.state.save_state"):
+            msg = recheck.run(dt.date(2026, 11, 20), bulk, wp, lambda url: "매 10분 400원")
+        self.assertIn("2026-11-20 근거 다시 보기", store["7"])
+        self.assertNotIn("8", store)                         # 초안은 공개 직전 확인이 따로 봄
+        self.assertIn("표시 1편", msg)
+        self.assertEqual(state[recheck.CURSOR], "7")
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

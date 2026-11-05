@@ -199,6 +199,11 @@ def main() -> None:
         print(watch_calcs(), flush=True)
     except Exception as e:  # noqa: BLE001
         print(f"계산기 연초 값 확인 실패: {e}", flush=True)
+    try:  # 공개 글 근거 다시 보기 (bot/recheck.py) — 실패해도 수집·갱신은 계속
+        from .recheck import run as recheck_posts
+        print(recheck_posts(), flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"공개 글 근거 다시 보기 실패: {e}", flush=True)
     try:  # 계산기 연초 값 확인 (bot/calc_watch.py) — 실패해도 수집·갱신은 계속
         from .calc_watch import run as watch_calcs
         print(watch_calcs(), flush=True)
