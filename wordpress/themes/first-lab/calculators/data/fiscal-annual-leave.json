@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-05",
+  "basis_date": "2026-11-05", "yearly": false,
   "sources": [
     {"name": "근로기준법 제60조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
     {"name": "고용노동부 연차유급휴가 질의회신 (회계연도 기준 비례 부여·퇴직 정산)", "url": "https://www.moel.go.kr/policy/policydata/view.do?bbs_seq=5850"},
