@@ -1,0 +1,22 @@
+{
+  "basis_date": "2026-11-05", "yearly_checked": 2026,
+  "sources": [
+    {"name": "한국공항공사 김해국제공항 주차요금 안내 (요금 체계·할인·서비스 타임)", "url": "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"},
+    {"name": "한국공항공사 김해국제공항 주차장 안내", "url": "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"}
+  ],
+  "unit_minutes": 10,
+  "max_days": 60,
+  "lots": {
+    "p12": {
+      "free_minutes": 10,
+      "small": {"base_fee": 900, "unit_fee": 300, "daily_max_weekday": 10000, "daily_max_weekend": 15000},
+      "large": {"base_fee": 1200, "unit_fee": 400, "daily_max_weekday": 9000, "daily_max_weekend": 13000}
+    },
+    "p3": {
+      "free_minutes": 20,
+      "small": {"base_fee": 900, "unit_fee": 300, "daily_max_weekday": 7000, "daily_max_weekend": 10000},
+      "large": {"base_fee": 1200, "unit_fee": 400, "daily_max_weekday": 5000, "daily_max_weekend": 7000}
+    }
+  },
+  "discount_rates": {"none": 0, "half": 0.5, "low3": 0.2}
+}
