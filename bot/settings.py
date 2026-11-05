@@ -105,19 +105,26 @@ class BotSettings:
         )
 
 
-def wp_cli(*args: str) -> str:
-    """워드프레스 파일 소유자 권한으로 WP-CLI 실행."""
+def wp_cli(*args: str, stdin: str | None = None) -> str:
+    """워드프레스 파일 소유자 권한으로 WP-CLI 실행. stdin: 값을 표준 입력으로 (명령줄 인자 한도 128KB 를 넘는 값)."""
     cmd = ["runuser", "-u", WP_USER, "--", "wp", f"--path={WP_PATH}", *args]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, input=stdin)
     if result.returncode != 0:
         raise subprocess.CalledProcessError(result.returncode, cmd[:7], result.stdout, result.stderr.strip()[:300])
     return result.stdout
 
 
+def option_missing(e: subprocess.CalledProcessError) -> bool:
+    """wp option get 실패가 '옵션이 아직 없음'인지 (그 밖의 실패는 일시 오류)."""
+    return "Could not get" in str(e.stderr or "") or "does not exist" in str(e.stderr or "")
+
+
 def load_settings() -> BotSettings:
     try:
         raw = json.loads(wp_cli("option", "get", OPTION, "--format=json") or "{}")
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        if not option_missing(e):
+            raise  # 잠깐 못 읽은 것(잠금·배포 중)을 기본 설정으로 착각해 공개 기록을 지우지 않게 (11/5 검토)
         raw = {}  # 아직 한 번도 저장하지 않은 경우
     return BotSettings.from_option(raw, load_secrets())
 

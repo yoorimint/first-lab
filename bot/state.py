@@ -28,10 +28,17 @@ STATE_LOCK = "/run/firstlab-state.lock"  # 봇(1분)·배포(글 올리기)·키
 MAX_USED = 2000
 
 
+_SNAPSHOT: dict[int, str] = {}  # 읽어 갈 때의 상태 (저장 때 '내가 바꾼 키'만 덮어쓰려고)
+_OWN = ("log",) + ("used_keywords", "law_changes_done", "new_benefits_done")  # 따로 합치는 키
+
+
 def load_state() -> dict:
+    from .settings import option_missing
     try:
         state = json.loads(wp_cli("option", "get", STATE_OPTION, "--format=json") or "{}")
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as e:
+        if not option_missing(e):
+            raise  # 잠깐 못 읽은 것을 빈 상태로 착각해 오늘 공개·실행 기록을 지우지 않게 (11/5 검토)
         state = {}
     for key, default in (("plan", {}), ("done", {}), ("used_keywords", []), ("log", [])):
         state.setdefault(key, default)
@@ -39,6 +46,7 @@ def load_state() -> dict:
     for key in DICT_KEYS:
         if key in state and not isinstance(state[key], dict):
             state[key] = {}
+    _SNAPSHOT[id(state)] = json.dumps(state, sort_keys=True, ensure_ascii=False)
     return state
 
 
@@ -68,12 +76,37 @@ def merge_stored(state: dict, stored: dict) -> None:
         mine_list += [k for k in stored.get(key, []) or [] if k not in seen]
 
 
+def changed_onto(state: dict, base: dict, stored: dict) -> dict:
+    """읽은 뒤(base) 내가 바꾼 최상위 키만 지금 저장된 값(stored) 위에 덮어씀 (3방향 합치기).
+    11/5 검토: 배포(글 올리기)·새벽 수집이 몇 분 들고 있던 옛 상태를 통째로 저장해, 그사이 1분 봇이 적은
+    오늘 공개·글쓰기 실행 기록이 지워짐 → 같은 시각을 다시 공개·실행할 수 있었음."""
+    merged = dict(stored)
+    for key, value in state.items():
+        if key not in _OWN and (key not in base or base[key] != value):
+            merged[key] = value
+    for key in base:
+        if key not in state and key not in _OWN:
+            merged.pop(key, None)
+    for key in _OWN:
+        if key in state:
+            merged[key] = state[key]
+    return merged
+
+
 def save_state(state: dict) -> None:
     with _state_lock():
-        merge_stored(state, load_state())
-        state["used_keywords"] = state["used_keywords"][-MAX_USED:]
-        state["log"] = state["log"][:MAX_LOG]
-        wp_cli("option", "update", STATE_OPTION, json.dumps(state, ensure_ascii=False), "--format=json")
+        stored = load_state()
+        base = _SNAPSHOT.get(id(state))
+        merged = changed_onto(state, json.loads(base), stored) if base else state
+        merge_stored(merged, stored)
+        merged["used_keywords"] = merged["used_keywords"][-MAX_USED:]
+        merged["log"] = merged["log"][:MAX_LOG]
+        # 값은 표준 입력으로 (명령줄 인자 하나는 128KB 까지라 상태가 커지면 저장이 영영 실패함 — 11/5 검토)
+        wp_cli("option", "update", STATE_OPTION, "--format=json", stdin=json.dumps(merged, ensure_ascii=False))
+        if merged is not state:
+            state.clear()
+            state.update(merged)
+        _SNAPSHOT[id(state)] = json.dumps(state, sort_keys=True, ensure_ascii=False)
 
 
 def add_spend(state: dict, usd: float) -> None:

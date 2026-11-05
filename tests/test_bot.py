@@ -405,7 +405,8 @@ class ContinuousTest(unittest.TestCase):
         settings = BotSettings.from_option({}, {})
         with mock.patch.object(run, "continuous_on", return_value=on), \
                 mock.patch.object(run, "set_continuous") as stop, \
-                mock.patch.object(run, "fire_routine", return_value=fire_ok) as fire:
+                mock.patch.object(run, "fire_routine", return_value=fire_ok) as fire, \
+                mock.patch.object(run, "save_state"):
             run.continuous_step(state, settings, now)
         return fire, stop
 
@@ -1077,10 +1078,10 @@ class StateMergeTest(unittest.TestCase):
                                                       {"time": "2026-11-05 08:46", "ok": True, "msg": "연속 작성 41번째"}]}
         written = []
         with mock.patch.object(st, "load_state", return_value=stored), \
-             mock.patch.object(st, "wp_cli", side_effect=lambda *a: written.append(a) or ""), \
+             mock.patch.object(st, "wp_cli", side_effect=lambda *a, **k: written.append(k.get("stdin")) or ""), \
              mock.patch.object(st, "STATE_LOCK", "/nonexistent-dir/x.lock"):
             st.save_state(mine)
-        saved = json.loads(written[-1][3])
+        saved = json.loads(written[-1])
         self.assertEqual([e["msg"] for e in saved["log"]], ["사진 채우기", "직접 작성 글: 증여세", "연속 작성 41번째"])
         self.assertEqual(saved["used_keywords"], ["a", "b"])
 
@@ -1504,10 +1505,10 @@ class LawWatchTest(unittest.TestCase):
         stored = {"law_changes_done": ["고용보험법|2027-01-01"]}
         written = []
         with mock.patch.object(st, "load_state", return_value=stored), \
-             mock.patch.object(st, "wp_cli", side_effect=lambda *a: written.append(a) or ""), \
+             mock.patch.object(st, "wp_cli", side_effect=lambda *a, **k: written.append(k.get("stdin")) or ""), \
              mock.patch.object(st, "STATE_LOCK", "/nonexistent-dir/x.lock"):
             st.save_state(mine)
-        self.assertEqual(json.loads(written[-1][3])["law_changes_done"], ["고용보험법|2027-01-01"])
+        self.assertEqual(json.loads(written[-1])["law_changes_done"], ["고용보험법|2027-01-01"])
 
     def test_writer_gets_law_changes(self):
         self.assertIn("law_changes", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
@@ -2189,6 +2190,33 @@ class DeployWatchTest(unittest.TestCase):
         kst, state = ZoneInfo("Asia/Seoul"), {}
         self.assertIsNone(dw.check(state, datetime(2026, 11, 5, 10, 0, tzinfo=kst), "aaa", "bbb"))
         self.assertIn("분째", dw.check(state, datetime(2026, 11, 5, 11, 5, tzinfo=kst), "aaa", "bbb"))
+
+
+class StateThreeWayTest(unittest.TestCase):
+    """11/5 검토: 몇 분 들고 있던 옛 상태를 저장하면 그사이 봇이 적은 오늘 공개·실행 기록이 지워짐 → 바꾼 키만 덮어씀."""
+
+    def test_only_changed_keys_overwrite(self):
+        from bot import state as st
+        base = {"done": {}, "direct_fired": {}, "rates": {"base": 3.0}, "log": [], "used_keywords": []}
+        mine = json.loads(json.dumps(base))
+        mine["rates"] = {"base": 2.75}                      # 내가 바꾼 것
+        stored = {"done": {"2026-11-05": ["09:00"]}, "direct_fired": {"2026-11-05": ["07:40"]}, "rates": {"base": 3.0},
+                  "log": [{"time": "2026-11-05 09:00", "ok": True, "msg": "공개"}], "used_keywords": []}
+        merged = st.changed_onto(mine, base, stored)
+        self.assertEqual(merged["done"], {"2026-11-05": ["09:00"]})        # 다른 실행이 적은 공개 기록 유지
+        self.assertEqual(merged["direct_fired"], {"2026-11-05": ["07:40"]})
+        self.assertEqual(merged["rates"], {"base": 2.75})
+
+    def test_read_failure_is_not_empty_state(self):
+        import subprocess
+        from bot import state as st
+        err = subprocess.CalledProcessError(1, ["wp"], "", "Error: Database is locked")
+        with mock.patch.object(st, "wp_cli", side_effect=err):
+            with self.assertRaises(subprocess.CalledProcessError):
+                st.load_state()
+        missing = subprocess.CalledProcessError(1, ["wp"], "", "Error: Could not get 'firstlab_bot_state' option. Does it exist?")
+        with mock.patch.object(st, "wp_cli", side_effect=missing):
+            self.assertEqual(st.load_state()["log"], [])
 
 
 class BokApiTest(unittest.TestCase):

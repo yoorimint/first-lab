@@ -199,8 +199,8 @@ def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "")
         url = routine.fire(settings.routine_fire_url, settings.routine_token, text)
         add_log(state, True, f"{label}: Claude 글쓰기 작업 시작 {url}")
         return True
-    except routine.RoutineError as e:
-        add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패 - {e}")
+    except Exception as e:  # noqa: BLE001 - 응답 형식이 바뀌어도(미리보기 기능) 봇이 멈추지 않게 (11/5 검토)
+        add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패 - {str(e)[:150]}")
         return False
 
 
@@ -244,9 +244,11 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
         state.pop("continuous", None)
         add_log(state, False, f"연속 작성 자동 정지: {fails}번 연속으로 글이 안 올라옴 (사용량 한도·후보 소진·오류 확인 필요)")
         return
+    seen = latest_post_log(state)
+    state["continuous"] = {"fired_at": stamp, "fails": fails, "count": count, "seen": seen}
+    save_state(state)  # 실행 전에 저장 — 중간에 죽어도 다음 분에 또 실행하지 않게 (11/5 검토)
     ok = fire_routine(state, settings, f"연속 작성 {count + 1}번째")
-    state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count,
-                           "seen": latest_post_log(state)}
+    state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count, "seen": seen}
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
@@ -301,6 +303,7 @@ def main() -> None:
         due = schedule.due_slot(plan, done, now.replace(tzinfo=None))
         if due:
             done.append(due)
+            save_state(state)  # 공개 전에 '했음'을 먼저 저장 — 중간에 죽어도 같은 시각을 다시 공개하지 않게 (11/5 검토)
             try:
                 msg = schedule.publish_next(now)
                 add_log(state, True, f"예약 공개 {due}: {msg or '공개할 초안 없음'}")
@@ -323,6 +326,7 @@ def main() -> None:
         due = schedule.due_slot(settings.maint_times, fired, now.replace(tzinfo=None))
         if due:
             state["maint_fired"] = {today: fired + [due]}
+            save_state(state)  # 실행 전에 저장 (중간에 죽으면 매분 다시 실행하던 경로, 11/5 검토)
             fire_routine(state, settings, f"매일 점검 {due}", routine.MAINT_TEXT)
 
     # 글 생성: 수동 요청, 연속 작성, 글 작성 시각 (월정액 → Claude, API 봇 방식 + 'API 봇 사용' → API)
@@ -341,6 +345,7 @@ def main() -> None:
         due = schedule.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
         if due:
             state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림, 실패해도 같은 시각은 다시 안 함
+            save_state(state)  # 실행 전에 저장 (11/5 검토)
             if settings.write_mode == "direct":
                 fire_routine(state, settings, f"글 작성 {due}")
             elif settings.enabled and reason is None:
