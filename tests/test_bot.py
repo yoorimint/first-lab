@@ -2197,6 +2197,26 @@ class ReviewQueueTest(unittest.TestCase):
         self.assertIsNone(rq.pick(ready[:-1], set()))                       # 대기 글이 적으면 새 글 쓰기
         self.assertIsNone(rq.pick(ready, {r["post_id"] for r in ready}))     # 다 검수했으면 새 글 쓰기
 
+    def test_any_run_end_counts_as_done(self):
+        """보류 수정·계산기만 한 실행도 끝남으로 (11/5 22:13 실행 74번이 보류 수정만 하고 47분 멈춤)."""
+        import tempfile
+        from bot import publish_queue, run
+        state = {"log": [{"time": "2026-11-05 22:24", "ok": True, "msg": "글쓰기 실행 끝(직접): 보류 초안 #784 계산기 검수"}]}
+        self.assertTrue(run.post_arrived_since(state, "2026-11-05 22:13", seen="2026-11-05 22:12 직접 작성 글: x"))
+        self.assertIn('"type": "run_done"', (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+        d = Path(tempfile.mkdtemp())
+        f = d / "done-1.json"
+        f.write_text(json.dumps({"type": "run_done", "summary": "보류 수정"}), encoding="utf-8")
+        st = {"log": []}
+        with mock.patch.object(publish_queue, "pending", return_value=[f]), mock.patch.object(publish_queue, "load_settings"), \
+                mock.patch.object(publish_queue, "load_state", return_value=st), mock.patch.object(publish_queue, "save_state"), \
+                mock.patch.object(publish_queue, "DONE_DIR", d / "done"), mock.patch.object(publish_queue.related, "allowed_urls", return_value=set()), \
+                mock.patch.object(publish_queue, "_marker", side_effect=lambda p: d / (p.name + ".ok")), \
+                mock.patch.object(publish_queue, "add_log", side_effect=lambda s, ok, m: s["log"].insert(0, {"time": "t", "ok": ok, "msg": m})):
+            publish_queue.main()
+        self.assertTrue(st["log"][0]["msg"].startswith("글쓰기 실행 끝(직접):"), st["log"])
+        self.assertIn("last_done_at", st)
+
     def test_review_run_counts_as_done(self):
         from bot import run
         state = {"log": [{"time": "2026-11-05 19:00", "ok": True, "msg": "대기 글 검수(직접): 글 12 't' 고친 곳 3개"}]}

@@ -11,6 +11,7 @@
   → 글쓰기 세션이 부적합하다고 본 후보·다룰 내용 없는 제도/혜택 글감을 다시 안 뜨게 함
 사진 검사 파일: {"type": "image_check", "post_id", "replace", "remove"} → image_check.apply_check (엉터리 글자 사진 교체)
 대기 글 검수 완료 파일: {"type": "review_done", "post_id", "title", "patches"} → 기록만 (연속 작성이 '한 번 끝남'으로 셈)
+실행 끝 파일: {"type": "run_done", "summary"} → 기록만 (글쓰기 작업이 실행마다 마지막에 올림 — 연속 작성이 '한 번 끝남'으로 셈)
 근거 기록 파일: {"type": "evidence", "post_id", "keyword", "review": [글쓰기 검수와 같은 형식]} → 근거 기록이 없던 예전 봇 글에
   근거 대조 기록을 만듦 (11/5 운영자 '예전 봇 글도 근거 기록 만들어라') → 법령 감시·공개 직전 확인·공개 글 다시 보기가 이 글도 봄
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
@@ -192,6 +193,11 @@ def skip_keywords(data: dict) -> str:
             + (f", 새 브랜드 {', '.join(new_brands)} → 같은 브랜드 후보 {same_brand}개 제외" if new_brands else ""))
 
 
+def run_marks() -> tuple[str, ...]:
+    from .run import DONE_MARKS
+    return DONE_MARKS
+
+
 def main() -> None:
     files = pending()
     if not files:
@@ -220,6 +226,9 @@ def main() -> None:
                 msg = f"글 {int(data['post_id'])} '{str(data.get('title', ''))[:40]}' 고친 곳 {int(data.get('patches', 0))}개"
                 if int((state.get("review_target") or {}).get("post_id", 0) or 0) == int(data["post_id"]):
                     state["review_target"] = None  # 바로 다음 실행이 같은 글을 또 검수하지 않게 (11/5 #690 두 번 검수 — 대상은 1분 봇이 새로 고름)
+            elif data.get("type") == "run_done":  # 보류 수정·계산기만 한 실행도 '끝남'으로 (bot/run.DONE_MARKS)
+                label = "글쓰기 실행 끝(직접)"
+                msg = str(data.get("summary", ""))[:200] or "-"
             elif data.get("type") == "evidence":
                 label = "근거 기록"
                 msg = save_evidence(data)
@@ -231,7 +240,7 @@ def main() -> None:
             _marker(path).touch()
             msg = f"{label}: {msg}"
             add_log(state, True, msg)
-            if label in ("직접 작성 글", "대기 글 검수(직접)", "보류 수정"):
+            if f"{label}:" in run_marks():  # '보류 수정' 오타로 보류 수정 실행이 /health 에 안 잡혔음 → 같은 목록을 씀
                 state["last_done_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")  # /health (외부 알림)
         except Exception as e:  # noqa: BLE001 - 한 파일 실패가 배포를 막지 않게 (다음 배포 때 다시 시도)
             fails = _bump_file_fail(path)
