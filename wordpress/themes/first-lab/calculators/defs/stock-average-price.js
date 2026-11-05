@@ -19,11 +19,11 @@
           ['target', '목표 평단가까지 몇 주를 더 사야 하나'],
         ],
       },
-      { name: 'held_price', label: '지금 평단가 (원)', type: 'number', min: 0, step: 1 },
+      { name: 'held_price', label: '지금 평단가 (원)', type: 'number', min: 0, step: 0.01 },
       { name: 'held_qty', label: '지금 보유 수량 (주)', type: 'number', min: 0, step: 1 },
       { name: 'buy_price', label: '추가로 살 가격 (원)', type: 'number', min: 0, step: 1 },
       { name: 'buy_qty', label: '추가로 살 수량 (주, 평단가 계산용)', type: 'number', min: 0, step: 1 },
-      { name: 'target_price', label: '목표 평단가 (원, 수량 계산용)', type: 'number', min: 0, step: 1 },
+      { name: 'target_price', label: '목표 평단가 (원, 수량 계산용)', type: 'number', min: 0, step: 0.01 },
       {
         name: 'market', label: '팔 시장 (본전 매도가 계산용)', type: 'select', default: 'kospi',
         options: [
@@ -57,7 +57,11 @@
         const exact = (Q * (A - T)) / (T - P);
         // 부동소수점 오차로 100.0000001 이 101 이 되지 않게 아주 작은 값은 버림
         n = Math.ceil(exact - 1e-9);
-        rows.push(['필요한 추가 수량', `${n.toLocaleString('ko-KR')}주 (계산값 ${r2(exact).toLocaleString('ko-KR')}주를 올림)`]);
+        // 계산값은 넷째 자리까지 (r2 로 보이면 50.000375 가 '50주를 올림 → 51주'처럼 말이 안 맞음)
+        const shown = exact.toLocaleString('ko-KR', { maximumFractionDigits: 4 });
+        const how = Math.abs(n - exact) < 1e-9 ? `계산값 ${shown}주 그대로` : `계산값 ${shown}주를 올림`;
+        rows.push(['필요한 추가 수량', `${n.toLocaleString('ko-KR')}주 (${how})`]);
+        notes.push('필요한 수량은 목표 평단가에 닿는 가장 적은 주식 수예요. 그래서 새 평단가가 목표를 조금 지나칠 수 있어요 (싸게 더 사면 목표보다 조금 낮게, 비싸게 더 사면 조금 높게).');
         rows.push(['추가 매수 금액', u.won(P * n)]);
       } else {
         n = Number(v.buy_qty);

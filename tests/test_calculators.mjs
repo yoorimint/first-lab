@@ -48,6 +48,17 @@ for (const id of ids) {
     fail(id, `기준선 사례("boundary": true)가 ${MIN_BOUNDARY}개 이상 필요함 — 공제액·합격 점수·면세점·세율 구간·상한/하한에 딱 맞는 값과 바로 아래/위 값을, 계산기 말고 법령대로 손으로 계산해 넣기`);
   }
 
+  // 사례에 소수를 넣는 칸은 소수점 있는 자판이어야 함 (step 이 정수면 휴대폰 숫자 자판에 소수점이 없어 평단가 9,333.33 을 못 넣음, 11/5)
+  const inputsByName = Object.fromEntries(def.inputs.map((input) => [input.name, input]));
+  for (const c of cases || []) {
+    for (const [name, value] of Object.entries(c.input || {})) {
+      const input = inputsByName[name];
+      if (input && input.type === 'number' && typeof value === 'number' && !Number.isInteger(value) && util.inputMode(input) !== 'decimal') {
+        fail(id, `'${name}' 칸에 소수(${value})를 넣는 사례가 있는데 step 이 정수라 소수점 없는 자판이 뜸 — step 을 0.01 처럼 소수로`);
+      }
+    }
+  }
+
   for (const [i, c] of (cases || []).entries()) {
     let out;
     try {

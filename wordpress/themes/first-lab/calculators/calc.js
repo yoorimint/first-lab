@@ -20,6 +20,8 @@
 
   const util = {
     InputError,
+    /** 숫자 칸 자판: 소수를 넣는 칸(step 이 소수·'any')은 'decimal'. 'numeric' 은 iOS 자판에 소수점이 없어 9,333.33·0.015 를 못 넣음 (11/5) */
+    inputMode: (input) => (input.step !== undefined && !Number.isInteger(Number(input.step)) ? 'decimal' : 'numeric'),
     /** 금액 → "23,000원" */
     won: (n) => Math.round(n).toLocaleString('ko-KR') + '원',
     /** 'YYYY-MM-DD' → 그날 0시(UTC) 밀리초. 형식이 틀리거나 없는 날짜면 null */
@@ -75,7 +77,7 @@
       control.value = input.default || input.options[0][0];
     } else {
       const type = input.type === 'date' ? 'date' : 'number';
-      control = el('input', { id, name: input.name, type, min: input.min, step: input.step, inputmode: type === 'number' ? 'numeric' : null });
+      control = el('input', { id, name: input.name, type, min: input.min, step: input.step, inputmode: type === 'number' ? util.inputMode(input) : null });
       control.value = input.default === 'today' ? util.todayIso() : (input.default ?? '');
     }
     return el('div', { class: 'firstlab-calc__field' },

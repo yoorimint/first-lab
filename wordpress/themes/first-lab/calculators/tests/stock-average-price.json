@@ -201,5 +201,109 @@
       "n": 34,
       "breakeven": 10529
     }
+  },
+  {
+    "why": "목표 8,001원(매수가 바로 위): 100×1,999÷1 = 정확히 199,900주",
+    "boundary": true,
+    "input": {
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 0,
+      "market": "kospi",
+      "fee": 0,
+      "mode": "target",
+      "target_price": 8001
+    },
+    "expect": {
+      "n": 199900,
+      "qty": 200000,
+      "cost": 1600200000,
+      "avg": 8001,
+      "breakeven": 8018
+    }
+  },
+  {
+    "why": "목표 9,999원(평단가 바로 아래): 100×1÷1,999 = 0.05 → 1주",
+    "boundary": true,
+    "input": {
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 0,
+      "market": "kospi",
+      "fee": 0,
+      "mode": "target",
+      "target_price": 9999
+    },
+    "expect": {
+      "n": 1,
+      "qty": 101,
+      "cost": 1008000,
+      "avg": 9980.2,
+      "breakeven": 10001
+    }
+  },
+  {
+    "why": "목표 9,333.33원: 100×666.67÷1,333.33 = 50.000375 → 51주 (50주면 목표에 못 닿음)",
+    "boundary": true,
+    "input": {
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 0,
+      "market": "kospi",
+      "fee": 0,
+      "mode": "target",
+      "target_price": 9333.33
+    },
+    "expect": {
+      "n": 51,
+      "qty": 151,
+      "cost": 1408000,
+      "avg": 9324.5,
+      "breakeven": 9344
+    }
+  },
+  {
+    "why": "소수 평단가 9,333.33원 150주, 목표 9,000원: 150×333.33÷1,000 = 49.9995 → 50주",
+    "boundary": true,
+    "input": {
+      "held_price": 9333.33,
+      "held_qty": 150,
+      "buy_price": 8000,
+      "buy_qty": 0,
+      "market": "kospi",
+      "fee": 0,
+      "mode": "target",
+      "target_price": 9000
+    },
+    "expect": {
+      "n": 50,
+      "qty": 200,
+      "cost": 1800000,
+      "avg": 9000,
+      "breakeven": 9019
+    }
+  },
+  {
+    "why": "추가 매수가 = 평단가: 평단가 그대로 10,000원",
+    "boundary": true,
+    "input": {
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 10000,
+      "buy_qty": 50,
+      "market": "kospi",
+      "fee": 0,
+      "mode": "add"
+    },
+    "expect": {
+      "n": 50,
+      "qty": 150,
+      "cost": 1500000,
+      "avg": 10000,
+      "breakeven": 10021
+    }
   }
 ]
