@@ -1267,6 +1267,7 @@ class PreventionRequiredTest(unittest.TestCase):
     def test_unknown_check_blocked(self):
         self.assertTrue(any("못 찾음" in e for e in self.errs(prevention="check:없는검사")))
         self.assertTrue(any("못 찾음" in e for e in self.errs(prevention="check:a")))   # 아무 글자나 이름으로 못 씀
+        self.assertTrue(any("못 찾음" in e for e in self.errs(prevention="check:title_has_keyword")))  # 검사 모듈 밖 함수 (11/5 #847)
 
     def test_named_gate_must_fire_on_original(self):
         self.assertEqual(self.errs(prevention="check:lead_vs_body"), [])

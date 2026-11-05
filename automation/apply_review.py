@@ -6,7 +6,7 @@
 사용: python3 automation/apply_review.py <글번호> "<제목>" [패치목록.json]
   패치목록.json: [{"type", "why", "find", "replace_paragraph" | "remove_element", "tag", "prevention"} 또는 {"type", "why", "set_title" | "set_excerpt", "prevention"}]
   prevention (필수, 11/5 운영자 '하나라도 수정했으면 다음부터 그런 오류가 안 생기게 해야지'): 재발 방지 없이는 고치지 않는다.
-    "check:<함수·테스트 이름>"  이 오류를 다음부터 막는 코드 검사 (저장소에 있어야 함 — condition_gate 의 검사는 고치기 전 글에 실제로 걸려야 통과)
+    "check:<함수 이름>"  이 오류를 다음부터 막는 코드 검사 (CHECK_MODULES 안의 함수여야 함 — condition_gate 의 검사는 고치기 전 글에 실제로 걸려야 통과)
     "review_only:<이유>"        코드로 못 막는 사실 오류(공식 값과 다름 등) — 이유를 남기고 automation/review-only-log.md 에 쌓임 (같은 꼴이 쌓이면 검사로 옮김)
   패치가 없으면(오류 0) 파일 없이 실행 → 검수 완료만 기록.
   본문은 /tmp/firstlab-review/post-<글번호>.json (automation/unreviewed.py 가 받아 둔 것) 과 대조한다.
@@ -48,6 +48,7 @@ def verified_numbers(post: dict) -> list[str]:
 
 
 PREVENTION_LOG = ROOT / "automation" / "review-only-log.md"
+CHECK_MODULES = ("condition_gate.py", "review_gate.py", "source_check.py", "writer.py", "freshness.py")  # 글을 막거나 표시하는 검사가 있는 곳
 
 
 def _prevention_problem(post: dict, p: dict) -> str | None:
@@ -59,7 +60,8 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
         return None if len(prev) >= len("review_only:") + 10 else "review_only 이유가 너무 짧음 (왜 코드로 못 막는지)"
     if prev.startswith("check:"):
         name = prev[len("check:"):].strip()
-        code = "".join(f.read_text(encoding="utf-8") for f in list((ROOT / "bot").glob("*.py")) + list((ROOT / "tests").glob("*.py")))
+        # 검사 모듈의 함수만 (11/5 #847: 감시 세션이 상관없는 refresh.title_has_keyword 를 적어 통과 — 이름만 맞으면 되던 구멍)
+        code = "".join((ROOT / "bot" / f).read_text(encoding="utf-8") for f in CHECK_MODULES)
         if not re.fullmatch(r"\w+", name) or not re.search(rf"\b(def|class) {name}\b", code):
             return f"check:{name} 를 저장소 코드·테스트에서 못 찾음 — 검사를 먼저 만들기"
         from bot import condition_gate
