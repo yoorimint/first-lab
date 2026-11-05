@@ -70,6 +70,17 @@ def law_key(url: str) -> str | None:
     return None
 
 
+def title_of(text: str) -> str:
+    """법령 본문 머리의 이름 ('… 고용보험법 [시행 2026. 9. 18.]' → '고용보험법')."""
+    m = re.search(r"([가-힣·ㆍ ]{2,40}?)\s*\[시행", text[:600])
+    words = m.group(1).split() if m else []
+    if not words:
+        return ""
+    if words[-1] in ("시행령", "시행규칙") and len(words) >= 2:  # '법인세법 시행령'
+        return f"{words[-2]} {words[-1]}"
+    return words[-1]
+
+
 def effective_dates(text: str) -> list[tuple[dt.date, list[str]]]:
     """(시행일, 그 시행일에 바뀌는 조문들 — 모르면 빈 목록)."""
     out = []
@@ -78,13 +89,14 @@ def effective_dates(text: str) -> list[tuple[dt.date, list[str]]]:
             when = dt.date(int(y), int(m), int(d))
         except ValueError:
             continue
+        ctx = re.sub(r"제1조\s*\(\s*시행일\s*\)", "", ctx)  # 부칙 '제1조(시행일)' 은 바뀌는 조문이 아님
         out.append((when, sorted(set(re.findall(r"제\d+조(?:의\d+)?", ctx)))))
     return out
 
 
 def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch) -> tuple[list[dict], list[dict]]:
     """(앞으로 시행될 개정, 막 시행된 개정)."""
-    upcoming, just = [], []
+    upcoming, just, seen = [], [], set()
     bases = sorted(laws)[:MAX_LAWS]
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         texts = dict(zip(bases, pool.map(fetcher, bases)))
@@ -92,14 +104,17 @@ def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch) 
         text = texts.get(base)
         if not text:
             continue
-        seen = set()
+        name = title_of(text) or law_name(base)
         for when, articles in effective_dates(text):
-            key = (when, tuple(articles))
-            if key in seen:
+            key = (name, when, tuple(articles))
+            if key in seen:  # 같은 법을 다른 주소로 적은 경우 한 번만
+                for item in upcoming + just:
+                    if (item["law"], item["date"], tuple(item["articles"])) == (name, f"{when:%Y-%m-%d}", tuple(articles)):
+                        item["posts"] = sorted(set(item["posts"]) | laws[base])[:10]
                 continue
             seen.add(key)
-            item = {"law": law_name(base), "url": base, "date": f"{when:%Y-%m-%d}", "articles": articles,
-                    "posts": sorted(laws[base])[:10], "key": f"{law_name(base)}|{when:%Y-%m-%d}"}
+            item = {"law": name, "url": base, "date": f"{when:%Y-%m-%d}", "articles": articles,
+                    "posts": sorted(p for p in laws[base] if p)[:10], "key": f"{name}|{when:%Y-%m-%d}"}
             if today < when <= today + dt.timedelta(days=LOOKAHEAD_DAYS):
                 upcoming.append(item)
             elif today - dt.timedelta(days=JUST_DAYS) <= when <= today:

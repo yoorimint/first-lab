@@ -1279,6 +1279,19 @@ class LawWatchTest(unittest.TestCase):
         self.assertEqual(upcoming[0]["key"], "고용보험법|2027-01-01")
         self.assertEqual(upcoming[0]["posts"], ["실업급여신청절차"])
 
+    def test_names_and_dedupe_across_urls(self):
+        import datetime as dt
+        from bot import law_watch
+        text = ("판례 연혁 고용보험법 [시행 2026. 9. 18.] ... 부칙 제1조(시행일) 이 법은 2027년 1월 1일부터 시행한다. "
+                "다만, 제46조의 개정규정은 2027년 3월 1일부터 시행한다.")
+        laws = {"https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=1": {"a"}, "https://www.law.go.kr/법령/고용보험법": {"b"}}
+        upcoming, _ = law_watch.scan(laws, dt.date(2026, 11, 5), fetcher=lambda u: text)
+        self.assertEqual([(u["law"], u["date"], u["articles"]) for u in upcoming],
+                         [("고용보험법", "2027-01-01", []), ("고용보험법", "2027-03-01", ["제46조"])])
+        self.assertEqual(upcoming[0]["posts"], ["a", "b"])  # 두 주소의 글을 합침
+        self.assertEqual(law_watch.title_of(" [시행 2026. 1. 1.]"), "")  # 이름 자리가 빈 페이지
+        self.assertEqual(law_watch.title_of("판례 연혁 법인세법 시행령 [시행 2026. 1. 1.]"), "법인세법 시행령")
+
     def test_law_key_dedupes(self):
         from bot.law_watch import law_key
         self.assertEqual(law_key("https://www.law.go.kr/법령/고용보험법/제46조"), law_key("https://www.law.go.kr/법령/고용보험법"))
