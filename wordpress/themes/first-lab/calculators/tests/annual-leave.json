@@ -1,0 +1,203 @@
+[
+  {
+    "why": "1년 계약직: 2025-01-01 입사, 2025-12-31 계약 만료 → 1개월 개근마다 1일, 11일만 (대법원 2021다227100·법제처 24-0674: 15일은 1년 근로를 마친 다음 날 발생)",
+    "input": {
+      "start": "2025-01-01",
+      "base": "2025-12-31"
+    },
+    "expect": {
+      "months": 11,
+      "years": 0,
+      "monthly": 11,
+      "current": 0,
+      "total": 11,
+      "next_date": "2026-01-01",
+      "next_days": 15
+    },
+    "boundary": true
+  },
+  {
+    "why": "1년 다음 날(366일째)까지 재직 → 11일 + 15일 = 26일 (제60조①②)",
+    "input": {
+      "start": "2025-01-01",
+      "base": "2026-01-01"
+    },
+    "expect": {
+      "months": 12,
+      "years": 1,
+      "monthly": 11,
+      "current": 15,
+      "total": 26,
+      "next_date": "2027-01-01",
+      "next_days": 15
+    },
+    "boundary": true
+  },
+  {
+    "why": "입사 한 달이 차기 전날(1/31): 첫 1일은 2/1 발생이라 0일",
+    "input": {
+      "start": "2025-01-01",
+      "base": "2025-01-31"
+    },
+    "expect": {
+      "months": 0,
+      "years": 0,
+      "monthly": 0,
+      "current": 0,
+      "total": 0,
+      "next_date": "2025-02-01",
+      "next_days": 1
+    },
+    "boundary": true
+  },
+  {
+    "why": "한 달을 채운 다음 날(2/1): 1일 (제60조②)",
+    "input": {
+      "start": "2025-01-01",
+      "base": "2025-02-01"
+    },
+    "expect": {
+      "months": 1,
+      "years": 0,
+      "monthly": 1,
+      "current": 0,
+      "total": 1,
+      "next_date": "2025-03-01",
+      "next_days": 1
+    },
+    "boundary": true
+  },
+  {
+    "why": "근속 6년: 15+15+16+16+17+17 = 96일 + 1년 미만 11일 = 107일, 7년째 18일 (제60조④ 매 2년 1일)",
+    "input": {
+      "start": "2020-03-02",
+      "base": "2026-11-05"
+    },
+    "expect": {
+      "months": 80,
+      "years": 6,
+      "monthly": 11,
+      "current": 17,
+      "total": 107,
+      "next_date": "2027-03-02",
+      "next_days": 18
+    }
+  },
+  {
+    "why": "근속 2년 11개월: 3년째 16일이 처음 가산 (제60조④ 3년 이상)",
+    "input": {
+      "start": "2023-11-06",
+      "base": "2026-11-05"
+    },
+    "expect": {
+      "months": 35,
+      "years": 2,
+      "monthly": 11,
+      "current": 15,
+      "total": 41,
+      "next_date": "2026-11-06",
+      "next_days": 16
+    },
+    "boundary": true
+  },
+  {
+    "why": "근속 3년 딱: 16일",
+    "input": {
+      "start": "2023-11-05",
+      "base": "2026-11-05"
+    },
+    "expect": {
+      "months": 36,
+      "years": 3,
+      "monthly": 11,
+      "current": 16,
+      "total": 57,
+      "next_date": "2027-11-05",
+      "next_days": 16
+    },
+    "boundary": true
+  },
+  {
+    "why": "근속 19년 11개월(20년 되기 하루 전): 19년째 연차 15+9=24일, 20년째도 24일",
+    "input": {
+      "start": "2006-01-03",
+      "base": "2026-01-02"
+    },
+    "expect": {
+      "months": 239,
+      "years": 19,
+      "monthly": 11,
+      "current": 24,
+      "total": 377,
+      "next_date": "2026-01-03",
+      "next_days": 24
+    },
+    "boundary": true
+  },
+  {
+    "why": "근속 21년: 25일 한도 (제60조④)",
+    "input": {
+      "start": "2005-01-03",
+      "base": "2026-01-03"
+    },
+    "expect": {
+      "months": 252,
+      "years": 21,
+      "monthly": 11,
+      "current": 25,
+      "total": 426,
+      "next_date": "2027-01-03",
+      "next_days": 25
+    },
+    "boundary": true
+  },
+  {
+    "why": "1/31 입사: 2월에 31일이 없어 2/29 만료 → 첫 1일은 3/1 (민법 제160조③)",
+    "input": {
+      "start": "2024-01-31",
+      "base": "2024-02-29"
+    },
+    "expect": {
+      "months": 0,
+      "years": 0,
+      "monthly": 0,
+      "current": 0,
+      "total": 0,
+      "next_date": "2024-03-01",
+      "next_days": 1
+    },
+    "boundary": true
+  },
+  {
+    "why": "1/31 입사, 3/1 기준 → 1일",
+    "input": {
+      "start": "2024-01-31",
+      "base": "2024-03-01"
+    },
+    "expect": {
+      "months": 1,
+      "years": 0,
+      "monthly": 1,
+      "current": 0,
+      "total": 1,
+      "next_date": "2024-03-31",
+      "next_days": 1
+    }
+  },
+  {
+    "why": "기준일이 입사일보다 앞이면 안내 문장",
+    "input": {
+      "start": "2026-01-01",
+      "base": "2025-12-31"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "입사일 빈칸은 안내 문장",
+    "input": {
+      "start": "",
+      "base": "2026-11-05"
+    },
+    "expect_error": true
+  }
+]

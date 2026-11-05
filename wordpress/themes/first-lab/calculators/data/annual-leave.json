@@ -1,0 +1,11 @@
+{
+  "basis_date": "2026-11-05",
+  "sources": [
+    {"name": "근로기준법 제60조·제61조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
+    {"name": "민법 제160조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/민법"},
+    {"name": "법제처 법령해석 24-0674 (연차휴가 발생 시점)", "url": "https://opinion.lawmaking.go.kr/nl4li/lsItptEmp/444315?mode=ltst"}
+  ],
+  "base_days": 15,
+  "max_days": 25,
+  "first_year_max": 11
+}
