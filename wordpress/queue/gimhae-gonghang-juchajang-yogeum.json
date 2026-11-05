@@ -1,0 +1,407 @@
+{
+ "title": "김해공항 주차장 요금: 10분 300원, 월~목 하루 최대 10,000원",
+ "excerpt": "김해공항 주차장 요금은 기본 30분 900원, 10분마다 300원. 24시간 최대 P1·P2 10,000원(금~일·공휴일 15,000원), P3 7,000원(금~일·공휴일 10,000원), 경차 50% 할인.",
+ "content_html": "<p>김해공항 주차장 요금은 소형차 기준 <strong>기본 30분 900원, 이후 10분마다 300원</strong>이에요. 오래 세워도 24시간마다 최대요금에서 멈추는데, P1·P2 여객주차장은 월~목 <strong>10,000원</strong>, 금~일·법정공휴일 <strong>15,000원</strong>이고 P3 여객(화물)주차장은 월~목 <strong>7,000원</strong>, 금~일·법정공휴일 <strong>10,000원</strong>이에요. 여행 날짜가 주말에 걸리느냐, P3를 쓰느냐에 따라 3박 4일 요금이 1만 원 넘게 차이 나요.</p>\n\n<h2>김해공항 주차요금표 (P1·P2 / P3)</h2>\n<p>기본·추가 요금은 두 주차장이 같고, 24시간 최대요금만 달라요.</p>\n<table>\n<thead><tr><th>구분</th><th>기본·추가</th><th>P1·P2 최대 (월~목 / 금~일)</th><th>P3 최대 (월~목 / 금~일)</th></tr></thead>\n<tbody>\n<tr><td>소형</td><td>30분 900원, 10분 300원</td><td>10,000원 / 15,000원</td><td>7,000원 / 10,000원</td></tr>\n<tr><td>대형</td><td>30분 1,200원, 10분 400원</td><td>9,000원 / 13,000원</td><td>5,000원 / 7,000원</td></tr>\n</tbody>\n</table>\n<p>소형은 승용차 전부와 15인승 이하 승합차, 최대적재량 1톤·총중량 3.5톤 이하 화물차예요. 16인승 이상 승합차와 그보다 큰 화물차·특수차는 대형이에요. 24시간이 지나면 같은 요금을 처음부터 다시 적용해요.</p>\n\n<h2>요일은 '24시간 구간이 시작하는 날' 기준</h2>\n<p>요금은 입차 시간 기준으로 24시간씩 끊어서 매겨요. 목요일 10시에 들어가 금요일 12시에 나오면 목요일 구간 10,000원에 금요일 10시부터 2시간 3,600원이 붙어 13,600원이에요. 금요일에 들어가면 첫 구간부터 금~일 요금이라, 첫 구간 최대요금이 월~목에 시작할 때보다 높아요.</p>\n\n<h2>여행 기간별 계산 예시 (소형, 할인 없음)</h2>\n<table>\n<thead><tr><th>주차 기간</th><th>P1·P2</th><th>P3</th></tr></thead>\n<tbody>\n<tr><td>1시간 (마중·배웅)</td><td>1,800원</td><td>1,800원</td></tr>\n<tr><td>월 08:00 ~ 수 20:00 (2박 3일)</td><td>30,000원</td><td>21,000원</td></tr>\n<tr><td>목 07:00 ~ 일 22:00 (3박 4일)</td><td>55,000원</td><td>37,000원</td></tr>\n</tbody>\n</table>\n<p>3박 4일 P1·P2는 목요일 구간 10,000원, 금·토요일 구간 15,000원씩, 일요일 07시부터 15시간 구간 15,000원(최대요금)을 더한 값이에요. 같은 일정을 P3에 세우면 7,000원 + 10,000원 × 3 = 37,000원이라 18,000원 덜 내요.</p>\n<p>[firstlab_calc id=\"gimhae-airport-parking\"]</p>\n\n<h2>무료 시간과 정산</h2>\n<ul>\n<li>P1·P2는 입차 후 10분, P3는 20분 안에 나가면 주차요금이 없어요.</li>\n<li>청사 1층 출입문이나 주차장 안 무인정산기에서 차량번호를 넣고 현금·신용카드로 낼 수 있어요. 정산 후 30분 안에 나가지 않으면 추가요금이 붙어요.</li>\n<li>P3에 세웠다면 P3 무인정산기나 출구 정산기에서만 정산돼요. 국내선·국제선 청사 정산기로는 안 돼요.</li>\n<li>무인정산기에서 현금을 낼 때 10원·50원 동전은 쓸 수 없어요.</li>\n<li>세 주차장 모두 하이패스로 낼 수 있지만, 요금이 5만 원 이상이면 하이패스 결제가 안 돼요. 할인 뒤 5만 원 미만이면 가능해요. 3박 4일 P1·P2(55,000원)처럼 길게 세우면 카드를 준비해 두세요.</li>\n</ul>\n\n<h2>할인 대상 (50%·20%)</h2>\n<table>\n<thead><tr><th>대상</th><th>할인율</th><th>현장 할인</th></tr></thead>\n<tbody>\n<tr><td>경차</td><td>50%</td><td>행정정보 자동 확인</td></tr>\n<tr><td>저공해 1·2종 / 3종</td><td>50% / 20%</td><td>행정정보 자동 확인</td></tr>\n<tr><td>장애인 등록차량·상이 국가유공자 등</td><td>50%</td><td>행정정보 자동 확인</td></tr>\n<tr><td>다자녀 (2자녀 이상, 막내 만 18세 이하)</td><td>50%</td><td>홈페이지 사전 등록 차량만</td></tr>\n<tr><td>장애인 대리인 차량</td><td>50%</td><td>불가 (사후할인)</td></tr>\n</tbody>\n</table>\n<p>경유차는 2020년 4월 3일부터 저공해차에서 빠졌어요. 할인 사유가 두 개 이상이면 유리한 하나만 적용돼요. 3박 4일 P1·P2 예시를 경차로 세우면 27,500원이에요.</p>\n<p>출차할 때 할인을 못 받았다면 출차 후 30일 안에 사후할인 신청 페이지에 서류를 올리면 할인 금액만큼 돌려받아요(다자녀는 다자녀할인 등록 홈페이지에서 사후감면 신청). 경차는 차량등록증 사본, 장애인·국가유공자는 복지카드·유공자증·고속도로통행료감면카드 중 1개 사본과 장애인표지 사진이 필요하고, 영수증(분실 시 카드 결제 내역)도 함께 올려요.</p>\n\n<h2>주차장 고르는 법</h2>\n<p>P1 여객주차장은 약 2,005대, P2는 약 2,453대로 청사 바로 앞이고, P3 여객(화물)주차장은 약 878대예요. P3와 국제선·국내선 청사 사이는 무료 순환버스가 오전 5시부터 오후 10시 50분까지 10분 간격으로 다녀요. 다만 P3는 주말·성수기에 이용객이 몰려 만차가 될 수 있고, P3가 차서 P1·P2에 세우면 P1·P2 요금을 내요. 해외로 나간다면 <a href=\"https://first-lab.kr/유럽여행준비물리스트/\">유럽 여행 준비물 리스트</a>와 함께 주차 계획도 미리 세워 두면 좋아요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>장애인 차량은 만차여도 들어갈 수 있나요?</h3>\n<p>일반 주차면이 차서 입차를 막을 때도 장애인 주차면에 여유가 있으면 주차안내요원 확인 뒤 장애인 차량은 먼저 들어갈 수 있어요.</p>\n<h3>다자녀 기준이 바뀌었다던데요?</h3>\n<p>2024년 12월 5일부터 '막내 만 15세 이하'에서 '막내 만 18세 이하'로 넓어졌어요. 다자녀 할인 등록 홈페이지에서 미리 승인받아야 현장 할인이 되고, 못 했으면 같은 홈페이지에서 사후감면을 신청해요.</p>\n<h3>주차 문의는 어디로 하나요?</h3>\n<p>한국공항공사 고객만족센터 1661-2626이나 김해공항 주차지원센터 051-974-3718로 하면 돼요.</p>",
+ "tags": [
+  "김해공항 주차장",
+  "김해공항 주차요금",
+  "공항 주차"
+ ],
+ "category": "여행",
+ "images": [
+  {
+   "prompt": "a wide view of a large open-air airport parking lot with rows of cars under a clear sky, airplane taking off in the distance",
+   "alt": "비행기가 이륙하는 공항 옆 넓은 야외 주차장"
+  }
+ ],
+ "keyword": "김해공항주차장요금",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "제목: 김해공항 주차장 요금 10분 300원, 월~목 하루 최대 10,000원 (P1·P2 소형)",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요약: 24시간 최대 P1·P2 10,000원(금~일·공휴일 15,000원), P3 7,000원(금~일·공휴일 10,000원), 경차 50% 할인",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "소형 기본 30분 900원, 이후 10분마다 300원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "24시간마다 최대요금에서 멈춤, 24시간 지나면 같은 요금 반복 적용",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P1·P2 소형 최대 월~목 10,000원, 금~일·법정공휴일 15,000원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P3 소형 최대 월~목 7,000원, 금~일·법정공휴일 10,000원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주말 포함 여부·P3 이용에 따라 3박 4일 요금이 1만 원 넘게 차이",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기본·추가 요금은 P1·P2와 P3가 같고 최대요금만 다름",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대형 기본 30분 1,200원, 10분 400원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대형 P1·P2 최대 9,000원 / 13,000원, P3 5,000원 / 7,000원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소형 = 승용차 전부, 15인승 이하 승합차, 최대적재량 1톤·총중량 3.5톤 이하 화물차",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대형 = 16인승 이상 승합차, 그보다 큰 화물차·특수차",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요금은 입차시간 기준 24시간 구간, 구간이 시작하는 날 요일 요금",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "목 10시 입차 금 12시 출차 = 10,000원 + 3,600원 = 13,600원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금요일에 들어가면 첫 구간부터 금~일 요금이라 월~목 시작보다 최대요금이 높음",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "1시간 1,800원 (P1·P2, P3)",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "월 08:00~수 20:00 P1·P2 30,000원, P3 21,000원",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "목 07:00~일 22:00 P1·P2 55,000원, P3 37,000원 (10,000+15,000+15,000+15,000 / 7,000+10,000×3), 18,000원 차이",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P1·P2 입차 후 10분, P3 20분 이내 출차 무료",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2",
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "청사 1층 출입문·주차장 내 무인정산기에서 차량번호 입력 후 현금·신용카드 정산",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "정산 후 30분 이내 출차 못 하면 추가요금",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P3는 P3 무인정산기나 출구 정산기에서만 정산, 청사 정산기 불가",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "무인정산기 현금 결제 시 10원·50원 동전 사용 불가",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P1·P2·P3 하이패스 결제 가능",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5만 원 이상 하이패스 불가, 할인 후 5만 원 미만이면 가능 (55,000원 사례)",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "경차 50%, 행정정보 자동 확인",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "저공해 1·2종 50%, 3종 20%, 행정정보 자동 확인",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "장애인 등록차량·상이 국가유공자 등 50%, 행정정보 자동 확인",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "다자녀(2자녀 이상, 막내 만 18세 이하) 50%, 홈페이지 사전 등록 차량만 현장 할인",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "장애인 대리인 차량 50%, 현장 할인 불가(사후할인)",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "경유차는 2020년 4월 3일부터 저공해차 제외",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "할인 사유 2개 이상이면 유리한 1개만 적용",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3박 4일 P1·P2 경차 27,500원 (55,000원 × 50%)",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "출차 후 30일 이내 사후할인 신청 페이지에 서류 올리면 할인 금액 환불, 다자녀는 다자녀할인 등록 홈페이지에서 사후감면",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "경차 사후할인 서류: 차량등록증 사본",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "장애인·국가유공자: 복지카드·유공자증·고속도로통행료감면카드 중 1개 사본 + 장애인표지 사진",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "사후할인 영수증 첨부 필수, 분실 시 카드 결제 내역",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P1 약 2,005대, P2 약 2,453대, P3 약 878대",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P1·P2는 여객청사 주차장",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P3와 국제선·국내선 청사 무료 순환버스 05:00~22:50, 10분 간격",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "P3는 주말·성수기에 만차가 될 수 있음",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "P3 만차로 P1·P2 이용 시 P1·P2 요금 적용",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만차 입차 통제 때도 장애인 주차면 여유 있으면 확인 후 장애인 차량 우선 입차",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2024년 12월 5일부터 다자녀 기준 막내 만 15세 이하 → 만 18세 이하",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "다자녀는 등록 홈페이지 사전 승인해야 현장 할인, 못 했으면 같은 홈페이지에서 사후감면",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "고객만족센터 1661-2626, 주차지원센터 051-974-3718",
+   "urls": [
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2",
+    "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "한국공항공사 김해국제공항 주차요금 안내",
+   "url": "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"
+  },
+  {
+   "name": "한국공항공사 김해국제공항 주차장 안내",
+   "url": "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"
+  }
+ ]
+}
