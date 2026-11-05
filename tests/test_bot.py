@@ -1057,5 +1057,21 @@ class StateMergeTest(unittest.TestCase):
         self.assertEqual([e["msg"] for e in saved["log"]], ["사진 채우기", "직접 작성 글: 증여세", "연속 작성 41번째"])
         self.assertEqual(saved["used_keywords"], ["a", "b"])
 
+
+class LawTextTest(unittest.TestCase):
+    """11/5 #537: 법령에 그대로 있는 내용이 검수자가 law.go.kr 을 못 열어 확인불가 → 조문 꺼내기 도구."""
+
+    def test_prints_article_and_exceptions(self):
+        import io
+        from contextlib import redirect_stdout
+        from bot import lawtext
+        body = "제20조(살처분 명령) ④ 시장ㆍ군수ㆍ구청장은 광견병 예방주사를 맞지 아니한 개가 배회하면 억류할 수 있다. 다만, 소유자가 있으면 그러하지 아니하다. 제21조(도태) ① 권고한다."
+        out = io.StringIO()
+        with mock.patch.object(lawtext, "law_body", return_value=body), redirect_stdout(out):
+            self.assertEqual(lawtext.main(["x", "가축전염병예방법", "제20조"]), 0)
+        self.assertIn("배회하면 억류", out.getvalue())
+        self.assertIn("[예외·단서]", out.getvalue())
+        self.assertNotIn("도태", out.getvalue())
+
 if __name__ == "__main__":
     unittest.main()
