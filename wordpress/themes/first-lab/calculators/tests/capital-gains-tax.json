@@ -1,0 +1,256 @@
+[
+  {
+    "why": "1세대1주택 15억(취득 7억·경비 3천만) 10년 보유·10년 거주: 과세 양도차익 7.7억×3억/15억=1.54억(시행령 제160조), 장특공 40%+40%=80%(소득세법 제95조 표2), 과세표준 3,080만-250만=2,830만, 2,830만×15%-126만=298만 5천 원, 지방세 10%",
+    "input": {
+      "asset": "house",
+      "status": "one",
+      "expense": 30000000,
+      "live": 10,
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "hold": 10
+    },
+    "expect": {
+      "taxable_gain": 154000000,
+      "lthd_pct": 80,
+      "lthd": 123200000,
+      "base": 28300000,
+      "rate": 15,
+      "tax": 2985000,
+      "local": 298500,
+      "total": 3283500
+    }
+  },
+  {
+    "why": "같은 집 거주 0년: 표2 대신 표1(10년 20%) — 1.54억×20%=3,080만, 과세표준 1억 2,070만×35%-1,544만=2,680만 5천 원",
+    "input": {
+      "asset": "house",
+      "status": "one",
+      "expense": 30000000,
+      "live": 0,
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "hold": 10
+    },
+    "expect": {
+      "lthd_pct": 20,
+      "lthd": 30800000,
+      "base": 120700000,
+      "rate": 35,
+      "tax": 26805000,
+      "total": 29485500
+    }
+  },
+  {
+    "why": "기준선: 1세대1주택 양도가액 딱 12억 원은 비과세(소득세법 제89조 '12억원을 초과하는 고가주택은 제외')",
+    "input": {
+      "asset": "house",
+      "status": "one",
+      "expense": 0,
+      "live": 5,
+      "sale": 1200000000,
+      "acquire": 500000000,
+      "hold": 5
+    },
+    "expect": {
+      "tax": 0,
+      "total": 0,
+      "exempt": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 12억 1천만 원이면 초과분만 과세 — 7.1억×1천만/12.1억=5,867,768원, 장특공 20%+20%=40%, 과세표준 1,020,661원×6%=61,239원",
+    "input": {
+      "asset": "house",
+      "status": "one",
+      "expense": 0,
+      "live": 5,
+      "sale": 1210000000,
+      "acquire": 500000000,
+      "hold": 5
+    },
+    "expect": {
+      "exempt": false,
+      "taxable_gain": 5867768,
+      "lthd_pct": 40,
+      "base": 1020661,
+      "tax": 61239
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 보유 만 2년(일반 주택)은 장특공 없음(3년 이상부터), 기본세율 — 과세표준 9,750만×35%-1,544만=1,868만 5천 원",
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "expense": 0,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 400000000,
+      "hold": 2
+    },
+    "expect": {
+      "lthd_pct": 0,
+      "base": 97500000,
+      "rate": 35,
+      "tax": 18685000
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 보유 만 3년이면 장특공 6%(표1) — 1억×6%=600만, 과세표준 9,150만×35%-1,544만=1,658만 5천 원",
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "expense": 0,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 400000000,
+      "hold": 3
+    },
+    "expect": {
+      "lthd_pct": 6,
+      "lthd": 6000000,
+      "base": 91500000,
+      "tax": 16585000
+    },
+    "boundary": true
+  },
+  {
+    "why": "주택 1년 이상 2년 미만 60%(소득세법 제104조①2): 9,750만×60%=5,850만 원",
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "expense": 0,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 400000000,
+      "hold": 1
+    },
+    "expect": {
+      "rate": 60,
+      "tax": 58500000
+    },
+    "boundary": true
+  },
+  {
+    "why": "주택 1년 미만 70%(제104조①3): 9,750만×70%=6,825만 원",
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "expense": 0,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 400000000,
+      "hold": 0
+    },
+    "expect": {
+      "rate": 70,
+      "tax": 68250000
+    }
+  },
+  {
+    "why": "조정대상지역 2주택 중과(제104조⑦): 장특공 없음, 과세표준 1억 8,750만×(38+20)%-1,994만=8,881만 원",
+    "input": {
+      "asset": "house",
+      "status": "heavy2",
+      "expense": 10000000,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 300000000,
+      "hold": 5
+    },
+    "expect": {
+      "lthd_pct": 0,
+      "base": 187500000,
+      "rate": 58,
+      "tax": 88810000,
+      "local": 8881000
+    }
+  },
+  {
+    "why": "조정대상지역 3주택 중과 +30%p: 1억 8,750만×68%-1,994만=1억 756만 원",
+    "input": {
+      "asset": "house",
+      "status": "heavy3",
+      "expense": 10000000,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 300000000,
+      "hold": 5
+    },
+    "expect": {
+      "rate": 68,
+      "tax": 107560000
+    }
+  },
+  {
+    "why": "중과 주택을 1년 보유: 중과 세액(1억 9,750만×58%-1,994만=9,461만)과 60% 세액(1억 1,850만) 중 큰 것(제104조⑦ 후단)",
+    "input": {
+      "asset": "house",
+      "status": "heavy2",
+      "expense": 0,
+      "live": 0,
+      "sale": 500000000,
+      "acquire": 300000000,
+      "hold": 1
+    },
+    "expect": {
+      "rate": 60,
+      "tax": 118500000
+    }
+  },
+  {
+    "why": "토지·상가 1년 이상 2년 미만 40%(제104조①2): 9,750만×40%=3,900만 원",
+    "input": {
+      "asset": "land",
+      "status": "general",
+      "sale": 300000000,
+      "acquire": 200000000,
+      "expense": 0,
+      "hold": 1,
+      "live": 0
+    },
+    "expect": {
+      "rate": 40,
+      "tax": 39000000
+    }
+  },
+  {
+    "why": "기준선: 과세표준 딱 1,400만 원 → 6% 84만 원 (양도차익 1,650만 − 기본공제 250만)",
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "expense": 0,
+      "live": 0,
+      "sale": 116500000,
+      "acquire": 100000000,
+      "hold": 2
+    },
+    "expect": {
+      "base": 14000000,
+      "rate": 6,
+      "tax": 840000
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 과세표준 1,400만 1원 → 15% 구간, 2,100,000-1,260,000=840,000원",
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "expense": 0,
+      "live": 0,
+      "sale": 116500001,
+      "acquire": 100000000,
+      "hold": 2
+    },
+    "expect": {
+      "base": 14000001,
+      "rate": 15,
+      "tax": 840000
+    },
+    "boundary": true
+  }
+]
