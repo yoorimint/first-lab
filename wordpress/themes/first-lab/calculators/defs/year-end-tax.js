@@ -39,10 +39,10 @@
       { name: 'salary', label: '총급여 (원)', type: 'number', min: 0, step: 10000, help: '1년 급여에서 비과세 소득(식대 등)을 뺀 금액이에요. 근로소득 원천징수영수증의 총급여 칸 값이에요.' },
       { name: 'people', label: '기본공제 인원 (본인 포함)', type: 'number', min: 1, step: 1, default: 1, help: '본인과 요건을 갖춘 배우자·부양가족 1명당 150만 원씩 빠져요.' },
       { name: 'other_deduction', label: '그 밖의 소득공제 합계 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '국민연금·건강·장기요양·고용보험료(근로자 부담분), 신용카드 소득공제, 주택자금 공제, 추가공제 등을 더한 금액' },
-      { name: 'children', label: '자녀세액공제 대상 자녀 수', type: 'number', min: 0, step: 1, default: 0, help: '2026년분은 기본공제 대상인 9세 이상 자녀·손자녀 (출산·입양 공제는 아래 세액공제 칸에 더해요)' },
+      { name: 'children', label: '자녀세액공제 대상 자녀 수', type: 'number', min: 0, step: 1, default: 0, help: '2026년분은 기본공제 대상인 9세 이상 자녀·손자녀 (2017년생은 제외). 출산·입양 공제는 아래 세액공제 칸에 더해요.' },
       { name: 'other_credit', label: '그 밖의 세액공제 합계 (원)', type: 'number', min: 0, step: 1000, default: 0, help: '연금계좌·보험료·의료비·교육비·기부금·월세 세액공제 등 (근로소득·자녀·표준세액공제는 빼고)' },
       {
-        name: 'special', label: '건강보험료 공제·특별세액공제·월세 공제', type: 'select', default: 'yes',
+        name: 'special', label: '건강·고용보험료·주택자금 소득공제, 보험료·의료비·교육비·기부금·월세 세액공제', type: 'select', default: 'yes',
         options: [['yes', '하나라도 받는다'], ['no', '하나도 안 받는다 (표준세액공제 13만 원)']],
       },
       { name: 'prepaid', label: '1년 동안 떼인 소득세 (원)', type: 'number', min: 0, step: 1000, default: 0, help: '기납부세액: 매달 월급에서 원천징수된 소득세 합계 (지방소득세는 빼고)' },
@@ -94,7 +94,7 @@
         values: { wage_deduction: wageDed, earned, deduction, base, rate, tax, wage_credit: wage, wage_limit: limit, child_credit: child, standard_credit: standard, determined, due, local, local_due: localDue, total },
         rows,
         notes: [
-          '세액공제가 산출세액보다 많으면 결정세액은 0원이에요. 남는 공제는 돌려받지 못해요.',
+          '세액공제가 산출세액보다 많으면 결정세액은 0원이고 남는 공제는 돌려받지 못해요 (기부금 세액공제 초과분은 10년 안에 이월 공제).',
           '지방소득세는 결정세액의 10%로, 떼인 소득세의 10%만큼 지방소득세도 미리 냈다고 봤어요.',
           '중도 입사·두 곳 이상 근무, 외국납부세액공제 같은 경우는 넣지 않았어요. 실제 금액은 회사가 내주는 원천징수영수증으로 확인해요.',
         ],
