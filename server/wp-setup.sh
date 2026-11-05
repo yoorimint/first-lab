@@ -148,7 +148,7 @@ wp option get timezone_string
 wp option get permalink_structure
 wp plugin list --fields=name,status --format=csv
 wp theme list --fields=name,status --format=csv
-for path in / /sitemap.xml /robots.txt /about/ /contact/ /privacy-policy/; do
+for path in / /sitemap.xml /robots.txt /about/ /contact/ /privacy-policy/ /terms/ /editorial-policy/; do
   curl -s -o /dev/null -w "$path %{http_code}\n" "https://first-lab.kr$path"
 done
 echo -e "\n워드프레스 설정 완료!"
