@@ -32,6 +32,8 @@ apply_settings_once() {
   touch "$mark" && echo "적용: $*"
 }
 apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
+# 11/5 되돌림: 운영자 승인 없이 바뀐 글 작성 시각(07:40,13:10,19:40)을 원래 값(07:40, 직전 배포 기록)으로 — 운영자 '내가 끄고 설정 새로 해야지'
+apply_settings_once 2026-11-05-direct-times-restore direct_times=07:40
 
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
