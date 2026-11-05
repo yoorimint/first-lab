@@ -382,5 +382,11 @@
       "age65": "no"
     },
     "expect_error": true
-  }
+  },
+  {"why": "국민연금법 제8조①: 18세 이상 60세 미만만 사업장가입자 — 60세 이상은 일당 25만 원·10일·1개월 이상이어도 국민연금 0원, 공제 153,878원, 손에 쥐는 2,346,122원 (11/5 외부 검수, Python 별도 계산)",
+   "input": {"wage": 250000, "days": 10, "hours": 80, "month1": "yes", "site": "general", "age60": "yes", "age65": "no"},
+   "expect": {"pension_in": false, "pension": 0, "total": 153878, "net": 2346122}, "boundary": true},
+  {"why": "건설현장 아닌 일용직 5일(월 8일 미만)·1개월 이상 → 건강보험 근로일수 기준은 공단 확인 안내",
+   "input": {"wage": 200000, "days": 5, "hours": 40, "month1": "yes", "site": "general", "age60": "no", "age65": "no"},
+   "expect": {"health_in": false}, "notes_include": ["국민건강보험공단(1577-1000)"]}
 ]

@@ -23,6 +23,10 @@
         options: [['general', '건설현장이 아닌 곳'], ['construction', '건설현장']],
       },
       {
+        name: 'age60', label: '나이', type: 'select', default: 'no',
+        options: [['no', '18세 이상 60세 미만'], ['yes', '60세 이상 (국민연금 안 냄)']],
+      },
+      {
         name: 'age65', label: '65세 이후 새로 고용됐나요', type: 'select', default: 'no',
         options: [['no', '아니요'], ['yes', '예 (실업급여 보험료 안 냄)']],
       },
@@ -54,7 +58,9 @@
 
       // 국민연금: 1개월 이상 계속 + (월 8일 이상 또는 월 60시간 이상(건설현장 제외) 또는 월 소득 고시 금액 이상)
       const month1 = v.month1 !== 'no';
-      const pensionIn = month1 && (days >= d.min_days || (v.site !== 'construction' && hours >= d.pension_min_hours) || pay >= d.pension_income_threshold);
+      // 국민연금법 제8조①: 18세 이상 60세 미만만 사업장가입자 (11/5 외부 검수: 60세 이상도 연금을 뗌)
+      const over60 = v.age60 === 'yes';
+      const pensionIn = !over60 && month1 && (days >= d.min_days || (v.site !== 'construction' && hours >= d.pension_min_hours) || pay >= d.pension_income_threshold);
       let pensionBase = 0;
       let pension = 0;
       if (pensionIn) {
@@ -79,7 +85,7 @@
         [`소득세 (하루 ${u.won(dayTax)} × ${days}일)`, u.won(incomeTax)],
         [`지방소득세 (하루 ${u.won(dayLocal)} × ${days}일)`, u.won(localTax)],
         [v.age65 === 'yes' ? '고용보험 (65세 이후 고용이라 안 냄)' : `고용보험 (× ${pct(d.employment_rate_employee_per_1000 / 10)})`, u.won(employment)],
-        [pensionIn ? `국민연금 (${u.won(pensionBase)} × ${pct(d.pension_rate_employee_per_10000 / 100)})` : '국민연금 (가입 기준 아래라 안 냄)', u.won(pension)],
+        [pensionIn ? `국민연금 (${u.won(pensionBase)} × ${pct(d.pension_rate_employee_per_10000 / 100)})` : (over60 ? '국민연금 (60세 이상이라 안 냄)' : '국민연금 (가입 기준 아래라 안 냄)'), u.won(pension)],
         [healthIn ? `건강보험 (× ${pct(d.health_rate_per_10000 / 200)})` : '건강보험 (가입 기준 아래라 안 냄)', u.won(health)],
         [healthIn ? `장기요양보험 (건강보험료 × ${(ltcRatio / 100).toFixed(2)}%)` : '장기요양보험', u.won(ltc)],
         ['공제 합계', u.won(total)],
@@ -88,6 +94,7 @@
       const notes = [];
       if (dayTax === 0) notes.push(`하루 소득세가 ${u.won(d.small_tax_floor)} 미만이면 떼지 않아요 (소액부징수). 일당 ${u.won(d.daily_deduction)} 이하면 세금이 아예 없어요.`);
       notes.push('소득세는 일당을 날마다 받는다고 보고 하루씩 계산했어요. 여러 날 치를 한 번에 받으면 소액부징수 판단이 달라질 수 있어요.');
+      if (month1 && !healthIn && v.site !== 'construction') notes.push(`건설현장이 아닌 일용직의 건강보험 근로일수 기준(월 ${d.min_days}일)은 국민건강보험공단(1577-1000)에서 확인해요 — 법령은 '1개월 이상 고용'만 정해요.`);
       if (!month1) notes.push('같은 사업장에서 1개월이 안 되면 국민연금·건강보험은 사업장에서 가입하지 않아요.');
       notes.push('국민연금·건강보험 가입 여부와 보험료는 회사가 공단에 신고한 내용으로 정해져서, 이 계산과 다를 수 있어요. 산재보험료는 회사가 전부 내요.');
       return {
