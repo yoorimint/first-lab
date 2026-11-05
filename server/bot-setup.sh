@@ -8,7 +8,7 @@ REQ="$REPO_DIR/bot/requirements.txt"
 log() { echo -e "\n==> $*"; }
 
 log "파이썬 가상환경"
-for pkg in python3-venv fonts-nanum; do  # fonts-nanum: 제목 카드 한글 글꼴
+for pkg in python3-venv fonts-nanum poppler-utils; do  # fonts-nanum: 제목 카드 한글 글꼴, poppler-utils: 근거 대조가 첨부 PDF 글자를 읽음(pdftotext)
   dpkg -s "$pkg" &>/dev/null || DEBIAN_FRONTEND=noninteractive apt-get install -y -q "$pkg"
 done
 [ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"

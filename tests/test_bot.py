@@ -2604,6 +2604,27 @@ class PageIdsTest(unittest.TestCase):
         self.assertEqual(out.stdout.strip(), "2|1")
 
 
+class AttachmentTextTest(unittest.TestCase):
+    """근거 대조가 공공기관 게시글의 첨부(hwpx·PDF) 글자도 읽음 (11/5 #808·#842 첨부에만 있는 금액이 '페이지에 없음')."""
+
+    def test_hwpx_and_links(self):
+        import io
+        import zipfile
+        from bot import source_check as sc
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as z:
+            z.writestr("Contents/section0.xml", "<hp:t>상한액 336,840원</hp:t>")
+        hwpx = buf.getvalue()
+        self.assertIn("336840", sc.doc_text(hwpx))
+        page = '<a href="/common/fileDown.do?id=1">첨부</a><a href="/other.html">x</a>'
+        seen = []
+        raw_of = lambda u: (seen.append(u), (hwpx, None, ""))[1]  # noqa: E731
+        self.assertIn("336840", sc.attachment_text(page, "https://www.moel.go.kr/news/view.do?x=1", raw_of))
+        self.assertEqual(seen, ["https://www.moel.go.kr/common/fileDown.do?id=1"])
+        self.assertEqual(sc.attachment_text(page, "https://blog.example.com/a", raw_of), "")   # 공공기관만
+        self.assertEqual(sc.doc_text(b"not a doc"), "")
+
+
 class CitedUrlsTest(unittest.TestCase):
     def test_reviewer_gets_writer_sources(self):
         """검수 파일에 글쓴이 근거 주소 + 지시문이 '확인불가 전에 열기' (11/5 #775 고시를 안 열어 확인불가 19건)."""

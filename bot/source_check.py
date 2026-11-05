@@ -68,6 +68,50 @@ def page_text(raw: bytes, charset: str | None) -> str:
     return text.replace(",", "")
 
 
+# 첨부 파일(PDF·hwpx) 글자 — 고시·공고 금액은 게시글 본문이 아니라 첨부에만 있는 경우가 많음
+# (11/5 #808 난임치료휴가 상한액 5건, #842 기준 중위소득 18건이 '페이지에 없음'으로 나옴)
+_ATTACH = re.compile(r"""href=["']([^"']*(?:fileDown|FileDown|download|Download|flDownload|atchFile|\.pdf|\.hwpx)[^"']*)["']""")
+MAX_ATTACH = 3
+
+
+def doc_text(raw: bytes) -> str:
+    """PDF(pdftotext)·hwpx(zip 안 XML) 바이트 → 글자 (쉼표 뺌). 못 읽으면 ''."""
+    import io
+    import subprocess
+    import zipfile
+    try:
+        if raw[:4] == b"%PDF":
+            out = subprocess.run(["pdftotext", "-layout", "-", "-"], input=raw, capture_output=True, timeout=60)
+            text = out.stdout.decode("utf-8", "ignore")
+        elif raw[:2] == b"PK":
+            with zipfile.ZipFile(io.BytesIO(raw)) as z:
+                parts = [z.read(n).decode("utf-8", "ignore") for n in z.namelist() if re.match(r"Contents/section\d+\.xml$", n)]
+            text = html.unescape(re.sub(r"<[^>]+>", " ", " ".join(parts)))
+        else:
+            return ""
+    except (OSError, ValueError, zipfile.BadZipFile, subprocess.SubprocessError):
+        return ""  # pdftotext 없음·깨진 파일 → 예전처럼 본문만
+    return re.sub(r"\s+", " ", text).replace(",", "")
+
+
+def attachment_text(page_html: str, page_url: str, raw_of=None) -> str:
+    """공공기관(.go.kr·.or.kr) 게시글의 첨부 링크를 MAX_ATTACH 개까지 받아 글자를 붙임."""
+    host = urllib.parse.urlparse(page_url).netloc
+    if not re.search(r"\.(go|or)\.kr$", host):
+        return ""
+    raw_of = raw_of or _raw
+    texts = []
+    from .condition_gate import _cached
+    for link in list(dict.fromkeys(_ATTACH.findall(page_html or "")))[:MAX_ATTACH]:
+        full = urllib.parse.urljoin(page_url, html.unescape(link))
+
+        def read(full=full):
+            got = raw_of(full)
+            return doc_text(got[0]) if got else ""
+        texts.append(read() if raw_of is not _raw else _cached("attach", full, read))  # 같은 날 같은 첨부는 다시 안 받음
+    return " ".join(t for t in texts if t)
+
+
 def law_body_url(shell_html: str) -> str | None:
     """law.go.kr '/법령/이름' 껍데기 페이지 → 조문 본문 주소 (lsInfoR.do + 시행일 포함 값). 11/5 확인한 방법."""
     m = re.search(r"lsiSeq=\d+[^\"'<>\s]*?efYd=\d+", html.unescape(shell_html))
@@ -112,9 +156,11 @@ def _fetch(url: str) -> str | None:
             ctype = resp.headers.get("Content-Type", "")
             if resp.status >= 400:
                 return None
+            raw = resp.read(MAX_BYTES)
             if "html" not in ctype and "text" not in ctype:
-                return ""  # PDF 등 문서: 열리긴 함(숫자 대조는 못 함, '근거 못 읽음'으로 세지 않음)
-            text = page_text(resp.read(MAX_BYTES), resp.headers.get_content_charset())
+                return doc_text(raw)  # PDF·hwpx 는 글자를 뽑아 대조 (못 읽으면 '' = 열리긴 함)
+            text = page_text(raw, resp.headers.get_content_charset())
+            text += " " + attachment_text(raw.decode(resp.headers.get_content_charset() or "utf-8", "ignore"), url)
             return text if len(re.findall(r"[가-힣]", text)) >= MIN_KOREAN else None
     except (urllib.error.URLError, TimeoutError, ValueError, ConnectionError, OSError):
         return None
