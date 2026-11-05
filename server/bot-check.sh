@@ -16,7 +16,8 @@ cd "$REPO_DIR" && python3 -m bot.keywords 다이어트 --top 5 \
 echo -e "\n==> 공공 API 점검 (키 값은 출력 안 함)"
 # 법제처 API 는 신청 때 등록한 서버 주소에서만 됨 — 이 서버가 밖으로 나갈 때 쓰는 주소 (등록값과 같아야 함)
 echo "이 서버가 나가는 주소: $(curl -s --max-time 10 https://api.ipify.org || echo 확인 실패)"
-cd "$REPO_DIR" && /opt/first-lab-venv/bin/python - <<'PY' 2>&1 | tail -3
+API_OUT=$(mktemp)
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python - <<'PY' 2>&1 | tail -4) > "$API_OUT"
 from bot import law_api, benefit_api
 body = law_api.fetch("service", "law", ID="001761") or ""
 print("법령 API:", "정상" if body else "실패 (신청 승인·등록한 서버 주소 확인)")
@@ -28,19 +29,26 @@ keys = naver_hub._keys()
 if not keys:
     print("네이버 API HUB: 키 없음")
 else:
-    try:  # 호출 2회 (하루 상한 안에서 셈)
-        today = dt.date.today()
-        series = naver_hub.monthly_trend(["연말정산"], keys, today).get("연말정산", {})
-        print(f"네이버 API HUB: 정상 (연말정산 블로그 문서 {naver_hub.blog_totals(['연말정산'], keys, today).get('연말정산')}개, "
-              f"트렌드 {len(series)}개월, 성수기 {naver_hub.season(series)[0]}월)")
+    try:  # 호출 1회 (하루 상한 안에서 셈)
+        got = naver_hub.blog_totals(["연말정산"], keys, dt.date.today()).get("연말정산") or {}
+        print(f"네이버 API HUB: {'정상 (연말정산 블로그 문서 ' + format(got['docs'], ',') + '개)' if got else '실패'}")
     except Exception as e:  # noqa: BLE001
         print(f"네이버 API HUB: 실패 ({type(e).__name__}: {str(e)[:120]})")
 PY
-(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.naver_hub --diag 2>&1 | tail -1) || true
-tail -2 /var/lib/first-lab/bot/golden-first.log 2>/dev/null | cut -c1-400 || true
-(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api 2>&1 | tail -1) || true
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api 2>&1 | tail -1) >> "$API_OUT" || true
 # 은행 대출금리 통계(신규취급액 기준) 항목 코드 확인용 — 주택담보·전세·신용 항목만 (연결 뒤 지움)
-(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api items 121Y006 2>&1 | grep -E "주택담보|전세|신용|가계대출" | head -12) || true
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api items 121Y006 2>&1 | grep -E "주택담보|전세|신용|가계대출" | head -12) >> "$API_OUT" || true
+cat "$API_OUT"
+# 감시 세션이 GitHub 배포 기록을 뒤지지 않고 /maintenance 로 보게 봇 기록에도 남김 (키 값은 없음)
+(cd "$REPO_DIR" && API_OUT="$API_OUT" /opt/first-lab-venv/bin/python - <<'PY') || true
+import os
+from bot.state import add_log, load_state, save_state
+text = open(os.environ["API_OUT"], encoding="utf-8").read().strip().replace("\n", " / ")
+state = load_state()
+add_log(state, "실패" not in text, "배포 점검(공공 API): " + text[:1500])
+save_state(state)
+PY
+rm -f "$API_OUT"
 
 echo -e "\n==> 봇 프로세스"
 systemctl status firstlab-bot.service --no-pager 2>/dev/null | sed -n '1,4p' || true
