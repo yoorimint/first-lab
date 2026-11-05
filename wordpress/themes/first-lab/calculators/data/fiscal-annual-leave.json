@@ -1,0 +1,12 @@
+{
+  "basis_date": "2026-11-05",
+  "sources": [
+    {"name": "근로기준법 제60조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
+    {"name": "고용노동부 연차유급휴가 질의회신 (회계연도 기준 비례 부여·퇴직 정산)", "url": "https://www.moel.go.kr/policy/policydata/view.do?bbs_seq=5850"},
+    {"name": "고용노동부 빠른인터넷상담 (2020.9.20 입사 회계연도 계산 예시)", "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202511241049571800334"},
+    {"name": "고용노동부 빠른인터넷상담 (회계연도 기준이 더 많은 경우)", "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202502120357100730386"}
+  ],
+  "base_days": 15,
+  "year_days": 365,
+  "first_year_max": 11
+}

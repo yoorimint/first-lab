@@ -1,0 +1,125 @@
+[
+  {
+    "why": "고용노동부 상담 예시: 2020.9.20 입사·2022.1.23 퇴직 → 월차 11일 + 2021.1.1 15×103/365≈4.2일 + 2022.1.1 15일 = 30.2일, 입사일 기준 11+15=26일",
+    "input": {
+      "start": "2020-09-20",
+      "base": "2022-01-23"
+    },
+    "expect": {
+      "monthly": 11,
+      "worked_days": 103,
+      "prorated": 4.2,
+      "fiscal_total": 30.2,
+      "hire_total": 26,
+      "diff": -4.2
+    }
+  },
+  {
+    "why": "12월 31일까지: 비례 연차는 다음 해 1월 1일에 생겨서 아직 없음 (월차 10/20·11/20·12/20 3일)",
+    "input": {
+      "start": "2020-09-20",
+      "base": "2020-12-31"
+    },
+    "expect": {
+      "monthly": 3,
+      "prorated": 4.2,
+      "fiscal_total": 3,
+      "hire_total": 3,
+      "diff": 0
+    },
+    "boundary": true
+  },
+  {
+    "why": "1월 1일 당일: 비례 4.2일 생김 → 3+4.2=7.2일",
+    "input": {
+      "start": "2020-09-20",
+      "base": "2021-01-01"
+    },
+    "expect": {
+      "monthly": 3,
+      "fiscal_total": 7.2,
+      "hire_total": 3,
+      "diff": -4.2
+    },
+    "boundary": true
+  },
+  {
+    "why": "입사 1년 되기 전날(2021.9.19): 월차 11일, 입사일 기준 15일 아직 없음",
+    "input": {
+      "start": "2020-09-20",
+      "base": "2021-09-19"
+    },
+    "expect": {
+      "months": 11,
+      "monthly": 11,
+      "fiscal_total": 15.2,
+      "hire_total": 11,
+      "diff": -4.2
+    },
+    "boundary": true
+  },
+  {
+    "why": "입사 1년 되는 날(2021.9.20): 입사일 기준 15일 생김 → 26일",
+    "input": {
+      "start": "2020-09-20",
+      "base": "2021-09-20"
+    },
+    "expect": {
+      "months": 12,
+      "monthly": 11,
+      "fiscal_total": 15.2,
+      "hire_total": 26,
+      "diff": 10.8
+    },
+    "boundary": true
+  },
+  {
+    "why": "본문 예시: 2025.7.1 입사, 2026.12.31 퇴사 → 184일, 15×184/365=7.56→7.6일, 회계 18.6 vs 입사일 26 → 7.4일 정산",
+    "input": {
+      "start": "2025-07-01",
+      "base": "2026-12-31"
+    },
+    "expect": {
+      "worked_days": 184,
+      "prorated": 7.6,
+      "fiscal_total": 18.6,
+      "hire_total": 26,
+      "diff": 7.4
+    }
+  },
+  {
+    "why": "본문 예시: 2027.1.1까지 재직 → 11+7.6+15=33.6일",
+    "input": {
+      "start": "2025-07-01",
+      "base": "2027-01-01"
+    },
+    "expect": {
+      "fiscal_total": 33.6,
+      "hire_total": 26,
+      "diff": -7.6
+    },
+    "boundary": true
+  },
+  {
+    "why": "1월 1일 입사: 재직 365일 → 비례 15일 (입사일 기준과 같음)",
+    "input": {
+      "start": "2025-01-01",
+      "base": "2026-01-01"
+    },
+    "expect": {
+      "worked_days": 365,
+      "prorated": 15,
+      "fiscal_total": 26,
+      "hire_total": 26,
+      "diff": 0
+    }
+  },
+  {
+    "why": "범위 밖: 셋째 1월 1일 이후 기준일은 안내 문장",
+    "input": {
+      "start": "2025-07-01",
+      "base": "2028-01-01"
+    },
+    "expect_error": true
+  }
+]
