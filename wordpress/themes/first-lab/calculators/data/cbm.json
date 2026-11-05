@@ -1,0 +1,12 @@
+{
+  "basis_date": "2026-11-05",
+  "sources": [
+    {"name": "우체국 EMS 배달소요일/요금조회 (부피중량 = 가로×세로×높이(cm) ÷ 6000, 실중량과 큰 값)", "url": "https://ems.epost.go.kr/front.EmsDeliveryDelivery01.postal"},
+    {"name": "NIST SI 단위 환산표 (1 inch = 2.54 cm, 1 ft³ = 0.02831685 m³)", "url": "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9"},
+    {"name": "NIST SI 접두어 (센티 10⁻², 밀리 10⁻³)", "url": "https://www.nist.gov/pml/owm/metric-si-prefixes"}
+  ],
+  "cm_per_unit": {"cm": 1, "mm": 0.1, "m": 100, "inch": 2.54},
+  "cm3_per_m3": 1000000,
+  "m3_per_ft3": 0.02831685,
+  "ems_divisor": 6000
+}
