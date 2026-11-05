@@ -1897,15 +1897,24 @@ class ChangedMarkTest(unittest.TestCase):
 
     def test_draft_with_new_mark_is_held_before_publish(self):
         import datetime as dt
-        from bot import changed, freshness
+        from bot import changed, freshness, source_check
 
         def wp(*a):
             if a[:3] == ("post", "meta", "get"):
-                return {freshness.VERIFIED_META: "2026-11-01", changed.META: "2026-11-05 혜택 내용 변경(정부24): 구직급여"}.get(a[4], "")
+                return {freshness.VERIFIED_META: "2026-11-01", changed.META: "2026-11-05 혜택 내용 변경(정부24): 구직급여",
+                        source_check.META: json.dumps({"found": [{"claim": "c", "numbers": ["1"], "urls": ["u"]}]})}.get(a[4], "")
             return "x"
         with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a: []):
             self.assertEqual(freshness.check_post(1, dt.date(2026, 11, 6)), ["쓴 뒤 근거 변경: 2026-11-05 혜택 내용 변경(정부24): 구직급여"])
             self.assertEqual(freshness.check_post(1, dt.date(2026, 11, 4)), [])   # 아직 안 온 날짜 표시는 무시
+
+    def test_post_without_evidence_is_held(self):
+        """근거 기록(근거 대조·검수 기록)이 하나도 없는 글은 공개 전에 보류 (11/5 운영자 '예전 봇 글도 근거 기록')."""
+        import datetime as dt
+        from bot import freshness
+        with mock.patch.object(freshness, "wp_cli", side_effect=lambda *a: "2026-11-01" if "--field=post_date" in a else ""), \
+                mock.patch.object(freshness, "_review_from_queue", return_value=[]):
+            self.assertIn("근거 기록 없음 (어느 공식 출처로 확인했는지 남기기)", freshness.check_post(1, dt.date(2026, 11, 6)))
 
     def test_recheck_without_changes_records_date(self):
         from bot import refresh

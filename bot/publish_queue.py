@@ -10,6 +10,8 @@
 후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why", "brand"(브랜드·회사 상품이면 그 이름)}], "law_changes": [key], "new_benefits": [key]}
   → 글쓰기 세션이 부적합하다고 본 후보·다룰 내용 없는 제도/혜택 글감을 다시 안 뜨게 함
 사진 검사 파일: {"type": "image_check", "post_id", "replace", "remove"} → image_check.apply_check (엉터리 글자 사진 교체)
+근거 기록 파일: {"type": "evidence", "post_id", "keyword", "review": [글쓰기 검수와 같은 형식]} → 근거 기록이 없던 예전 봇 글에
+  근거 대조 기록을 만듦 (11/5 운영자 '예전 봇 글도 근거 기록 만들어라') → 법령 감시·공개 직전 확인·공개 글 다시 보기가 이 글도 봄
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
 from __future__ import annotations
@@ -102,6 +104,17 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     return f"[{kind}] '{article.title}' (키워드: {keyword}, 직접 작성, {image_note}{extra}) {link}"
 
 
+def save_evidence(data: dict) -> str:
+    """예전 글에 근거 대조 기록 (bot/source_check.record) + 확인한 날 (공개 직전 확인·다시 보기의 기준일)."""
+    post_id = str(int(data["post_id"]))
+    review = data.get("review") or []
+    if not review:
+        raise ValueError("review 가 비어 있음")
+    note = source_check.record(post_id, review, lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
+    freshness.mark_verified(post_id)
+    return f"글 {post_id} ({data.get('keyword', '')}) 주장 {len(review)}개 — {note}"
+
+
 def golden_note(conn, keyword: str, total: int) -> str:
     """기록에 남길 황금 키워드 정보 (11/5 운영자 '김해공항 주차장 황금 키워드인가?' — 글마다 바로 알 수 있게)."""
     try:
@@ -168,6 +181,9 @@ def main() -> None:
             elif data.get("type") == "skip":
                 label = "후보 제외(직접)"
                 msg = skip_keywords(data)
+            elif data.get("type") == "evidence":
+                label = "근거 기록"
+                msg = save_evidence(data)
             elif data.get("type") == "image_check":
                 label = "사진 검사"
                 msg = image_check.apply_check(data)

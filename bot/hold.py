@@ -6,7 +6,7 @@
 """
 from __future__ import annotations
 
-from . import freshness, review_gate, schedule
+from . import freshness, review_gate, schedule, source_check
 from .blocks import to_blocks
 from .refresh import _html
 from .settings import wp_cli
@@ -44,4 +44,6 @@ def apply_fix(data: dict) -> str:
     wp_cli("post", "meta", "delete", str(post_id), review_gate.HOLD_META)
     schedule.mark_ready(post_id)
     freshness.mark_verified(post_id)  # 다시 검수했으니 공개 직전 확인 기준일도 오늘
+    # 새 검수 기록으로 근거 대조도 다시 저장 (공개 직전 확인·법령 감시·공개 글 다시 보기가 이 근거를 봄)
+    source_check.record(post_id, data.get("review"), lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
     return f"'{title}' 재검사 통과 → 공개 대기열 ({str(data.get('changes', ''))[:80]})"

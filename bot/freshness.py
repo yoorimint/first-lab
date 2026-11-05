@@ -46,8 +46,8 @@ def _review_from_queue(keyword: str) -> list[dict]:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        if str(data.get("keyword", "")).strip() == keyword:
-            return data.get("review") or []
+        if str(data.get("keyword", "")).strip() == keyword and data.get("review"):
+            return data["review"]  # 글 파일에 없으면 근거 기록 파일(type evidence)의 것
     return []
 
 
@@ -98,6 +98,9 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
         record = {}
     review = [] if record.get("laws") else _review_from_queue(urllib.parse.unquote(get("post_name")))
     out = problems(record, review, since, today)
+    if not record.get("found") and not record.get("laws") and not review:
+        # 근거 기록이 하나도 없는 글은 바뀌어도 알 길이 없음 → 공개 전에 근거부터 (11/5 운영자 '예전 봇 글도 근거 기록 만들어라')
+        out.append("근거 기록 없음 (어느 공식 출처로 확인했는지 남기기)")
     try:  # 쓴 뒤에 근거(법령·금리·혜택 내용·계산기 값)가 바뀌었다는 표시 (bot/changed.py)
         mark = wp_cli("post", "meta", "get", str(post_id), changed.META).strip()
     except Exception:  # noqa: BLE001
