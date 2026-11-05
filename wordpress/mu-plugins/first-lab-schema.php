@@ -19,7 +19,8 @@ function firstlab_official_links( string $content ): array {
 		return array();
 	}
 	preg_match_all( '/<a\s[^>]*href="(https:\/\/[^"]+)"/i', substr( $content, $at ), $m );
-	return array_values( array_unique( $m[1] ) );
+	// 본문 HTML 의 '&amp;' 를 실제 주소의 '&' 로 (그대로 두면 구조화 데이터의 출처 주소가 틀림)
+	return array_values( array_unique( array_map( 'html_entity_decode', $m[1] ) ) );
 }
 
 /** Article 구조화 데이터 (글 화면에서만). */

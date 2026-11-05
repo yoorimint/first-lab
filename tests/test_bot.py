@@ -1087,6 +1087,7 @@ class SchemaPluginTest(unittest.TestCase):
         # 글 끝 공식 링크 제목이 바뀌면 인용 출처가 비므로 같은 문구를 쓰는지 확인
         from bot.sources import HEADING
         self.assertIn(f"'{HEADING}'", self.SRC)
+        self.assertIn("html_entity_decode", self.SRC)  # 11/5 배포 확인: citation 주소에 &amp; 가 그대로 들어감
 
 
 class ApplyReviewTest(unittest.TestCase):
