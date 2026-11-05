@@ -74,11 +74,11 @@
       ];
       const notes = [];
       if (!covered) notes.push('상시 4명 이하 사업장은 연장·야간·휴일 가산(50%·100%) 규정이 적용되지 않아요. 근로계약서·취업규칙에 가산을 정했다면 그 기준을 따라요. 다만 국가·지방자치단체 기관의 단시간근로자는 계약한 시간을 넘은 근로에 50% 이상 가산해요 (기간제법 제6조③).');
-      if (hourly < d.min_wage_2026) notes.push(`통상시급이 2026년 최저임금(시급 ${u.won(d.min_wage_2026)})보다 낮아요. 통상임금이나 기준시간을 다시 확인해 보세요.`);
+      if (hourly < d.min_wage) notes.push(`통상시급이 ${d.min_wage_year}년 최저임금(시급 ${u.won(d.min_wage)})보다 낮아요. 통상임금이나 기준시간을 다시 확인해 보세요.`);
       notes.push(`연장근로는 당사자가 합의해도 원칙적으로 1주 ${d.weekly_overtime_limit}시간까지예요 (고용노동부장관 인가를 받은 특별연장근로 등은 예외).`);
       notes.push('휴일근로는 연장 가산과 겹쳐 받지 않아요. 휴일 밤 10시~아침 6시 근무는 야간 가산 칸에 따로 넣어요. 각 줄은 원 미만을 버렸어요.');
       return {
-        values: { hourly: num(hourly), ot_pay: otPay, ot_night_pay: otNightPay, night_pay: nightPay, holiday_pay: holidayPay, total },
+        values: { hourly: num(hourly), below_min_wage: hourly < d.min_wage, ot_pay: otPay, ot_night_pay: otNightPay, night_pay: nightPay, holiday_pay: holidayPay, total },
         rows,
         notes,
       };

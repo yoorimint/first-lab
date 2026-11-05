@@ -2449,5 +2449,57 @@
     "expect": {
       "unemployment": "no"
     }
+  },
+  {
+    "why": "2026.12.2부터 2026년 소득분 안내: 정기 신청 2027.5.1~5.31 (조특법 제100조의6①, 5월 확정신고 기간)",
+    "today": "2026-12-02",
+    "input": {
+      "birth": "1986-03-15",
+      "today": "2026-12-02",
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "base_extend": "no",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0,
+      "public_pension": "no"
+    },
+    "expect": {
+      "eitc_period": "before",
+      "eitc": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "2027.6.1: 정기 신청(5.31) 끝 → 기한 후 신청 (2027.11.30까지 95%)",
+    "today": "2027-06-01",
+    "input": {
+      "birth": "1986-03-15",
+      "today": "2027-06-01",
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "base_extend": "no",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0,
+      "public_pension": "no"
+    },
+    "expect": {
+      "eitc_period": "late"
+    }
   }
 ]

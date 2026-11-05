@@ -327,5 +327,45 @@
       "public_parttime": "no"
     },
     "expect": {}
+  },
+  {
+    "why": "2026년 시급 10,500원은 최저임금 10,320원 이상",
+    "today": "2026-12-31",
+    "input": {
+      "pay_type": "hourly",
+      "amount": 10500,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 1,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "below_min_wage": false,
+      "ot_pay": 15750
+    },
+    "boundary": true
+  },
+  {
+    "why": "2027.1.1부터 최저임금 10,700원(고시) → 시급 10,500원은 미달 안내",
+    "today": "2027-01-01",
+    "input": {
+      "pay_type": "hourly",
+      "amount": 10500,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 1,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "below_min_wage": true,
+      "ot_pay": 15750
+    },
+    "boundary": true
   }
 ]

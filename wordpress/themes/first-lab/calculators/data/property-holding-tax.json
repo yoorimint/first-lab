@@ -33,5 +33,7 @@
   "hold_credit": [{"from": 15, "pct": 50}, {"from": 10, "pct": 40}, {"from": 5, "pct": 20}],
   "credit_max_pct": 80,
   "rural_pct": 20,
-  "installment_over": 2500000
+  "installment_over": 2500000,
+  "yearly_recheck": "2026-12-31",
+  "yearly_pending": "2026 세제개편안(종부세 1주택 공제·공정시장가액비율) 국회 처리·12월 공포, 재산세 1주택 비율 45% 특례(2026년분 한정, 5~6월 시행령)"
 }

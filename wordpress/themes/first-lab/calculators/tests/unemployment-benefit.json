@@ -108,5 +108,41 @@
       "total": 10215000
     },
     "boundary": true
+  },
+  {
+    "why": "2027 이직: 하한 10,700×8×0.8=68,480 (2027 최저임금 고시) × 150일",
+    "today": "2027-01-01",
+    "input": {
+      "wage_3m": 9000000,
+      "days_3m": 92,
+      "hours": 8,
+      "age50": "under50",
+      "period": "1"
+    },
+    "expect": {
+      "min_daily": 68480,
+      "daily": 68480,
+      "days": 150,
+      "total": 10272000
+    },
+    "boundary": true
+  },
+  {
+    "why": "2027: 상한 113,500×0.6=68,100 < 하한 68,480 → 하한이 구직급여일액 (고용보험법 제46조②) × 270일",
+    "today": "2027-01-01",
+    "input": {
+      "wage_3m": 15000000,
+      "days_3m": 92,
+      "hours": 8,
+      "age50": "over50",
+      "period": "4"
+    },
+    "expect": {
+      "calc_daily": 68100,
+      "min_daily": 68480,
+      "daily": 68480,
+      "total": 18489600
+    },
+    "boundary": true
   }
 ]

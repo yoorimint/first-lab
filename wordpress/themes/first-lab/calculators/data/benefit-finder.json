@@ -82,5 +82,8 @@
     "free_rent_rate": "0.78%",
     "conversion_percent_year": 4,
     "apply": "기초연금: 읍·면·동 행정복지센터, 국민연금공단 지사, 복지로에서 신청해요. 만 65세 생일이 속한 달의 1개월 전부터 신청할 수 있어요 (상담 국민연금공단 1355, 보건복지상담센터 129)."
-  }
+  },
+  "yearly_recheck": "2026-12-31",
+  "yearly_pending": "근로·자녀장려금 소득 기준 인상(정부안 2,600만·3,700만·5,200만 원, 국회 11~12월)·기초연금 선정기준액(12월 말 고시)·에너지바우처(5~6월 공고)·국민내일배움카드 운영규정",
+  "scheduled": [{"from": "2026-12-02", "values": {"eitc": {"income_year": 2026, "income_limit": {"single": 22000000, "one": 32000000, "dual": 44000000}, "type_labels": {"single": "단독가구", "one": "홑벌이 가구", "dual": "맞벌이 가구"}, "dual_each_min": 3000000, "property_limit": 240000000, "property_half": 170000000, "regular_from": "2027-05-01", "regular_until": "2027-05-31", "late_until": "2027-11-30", "late_rate_percent": 95, "apply": "근로·자녀장려금: 홈택스·손택스에서 신청하고, 문의는 장려금 상담센터 1566-3636이에요."}}, "source": {"name": "조세특례제한법 제100조의6①⑧ (신청: 5월 종합소득세 확정신고 기간, 기한 후 신청: 다음 날부터 6개월)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284389&efYd=20260918&chrClsCd=010202&ancYnChk=0"}}]
 }

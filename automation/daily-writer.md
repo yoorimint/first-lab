@@ -107,7 +107,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 기관이 정한 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
   표준 수학 공식은 공식 기관의 계산 예시가 없어도 위 방법으로 검증해 만든다.
 - 본문에 넣는 법: `content_html` 의 계산 예시 근처에 **독립된 줄**로 `<p>[firstlab_calc id="<id>"]</p>`
-- **연초 값**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 글보다 먼저 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 아직 확정 전이면 고치지 않는다.
+- **연초 값**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 글보다 먼저 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 아직 확정 전이면 값은 고치지 않고 `"yearly_recheck": "<확정 예상일>"` 와 `"yearly_pending"`(무엇을 기다리는지) 만 적는다 (그날까지 다시 안 나옴). 항목의 `pending` 에 지난번에 기다리던 것이 있다.
 - 계산기는 별도 커밋으로 먼저 올린다: `git add wordpress/themes/first-lab/calculators wordpress/pages && git commit -m "계산기: <이름>"`
 
 ## 5. 올리기

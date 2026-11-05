@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly_checked": 2026,
+  "basis_date": "2026-11-04", "yearly_checked": 2027,
   "sources": [
     {"name": "국세청 증여세 세액계산 흐름도 (세율·누진공제, 증여재산공제, 세대생략 할증)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2340&cntntsId=7728"},
     {"name": "국세청 증여세 신고시 유의사항 (신고기한 3개월, 신고세액공제 3%)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2342&cntntsId=7730"},

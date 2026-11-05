@@ -25,7 +25,7 @@
       const idx = Number(v.period);
       if (!(idx >= 0 && idx < table.length)) throw new u.InputError('고용보험 가입 기간을 골라 주세요.');
 
-      // 기초일액 = 평균임금 (3개월 임금 ÷ 일수), 상한 11만3500원
+      // 기초일액 = 평균임금 (3개월 임금 ÷ 일수), 상한 data.daily_wage_cap
       const avg = FirstLabCalc.util.floor(wage / days);
       const base = Math.min(avg, d.daily_wage_cap);
       // 하한 = 최저임금 × 소정근로시간 × 80%
@@ -37,7 +37,7 @@
 
       let basis = '평균임금 × 60%';
       if (daily === minDaily && calc < minDaily) basis = '하한액 적용 (최저임금 × 소정근로시간 × 80%)';
-      else if (avg > d.daily_wage_cap) basis = '상한액 적용 (11만 3,500원 × 60%)';
+      else if (avg > d.daily_wage_cap) basis = `상한액 적용 (${u.won(d.daily_wage_cap)} × 60%)`;
 
       const rows = [
         ['1일 평균임금 (3개월 임금 ÷ 일수)', u.won(avg)],
@@ -51,6 +51,7 @@
         '원 미만은 버렸어요. 평균임금이 통상임금보다 적으면 통상임금으로 계산하기 때문에 실제 금액이 조금 더 많을 수 있어요.',
         '수급 조건(18개월 동안 피보험 단위기간 180일 이상, 비자발적 이직 등)을 채워야 받을 수 있어요.',
         '퇴사 다음 날부터 12개월이 지나면 남은 날수는 받지 못해요.',
+        `하한액은 퇴사한 해의 최저임금으로 정해요. 이 계산은 오늘 기준 최저임금(시급 ${u.won(d.min_wage_hour)})을 썼어요.`,
       ];
       return {
         values: { avg_wage: avg, calc_daily: calc, min_daily: minDaily, daily, days: benefitDays, total },

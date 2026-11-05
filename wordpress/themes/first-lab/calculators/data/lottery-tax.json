@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-05", "yearly_checked": 2026,
+  "basis_date": "2026-11-05", "yearly_checked": 2027,
   "max_input": 1000000000000,
   "won10_keys": ["income_tax", "local_tax", "total"],
   "sources": [

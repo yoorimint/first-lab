@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-05", "yearly_checked": 2026,
+  "basis_date": "2026-11-05", "yearly_checked": 2027,
   "sources": [
     {"name": "근로기준법 제2조·제11조·제50조·제53조·제56조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
     {"name": "근로기준법 시행령 제6조(통상임금)·제7조·별표 1 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법시행령"},
@@ -15,5 +15,7 @@
   "holiday_rate_over": 2.0,
   "holiday_split_hours": 8,
   "weekly_overtime_limit": 12,
-  "min_wage_2026": 10320
+  "min_wage": 10320,
+  "min_wage_year": 2026,
+  "scheduled": [{"from": "2027-01-01", "texts": [["10,320원", "10,700원"]], "values": {"min_wage": 10700, "min_wage_year": 2027}, "source": {"name": "고용노동부 2027년 적용 최저임금 시간급 10,700원 고시", "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"}}]
 }

@@ -2,6 +2,9 @@
 (function () {
   'use strict';
 
+  // 요율 화면 표시 (요율은 data 에서만 — 해가 바뀌면 data 의 scheduled 로 자동 전환, 화면 문구도 같이 바뀜)
+  const pct = (n) => `${Math.round(n * 1000) / 1000}%`;
+
   // 간이세액표 해당란 세액 (소득세법 시행령 별표 2). taxable: 비과세 뺀 월급(원), fam: 공제대상가족 수(본인 포함, 1~11)
   function tableTax(taxable, fam, d) {
     const k = fam - 1;
@@ -68,7 +71,7 @@
 
       const taxable = pay - nontax; // 4대보험·소득세 모두 비과세를 뺀 금액 기준
 
-      // 국민연금: 기준소득월액(천원 미만 버림, 하한~상한) × 4.75%
+      // 국민연금: 기준소득월액(천원 미만 버림, 하한~상한) × 근로자 몫 (2026년 4.75%, 2027년 5% — data 의 scheduled)
       let pensionBase = 0;
       let pension = 0;
       if (v.pension !== 'no') {
@@ -80,7 +83,7 @@
       // 장기요양: 건강보험료 × (장기요양보험료율 ÷ 건강보험료율, 소수점 이하 다섯째자리에서 반올림) — 노인장기요양보험법 제9조① (2026.5.26 개정, 2026년 11월분부터)
       const ltcRatio = Math.round((d.ltc_rate_per_1000000 * 100) / d.health_rate_per_10000); // 0.9448/7.19 = 0.131404… → 0.1314 (1만분의 1314)
       const ltc = FirstLabCalc.util.floor((health * ltcRatio) / 10000);
-      // 고용보험(실업급여): 보수 × 0.9%
+      // 고용보험(실업급여): 보수 × 근로자 몫
       const employment = FirstLabCalc.util.floor((taxable * d.employment_rate_employee_per_1000) / 1000);
       const insurance = pension + health + ltc + employment;
 
@@ -97,10 +100,10 @@
       const rows = [
         ['세전 월급', u.won(pay)],
         ['비과세 (빼고 계산)', u.won(nontax)],
-        [v.pension === 'no' ? '국민연금 (안 냄)' : `국민연금 (${u.won(pensionBase)} × 4.75%)`, u.won(pension)],
-        ['건강보험 (× 3.595%)', u.won(health)],
+        [v.pension === 'no' ? '국민연금 (안 냄)' : `국민연금 (${u.won(pensionBase)} × ${pct(d.pension_rate_employee_per_10000 / 100)})`, u.won(pension)],
+        [`건강보험 (× ${pct(d.health_rate_per_10000 / 200)})`, u.won(health)],
         [`장기요양보험 (건강보험료 × ${(ltcRatio / 100).toFixed(2)}%)`, u.won(ltc)],
-        ['고용보험 (× 0.9%)', u.won(employment)],
+        [`고용보험 (× ${pct(d.employment_rate_employee_per_1000 / 10)})`, u.won(employment)],
         [ratio === 100 ? '소득세 (간이세액표)' : `소득세 (간이세액표 × ${ratio}%)`, u.won(incomeTax)],
         ['지방소득세 (소득세 × 10%)', u.won(localTax)],
         ['공제 합계', u.won(insurance + tax)],

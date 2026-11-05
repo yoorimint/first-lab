@@ -3,6 +3,7 @@
 계산기 data/<id>.json 은 둘 중 하나를 적는다 (tests/test_calculators.mjs 가 강제):
   "yearly": false            해마다 바뀌는 값이 없음 (평단가·CBM 등)
   "yearly_checked": 2027     2027년 값까지 확인함 — 확정된 다음 값은 "scheduled"(calc.js util.dataOn)로 미리 넣어 두면 그날 자동 전환
+  "yearly_recheck": "2026-12-15", "yearly_pending": "무엇을 기다리는지"  아직 확정 전인 값이 남아 그날 다시 확인 (그 전에는 글쓰기 세션에 안 넘김 — 매일 같은 조사를 반복하지 않게)
 11월 15일부터는 다음 해, 그 전에는 올해 기준으로 확인이 안 된 계산기를 state["calc_yearly"] 에 → /next 의 calc_yearly
 → 글쓰기 세션이 공식 출처로 다음 해 값을 확인해 scheduled 를 넣고 yearly_checked 를 올림 (daily-writer.md 4-2).
 
@@ -33,8 +34,8 @@ def due(today: dt.date, data_dir: Path = DATA_DIR) -> list[dict]:
         if data.get("yearly") is False:
             continue
         checked = int(data.get("yearly_checked") or 0)
-        if checked < year:
-            out.append({"id": path.stem, "checked": checked, "for": year,
+        if checked < year and str(data.get("yearly_recheck") or "") <= f"{today:%Y-%m-%d}":
+            out.append({"id": path.stem, "checked": checked, "for": year, "pending": data.get("yearly_pending", ""),
                         "scheduled": [s.get("from") for s in data.get("scheduled", [])]})
     return out
 
@@ -63,6 +64,8 @@ def switches(today: dt.date, done: set[str], data_dir: Path = DATA_DIR) -> list[
             for name, new in (sch.get("values") or {}).items():
                 for t in old_texts(data.get(name), new):
                     texts[t] = f"{name} {data.get(name)}→{new}"
+            for old_text, new_text in sch.get("texts", []):  # 화면 표기 (4.75% → 5%) — 계산기가 들어간 글에서만 찾음 (흔한 숫자)
+                texts.setdefault(old_text if old_text.endswith("%") else old_text, f"{old_text}→{new_text}")
             out.append({"key": key, "id": path.stem, "from": sch.get("from"), "texts": texts})
     return out
 

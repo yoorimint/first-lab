@@ -6,6 +6,7 @@
 // 잘못된 입력 사례는 "expect_error": true — compute() 가 InputError(화면 안내 문장)를 내야 통과.
 // 연초 값: data 에 "yearly": false 또는 "yearly_checked": <연도> 필수 (bot/calc_watch.py 가 다음 해 확인 안 된 계산기를 글쓰기 세션에 넘김).
 // 미리 넣은 다음 값("scheduled")은 키가 data 에 있어야 하고, 출처와 그 날짜 사례("today": "YYYY-MM-DD")가 있어야 한다.
+// scheduled 의 "texts": [[옛 표기, 새 표기]] — 계산기 페이지에 옛 표기가 있으면 새 표기도 있어야 함 (글은 bot/calc_watch.py 가 그날 재확인 표시).
 // data.links(결과 행의 관련 글 주소)는 대기열 글 키워드(wordpress/queue/*.json)나 고정 페이지(wordpress/pages/*.html) 주소여야 한다.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -69,6 +70,12 @@ for (const id of ids) {
     if (!Object.keys(sch.values || {}).length) fail(id, `${where}.values 가 비어 있음`);
     if (!sch.source || !sch.source.name || !/^https:\/\//.test(sch.source.url || '')) fail(id, `${where}.source 에 이름과 https 주소가 필요함`);
     if (!(cases || []).some((c) => (c.today || '') >= sch.from)) fail(id, `${where}: ${sch.from} 부터의 사례("today": "${sch.from}")가 없음`);
+    // 계산기 단독 페이지가 옛 값만 적고 있으면 그날부터 틀림 (11/5: 4.75%·10,320원이 페이지에 박혀 있었음) → 새 값도 같이 적어야 함
+    const pageFile = path.join(PAGES, `${id}-calculator.html`);
+    const page = fs.existsSync(pageFile) ? fs.readFileSync(pageFile, 'utf8') : '';
+    for (const [oldText, newText] of sch.texts || []) {
+      if (page.includes(oldText) && !page.includes(newText)) fail(id, `${where}: 페이지에 옛 값 '${oldText}' 만 있음 — '${newText}'(${sch.from}부터)도 적기`);
+    }
   }
   if (!Array.isArray(cases) || cases.length < MIN_CASES) fail(id, `검증 사례가 ${MIN_CASES}개 이상 필요함`);
   else if (cases.filter((c) => c.boundary === true).length < MIN_BOUNDARY) {

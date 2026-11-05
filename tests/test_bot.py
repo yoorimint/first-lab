@@ -1792,6 +1792,9 @@ class CalcYearlyTest(unittest.TestCase):
         self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 11, 14), d)], [])
         self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 11, 15), d)], ["a"])
         self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2027, 1, 10), d)], ["a"])  # 해가 바뀌어도 남으면 계속
+        (d / "a.json").write_text(json.dumps({"yearly_checked": 2026, "yearly_recheck": "2026-12-15"}), encoding="utf-8")
+        self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 12, 14), d)], [])   # 확정 기다리는 중
+        self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 12, 15), d)], ["a"])
 
     def test_real_calculators_declare_yearly(self):
         from bot import calc_watch

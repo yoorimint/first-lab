@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly_checked": 2026,
+  "basis_date": "2026-11-04", "yearly_checked": 2027,
   "sources": [
     {"name": "국세청 종합소득세 세율 (2023~2025년 귀속 세율표·계산 예시)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2227&cntntsId=7667"},
     {"name": "국세청 종합소득세 세액계산 흐름도", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2226&cntntsId=7666"},
