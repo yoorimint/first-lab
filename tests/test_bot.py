@@ -1088,5 +1088,20 @@ class SchemaPluginTest(unittest.TestCase):
         from bot.sources import HEADING
         self.assertIn(f"'{HEADING}'", self.SRC)
 
+
+class ApplyReviewTest(unittest.TestCase):
+    """검수 반영: 패치가 하나라도 검사에 걸리면 아무것도 저장·기록하지 않는다 (11/5 #542: 패치 실패에도 검수 완료가 기록됨)."""
+
+    def test_bad_patch_blocks_everything(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        post = {"title": "t", "excerpt": "e", "content_html": "<p>가산점이 있고 1점이에요.</p>"}
+        bad = [{"type": "outdated", "why": "x", "find": "가산점이 있고", "replace_paragraph": "가산점이 있고 바뀌어요", "tag": "p"}]
+        self.assertTrue(any("그대로 있음" in e for e in apply_review.check(post, bad)))
+        unknown = [{"type": "없는유형", "why": "x", "find": "1점이에요", "replace_paragraph": "1점", "tag": "p"}]
+        self.assertTrue(any("유형" in e for e in apply_review.check(post, unknown)))
+        good = [{"type": "outdated", "why": "x", "find": "1점이에요", "replace_paragraph": "1점이고 바뀌어요", "tag": "p"}]
+        self.assertEqual(apply_review.check(post, good), [])
+
 if __name__ == "__main__":
     unittest.main()
