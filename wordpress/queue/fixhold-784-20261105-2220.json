@@ -1,0 +1,345 @@
+{
+ "type": "fix_hold",
+ "post_id": 784,
+ "base_modified": "2026-11-05 22:11:58",
+ "content_html": "<p>내신 등급은 과목마다 <strong>내 석차가 수강자 중 위에서 몇 %인지</strong>로 정해져요. 2025년 이후 고1로 입학한 학생(2026학년도 1·2학년)은 5등급제라서 누적 10% 이하가 1등급, 34% 이하가 2등급, 66% 이하가 3등급, 90% 이하가 4등급, 나머지가 5등급이에요. 2024년 이전 입학생(2026학년도 3학년)은 9등급제로 1등급이 4% 이하예요. 아래 계산기에 수강자수와 석차를 넣으면 바로 등급이 나오고, 과목별 등급과 학점을 넣으면 평균 등급도 계산돼요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">등급별 누적 비율과 인원</h2>\n\n\n\n<p>등급별 인원은 수강자수에 누적 비율을 곱한 뒤 반올림해서 정해요. 수강자 96명 과목이라면 1등급은 96×10% = 9.6명을 반올림한 10명까지예요.</p>\n\n\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>등급</th><th>5등급제 누적 비율</th><th>96명 기준 누적 인원</th></tr></thead><tbody>\n<tr><td>1등급</td><td>10% 이하</td><td>10명</td></tr>\n<tr><td>2등급</td><td>10% 초과~34% 이하</td><td>33명</td></tr>\n<tr><td>3등급</td><td>34% 초과~66% 이하</td><td>63명</td></tr>\n<tr><td>4등급</td><td>66% 초과~90% 이하</td><td>86명</td></tr>\n<tr><td>5등급</td><td>90% 초과~100%</td><td>96명</td></tr>\n</tbody></table></figure>\n\n\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>등급</th><th>9등급제 누적 비율</th><th>96명 기준 누적 인원</th></tr></thead><tbody>\n<tr><td>1등급</td><td>4% 이하</td><td>4명</td></tr>\n<tr><td>2등급</td><td>4% 초과~11% 이하</td><td>11명</td></tr>\n<tr><td>3등급</td><td>11% 초과~23% 이하</td><td>22명</td></tr>\n<tr><td>4등급</td><td>23% 초과~40% 이하</td><td>38명</td></tr>\n<tr><td>5등급</td><td>40% 초과~60% 이하</td><td>58명</td></tr>\n<tr><td>6등급</td><td>60% 초과~77% 이하</td><td>74명</td></tr>\n<tr><td>7등급</td><td>77% 초과~89% 이하</td><td>85명</td></tr>\n<tr><td>8등급</td><td>89% 초과~96% 이하</td><td>92명</td></tr>\n<tr><td>9등급</td><td>96% 초과~100%</td><td>96명</td></tr>\n</tbody></table></figure>\n\n\n\n<h2 class=\"wp-block-heading\">석차로 내 등급 계산하는 순서</h2>\n\n\n\n<p>반올림과 동점자 처리는 경기도교육청 2026학년도 고등학교 학업성적관리 시행지침 기준이에요.</p>\n\n\n\n<ol class=\"wp-block-list\">\n\n<li><strong>석차 확인</strong>: 석차는 정기시험과 수행평가를 반영 비율대로 환산한 점수 합계 순서예요. 동점자에게는 모두 그중 가장 높은 석차를 줘요.</li>\n\n\n<li><strong>누적 인원 구하기</strong>: 수강자수 × 누적 비율을 반올림해요. 수강자수에는 수강했지만 이수하지 못한 학생도 들어가요 (원적교 성적을 가져온 재·전·편입학생은 빠져요).</li>\n\n\n<li><strong>구간 찾기</strong>: 내 석차가 들어가는 첫 구간이 내 등급이에요. 96명 과목 10등은 1등급(10명 이내), 11등은 2등급이에요.</li>\n\n\n<li><strong>동점자가 경계에 걸리면</strong>: 중간석차 = 석차 + (동석차 인원수 − 1) ÷ 2 로 계산하고, 중간석차를 수강자수로 나눈 백분율을 위 비율표에 대어 동점자 모두에게 같은 등급을 줘요.</li>\n\n</ol>\n\n\n\n[firstlab_calc id=\"school-grade\"]\n\n\n\n<h2 class=\"wp-block-heading\">동점자 계산 예시</h2>\n\n\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>상황</th><th>중간석차</th><th>백분율</th><th>등급</th></tr></thead><tbody>\n<tr><td>5등급제, 96명 중 1등 동점 19명</td><td>1 + 18÷2 = 10</td><td>10.42%</td><td>모두 2등급</td></tr>\n<tr><td>5등급제, 120명 중 2등 동점 15명</td><td>2 + 14÷2 = 9</td><td>7.5%</td><td>모두 1등급</td></tr>\n<tr><td>9등급제, 96명 중 1등 동점 7명</td><td>1 + 6÷2 = 4</td><td>4.17%</td><td>모두 2등급</td></tr>\n</tbody></table></figure>\n\n\n\n<p>첫 번째 경우처럼 1등 동점자가 많으면 그 과목에는 1등급이 한 명도 없을 수 있어요. 반대로 두 번째 경우는 1등 1명과 2등 15명, 모두 16명이 1등급이라서 정원 12명보다 많아져요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">평균 등급 계산 예시</h2>\n\n\n\n<p>이 계산기의 평균 등급은 과목 등급에 학점(단위수)을 곱해 더한 뒤 전체 학점으로 나눈 값(학점 가중 평균)이에요. 1등급 4학점, 2등급 4학점, 3등급 3학점이라면 (4 + 8 + 9) ÷ 11 = 1.91등급이에요.</p>\n\n\n\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\"><thead><tr><th>과목</th><th>등급</th><th>학점</th><th>등급×학점</th></tr></thead><tbody>\n<tr><td>과목 A</td><td>1</td><td>4</td><td>4</td></tr>\n<tr><td>과목 B</td><td>2</td><td>4</td><td>8</td></tr>\n<tr><td>과목 C</td><td>3</td><td>3</td><td>9</td></tr>\n<tr><td>합계</td><td>-</td><td>11</td><td>21</td></tr>\n</tbody></table></figure>\n\n\n\n<p>대학 입시에서는 대학마다 반영 교과와 학년별 비율이 달라서, 실제 환산 점수는 지원할 대학의 모집요강으로 확인해요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">석차등급이 나오지 않는 과목</h2>\n\n\n\n<ul class=\"wp-block-list\">\n\n<li>사회·과학 교과의 융합 선택 9과목(여행지리, 사회문제 탐구, 금융과 경제생활, 융합과학 탐구 등)은 성취도만 적고 석차등급은 '·'예요.</li>\n\n\n<li>과학탐구실험, 체육·예술 교과(특수목적고 선택 과목 제외)는 3단계 성취도만, 교양 과목은 이수 여부(P)만 적어요.</li>\n\n\n<li>9등급제(2024년 이전 입학)의 진로 선택 과목과 전문교과Ⅱ는 석차등급을 내지 않아요.</li>\n\n\n<li>공동교육과정·온라인학교, 학교 밖 교육으로 들은 과목 등도 석차등급이 나오지 않아요.</li>\n\n\n<li>5등급제 과목 중 수강자가 5명 이하면 학교 규정에 따라 석차등급 대신 '·'로 적을 수 있어요. 9등급제는 13명 이하일 때예요.</li>\n\n</ul>\n\n\n\n<p>다른 시·도에 다니면 소속 교육청 지침과 학교 학업성적관리규정으로 세부 처리를 확인해요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">자주 묻는 질문</h2>\n\n\n\n<h3 class=\"wp-block-heading\">5등급제 등급을 9등급제로 바꿔 비교할 수 있나요?</h3>\n\n\n\n<p>등급 구간 경계가 서로 달라서 등급 숫자만으로는 비교하기 어려워요. 석차 백분율을 같이 보면 비교가 쉬워요.</p>\n\n\n\n<h3 class=\"wp-block-heading\">성취도 A와 1등급은 같은 건가요?</h3>\n\n\n\n<p>달라요. 성취도는 성취율로 매기는 절대평가이고, 석차등급은 다른 학생과 비교한 상대평가예요. 5등급제 선택 과목은 성취율 90% 이상이 A라서, A를 받아도 동점자가 많으면 2등급일 수 있어요.</p>\n\n\n\n<h3 class=\"wp-block-heading\">환산 점수는 어디까지 계산하나요?</h3>\n\n\n\n<p>정기시험과 수행평가 환산 점수 합계는 소수 셋째 자리에서 반올림해 소수 둘째 자리까지 구하고, 그 순서로 석차를 매겨요.</p>\n\n\n\n<h2 class=\"wp-block-heading\">공식 안내 바로가기</h2>\n\n\n\n<ul class=\"wp-block-list\">\n\n<li><a href=\"https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf\" target=\"_blank\" rel=\"noopener\">경기도교육청 2026학년도 고등학교 학업성적관리 시행지침</a></li>\n\n\n<li><a href=\"https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000274694\" target=\"_blank\" rel=\"noopener\">국가법령정보센터 교육부훈령 학교생활기록 작성 및 관리지침</a></li>\n\n\n<li><a href=\"https://m.korea.kr/news/policyNewsView.do?newsId=148924193\" target=\"_blank\" rel=\"noopener\">대한민국 정책브리핑 2028 대입제도 개편 확정 (내신 5등급)</a></li>\n\n</ul>",
+ "review": [
+  {
+   "claim": "(제목) 5등급제 1등급 10%·9등급제 4% (누적 비율 이하)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148921172"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "(요약) 5등급제 누적 10%·34%·66%·90%, 9등급제 1등급 4%",
+   "urls": [
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148921172",
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "(요약) 수강자 96명이면 1등급 10명 (96×10%=9.6 반올림)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "과목별 석차등급은 환산 점수 합계에 의한 석차 순에 따라 누적 비율로 평정",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2025년 이후 고1 입학생(2026학년도 1·2학년, 2022 개정 교육과정)은 5등급제",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf",
+    "https://m.korea.kr/news/policyNewsView.do?newsId=148924193"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2024년 이전 입학생(2026학년도 3학년, 2015 개정 교육과정)은 9등급제, 1등급 4% 이하",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5등급제 구간: 2등급 10% 초과~34% 이하, 3등급 34% 초과~66% 이하, 4등급 66% 초과~90% 이하, 5등급 90% 초과~100%",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148921172"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "9등급제 구간: 4·11·23·40·60·77·89·96·100% 누적",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "등급별 누적 학생수는 수강자수와 누적 등급비율을 곱한 값을 반올림 (경기도교육청 지침, 본문에 지역 명시)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "96명 5등급제 누적 인원 10명·33명·63명·86명·96명",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "96명 9등급제 누적 인원 4명·11명·22명·38명·58명·74명·85명·92명·96명",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "석차는 정기시험·수행평가 반영 비율 환산 점수 합계 순서",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동점자 모두에게 해당 순위의 최상의 석차 부여",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "반올림·동점자 처리는 경기도교육청 2026학년도 고등학교 학업성적관리 시행지침 기준 (지역 명시)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "수강자수에 수강했지만 이수하지 못한 학생 포함, 원적교 성적을 가져온 재·전·편입학생은 제외",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "96명 과목 10등은 1등급, 11등은 2등급",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간석차 = 석차 + (동석차 인원수 − 1) ÷ 2",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동점자가 등급 경계에 걸리면 중간석차백분율로 동점자 모두 같은 등급",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5등급제 96명 중 1등 동점 19명: 중간석차 10, 10.42%, 모두 2등급",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5등급제 120명 중 2등 동점 15명: 중간석차 9, 7.5%, 모두 1등급",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "9등급제 96명 중 1등 동점 7명: 중간석차 4, 4.17%, 모두 2등급",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1등 동점자가 많으면 그 과목에 1등급이 한 명도 없을 수 있음",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "120명 과목 1등 1명과 2등 15명, 16명이 1등급으로 정원 12명 초과",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "이 계산기의 평균 등급 = 등급×학점 합 ÷ 전체 학점 (계산기 정의로 한정, 공식 산식으로 단정하지 않음)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "평균 예시 1등급 4학점·2등급 4학점·3등급 3학점 → (4 + 8 + 9) ÷ 11 = 1.91등급 (계산)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대학마다 반영 교과·학년별 비율이 달라 모집요강으로 확인 (안내로 완화)",
+   "urls": [
+    "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=294&boardSeq=97551&lev=0&searchType=null&statusYN=W&page=1&s=moe&m=020402&opType=N"
+   ],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "사회·과학 융합 선택 9과목(여행지리·사회문제 탐구·금융과 경제생활·융합과학 탐구 등)은 석차등급 '·' (학교생활기록 작성 및 관리지침 제15조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000274694",
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf",
+    "https://m.korea.kr/news/policyNewsView.do?newsId=148924193"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "과학탐구실험, 체육·예술 교과(특수목적고 선택 과목 제외)는 3단계 성취도만 (학교생활기록 작성 및 관리지침 제15조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000274694",
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "교양 과목은 이수 여부(P)만 (학교생활기록 작성 및 관리지침 제15조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000274694",
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "9등급제 진로 선택 과목과 전문교과Ⅱ는 석차등급 미산출",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "공동교육과정·온라인학교, 학교 밖 교육으로 들은 과목 등은 석차등급이 나오지 않음 (학교생활기록 작성 및 관리지침 제15조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000274694",
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "5등급제 수강자 5명 이하 과목은 석차등급 또는 '·' (학교생활기록 작성 및 관리지침 제15조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/admRulInfoR.do?admRulSeq=2100000274694",
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "9등급제는 수강자 13명 이하일 때 석차등급 또는 '·'",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "다른 시·도는 소속 교육청 지침과 학교 학업성적관리규정으로 세부 처리 확인 (안내)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "(FAQ) 5등급·9등급은 구간 경계가 달라 등급 숫자만으로 비교 어려움, 석차 백분율을 같이 보면 비교 쉬움 (완화)",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "확인불가",
+   "action": "완화"
+  },
+  {
+   "claim": "성취도는 성취율에 따른 절대평가, 석차등급은 상대평가, 함께 기재",
+   "urls": [
+    "https://m.korea.kr/news/policyNewsView.do?newsId=148924193",
+    "https://www.moe.go.kr/boardCnts/viewRenew.do?boardID=294&boardSeq=97551&lev=0&searchType=null&statusYN=W&page=1&s=moe&m=020402&opType=N"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "5등급제 선택 과목은 성취율 90% 이상이 A",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "A를 받아도 동점자가 많으면 2등급일 수 있음",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "환산 점수 합계는 소수 셋째 자리에서 반올림해 소수 둘째 자리까지, 그 순서로 석차",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기: 수강자수·석차·동석차 인원으로 등급, 과목 등급·학점으로 평균 등급",
+   "urls": [
+    "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "changes": "계산기 school-grade 독립 검수 완료(틀림 0, 경기도교육청 2026 학업성적관리 시행지침 대조) — 본문 그대로"
+}
