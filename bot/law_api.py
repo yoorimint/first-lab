@@ -47,14 +47,19 @@ def fetch(kind: str, target: str = "law", **params) -> str | None:
         if oc:
             query = urllib.parse.urlencode({"OC": oc, "target": target, "type": "XML", **params})
             return _get(DRF.format(page=PAGES[kind]) + "?" + query) or None
-        token = os.environ.get("FIRSTLAB_API_TOKEN", "")
-        if token:
-            query = urllib.parse.urlencode({"kind": kind, "target": target, **params})
-            got = json.loads(_get(PROXY + "?" + query, {"X-Firstlab-Token": token}))
-            return got.get("body") if got.get("status") == 200 else None
+        got = via_site(kind, target, **params)
+        return got.get("body") if got and got.get("status") == 200 else None
     except (OSError, ValueError):  # 연결 끊김·시간 초과·JSON 아님 → 화면 읽기로
         return None
-    return None
+
+
+def via_site(kind: str, target: str = "law", **params) -> dict | None:
+    """사이트 통로 응답 그대로 ({status, body, request(OC 가림)}). 토큰 없으면 None."""
+    token = os.environ.get("FIRSTLAB_API_TOKEN", "")
+    if not token:
+        return None
+    query = urllib.parse.urlencode({"kind": kind, "target": target, **params})
+    return json.loads(_get(PROXY + "?" + query, {"X-Firstlab-Token": token}))
 
 
 def available() -> bool:
@@ -69,6 +74,12 @@ def main(argv: list[str]) -> int:
     body = fetch(argv[1], argv[2], **params)
     if body is None:
         print("받지 못함 (신청값·토큰이 없거나 연결 실패)")
+        try:
+            got = via_site(argv[1], argv[2], **params)
+            if got:
+                print(f"통로 응답: 상태 {got.get('status')}, 요청 {got.get('request', '')}\n{got.get('body', '')[:500]}")
+        except (OSError, ValueError) as e:
+            print(f"통로 응답 못 받음: {e}")
         return 1
     print(body)
     return 0

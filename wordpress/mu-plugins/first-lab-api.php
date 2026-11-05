@@ -275,11 +275,17 @@ function firstlab_api_law( WP_REST_Request $request ) {
 	if ( is_wp_error( $res ) ) {
 		return new WP_Error( 'law_fetch', $res->get_error_message(), array( 'status' => 502 ) );
 	}
-	$out = array(
-		'status' => (int) wp_remote_retrieve_response_code( $res ),
-		'body'   => str_replace( $oc, '***', (string) wp_remote_retrieve_body( $res ) ), // 오류 응답에 OC 가 섞여 나와도 감춤
+	$body = (string) wp_remote_retrieve_body( $res );
+	$out  = array(
+		'status'  => (int) wp_remote_retrieve_response_code( $res ),
+		'body'    => str_replace( $oc, '***', $body ), // 오류 응답에 OC 가 섞여 나와도 감춤
+		'request' => str_replace( rawurlencode( $oc ), '***', str_replace( $oc, '***', $url ) ) . ' (OC ' . strlen( $oc ) . '자)', // 문제 확인용, OC 는 가림
 	);
-	if ( 200 === $out['status'] && '' !== $out['body'] ) {
+	// 법제처는 오류도 200 으로 돌려준다 (<Response><result>…실패…) → 저장하지 않고 오류로 표시
+	if ( false !== strpos( $body, '<Response>' ) && false !== strpos( $body, '실패' ) ) {
+		$out['status'] = 502;
+	}
+	if ( 200 === $out['status'] && '' !== $body ) {
 		set_transient( $key, $out, 6 * HOUR_IN_SECONDS ); // 같은 조문을 하루에 여러 번 묻지 않게
 	}
 	return $out;
