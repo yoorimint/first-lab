@@ -236,6 +236,27 @@ def law_exceptions(review: list[dict] | None, fetcher=fetch) -> list[dict]:
     return out
 
 
+CONDITION_WORDS = ("이하", "이상", "초과", "미만", "경우", "한해", "한정", "때만", "기준", "가정")
+QUALIFIERS = ("최대", "최소", "이하", "이상", "초과", "미만", "까지", "부터", "기준", "약", "예시", "최고", "최저")
+
+
+def headline_conditions(review: list[dict] | None, title: str, excerpt: str) -> list[str]:
+    """제목·요약 숫자가 조건이 붙은 주장에서 왔는데 제목·요약엔 조건이 없을 때 (11/5 #493 수수료·#553 '한도 74만 원')."""
+    from .review_gate import _headline_numbers, _numbers
+    out = []
+    for field, text in (("제목", title), ("요약", excerpt)):
+        for n in sorted(_headline_numbers(text)):
+            claims = [str(i.get("claim", "")) for i in review or [] if _ok(i) and n in _numbers(str(i.get("claim", "")))]
+            conditional = [c for c in claims if any(w in c for w in CONDITION_WORDS)]
+            if not conditional or len(conditional) < len(claims):
+                continue  # 조건 없이 뒷받침하는 주장도 있으면 제목 그대로 괜찮음
+            raw = re.search(rf"[^·,:]*{re.escape(n[:-3] + ',' + n[-3:]) if len(n) > 3 else re.escape(n)}[^·,]*", text) or re.search(re.escape(n), text)
+            around = raw.group(0) if raw else text
+            if "~" not in around and not any(q in around for q in QUALIFIERS):  # '6~45%' 처럼 범위로 쓴 것은 조건 포함
+                out.append(f"{field}의 '{around.strip()[:40]}' — 근거 주장엔 조건이 있음: {conditional[0][:70]}")
+    return out
+
+
 def absolute_sentences(content_html: str, limit: int = 15) -> list[str]:
     """본문에서 단정하는 문장 ('하나·만·모두·없어요·불가' …) — 예외를 원문에서 확인했는지 볼 목록."""
     text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", content_html or "")))
@@ -307,6 +328,8 @@ def main(argv: list[str]) -> None:
         for x in law["exceptions"]:
             print(f"    · {x}")
     data = json.loads(open(argv[1], encoding="utf-8").read())
+    for x in headline_conditions(review, data.get("title", ""), data.get("excerpt", "")):
+        print(f"- [제목 조건 확인] {x} → 제목·요약에 조건(최대·이하·기준 등)을 붙이거나 조건 없는 값으로")
     for x in absolute_sentences(data.get("content_html", "")):
         print(f"- [단정 문장] {x} → 예외(제외 대상·조건·상한·하한)를 원문에서 확인")
     for a in amended(review):

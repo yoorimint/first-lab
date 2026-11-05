@@ -55,7 +55,8 @@
     "prevention": "관문: 제목·요약 숫자는 검수된 주장 안에 있어야 함 + 본문과 숫자 자동 맞춤",
     "checks": [
       "tests/test_bot.py::def test_gate",
-      "tests/test_bot.py::from bot.writer import align_with_body"
+      "tests/test_bot.py::from bot.writer import align_with_body",
+      "tests/test_bot.py::def test_headline_condition_missing"
     ],
     "writer_tip": "제목·요약 숫자와 표현은 본문·검수된 주장과 같게.",
     "cause": "본문을 고친 뒤 제목·요약을 같이 안 고침, 조건이 붙는 숫자를 제목에 하나만 씀 (#416·#493)."

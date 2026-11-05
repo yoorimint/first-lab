@@ -901,6 +901,17 @@ class SourceCheckTest(unittest.TestCase):
         self.assertEqual(got[0]["article"], "제48조")
         self.assertIn("4년을 넘을 때에는", got[0]["exceptions"][0])
 
+    def test_headline_condition_missing(self):
+        """11/5 #553: '세액공제 한도 74만 원' — 근거는 '총급여 3,300만 원 이하 74만 원'."""
+        from bot import source_check as sc
+        review = [{"claim": "한도: 총급여 3,300만 원 이하 74만 원 (소득세법 제59조)", "urls": ["https://www.law.go.kr/x"], "verdict": "맞음", "action": "유지"}]
+        self.assertEqual(len(sc.headline_conditions(review, "근로소득세 계산법: 세액공제 한도 74만 원", "")), 1)
+        self.assertEqual(sc.headline_conditions(review, "근로소득세 계산법: 세액공제 한도 최대 74만 원", ""), [])
+        rate = [{"claim": "세율표: 1,400만 원 이하 6%", "urls": ["https://www.law.go.kr/x"], "verdict": "맞음", "action": "유지"}]
+        self.assertEqual(sc.headline_conditions(rate, "세율 6~45%", ""), [])  # 범위로 쓴 것
+        both = review + [{"claim": "세액공제 최고 한도 74만 원", "urls": ["https://www.law.go.kr/x"], "verdict": "맞음", "action": "유지"}]
+        self.assertEqual(sc.headline_conditions(both, "세액공제 한도 74만 원", ""), [])  # 조건 없는 근거도 있음
+
     def test_law_notation(self):
         from bot import source_check as sc
         self.assertTrue(sc.has_number("세율은 1천분의 5", "0.5"))     # 0.5%
