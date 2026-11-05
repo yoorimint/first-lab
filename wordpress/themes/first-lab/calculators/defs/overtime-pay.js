@@ -16,8 +16,8 @@
         name: 'pay_type', label: '임금 형태', type: 'select', default: 'monthly',
         options: [['monthly', '월급 (월 통상임금)'], ['hourly', '시급']],
       },
-      { name: 'amount', label: '월 통상임금 또는 시급 (원)', type: 'number', min: 1, step: 1, default: 2500000, help: '기본급에 매달 정해진 대로 모두에게 주는 고정 수당을 더한 금액이에요. 연장수당·실적 성과급은 빼요.' },
-      { name: 'base_hours', label: '월 통상임금 산정 기준시간 (월급일 때)', type: 'number', min: 1, step: 'any', default: 209, help: '주 40시간·주휴 8시간이면 209시간이에요. 단시간이면 (1주 소정근로시간 + 주휴시간) × 365 ÷ 7 ÷ 12.' },
+      { name: 'amount', label: '월 통상임금 또는 시급 (원)', type: 'number', min: 1, step: 1, default: 2500000, help: '기본급에 소정근로에 대해 정기적·일률적으로 주기로 정한 수당을 더한 금액이에요. 연장·야간·휴일근로수당은 빼요.' },
+      { name: 'base_hours', label: '월 통상임금 산정 기준시간 (월급일 때)', type: 'number', min: 1, step: 'any', default: 209, help: '주 40시간·주휴 8시간이면 209시간이에요. 단시간이면 (1주 소정근로시간 + 주휴시간) × 365 ÷ 7 ÷ 12 (주 15시간 미만은 주휴시간 0).' },
       { name: 'employees', label: '상시 근로자 수 (명)', type: 'number', min: 1, step: 1, default: 5, help: '4명 이하면 가산수당 규정이 적용되지 않아요.' },
       { name: 'ot_hours', label: '연장근로 시간 (평일, 시간)', type: 'number', min: 0, step: 0.5, default: 10, help: '하루 8시간·주 40시간을 넘은 시간이에요. 단시간근로자는 계약한 시간을 넘은 시간.' },
       { name: 'ot_night_hours', label: '그중 밤 10시~아침 6시 시간', type: 'number', min: 0, step: 0.5, default: 0 },
@@ -66,7 +66,7 @@
       const notes = [];
       if (!covered) notes.push('상시 4명 이하 사업장은 연장·야간·휴일 가산(50%·100%) 규정이 적용되지 않아요. 근로계약서·취업규칙에 가산을 정했다면 그 기준을 따라요.');
       if (hourly < d.min_wage_2026) notes.push(`통상시급이 2026년 최저임금(시급 ${u.won(d.min_wage_2026)})보다 낮아요. 통상임금이나 기준시간을 다시 확인해 보세요.`);
-      notes.push(`연장근로는 당사자가 합의해도 1주 ${d.weekly_overtime_limit}시간까지예요 (휴일근로 포함).`);
+      notes.push(`연장근로는 당사자가 합의해도 원칙적으로 1주 ${d.weekly_overtime_limit}시간까지예요 (고용노동부장관 인가를 받은 특별연장근로 등은 예외).`);
       notes.push('휴일근로는 연장 가산과 겹쳐 받지 않아요. 휴일 밤 10시~아침 6시 근무는 야간 가산 칸에 따로 넣어요. 각 줄은 원 미만을 버렸어요.');
       return {
         values: { hourly: num(hourly), ot_pay: otPay, ot_night_pay: otNightPay, night_pay: nightPay, holiday_pay: holidayPay, total },
