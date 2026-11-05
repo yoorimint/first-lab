@@ -56,3 +56,4 @@
 - 공공데이터포털 '대한민국 공공서비스(혜택) 정보': 서버 비밀값 `DATA_GO_KR_KEY`, 통로 `/wp-json/firstlab/v1/benefits`. 코드 `bot/benefit_api.py` (`python3 -m bot.benefit_api serviceList perPage=3`).
 - 배포 기록 '공공 API 점검' 줄에서 두 API 상태 확인.
 - NAVER API HUB (네이버 클라우드): 서버 비밀값 `NAVER_HUB_ID`·`NAVER_HUB_SECRET`. 매일 키워드 수집 끝에 상위 후보 40개의 블로그 문서 수·검색 성수기를 keywords.db `hub_signals` 에 저장 → 글감 점수에 반영 (`bot/naver_hub.py`, 하루 호출 상한 300). 무료 범위·유료 전환 공지 확인, 유료가 되면 `ENABLED = False`.
+- 네이버 신호 효과 측정 (운영자 질문 "몇 % 좋아지나", 11/5): 지금은 숫자 없음. ① 11/6 수집 뒤 상위 20 후보가 신호 때문에 얼마나 바뀌었는지(%) ② 12/3 이후 서치콘솔 글별 노출·클릭을 '성수기 직전 vs 비수기에 쓴 글', '블로그 글 적은 vs 포화 키워드'로 비교 (hub_signals 의 checked 날짜 기준). 차이가 확인돼야 효과로 보고.
