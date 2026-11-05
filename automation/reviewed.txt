@@ -115,3 +115,5 @@ calc:fiscal-annual-leave
 calc:gimhae-airport-parking
 254 지역 의료보험료 계산
 673 사대보험 징수포털 사용법: 다음 달 10일 납부·카드 수수료 0.8%
+687 음력 달력 계산기: 2026 설날 2월 17일·추석 9월 25일
+calc:lunar-calendar
