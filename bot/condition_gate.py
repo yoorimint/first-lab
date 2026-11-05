@@ -435,8 +435,19 @@ _APPLY = re.compile(r"(이후|시행 후|시행 뒤)[^.]{0,60}?(경우|분|기�
 _APPLY_OK = re.compile(r"이후|종전|분부터|경우부터|신고부터|전 [^.]{0,10}(은|는)")
 
 
+# 요약 '○년 ○월 ○일부터 새 기준' ↔ 본문 부칙 경과조치('예전 기간 중 하나', '종전 규정') (11/5 #832 운전면허 갱신기간 —
+# 2026년 전 발급자는 첫 갱신 때 예전 기간도 됨, #828 2027 고용보험 — 이미 가입한 사람은 이직 전까지 종전 규정)
+_START = re.compile(r"\d{4}년 \d{1,2}월 \d{1,2}일부터")
+_TRANSITION_BODY = re.compile(r"(종전|예전)의? (기간|규정|기준|방식|갱신기간)|중 하나(를|에) (따|골라|선택)")
+_TRANSITION_OK = re.compile(r"예전|전에 [^.]{0,15}(받|가입|신청)")
+
+
 def excerpt_apply_date(excerpt: str, body_html: str) -> list[str]:
-    ex = _plain(excerpt)
-    if _CHANGE.search(ex) and _APPLY.search(_plain(body_html)) and not _APPLY_OK.search(ex):
+    ex, body = _plain(excerpt), _plain(body_html)
+    if _APPLY_OK.search(ex) or _TRANSITION_OK.search(ex):
+        return []
+    if _CHANGE.search(ex) and _APPLY.search(body):
         return [f"요약 '{ex[:50]}' 은 바뀐 값만 있고 본문의 적용 시점('이후 … 경우부터 적용', 그 전은 종전)이 없음 — 요약에도 넣기"]
+    if _START.search(ex) and _TRANSITION_BODY.search(body):
+        return [f"요약 '{ex[:50]}' 은 새 기준만 있고 본문의 경과조치('{_TRANSITION_BODY.search(body).group(0)}')가 없음 — 요약에도 넣기"]
     return []

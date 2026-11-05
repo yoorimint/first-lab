@@ -2657,6 +2657,13 @@ class ExcerptApplyDateTest(unittest.TestCase):
         self.assertEqual(g.excerpt_apply_date("2026년 11월 27일 이후 거짓 신고하면 가산금이 10%에서 40%로 올라요.", body), [])
         self.assertEqual(g.excerpt_apply_date("2026년 11월 27일부터 가산금이 10%에서 40%로 올라요.", "<p>올라요.</p>"), [])
 
+    def test_transition_in_body(self):
+        """#832: 요약 '2026년 1월 1일부터 생일 전후 6개월' ↔ 본문 '2026년 전 발급자는 예전 기간 중 하나'."""
+        from bot import condition_gate as g
+        body = "<p>2026년 전에 면허증을 받은 사람은 첫 갱신 때 새 기간과 예전 기간 중 하나를 골라요.</p>"
+        self.assertTrue(g.excerpt_apply_date("갱신기간은 2026년 1월 1일부터 생일 전후 6개월이에요.", body))
+        self.assertEqual(g.excerpt_apply_date("갱신기간은 2026년 1월 1일부터 생일 전후 6개월이에요. 2026년 전에 받은 사람은 첫 갱신 때 예전 기간도 돼요.", body), [])
+
 
 class LawAbsenceTest(unittest.TestCase):
     def test_flag_and_pass(self):
