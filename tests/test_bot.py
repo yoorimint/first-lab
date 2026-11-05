@@ -1306,6 +1306,14 @@ class PreventionRequiredTest(unittest.TestCase):
         self.assertTrue(any("너무 짧음" in e for e in self.errs(prevention="review_only:몰라")))
         self.assertTrue(any("코드 검사가 있는 유형" in e for e in self.errs(type="headline", prevention="review_only:제목이 본문과 다름을 고침")))
 
+    def test_unverified_review_only_only_without_numbers(self):
+        """근거 대조는 숫자만 페이지와 맞춰 봄 → 숫자 없는 단정(11/6 #874 '공항버스 제외')만 review_only, 숫자 주장은 검사로."""
+        self.post["content_html"] = "<li>KTX·SRT, 시외·고속버스, 공항버스처럼 표를 따로 사는 수단은 빠져요</li><p>청년은 월 15회 이상 타면 30% 환급돼요.</p>"
+        why = "review_only:숫자 없는 단정은 근거 대조가 페이지와 맞춰 보지 못함"
+        self.assertEqual(self.errs(type="unverified", tag="li", find="공항버스처럼", replace_paragraph="KTX·SRT는 빠져요", prevention=why), [])
+        self.assertTrue(any("코드 검사가 있는 유형" in e for e in
+                            self.errs(type="unverified", find="30% 환급", replace_paragraph="자주 타면 환급돼요.", prevention=why)))
+
 
 class IndexNowTest(unittest.TestCase):
     """글이 공개되는 순간 검색엔진에 알린다 (11/5 운영자 승인)."""

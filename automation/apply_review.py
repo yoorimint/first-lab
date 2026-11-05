@@ -47,6 +47,14 @@ def verified_numbers(post: dict) -> list[str]:
     return sorted({n for item in found for n in item.get("numbers", [])})
 
 
+PLAIN_REVIEW_ONLY = ("unverified", "no_source")   # 근거 대조가 맞춰 볼 숫자(세 자리 이상·비율)가 없는 문단일 때만 review_only 허용
+
+
+def _has_claim_number(text: str) -> bool:
+    from bot.source_check import key_numbers
+    return bool(key_numbers(_plain(text)))
+
+
 PREVENTION_LOG = ROOT / "automation" / "review-only-log.md"
 CHECK_MODULES = ("condition_gate.py", "review_gate.py", "source_check.py", "writer.py", "freshness.py")  # 글을 막거나 표시하는 검사가 있는 곳
 
@@ -55,6 +63,9 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
     """재발 방지 표시가 없거나 거짓이면 이유."""
     prev = str(p.get("prevention", "")).strip()
     if prev.startswith("review_only:"):
+        if p.get("type") in PLAIN_REVIEW_ONLY and not _has_claim_number(element_around(post["content_html"], p.get("find", ""), p.get("tag", "p"))):
+            # 근거 대조(bot/source_check)는 숫자만 페이지와 맞춰 봄 — 숫자 없는 단정(11/6 #874 '공항버스 제외')은 코드로 못 봄
+            return None if len(prev) >= len("review_only:") + 10 else "review_only 이유가 너무 짧음 (왜 코드로 못 막는지)"
         if not TYPES.get(p.get("type"), {}).get("review_only"):
             return f"'{p.get('type')}' 유형은 코드 검사가 있는 유형 — review_only 대신 check:<검사 이름> (검사가 못 잡았으면 검사를 고치고 테스트에 이 글 사례 추가)"
         return None if len(prev) >= len("review_only:") + 10 else "review_only 이유가 너무 짧음 (왜 코드로 못 막는지)"
