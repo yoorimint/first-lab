@@ -919,6 +919,12 @@ class SourceCheckTest(unittest.TestCase):
         both = review + [{"claim": "세액공제 최고 한도 74만 원", "urls": ["https://www.law.go.kr/x"], "verdict": "맞음", "action": "유지"}]
         self.assertEqual(sc.headline_conditions(both, "세액공제 한도 74만 원", ""), [])  # 조건 없는 근거도 있음
 
+    def test_short_real_page_is_readable(self):
+        """11/5 #572: 한글 1,394자인 실제 안내 페이지를 껍데기로 잘못 셈 → 기준 400자."""
+        from bot import source_check as sc
+        self.assertLessEqual(sc.MIN_KOREAN, 1394)
+        self.assertGreater(sc.MIN_KOREAN, 0)
+
     def test_law_notation(self):
         from bot import source_check as sc
         self.assertTrue(sc.has_number("세율은 1천분의 5", "0.5"))     # 0.5%
