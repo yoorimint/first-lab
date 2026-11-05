@@ -2285,6 +2285,23 @@ class HealthAlertTest(unittest.TestCase):
         self.assertIn("sys.exit(1)", wf)
 
 
+class PatchNoSwallowTest(unittest.TestCase):
+    """찾을 문구가 닫는 태그로 끝나도 다음 문단을 삼키지 않음 (11/5 #51·#59·#70 다음 문단이 사라진 일)."""
+
+    def test_find_with_closing_tag(self):
+        from bot.fix_posts import patch_content
+        html = "<ul><li>견적을 받아요.</li><li>항목을 맞춰 봐요.</li></ul>"
+        out = patch_content(html, {"find": "견적을 받아요.</li>", "replace_paragraph": "총액 견적을 받아요.", "tag": "li"})
+        self.assertEqual(out, "<ul><li>총액 견적을 받아요.</li><li>항목을 맞춰 봐요.</li></ul>")
+
+    def test_apply_review_rejects_closing_tag(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        post = {"title": "t", "excerpt": "e", "content_html": "<p>준비하면 돼요.</p><p>다음</p>"}
+        bad = [{"type": "outdated", "why": "x", "find": "준비하면 돼요.</p>", "replace_paragraph": "고쳤어요", "tag": "p"}]
+        self.assertTrue(any("닫는 태그" in e for e in apply_review.check(post, bad)))
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

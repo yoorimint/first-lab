@@ -74,8 +74,14 @@ def patch_content(content: str, patch: dict) -> str | None:
     tag = patch.get("tag", "p")
     # 안에 <strong> 같은 태그가 있어도 찾도록: '<p>' 부터 같은 문단의 '</p>' 까지.
     # 여는 태그의 속성(<h2 class="wp-block-heading"> 등)은 그대로 둔다
-    m = re.search(rf"<{tag}(?P<attrs>\s[^>]*)?>(?:(?!</{tag}>).)*?" + re.escape(patch["find"]) + rf".*?</{tag}>",
-                  content, flags=re.S)
+    find = patch["find"]
+    if find.rstrip().endswith(f"</{tag}>"):
+        # find 가 닫는 태그로 끝나면 그 문단에서 끝냄 — 안 그러면 '.*?</p>' 가 다음 문단까지 삼킴 (11/5 #51·#59·#70 다음 문단이 사라짐)
+        core = find.rstrip()[: -len(f"</{tag}>")]
+        m = re.search(rf"<{tag}(?P<attrs>\s[^>]*)?>(?:(?!</{tag}>).)*?" + re.escape(core) + rf"</{tag}>", content, flags=re.S)
+    else:
+        m = re.search(rf"<{tag}(?P<attrs>\s[^>]*)?>(?:(?!</{tag}>).)*?" + re.escape(find) + rf"(?:(?!</{tag}>).)*?</{tag}>",
+                      content, flags=re.S)
     if "insert_after" in patch:
         if not m or patch["insert_after"] in content:
             return None
