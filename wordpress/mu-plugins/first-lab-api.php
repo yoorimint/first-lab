@@ -266,7 +266,7 @@ function firstlab_api_law( WP_REST_Request $request ) {
 	if ( null === $url ) {
 		return new WP_Error( 'bad_args', 'kind 는 search|service, target 은 ' . implode( '|', FIRSTLAB_LAW_TARGETS ), array( 'status' => 400 ) );
 	}
-	$key    = 'firstlab_law_' . md5( $url );
+	$key    = 'firstlab_law2_' . md5( $url ); // 2: 첫 판이 오류 응답을 저장했던 것 무시
 	$cached = get_transient( $key );
 	if ( false !== $cached ) {
 		return $cached;
