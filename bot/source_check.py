@@ -12,9 +12,11 @@
 """
 from __future__ import annotations
 
+import datetime as dt
 import html
 import json
 import re
+import sys
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -158,6 +160,48 @@ def check(review: list[dict] | None, fetcher=fetch) -> dict:
     return {"counts": counts, "claims": [c for c in claims if c["status"] != FOUND]}
 
 
+RECENT_DAYS = 365  # 이 기간 안에 개정·시행된 조문은 안내 페이지가 아직 옛 내용일 수 있음 (11/5 #512 납부지연 가산세 2026.7.1 개정)
+
+
+def article_of(url: str) -> str | None:
+    """law.go.kr 주소의 조문 번호 ('/법령/국세기본법/제47조의4' → '제47조의4')."""
+    m = re.search(r"/(제\d+조(?:의\d+)?)", urllib.parse.unquote(url))
+    return m.group(1) if "law.go.kr" in url and m else None
+
+
+def recent_changes(text: str, article: str, today: dt.date | None = None) -> list[str]:
+    """조문 본문의 '<개정 …>'·'<신설 …>' 날짜와 부칙 '○○의 개정규정은 YYYY년 M월 D일부터 시행' 중 최근 1년·앞으로 시행되는 것."""
+    today = today or dt.date.today()
+    start = text.find(article + "(")
+    if start < 0:
+        return []
+    nxt = re.search(r"제\d+조(?:의\d+)?\(", text[start + len(article) + 1:])
+    body = text[start: start + len(article) + 1 + (nxt.start() if nxt else 3000)]
+    dates = [dt.date(int(y), int(m), int(d)) for y, m, d in re.findall(r"(20\d\d)\.\s*(\d{1,2})\.\s*(\d{1,2})\.", body)]
+    for y, m, d in re.findall(re.escape(article) + r"[^.]{0,80}?개정규정은\s*(20\d\d)년\s*(\d{1,2})월\s*(\d{1,2})일", text):
+        dates.append(dt.date(int(y), int(m), int(d)))
+    return sorted({f"{x:%Y.%m.%d}" for x in dates if (today - x).days <= RECENT_DAYS})
+
+
+def amended(review: list[dict] | None, fetcher=fetch, today: dt.date | None = None) -> list[dict]:
+    """주장의 법령 근거 조문이 최근 1년 안에 개정됐거나 앞으로 시행되면 (안내 페이지·기사 값을 다시 확인할 대상)."""
+    out, cache = [], {}
+    for item in review or []:
+        if not _ok(item):
+            continue
+        for url in item.get("urls", []):
+            art = article_of(str(url))
+            if not art:
+                continue
+            base = re.sub(r"(/법령/[^/?#]+)/.*$", r"\1", urllib.parse.unquote(str(url)))
+            if base not in cache:
+                cache[base] = fetcher(base)
+            found = recent_changes(cache[base] or "", art, today)
+            if found:
+                out.append({"claim": str(item.get("claim", ""))[:120], "article": art, "dates": found, "url": str(url)})
+    return out
+
+
 def summary(result: dict) -> str:
     c = result["counts"]
     total = sum(c.values())
@@ -175,3 +219,18 @@ def record(post_id: int | str, review: list[dict] | None, save) -> str:
         return summary(result)
     except Exception as e:  # noqa: BLE001 — 기록용 검사라 글 올리기를 막지 않는다
         return f"근거 대조 실패(기록만): {e}"[:150]
+
+
+def main(argv: list[str]) -> None:
+    """글쓰기 세션이 올리기 전에 돌린다: python3 -m bot.source_check ARTICLE.json (review 필드를 읽음)."""
+    review = json.loads(open(argv[1], encoding="utf-8").read()).get("review")
+    result = check(review)
+    print(summary(result))
+    for c in result["claims"]:
+        print(f"- [{c['status']}] {c['claim']}" + (f" (없는 숫자: {', '.join(c['missing'])})" if c["missing"] else ""))
+    for a in amended(review):
+        print(f"- [최근 개정 조문 {a['article']} {', '.join(a['dates'])}] {a['claim']} → 안내 페이지·기사 값이 아니라 현행 조문·부칙으로 다시 확인")
+
+
+if __name__ == "__main__":
+    main(sys.argv)

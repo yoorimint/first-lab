@@ -862,6 +862,19 @@ class SourceCheckTest(unittest.TestCase):
         self.assertEqual(sc.law_body_url(shell),
                          "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284381&chrClsCd=010202&urlMode=lsInfoP&efYd=20260918")
 
+    def test_recent_amendment_flag(self):
+        """11/5 #512: 납부지연 가산세 조문이 2026.7.1 개정됐는데 개정 전 방식으로 계산 → 최근 개정 조문을 알려 준다."""
+        import datetime as dt
+        from bot import source_check as sc
+        law = ("제47조의3(과소신고) ... <개정 2019. 12. 31.> 제47조의4(납부지연가산세) ① 납세의무자가 ... <개정 2018. 12. 31., 2025. 12. 23.> "
+               "1. 납부일의 전날까지 제47조의5(원천징수) ... 부칙 제1조(시행일) 다만 제47조의4 및 제47조의5의 개정규정은 2026년 7월 1일부터 시행한다.")
+        today = dt.date(2026, 11, 5)
+        self.assertEqual(sc.recent_changes(law, "제47조의4", today), ["2025.12.23", "2026.07.01"])
+        self.assertEqual(sc.recent_changes(law, "제47조의3", today), [])
+        review = [{"claim": "납부지연가산세 13만 2,000원", "urls": ["https://www.law.go.kr/법령/국세기본법/제47조의4"], "verdict": "맞음", "action": "유지"}]
+        got = sc.amended(review, fetcher=lambda u: law, today=today)
+        self.assertEqual((got[0]["article"], got[0]["dates"][-1]), ("제47조의4", "2026.07.01"))
+
     def test_law_notation(self):
         from bot import source_check as sc
         self.assertTrue(sc.has_number("세율은 1천분의 5", "0.5"))     # 0.5%
@@ -986,6 +999,10 @@ class ErrorTypeRegistryTest(unittest.TestCase):
         self.assertEqual((ROOT / "automation" / "common-errors.md").read_text(encoding="utf-8"), common_errors.build(),
                          "python3 automation/common_errors.py 로 다시 만들기")
         self.assertIn("common-errors.md", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+        # 글쓰기 독립 검수자와 감시 외부 검수자가 같은 확인표를 쓴다 (11/5: 글쓰기 쪽 지시가 더 약해 외부 검수에서만 잡히던 오류)
+        for f in ("daily-writer.md", "review-prompt.md"):
+            self.assertIn("review-checklist.md", (ROOT / "automation" / f).read_text(encoding="utf-8"), f)
+        self.assertIn("python3 -m bot.source_check", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
     def test_no_absence_wording_in_fixes(self):
         """확인 못 한 것을 '없다·찾지 못했다'로 고치지 않는다 (11/4 #219 파인 대출 계산기)."""

@@ -28,6 +28,8 @@ def build() -> str:
     for key, n in counts.most_common():
         t = reg[key]
         lines.append(f"## {t['name']} ({n}곳)")
+        if t.get("cause"):
+            lines.append(f"- 왜 틀렸나: {t['cause']}")
         lines.append(f"- 쓸 때: {t.get('writer_tip', '')}")
         recent = [p for p in reversed(patches) if p["type"] == key][:EXAMPLES]
         for p in recent:
