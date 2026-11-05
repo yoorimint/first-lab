@@ -109,8 +109,8 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     for r in rows:
         if not is_allowed(r["keyword"], settings.blocked_words) or overlaps_used(r["norm"]):
             continue
-        if r["last_checked"] != latest and not naver_hub.is_info(r["keyword"]):
-            continue  # 황금으로 들어온 옛 키워드는 정보 검색만 (상품명 제외)
+        if r["last_checked"] != latest and naver_hub.intent(r["keyword"]) == "skip":
+            continue  # 황금으로 들어온 옛 키워드 중 사이트 찾아가기·네이버가 바로 답함·브랜드는 제외
         head = find_head(r["norm"], r["total"], volumes)
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
         sc += topic_weight(r["norm"])
@@ -134,7 +134,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
                        "comp_info": r["comp_info"] or (f"같은 주제 추정 {difficulty}" if estimated else ""),
                        "gsc": {"opportunity": "서치콘솔 기회", "good_head": "잘 되는 주제",
                                "bad_head": "안 되는 주제"}.get(gsc or "", ""),
-                       "naver": naver_hub.describe(sig, r["total"]),  # 글쓰기 세션이 보는 근거 (황금 점수·성수기·블로그 글 수)
+                       "naver": naver_hub.describe(sig, r["total"], r["keyword"]),  # 글쓰기 세션이 보는 근거 (황금 점수·성수기·블로그 글 수)
                        "gold": naver_hub.is_gold(sig, r["total"], r["keyword"])})
     # 운영자 지시(11/5): 황금 키워드 찾은 것은 점수 높은 것부터 먼저 쓴다 → 황금·좋음 무리를 맨 앞에, 그 안에서 점수순
     result.sort(key=lambda x: (x["gold"], x["score"]), reverse=True)

@@ -1619,7 +1619,10 @@ class NaverHubTest(unittest.TestCase):
             self.assertFalse(h.is_info(product), product)
         for info in ("연차개수계산기", "육아휴직급여신청", "실업급여조건", "근로장려금"):
             self.assertTrue(h.is_info(info), info)
-        self.assertEqual(h.signal_score({"docs": 100, "hits": 0}, 9000, 7, "카시오F91W"), 0.0)   # 상품명은 황금 가점 없음
+        full = h.signal_score({"docs": 100}, 9000, 7)
+        self.assertAlmostEqual(h.signal_score({"docs": 100}, 9000, 7, "카시오F91W"), full * 0.5)   # 애매(상품명일 수도) → 버리지 않고 절반
+        self.assertEqual(h.signal_score({"docs": 100}, 9000, 7, "홈택스로그인"), 0.0)             # 사이트 찾아가기 → 없음
+        self.assertEqual(h.intent("카시오F91W"), "unknown")
         for domain in ("청약통장", "육아휴직", "자동차세", "국가장학금", "전입신고"):  # 수식어 없어도 제도 이름이면 정보 검색
             self.assertTrue(h.is_info(domain), domain)
         for shop in ("아로나민골드가격", "비맥스제트가격", "나이키v2k런", "치폴레뜻", "제네시스견적내기"):  # 11/5 두 번째 집계 상위 — 쇼핑·사전
@@ -1636,6 +1639,24 @@ class NaverHubTest(unittest.TestCase):
         self.assertAlmostEqual(h.signal_score({"docs": 50000, "low": "7"}, 1000, 7), 2 * 3 * (0.02 / 0.3) - 0.5)
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
         self.assertEqual(h.describe(sig, 1000), f"좋음 {gs:.1f} / 성수기 1·2월 / 황금지수 0.20(검색 1,000/글 5,000) / 참고: 상위 30개 중 제목 일치 6개(1년 넘은 글 3개)")
+
+    def test_gov_vocab_catches_new_program_names(self):
+        """정부 혜택 이름에서 뽑은 제도 단어로 수식어 없는 새 제도 이름도 정보 검색으로 (고정 목록이 놓치는 것)."""
+        import datetime as dt
+        import tempfile
+        from bot import naver_hub as h
+        pages = {1: {"data": [{"서비스명": "청년도약계좌 지원"}, {"서비스명": "첫만남이용권(출생 축하)"}, {"서비스명": "농업인 서비스"}]}}
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "vocab.json"
+            msg = h.refresh_vocab(dt.date(2026, 11, 5), fetch=lambda kind, page, perPage: pages.get(page), path=path)
+            self.assertIn("3개 이름에서", msg)
+            with mock.patch.object(h, "GOV_VOCAB", path):
+                h._gov_words.cache_clear()
+                self.assertEqual(h.intent("청년도약계좌"), "info")       # 고정 단어 목록에 없는 새 제도
+                self.assertEqual(h.intent("첫만남이용권"), "info")
+                self.assertEqual(h.intent("서비스맛집"), "unknown")  # '서비스' 같은 흔한 말은 사전에서 뺌
+                self.assertIn("최근 받음", h.refresh_vocab(dt.date(2026, 11, 7), fetch=None, path=path))  # 일주일 안엔 다시 안 받음
+            h._gov_words.cache_clear()
 
     def test_daily_limit_per_kind(self):
         import datetime as dt

@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import html
 import json
 import math
@@ -192,13 +193,83 @@ DOMAIN_WORDS = ("청약", "적금", "예금", "통장", "전세", "월세", "주
                 "바우처", "민원", "과태료", "범칙금", "벌점", "자동차검사", "명의이전", "전입신고", "확정일자", "보증금")
 
 
-def is_info(keyword: str) -> bool:
-    """정보를 찾는 검색만 황금 대상: 수식어(방법·신청·조건·계산·기간 …)가 붙었거나 돈·계산기 주제.
-    11/5 첫 조회에서 '스케쳐스윈터부츠·카시오F91W' 같은 상품명이 황금으로 올라옴 — 사려고 검색해서 블로그 글이 적을 뿐,
-    정보 글로는 들어올 사람이 없다."""
+GOV_VOCAB = COUNTER_DIR / "gov-vocab.json"   # 정부 혜택 서비스 이름에서 뽑은 제도 단어 (일주일마다 새로)
+VOCAB_DAYS = 7
+GENERIC = {"서비스", "프로그램", "지원사업", "사업", "센터", "운영", "관리", "지원금지원", "제공", "추진", "활성화", "육성", "조성",
+           "구축", "설치", "개선", "강화", "교육", "상담", "안내", "기타", "일반", "특별", "긴급", "한시"}
+
+
+def _vocab_words(names: list[str]) -> set[str]:
+    """서비스 이름 → 제도 단어 (3~12자, 너무 흔한 말·숫자 제외). 예: '주택금융공사 월세자금보증' → 주택금융공사·월세자금보증."""
+    words = set()
+    for name in names:
+        for part in re.split(r"[\s·,()\[\]/\-<>「」『』ㆍ:]+", name or ""):
+            w = norm(part)
+            if 3 <= len(w) <= 12 and not w.isdigit() and w not in GENERIC:
+                words.add(w)
+    return words
+
+
+def refresh_vocab(today: dt.date | None = None, fetch=None, path: Path | None = None) -> str:
+    """정부 혜택(공공서비스) 이름 전체 → 제도 단어 사전. VOCAB_DAYS 안에 받았으면 건너뜀. 실패해도 예전 사전 유지."""
+    today, path = today or dt.date.today(), path or GOV_VOCAB
+    try:
+        old = json.loads(path.read_text(encoding="utf-8"))
+        if old.get("checked", "") >= f"{today - dt.timedelta(days=VOCAB_DAYS):%Y-%m-%d}":
+            return f"제도 단어 사전: {len(old.get('words', [])):,}개 (최근 받음)"
+    except (OSError, ValueError):
+        pass
+    if fetch is None:
+        from .benefit_api import fetch as fetch
+    names, page = [], 1
+    while page <= 20:
+        got = fetch("serviceList", page=page, perPage=1000)
+        rows = (got or {}).get("data") or []
+        names += [r.get("서비스명", "") for r in rows]
+        if len(rows) < 1000:
+            break
+        page += 1
+    if not names:
+        return "제도 단어 사전: 받지 못함 (예전 사전 유지)"
+    words = sorted(_vocab_words(names))
+    path.write_text(json.dumps({"checked": f"{today:%Y-%m-%d}", "words": words}, ensure_ascii=False), encoding="utf-8")
+    _gov_words.cache_clear()
+    return f"제도 단어 사전: 정부 혜택 {len(names):,}개 이름에서 {len(words):,}개"
+
+
+@functools.lru_cache(maxsize=1)
+def _gov_words() -> frozenset[str]:
+    try:
+        return frozenset(json.loads(GOV_VOCAB.read_text(encoding="utf-8")).get("words", []))
+    except (OSError, ValueError):
+        return frozenset()
+
+
+def _has_gov_word(k: str) -> bool:
+    """키워드 안에 제도 단어가 들어 있는지 (3~12자 부분 문자열을 사전에서 찾음 — 빠름)."""
+    words = _gov_words()
+    return bool(words) and any(k[i:i + n] in words for n in range(3, min(12, len(k)) + 1) for i in range(len(k) - n + 1))
+
+
+def intent(keyword: str) -> str:
+    """'info'(정보 검색 — 황금 가점 전부) / 'unknown'(판단 애매 — 버리지 않고 가점 절반, 글쓰기 세션이 판단) /
+    'skip'(사이트 찾아가기·네이버가 바로 답함·브랜드 — 가점 없음). 운영자 지시 '놓치는 거 없게' (11/5)."""
+    from .keyword_filter import is_brand
     from .select_keyword import topic_weight
     k = norm(keyword)
-    return not is_navigational(k) and (topic_weight(k) > 0 or any(m in k for m in INFO_MODIFIERS + DOMAIN_WORDS))
+    if is_navigational(k) or is_brand(k):
+        return "skip"
+    if topic_weight(k) > 0 or any(m in k for m in INFO_MODIFIERS + DOMAIN_WORDS) or _has_gov_word(k):
+        return "info"
+    return "unknown"
+
+
+def is_info(keyword: str) -> bool:
+    """정보를 찾는 검색 (intent == 'info'). 상품명·사전 검색은 빠짐 (11/5 집계 상위가 '스케쳐스윈터부츠·아로나민골드가격' 등)."""
+    return intent(keyword) == "info"
+
+
+INTENT_WEIGHT = {"info": 1.0, "unknown": 0.5, "skip": 0.0}
 
 
 def per_search(sig: dict | None, total: int) -> float | None:
@@ -237,10 +308,10 @@ def gold_label(sig: dict | None, total: int) -> str:
 
 
 def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") -> float:
-    """글감 점수 조정 (select_keyword): 황금 점수 × GOLD_WEIGHT + 성수기. 정보 검색(is_info)이 아니면 황금 가점 없음."""
+    """글감 점수 조정 (select_keyword): 황금 점수 × GOLD_WEIGHT × (정보 1 / 애매 0.5 / 제외 0) + 성수기."""
     if not sig:
         return 0.0
-    s = GOLD_WEIGHT * gold_score(sig, total) if (not keyword or is_info(keyword)) else 0.0
+    s = GOLD_WEIGHT * gold_score(sig, total) * (INTENT_WEIGHT[intent(keyword)] if keyword else 1.0)
     peak = [int(x) for x in (sig.get("peak") or "").split(",") if x]
     low = [int(x) for x in (sig.get("low") or "").split(",") if x]
     if month in peak or (month % 12 + 1) in peak:  # 이번 달 또는 다음 달이 성수기 → 지금 써야 시즌에 상위 노출
@@ -250,14 +321,15 @@ def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") ->
     return s
 
 
-def describe(sig: dict | None, total: int) -> str:
+def describe(sig: dict | None, total: int, keyword: str = "") -> str:
     """후보 목록에 붙일 한 줄: '황금 3.4 / 성수기 1·2월 / 상위 30개 중 정면 경쟁 2개(1년 넘은 글 1개)'."""
     if not sig:
         return ""
     parts = []
     label = gold_label(sig, total)
     if label:
-        parts.append(f"{label} {gold_score(sig, total):.1f}")
+        parts.append(f"{label} {gold_score(sig, total):.1f}" + (" (분류 미정 — 정보 글로 답할 수 있으면 쓰고, 아니면 건너뛰기)"
+                                                               if keyword and intent(keyword) == "unknown" else ""))
     if sig.get("peak"):
         parts.append(f"성수기 {'·'.join(sig['peak'].split(','))}월")
     index = gold_index(sig, total)
@@ -337,8 +409,9 @@ def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
         sig = known.get(n) or {}
         return (sig.get("docs_checked") or "") < cutoff
 
-    fresh = [r for r in rows if stale(r["norm"]) and is_allowed(r["keyword"], settings.blocked_words) and is_info(r["keyword"])]
-    fresh.sort(key=lambda r: (topic_weight(r["norm"]), r["total"]), reverse=True)
+    kinds = {r["norm"]: intent(r["keyword"]) for r in rows}
+    fresh = [r for r in rows if stale(r["norm"]) and is_allowed(r["keyword"], settings.blocked_words) and kinds[r["norm"]] != "skip"]
+    fresh.sort(key=lambda r: (kinds[r["norm"]] == "info", topic_weight(r["norm"]), r["total"]), reverse=True)  # 정보 검색 먼저
     batch = [r["keyword"] for r in fresh[:GOLD_SCAN]]
     saved = 0
 
@@ -364,17 +437,24 @@ def golden_report(conn, rows=None, top_n: int = 5, volume: tuple[int, int] | Non
         rows = conn.execute("SELECT keyword, norm, total FROM keywords WHERE status IN ('new','ok') AND total BETWEEN ? AND ?",
                             volume).fetchall()
     sigs = load(conn)
+    counts = {"info": [0, 0, 0], "unknown": [0, 0, 0]}  # 조회, 황금, 좋음
     scored = []
     for r in rows:
         sig = sigs.get(r["norm"])
-        if sig and sig.get("docs") is not None and is_info(r["keyword"]):
-            scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], sig["docs"]))
+        kind = intent(r["keyword"])
+        if not sig or sig.get("docs") is None or kind == "skip":
+            continue
+        label = gold_label(sig, r["total"])
+        counts[kind][0] += 1
+        counts[kind][1] += label == "황금"
+        counts[kind][2] += label == "좋음"
+        if kind == "info" and label in ("황금", "좋음"):
+            scored.append((label == "황금", gold_score(sig, r["total"]), r["norm"], r["total"], sig["docs"]))
     scored.sort(reverse=True)
-    gold = [x for x in scored if x[1] == "황금"]
-    good = [x for x in scored if x[1] == "좋음"]
-    shown = gold + good  # '확인 필요(글 거의 없음)'·포화는 목록에서 뺌 (황금 먼저, 그 안에서 점수순)
-    top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/글 {d:,})" for g, _, n, t, d in shown[:top_n])
-    return f"정보 검색 {len(scored):,}개 중 황금 {len(gold):,}개·좋음 {len(good):,}개 — 상위: {top or '없음'}"
+    top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/글 {d:,})" for _, g, n, t, d in scored[:top_n])
+    i, u = counts["info"], counts["unknown"]
+    return (f"정보 검색 {i[0]:,}개 중 황금 {i[1]:,}개·좋음 {i[2]:,}개 / 분류 미정 {u[0]:,}개 중 황금 {u[1]:,}개·좋음 {u[2]:,}개"
+            f" — 정보 검색 상위: {top or '없음'}")
 
 
 def refresh_signals(conn, candidates: list[dict], today: dt.date | None = None, keys=None) -> str:
@@ -466,8 +546,9 @@ def run_daily(log: bool = False) -> str:
     from .select_keyword import ranked_candidates
     from .settings import load_settings
     settings = load_settings()
+    vocab = refresh_vocab()  # 정부 혜택 이름 → 제도 단어 사전 (일주일마다)
     with connect() as conn:
-        queue = refresh_queue(conn)  # 공개 대기 글 먼저 (적은 호출로 오늘 공개 순서에 바로 반영)
+        queue = vocab + " / " + refresh_queue(conn)  # 공개 대기 글 먼저 (적은 호출로 오늘 공개 순서에 바로 반영)
         gold = scan_golden(conn, settings)
         msg = queue + " / " + gold + " / " + refresh_signals(conn, ranked_candidates(conn, settings, limit=CHECK_TOP))
     if log:
