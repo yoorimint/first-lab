@@ -1813,6 +1813,25 @@ class RatesTest(unittest.TestCase):
             self.assertIn("키 없음", bok_api.run(dt.date(2026, 11, 28)))
 
 
+class BenefitWatchTest(unittest.TestCase):
+    """새로 생긴 혜택 (11/5 운영자: 검색량 없는 새 정책도 먼저 쓰기) — 전국·광역, 개인·가구·소상공인, 안 쓴 것만."""
+
+    def test_pick_new_benefits(self):
+        from bot import benefit_watch
+        rows = [{"서비스ID": "1", "서비스명": "고속도로 다자녀가구 통행료 할인", "소관기관유형": "공공기관", "사용자구분": "가구", "등록일시": "20260814"},
+                {"서비스ID": "2", "서비스명": "안성시 출산비용", "소관기관유형": "시군구", "사용자구분": "개인", "등록일시": "20261008"},
+                {"서비스ID": "3", "서비스명": "충북 평생교육이용권", "소관기관유형": "광역시도", "사용자구분": "개인", "소관기관명": "충청북도", "등록일시": "20261002"},
+                {"서비스ID": "4", "서비스명": "법인 지원", "소관기관유형": "중앙행정기관", "사용자구분": "법인/시설/단체", "등록일시": "20261001"},
+                {"서비스ID": "5", "서비스명": "이미 쓴 것", "소관기관유형": "중앙행정기관", "사용자구분": "개인", "등록일시": "20261003"}]
+        rows.append({"서비스ID": "6", "서비스명": "마감된 것", "소관기관유형": "중앙행정기관", "사용자구분": "개인", "등록일시": "20261009",
+                     "신청기한": "2026.10.12~2026.10.30"})
+        got = benefit_watch.pick(rows, done={"5"}, today=__import__("datetime").date(2026, 11, 5))
+        self.assertEqual([g["key"] for g in got], ["1", "3"])          # 시군구·법인 대상·이미 쓴 것·신청 마감 제외, 전국 먼저
+        self.assertFalse(benefit_watch.apply_closed("상시신청", __import__("datetime").date(2026, 11, 5)))
+        self.assertEqual(got[1]["scope"], "충청북도 한정")              # 광역은 지역을 밝혀 쓰게
+        self.assertEqual(got[0]["scope"], "전국")
+
+
 class BenefitApiTest(unittest.TestCase):
     """혜택 정보 API: 키는 서버에만, 인코딩된 키·원래 키 모두 처리, 통로는 허용한 경로·변수만."""
 

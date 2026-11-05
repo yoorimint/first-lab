@@ -23,7 +23,7 @@ REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
 DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired", "publish_fired", "continuous", "maint_fired", "law_changes", "rates")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
 MAX_LOG = 30
-MERGE_LISTS = ("used_keywords", "law_changes_done")  # 저장 때 다른 실행의 값과 합칠 목록
+MERGE_LISTS = ("used_keywords", "law_changes_done", "new_benefits_done")  # 저장 때 다른 실행의 값과 합칠 목록
 STATE_LOCK = "/run/firstlab-state.lock"  # 봇(1분)·배포(글 올리기)·키워드 수집이 상태를 동시에 저장할 때 순서 맞춤
 MAX_USED = 2000
 

@@ -80,6 +80,11 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     # 근거 링크를 열어 주장 숫자 대조 — 지금은 기록만 (bot/source_check.py)
     notes.append(source_check.record(post_id, data.get("review"),
                                      lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val)))
+    if data.get("new_benefit"):  # '새로 생긴 혜택' 글 (/next 의 new_benefits 항목 key) → 다시 글감으로 안 줌
+        state = load_state()
+        done = state.get("new_benefits_done") or []
+        state["new_benefits_done"] = (done + [str(data["new_benefit"])])[-300:]
+        save_state(state)
     if data.get("law_change"):  # '바뀌는 제도' 글 (/next 의 law_changes 항목 key) → 같은 변경은 다시 글감으로 안 줌
         state = load_state()
         done = state.get("law_changes_done") or []

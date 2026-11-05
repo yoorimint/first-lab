@@ -184,6 +184,11 @@ def main() -> None:
         print(watch_laws(), flush=True)
     except Exception as e:  # noqa: BLE001
         print(f"법령 감시 실패: {e}", flush=True)
+    try:  # 새로 생긴 혜택 (bot/benefit_watch.py) — 실패해도 수집·갱신은 계속
+        from .benefit_watch import run as watch_benefits
+        print(watch_benefits(), flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"새 혜택 감시 실패: {e}", flush=True)
     try:  # 최신 금리 (bot/bok_api.py) — 실패해도 수집·갱신은 계속
         from .bok_api import run as update_rates
         print(update_rates(), flush=True)
