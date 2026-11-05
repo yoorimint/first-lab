@@ -1819,10 +1819,11 @@ class CalcYearlyTest(unittest.TestCase):
         up = [{"law": "근로자퇴직급여 보장법", "date": "2027-01-01", "key": "근로자퇴직급여 보장법|2027-01-01", "articles": ["제8조"]},
               {"law": "소득세법", "date": "2026-11-01", "key": "소득세법|2026-11-01", "articles": []}]   # 이미 시행된 것은 빼고
         got = calc_watch.law_due(dt.date(2026, 11, 5), up, d)
-        self.assertEqual([(i["id"], i["law_change"]) for i in got], [("a", "근로자퇴직급여 보장법|2027-01-01")])
+        # 날짜로 거르지 않음 — 시행일이 지나도 처리될 때까지 남김 (run 이 calc_law_pending 으로 이어 줌, 11/5 검토)
+        self.assertEqual([(i["id"], i["law_change"]) for i in got], [("a", "근로자퇴직급여 보장법|2027-01-01"), ("b", "소득세법|2026-11-01")])
         (d / "a.json").write_text(json.dumps({"yearly": False, "sources": [{"name": "근로자퇴직급여 보장법", "url": "https://x"}],
                                               "law_checked": ["근로자퇴직급여 보장법|2027-01-01"]}), encoding="utf-8")
-        self.assertEqual(calc_watch.law_due(dt.date(2026, 11, 5), up, d), [])   # 상관없다고 확인하면 다시 안 나옴
+        self.assertEqual([i["id"] for i in calc_watch.law_due(dt.date(2026, 11, 5), up, d)], ["b"])   # a 는 상관없다고 확인 → 다시 안 나옴
         self.assertIn("국민건강보험법 시행령", calc_watch.laws_in("국가법령정보센터 국민건강보험법 시행령 (보험료율)"))
         self.assertNotIn("국가법령정보센터 국민건강보험법 시행령", calc_watch.laws_in("국가법령정보센터 국민건강보험법 시행령"))
 

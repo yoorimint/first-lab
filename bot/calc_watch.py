@@ -73,15 +73,17 @@ def _same_law(a: str, b: str) -> bool:
 
 
 def law_due(today: dt.date, upcoming: list[dict], data_dir: Path = DATA_DIR) -> list[dict]:
-    """근거 법령에 시행 예정 개정이 있는데 아직 반영(scheduled 같은 날짜)도 확인(law_checked)도 안 한 계산기."""
+    """근거 법령에 개정이 있는데 아직 확인(law_checked, 또는 그 key 를 적은 scheduled)을 안 한 계산기.
+    같은 날 시행되는 다른 개정이 가려지지 않게 날짜가 아니라 key 로만 셈 (11/5 검토: 국민연금 1/1 scheduled 가 같은 날 고용보험료 시행령 개정을 가림).
+    upcoming 은 시행 전 개정과, 처리 안 된 채 시행일이 지난 개정(state calc_law_pending)을 함께 받는다."""
     laws = calc_laws(data_dir)
     out = []
     for path in sorted(data_dir.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))
-        done = set(data.get("law_checked", [])) | {s.get("from") for s in data.get("scheduled", [])}
+        done = set(data.get("law_checked", [])) | {s.get("law_change") for s in data.get("scheduled", []) if s.get("law_change")}
         for item in upcoming:
-            if (item.get("date", "") > f"{today:%Y-%m-%d}" and item.get("key") not in done and item.get("date") not in done
-                    and any(_same_law(item.get("law", ""), law) for law in laws[path.stem])):
+            if (item.get("key") not in done and item.get("key")
+                    and any(_same_law(item.get("law", ""), law) for law in laws.get(path.stem, ()))):
                 out.append({"id": path.stem, "law_change": item["key"], "date": item["date"],
                             "articles": item.get("articles", [])[:8]})
     return out
@@ -157,7 +159,9 @@ def due(today: dt.date, data_dir: Path = DATA_DIR) -> list[dict]:
         if data.get("yearly") is False:
             continue
         checked = int(data.get("yearly_checked") or 0)
-        if checked < year and str(data.get("yearly_recheck") or "") <= f"{today:%Y-%m-%d}":
+        recheck = str(data.get("yearly_recheck") or "")
+        # 다시 볼 날이 됐으면 올해 확인을 마쳤어도 넘김 (7월 국민연금 상·하한처럼 해 중간에 바뀌는 값 — 11/5 검토)
+        if (checked < year and recheck <= f"{today:%Y-%m-%d}") or (recheck and recheck <= f"{today:%Y-%m-%d}"):
             out.append({"id": path.stem, "checked": checked, "for": year, "pending": data.get("yearly_pending", ""),
                         "scheduled": [s.get("from") for s in data.get("scheduled", [])]})
     return out
@@ -216,7 +220,12 @@ def run(today: dt.date | None = None) -> str:
     from .state import add_log, load_state, save_state
     today = today or dt.date.today()
     state = load_state()
-    items = due(today) + law_due(today, (state.get("law_changes") or {}).get("upcoming", []))
+    upcoming = [u for u in (state.get("law_changes") or {}).get("upcoming", []) if u.get("date", "") > f"{today:%Y-%m-%d}"]
+    keys = {u.get("key") for u in upcoming}
+    upcoming += [u for u in state.get("calc_law_pending", []) if u.get("key") not in keys]  # 시행일이 지나도 처리될 때까지
+    laws_due = law_due(today, upcoming)
+    state["calc_law_pending"] = [u for u in upcoming if any(d["law_change"] == u.get("key") for d in laws_due)][:60]
+    items = due(today) + laws_due
     try:
         items += source_changes()
     except Exception as e:  # noqa: BLE001 - 페이지 확인이 실패해도 나머지는 넘김

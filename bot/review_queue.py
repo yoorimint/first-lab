@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 REVIEWED = Path(__file__).resolve().parent.parent / "automation" / "reviewed.txt"
-REVIEW_WHEN_READY = 20
+REVIEW_WHEN_READY = 5   # 11/5 검토: 20 이면 공개를 늘린 뒤 대기열이 20 아래로 내려가 외부 검수가 영영 사라짐 → 검수 안 된 대기 글이 있으면 거의 늘 검수 (새 글 1편 → 다음 실행 검수)
 
 _READY_PHP = r"""
 $out = array();

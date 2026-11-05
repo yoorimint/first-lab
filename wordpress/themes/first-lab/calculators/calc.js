@@ -15,6 +15,7 @@
  *   rows 의 세 번째 값(선택)은 관련 글 주소 → 내용 뒤에 '관련 글 보기' 링크. 주소는 data 의 "links" 에 두면
  *   공개 안 된 글(초안·예약) 주소는 화면에 넣기 전에 빠진다 (mu-plugins/first-lab-calculators.php)
  *   입력이 모자라면 throw new util.InputError('안내 문장')
+ * 입력 기본값 'today' = 한국 날짜, 'data:키' = 그날 적용되는 data 값 (해마다 바뀌는 값을 defs 에 박지 않는다)
  */
 (function (root) {
   'use strict';
@@ -59,12 +60,18 @@
         if (s.source) out.sources.unshift(s.source);
       }
       delete out.scheduled;
+      Object.defineProperty(out, 'raw', { value: data, enumerable: false }); // 사건 날짜(퇴사일 등)로 다시 고를 때 (dataOn(d.raw, 날짜))
       return out;
     },
     /** 방문자 기기 기준 오늘 'YYYY-MM-DD' */
     todayIso() {
-      const d = new Date();
-      return util.isoDate(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      // 한국 날짜 (기기 시간대가 달라도 전환일 앞뒤로 값이 섞이지 않게 — 11/5 검토)
+      try {
+        return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+      } catch (e) {
+        const d = new Date();
+        return util.isoDate(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      }
     },
   };
 
@@ -90,7 +97,7 @@
     return node;
   }
 
-  function field(input, uid) {
+  function field(input, uid, data) {
     const id = `${uid}-${input.name}`;
     let control;
     if (input.type === 'select') {
@@ -100,7 +107,9 @@
     } else {
       const type = input.type === 'date' ? 'date' : 'number';
       control = el('input', { id, name: input.name, type, min: input.min, step: input.step, inputmode: type === 'number' ? util.inputMode(input) : null });
-      control.value = input.default === 'today' ? util.todayIso() : (input.default ?? '');
+      // 'data:키' = 그날 적용되는 data 값 (최저임금처럼 해마다 바뀌는 기본값을 코드에 박지 않게 — 11/5 검토)
+      const fromData = typeof input.default === 'string' && input.default.startsWith('data:') ? (data || {})[input.default.slice(5)] : undefined;
+      control.value = input.default === 'today' ? util.todayIso() : (fromData ?? input.default ?? '');
     }
     return el('div', { class: 'firstlab-calc__field' },
       el('label', { for: id }, input.label),
@@ -138,7 +147,7 @@
       return;
     }
     const uid = `fc${++seq}`;
-    const form = el('form', { class: 'firstlab-calc__form', novalidate: '' }, def.inputs.map((i) => field(i, uid)));
+    const form = el('form', { class: 'firstlab-calc__form', novalidate: '' }, def.inputs.map((i) => field(i, uid, data)));
     const out = el('div', { class: 'firstlab-calc__result', 'aria-live': 'polite' });
 
     const update = () => {

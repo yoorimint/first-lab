@@ -144,5 +144,40 @@
       "total": 18489600
     },
     "boundary": true
+  },
+  {
+    "why": "2027년에 계산해도 2026.12.31 퇴사면 2026년 최저임금 하한: 10,320×8×0.8=66,048 (고용보험법 제46조, 퇴사한 해 기준)",
+    "today": "2027-01-05",
+    "input": {
+      "wage_3m": 9000000,
+      "days_3m": 92,
+      "hours": 8,
+      "age50": "under50",
+      "period": "1",
+      "quit_date": "2026-12-31"
+    },
+    "expect": {
+      "min_daily": 66048,
+      "daily": 66048,
+      "total": 9907200
+    },
+    "boundary": true
+  },
+  {
+    "why": "2027.1.1 퇴사면 2027년 최저임금 하한 68,480",
+    "today": "2027-01-05",
+    "input": {
+      "wage_3m": 9000000,
+      "days_3m": 92,
+      "hours": 8,
+      "age50": "under50",
+      "period": "1",
+      "quit_date": "2027-01-01"
+    },
+    "expect": {
+      "min_daily": 68480,
+      "daily": 68480
+    },
+    "boundary": true
   }
 ]
