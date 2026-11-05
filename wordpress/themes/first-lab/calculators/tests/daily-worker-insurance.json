@@ -1,0 +1,386 @@
+[
+  {
+    "why": "본문 예시: 일당 25만·10일·1개월 이상: 소득세 (25만-15만)×6%×45%=2,700원/일, 고용 250만×0.9%=22,500, 연금 250만×4.75%=118,750, 건강 250만×3.595%=89,875→89,870, 장기요양 ×0.1314=11,808",
+    "input": {
+      "wage": 250000,
+      "days": 10,
+      "hours": 80,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 2500000,
+      "day_tax": 2700,
+      "income_tax": 27000,
+      "local_tax": 2700,
+      "employment": 22500,
+      "pension_in": true,
+      "pension_base": 2500000,
+      "pension": 118750,
+      "health_in": true,
+      "health": 89870,
+      "ltc": 11808,
+      "total": 272628,
+      "net": 2227372
+    }
+  },
+  {
+    "why": "일당 20만: 5만×6%=3,000 − 55%(1,650) = 1,350원 (소수 곱셈 오차 없이), 지방세 135→130 (10원 미만 버림)",
+    "input": {
+      "wage": 200000,
+      "days": 10,
+      "hours": 80,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 2000000,
+      "day_tax": 1350,
+      "income_tax": 13500,
+      "local_tax": 1300,
+      "employment": 18000,
+      "pension_in": true,
+      "pension_base": 2000000,
+      "pension": 95000,
+      "health_in": true,
+      "health": 71900,
+      "ltc": 9447,
+      "total": 209147,
+      "net": 1790853
+    }
+  },
+  {
+    "why": "일당 15만·5일·40시간: 근로소득공제 15만이라 세금 0, 8일·60시간 미만이라 연금·건강 제외, 고용 75만×0.9%=6,750",
+    "input": {
+      "wage": 150000,
+      "days": 5,
+      "hours": 40,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 750000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 6750,
+      "pension_in": false,
+      "pension_base": 0,
+      "pension": 0,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 6750,
+      "net": 743250
+    }
+  },
+  {
+    "why": "소액부징수 경계: 일당 18만 7천 원 → 37,000×2.7%=999원 < 1천 원 → 0 (소득세법 제86조)",
+    "input": {
+      "wage": 187000,
+      "days": 3,
+      "hours": 24,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 561000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 5049,
+      "pension_in": false,
+      "pension_base": 0,
+      "pension": 0,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 5049,
+      "net": 555951
+    },
+    "boundary": true
+  },
+  {
+    "why": "소액부징수 바로 위: 일당 18만 7,100원 → 37,100×2.7%=1,001.7 → 10원 미만 버림 1,000원 → 징수",
+    "input": {
+      "wage": 187100,
+      "days": 3,
+      "hours": 24,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 561300,
+      "day_tax": 1000,
+      "income_tax": 3000,
+      "local_tax": 300,
+      "employment": 5051,
+      "pension_in": false,
+      "pension_base": 0,
+      "pension": 0,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 8351,
+      "net": 552949
+    },
+    "boundary": true
+  },
+  {
+    "why": "국민연금 60시간 경계: 7일·60시간(건설 아님) → 연금 대상 91만×4.75%=43,225→43,220, 건강은 8일 미만이라 제외",
+    "input": {
+      "wage": 130000,
+      "days": 7,
+      "hours": 60,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 910000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 8190,
+      "pension_in": true,
+      "pension_base": 910000,
+      "pension": 43220,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 51410,
+      "net": 858590
+    },
+    "boundary": true
+  },
+  {
+    "why": "국민연금 59시간: 7일·59시간 → 연금·건강 모두 제외",
+    "input": {
+      "wage": 130000,
+      "days": 7,
+      "hours": 59,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 910000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 8190,
+      "pension_in": false,
+      "pension_base": 0,
+      "pension": 0,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 8190,
+      "net": 901810
+    },
+    "boundary": true
+  },
+  {
+    "why": "건설현장은 60시간 기준 없음 (시행령 제2조1호가목): 7일·60시간이라도 연금 제외",
+    "input": {
+      "wage": 130000,
+      "days": 7,
+      "hours": 60,
+      "month1": "yes",
+      "site": "construction",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 910000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 8190,
+      "pension_in": false,
+      "pension_base": 0,
+      "pension": 0,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 8190,
+      "net": 901810
+    },
+    "boundary": true
+  },
+  {
+    "why": "건설현장 7일이라도 월 소득 245만 원 ≥ 고시 220만 원 → 연금 대상, 건강은 8일 미만이라 제외",
+    "input": {
+      "wage": 350000,
+      "days": 7,
+      "hours": 56,
+      "month1": "yes",
+      "site": "construction",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 2450000,
+      "day_tax": 5400,
+      "income_tax": 37800,
+      "local_tax": 3780,
+      "employment": 22050,
+      "pension_in": true,
+      "pension_base": 2450000,
+      "pension": 116370,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 180000,
+      "net": 2270000
+    },
+    "boundary": true
+  },
+  {
+    "why": "월 소득 정확히 220만 원(일당 11만·20일): 8일 이상이라 연금·건강 대상, 세금 0",
+    "input": {
+      "wage": 110000,
+      "days": 20,
+      "hours": 160,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 2200000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 19800,
+      "pension_in": true,
+      "pension_base": 2200000,
+      "pension": 104500,
+      "health_in": true,
+      "health": 79090,
+      "ltc": 10392,
+      "total": 213782,
+      "net": 1986218
+    }
+  },
+  {
+    "why": "1개월 미만이면 8일·240만 원이어도 연금·건강 제외 (시행령 제2조1호 본문·건강보험법 제6조②1호), 고용보험은 냄",
+    "input": {
+      "wage": 300000,
+      "days": 8,
+      "hours": 64,
+      "month1": "no",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 2400000,
+      "day_tax": 4050,
+      "income_tax": 32400,
+      "local_tax": 3200,
+      "employment": 21600,
+      "pension_in": false,
+      "pension_base": 0,
+      "pension": 0,
+      "health_in": false,
+      "health": 0,
+      "ltc": 0,
+      "total": 57200,
+      "net": 2342800
+    }
+  },
+  {
+    "why": "65세 이후 새로 고용: 고용보험 실업급여 보험료 0 (고용보험법 제10조②)",
+    "input": {
+      "wage": 250000,
+      "days": 20,
+      "hours": 160,
+      "month1": "yes",
+      "site": "general",
+      "age65": "yes"
+    },
+    "expect": {
+      "pay": 5000000,
+      "day_tax": 2700,
+      "income_tax": 54000,
+      "local_tax": 5400,
+      "employment": 0,
+      "pension_in": true,
+      "pension_base": 5000000,
+      "pension": 237500,
+      "health_in": true,
+      "health": 179750,
+      "ltc": 23619,
+      "total": 500269,
+      "net": 4499731
+    }
+  },
+  {
+    "why": "건설 8일 경계: 일당 10만·8일 → 연금 80만×4.75%=38,000, 건강 80만×3.595%=28,760",
+    "input": {
+      "wage": 100000,
+      "days": 8,
+      "hours": 64,
+      "month1": "yes",
+      "site": "construction",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 800000,
+      "day_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "employment": 7200,
+      "pension_in": true,
+      "pension_base": 800000,
+      "pension": 38000,
+      "health_in": true,
+      "health": 28760,
+      "ltc": 3779,
+      "total": 77739,
+      "net": 722261
+    },
+    "boundary": true
+  },
+  {
+    "why": "2027년 1월부터: 연금 근로자 5%(250만×5%=125,000), 장기요양 0.9994%÷7.19%=13.90% → 89,870×0.139=12,491",
+    "input": {
+      "wage": 250000,
+      "days": 10,
+      "hours": 80,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect": {
+      "pay": 2500000,
+      "day_tax": 2700,
+      "income_tax": 27000,
+      "local_tax": 2700,
+      "employment": 22500,
+      "pension_in": true,
+      "pension_base": 2500000,
+      "pension": 125000,
+      "health_in": true,
+      "health": 89870,
+      "ltc": 12491,
+      "total": 279561,
+      "net": 2220439
+    },
+    "today": "2027-01-01"
+  },
+  {
+    "why": "일당 0원은 안내",
+    "input": {
+      "wage": 0,
+      "days": 5,
+      "hours": 40,
+      "month1": "yes",
+      "site": "general",
+      "age65": "no"
+    },
+    "expect_error": true
+  }
+]

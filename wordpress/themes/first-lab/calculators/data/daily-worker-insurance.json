@@ -1,0 +1,44 @@
+{
+  "basis_date": "2026-11-05",
+  "yearly_checked": 2026,
+  "yearly_recheck": "2026-12-15",
+  "yearly_pending": "고용보험 실업급여 보험료율(시행령 개정 여부)·건강보험료 상한·하한 고시(12월)·국민연금 기준소득월액 상한·하한(2027.7)",
+  "won10_keys": ["day_tax", "income_tax", "local_tax", "pension", "health"],
+  "sources": [
+    {"name": "소득세법 제47조② (일용근로자 근로소득공제 1일 15만 원)·제59조③ (산출세액의 100분의 55 공제)·제129조①4호 (일용근로자 원천징수세율 100분의 6)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "소득세법 제86조 (원천징수세액 1천 원 미만 소액 부징수)", "url": "https://www.law.go.kr/법령/소득세법/제86조"},
+    {"name": "지방세법 제103조의13 (개인지방소득세 = 원천징수 소득세의 100분의 10)", "url": "https://www.law.go.kr/법령/지방세법/제103조의13"},
+    {"name": "국민연금법 시행령 제2조제1호 (일용근로자: 1개월 이상 계속 + 월 8일 이상·월 60시간 이상(건설 제외)·월 소득 고시 금액 이상)", "url": "https://www.law.go.kr/법령/국민연금법시행령/제2조"},
+    {"name": "국민연금공단 사업장가입자 안내 (일용·단시간 가입 기준, 고시 금액 220만 원, 2026년 근로자 4.75%)", "url": "https://www.nps.or.kr/pnsinfo/ntpsklg/getOHAF0016M0.do"},
+    {"name": "국민건강보험법 제6조②1호 (고용 기간 1개월 미만 일용근로자는 직장가입자 제외)", "url": "https://www.law.go.kr/법령/국민건강보험법/제6조"},
+    {"name": "국민건강보험법 시행령 (보험료율 1만분의 719) · 노인장기요양보험법 제9조① (건강보험료 대비 비율, 2026년 11월분부터)", "url": "https://www.law.go.kr/법령/국민건강보험법시행령"},
+    {"name": "고용보험 및 산업재해보상보험의 보험료징수 등에 관한 법률 시행령 제12조 (실업급여 보험료율 1천분의 18) · 고용보험법 시행령 제3조② (일용근로자는 근로시간과 상관없이 적용) · 고용보험법 제10조② (65세 이후 고용)", "url": "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률시행령/제12조"},
+    {"name": "국고금관리법 제47조① (10원 미만 끝수는 계산하지 않음)", "url": "https://www.law.go.kr/법령/국고금관리법/제47조"}
+  ],
+  "daily_deduction": 150000,
+  "tax_rate_pct": 6,
+  "tax_credit_pct": 55,
+  "small_tax_floor": 1000,
+  "min_days": 8,
+  "pension_min_hours": 60,
+  "pension_income_threshold": 2200000,
+  "pension_rate_employee_per_10000": 475,
+  "pension_min": 410000,
+  "pension_max": 6590000,
+  "health_rate_per_10000": 719,
+  "ltc_rate_per_1000000": 9448,
+  "health_employee_min": 10080,
+  "health_employee_max": 4591740,
+  "employment_rate_employee_per_1000": 9,
+  "scheduled": [
+    {
+      "from": "2027-01-01",
+      "texts": [["4.75%", "5%"]],
+      "values": {"pension_rate_employee_per_10000": 500, "ltc_rate_per_1000000": 9994},
+      "source": {
+        "name": "국민연금법 부칙 제4조 (2027년 보험료율 1천분의 100, 근로자 절반 5%)·보건복지부 2027년 장기요양보험료율 소득 대비 0.9994% 장기요양위원회 의결 (2026.10.30)",
+        "url": "https://www.mohw.go.kr/board.es?mid=a10503010100&bid=0027&act=view&list_no=1492396"
+      }
+    }
+  ]
+}
