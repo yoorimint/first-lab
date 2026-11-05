@@ -3,17 +3,17 @@
   "sources": [
     {"name": "한국에너지공단 2026 에너지바우처 지원대상·지원금액", "url": "https://www.energyv.or.kr/info/support_info.do"},
     {"name": "한국에너지공단 에너지바우처 신청안내 (2026년 6월 15일~12월 31일)", "url": "https://www.energyv.or.kr/info/apl_info.do"},
-    {"name": "고용보험법 (제10조 적용 제외·65세, 제40조 구직급여 수급 요건, 제41조 피보험 단위기간, 제58조 수급자격 제한, 제69조의3 자영업자)", "url": "https://www.law.go.kr/법령/고용보험법"},
+    {"name": "고용보험법 (제10조 적용 제외·65세, 제40조 구직급여 수급 요건·기준기간, 제41조 피보험 단위기간, 제58조 수급자격 제한, 제69조의3 자영업자)", "url": "https://www.law.go.kr/법령/고용보험법"},
     {"name": "고용보험법 시행규칙 (제101조·별표 2 정당한 이직 사유)", "url": "https://www.law.go.kr/법령/고용보험법시행규칙"},
     {"name": "고용노동부 실업급여 신청 절차 자주 묻는 질문", "url": "https://www.moel.go.kr/faq/faqView.do?seqRepeat=219"},
     {"name": "고용24 국민내일배움카드 발급 안내 (지원 제외 대상)", "url": "https://m.work24.go.kr/hr/h/a/1100/selectIssuGudn.do"},
     {"name": "고용노동부고시 제2026-101호 국민내일배움카드 운영규정 제4조 (2026. 1. 1. 시행)", "url": "https://www.moel.go.kr/info/lawinfo/instruction/view.do?bbs_seq=20251201795"},
-    {"name": "조세특례제한법 (제100조의3 근로장려금 신청자격, 제100조의5 1억7천만 원 50%, 제100조의6 기한 후 신청, 제100조의7 95%, 제100조의28 자녀장려금)", "url": "https://www.law.go.kr/법령/조세특례제한법"},
-    {"name": "국세청 근로·자녀장려금 신청자격 (2025년 귀속)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2452&cntntsId=7783"},
-    {"name": "대한민국 정책브리핑 2025년 귀속 근로·자녀장려금 신청 (기한 후 12월 1일까지)", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148963769"},
-    {"name": "기초연금법 제3조·시행령 제4조 (65세 이상, 선정기준액 이하, 부부 160%)", "url": "https://www.law.go.kr/법령/기초연금법"},
+    {"name": "조세특례제한법 (제100조의3 근로장려금 신청자격·가구 유형, 제100조의4 부양자녀, 제100조의5 1억7천만 원 50%, 제100조의6 기한 후 신청, 제100조의7 95%, 제100조의28 자녀장려금)", "url": "https://www.law.go.kr/법령/조세특례제한법"},
+    {"name": "국세청 근로·자녀장려금 신청자격 (2025년 귀속, 총소득·재산 평가)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2452&cntntsId=7783"},
+    {"name": "대한민국 정책브리핑 2025년 귀속 근로·자녀장려금 신청 (정기 6월 1일, 기한 후 12월 1일까지)", "url": "https://www.korea.kr/news/policyNewsView.do?newsId=148963769"},
+    {"name": "기초연금법 제3조·시행령 제4조 (65세 이상, 선정기준액 이하, 직역연금 수급권자 제외, 부부 160%)", "url": "https://www.law.go.kr/법령/기초연금법"},
     {"name": "보건복지부 기초연금 대상자 안내 (2026년 선정기준액)", "url": "https://basicpension.mohw.go.kr/menu.es?mid=a10102010000"},
-    {"name": "보건복지부 기초연금 소득인정액 산정방식", "url": "https://basicpension.mohw.go.kr/menu.es?mid=a10102020000"},
+    {"name": "보건복지부 기초연금 소득인정액 산정방식 (무료임차소득·고급자동차)", "url": "https://basicpension.mohw.go.kr/menu.es?mid=a10102020000"},
     {"name": "보건복지부 기초연금 신청방법", "url": "https://basicpension.mohw.go.kr/menu.es?mid=a10201000000"}
   ],
   "status_labels": {"likely": "받을 가능성 있음", "check": "조건 더 확인", "no": "해당 안 됨"},
@@ -23,13 +23,19 @@
     "naeil_card": "/내일배움카드자격/"
   },
   "energy_voucher": {
-    "elderly_age": 65,
-    "elderly_born_by": "1961년 12월 31일",
+    "year": 2026,
+    "elderly_born_by": "1961-12-31",
     "amounts": [295200, 407500, 532700, 701300],
-    "apply": "에너지바우처: 2026년 12월 31일까지 주소지 읍·면·동 행정복지센터나 복지로에서 신청해요 (상담 1600-3190)."
+    "summer_only_amounts": [40700, 58800, 75800, 102000],
+    "apply_from": "2026-06-15",
+    "apply_until": "2026-12-31",
+    "apply": "에너지바우처: 주소지 읍·면·동 행정복지센터나 복지로에서 신청해요 (상담 1600-3190)."
   },
   "unemployment": {
     "min_insured_days": 180,
+    "base_months": 18,
+    "base_max_days": 550,
+    "extended_max_days": 1096,
     "no_new_hire_age": 65,
     "self_months": 24,
     "self_insured_years": 1,
@@ -40,6 +46,9 @@
     "large_firm_age": 45,
     "large_firm_wage": 3000000,
     "self_revenue": 400000000,
+    "rental_supply": 48000000,
+    "freelancer_income": 5000000,
+    "corp_ceo_income": 3000000,
     "card_limit": 3000000,
     "card_years": 5,
     "apply": "국민내일배움카드: 고용24 또는 가까운 고용센터에서 신청해요. 실업 상태라면 먼저 고용24에 구직 신청을 해요 (상담 1350)."
@@ -48,11 +57,14 @@
     "income_year": 2025,
     "income_limit": {"single": 22000000, "one": 32000000, "dual": 44000000},
     "type_labels": {"single": "단독가구", "one": "홑벌이 가구", "dual": "맞벌이 가구"},
+    "dual_each_min": 3000000,
     "property_limit": 240000000,
     "property_half": 170000000,
+    "regular_from": "2026-05-01",
+    "regular_until": "2026-06-01",
+    "late_until": "2026-12-01",
     "late_rate_percent": 95,
-    "late_until": "2026년 12월 1일",
-    "apply": "근로·자녀장려금: 2025년 소득분 정기 신청(6월 1일까지)은 끝났고, 2026년 12월 1일까지 기한 후 신청하면 산정액의 95%를 받아요. 홈택스·손택스에서 신청하고, 문의는 장려금 상담센터 1566-3636이에요."
+    "apply": "근로·자녀장려금: 홈택스·손택스에서 신청하고, 문의는 장려금 상담센터 1566-3636이에요."
   },
   "child_credit": {
     "income_limit": 70000000,
@@ -66,6 +78,8 @@
     "earned_deduction": 1160000,
     "earned_extra_percent": 30,
     "luxury_car": 40000000,
+    "free_rent_house": 600000000,
+    "free_rent_rate": "0.78%",
     "conversion_percent_year": 4,
     "apply": "기초연금: 읍·면·동 행정복지센터, 국민연금공단 지사, 복지로에서 신청해요. 만 65세 생일이 속한 달의 1개월 전부터 신청할 수 있어요 (상담 국민연금공단 1355, 보건복지상담센터 129)."
   }
