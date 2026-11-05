@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 
-from . import images, photo
+from . import wpbulk, images, photo
 from .settings import wp_cli
 
 _AI_SRC = r'https?://[^"\s]*/(?P<name>ai-[0-9a-f]{10})(?:-\d+x\d+)?\.jpg'
@@ -79,20 +79,28 @@ def migrate_post(post_id: str, content: str) -> str | None:
 
 
 def main() -> None:
-    ids = wp_cli("post", "list", "--post_type=post", "--post_status=any", "--field=ID").split()
+    from .image_check import CHECKED_META
+    bulk = wpbulk.posts()  # 글마다 wp-cli 를 부르면 배포가 10분을 넘김 (11/5)
+    ids = list(bulk)
+    changed = False
     for post_id in ids:
-        msg = migrate_post(post_id, wp_cli("post", "get", post_id, "--field=post_content"))
+        if not body_photos(bulk[post_id]["content"]):
+            continue  # 본문에 AI 사진이 없으면 할 일 없음 (대부분)
+        msg = migrate_post(post_id, bulk[post_id]["content"])
         if msg:
             print(f"[대표 사진] {msg}", flush=True)
+            changed = True
+    if changed:
+        bulk = wpbulk.posts()  # 요약은 정리한 뒤 상태로
     # 감시용 요약: '사진 없음'이 늘면 이상 (대기 = 한도 초기화 후 자동으로 채워질 글)
-    has = [i for i in ids if photo.meta(i, photo.PHOTO_META)]
-    waiting = [i for i in ids if i not in has and photo.meta(i, photo.PENDING_META)]
+    meta = {i: bulk[i]["meta"] for i in ids if i in bulk}
+    has = [i for i in ids if meta[i].get(photo.PHOTO_META)]
+    waiting = [i for i in ids if i not in has and meta[i].get(photo.PENDING_META)]
     none = [i for i in ids if i not in has and i not in waiting]
-    from .image_check import CHECKED_META
     for i in none:  # 대표 사진이 없는데 '검사 끝'이면 사진을 영영 못 받음 → 다시 검사 대상으로
-        if photo.meta(i, CHECKED_META):
+        if meta[i].get(CHECKED_META):
             photo._delete_meta(i, CHECKED_META)
-    left = [i for i in ids if _ANY_SRC.search(wp_cli("post", "get", i, "--field=post_content"))]  # 0 이어야 정상
+    left = [i for i in ids if _ANY_SRC.search(bulk[i]["content"])]  # 0 이어야 정상
     print(f"[대표 사진] 요약: 사진 {len(has)}개 · 대기 {len(waiting)}개 · 없음(제목 카드) {len(none)}개 {none[:15]}"
           f" · 본문에 AI 사진 남은 글 {len(left)}개 {left[:15]}", flush=True)
 

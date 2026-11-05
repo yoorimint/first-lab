@@ -64,6 +64,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: 22
+          command_timeout: 30m   # 기본 10분 — 글·수정이 늘며 넘겨서 11/5 오후 배포가 계속 실패함 (보정·사진 정리는 한 번에 읽기로 줄임)
           script: |
             set -e
             REPO=/opt/first-lab

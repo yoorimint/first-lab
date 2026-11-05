@@ -1324,5 +1324,27 @@ class LawWatchTest(unittest.TestCase):
         self.assertIn("law_changes", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
         self.assertIn("law_changes", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
+
+class DeploySpeedTest(unittest.TestCase):
+    """11/5: 배포가 10분 제한을 넘겨 계속 실패 (글마다 wp-cli 호출). 보정·사진 정리는 한 번에 읽은 글로 처리."""
+
+    def test_apply_patches_uses_bulk_without_per_post_reads(self):
+        from bot import fix_posts
+        bulk = {"1": {"content": "<p>옛 문장</p>", "title": "t", "excerpt": "e", "name": "n", "status": "draft", "meta": {}}}
+        calls = []
+        patches = [{"post": 1, "why": "x", "find": "옛 문장", "replace_paragraph": "새 문장", "tag": "p"},
+                   {"post": 1, "why": "y", "set_title": "새 제목", "from_title": "t"}]
+        with mock.patch.object(fix_posts, "PATCHES") as path, mock.patch.object(fix_posts, "wp_cli", side_effect=lambda *a: calls.append(a) or ""):
+            path.exists.return_value = True
+            path.read_text.return_value = json.dumps(patches, ensure_ascii=False)
+            fix_posts.apply_patches(bulk)
+        self.assertFalse([c for c in calls if c[:2] == ("post", "get")])  # 글마다 읽지 않음
+        self.assertEqual([c[:3] for c in calls], [("post", "update", "1"), ("post", "update", "1")])
+        self.assertIn("새 문장", bulk["1"]["content"])
+        self.assertEqual(bulk["1"]["title"], "새 제목")
+
+    def test_deploy_timeout_raised(self):
+        self.assertIn("command_timeout: 30m", (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8"))
+
 if __name__ == "__main__":
     unittest.main()

@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .blocks import to_blocks
 from .publisher import CARD_VERSION, set_featured_card, site_author_id
+from . import wpbulk
 from .settings import wp_cli
 
 
@@ -88,19 +89,25 @@ def patch_content(content: str, patch: dict) -> str | None:
     return content.replace(m.group(0), f"<{tag}{m.group('attrs') or ''}>{patch['replace_paragraph']}</{tag}>")
 
 
-def apply_patches() -> None:
-    """wordpress/patches.json 의 글 수정 적용. 'find' 가 들어 있는 문단 전체를 교체 (이미 바뀌었으면 건너뜀)."""
+def apply_patches(bulk: dict[str, dict] | None = None) -> None:
+    """wordpress/patches.json 의 글 수정 적용. 'find' 가 들어 있는 문단 전체를 교체 (이미 바뀌었으면 건너뜀).
+    bulk: wpbulk.posts() 로 미리 읽은 글 (없으면 글마다 읽음). 고친 글은 bulk 에도 반영해 다음 패치가 이어서 본다."""
     if not PATCHES.exists():
         return
     for patch in json.loads(PATCHES.read_text(encoding="utf-8")):
         pid = str(patch["post"])
         if "set_title" in patch or "set_excerpt" in patch:
-            _patch_fields(pid, patch)
+            _patch_fields(pid, patch, bulk)
             continue
-        try:
-            content = wp_cli("post", "get", pid, "--field=post_content")
-        except subprocess.CalledProcessError:
-            continue
+        if bulk is not None:
+            if pid not in bulk:
+                continue
+            content = bulk[pid]["content"]
+        else:
+            try:
+                content = wp_cli("post", "get", pid, "--field=post_content")
+            except subprocess.CalledProcessError:
+                continue
         updated = patch_content(content, patch)
         if updated is None:
             if "insert_after" in patch:  # 넣은 블록이 그대로 있는지 확인용 (편집기 저장으로 지워지면 다시 넣음)
@@ -108,21 +115,31 @@ def apply_patches() -> None:
             continue
         content = updated
         wp_cli("post", "update", pid, f"--post_content={content}")
+        if bulk is not None:
+            bulk[pid]["content"] = content
         kind = "블록 추가" if "insert_after" in patch else "문단 수정"
         print(f"[보정] {pid} {kind}: {patch['why']}")
 
 
-def _patch_fields(pid: str, patch: dict) -> None:
+def _patch_fields(pid: str, patch: dict, bulk: dict[str, dict] | None = None) -> None:
     """제목·요약문 고치기: 지금 값이 from_title/from_excerpt 와 같을 때만 (나중에 다른 이유로 바뀐 값은 되돌리지 않음)."""
     for field, frm, to in (("post_title", "from_title", "set_title"), ("post_excerpt", "from_excerpt", "set_excerpt")):
         if to not in patch:
             continue
-        try:
-            current = wp_cli("post", "get", pid, f"--field={field}").strip()
-        except subprocess.CalledProcessError:
-            return
+        short = "title" if field == "post_title" else "excerpt"
+        if bulk is not None:
+            if pid not in bulk:
+                return
+            current = str(bulk[pid][short]).strip()
+        else:
+            try:
+                current = wp_cli("post", "get", pid, f"--field={field}").strip()
+            except subprocess.CalledProcessError:
+                return
         if current == patch.get(frm, "").strip() and current != patch[to]:
             wp_cli("post", "update", pid, f"--{field}={patch[to]}")
+            if bulk is not None:
+                bulk[pid][short] = patch[to]
             print(f"[보정] {pid} {'제목' if field == 'post_title' else '요약문'} 수정: {patch['why']}", flush=True)
 
 
@@ -145,13 +162,13 @@ def fill_missing_author() -> None:
 
 
 def main() -> None:
-    apply_patches()
+    bulk = wpbulk.posts()  # 글 본문·메타를 한 번에 (글마다 wp-cli 를 부르면 배포가 10분을 넘김)
+    apply_patches(bulk)
     fill_missing_author()
-    posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=any",
-                              "--fields=ID,post_title,post_name", "--format=json") or "[]")
+    posts = [{"ID": int(pid), "post_title": b["title"], "post_name": b["name"], "meta": b["meta"]} for pid, b in bulk.items()]
     for p in posts:
         pid = str(p["ID"])
-        content = wp_cli("post", "get", pid, "--field=post_content")
+        content = bulk[pid]["content"]
         if "AI 생성 이미지</figcaption>" in content:  # 예전 캡션 제거 (운영자 요청)
             content = content.replace('<figcaption class="wp-element-caption">AI 생성 이미지</figcaption>', "")
             wp_cli("post", "update", pid, f"--post_content={content}")
@@ -171,7 +188,8 @@ def main() -> None:
 def sync_card(p: dict) -> bool:
     """대표 이미지가 없거나, 봇이 만든 제목 카드인데 디자인이 옛 버전이거나 제목이 바뀌었으면 다시 생성."""
     pid = str(p["ID"])
-    thumb, card = _meta(pid, "_thumbnail_id"), _meta(pid, "_firstlab_card")
+    meta = p.get("meta")
+    thumb, card = (meta["_thumbnail_id"], meta["_firstlab_card"]) if meta else (_meta(pid, "_thumbnail_id"), _meta(pid, "_firstlab_card"))
     bot_card = bool(card) or (bool(thumb) and _is_bot_card(thumb))
     title_changed = bot_card and _meta(pid, "_firstlab_card_title") != p["post_title"]
     if not thumb or (bot_card and (card != CARD_VERSION or title_changed)):
