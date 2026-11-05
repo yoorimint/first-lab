@@ -113,7 +113,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
         sc += topic_weight(r["norm"])
         sig = hub.get(r["norm"]) or hub.get(head or "")
-        sc += naver_hub.signal_score(sig, r["total"], month)
+        sc += naver_hub.signal_score(sig, r["total"], month, r["keyword"])
         difficulty, estimated = r["difficulty"], False
         if difficulty is None and (head or r["norm"]) in head_difficulty:
             difficulty, estimated = head_difficulty[head or r["norm"]], True  # 조회 안 한 키워드: 같은 주제로 추정

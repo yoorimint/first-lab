@@ -36,6 +36,8 @@ else:
     except Exception as e:  # noqa: BLE001
         print(f"네이버 API HUB: 실패 ({type(e).__name__}: {str(e)[:120]})")
 PY
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.naver_hub --diag 2>&1 | tail -1) || true
+tail -2 /var/lib/first-lab/bot/golden-first.log 2>/dev/null | cut -c1-400 || true
 
 echo -e "\n==> 봇 프로세스"
 systemctl status firstlab-bot.service --no-pager 2>/dev/null | sed -n '1,4p' || true

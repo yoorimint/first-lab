@@ -35,12 +35,22 @@ KEEP_DAYS = 8           # 후보 보관 기간 (상승세 비교용)
 STAMP_FILE = Path("/var/lib/first-lab/bot/discover-date-v2")  # 마지막 수집 날짜 (하루 1회 보장)
 
 
+GOLD_HEAD_MIN = 1000    # 황금·좋음(검색 1회당 글 1개 미만) 키워드는 이 검색량부터 롱테일 조합을 만든다
+
+
 def _modifier_heads(conn, today: str, limit_heads: int) -> list[str]:
+    """롱테일 조합을 만들 큰 키워드: 황금·좋음 키워드 먼저(그 주변 롱테일도 글이 적을 가능성), 다음 돈·계산기 주제, 검색량 순."""
+    from .naver_hub import load
+    from .select_keyword import topic_weight
+    load(conn)  # naver_signals 표 준비
     rows = conn.execute(
-        "SELECT keyword FROM keywords WHERE last_checked=? AND mod_done=0 AND total>=?"
-        " AND status NOT IN ('rejected','excluded') ORDER BY total DESC LIMIT ?",
-        (today, HEAD_MIN_VOLUME, limit_heads))
-    return [r["keyword"] for r in rows]
+        "SELECT k.keyword, k.norm, k.total, n.docs FROM keywords k LEFT JOIN naver_signals n ON n.norm = k.norm"
+        " WHERE k.mod_done=0 AND k.status NOT IN ('rejected','excluded') AND ("
+        " (k.last_checked=? AND k.total>=?) OR (n.docs IS NOT NULL AND n.docs < k.total AND k.total>=?))",
+        (today, HEAD_MIN_VOLUME, GOLD_HEAD_MIN)).fetchall()
+    rows = sorted(rows, key=lambda r: (r["docs"] is not None and r["docs"] < r["total"], topic_weight(r["norm"]), r["total"]),
+                  reverse=True)
+    return [r["keyword"] for r in rows[:limit_heads]]
 
 
 def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
@@ -97,8 +107,10 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
 
         # 3) 정리: 오래된 후보 삭제 (쓴 것·부적합·제외 기록은 보관)
         cutoff = (datetime.now() - timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
-        stats["pruned"] = conn.execute(
-            "DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ?", (cutoff,)).rowcount
+        stats["pruned"] = conn.execute(  # 황금·좋음(검색 1회당 글 1개 미만)으로 확인된 키워드는 오래돼도 남김 (글감 후보)
+            "DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ? AND norm NOT IN ("
+            " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm WHERE n.docs IS NOT NULL AND n.docs < k.total)",
+            (cutoff,)).rowcount
         conn.commit()
         info = summary(conn)
     return {**stats, **info}
