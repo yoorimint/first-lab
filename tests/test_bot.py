@@ -2465,6 +2465,21 @@ class CalcReviewGateTest(unittest.TestCase):
             self.assertEqual(review_gate.unreviewed_calcs(body, Path(d, "없음.txt")), [])   # 기록 파일이 없으면 막지 않음
         self.assertTrue(any("new-calc" in p for p in review_gate.problems([{"claim": "x"}], body_html=body)))
 
+    def test_ready_post_held_before_publish(self):
+        """관문 뒤 대기 중인 글도 공개 직전에 다시 (11/5 school-grade: 규칙 전에 대기열에 들어감)."""
+        import datetime as dt
+        from bot import freshness, review_gate
+
+        def wp(*a):
+            if a[:2] == ("post", "get") and a[3] == "--field=post_content":
+                return '<p>[firstlab_calc id="not-reviewed-yet"]</p>'
+            return "" if a[:3] == ("post", "meta", "get") else "2026-11-01"
+        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a: []), \
+                mock.patch.object(freshness, "_review_from_queue", return_value=[{"claim": "c"}]):
+            got = freshness.check_post(1, dt.date(2026, 11, 6))
+        self.assertTrue(any("not-reviewed-yet" in g for g in got), got)
+        self.assertTrue(review_gate.reviewed_calcs())   # 저장소 검수 기록을 실제로 읽음
+
     def test_calc_pages_published_only_when_reviewed(self):
         setup = (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8")
         self.assertIn('grep -qE "^calc:${slug%-calculator}', setup)

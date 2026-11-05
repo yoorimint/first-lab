@@ -112,6 +112,9 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
         mark = ""
     if changed.pending(mark, f"{since:%Y-%m-%d}") and mark[:10] <= f"{today:%Y-%m-%d}":
         out.append(f"쓴 뒤 근거 변경: {mark[:150]}")
+    # 대기열에 들어간 뒤라도 본문 계산기가 독립 검수 전이면 공개하지 않음 (11/5 운영자 '계산기들은 전부 발행처리했네?')
+    from . import review_gate
+    out += review_gate.unreviewed_calcs(get("post_content"))
     return out
 
 
