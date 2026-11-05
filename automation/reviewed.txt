@@ -106,3 +106,8 @@ calc:overtime-pay
 calc:lottery-tax
 630 연차 개수 계산기: 1년 미만 11일·1년 15일·최대 25일
 calc:annual-leave
+647 CBM 계산기: 60×40×40cm 10개 0.96CBM·EMS 16kg
+651 회계연도 연차 계산기: 7월 입사면 1월 1일 비례 연차 7.6일
+640 로또 세금 계산기: 200만 원 넘으면 22%, 3억 초과분 33%
+calc:cbm
+calc:fiscal-annual-leave
