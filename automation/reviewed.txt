@@ -94,3 +94,4 @@ calc:capital-gains-tax
 583 주식 평단가 계산기: 물타기·목표 수량·코스피 매도세 0.20%
 calc:stock-average-price
 calc:benefit-finder
+calc:take-home-pay

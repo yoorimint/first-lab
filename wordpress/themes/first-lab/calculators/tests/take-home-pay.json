@@ -35,14 +35,14 @@
     "expect": {
       "taxable": 10000000,
       "pension_base": 6590000,
-      "pension": 313025,
+      "pension": 313020,
       "health": 359500,
       "ltc": 47238,
       "employment": 90000,
       "table_tax": 1507400,
       "income_tax": 1507400,
       "local_tax": 150740,
-      "net": 7532097
+      "net": 7532102
     },
     "boundary": true
   },
@@ -59,14 +59,14 @@
     "expect": {
       "taxable": 10010000,
       "pension_base": 6590000,
-      "pension": 313025,
-      "health": 359859,
-      "ltc": 47285,
+      "pension": 313020,
+      "health": 359850,
+      "ltc": 47284,
       "employment": 90090,
       "table_tax": 1535830,
       "income_tax": 1535830,
-      "local_tax": 153583,
-      "net": 7510328
+      "local_tax": 153580,
+      "net": 7510346
     },
     "boundary": true
   },
@@ -84,13 +84,13 @@
       "taxable": 1060000,
       "pension_base": 1060000,
       "pension": 50350,
-      "health": 38107,
-      "ltc": 5007,
+      "health": 38100,
+      "ltc": 5006,
       "employment": 9540,
       "table_tax": 1040,
       "income_tax": 1040,
-      "local_tax": 104,
-      "net": 955852
+      "local_tax": 100,
+      "net": 955864
     },
     "boundary": true
   },
@@ -107,14 +107,14 @@
     "expect": {
       "taxable": 1059999,
       "pension_base": 1059000,
-      "pension": 50302,
-      "health": 38106,
-      "ltc": 5007,
+      "pension": 50300,
+      "health": 38100,
+      "ltc": 5006,
       "employment": 9539,
       "table_tax": 0,
       "income_tax": 0,
       "local_tax": 0,
-      "net": 957045
+      "net": 957054
     },
     "boundary": true
   },
@@ -137,12 +137,12 @@
       "employment": 45000,
       "table_tax": 219100,
       "income_tax": 173270,
-      "local_tax": 17327,
-      "net": 4523534
+      "local_tax": 17320,
+      "net": 4523541
     }
   },
   {
-    "why": "과세 660만(연금 상한 659만 위): 연금 6,590,000×4.75%=313,025원, 별표2 6,600~6,620천원 2명 594,050 × 80% = 475,240원 / 장기요양 237,270×0.1314(제9조① 비율 반올림)=31,177",
+    "why": "과세 660만(연금 상한 659만 위): 연금 6,590,000×4.75%=313,020원 (10원 미만 버림), 별표2 6,600~6,620천원 2명 594,050 × 80% = 475,240원 / 장기요양 237,270×0.1314(제9조① 비율 반올림)=31,177",
     "input": {
       "pay": 6600000,
       "nontax": 0,
@@ -154,14 +154,14 @@
     "expect": {
       "taxable": 6600000,
       "pension_base": 6590000,
-      "pension": 313025,
+      "pension": 313020,
       "health": 237270,
       "ltc": 31177,
       "employment": 59400,
       "table_tax": 594050,
       "income_tax": 475240,
-      "local_tax": 47524,
-      "net": 5436364
+      "local_tax": 47520,
+      "net": 5436373
     },
     "boundary": true
   },
@@ -186,6 +186,263 @@
       "income_tax": 0,
       "local_tax": 0,
       "net": 380131
+    }
+  },
+  {
+    "why": "국민연금 하한 바로 아래 409,999원 → 하한 41만 기준 19,470원 (10원 미만 버림)",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 409999
+    },
+    "expect": {
+      "pension": 19470,
+      "health": 14730,
+      "ltc": 1935,
+      "employment": 3689,
+      "income_tax": 0,
+      "local_tax": 0
+    }
+  },
+  {
+    "why": "국민연금 하한 41만 원 → 19,470원, 실수령 370,175원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 410000
+    },
+    "expect": {
+      "pension": 19470,
+      "health": 14730,
+      "ltc": 1935,
+      "employment": 3690,
+      "net": 370175
+    }
+  },
+  {
+    "why": "하한 바로 위 411,000원 → 19,520원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 411000
+    },
+    "expect": {
+      "pension": 19520,
+      "health": 14770,
+      "ltc": 1940,
+      "employment": 3699,
+      "net": 371071
+    }
+  },
+  {
+    "why": "국민연금 상한 바로 아래 6,589,999원 → 기준 6,589,000원 312,970원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 6589999
+    },
+    "expect": {
+      "pension": 312970,
+      "health": 236910,
+      "ltc": 31129,
+      "employment": 59309,
+      "income_tax": 637450,
+      "local_tax": 63740,
+      "net": 5248491
+    }
+  },
+  {
+    "why": "국민연금 상한 6,590,000원 → 313,020원 (313,025원에서 10원 미만 버림)",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 6590000
+    },
+    "expect": {
+      "pension": 313020,
+      "health": 236910,
+      "ltc": 31129,
+      "employment": 59310,
+      "net": 5248441
+    }
+  },
+  {
+    "why": "상한 위 6,591,000원 → 연금은 상한 그대로 313,020원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 6591000
+    },
+    "expect": {
+      "pension": 313020,
+      "health": 236940,
+      "ltc": 31133,
+      "employment": 59319,
+      "net": 5249398
+    }
+  },
+  {
+    "why": "간이세액표 1,400만 원 구간 경계: 1구간 끝값 = 2구간 시작값 2,904,400원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 14000000
+    },
+    "expect": {
+      "income_tax": 2904400,
+      "local_tax": 290440,
+      "net": 9796707
+    }
+  },
+  {
+    "why": "1,400만 원 바로 위 14,000,001원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 14000001
+    },
+    "expect": {
+      "income_tax": 2904400,
+      "net": 9796708
+    }
+  },
+  {
+    "why": "건강보험 하한: 월 20만 원 → 근로자 몫 하한 10,080원 (보수월액보험료 하한 20,160원의 절반)",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 200000
+    },
+    "expect": {
+      "health": 10080,
+      "ltc": 1324,
+      "employment": 1800,
+      "net": 167326
+    }
+  },
+  {
+    "why": "건강보험 상한: 월 1억5천만 원 → 근로자 몫 상한 4,591,740원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 150000000
+    },
+    "expect": {
+      "health": 4591740,
+      "ltc": 603354,
+      "employment": 1350000,
+      "income_tax": 60892000,
+      "local_tax": 6089200,
+      "net": 76160686
+    }
+  },
+  {
+    "why": "공제대상가족 12명(11명 초과 산식): 87,850 − (106,600 − 87,850) = 69,100원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 12,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 5000000
+    },
+    "expect": {
+      "income_tax": 69100,
+      "local_tax": 6910,
+      "net": 4438121
+    }
+  },
+  {
+    "why": "4명·자녀 3명: 219,100 − 79,160 = 139,940원, 지방소득세 13,994 → 13,990원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 4,
+      "children": 3,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 5000000
+    },
+    "expect": {
+      "income_tax": 139940,
+      "local_tax": 13990,
+      "net": 4360201
+    }
+  },
+  {
+    "why": "120% 선택: 74,350 × 1.2 = 89,220원",
+    "boundary": true,
+    "input": {
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "120",
+      "pension": "yes",
+      "pay": 3000000
+    },
+    "expect": {
+      "income_tax": 89220,
+      "local_tax": 8920,
+      "net": 2610339
+    }
+  },
+  {
+    "why": "식대 비과세 20만 원(한도) 3,200,000원",
+    "boundary": true,
+    "input": {
+      "nontax": 200000,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes",
+      "pay": 3200000
+    },
+    "expect": {
+      "pension": 142500,
+      "income_tax": 74350,
+      "local_tax": 7430,
+      "net": 2826699
     }
   }
 ]
