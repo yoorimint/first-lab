@@ -64,11 +64,14 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     keyword = str(data["keyword"]).strip()
     # 같은 키워드 글이 이미 있으면 새로 만들지 않음 (11/4 연속 작성 동시 실행으로 실업급여 글이 두 편 생긴 일)
     duplicate = existing_post_id(keyword)
-    if duplicate:
-        return f"[건너뜀] 중복 키워드 '{keyword}' — 글 {duplicate} 이 이미 있음"
-    similar, slug = similar_post(keyword)
-    if similar:  # 글자 몇 개만 다른 같은 주제 (11/5 '대부업체대출조회' ↔ '대부업대출조회')
-        return f"[건너뜀] 비슷한 주제 '{keyword}' — 글 {similar}({slug}) 이 이미 있음"
+    similar, slug = ("", "") if duplicate else similar_post(keyword)  # 글자 몇 개만 다른 같은 주제 (11/5 '대부업체대출조회' ↔ '대부업대출조회')
+    if duplicate or similar:
+        _record_topic_done(data)  # 건너뛰어도 그 제도·혜택 글감은 끝난 것으로 (11/5 검토: 매 실행 같은 글감을 다시 씀)
+        with connect() as conn:
+            if conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone():
+                set_status(conn, keyword, "used", f"이미 있는 글 {duplicate or similar}")
+                conn.commit()
+        return f"[건너뜀] {'중복 키워드' if duplicate else '비슷한 주제'} '{keyword}' — 글 {duplicate or similar}{f'({slug})' if similar else ''} 이 이미 있음"
     # status: draft | publish | auto(설정 페이지의 발행 방식을 따름)
     status = data.get("status", "draft")
     if status == "auto":
@@ -107,16 +110,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     # 근거 링크를 열어 주장 숫자 대조 — 지금은 기록만 (bot/source_check.py)
     notes.append(source_check.record(post_id, data.get("review"),
                                      lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val)))
-    if data.get("new_benefit"):  # '새로 생긴 혜택' 글 (/next 의 new_benefits 항목 key) → 다시 글감으로 안 줌
-        state = load_state()
-        done = state.get("new_benefits_done") or []
-        state["new_benefits_done"] = (done + [str(data["new_benefit"])])[-300:]
-        save_state(state)
-    if data.get("law_change"):  # '바뀌는 제도' 글 (/next 의 law_changes 항목 key) → 같은 변경은 다시 글감으로 안 줌
-        state = load_state()
-        done = state.get("law_changes_done") or []
-        state["law_changes_done"] = (done + [str(data["law_change"])])[-200:]
-        save_state(state)
+    _record_topic_done(data)
     with connect() as conn:
         exists = conn.execute("SELECT total FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
         if exists:
@@ -151,6 +145,18 @@ def golden_note(conn, keyword: str, total: int) -> str:
     except Exception as e:  # noqa: BLE001 - 기록용이라 실패해도 글은 올림
         return f"네이버 신호 못 읽음({type(e).__name__})"
     return f"네이버: {text}" if text else f"네이버 신호 없음 (검색량 {int(total or 0):,})"
+
+
+def _record_topic_done(data: dict) -> None:
+    """'새로 생긴 혜택'·'바뀌는 제도' 글감 key 를 끝난 것으로 (/next 에 다시 안 나옴)."""
+    pairs = (("new_benefit", "new_benefits_done", 300), ("law_change", "law_changes_done", 200))
+    if not any(data.get(k) for k, _, _ in pairs):
+        return
+    state = load_state()
+    for key, field, cap in pairs:
+        if data.get(key):
+            state[field] = ((state.get(field) or []) + [str(data[key])])[-cap:]
+    save_state(state)
 
 
 def skip_keywords(data: dict) -> str:

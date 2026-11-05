@@ -8,6 +8,16 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 새 글이 실패하면 아무것도 올리지 말고 넘어간다 (월정액 방식에는 API 예비 봇이 없다).
 갱신은 예비가 없다 (실패하면 다음 날 서버가 다시 고름).
 
+## 실행 순서 (한 번 실행에 **무거운 일 1개만** — 사용량을 넘기지 않게, 남은 일은 다음 실행이 함)
+1. 준비(0단계)와 `/next` 받기(1단계 첫 줄). 실행 메시지가 `maintenance-check` 면 `automation/maintenance.md` 대로 하고 끝.
+2. 급한 일: `deploy_alert` → `patch_problems` (1단계 설명). 있으면 그것을 하고 3번으로.
+3. 무거운 일 — 위에서부터 **처음 해당하는 1개만**:
+   ① `held_drafts` 첫 글 고치기(5-1) ② `review_target` 대기 글 검수(1단계) ③ `calc_yearly` 3건까지(4-2) ④ 새 글 1편(1~5단계)
+4. 가벼운 일(사용량이 남으면): `image_checks`(5-2), `refresh_target`(6).
+5. 건너뛴 후보 skip 파일은 새 글을 안 써도 올린다.
+6. 끝에 **검사 1번 → 커밋 1개 → push 1번** (5단계 명령). 단계마다 따로 push 하지 않는다 (다음 실행과 겹침).
+- 사용량: 새 글 1편에 웹 검색·열람 합계 40번 안쪽 (상위 글 3~5개, 사실 조사 10번, 하위 검수 15번, 보강 10번).
+
 ## 0. 준비
 - 저장소 루트에서 작업한다. 최신 main 을 받는다: `git fetch origin main && git checkout -B daily-writer origin/main`
 - 환경 변수 `FIRSTLAB_API_TOKEN` 이 없으면 글을 쓰지 말고 "토큰 없음"으로 끝낸다.
@@ -23,19 +33,23 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
 - 응답의 `write_mode` 가 `"direct"` 가 아니면(설정 페이지에서 "API 봇" 선택) 글을 쓰지 말고 "봇 방식이라 쉼"으로 끝낸다.
 - **배포가 막혔으면 그것부터**: 응답의 `deploy_alert` 가 있으면 `python3 -m unittest discover -s tests && node tests/test_calculators.mjs` 를 돌려 실패한 검사를 고쳐(대개 지난 실행이 올린 파일) 커밋·main 에 올리고, 그 뒤에 아래를 한다. 못 고치면 보고 첫 줄에 "배포 막힘: <실패한 검사>".
 - **고친 내용이 안 들어간 글**: 응답의 `patch_problems` 가 있으면 첫 항목의 글(글 번호)을 `python3 automation/unreviewed.py <번호>` 로 받아, 그 문구를 고친 본문으로 6단계 갱신 파일(`refresh`, `base_modified` 는 응답 대신 받은 글의 값)을 올린다.
-- **대기 글 검수 먼저**: 응답의 `review_target` 이 있으면(공개 대기 글이 20편 넘게 쌓임) 이번 실행은 **새 글을 쓰지 않고** 그 글 1편을 외부 검수한다 —
-  `automation/monitor.md` '감시 차례마다' 2번 절차 그대로: `python3 automation/unreviewed.py <post_id>` 로 본문 받기 → `automation/review-prompt.md` 로 하위 에이전트 검수
-  → '틀림'은 근거 원문을 내가 직접 열어 확인한 뒤에만 고치고, 못 열면 '확인하세요'로 완화 (공식 페이지에서 확인된 숫자는 지우지 않는다 — 도구가 막음)
-  → `python3 automation/apply_review.py <post_id> "<제목>" [패치.json]` → `wordpress/queue/reviewdone-<post_id>-<날짜시각>.json` = `{"type": "review_done", "post_id": <id>, "title": "<제목>", "patches": <고친 곳 수>}`
-  → 5단계처럼 검사·커밋(`대기 글 검수: <제목>`)·main 에 올림 → 보고하고 끝낸다. (6단계 글 갱신·5-1 보류 수정은 그대로 해도 된다)
+- **대기 글 검수** (`review_target` 이 있고 실행 순서상 차례일 때 — 새 글은 안 씀):
+  1. `python3 automation/unreviewed.py <post_id>` 로 본문 받기 (`/tmp/firstlab-review/post-<id>.json`)
+  2. `automation/review-prompt.md` 의 `---` 아래 지시문에 그 파일 경로와 오늘 날짜를 넣어 하위 에이전트 1개에게 검수 (모델 지정 안 함)
+  3. 검수자가 '틀림'이라 한 곳은 근거 원문을 **내가 직접 열어** 확인한 뒤에만 고친다. 못 열면 '○○에서 확인하세요'로 완화. 공식 페이지에서 확인된 숫자는 지우지 않는다 (도구가 막음)
+  4. 패치 목록 JSON: `[{"type": <automation/error_types.json 의 유형 하나>, "why": "근거 한 줄", "find": "본문에 딱 한 번 있는 문구", "replace_paragraph": "그 문단(p·li·tr) 안쪽 전체", "tag": "p|li|tr"}]` (제목은 `{"type", "why", "set_title"}`)
+  5. `python3 automation/apply_review.py <post_id> "<제목>" <패치.json>` (고칠 곳이 없으면 패치 파일 없이) — 오류가 나오면 그 문구대로 패치를 고쳐 다시
+  6. `wordpress/queue/reviewdone-<post_id>-<날짜시각>.json` = `{"type": "review_done", "post_id": <id>, "title": "<제목>", "patches": <고친 곳 수>}`
+  7. 커밋에 `wordpress/queue wordpress/patches.json automation/reviewed.txt automation/common-errors.md` 를 **모두** 넣는다 (빠지면 같은 글을 매번 다시 검수함)
 - `candidates` 는 점수순 후보다. 위에서부터 보고 아래에 해당하면 건너뛴다:
   - 날마다 값이 바뀌는 시세·가격(예: 오늘의 금 시세, 농산물 가격) — 글이 금방 틀린 정보가 됨
   - 특정 회사·브랜드 상품 비교, 추천·순위·이벤트, 의료·건강 진단, 정치·종교
   - `recent_posts` 에 이미 같은 주제(앞뒤 수식어만 다른 것)가 있는 키워드
 - 처음으로 통과한 후보 1개를 고른다. 후보 키워드(`keyword`)는 띄어쓰기 없는 원문 그대로 쓴다.
+- 바뀌는 제도·새 혜택 글의 `keyword` 는 독자가 검색할 말을 띄어쓰기 없이 (예: `2027최저임금`, `청년미래적금신청`). 같은 주제 글이 이미 있어 서버가 건너뛰어도 그 제도·혜택은 다시 안 나온다.
 - 위 기준으로 **건너뛴 후보**는 다시 안 뜨게 기록한다 (`recent_posts` 와 겹쳐서 건너뛴 것은 제외. 서버가 이미 막음):
   `wordpress/queue/skip-<날짜>-<시각>.json` = `{"type": "skip", "keywords": [{"keyword": "<원문>", "why": "<이유 한 줄>", "brand": "<특정 브랜드·회사 상품이면 그 이름, 예: SBI저축은행>"}], "law_changes": [], "new_benefits": []}` (brand 를 적으면 그 브랜드가 든 다른 후보도 서버가 한 번에 뺀다)
-  새 글과 같은 커밋에 넣는다. 건너뛴 게 없으면 만들지 않는다.
+  새 글을 안 써도(검수·보류 수정만 한 실행이라도) 올린다. 건너뛴 게 없으면 만들지 않는다.
 
 ## 2. 쓰기 규칙 불러오기
 봇과 같은 작가·검수 규칙을 쓴다 (저장소의 코드가 기준):
@@ -65,7 +79,7 @@ EOF
 - 계산 예시는 Python 으로 계산해서 그 결과를 그대로 쓴다. 표의 합계는 항목 합과 같아야 한다.
 - 내부 링크: 1단계 응답 `recent_posts` 중 `url` 이 있는(발행된) 글이 본문과 실제로 관련 있으면, 관련 문장 안에
   `<a href="<url>">자연스러운 문구</a>` 로 1~3개 건다. 관련 없으면 걸지 않는다. 목록에 없는 주소·외부 사이트 주소는 서버가 링크를 지운다.
-- 다 쓰면 숫자 일치를 확인한다 (False 면 고친다):
+- 다 쓰면 숫자 일치를 확인한다:
 ```
 python3 -c "import json;from bot.writer import parse_article,align_with_body;a=parse_article(open('ARTICLE.json').read());print(align_with_body(a))"
 ```
@@ -90,10 +104,10 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   2. 보강이 안 되면 **빼거나**, 꼭 필요한 내용이면 독자가 손해 보지 않는 쪽으로 **완화**한다 (예: '안 돼요' → '안 될 수 있으니 계약 전에 ○○에 확인').
   3. **해마다 바뀌는 내용**(지원사업·한시 감면·신청 기간·올해 금액)은 올해 공식 공고 원문에서 시작일·종료일·금액까지 확인해야 쓴다.
      확인 못 하면 기간·수량은 빼고 "올해 공고를 확인"으로 안내한다 (작년 기사·블로그 값으로 쓰지 않는다).
-  4. 글의 핵심(제목·첫 문단의 답)이 보강도 완화도 안 되면 그 글은 `"status": "draft"` 로 올린다 (공개 대기열에 안 들어감) 그리고 보고에 이유를 적는다.
+  4. 글의 핵심(제목·첫 문단의 답)이 보강도 완화도 안 되면 그 글은 `"status": "draft"` 로 올린다 (서버가 보류 목록에 넣어 다음 실행이 다시 고침).
 - 고치거나 보강한 항목은 **하위 에이전트에게 다시 확인시켜** `맞음`이 나온 것만 `맞음`으로 기록하고 그 항목에 `"rechecked": true` 를 넣는다 (재확인 결과를 받은 **뒤에** 올린다 — 없으면 관문이 보류) (내가 찾은 근거로 내가 `맞음`을 매기지 않는다 — 11/5 외부 검수에서 고친 곳이 이 경로로 많이 나옴).
 - 4단계의 숫자 일치 확인(`align_with_body`)을 다시 돌린다.
-- 올리기 전에 `python3 -m bot.source_check ARTICLE.json` 을 돌려, '근거 못 읽음·페이지에 없음·최근 개정 조문' 으로 나온 주장은 하위 에이전트에게 다시 확인시키거나 완화하고, '예외 확인'(근거 조문의 단서·예외 문장)·'단정 문장' 목록은 글에 빠진 예외가 없는지 하나씩 맞춰 본다. `[관문: …]` 줄은 서버가 공개를 막는 항목이라 반드시 고친다 (제목에 조건 넣기, 특례·예외 조문은 글에 반영하거나 검수 기록에 '제N조 해당 없음 — 이유' 항목).
+- 올리기 전에 `review` 를 ARTICLE.json 에 넣고 `python3 -m bot.source_check ARTICLE.json` 을 돌려 (종료코드 1 이면 서버가 보류할 글 — 고친 뒤 다시), '근거 못 읽음·페이지에 없음·최근 개정 조문' 으로 나온 주장은 하위 에이전트에게 다시 확인시키거나 완화하고, '예외 확인'(근거 조문의 단서·예외 문장)·'단정 문장' 목록은 글에 빠진 예외가 없는지 하나씩 맞춰 본다. `[관문]` 줄은 서버가 공개를 막는 항목이라 반드시 고친다 (제목에 조건 넣기, 특례·예외 조문은 글에 반영하거나 검수 기록에 '제N조 해당 없음 — 이유' 항목).
 
 ## 4-2. 계산기 (주제에 정해진 계산 공식이 있을 때만)
 수수료표·세율·요율·법령 계산식이나 대출 상환 같은 **정해진 공식**이 있고, 독자가 자기 값을 넣어볼 이유가 있는 주제면 계산기를 본문에 넣는다.
@@ -114,8 +128,8 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 기관이 정한 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
   표준 수학 공식은 공식 기관의 계산 예시가 없어도 위 방법으로 검증해 만든다.
 - 본문에 넣는 법: `content_html` 의 계산 예시 근처에 **독립된 줄**로 `<p>[firstlab_calc id="<id>"]</p>`
-- **연초 값·근거 법령 개정**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 (한 번에 3건까지) 글보다 먼저. `source_changed` 가 있는 항목은 그 기관 페이지에서 `missing` 숫자가 무엇으로 바뀌었는지 보고 data 를 고친다 (basis_date 를 오늘로). `law_change` 가 있는 항목은 그 개정의 `articles`(바뀌는 조문)를 `python3 -m bot.lawtext <법령명> <제N조>` 로 보고, 계산기 값·식·안내가 바뀌면 그 시행일(`date`)로 `scheduled` 를 넣고, 상관없으면 data 의 `"law_checked"` 목록에 그 `law_change` 값을 더한다. 그 밖의 항목은 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 아직 확정 전이면 값은 고치지 않고 `"yearly_recheck": "<확정 예상일>"` 와 `"yearly_pending"`(무엇을 기다리는지) 만 적는다 (그날까지 다시 안 나옴). 항목의 `pending` 에 지난번에 기다리던 것이 있다.
-- 계산기는 별도 커밋으로 먼저 올린다: `git add wordpress/themes/first-lab/calculators wordpress/pages && git commit -m "계산기: <이름>"`
+- **연초 값·근거 법령 개정**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 (한 번에 3건까지, 실행 순서 ③). 먼저 저장소의 `data/<id>.json` 을 본다 — 이미 `yearly_checked` 가 그 해이거나 `yearly_recheck` 가 오늘보다 뒤이거나 `law_checked` 에 그 key 가 있으면 앞 실행이 처리한 것이라 건너뛴다 (서버 목록은 새벽에만 갱신). `id` 가 `-` 인 항목은 무시. `source_changed` 가 있는 항목은 그 기관 페이지에서 `missing` 숫자가 무엇으로 바뀌었는지 보고 data 를 고친다 (basis_date 를 오늘로). `law_change` 가 있는 항목은 그 개정의 `articles`(바뀌는 조문)를 `python3 -m bot.lawtext <법령명> <제N조>` 로 보고, 계산기 값·식·안내가 바뀌면 그 시행일(`date`)로 `scheduled` 를 넣고, 상관없으면 data 의 `"law_checked"` 목록에 그 `law_change` 값을 더한다. 그 밖의 항목은 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 해 중간에 바뀌는 값(7월 국민연금 상·하한 등)이 남으면 `yearly_recheck` 를 그 확정 예상일로, 다 끝나면 `yearly_recheck`·`yearly_pending` 을 지운다. `basis_date` 를 올릴 때 그 날짜보다 앞선 `scheduled` 는 값(values)을 본값에 합치고 지운다 (안 그러면 검사가 막음). 아직 확정 전이면 값은 고치지 않고 `"yearly_recheck": "<확정 예상일>"` 와 `"yearly_pending"`(무엇을 기다리는지) 만 적는다 (그날까지 다시 안 나옴). 항목의 `pending` 에 지난번에 기다리던 것이 있다.
+- 계산기 파일도 실행 끝의 커밋 1개에 같이 넣는다 (5단계 명령).
 
 ## 5. 올리기
 - `wordpress/queue/<영문-슬러그>.json` 으로 저장한다. 4단계 JSON 에 `"keyword": "<후보 원문>"`, `"status": "auto"` 를 더한다
@@ -123,17 +137,16 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - `"review"`: 독립 검수 기록 (서버가 초안 저장 때 확인 → 통과 못 하면 공개 대기열에 안 넣고 초안 보류).
   주장마다 `{"claim": "요지", "urls": ["확인한 주소"], "verdict": "맞음|틀림|확인불가", "action": "유지|수정|완화|삭제"}`.
   본문에 단정형으로 남긴 주장(유지·수정)은 `맞음` + 공식 기관 주소(.go.kr .or.kr 등)가 있어야 통과. 사실대로 적는다.
-  주장은 5개 이상, **제목·요약문의 숫자는 본문과 같은 표기로 `맞음` 주장 안에 들어 있어야** 통과한다 (예: 제목이 '74만 8,000원'이면 주장에도 '74만 8,000원').
+  주장은 본문(공백 제외) 70자당 1개 이상, **제목·요약문의 숫자는 본문과 같은 표기로 `맞음` 주장 안에 들어 있어야** 통과한다 (예: 제목이 '74만 8,000원'이면 주장에도 '74만 8,000원').
 - `"sources"`: 독립 검수에서 `맞음` 이 나온 장부 주소 중 **정부·공공기관 페이지**(.go.kr .or.kr .re.kr .ac.kr) 2~3개를
   `[{"name": "기관명 + 페이지 내용 (예: 한국교통안전공단 검사 수수료 안내)", "url": "https://..."}]` 로 넣는다.
   서버가 실제로 열리는지 확인한 뒤 글 끝에 '공식 안내 바로가기'로 붙인다 (본문 안 외부 링크는 지워짐).
 - 검사: `python3 -m unittest discover -s tests && node tests/test_calculators.mjs`
-- 커밋하고 main 에 올린다 (운영자 승인된 자동 작업): 
-  `git add wordpress/queue && git commit -m "매일 글: <키워드>" && git push origin HEAD:main`
+- 실행 끝에 한 번만 커밋하고 main 에 올린다 (운영자 승인된 자동 작업). 이번 실행에서 바뀐 것 전부:
+  `git add wordpress/queue wordpress/patches.json wordpress/themes/first-lab/calculators wordpress/pages automation/reviewed.txt automation/common-errors.md && git commit -m "<한 일 요약>" && git push origin HEAD:main`
 - push 가 다른 실행과 겹쳐 거절되면(non-fast-forward) `git pull --rebase origin main` 후 한 번 더 push 한다.
-- 배포 결과 확인 (예약 세션엔 GitHub 도구가 없으니 공개 API 사용, 2~5분 걸림):
-  `curl -s "https://api.github.com/repos/yoorimint/first-lab/actions/runs?head_sha=$(git rev-parse HEAD)" | python3 -c "import json,sys;[print(r['name'],r['status'],r['conclusion']) for r in json.load(sys.stdin)['workflow_runs']]"`
-  conclusion 이 success 면 끝. failure 면 원인만 보고하고 끝낸다.
+  `patches.json`·`reviewed.txt` 가 충돌하면 양쪽 내용을 모두 남기고(둘 다 끝에 덧붙인 줄) `python3 automation/common_errors.py` 를 다시 돌린 뒤 이어서 rebase.
+- 배포 결과는 기다리지 않는다 (서버가 배포 밀림을 감지해 다음 실행의 `deploy_alert` 로 알려 줌).
 - push 가 권한 문제로 실패하면 다른 방법을 찾지 말고 "push 실패"로 보고하고 끝낸다.
 
 ## 5-1. 검수 보류 초안 고치기 (있을 때만, 실행 1번에 1개)
@@ -144,7 +157,8 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   `{"type": "fix_hold", "post_id": <id>, "base_modified": "<응답 값 그대로>", "content_html": "<고친 본문 전체>", "review": [...], "changes": "<한 줄>"}`
   제목·요약문을 바꿨으면 `"title"`, `"excerpt"` 도 넣는다. 서버가 다시 관문 검사 → 통과하면 공개 대기열.
 - 공식 근거를 끝내 못 찾는 등 고칠 수 없으면 `{"type": "fix_hold", "post_id": <id>, "give_up": true, "why": "<한 줄>"}` 만 올린다 (30일 동안 목록에서 빠지고 다음 보류 글로 넘어감).
-- 5단계와 같이 검사 → 커밋(`보류 수정: <글 제목>`) → main 에 올림.
+- 이유가 기록 문제(조문 번호 없음·rechecked 없음·주장 수 부족)뿐이면 저장소 `wordpress/queue/` 의 그 글 파일에서 원래 `review` 를 불러와 그 항목만 고친다 (검수를 처음부터 다시 하지 않음). 내용 문제일 때만 그 주장을 다시 검수한다.
+- 실행 끝 커밋에 같이 넣는다.
 
 ## 5-2. 대표 사진 검사 (있을 때만, 실행 1번에 응답의 글 전부)
 글마다 AI 사진 1장이 대표 사진(홈 목록·공유 미리보기)이다. 본문에는 사진을 넣지 않는다.
@@ -155,7 +169,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - `images` 가 빈 목록이면(사진 생성 실패) 글 주제에 맞는 장면 1개를 `add` 에 `{"prompt", "alt"}` 로 적는다.
 - `wordpress/queue/imgcheck-<post_id>-<날짜시각>.json` 으로 저장 (이상 없으면 replace·remove·add 를 빈 목록으로 → 검사 끝 표시):
   `{"type": "image_check", "post_id": <id>, "replace": [{"old": "<name>", "prompt": "...", "alt": "한국어 대체 텍스트", "why": "한 줄"}], "remove": [], "add": []}`
-- 5단계 커밋에 같이 넣는다 (새 글이 없으면 `사진 검사: <글 번호들>` 로 커밋 → main 에 올림).
+- 실행 끝 커밋에 같이 넣는다.
 
 ## 6. 글 갱신 (있는 날만)
 1단계 응답의 `refresh_target` 이 `null` 이면 건너뛴다. 있으면 그 글 1개를 고친다 (새 글이 실패했어도 따로 진행).
@@ -173,9 +187,9 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   (제목 모드는 `content_html` 대신 `"title": "...", "excerpt": "..."`)
   (`base_modified` 는 그 사이 운영자가 글을 고쳤으면 덮어쓰지 않게 하는 값이다. 바꾸지 말 것)
 - 확인해 보니 고칠 게 없으면 `{"type": "refresh", "post_id": <id>, "base_modified": "<응답 값>", "checked": true, "changes": "확인 결과 그대로: <확인한 것 한 줄>"}` 만 올린다 (안 올리면 같은 글이 매일 다시 나옴).
-- 5단계와 같이 검사 → 커밋(`매일 갱신: <글 제목>`) → main 에 올림 → 배포 확인.
+- 실행 끝 커밋에 같이 넣는다.
 
 ## 7. 마무리 보고 (세션 마지막 메시지)
-- 새 글: 고른 키워드와 건너뛴 후보(이유), 제목, 근거 약한 주장 처리 결과(보강·완화·삭제 각각 무엇을), 배포 결과.
+- 이번 실행에 한 무거운 일(보류 수정·대기 글 검수·계산기·새 글 중 무엇), 새 글이면 키워드·건너뛴 후보(이유)·제목·근거 약한 주장 처리 결과.
   본문에 근거 약한 채로 **단정형**으로 남은 주장이 있으면 안 된다.
 - 갱신: 대상 글, 바꾼 내용, 배포 결과 (없으면 "갱신 대상 없음").

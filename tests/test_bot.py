@@ -2254,6 +2254,17 @@ class PipelineReviewFixesTest(unittest.TestCase):
         self.assertTrue(changed.pending("2026-10-25 고용보험법 / 2026-11-05 기준금리", "2026-10-30"))
 
 
+class ReviewDoneConsistencyTest(unittest.TestCase):
+    """대기 글 검수 기록 파일이 있으면 reviewed.txt 에도 그 글이 있어야 함 (11/5 검토: 빠지면 같은 글을 매번 다시 검수)."""
+
+    def test_reviewdone_files_recorded(self):
+        from bot.review_queue import reviewed_ids
+        done = reviewed_ids()
+        for path in (ROOT / "wordpress" / "queue").glob("reviewdone-*.json"):
+            pid = int(json.loads(path.read_text(encoding="utf-8"))["post_id"])
+            self.assertIn(pid, done, f"{path.name}: automation/reviewed.txt 에 {pid} 없음 — 커밋에서 빠짐")
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt
