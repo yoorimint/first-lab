@@ -1,0 +1,205 @@
+[
+  {
+    "why": "본문 예시: 10,000원 100주 + 8,000원 50주 = 1,400,000원 ÷ 150주 = 9,333.33원, 코스피 0.20% 본전 9,333.33 ÷ 0.998 = 9,352.04 → 9,353원",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 50,
+      "target_price": 0,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 9333.33,
+      "qty": 150,
+      "cost": 1400000,
+      "n": 50,
+      "breakeven": 9353
+    }
+  },
+  {
+    "why": "본문 표: 8,000원 100주 추가 = 1,800,000원 ÷ 200주 = 9,000원",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 100,
+      "target_price": 0,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 9000.0,
+      "qty": 200,
+      "cost": 1800000,
+      "n": 100,
+      "breakeven": 9019
+    }
+  },
+  {
+    "why": "본문 표: 8,000원 200주 추가 = 2,600,000원 ÷ 300주 = 8,666.67원",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 200,
+      "target_price": 0,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 8666.67,
+      "qty": 300,
+      "cost": 2600000,
+      "n": 200,
+      "breakeven": 8685
+    }
+  },
+  {
+    "why": "불타기: 12,000원 50주 추가 = 1,600,000원 ÷ 150주 = 10,666.67원",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 12000,
+      "buy_qty": 50,
+      "target_price": 0,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 10666.67,
+      "qty": 150,
+      "cost": 1600000,
+      "n": 50,
+      "breakeven": 10689
+    }
+  },
+  {
+    "why": "목표 9,000원: 100 × (10,000 − 9,000) ÷ (9,000 − 8,000) = 정확히 100주 (올림해서 101주가 되면 안 됨)",
+    "input": {
+      "mode": "target",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 50,
+      "target_price": 9000,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 9000.0,
+      "qty": 200,
+      "cost": 1800000,
+      "n": 100,
+      "breakeven": 9019
+    },
+    "boundary": true
+  },
+  {
+    "why": "목표 9,500원: 100 × 500 ÷ 1,500 = 33.33주 → 34주, 평단가 1,272,000 ÷ 134 = 9,492.54원",
+    "input": {
+      "mode": "target",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 50,
+      "target_price": 9500,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 9492.54,
+      "qty": 134,
+      "cost": 1272000,
+      "n": 34,
+      "breakeven": 9512
+    },
+    "boundary": true
+  },
+  {
+    "why": "세금·수수료 0: 평단가 9,000원이면 본전도 딱 9,000원 (올림으로 9,001원이 되면 안 됨)",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 100,
+      "target_price": 0,
+      "market": "none",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 9000.0,
+      "qty": 200,
+      "cost": 1800000,
+      "n": 100,
+      "breakeven": 9000
+    },
+    "boundary": true
+  },
+  {
+    "why": "코스닥 0.20% + 수수료 0.015%: 9,333.33 × 1.00015 ÷ (1 − 0.002 − 0.00015) = 9,354.85 → 9,355원",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 50,
+      "target_price": 0,
+      "market": "kosdaq",
+      "fee": 0.015
+    },
+    "expect": {
+      "avg": 9333.33,
+      "qty": 150,
+      "cost": 1400000,
+      "n": 50,
+      "breakeven": 9355
+    }
+  },
+  {
+    "why": "코넥스 0.10%: 9,333.33 ÷ 0.999 = 9,342.68 → 9,343원",
+    "input": {
+      "mode": "add",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 8000,
+      "buy_qty": 50,
+      "target_price": 0,
+      "market": "konex",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 9333.33,
+      "qty": 150,
+      "cost": 1400000,
+      "n": 50,
+      "breakeven": 9343
+    }
+  },
+  {
+    "why": "불타기 목표 10,500원: 100 × (10,000 − 10,500) ÷ (10,500 − 12,000) = 33.33 → 34주",
+    "input": {
+      "mode": "target",
+      "held_price": 10000,
+      "held_qty": 100,
+      "buy_price": 12000,
+      "buy_qty": 50,
+      "target_price": 10500,
+      "market": "kospi",
+      "fee": 0
+    },
+    "expect": {
+      "avg": 10507.46,
+      "qty": 134,
+      "cost": 1408000,
+      "n": 34,
+      "breakeven": 10529
+    }
+  }
+]
