@@ -452,8 +452,8 @@ def excerpt_apply_date(excerpt: str, body_html: str) -> list[str]:
         return [f"요약 '{ex[:50]}' 은 새 기준만 있고 본문의 경과조치('{_TRANSITION_BODY.search(body).group(0)}')가 없음 — 요약에도 넣기"]
     # '○일부터' 문장에 본문이 '지금도'라고 한 기존 값을 섞음 (11/5 #857: 범칙금 6만 원은 지금도 — 2/25부터 새로 생기는 건 벌점만)
     for sent in re.split(r"(?<=[.!?])\s+", ex):
-        if not _START.search(sent):
-            continue
+        if not _START.search(sent) or _NOW.search(sent):
+            continue  # 요약 문장이 스스로 '지금도'로 나눠 쓴 경우는 괜찮음
         for amount in re.findall(r"\d[\d,.]*\s*(?:만 원|원|%|점)", sent):
             if any(_NOW.search(b) and amount in b for b in _sentences(body_html)):
                 return [f"요약 '{sent[:50]}' 은 '{amount}'까지 그날부터 생기는 것처럼 읽힘 — 본문은 '지금도'라고 함, 기존 값과 새 값을 나눠 쓰기"]
