@@ -1,0 +1,347 @@
+{
+ "title": "전세대출 이자 계산기: 1억 3.5%면 월 291,667원",
+ "excerpt": "전세대출 월 이자는 대출금×연 금리÷12. 1억 원 연 3.5%면 월 291,667원, 2년 7,000,000원이에요. 버팀목 금리·상환 방식별 차이·소득공제 40%까지 정리했어요.",
+ "content_html": "<p>전세대출 한 달 이자는 <strong>대출금 × 연 금리 ÷ 12</strong>로 구하면 돼요. 1억 원을 연 3.5%로 빌리면 월 291,667원, 2년이면 이자만 7,000,000원이에요. 매달 이자만 내고 계약이 끝날 때 원금을 갚는 만기일시상환이라면 이 공식 하나로 계산할 수 있어요.</p>\n<h2>전세대출 이자 계산기</h2>\n<p>상환 방식에서 '만기일시'를 고르면 전세대출 월 이자가 바로 나와요. 원리금균등이나 원금균등을 고르면 원금까지 나눠 갚을 때의 월 납입금도 볼 수 있어요.</p>\n<p>[firstlab_calc id=\"loan-repayment\"]</p>\n<h2>대출금·금리별 월 이자 (만기일시상환)</h2>\n<table><thead><tr><th>대출금</th><th>연 금리</th><th>월 이자</th><th>2년 이자 합계</th></tr></thead><tbody>\n<tr><td>1억 원</td><td>3.5%</td><td>291,667원</td><td>7,000,000원</td></tr>\n<tr><td>1억 원</td><td>4.0%</td><td>333,333원</td><td>8,000,000원</td></tr>\n<tr><td>1억 5,000만 원</td><td>3.5%</td><td>437,500원</td><td>10,500,000원</td></tr>\n<tr><td>2억 원</td><td>4.0%</td><td>666,667원</td><td>16,000,000원</td></tr>\n</tbody></table>\n<p>금리가 0.5%p만 올라도 1억 원 기준 월 이자가 41,667원 늘어요. 변동금리라면 금리가 바뀔 때마다 다시 계산해 보는 게 좋아요.</p>\n<h2>상환 방식에 따라 달라지는 월 납입금</h2>\n<p>같은 1억 원, 연 3.5%, 24개월이라도 상환 방식에 따라 매달 내는 돈이 크게 달라요.</p>\n<table><thead><tr><th>상환 방식</th><th>월 납입금</th><th>이자 총액</th></tr></thead><tbody>\n<tr><td>만기일시상환</td><td>291,667원 (마지막 달 원금 1억 원 추가)</td><td>7,000,000원</td></tr>\n<tr><td>원리금균등상환</td><td>4,320,272원</td><td>3,686,533원</td></tr>\n<tr><td>원금균등상환</td><td>첫 달 4,458,333원 → 마지막 달 4,178,819원</td><td>3,645,833원</td></tr>\n</tbody></table>\n<p>원금을 나눠 갚으면 이자 총액은 줄지만 매달 부담이 커요.</p>\n<h2>버팀목 전세자금대출이면 금리와 한도부터 보세요</h2>\n<p>주택도시기금의 버팀목 전세자금대출은 부부합산 연소득 5천만 원 이하(2자녀 이상 가구 등 6천만 원, 신혼부부 7.5천만 원 이하), 순자산가액 3.45억 원 이하 무주택 세대주가 대상이에요. 금리는 연 2.5%~3.5% 변동금리이고, 대상 주택이 지방에 있으면 0.2%p 낮아지며 우대금리를 받으면 더 내려갈 수 있어요. 한도는 일반가구 기준 수도권 1.2억 원, 수도권 외 0.8억 원 이내(신혼·2자녀 이상 가구는 2.5억 원, 1.6억 원)이고, 전세금의 70%(신혼·2자녀 이상 가구 80%) 이내 등 기준 중 작은 금액으로 정해져요.</p>\n<ul>\n<li>수도권 일반가구 한도 1.2억 원을 연 2.5%로 빌리면 월 250,000원</li>\n<li>같은 금액을 연 3.5%로 빌리면 월 350,000원</li>\n<li>상환은 일시상환 또는 혼합상환 중에서 고르고, 중도상환수수료는 없어요</li>\n</ul>\n<h2>이자 말고 드는 비용</h2>\n<ul>\n<li><strong>보증료</strong>: 한국주택금융공사·주택도시보증공사 보증서를 담보로 하면 보증료를 따로 내요.</li>\n<li><strong>인지세</strong>: 버팀목 대출은 고객과 은행이 50%씩 부담해요.</li>\n<li><strong>중도상환수수료</strong>: 금융소비자보호법상 금융회사는 대출계약이 성립한 날부터 3년 이내에 갚는 경우 등에만 받을 수 있어요. 3년 안에 갚을 계획이면 약정서의 수수료율을 먼저 보세요.</li>\n</ul>\n<p>계산기 결과에는 이 비용이 들어 있지 않아요. 실제 청구액은 납입일과 월별 일수에 따라 조금 다를 수 있어요.</p>\n<h2>연말정산 소득공제로 이자 일부 돌려받기</h2>\n<p>근로소득이 있는(일용근로자 제외) 무주택 세대의 세대주가 국민주택규모(주거전용면적 85㎡ 이하, 수도권 밖 도시지역이 아닌 읍·면은 100㎡ 이하) 주택(오피스텔 포함)을 빌리면서 받은 전세대출은 원리금 상환액의 40%를 근로소득금액에서 공제받을 수 있어요. 무주택 여부는 그해 12월 31일 기준으로 봐요. 한도는 주택청약종합저축 소득공제와 합쳐 연 400만 원이에요.</p>\n<ul>\n<li>임대차계약서의 입주일과 전입일 중 빠른 날부터 전후 3개월 이내에 빌린 돈이어야 해요. 계약을 연장·갱신하며 빌렸다면 연장일·갱신일부터 전후 3개월이에요.</li>\n<li>대출기관이 집주인 계좌로 직접 입금했어야 해요.</li>\n<li>예: 1억 원을 연 3.5%로 1년 내내 빌렸다면 이자 3,500,000원의 40%인 1,400,000원이 공제돼요.</li>\n</ul>\n<h2>자주 묻는 질문</h2>\n<h3>세대주가 아니면 공제를 못 받나요?</h3>\n<p>세대주가 주택자금 관련 공제를 받지 않으면 근로소득이 있는 세대원도 받을 수 있어요.</p>\n<h3>버팀목 대출을 받은 뒤 집을 사면 어떻게 되나요?</h3>\n<p>대출을 받은 뒤 주택을 취득한 것이 확인되면 대출금을 갚아야 해요.</p>\n<h3>버팀목 대출 기간은 얼마나 되나요?</h3>\n<p>기본 2년 이내이고 연장해서 최장 10년까지 쓸 수 있어요(임차종료일은 넘길 수 없어요). 10년을 쓴 뒤 연장할 때 미성년 자녀가 있으면 1명당 2년씩 늘어 최장 20년까지 가능해요.</p>\n<h3>대출 계약을 취소할 수 있나요?</h3>\n<p>버팀목 대출은 계약서류를 받은 날·계약체결일·대출실행일·사후자산심사 부적격 확정통지일 중 늦은 날부터 14일 이내에 원금·이자·부대비용을 모두 돌려주면 철회할 수 있어요.</p>",
+ "tags": [
+  "전세대출",
+  "전세대출 이자",
+  "버팀목 전세자금대출",
+  "대출 이자 계산"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a bright empty apartment living room with wooden floor and sunlight through large windows, moving boxes stacked near the wall",
+   "alt": "햇살이 드는 빈 아파트 거실과 벽 쪽에 쌓인 이삿짐 상자"
+  }
+ ],
+ "keyword": "전세대출이자계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "만기일시상환 월 이자 = 대출금 × 연 금리 ÷ 12 (재계산, 계산기 bullet 방식과 같음)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "1억 원 연 3.5%면 월 291,667원, 2년 이자 7,000,000원 (재계산, 제목·요약)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1억 원 연 4.0% 월 333,333원·2년 8,000,000원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1억 5,000만 원 연 3.5% 월 437,500원·2년 10,500,000원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2억 원 연 4.0% 월 666,667원·2년 16,000,000원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금리 0.5%p 오르면 1억 원 기준 월 이자 41,667원 증가 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1억 원 3.5% 24개월 원리금균등 월 4,320,272원·이자 3,686,533원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등 첫 달 4,458,333원 → 마지막 달 4,178,819원, 이자 3,645,833원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만기일시상환 마지막 달 원금 1억 원 추가, 이자 총액 7,000,000원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기 상환 방식에 만기일시·원리금균등·원금균등이 있고 보증료·중도상환수수료 미포함",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "버팀목 대상: 부부합산 연소득 5천만 원 이하(2자녀 이상 가구 등 6천만 원, 신혼부부 7.5천만 원 이하)",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "버팀목 대상: 순자산가액 3.45억 원 이하 무주택 세대주",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "버팀목 금리 연 2.5%~3.5% 변동금리",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대상 주택이 지방이면 금리 0.2%p 인하",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "우대금리를 받으면 금리가 더 내려갈 수 있음",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "한도 일반가구 수도권 1.2억 원, 수도권 외 0.8억 원(신혼·2자녀 이상 2.5억 원, 1.6억 원), 전세금 70%(80%) 이내 등 중 작은 금액",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "수도권 일반가구 한도 1.2억 원 연 2.5% 월 250,000원, 연 3.5% 월 350,000원 (재계산)",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp",
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "버팀목 상환 방법 일시상환 또는 혼합상환",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "버팀목 중도상환수수료 없음",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "HF·HUG 보증서 담보 시 보증료 고객 부담",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "버팀목 인지세 고객/은행 각 50% 부담",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중도상환수수료는 대출계약 성립일부터 3년 이내 상환 등에만 부과 가능 (금융소비자보호법 제20조)",
+   "urls": [
+    "https://www.law.go.kr/법령/금융소비자보호에관한법률/제20조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "근로소득자(일용근로자 제외) 무주택 세대주의 주택임차자금 차입금 원리금 상환액 40% 근로소득금액에서 공제 (소득세법 제52조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제52조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "국민주택규모 주택(오피스텔 포함): 주거전용 85㎡ 이하, 수도권 밖 도시지역 아닌 읍·면 100㎡ 이하 (소득세법 시행령 제112조, 주택법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령/제112조",
+    "https://www.law.go.kr/법령/주택법/제2조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "무주택 여부는 과세기간 종료일(12월 31일) 기준 (소득세법 제52조, 제5조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제52조",
+    "https://www.law.go.kr/법령/소득세법/제5조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "한도는 주택청약종합저축 소득공제와 합쳐 연 400만 원 (소득세법 제52조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제52조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "입주일과 전입일 중 빠른 날부터 전후 3개월 이내 차입 (소득세법 시행령 제112조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령/제112조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연장·갱신 때는 연장일·갱신일부터 전후 3개월 (소득세법 시행령 제112조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령/제112조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "대출기관이 임대인 계좌로 직접 입금 (소득세법 시행령 제112조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령/제112조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1억 원 연 3.5% 1년 이자 3,500,000원의 40% = 1,400,000원 공제 (재계산, 소득세법 제52조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제52조",
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세대주가 공제를 받지 않으면 근로소득 있는 세대원도 공제 (소득세법 제52조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제52조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "버팀목 대출 후 주택 취득이 확인되면 대출금 상환",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "버팀목 대출기간 2년 이내, 최장 10년, 임차종료일 초과 불가",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "10년 이용 후 연장 시 미성년 자녀 1명당 2년 추가, 최장 20년",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "철회: 계약서류 제공일·계약체결일·대출실행일·사후자산심사 부적격 확정통지일 중 늦은 날부터 14일, 원금·이자·부대비용 전액 반환 시 (금융소비자보호법 제46조)",
+   "urls": [
+    "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp",
+    "https://www.law.go.kr/법령/금융소비자보호에관한법률/제46조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "전세대출은 만기일시상환이 많다",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "삭제"
+  },
+  {
+   "claim": "실제 청구액은 납입일·월별 일수에 따라 조금 다를 수 있음",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "확인불가",
+   "action": "완화"
+  }
+ ],
+ "sources": [
+  {
+   "name": "주택도시기금 버팀목전세자금대출 상품안내",
+   "url": "https://nhuf.molit.go.kr/FP/FP05/FP0502/FP05020101.jsp"
+  },
+  {
+   "name": "금융감독원 파인 대출이자계산기",
+   "url": "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+  },
+  {
+   "name": "국가법령정보센터 소득세법 제52조 (주택임차차입금 공제)",
+   "url": "https://www.law.go.kr/법령/소득세법/제52조"
+  }
+ ]
+}
