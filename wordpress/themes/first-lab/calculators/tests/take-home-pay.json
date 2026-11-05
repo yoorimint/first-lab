@@ -1,0 +1,191 @@
+[
+  {
+    "why": "월급 300만·식대 20만·1명: 과세 280만 → 별표2 2,800~2,810천원 1명 56,800원, 연금 280만×4.75%=133,000 (본문 예시)",
+    "input": {
+      "pay": 3000000,
+      "nontax": 200000,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 2800000,
+      "pension_base": 2800000,
+      "pension": 133000,
+      "health": 100660,
+      "ltc": 13227,
+      "employment": 25200,
+      "table_tax": 56800,
+      "income_tax": 56800,
+      "local_tax": 5680,
+      "net": 2665433
+    }
+  },
+  {
+    "why": "과세 정확히 1,000만 원: 별표2 '10,000천원' 행 1명 1,507,400원, 연금 상한 659만",
+    "input": {
+      "pay": 10000000,
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 10000000,
+      "pension_base": 6590000,
+      "pension": 313025,
+      "health": 359500,
+      "ltc": 47240,
+      "employment": 90000,
+      "table_tax": 1507400,
+      "income_tax": 1507400,
+      "local_tax": 150740,
+      "net": 7532095
+    },
+    "boundary": true
+  },
+  {
+    "why": "과세 1,001만 원: 1,507,400 + 10,000×98%×35%(3,430) + 25,000 = 1,535,830원",
+    "input": {
+      "pay": 10010000,
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 10010000,
+      "pension_base": 6590000,
+      "pension": 313025,
+      "health": 359859,
+      "ltc": 47287,
+      "employment": 90090,
+      "table_tax": 1535830,
+      "income_tax": 1535830,
+      "local_tax": 153583,
+      "net": 7510326
+    },
+    "boundary": true
+  },
+  {
+    "why": "과세 1,060,000원: 별표2 1,060~1,065천원 1명 1,040원 (세액이 처음 생기는 행)",
+    "input": {
+      "pay": 1060000,
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 1060000,
+      "pension_base": 1060000,
+      "pension": 50350,
+      "health": 38107,
+      "ltc": 5007,
+      "employment": 9540,
+      "table_tax": 1040,
+      "income_tax": 1040,
+      "local_tax": 104,
+      "net": 955852
+    },
+    "boundary": true
+  },
+  {
+    "why": "과세 1,059,999원: 별표2 1,055~1,060천원 행은 '-' → 0원",
+    "input": {
+      "pay": 1059999,
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 1059999,
+      "pension_base": 1059000,
+      "pension": 50302,
+      "health": 38106,
+      "ltc": 5007,
+      "employment": 9539,
+      "table_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "net": 957045
+    },
+    "boundary": true
+  },
+  {
+    "why": "과세 500만·4명·8~20세 자녀 2명: 별표2 5,000~5,020천원 4명 219,100 − 45,830 = 173,270원",
+    "input": {
+      "pay": 5200000,
+      "nontax": 200000,
+      "family": 4,
+      "children": 2,
+      "ratio": "100",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 5000000,
+      "pension_base": 5000000,
+      "pension": 237500,
+      "health": 179750,
+      "ltc": 23620,
+      "employment": 45000,
+      "table_tax": 219100,
+      "income_tax": 173270,
+      "local_tax": 17327,
+      "net": 4523533
+    }
+  },
+  {
+    "why": "과세 660만(연금 상한 659만 위): 연금 6,590,000×4.75%=313,025원, 별표2 6,600~6,620천원 2명 594,050 × 80% = 475,240원",
+    "input": {
+      "pay": 6600000,
+      "nontax": 0,
+      "family": 2,
+      "children": 0,
+      "ratio": "80",
+      "pension": "yes"
+    },
+    "expect": {
+      "taxable": 6600000,
+      "pension_base": 6590000,
+      "pension": 313025,
+      "health": 237270,
+      "ltc": 31178,
+      "employment": 59400,
+      "table_tax": 594050,
+      "income_tax": 475240,
+      "local_tax": 47524,
+      "net": 5436363
+    },
+    "boundary": true
+  },
+  {
+    "why": "과세 40만 원 (연금 하한 41만 아래), 국민연금 안 냄 선택 → 연금 0, 소득세 0",
+    "input": {
+      "pay": 400000,
+      "nontax": 0,
+      "family": 1,
+      "children": 0,
+      "ratio": "100",
+      "pension": "no"
+    },
+    "expect": {
+      "taxable": 400000,
+      "pension_base": 0,
+      "pension": 0,
+      "health": 14380,
+      "ltc": 1889,
+      "employment": 3600,
+      "table_tax": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "net": 380131
+    }
+  }
+]
