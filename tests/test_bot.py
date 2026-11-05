@@ -1558,6 +1558,8 @@ class NaverHubTest(unittest.TestCase):
             self.assertEqual((row["docs"], row["peak"]), (1234, "1"))
             h.refresh_signals(conn, [{"keyword": "연말정산 계산기"}], today, keys=("i", "k"))
             self.assertEqual(trend.call_count, 1)  # 30일 안에 다시 조회 안 함 (호출 자체를 안 함)
+            h.refresh_signals(conn, [{"keyword": "연말정산 환급", "head": "연말정산 계산기"}], today, keys=("i", "k"))
+            self.assertEqual(trend.call_args.args[0], ["연말정산 환급"])  # 대표 주제는 이미 받아 둔 것이라 키워드만
         self.assertIn("키 없음", h.refresh_signals(conn, [], today, keys=()))
 
 

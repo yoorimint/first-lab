@@ -27,7 +27,7 @@ BASE = "https://naverapihub.apigw.ntruss.com"
 ID_SECRET, KEY_SECRET = "NAVER_HUB_ID", "NAVER_HUB_SECRET"
 DAILY_LIMIT = 300            # 하루 전체 호출 상한 (무료 범위: 블로그 하루 2만5천·트렌드 월 5만보다 훨씬 적게)
 COUNTER = Path("/var/lib/first-lab/bot/naver-hub-calls")  # 'YYYY-MM-DD 호출수'
-CHECK_TOP = 40               # 하루에 새로 조회할 후보 수
+CHECK_TOP = 60               # 하루에 새로 조회할 후보 수 (+ 그 대표 주제들 — 같은 주제 키워드가 주제의 성수기를 같이 씀)
 REFRESH_DAYS = 30            # 같은 키워드는 이 기간 지나야 다시 조회
 TREND_MONTHS = 24
 PEAK, LOW = 0.8, 0.4         # 월평균이 최고 달의 80% 이상이면 성수기, 40% 이하면 비수기
@@ -138,7 +138,12 @@ def refresh_signals(conn, candidates: list[dict], today: dt.date | None = None, 
         return "네이버 API HUB: 키 없음 → 건너뜀"
     known = load(conn)
     cutoff = f"{today - dt.timedelta(days=REFRESH_DAYS):%Y-%m-%d}"
-    todo = [c for c in candidates[:CHECK_TOP] if norm(c["keyword"]) not in known or known[norm(c["keyword"])]["checked"] < cutoff]
+    words: list[str] = []
+    for c in candidates[:CHECK_TOP]:  # 후보와 그 대표 주제(head) — select_keyword 가 키워드에 신호가 없으면 주제 것을 씀
+        for w in (c["keyword"], c.get("head") or ""):
+            if w and norm(w) not in {norm(x) for x in words}:
+                words.append(w)
+    todo = [{"keyword": w} for w in words if norm(w) not in known or known[norm(w)]["checked"] < cutoff]
     done = 0
     try:
         trends = monthly_trend([c["keyword"] for c in todo], keys, today) if todo else {}
@@ -155,7 +160,7 @@ def refresh_signals(conn, candidates: list[dict], today: dt.date | None = None, 
         conn.commit()
         return f"네이버 API HUB: {done}개 조회 후 실패 ({type(e).__name__}: {str(e)[:80]})"
     conn.commit()
-    return f"네이버 API HUB: 후보 {done}개 문서 수·검색 트렌드 갱신"
+    return f"네이버 API HUB: 후보·대표 주제 {done}개 문서 수·검색 트렌드 갱신"
 
 
 def main(argv: list[str]) -> int:
