@@ -27,7 +27,7 @@
       },
       { name: 'total', label: '수강자수 (명)', type: 'number', min: 1, step: 1, help: '그 과목을 들은 전체 학생 수예요.' },
       { name: 'rank', label: '내 석차 (등)', type: 'number', min: 1, step: 1, help: '동점자가 있으면 동점자 중 가장 높은 석차를 넣어요.' },
-      { name: 'ties', label: '동석차 인원수 (나 포함, 명)', type: 'number', min: 1, step: 1, default: 1, help: '동점자가 없으면 1이에요.' },
+      { name: 'ties', label: '동석차 인원수 (나 포함, 명)', type: 'number', min: 1, step: 1, default: 1, help: '학교 동점자 처리 규정을 적용한 뒤에도 같은 석차인 인원(나 포함)이에요. 없으면 1이에요.' },
       ...subjectInputs,
     ],
 
@@ -80,6 +80,7 @@
       const byCount = (x) => cum.findIndex((c) => x <= c) + 1;
       const mid = rank + (ties - 1) / 2;  // 중간석차 = 석차 + (동석차 인원수 - 1) / 2
       const midPct = Math.round((mid / total) * 10000 + 1e-9) / 100;
+      const rankPct = Math.round((rank / total) * 10000 + 1e-9) / 100;  // 표에 보이는 석차 백분율은 내 석차 기준 (11/5 검수: 중간석차 값을 '석차 백분율'로 보임)
       const first = byCount(rank);
       const last = byCount(rank + ties - 1);
       const usedMid = ties > 1 && first !== last;  // 동점자가 등급 경계에 걸침 → 중간석차백분율로
@@ -87,16 +88,16 @@
 
       const rows = [
         ['과목 등급', `${grade}등급 (${name})`],
-        [usedMid ? '중간석차백분율' : '석차 백분율', `${midPct}%`],
+        usedMid ? ['중간석차백분율', `${midPct}%`] : ['석차 백분율', `${rankPct}%`],
         ['등급별 누적 인원', cum.slice(0, -1).map((c, k) => `${k + 1}등급 ${c}명`).join(' · ')],
       ];
       const notes = [];
       if (usedMid) notes.push(`동점자 ${ties}명이 등급 경계에 걸쳐서 중간석차 ${mid}등(${midPct}%)으로 모두 같은 등급을 받아요.`);
       if (grade > 1 && !usedMid) rows.push(['한 등급 위 기준', `${grade - 1}등급은 ${cum[grade - 2]}등 이내`]);
-      if (total <= d.small_class[system]) notes.push(`수강자가 ${d.small_class[system]}명 이하인 과목은 학교 규정에 따라 석차등급 대신 '·'로 적힐 수 있어요.`);
+      if (total <= d.small_class[system]) notes.push(`수강자가 ${d.small_class[system]}명 이하인 과목은 석차등급 대신 '·'로 적힐 수 있어요 (같은 입학년도 교육과정의 같은 과목은 한 가지 방식으로 통일).`);
       notes.push(system === 'five' ? '사회·과학 융합 선택 9과목, 과학탐구실험, 체육·예술, 교양, 공동교육과정 과목 등은 석차등급이 나오지 않아요.' : '진로 선택 과목, 과학탐구실험, 체육·예술, 교양, 전문교과Ⅱ 과목 등은 석차등급이 나오지 않아요.');
       notes.push('경기도교육청 2026학년도 학업성적관리 시행지침의 계산 방식이에요. 소속 시·도 지침과 학교 규정으로 최종 확인해요.');
-      return { values: { grade, cum1: cum[0], midPct, usedMid }, rows, notes };
+      return { values: { grade, cum1: cum[0], midPct, rankPct, usedMid, shown_pct: usedMid ? midPct : rankPct }, rows, notes };
     },
   });
 })();

@@ -10,5 +10,6 @@
   {"why": "9등급제 200명 33등: 3등급 누적 200×23%=46, 2등급 22 → 3등급", "input": {"mode": "rank", "system": "nine", "total": 200, "rank": 33}, "expect": {"grade": 3, "cum1": 8, "midPct": 16.5}},
   {"why": "학점 가중 평균: 1등급 4학점·2등급 4학점·3등급 3학점 → 21÷11 = 1.909 → 1.91 (본문 표)", "input": {"mode": "average", "system": "five", "g1": 1, "c1": 4, "g2": 2, "c2": 4, "g3": 3, "c3": 3}, "expect": {"avg": 1.91, "credits": 11, "subjects": 3}},
   {"why": "석차+동석차가 수강자수를 넘음 → 안내", "input": {"mode": "rank", "system": "five", "total": 10, "rank": 10, "ties": 2}, "expect_error": true},
-  {"why": "5등급제에 6등급 입력 → 안내", "input": {"mode": "average", "system": "five", "g1": 6, "c1": 3}, "expect_error": true}
+  {"why": "5등급제에 6등급 입력 → 안내", "input": {"mode": "average", "system": "five", "g1": 6, "c1": 3}, "expect_error": true},
+  {"why": "동점 2명이 경계에 안 걸림(9·10등 모두 1등급) → 등급은 석차로, 표의 석차 백분율은 내 석차 9/96 = 9.38% (중간석차 9.5 값 9.9%를 보이면 틀림 — 11/5 외부 검수)", "input": {"mode": "rank", "system": "five", "total": 96, "rank": 9, "ties": 2}, "expect": {"grade": 1, "usedMid": false, "rankPct": 9.38, "shown_pct": 9.38}}
 ]
