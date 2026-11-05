@@ -1,0 +1,42 @@
+{
+  "basis_date": "2026-11-05",
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 제47조 (근로소득공제)", "url": "https://www.law.go.kr/법령/소득세법/제47조"},
+    {"name": "국가법령정보센터 소득세법 제55조 (세율)", "url": "https://www.law.go.kr/법령/소득세법/제55조"},
+    {"name": "국가법령정보센터 소득세법 제59조 (근로소득세액공제)", "url": "https://www.law.go.kr/법령/소득세법/제59조"},
+    {"name": "국가법령정보센터 소득세법 제59조의2 (자녀세액공제)", "url": "https://www.law.go.kr/법령/소득세법/제59조의2"},
+    {"name": "국가법령정보센터 소득세법 제59조의4 (특별세액공제·표준세액공제)", "url": "https://www.law.go.kr/법령/소득세법/제59조의4"},
+    {"name": "국가법령정보센터 소득세법 제137조 (근로소득세액의 연말정산)", "url": "https://www.law.go.kr/법령/소득세법/제137조"}
+  ],
+  "basic_deduction_per_person": 1500000,
+  "wage_deduction": [
+    {"upto": 5000000, "base": 0, "over": 0, "rate_pct": 70},
+    {"upto": 15000000, "base": 3500000, "over": 5000000, "rate_pct": 40},
+    {"upto": 45000000, "base": 7500000, "over": 15000000, "rate_pct": 15},
+    {"upto": 100000000, "base": 12000000, "over": 45000000, "rate_pct": 5},
+    {"upto": null, "base": 14750000, "over": 100000000, "rate_pct": 2}
+  ],
+  "wage_deduction_max": 20000000,
+  "brackets": [
+    {"upto": 14000000, "rate_pct": 6, "deduction": 0},
+    {"upto": 50000000, "rate_pct": 15, "deduction": 1260000},
+    {"upto": 88000000, "rate_pct": 24, "deduction": 5760000},
+    {"upto": 150000000, "rate_pct": 35, "deduction": 15440000},
+    {"upto": 300000000, "rate_pct": 38, "deduction": 19940000},
+    {"upto": 500000000, "rate_pct": 40, "deduction": 25940000},
+    {"upto": 1000000000, "rate_pct": 42, "deduction": 35940000},
+    {"upto": null, "rate_pct": 45, "deduction": 65940000}
+  ],
+  "wage_credit": {
+    "threshold": 1300000, "low_pct": 55, "high_base": 715000, "high_pct": 30,
+    "limits": [
+      {"upto": 33000000, "start": 740000, "over": 33000000, "per_mille": 0, "floor": 740000},
+      {"upto": 70000000, "start": 740000, "over": 33000000, "per_mille": 8, "floor": 660000},
+      {"upto": 120000000, "start": 660000, "over": 70000000, "per_mille": 500, "floor": 500000},
+      {"upto": null, "start": 500000, "over": 120000000, "per_mille": 500, "floor": 200000}
+    ]
+  },
+  "child_credit": {"one": 250000, "two": 550000, "per_extra": 400000},
+  "standard_credit": 130000,
+  "local_ratio_div": 10
+}

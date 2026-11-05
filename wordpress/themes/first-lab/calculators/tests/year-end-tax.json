@@ -1,0 +1,202 @@
+[
+  {
+    "why": "본문 예시 A: 총급여 5,000만·보험료 450만·연금저축 세액공제 45만·떼인 소득세 250만 → 소득세 107,500원 환급 (제47조·제55조·제59조 법령 식대로 따로 계산)",
+    "input": {
+      "salary": 50000000,
+      "people": 1,
+      "other_deduction": 4500000,
+      "children": 0,
+      "other_credit": 450000,
+      "special": "yes",
+      "prepaid": 2500000
+    },
+    "expect": {
+      "wage_deduction": 12250000,
+      "earned": 37750000,
+      "base": 31750000,
+      "rate": 15,
+      "tax": 3502500,
+      "wage_credit": 660000,
+      "wage_limit": 660000,
+      "child_credit": 0,
+      "standard_credit": 0,
+      "determined": 2392500,
+      "due": -107500,
+      "local": 239250,
+      "local_due": -10750,
+      "total": -118250
+    }
+  },
+  {
+    "why": "본문 예시 B: 예시 A 에서 연금저축 없음 → 소득세 342,500원 추가 납부",
+    "input": {
+      "salary": 50000000,
+      "people": 1,
+      "other_deduction": 4500000,
+      "children": 0,
+      "other_credit": 0,
+      "special": "yes",
+      "prepaid": 2500000
+    },
+    "expect": {
+      "wage_deduction": 12250000,
+      "earned": 37750000,
+      "base": 31750000,
+      "rate": 15,
+      "tax": 3502500,
+      "wage_credit": 660000,
+      "wage_limit": 660000,
+      "child_credit": 0,
+      "standard_credit": 0,
+      "determined": 2842500,
+      "due": 342500,
+      "local": 284250,
+      "local_due": 34250,
+      "total": 376750
+    }
+  },
+  {
+    "why": "근로세액공제 한도 기준선: 총급여 3,300만 원 → 한도 74만 원 (제59조②1), 표준세액공제 13만",
+    "input": {
+      "salary": 33000000,
+      "people": 1,
+      "other_deduction": 0,
+      "children": 0,
+      "other_credit": 0,
+      "special": "no",
+      "prepaid": 0
+    },
+    "expect": {
+      "wage_deduction": 10200000,
+      "earned": 22800000,
+      "base": 21300000,
+      "rate": 15,
+      "tax": 1935000,
+      "wage_credit": 740000,
+      "wage_limit": 740000,
+      "child_credit": 0,
+      "standard_credit": 130000,
+      "determined": 1065000,
+      "due": 1065000,
+      "local": 106500,
+      "local_due": 106500,
+      "total": 1171500
+    },
+    "boundary": true
+  },
+  {
+    "why": "한도 기준선: 총급여 7,000만 원 → 74만 − 3,700만×8/1000 = 44만 4천 → 최소 66만 원 (제59조②2 단서)",
+    "input": {
+      "salary": 70000000,
+      "people": 1,
+      "other_deduction": 0,
+      "children": 0,
+      "other_credit": 0,
+      "special": "yes",
+      "prepaid": 0
+    },
+    "expect": {
+      "wage_deduction": 13250000,
+      "earned": 56750000,
+      "base": 55250000,
+      "rate": 24,
+      "tax": 7500000,
+      "wage_credit": 660000,
+      "wage_limit": 660000,
+      "child_credit": 0,
+      "standard_credit": 0,
+      "determined": 6840000,
+      "due": 6840000,
+      "local": 684000,
+      "local_due": 684000,
+      "total": 7524000
+    },
+    "boundary": true
+  },
+  {
+    "why": "한도 기준선 바로 위: 총급여 7,100만 원 → 66만 − 100만×1/2 = 16만 → 최소 50만 원 (제59조②3 단서)",
+    "input": {
+      "salary": 71000000,
+      "people": 1,
+      "other_deduction": 0,
+      "children": 0,
+      "other_credit": 0,
+      "special": "yes",
+      "prepaid": 0
+    },
+    "expect": {
+      "wage_deduction": 13300000,
+      "earned": 57700000,
+      "base": 56200000,
+      "rate": 24,
+      "tax": 7728000,
+      "wage_credit": 500000,
+      "wage_limit": 500000,
+      "child_credit": 0,
+      "standard_credit": 0,
+      "determined": 7228000,
+      "due": 7228000,
+      "local": 722800,
+      "local_due": 722800,
+      "total": 7950800
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로소득공제 상한: 총급여 4억 → 1,475만 + 3억×2% = 2,075만 → 2,000만 원 (제47조① 단서)",
+    "input": {
+      "salary": 400000000,
+      "people": 1,
+      "other_deduction": 0,
+      "children": 0,
+      "other_credit": 0,
+      "special": "yes",
+      "prepaid": 0
+    },
+    "expect": {
+      "wage_deduction": 20000000,
+      "earned": 380000000,
+      "base": 378500000,
+      "rate": 40,
+      "tax": 125460000,
+      "wage_credit": 200000,
+      "wage_limit": 200000,
+      "child_credit": 0,
+      "standard_credit": 0,
+      "determined": 125260000,
+      "due": 125260000,
+      "local": 12526000,
+      "local_due": 12526000,
+      "total": 137786000
+    },
+    "boundary": true
+  },
+  {
+    "why": "세액공제가 산출세액보다 많음: 총급여 2,000만·자녀 3명(55만+40만) → 결정세액 0원, 떼인 10만 원 전액 환급 (제59조의2①3)",
+    "input": {
+      "salary": 20000000,
+      "people": 2,
+      "other_deduction": 1000000,
+      "children": 3,
+      "other_credit": 0,
+      "special": "yes",
+      "prepaid": 100000
+    },
+    "expect": {
+      "wage_deduction": 8250000,
+      "earned": 11750000,
+      "base": 7750000,
+      "rate": 6,
+      "tax": 465000,
+      "wage_credit": 255750,
+      "wage_limit": 740000,
+      "child_credit": 950000,
+      "standard_credit": 0,
+      "determined": 0,
+      "due": -100000,
+      "local": 0,
+      "local_due": -10000,
+      "total": -110000
+    }
+  }
+]
