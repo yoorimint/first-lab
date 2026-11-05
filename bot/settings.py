@@ -44,6 +44,8 @@ class BotSettings:
     maint_times: list[str] = field(default_factory=lambda: ["06:10"])  # 매일 점검 시각 (비우면 안 함)
     direct_enabled: bool = True  # '글 작성 시각 사용' (끄면 정해진 시각에 자동으로 쓰지 않음)
     direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 글 작성 시각 (월정액: Claude, API 봇: API)
+    # 연속 작성(한 편 끝나면 바로 다음 편)을 이 날까지만 — 뒤로는 3만 원 요금제라 direct_times 예약 시각 방식 (운영자 11/5, autopilot.md)
+    continuous_until: str = "2026-12-04"
     routine_fire_url: str = ""  # 월정액: Claude 예약 작업 실행 주소·토큰 (secrets.env, bot/routine.py)
     routine_token: str = ""
     enabled: bool = False
@@ -78,6 +80,7 @@ class BotSettings:
             maint_times=_times(raw.get("maint_times", "06:10")),
             direct_enabled=bool(int(raw.get("direct_enabled", 1) or 0)),
             direct_times=_times(raw.get("direct_times", "07:40")),
+            continuous_until=str(raw.get("continuous_until") or "2026-12-04"),
             routine_fire_url=secrets.get("CLAUDE_ROUTINE_FIRE_URL", ""),
             routine_token=secrets.get("CLAUDE_ROUTINE_TOKEN", ""),
             enabled=bool(int(raw.get("enabled") or 0)),

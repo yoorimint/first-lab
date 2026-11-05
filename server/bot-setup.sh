@@ -32,6 +32,8 @@ apply_settings_once() {
   touch "$mark" && echo "적용: $*"
 }
 apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
+# 넘긴 뒤 예약 시각 (연속 작성은 continuous_until 다음 날 스스로 꺼짐): 하루 3번 — 3만 원 요금제 사용량에 맞춰 설정 페이지에서 조정
+apply_settings_once 2026-11-05-direct-times direct_times=07:40,13:10,19:40
 
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
