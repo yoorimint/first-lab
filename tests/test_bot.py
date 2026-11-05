@@ -2429,6 +2429,26 @@ class ExcerptExclusionTest(unittest.TestCase):
         self.assertEqual(g.excerpt_vs_exclusions(ex, faq), [])
 
 
+class LeadThresholdTest(unittest.TestCase):
+    """#771 경기 극저신용대출: 요약·첫 문단 '하위 10%' ↔ 본문 '…이라면 하위 20%', 제목 '피해자' ↔ 본문 '불법사금융 피해자'."""
+
+    BODY = ("<p>신용평점 하위 10% 이하인 도민에게 빌려줘요. 지금은 불법사금융 피해자 대출을 받아요.</p>"
+            "<p>기초생활수급자·차상위계층이라면 하위 20%까지 기준이 넓어져요.</p>"
+            "<p>불법사금융 피해자는 확인서가 필요해요. 불법사금융 피해자 대출은 10억 원 규모예요.</p>")
+
+    def test_thresholds(self):
+        from bot import condition_gate as g
+        self.assertTrue(g.lead_thresholds("신용평점 하위 10%, 연 1%.", self.BODY))
+        fixed = self.BODY.replace("하위 10% 이하인", "하위 10% 이하(기초생활수급자 등은 하위 20%)인")
+        self.assertEqual(g.lead_thresholds("신용평점 하위 10%(기초생활수급자 등은 하위 20%), 연 1%.", fixed), [])
+        self.assertEqual(g.lead_thresholds("", "<p>9월 1일부터 신청해요.</p><p>원하면 9월 16일부터 해요.</p>"), [])  # 날짜는 기준값 아님
+
+    def test_title_qualifier(self):
+        from bot import condition_gate as g
+        self.assertTrue(g.title_qualifier("극저신용대출: 11월 30일까지 피해자 접수", self.BODY))
+        self.assertEqual(g.title_qualifier("극저신용대출: 불법사금융 피해자 11월 30일까지 접수", self.BODY), [])
+
+
 class TransitionRuleTest(unittest.TestCase):
     """부칙 경과조치: 개정으로 바뀐 숫자는 적용 시점과 함께 (11/5 #762 하루 상한 68,100원 ← 2025년 이전 퇴사자는 66,000원)."""
 

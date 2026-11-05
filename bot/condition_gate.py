@@ -6,7 +6,8 @@
 2. 다른 조문의 특례·예외 (exception_articles): 글이 근거로 단 조문(제N조)을 같은 법의 다른 조문이 '제N조에도 불구하고',
    '제N조에 따른 공제와 별개로'처럼 바꾸거나 더하면, 검수 기록이 그 조문도 확인했어야 통과 (#640 증여공제 제53조 ← 혼인·출산 제53조의2).
    글에 넣을 필요가 없으면 검수 기록에 그 조문을 '해당 없음 — 이유'로 적으면 된다. 법령을 못 열면 막지 않는다.
-3. 첫 문단 단정 ↔ 본문 예외 (lead_vs_body, #748), 요약 '받아요' ↔ 본문 '못 받는 경우' (excerpt_vs_exclusions, #762).
+3. 첫 문단 단정 ↔ 본문 예외 (lead_vs_body, #748), 요약 '받아요' ↔ 본문 '못 받는 경우' (excerpt_vs_exclusions, #762),
+   요약·첫 문단 기준 '하위 10%' ↔ 본문 '…이라면 하위 20%' (lead_thresholds, #771), 제목 '피해자' ↔ 본문은 늘 '불법사금융 피해자' (title_qualifier, #771).
 4. 부칙 경과조치 (transition_rules, #762): 근거 조문이 최근 개정되고 부칙이 '시행 전에 이직한 사람은 종전 규정'이면,
    그 숫자를 쓴 문장에 적용 시점('2026년 1월 1일 이후 …', '종전')이 있어야 한다 (하루 상한 68,100원 ← 2025년 퇴사자는 66,000원).
 """
@@ -295,3 +296,38 @@ def transition_rules(review: list[dict] | None, body_html: str, page_of=None, ch
                                f"('{date.year}년 {date.month}월 {date.day}일 이후 …, 그 전은 종전 기준')을 적기")
                     break
     return list(dict.fromkeys(out))[:3]
+
+
+# 요약·첫 문단 기준값 ↔ 본문의 다른 기준값 (11/5 #771 '신용평점 하위 10%' ↔ '기초생활수급자·…이라면 하위 20%')
+THRESHOLD = re.compile(r"(하위|상위|최대|최고|최소|최저|최장)\s*(\d[\d,.]*)\s*(%|점|만 원|원|년|개월|일|세)")
+
+
+def lead_thresholds(excerpt: str, body_html: str) -> list[str]:
+    first = re.search(r"<p[^>]*>.*?</p>", body_html or "", re.S)
+    lead = _plain(excerpt) + " " + (_plain(first.group(0)) if first else "")
+    rest = _sentences(body_html[first.end():] if first else body_html)
+    out = []
+    for m in THRESHOLD.finditer(lead):
+        for sent in rest:
+            if not CONDITION.search(sent):
+                continue
+            alt = next((a for a in THRESHOLD.finditer(sent) if a.group(1) == m.group(1) and a.group(3) == m.group(3)
+                        and a.group(2) != m.group(2)
+                        and not re.search(rf"{a.group(1)}\s*{re.escape(a.group(2))}\s*{re.escape(a.group(3))}", lead)), None)
+            if alt:
+                out.append(f"요약·첫 문단은 '{m.group(0)}' 만 적었는데 본문에 '{alt.group(0)}' 조건이 있음: '{sent[:60]}' — 요약·첫 문단에도 넣기")
+                break
+    return list(dict.fromkeys(out))[:2]
+
+
+def title_qualifier(title: str, body_html: str) -> list[str]:
+    """제목의 '…자'(피해자·대상자) 가 본문에서는 거의 늘 같은 꾸밈말과 나오는데 제목에는 없으면 (11/5 #771 '피해자' ↔ '불법사금융 피해자')."""
+    body = _plain(body_html)
+    out = []
+    for word in sorted(set(re.findall(r"([가-힣]{2,}자)(?=[\s,·:]|$)", title or ""))):
+        mods = re.findall(rf"([가-힣]{{2,}})\s+{word}", body)
+        if len(mods) >= 3:
+            top = max(sorted(set(mods)), key=mods.count)
+            if mods.count(top) / len(mods) >= 0.6 and top not in title:
+                out.append(f"제목 '{word}' 는 본문에서 늘 '{top} {word}' — 제목에도 '{top}' 를 넣기 (대상을 잘못 알 수 있음)")
+    return out
