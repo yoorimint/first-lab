@@ -2320,6 +2320,19 @@ class WpMetaMissingTest(unittest.TestCase):
             self.assertEqual(hold._bump_tries(7), 1)
 
 
+class LeadVsBodyTest(unittest.TestCase):
+    """첫 문단 단정 ↔ 본문 예외 (11/5 #748: '성인 Tdap 국가 지원 대상이 아니라' ↔ '유행할 때 임시예방접종 대상이면 국가 지원을 받을 수 있')."""
+
+    def test_flag_and_pass(self):
+        from bot import condition_gate as g
+        body = ("<p>아이는 6회를 무료로 맞아요. 반대로 성인이 맞는 Tdap은 국가 지원 대상이 아니라 병원마다 금액이 달라요.</p>"
+                "<h2>지원</h2><p>만 13세 이상은 백일해가 유행할 때 임시예방접종 대상이면 국가 지원을 받을 수 있어요.</p>")
+        self.assertTrue(g.lead_vs_body(body))
+        fixed = body.replace("국가 지원 대상이 아니라", "유행 때 임시예방접종 대상인 경우가 아니면 국가 지원이 없고")
+        self.assertEqual(g.lead_vs_body(fixed), [])
+        self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

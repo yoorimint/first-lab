@@ -116,6 +116,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     # 조건 누락 (11/5 운영자 '막을 대책 세워서 어떻게든 해야지') — bot/condition_gate.py
     from . import condition_gate
     out += condition_gate.headline_scope(title, excerpt, body_html)
+    out += condition_gate.lead_vs_body(body_html)
     out += condition_gate.exception_articles(review, law_fetcher)
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:

@@ -79,6 +79,44 @@ def headline_scope(title: str, excerpt: str, body_html: str) -> list[str]:
     return out
 
 
+# 3. 첫 문단의 단정 ↔ 본문의 예외 (lead_vs_body): 첫 문단은 '…대상이 아니에요·없어요'로 단정하는데 본문에는 '…때·…이면 받을 수 있어요'가
+#    있으면 막는다 — 첫 문단만 읽는 사람이 틀린 답을 가져감 (11/5 #748 '성인 Tdap 국가 지원 없음' ↔ 본문 '유행 때 임시예방접종 대상이면 지원').
+ABSOLUTE_NEG = re.compile(r"(아니라|아니에요|아니고|없어요|없고|없어서|안 돼요|불가|못 받|받을 수 없|해당하지 않|지원하지 않)")
+CONDITION = re.compile(r"(경우|때는|때만|때에|할 때|일 때|이면|라면|하면|다만|제외|빼고|아니면|한해|한정)")
+PERMIT = re.compile(r"(받을 수 있|할 수 있|가능해|가능하|지원돼|지원해|지원을 받|지원받|돼요|대상이 돼|포함돼)")
+JOSA = re.compile(r"(이라면|에서는|으로는|이면|라면|에는|으로|에서|에게|까지|부터|이라|이고|이나|은|는|이|가|을|를|의|에|도|로|과|와|만|요)$")
+STOP = {"있어요", "있고", "해요", "돼요", "그래서", "하지만", "반대로", "이런", "같은", "따라", "때문", "정도", "모두", "아니라", "아니에요"}
+
+
+def _stems(text: str) -> set[str]:
+    out = set()
+    for w in re.findall(r"[가-힣A-Za-z]{2,}", text):
+        w = w.lower()
+        stripped = JOSA.sub("", w)
+        w = stripped if len(stripped) >= 2 else w  # '국가' 의 '가' 를 조사로 떼지 않게
+        if len(w) >= 2 and w not in STOP:
+            out.add(w)
+    return out
+
+
+def lead_vs_body(body_html: str) -> list[str]:
+    first = re.search(r"<p[^>]*>(.*?)</p>", body_html or "", re.S)
+    if not first:
+        return []
+    lead = _sentences(first.group(0))
+    rest = _sentences(body_html[first.end():])
+    out = []
+    for s in lead:
+        if not ABSOLUTE_NEG.search(s) or CONDITION.search(s):
+            continue
+        key = _stems(ABSOLUTE_NEG.split(s)[0][-40:])  # 단정 바로 앞말(무엇이 아닌지)
+        for e in rest:
+            if CONDITION.search(e) and PERMIT.search(e) and len(key & _stems(e)) >= 3:
+                out.append(f"첫 문단 '{s[:50]}' 는 단정인데 본문에 예외가 있음: '{e[:60]}' — 첫 문단에도 그 조건을 넣기")
+                break
+    return out[:2]
+
+
 EXCEPTION_REF = r"(?:에도 불구하고|와 별개로|과 별개로)"
 
 
