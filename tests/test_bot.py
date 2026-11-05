@@ -1200,6 +1200,19 @@ class ApplyReviewTest(unittest.TestCase):
         good = [{"type": "outdated", "why": "x", "find": "1점이에요", "replace_paragraph": "1점이고 바뀌어요", "tag": "p"}]
         self.assertEqual(apply_review.check(post, good), [])
 
+    def test_softening_keeps_verified_numbers(self):
+        """조건 추가·완화가 공식 페이지에서 확인된 숫자를 지우면 막음 (11/5 #673 200원·230원)."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        post = {"title": "t", "excerpt": "e", "content_html": "<ul><li>건강보험 200원, 연금 230원이 줄어요.</li></ul>",
+                "source_check": {"found": [{"claim": "200원·230원 감액", "numbers": ["200", "230"], "urls": ["https://x.or.kr"]}]}}
+        soft = [{"type": "unverified", "why": "x", "find": "연금 230원이 줄어요.", "replace_paragraph": "가입자마다 달라요. 공단에 확인하세요.", "tag": "li"}]
+        self.assertTrue(any("200, 230" in e for e in apply_review.check(post, soft)))
+        keep = [dict(soft[0], replace_paragraph="건강보험 200원, 연금 230원이 줄어요(지역가입자 기준). 사업장은 공단에 확인하세요.")]
+        self.assertEqual(apply_review.check(post, keep), [])
+        fix = [dict(soft[0], type="wrong_fact", replace_paragraph="건강보험 300원이 줄어요.")]   # 숫자가 틀렸다고 고치는 유형은 허용
+        self.assertEqual(apply_review.check(post, fix), [])
+
 
 class IndexNowTest(unittest.TestCase):
     """글이 공개되는 순간 검색엔진에 알린다 (11/5 운영자 승인)."""
