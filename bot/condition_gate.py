@@ -426,3 +426,17 @@ _LAW_ABSENCE = re.compile(r"(법|법령|법률|규정)(에|상|으로)[^.?!]{0,2
 def law_absence(body_html: str) -> list[str]:
     return [f"'{s[:50]}' 는 법령 전체를 봐야 아는 부정 단정 — '○○를 부르는 별칭이에요'처럼 확인한 사실로"
             for s in _sentences(body_html) if _LAW_ABSENCE.search(s)][:2]
+
+
+# 요약 '○월 ○일부터 A에서 B로' ↔ 본문 '시행 이후 … 경우부터 적용' (11/5 #817 가산금 10%→40% — 그 전 신고분은 종전 10%.
+# 같은 꼴: #762 상한액 적용 시점, #808 '11/27 이후 쓰는 휴가부터' → 3번째에 검사로)
+_CHANGE = re.compile(r"(\d{1,2}월 \d{1,2}일|\d{4}년)(?: \d{1,2}월 \d{1,2}일)?부터[^.]*?\d[\d,.]*\s*(?:%|원|일|배)?\s*(?:에서|→)\s*\d")
+_APPLY = re.compile(r"(이후|시행 후|시행 뒤)[^.]{0,60}?(경우|분|기간|것|휴가|신고)부터|종전")
+_APPLY_OK = re.compile(r"이후|종전|분부터|경우부터|신고부터|전 [^.]{0,10}(은|는)")
+
+
+def excerpt_apply_date(excerpt: str, body_html: str) -> list[str]:
+    ex = _plain(excerpt)
+    if _CHANGE.search(ex) and _APPLY.search(_plain(body_html)) and not _APPLY_OK.search(ex):
+        return [f"요약 '{ex[:50]}' 은 바뀐 값만 있고 본문의 적용 시점('이후 … 경우부터 적용', 그 전은 종전)이 없음 — 요약에도 넣기"]
+    return []

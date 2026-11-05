@@ -2648,6 +2648,16 @@ class VariantOnlyTest(unittest.TestCase):
         self.assertEqual(g.variant_only("<h2>신청</h2><p>본인만 신청할 수 있어요. 서류만 내면 돼요.</p>"), [])   # 갈래가 없는 글
 
 
+class ExcerptApplyDateTest(unittest.TestCase):
+    def test_flag_and_pass(self):
+        """#817: 요약 '11월 27일부터 가산금 10%에서 40%' ↔ 본문 '시행 이후 거짓 신고한 경우부터 적용'."""
+        from bot import condition_gate as g
+        body = "<p>개정 규정은 시행 이후 거짓으로 신고한 경우부터 적용해요. 그 전 신고분은 종전 10%예요.</p>"
+        self.assertTrue(g.excerpt_apply_date("2026년 11월 27일부터 가산금이 10%에서 40%로 올라요.", body))
+        self.assertEqual(g.excerpt_apply_date("2026년 11월 27일 이후 거짓 신고하면 가산금이 10%에서 40%로 올라요.", body), [])
+        self.assertEqual(g.excerpt_apply_date("2026년 11월 27일부터 가산금이 10%에서 40%로 올라요.", "<p>올라요.</p>"), [])
+
+
 class LawAbsenceTest(unittest.TestCase):
     def test_flag_and_pass(self):
         """#690 \'파킹통장은 법에 있는 상품 이름이 아니에요\' — 확인 못 한 부정 단정."""

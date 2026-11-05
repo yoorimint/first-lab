@@ -70,7 +70,8 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "title_qualifier": lambda: condition_gate.title_qualifier(post["title"], post["content_html"]),
               "lead_minimums": lambda: condition_gate.lead_minimums(post["excerpt"], post["content_html"]),
               "variant_only": lambda: condition_gate.variant_only(post["content_html"]),
-              "law_absence": lambda: condition_gate.law_absence(post["content_html"])}.get(name)
+              "law_absence": lambda: condition_gate.law_absence(post["content_html"]),
+              "excerpt_apply_date": lambda: condition_gate.excerpt_apply_date(post["excerpt"], post["content_html"])}.get(name)
         if fn and not fn():
             return f"check:{name} 가 고치기 전 글에 안 걸림 — 이 오류를 실제로 잡는 검사가 아님"
         return None
