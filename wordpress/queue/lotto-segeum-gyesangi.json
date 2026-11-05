@@ -1,0 +1,360 @@
+{
+ "title": "로또 세금 계산기: 200만 원 넘으면 22%, 3억 초과분 33%",
+ "excerpt": "로또 당첨금은 200만 원 이하면 세금이 없고, 3억 원까지 22%, 넘는 부분만 33%예요. 1등 20억 원이면 6억 2,700만 원을 떼고 13억 7,300만 원을 받아요.",
+ "content_html": "<p>로또 당첨금은 <strong>200만 원 이하면 세금이 없고</strong>, 200만 원을 넘으면 3억 원까지 <strong>22%</strong>(소득세 20% + 지방소득세 2%), 3억 원을 넘는 부분에만 <strong>33%</strong>(소득세 30% + 지방소득세 3%)를 떼고 받아요. 그래서 1등 20억 원이면 세금 6억 2,700만 원을 떼고 13억 7,300만 원을 받아요. 세금은 당첨금을 줄 때 미리 떼고 끝나기 때문에 따로 신고할 일은 없어요.</p>\n\n<h2>로또 세금 계산기</h2>\n<p>공시된 당첨금(1게임 기준)을 넣으면 소득세·지방소득세와 실수령액이 바로 나와요.</p>\n<p>[firstlab_calc id=\"lottery-tax\"]</p>\n\n<h2>당첨금 구간별 세율</h2>\n<table>\n<thead><tr><th>당첨금</th><th>소득세</th><th>지방소득세</th><th>합계</th></tr></thead>\n<tbody>\n<tr><td>200만 원 이하</td><td>없음</td><td>없음</td><td>0%</td></tr>\n<tr><td>200만 원 초과~3억 원 이하 부분</td><td>20%</td><td>2%</td><td>22%</td></tr>\n<tr><td>3억 원 초과 부분</td><td>30%</td><td>3%</td><td>33%</td></tr>\n</tbody>\n</table>\n<p>200만 원을 넘으면 200만 원을 빼고 계산하지 않고 <strong>당첨금 전체</strong>에 세율을 곱해요. 반대로 3억 원을 넘어도 전체에 33%를 곱하는 게 아니라, 3억 원까지는 22%이고 넘는 부분만 33%예요. 지방소득세는 소득세의 10%라서 합치면 22%·33%가 돼요. 세금은 10원 미만을 버려요.</p>\n\n<h2>등수별 실수령액 예시</h2>\n<p>1·2·3등 당첨금은 회차마다 판매액과 당첨자 수로 바뀌니, 아래는 예시 금액으로 계산한 값이에요. 동행복권 안내상 4등은 50,000원, 5등은 5,000원으로 정해져 있어요.</p>\n<table>\n<thead><tr><th>예시 당첨금</th><th>세금 합계</th><th>실수령액</th></tr></thead>\n<tbody>\n<tr><td>1등 20억 원</td><td>6억 2,700만 원</td><td>13억 7,300만 원</td></tr>\n<tr><td>3억 원</td><td>6,600만 원</td><td>2억 3,400만 원</td></tr>\n<tr><td>2등 5,000만 원</td><td>1,100만 원</td><td>3,900만 원</td></tr>\n<tr><td>3등 150만 원</td><td>0원</td><td>150만 원</td></tr>\n<tr><td>4등 50,000원</td><td>0원</td><td>50,000원</td></tr>\n</tbody>\n</table>\n<p>1등 20억 원을 풀어 보면, 3억 원 × 22% = 6,600만 원, 나머지 17억 원 × 33% = 5억 6,100만 원이라 세금 합계가 6억 2,700만 원이에요. 실제 세율로 따지면 31.35%예요.</p>\n\n<h2>200만 원 기준선은 이렇게 갈려요</h2>\n<ul>\n<li>당첨금이 딱 200만 원이면 세금 0원이에요. 기준이 '200만 원 이하'라서요.</li>\n<li>200만 1원이면 전체에 22%가 붙어 세금 440,000원, 실수령 1,560,001원이에요.</li>\n<li>3등 당첨금이 회차에 따라 200만 원을 넘으면 세금을 떼고 받아요.</li>\n</ul>\n\n<h2>당첨금 받는 곳과 기한</h2>\n<p>받는 곳은 복권 수탁사업자인 동행복권의 당첨자 안내 기준이에요. 바뀔 수 있으니 받으러 가기 전에 동행복권 홈페이지에서 한 번 더 확인해요.</p>\n<table>\n<thead><tr><th>등수</th><th>받는 곳</th><th>준비물</th></tr></thead>\n<tbody>\n<tr><td>1등</td><td>NH농협은행 본점</td><td>당첨복권, 신분증</td></tr>\n<tr><td>2등·3등</td><td>NH농협은행 전국 지점</td><td>당첨복권 (2등과 200만 원 넘는 3등은 신분증도)</td></tr>\n<tr><td>4등·5등</td><td>로또복권 판매점</td><td>당첨복권</td></tr>\n</tbody>\n</table>\n<p>표는 판매점에서 산 복권 기준이에요. 인터넷으로 산 1등은 당첨복권번호와 신분증을 챙겨 NH농협은행 본점으로 가고, 인터넷으로 산 4·5등은 예치금 계좌로 자동 입금돼요. 당첨금은 <strong>지급 개시일부터 1년</strong> 안에 받아야 하고, 지나면 복권기금으로 넘어가요. 동행복권 안내로는 마지막 날이 은행 영업일이 아니면 다음 영업일까지예요.</p>\n\n<h2>가족에게 나눠 주면 증여세</h2>\n<p>세금을 떼고 받은 당첨금을 다른 사람에게 주면 받는 사람에게 증여세가 생길 수 있어요. 10년 동안 받은 것을 합쳐 배우자는 6억 원, 부모·자녀 사이는 5,000만 원(미성년자가 부모 등에게 받으면 2,000만 원), 4촌 이내 혈족·3촌 이내 인척은 1,000만 원까지 공제되고, 그 밖의 사람은 공제가 없어요. 증여세는 받은 사람이 신고해요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>로또 당첨금도 종합소득세 신고를 해야 하나요?</h3>\n<p>아니에요. 복권 당첨금은 분리과세라 지급할 때 뗀 세금으로 끝나고, 근로소득 등 다른 소득과 합치지 않아요.</p>\n<h3>연금복권 당첨금 세금도 같나요?</h3>\n<p>동행복권 안내로는 연금 형식으로 받는 연금복권 1등 당첨금은 22%를 떼요. 한 번에 받는 로또와 계산이 달라요.</p>\n<h3>인터넷 사설 사이트에서 산 로또도 당첨금을 받나요?</h3>\n<p>동행복권 안내로는 못 받아요. 정식 인가된 판매점이나 동행복권 홈페이지가 아닌 곳에서 산 복권은 번호가 맞아도 당첨금이 지급되지 않아요.</p>\n<h3>당첨복권이 찢어지면 못 받나요?</h3>\n<p>동행복권 안내로는 복권의 절반 이상 원형이 남아 있고 컴퓨터가 인식할 수 있으면 받을 수 있어요. 당첨을 확인하면 바로 뒷면에 서명해 두세요.</p>",
+ "tags": [
+  "로또 세금",
+  "로또 실수령액",
+  "복권 당첨금 세금"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm Korean city street at dusk with warm lights from small shops and people walking in the distance",
+   "alt": "해 질 녘 작은 가게 불빛이 켜진 한국 도심 거리"
+  }
+ ],
+ "keyword": "로또세금계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 200만 원 넘으면 22%, 3억 초과분 33% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 200만 원 이하면 세금이 없음 (소득세법 제84조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 3억 원까지 22%, 넘는 부분만 33% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 1등 20억 원이면 6억 2,700만 원을 떼고 13억 7,300만 원 (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3억 원까지 소득세 20% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3억 원 넘는 부분에만 소득세 30% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "지방소득세는 소득세의 10% (지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "합계 22%(소득세 20% + 지방소득세 2%), 33%(30% + 3%) (지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 200만 원 이하 0%, 200만 원 초과~3억 원 22%, 3억 원 초과 33% (소득세법 제84조·제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "200만 원을 넘으면 200만 원을 빼지 않고 당첨금 전체에 세율 (소득세법 제84조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3억 원을 넘어도 전체에 33%가 아니라 넘는 부분만 33% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세금은 10원 미만 버림 (국고금관리법 제47조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국고금관리법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1·2·3등 당첨금은 회차마다 판매액과 당첨자 수로 바뀜",
+   "urls": [
+    "https://www.dhlottery.co.kr/lt645/intro"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "동행복권 안내상 4등 50,000원, 5등 5,000원",
+   "urls": [
+    "https://www.dhlottery.co.kr/lt645/intro"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "예시 1등 20억 원: 세금 6억 2,700만 원, 실수령 13억 7,300만 원 (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1등 풀이: 3억 원 × 22% = 6,600만 원, 17억 원 × 33% = 5억 6,100만 원, 실제 세율 31.35% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시 3억 원: 세금 6,600만 원, 실수령 2억 3,400만 원 (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시 2등 5,000만 원: 세금 1,100만 원, 실수령 3,900만 원 (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시 3등 150만 원·4등 50,000원: 세금 0원 (소득세법 제84조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시 금액으로 계산한 값",
+   "urls": [
+    "https://www.dhlottery.co.kr/lt645/intro"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "딱 200만 원이면 세금 0원, 기준이 200만 원 이하 (소득세법 제84조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "200만 1원이면 세금 440,000원, 실수령 1,560,001원 (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3등이 200만 원을 넘으면 세금을 떼고 받음 (소득세법 제84조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세금을 미리 떼고 끝나 따로 신고할 일 없음, 분리과세라 다른 소득과 합치지 않음 (소득세법 제14조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기: 공시 당첨금(1게임) 넣으면 소득세·지방소득세·실수령액 (소득세법 제129조 기준 계산)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동행복권 안내 기준 1등 NH농협은행 본점, 당첨복권·신분증",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide",
+    "https://www.dhlottery.co.kr/lt645/intro"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "동행복권 안내 기준 2등·3등 NH농협은행 전국 지점, 2등과 200만 원 넘는 3등은 신분증도",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "동행복권 안내 기준 4등·5등 로또복권 판매점",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide",
+    "https://www.dhlottery.co.kr/lt645/intro"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "동행복권 안내 기준 인터넷 1등은 당첨복권번호·신분증으로 NH농협은행 본점, 인터넷 4·5등은 예치금 자동 입금",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "지급 개시일부터 1년 안에 받아야 함 (복권및복권기금법 제9조)",
+   "urls": [
+    "https://www.law.go.kr/법령/복권및복권기금법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기한이 지나면 복권기금으로 넘어감 (복권및복권기금법 제9조)",
+   "urls": [
+    "https://www.law.go.kr/법령/복권및복권기금법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동행복권 안내로 마지막 날이 은행 영업일이 아니면 다음 영업일",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "당첨금을 남에게 주면 받는 사람에게 증여세, 10년 합산 공제 (상속세및증여세법 제53조)",
+   "urls": [
+    "https://www.law.go.kr/법령/상속세및증여세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자 6억 원, 부모·자녀 사이 5,000만 원(미성년자 2,000만 원), 4촌 이내 혈족·3촌 이내 인척 1,000만 원, 그 밖의 사람은 공제 없음 (상속세및증여세법 제53조)",
+   "urls": [
+    "https://www.law.go.kr/법령/상속세및증여세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "증여세는 받은 사람이 신고 (상속세및증여세법 제68조)",
+   "urls": [
+    "https://www.law.go.kr/법령/상속세및증여세법",
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동행복권 안내로 연금 형식 연금복권 1등은 22%",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "동행복권 안내로 비인가 판매처에서 산 복권은 번호가 맞아도 지급 안 됨",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "동행복권 안내로 절반 이상 원형이 남고 컴퓨터 인식이 되면 지급, 뒷면 서명",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide",
+    "https://www.dhlottery.co.kr/lt645/intro"
+   ],
+   "verdict": "맞음",
+   "action": "완화"
+  },
+  {
+   "claim": "인터넷 200만 원 이하 3등 자동 입금",
+   "urls": [
+    "https://www.dhlottery.co.kr/guide/wnrGuide"
+   ],
+   "verdict": "확인불가",
+   "action": "삭제"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 소득세법 (복권 당첨금 과세최저한·원천징수세율)",
+   "url": "https://www.law.go.kr/법령/소득세법"
+  },
+  {
+   "name": "국가법령정보센터 지방세법 (개인지방소득세 특별징수)",
+   "url": "https://www.law.go.kr/법령/지방세법"
+  },
+  {
+   "name": "국가법령정보센터 상속세 및 증여세법 (증여재산 공제)",
+   "url": "https://www.law.go.kr/법령/상속세및증여세법"
+  }
+ ]
+}
