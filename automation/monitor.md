@@ -62,3 +62,5 @@
 - 글쓰기 작업은 대기 글 검수를 하지 않는다 (bot/review_queue.MONITOR_REVIEWS_UNTIL). 감시 세션이 `python3 automation/unreviewed.py` 의 '검수 필요' 글을 **전부** 외부 검수(review-prompt.md, model opus, 동시에 3~4편)하고 apply_review 로 반영 (재발 방지 필수).
 - 검수 안 된 대기 글이 10편 넘게 쌓이면 서버가 글쓰기 작업에게 다시 맡긴다 (감시 세션이 멈춰도 안 쌓이게). 12/5 가 지나면 자동으로 원래대로.
 - 공개 편수는 운영자가 정한다 (바꾸지 않음).
+- main 에 올릴 때는 `bash automation/check_and_push.sh "커밋 메시지"` 로만 (테스트·계산기 검사가 실패하면 올리지 않음 — 11/5 '| tail -1 &&' 로 실패한 채 올라간 일).
+

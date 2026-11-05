@@ -2633,6 +2633,16 @@ class AttachmentTextTest(unittest.TestCase):
         self.assertFalse(sc.has_number("87만 5534원", "875533"))
 
 
+class CheckAndPushTest(unittest.TestCase):
+    def test_script_stops_on_failure(self):
+        """감시 세션의 올리기 명령은 테스트 실패 시 멈춤 (11/5 '| tail -1 &&' 로 실패한 채 올라감)."""
+        sh = (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8")
+        self.assertIn("set -euo pipefail", sh)
+        self.assertIn("|| { tail -30", sh)
+        code = "\n".join(l for l in sh.splitlines() if not l.lstrip().startswith("#"))
+        self.assertNotIn("| tail -1 &&", code)
+
+
 class CitedUrlsTest(unittest.TestCase):
     def test_reviewer_gets_writer_sources(self):
         """검수 파일에 글쓴이 근거 주소 + 지시문이 '확인불가 전에 열기' (11/5 #775 고시를 안 열어 확인불가 19건)."""
