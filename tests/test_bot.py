@@ -1826,6 +1826,48 @@ class SmallWorkplaceGateTest(unittest.TestCase):
         self.assertEqual(_small_workplace([{"claim": "근로기준법 제60조의2"}], "x"), [])
 
 
+class EarlyTopicsTest(unittest.TestCase):
+    """한발 빠른 글감 (11/5 운영자): 생활 핵심 법령의 시행 예정 개정(바뀌는 조문까지), 해마다 나오는 기준값 고시."""
+
+    def test_core_changes_lists_changed_articles_only(self):
+        import datetime as dt
+        from types import SimpleNamespace as NS
+        from bot import law_api, law_watch
+        d = dt.date
+        vers = [{"mst": "1", "date": d(2026, 9, 1)}, {"mst": "2", "date": d(2026, 12, 10)}, {"mst": "3", "date": d(2027, 1, 1)}]
+        arts = {"1": {"제54조": "휴게 30분", "제55조": "주휴"}, "2": {"제54조": "휴게 1시간", "제55조": "주휴"},
+                "3": {"제54조": "휴게 1시간", "제55조": "주휴 <개정 2026.12.1>"}}
+        api = NS(versions=lambda n: vers, current=law_api.current, all_articles=lambda v: arts[v["mst"]],
+                 changed_articles=law_api.changed_articles)
+        with mock.patch.object(law_watch, "CORE_LAWS", ("근로기준법",)):
+            got = law_watch.core_changes(d(2026, 11, 5), api=api)
+        self.assertEqual([(g["date"], g["articles"]) for g in got], [("2026-12-10", ["제54조"])])  # 1/1 판은 '<개정>' 표시만 → 뺌
+
+    def test_notice_changes(self):
+        import datetime as dt
+        from bot import law_watch
+        xml = ("<AdmRulSearch>"
+               "<admrul id='1'><행정규칙명>2027년 적용 최저임금 고시</행정규칙명><발령일자>20260805</발령일자><시행일자>20270101</시행일자><소관부처명>고용노동부</소관부처명><행정규칙일련번호>11</행정규칙일련번호></admrul>"
+               "<admrul id='2'><행정규칙명>2027년 적용 최저임금안 고시</행정규칙명><발령일자>20260716</발령일자><시행일자>20270101</시행일자><소관부처명>고용노동부</소관부처명><행정규칙일련번호>12</행정규칙일련번호></admrul>"
+               "<admrul id='3'><행정규칙명>2025년 적용 최저임금 고시</행정규칙명><발령일자>20240805</발령일자><시행일자>20250101</시행일자><소관부처명>고용노동부</소관부처명><행정규칙일련번호>13</행정규칙일련번호></admrul>"
+               "</AdmRulSearch>")
+        with mock.patch.object(law_watch, "NOTICE_QUERIES", (("최저임금", "고용노동부"),)):
+            got = law_watch.notice_changes(dt.date(2026, 11, 5), fetch=lambda *a, **k: xml)
+        self.assertEqual([g["key"] for g in got], ["고시|11"])   # 확정 전 '안 고시'·오래된 고시는 뺌
+        self.assertEqual(got[0]["date"], "2027-01-01")
+
+    def test_skip_file_marks_law_change_and_benefit_done(self):
+        from bot import publish_queue
+        state = {"law_changes_done": ["a"], "new_benefits_done": []}
+        with mock.patch.object(publish_queue, "connect"), mock.patch.object(publish_queue, "load_state", return_value=state), \
+                mock.patch.object(publish_queue, "save_state") as save:
+            msg = publish_queue.skip_keywords({"type": "skip", "keywords": [], "law_changes": ["근로기준법|2026-12-08"], "new_benefits": ["408"]})
+        saved = save.call_args.args[0]
+        self.assertEqual(saved["law_changes_done"], ["a", "근로기준법|2026-12-08"])
+        self.assertEqual(saved["new_benefits_done"], ["408"])
+        self.assertIn("건너뛴 제도·혜택 글감 2개", msg)
+
+
 class BenefitWatchTest(unittest.TestCase):
     """새로 생긴 혜택 (11/5 운영자: 검색량 없는 새 정책도 먼저 쓰기) — 전국·광역, 개인·가구·소상공인, 안 쓴 것만."""
 

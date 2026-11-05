@@ -255,6 +255,69 @@ def mark_posts(just: list[dict]) -> list[str]:
     return marked
 
 
+# 우리 글이 아직 근거로 쓰지 않았어도 사람들이 많이 찾는 생활 법령 — 공포된 개정(시행 예정)을 '바뀌는 제도' 글감으로 (11/5 운영자
+# '신규 정책처럼 한발 빠르게 쓸 수 있는 게 또 없나'). 시행령은 금액·요율이 자주 바뀌는 곳이라 같이 본다.
+CORE_LAWS = ("소득세법", "소득세법 시행령", "조세특례제한법", "조세특례제한법 시행령", "근로기준법", "근로기준법 시행령",
+             "최저임금법", "고용보험법", "고용보험법 시행령", "국민연금법", "국민연금법 시행령", "국민건강보험법",
+             "국민건강보험법 시행령", "노인장기요양보험법 시행령", "기초연금법", "아동수당법", "국민기초생활 보장법",
+             "주택임대차보호법", "주택임대차보호법 시행령", "부가가치세법", "지방세법", "상속세 및 증여세법",
+             "남녀고용평등과 일ㆍ가정 양립 지원에 관한 법률", "근로자퇴직급여 보장법")
+# 해마다 고시로 나오는 기준값 — 고시가 나오면 그날 글감 ('2027년 최저임금 확정'처럼 발표 직후 검색이 몰림)
+NOTICE_QUERIES = (("최저임금", "고용노동부"), ("기준 중위소득", "보건복지부"), ("기초연금 선정기준액", "보건복지부"),
+                  ("기준소득월액", "보건복지부"), ("장기요양위원회", "보건복지부"), ("구직급여", "고용노동부"))
+NOTICE_DAYS = 120             # 최근 이만큼 안에 고시됐거나 아직 시행 전인 고시
+
+
+def core_changes(today: dt.date, api=law_api) -> list[dict]:
+    """생활 핵심 법령의 시행 예정 판 (LOOKAHEAD_DAYS 안) + 바로 앞 판과 비교해 실제로 바뀌는 조문 (글쓴이가 무엇을 쓸지 알게).
+    바뀌는 조문이 없으면(부칙·별표만 등) 글감에서 뺌."""
+    def one(name: str) -> list[dict]:
+        vers = api.versions(name)
+        now = api.current(vers, today)
+        prev = api.all_articles(now) if now else {}
+        items = []
+        for v in (v for v in vers if today < v["date"] <= today + dt.timedelta(days=LOOKAHEAD_DAYS)):
+            after = api.all_articles(v)
+            changed = api.changed_articles(prev, after) if prev and after else []
+            prev = after or prev
+            if changed:
+                items.append({"law": name, "url": f"https://www.law.go.kr/법령/{name.replace(' ', '')}", "date": f"{v['date']:%Y-%m-%d}",
+                              "articles": changed, "posts": [], "key": f"{name}|{v['date']:%Y-%m-%d}", "source": "생활 핵심 법령"})
+        return items
+
+    out = []
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+        for items in pool.map(one, CORE_LAWS):
+            out += items
+    return out
+
+
+def _date8(text: str) -> dt.date | None:
+    return dt.date(int(text[:4]), int(text[4:6]), int(text[6:8])) if re.fullmatch(r"\d{8}", text or "") else None
+
+
+def notice_changes(today: dt.date, fetch=law_api.fetch) -> list[dict]:
+    """해마다 나오는 기준값 고시(행정규칙) 중 최근 고시됐거나 아직 시행 전인 것 → 글감."""
+    import xml.etree.ElementTree as ET
+    out, seen = [], set()
+    for query, ministry in NOTICE_QUERIES:
+        xml = fetch("search", "admrul", query=query, display="10", sort="ddes")
+        if not xml:
+            continue
+        for r in ET.fromstring(xml).iter("admrul"):
+            name, key = (r.findtext("행정규칙명") or "").strip(), r.findtext("행정규칙일련번호") or ""
+            issued, starts = _date8(r.findtext("발령일자") or ""), _date8(r.findtext("시행일자") or "")
+            if (not name or key in seen or (r.findtext("소관부처명") or "") != ministry or not issued
+                    or "변경승인" in name or re.search(r"안\s*고시$", name)):  # 통계 승인 절차·확정 전 '○○안 고시'는 뺌
+                continue
+            if today - issued <= dt.timedelta(days=NOTICE_DAYS) or (starts and starts > today):
+                seen.add(key)
+                out.append({"law": name, "url": f"https://www.law.go.kr/행정규칙/{name.replace(' ', '')}",
+                            "date": f"{(starts or issued):%Y-%m-%d}", "articles": [], "posts": [],
+                            "key": f"고시|{key}", "source": f"{ministry} 고시 ({issued:%Y-%m-%d} 발령)"})
+    return out
+
+
 def run(today: dt.date | None = None) -> str:
     today = today or dt.date.today()
     laws = watched_laws()
@@ -270,10 +333,16 @@ def run(today: dt.date | None = None) -> str:
             api_note = f"법제처 API 시행 예정 판 {len(api_up)}건 중 근거 조문 바뀜 {hit}건"
         except (OSError, ValueError) as e:  # API 이상이어도 부칙 읽기 결과는 저장
             api_note = f"법제처 API 실패({type(e).__name__}) → 부칙 읽기만"
+        try:  # 우리 글과 상관없는 생활 핵심 법령·해마다 나오는 기준값 고시 (먼저 쓸 글감)
+            core, notices = core_changes(today), notice_changes(today)
+            upcoming = merge(upcoming, core + notices)
+            api_note += f", 생활 핵심 법령 시행 예정 {len(core)}건, 기준값 고시 {len(notices)}건"
+        except (OSError, ValueError) as e:
+            api_note += f", 핵심 법령·고시 실패({type(e).__name__})"
     pre = proposals(names)
     marked = mark_posts([j for j in just if j["posts"]])
     state = load_state()  # 저장 때 다른 실행 기록과 합쳐짐 (bot/state.save_state)
-    state["law_changes"] = {"checked": f"{today:%Y-%m-%d}", "upcoming": upcoming[:30], "proposals": pre[:30]}
+    state["law_changes"] = {"checked": f"{today:%Y-%m-%d}", "upcoming": upcoming[:60], "proposals": pre[:30]}
     msg = (f"법령 감시: 근거 법령 {len(laws)}개 확인, 앞으로 시행 {len(upcoming)}건({api_note}), "
            f"입법예고 {len(pre)}건(확정 아님), 막 시행 {len(just)}건(재검증 표시 {len(marked)}편)")
     add_log(state, True, msg)

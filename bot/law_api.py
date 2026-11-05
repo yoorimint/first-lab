@@ -121,6 +121,26 @@ def article(name: str, art: str, version: dict) -> dict | None:
     return None
 
 
+def all_articles(version: dict) -> dict[str, str]:
+    """한 판의 모든 조문 {'제40조'|'제47조의4': 글자}. 못 받으면 {}."""
+    xml = fetch("service", "eflaw", MST=version["mst"], efYd=f"{version['date']:%Y%m%d}")
+    if not xml:
+        return {}
+    out = {}
+    for unit in ET.fromstring(xml).iter("조문단위"):
+        if unit.findtext("조문여부") != "조문":
+            continue
+        n, sub = unit.findtext("조문번호") or "", unit.findtext("조문가지번호") or ""
+        out[f"제{n}조" + (f"의{sub}" if sub and sub != "0" else "")] = unit_text(unit)
+    return out
+
+
+def changed_articles(before: dict, after: dict, limit: int = 15) -> list[str]:
+    """두 판 사이에 바뀌거나 새로 생긴 조문 (삭제된 조문 포함), 조문 순."""
+    keys = sorted(set(before) | set(after), key=lambda k: tuple(int(x) for x in re.findall(r"\d+", k)))
+    return [k for k in keys if not same_text(before.get(k, ""), after.get(k, ""))][:limit]
+
+
 def same_text(a: str, b: str) -> bool:
     """두 판의 조문이 같은지 (끝의 '<개정 …>' 표시는 빼고 비교 — 조문변경여부 값보다 확실)."""
     strip = lambda t: re.sub(r"\s+", "", re.sub(r"<(?:개정|신설|전문개정|본조신설|제목개정)[^>]*>", "", t))

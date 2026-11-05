@@ -7,7 +7,8 @@
   "review"(독립 검수 기록 → review_gate.py. 통과 못 하면 공개하지 않고 초안 보류).
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
 보류 초안 수정 파일: {"type": "fix_hold", ...} → hold.apply_fix (다시 관문 검사 후 대기열)
-후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}]} → 글쓰기 세션이 부적합하다고 본 후보를 다시 안 뜨게 함
+후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}], "law_changes": [key], "new_benefits": [key]}
+  → 글쓰기 세션이 부적합하다고 본 후보·다룰 내용 없는 제도/혜택 글감을 다시 안 뜨게 함
 사진 검사 파일: {"type": "image_check", "post_id", "replace", "remove"} → image_check.apply_check (엉터리 글자 사진 교체)
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
 """
@@ -107,7 +108,17 @@ def skip_keywords(data: dict) -> str:
         for item in items:
             set_status(conn, str(item["keyword"]).strip(), "rejected", f"글쓰기 세션 제외: {str(item.get('why', ''))[:80]}")
         conn.commit()
-    return f"{len(items)}개 ({', '.join(str(i['keyword']) for i in items[:5])}{' 등' if len(items) > 5 else ''})"
+    # 다룰 내용이 없는 '바뀌는 제도'·'새 혜택' 글감도 다시 안 주게 (안 그러면 다음 실행에 같은 첫 항목이 또 나옴)
+    skipped = {"law_changes_done": [str(k) for k in data.get("law_changes", [])],
+               "new_benefits_done": [str(k) for k in data.get("new_benefits", [])]}
+    if any(skipped.values()):
+        state = load_state()
+        for field, keys in skipped.items():
+            state[field] = ((state.get(field) or []) + keys)[-300:]
+        save_state(state)
+    extra = sum(len(v) for v in skipped.values())
+    return (f"{len(items)}개 ({', '.join(str(i['keyword']) for i in items[:5])}{' 등' if len(items) > 5 else ''})"
+            + (f", 건너뛴 제도·혜택 글감 {extra}개" if extra else ""))
 
 
 def main() -> None:

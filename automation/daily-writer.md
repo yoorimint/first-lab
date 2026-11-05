@@ -14,8 +14,8 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 - 스크래치 폴더(작업 파일)는 저장소 밖에 둔다.
 
 ## 1. 글감 고르기
-- **바뀌는 제도 먼저**: 1단계 응답의 `law_changes`(우리 글의 근거 법령 중 곧 시행될 개정)가 있으면 첫 항목을 글감으로 한다 — "○○년 ○월부터 바뀌는 ○○" 처럼 시행일과 바뀌는 내용을 `python3 -m bot.lawtext <법령명> <제N조>` 로 원문 확인해 쓰고, 큐 JSON 에 `"law_change": "<항목의 key>"` 를 넣는다. 다룰 만한 내용이 없는 개정(용어 정리 등)이면 건너뛰고 보고에 적는다.
-- **새로 생긴 혜택 다음**: `law_changes` 가 없으면 `new_benefits`(정부24에 새로 등록된 전국·광역 혜택, 아직 검색량이 없어도 먼저 씀)의 첫 항목을 글감으로 한다 — `url`(정부24 상세)과 소관 기관 원문으로 대상·금액·신청 기간을 확인해 쓰고, `scope` 가 지역 한정이면 제목·첫 문단에 그 지역을 밝힌다. 큐 JSON 에 `"new_benefit": "<key>"` 를 넣는다.
+- **바뀌는 제도 먼저**: 1단계 응답의 `law_changes`(우리 글의 근거 법령 중 곧 시행될 개정)가 있으면 첫 항목을 글감으로 한다 — "○○년 ○월부터 바뀌는 ○○" 처럼 시행일과 바뀌는 내용을 `python3 -m bot.lawtext <법령명> <제N조>` 로 원문 확인해 쓰고, 큐 JSON 에 `"law_change": "<항목의 key>"` 를 넣는다. 항목의 `articles`(바뀌는 조문)를 먼저 보고, 다룰 만한 내용이 없는 개정(용어 정리·내부 절차 등)이면 건너뛰고 skip 파일의 `"law_changes": ["<key>"]` 에 넣는다 (다시 안 나옴).
+- **새로 생긴 혜택 다음**: `law_changes` 가 없으면 `new_benefits`(정부24에 새로 등록된 전국·광역 혜택, 아직 검색량이 없어도 먼저 씀)의 첫 항목을 글감으로 한다 — `url`(정부24 상세)과 소관 기관 원문으로 대상·금액·신청 기간을 확인해 쓰고, `scope` 가 지역 한정이면 제목·첫 문단에 그 지역을 밝힌다. 큐 JSON 에 `"new_benefit": "<key>"` 를 넣는다. 글로 쓸 만하지 않으면 skip 파일의 `"new_benefits": ["<key>"]` 에 넣는다.
 - **금리 예시**: 대출·이자·예금 글의 금리는 1단계 응답의 `rates`(한국은행 최신 기준금리·은행 평균 대출금리, 날짜 포함)를 쓰고 그 기준 날짜를 글에 적는다.
 ```
 curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/firstlab/v1/next
@@ -27,7 +27,7 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
   - `recent_posts` 에 이미 같은 주제(앞뒤 수식어만 다른 것)가 있는 키워드
 - 처음으로 통과한 후보 1개를 고른다. 후보 키워드(`keyword`)는 띄어쓰기 없는 원문 그대로 쓴다.
 - 위 기준으로 **건너뛴 후보**는 다시 안 뜨게 기록한다 (`recent_posts` 와 겹쳐서 건너뛴 것은 제외. 서버가 이미 막음):
-  `wordpress/queue/skip-<날짜>-<시각>.json` = `{"type": "skip", "keywords": [{"keyword": "<원문>", "why": "<이유 한 줄>"}]}`
+  `wordpress/queue/skip-<날짜>-<시각>.json` = `{"type": "skip", "keywords": [{"keyword": "<원문>", "why": "<이유 한 줄>"}], "law_changes": [], "new_benefits": []}`
   새 글과 같은 커밋에 넣는다. 건너뛴 게 없으면 만들지 않는다.
 
 ## 2. 쓰기 규칙 불러오기
