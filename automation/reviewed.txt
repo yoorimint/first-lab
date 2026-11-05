@@ -114,3 +114,4 @@ calc:fiscal-annual-leave
 655 김해공항 주차장 요금: 10분 300원, 월~목 하루 최대 10,000원
 calc:gimhae-airport-parking
 254 지역 의료보험료 계산
+673 사대보험 징수포털 사용법: 다음 달 10일 납부·카드 수수료 0.8%
