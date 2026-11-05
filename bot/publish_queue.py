@@ -218,6 +218,8 @@ def main() -> None:
             elif data.get("type") == "review_done":  # 글쓰기 작업이 새 글 대신 대기 글을 외부 검수함 (bot/review_queue.py)
                 label = "대기 글 검수(직접)"
                 msg = f"글 {int(data['post_id'])} '{str(data.get('title', ''))[:40]}' 고친 곳 {int(data.get('patches', 0))}개"
+                if int((state.get("review_target") or {}).get("post_id", 0) or 0) == int(data["post_id"]):
+                    state["review_target"] = None  # 바로 다음 실행이 같은 글을 또 검수하지 않게 (11/5 #690 두 번 검수 — 대상은 1분 봇이 새로 고름)
             elif data.get("type") == "evidence":
                 label = "근거 기록"
                 msg = save_evidence(data)

@@ -34,6 +34,7 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
 - **배포가 막혔으면 그것부터**: 응답의 `deploy_alert` 가 있으면 GitHub 검사와 같게 root 가 아닌 사용자로 `useradd -M ci 2>/dev/null; runuser -u ci -- env HOME=/tmp python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` 를 돌려 (root 로는 권한 문제가 안 보임) 실패한 검사를 고쳐(대개 지난 실행이 올린 파일) 커밋·main 에 올리고, 그 뒤에 아래를 한다. 못 고치면 보고 첫 줄에 "배포 막힘: <실패한 검사>".
 - **고친 내용이 안 들어간 글**: 응답의 `patch_problems` 가 있으면 첫 항목의 글(글 번호)을 `python3 automation/unreviewed.py <번호>` 로 받아, 그 문구를 고친 본문으로 6단계 갱신 파일(`refresh`, `base_modified` 는 응답 대신 받은 글의 값)을 올린다.
 - **대기 글 검수** (`review_target` 이 있고 실행 순서상 차례일 때 — 새 글은 안 씀):
+  0. 그 글 번호가 저장소 `automation/reviewed.txt` 에 이미 있으면 앞 실행이 끝낸 것 — 검수하지 말고 다음 무거운 일로
   1. `python3 automation/unreviewed.py <post_id>` 로 본문 받기 (`/tmp/firstlab-review/post-<id>.json`)
   2. `automation/review-prompt.md` 의 `---` 아래 지시문에 그 파일 경로와 오늘 날짜를 넣어 하위 에이전트 1개에게 검수 (모델 지정 안 함)
   3. 검수자가 '틀림'이라 한 곳은 근거 원문을 **내가 직접 열어** 확인한 뒤에만 고친다. 못 열면 '○○에서 확인하세요'로 완화. 공식 페이지에서 확인된 숫자는 지우지 않는다 (도구가 막음)
