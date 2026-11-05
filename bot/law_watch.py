@@ -25,7 +25,7 @@ from .state import add_log, load_state, save_state
 QUEUE_DIR = Path(__file__).resolve().parent.parent / "wordpress" / "queue"
 LOOKAHEAD_DAYS = 120   # 이 안에 시행되는 개정을 글감으로
 JUST_DAYS = 30         # 최근 이 안에 시행된 개정은 기존 글 재검증
-MAX_LAWS = 150         # 하루에 여는 법령 수
+MAX_LAWS = 400         # 하루에 여는 법령 수 (11/5 검토: 150 이면 몇 주 안에 넘어 가나다순 뒤쪽 법령을 영영 안 봄 — 넘으면 기록에 남김)
 WORKERS = 6            # 동시에 여는 수 (law.go.kr 이 끊지 않을 정도)
 from .changed import META as LAW_META, flag  # noqa: E402  '시행일 법령명' — 갱신 대상 표시 (bot/changed.py)
 _EFFECTIVE = re.compile(r"(.{0,160}?)(?:개정규정은|이 법은|이 영은|이 규칙은|이 고시는)\s*(20\d\d)년\s*(\d{1,2})월\s*(\d{1,2})일부터\s*시행")
@@ -114,11 +114,23 @@ def effective_dates(text: str) -> list[tuple[dt.date, list[str]]]:
     return out
 
 
+def _safe(fn, default):
+    """법령 하나를 읽다 생긴 오류(깨진 응답·XML 오류 등)는 그 법령만 건너뜀."""
+    def run(name):
+        try:
+            return fn(name)
+        except Exception:  # noqa: BLE001
+            return default
+    return run
+
+
 def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch, names: set | None = None,
          name_of: dict | None = None) -> tuple[list[dict], list[dict]]:
     """(앞으로 시행될 개정, 막 시행된 개정). names 를 주면 읽은 법령 이름을, name_of 를 주면 주소 → 이름을 모은다."""
     upcoming, just, seen = [], [], set()
     bases = sorted(laws)[:MAX_LAWS]
+    if len(laws) > MAX_LAWS and names is not None:
+        names.add(f"(법령 {len(laws) - MAX_LAWS}개는 한도를 넘어 못 봄 — MAX_LAWS 올리기)")
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
         texts = dict(zip(bases, pool.map(fetcher, bases)))
     for base in bases:
@@ -227,7 +239,7 @@ def api_changes(cited: dict[str, dict[str, set[str]]], name_of: dict[str, str], 
     upcoming, just = [], []
     names = sorted(by_name)[:MAX_LAWS]
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
-        for up, js in pool.map(one, names):
+        for up, js in pool.map(_safe(one, ([], [])), names):  # 법령 하나의 오류가 전체를 멈추지 않게 (11/5 검토)
             upcoming += up
             just += js
     return upcoming, just
@@ -284,7 +296,7 @@ def core_changes(today: dt.date, api=law_api, names=None) -> list[dict]:
 
     out = []
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
-        for items in pool.map(one, names or CORE_LAWS):
+        for items in pool.map(_safe(one, []), names or CORE_LAWS):
             out += items
     return out
 
@@ -328,7 +340,7 @@ def run(today: dt.date | None = None) -> str:
             upcoming, just = merge(upcoming, api_up), merge(just, api_just)
             hit = sum(1 for x in api_up if x["articles"])
             api_note = f"법제처 API 시행 예정 판 {len(api_up)}건 중 근거 조문 바뀜 {hit}건"
-        except (OSError, ValueError) as e:  # API 이상이어도 부칙 읽기 결과는 저장
+        except Exception as e:  # noqa: BLE001 - API 이상(XML 깨짐 포함)이어도 부칙 읽기 결과는 저장
             api_note = f"법제처 API 실패({type(e).__name__}) → 부칙 읽기만"
         try:  # 우리 글과 상관없는 생활 핵심 법령·해마다 나오는 기준값 고시 (먼저 쓸 글감)
             from .calc_watch import calc_laws  # 계산기 근거 법령도 같이 (개정되면 계산기 값 고치기 — bot/calc_watch.py)
@@ -336,7 +348,7 @@ def run(today: dt.date | None = None) -> str:
             core, notices = core_changes(today, names=watch), notice_changes(today)
             upcoming = merge(upcoming, core + notices)
             api_note += f", 생활 핵심 법령 시행 예정 {len(core)}건, 기준값 고시 {len(notices)}건"
-        except (OSError, ValueError) as e:
+        except Exception as e:  # noqa: BLE001
             api_note += f", 핵심 법령·고시 실패({type(e).__name__})"
     pre = proposals(names)
     marked = mark_posts([j for j in just if j["posts"]])

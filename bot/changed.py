@@ -22,7 +22,9 @@ def merged(old: str, value: str) -> str:
 
 def pending(mark: str, since: str) -> bool:
     """표시가 마지막 확인(갱신·검수 통과) 날짜보다 뒤면 아직 처리 안 됨."""
-    return bool(mark) and mark[:10] > (since or "")
+    # 표시가 여러 개 붙으면(' / ') 가장 늦은 날짜로 — 새 표시가 앞에 붙어도 날짜가 더 이를 수 있음 (11/5 검토)
+    dates = [part.strip()[:10] for part in (mark or "").split(" / ") if part.strip()[:4].isdigit()]
+    return bool(dates) and max(dates) > (since or "")
 
 
 def flag(post_ids, value: str, wp=None) -> list[str]:

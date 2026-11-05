@@ -35,7 +35,8 @@ def batch(ids: list[str], cursor: str, n: int = DAILY) -> list[str]:
 
 def check_one(pid: str, post: dict, today: dt.date, wp, fetcher) -> list[str]:
     mark = _meta(wp, pid, changed.META)
-    since = max(_meta(wp, pid, freshness.VERIFIED_META)[:10], _meta(wp, pid, "_firstlab_refreshed")[:10]) or today.isoformat()
+    since = (max(_meta(wp, pid, freshness.VERIFIED_META)[:10], _meta(wp, pid, "_firstlab_refreshed")[:10])
+             or str(post.get("date", ""))[:10] or today.isoformat())  # 기록이 없으면 글 쓴 날 (11/5 검토: 오늘이면 개정을 영영 못 봄)
     if changed.pending(mark, since):
         return []  # 이미 다시 확인할 글로 표시돼 있음
     try:

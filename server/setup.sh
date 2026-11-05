@@ -98,7 +98,7 @@ fi
 log "확인"
 sleep 1
 for i in 1 2; do
-  curl -s -o /dev/null -D - https://first-lab.kr/ | grep -iE "^HTTP|^x-cache" | tr '\n' ' '; echo
+  { curl -s --max-time 20 -o /dev/null -D - https://first-lab.kr/ | grep -iE "^HTTP|^x-cache" | tr '\n' ' '; } || true; echo   # 확인 실패가 배포를 멈추지 않게
 done
 systemctl is-active php$PHP_VER-fpm nginx sajuday
 ps -o user=,cmd= -C php-fpm$PHP_VER | sort | uniq -c

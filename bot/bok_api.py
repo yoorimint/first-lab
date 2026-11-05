@@ -104,6 +104,8 @@ def run(today: dt.date | None = None) -> str:
         from .wpbulk import posts
         value = f"{today:%Y-%m-%d} 기준금리 {old}%→{rates['base']['value']}%"
         marked = flag(live_posts_with(posts(), lambda text: any(w in text for w in RATE_WORDS)), value, wp_cli)
+    if "base" not in rates and (state.get("rates") or {}).get("base"):
+        rates["base"] = state["rates"]["base"]  # 기준금리를 못 받은 날은 이전 값 유지 (다음 변경 비교 기준을 잃지 않게, 11/5 검토)
     state["rates"] = {"checked": f"{today:%Y-%m-%d}", **rates}
     parts = [f"기준금리 {rates['base']['value']}%" if "base" in rates else ""]
     parts += [f"{v['name']} {v['value']}%({v['month']})" for k, v in rates.items() if k != "base"]

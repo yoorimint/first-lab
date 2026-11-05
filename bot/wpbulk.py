@@ -17,7 +17,7 @@ foreach ( get_posts( array( 'post_type' => 'post', 'post_status' => 'any', 'numb
     $meta = array();
     foreach ( %s as $k ) { $meta[ $k ] = (string) get_post_meta( $p->ID, $k, true ); }
     $out[ $p->ID ] = array( 'content' => $p->post_content, 'title' => $p->post_title, 'excerpt' => $p->post_excerpt,
-                            'name' => $p->post_name, 'status' => $p->post_status, 'meta' => $meta );
+                            'name' => $p->post_name, 'status' => $p->post_status, 'date' => $p->post_date, 'meta' => $meta );
 }
 echo wp_json_encode( $out );
 """

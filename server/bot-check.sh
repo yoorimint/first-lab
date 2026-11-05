@@ -15,7 +15,7 @@ cd "$REPO_DIR" && python3 -m bot.keywords 다이어트 --top 5 \
 
 echo -e "\n==> 공공 API 점검 (키 값은 출력 안 함)"
 # 법제처 API 는 신청 때 등록한 서버 주소에서만 됨 — 이 서버가 밖으로 나갈 때 쓰는 주소 (등록값과 같아야 함)
-echo "이 서버가 나가는 주소: $(curl -s --max-time 10 https://api.ipify.org || echo 확인 실패)"
+# 서버 주소는 공개 배포 기록(공개 저장소)에 남기지 않음 (11/5 검토)
 API_OUT=$(mktemp)
 (cd "$REPO_DIR" && /opt/first-lab-venv/bin/python - <<'PY' 2>&1 | tail -4) > "$API_OUT"
 from bot import law_api, benefit_api

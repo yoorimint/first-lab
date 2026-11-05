@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import time
 import urllib.error
 import urllib.parse
@@ -72,7 +73,7 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
                 if e.code in (401, 403):
                     return False
                 break
-            except (urllib.error.URLError, TimeoutError):
+            except Exception:  # noqa: BLE001 - 응답 끊김·JSON 오류 하나가 그날 수집 전체를 멈추지 않게 (11/5 검토)
                 stats["errors"] += 1
                 break
         stats["calls"] += 1
@@ -178,34 +179,21 @@ def main() -> None:
     except Exception as e:  # noqa: BLE001
         msg, ok = f"키워드 수집 실패: {e}", False
     print(msg, flush=True)
-    STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
-    try:  # 법령 변경 감시 (bot/law_watch.py) — 실패해도 수집·갱신은 계속
-        from .law_watch import run as watch_laws
-        print(watch_laws(), flush=True)
-    except Exception as e:  # noqa: BLE001
-        print(f"법령 감시 실패: {e}", flush=True)
-    try:  # 새로 생긴 혜택 (bot/benefit_watch.py) — 실패해도 수집·갱신은 계속
-        from .benefit_watch import run as watch_benefits
-        print(watch_benefits(), flush=True)
-    except Exception as e:  # noqa: BLE001
-        print(f"새 혜택 감시 실패: {e}", flush=True)
-    try:  # 최신 금리 (bot/bok_api.py) — 실패해도 수집·갱신은 계속
-        from .bok_api import run as update_rates
-        print(update_rates(), flush=True)
-    except Exception as e:  # noqa: BLE001
-        print(f"금리 갱신 실패: {e}", flush=True)
-    try:  # 계산기 연초 값 확인 (bot/calc_watch.py) — 실패해도 수집·갱신은 계속
-        from .calc_watch import run as watch_calcs
-        print(watch_calcs(), flush=True)
-    except Exception as e:  # noqa: BLE001
-        print(f"계산기 연초 값 확인 실패: {e}", flush=True)
-    try:  # 공개 글 근거 다시 보기 (bot/recheck.py) — 실패해도 수집·갱신은 계속
-        from .recheck import run as recheck_posts
-        print(recheck_posts(), flush=True)
-    except Exception as e:  # noqa: BLE001
-        print(f"공개 글 근거 다시 보기 실패: {e}", flush=True)
+    if ok:  # 실패한 날은 다음 배포·타이머 때 다시 수집 (11/5 검토: 실패해도 '오늘 완료'가 찍혀 다시 안 함)
+        STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
+    failures = []
+    for label, module, func in (("법령 감시", "law_watch", "run"), ("새 혜택 감시", "benefit_watch", "run"),
+                                ("금리 갱신", "bok_api", "run"), ("계산기 연초 값·근거 법령 확인", "calc_watch", "run"),
+                                ("공개 글 근거 다시 보기", "recheck", "run")):
+        try:  # 하나가 실패해도 나머지는 계속, 실패는 봇 기록(/maintenance)에 남김 — 12/5 뒤엔 journal 을 볼 사람이 없음
+            print(getattr(importlib.import_module(f".{module}", __package__), func)(), flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"{label} 실패: {e}", flush=True)
+            failures.append(f"{label} 실패: {str(e)[:150]}")
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
+    for line in failures:
+        add_log(state, False, line)
     # 발행된 글 갱신 (서치콘솔 반영 직후, 주당 한도 안에서 하루 최대 1개)
     from .refresh import run_weekly
 

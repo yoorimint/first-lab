@@ -97,7 +97,7 @@ fi
 TOKEN_HASH=$(grep '^FIRSTLAB_API_TOKEN=' "$SECRETS" | tail -1 | cut -d= -f2- | tr -d '\n' | sha256sum | cut -d' ' -f1)
 runuser -u firstlab -- wp --path=/var/www/first-lab option update firstlab_api_token_hash "$TOKEN_HASH" --quiet 2>/dev/null \
   || runuser -u firstlab -- wp --path=/var/www/first-lab option add firstlab_api_token_hash "$TOKEN_HASH" --quiet || true
-echo "토큰 준비됨 (끝자리 $(grep '^FIRSTLAB_API_TOKEN=' "$SECRETS" | tail -1 | tail -c 5))"
+echo "토큰 준비됨"   # 끝자리도 공개 배포 기록에 안 남김 (11/5 검토)
 
 # 공공 API 키 → 워드프레스 옵션 (API 통로 /law·/benefits 가 씀, first-lab-api.php). 값은 출력하지 않음
 copy_secret_option() {  # 비밀값 이름, 옵션 이름, 설명

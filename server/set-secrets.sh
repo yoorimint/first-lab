@@ -7,6 +7,7 @@ SECRETS=/etc/first-lab/secrets.env
 [ $# -ge 1 ] || { echo "사용법: $0 키이름 [키이름 ...]"; exit 1; }
 
 install -d -m 700 /etc/first-lab
+umask 077   # 임시 파일도 처음부터 나만 읽게 (11/5 검토)
 touch "$SECRETS" && chmod 600 "$SECRETS"
 
 for name in "$@"; do

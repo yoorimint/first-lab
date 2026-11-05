@@ -49,7 +49,27 @@ def fill(cloudflare: tuple[str, str], max_posts: int = 2) -> list[str]:
             out.append(fill_post(post_id, cloudflare))
         except images.QuotaExceeded:
             break
+        except Exception as e:  # noqa: BLE001 - 한 글의 실패(안전 필터·5xx)가 다른 글을 영영 막지 않게 (11/5 검토)
+            tries = _bump_fail(post_id)
+            if tries >= MAX_FAILS:
+                wp_cli("post", "meta", "delete", post_id, photo.PENDING_META)  # 제목 카드로 둠
+                out.append(f"글 {post_id} 사진 {tries}번 실패 → 제목 카드로 둠 ({str(e)[:60]})")
+            else:
+                out.append(f"글 {post_id} 사진 실패 {tries}/{MAX_FAILS} ({str(e)[:60]})")
     return out
+
+
+FAIL_META = "_firstlab_img_fails"
+MAX_FAILS = 3
+
+
+def _bump_fail(post_id: str) -> int:
+    try:
+        n = int(wp_cli("post", "meta", "get", str(post_id), FAIL_META).strip() or 0) + 1
+    except Exception:  # noqa: BLE001
+        n = 1
+    wp_cli("post", "meta", "update", str(post_id), FAIL_META, str(n))
+    return n
 
 
 def backfill_from_queue() -> list[str]:

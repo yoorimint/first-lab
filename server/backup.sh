@@ -16,6 +16,14 @@ src.backup(dst)
 dst.close(); src.close()
 PY
 gzip -f "$DEST/wordpress-$STAMP.sqlite"
+# 키워드 창고(황금 신호·서치콘솔 포함) — 주석과 달리 빠져 있었음 (11/5 검토)
+python3 - "$DEST/keywords-$STAMP.sqlite" <<'PY' && gzip -f "$DEST/keywords-$STAMP.sqlite" || true
+import sqlite3, sys
+src = sqlite3.connect("file:/var/lib/first-lab/bot/keywords.db?mode=ro", uri=True)
+dst = sqlite3.connect(sys.argv[1])
+src.backup(dst)
+dst.close()
+PY
 tar -czf "$DEST/uploads-$STAMP.tar.gz" -C /var/www/first-lab/wp-content uploads 2>/dev/null || true
 tar -czf "$DEST/etc-$STAMP.tar.gz" -C /etc first-lab 2>/dev/null || true   # 키 파일 포함 → 폴더 권한 700
 find "$DEST" -type f -mtime +$KEEP_DAYS -delete
