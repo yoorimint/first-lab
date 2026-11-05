@@ -48,6 +48,10 @@ add_action(
 						'calc_yearly'   => (array) ( $state['calc_yearly'] ?? array() ),
 						// 공개 대기 글이 많으면 새 글 대신 외부 검수할 대기 글 (bot/review_queue.py, daily-writer.md 0단계)
 						'review_target' => $state['review_target'] ?? null,
+						// 배포가 막힘(대개 검사 실패) — 글쓰기 작업이 먼저 고침 (bot/deploy_watch.py)
+						'deploy_alert'  => $state['deploy_alert'] ?? null,
+						// 고친 내용이 서버 글에 안 들어간 패치 (bot/patch_check.py) — 글쓰기 작업이 갱신 파일로 고침
+						'patch_problems' => (array) ( $state['patch_problems'] ?? array() ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
 						'target_length' => (int) ( $settings['target_length'] ?? 3000 ),
@@ -235,7 +239,9 @@ function firstlab_api_maintenance(): array {
 			array_filter( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_hold_tries', 'numberposts' => -1 ) ), static fn( $p ) => firstlab_api_hold_resting( $p->ID ) )
 		) ),
 		'rates'       => $state['rates'] ?? null, // 한국은행 최신 금리
-		'calc_yearly' => $state['calc_yearly'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)
+		'calc_yearly' => $state['calc_yearly'] ?? null,
+		'deploy_alert' => $state['deploy_alert'] ?? null,
+		'patch_problems' => $state['patch_problems'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)
 		'law_watch'   => $state['law_changes'] ?? null, // 법령 감시: 곧 시행될 개정·입법예고(확정 아님) — 감시 세션 확인용
 		// 공개 대기 글 전체 (감시 세션이 외부 검수 안 한 글을 글 번호로 찾음 — automation/unreviewed.py)
 		'ready_posts' => array_map(

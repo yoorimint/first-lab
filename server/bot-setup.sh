@@ -35,6 +35,7 @@ apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
 
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.patch_check) || echo "패치 반영 확인 실패 (봇 동작에는 영향 없음)"
 log "본문 AI 사진 → 대표 사진 1장으로 정리 (이미 정리된 글은 건너뜀)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.migrate_photos) || echo "사진 정리 실패 (봇 동작에는 영향 없음)"
 

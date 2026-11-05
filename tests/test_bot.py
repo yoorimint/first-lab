@@ -2165,6 +2165,23 @@ class ReviewQueueTest(unittest.TestCase):
         self.assertTrue(run.post_arrived_since(state, "2026-11-05 18:00", seen=""))
 
 
+class DeployWatchTest(unittest.TestCase):
+    """배포 밀림 감지 (감시 세션 없이) — 서버 버전이 60분 넘게 안 바뀌고 main 이 앞서면 알림."""
+
+    def test_alert_after_limit(self):
+        from datetime import datetime, timedelta
+        from bot import deploy_watch as dw
+        state, t0 = {}, datetime(2026, 11, 5, 10, 0)
+        self.assertIsNone(dw.check(state, t0, "aaa", "bbb"))
+        self.assertIsNone(dw.check(state, t0 + timedelta(minutes=50), "aaa", "ccc"))      # main 이 움직여도 서버가 그대로면 시계 계속
+        self.assertIn("61분째", dw.check(state, t0 + timedelta(minutes=61), "aaa", "ccc"))
+        self.assertIn("deploy_alert", state)
+        self.assertIsNone(dw.check(state, t0 + timedelta(minutes=70), "ccc", "ccc"))      # 올라가면 풀림
+        self.assertNotIn("deploy_alert", state)
+        self.assertIsNone(dw.check(state, t0 + timedelta(minutes=80), "ccc", "ddd"))
+        self.assertIsNone(dw.check(state, t0 + timedelta(minutes=125), "ddd", "eee"))     # 배포가 진행 중이면 알림 없음
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

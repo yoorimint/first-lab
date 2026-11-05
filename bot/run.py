@@ -374,6 +374,10 @@ def main() -> None:
             print(f"실패: {detail}", file=sys.stderr)
         add_spend(state, sum(getattr(x, "cost_usd", 0.0) for x in used_llms))  # 실패해도 쓴 비용은 반영
 
+    if now.minute % 10 == 0:  # 배포 밀림 감지 (bot/deploy_watch.py)
+        from .deploy_watch import run as watch_deploy
+        watch_deploy(state, now)
+
     if reason or excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
         refresh_dashboard(state, settings)  # 변화가 있거나 1시간마다
         state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
