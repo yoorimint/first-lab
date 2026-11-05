@@ -19,6 +19,10 @@
 - 저장소는 공개 저장소: 비밀값을 커밋·출력하지 않는다.
 - main 에 올리면 자동 배포된다. 올리기 전에 `python3 -m unittest discover -s tests && node tests/test_calculators.mjs` 종료코드 확인.
 
+## 자동 운영 (운영자 지시 11/5, 가장 큰 목표)
+- 비싼 요금제를 쓰는 지금(~12/5경) 시스템 세팅을 끝내고, 그 뒤 3만 원 요금제에서는 감시 세션 없이 예약 글쓰기 + 서버 코드만으로 돌아가야 한다.
+- 감시 세션이 손으로 하는 일은 전부 코드·테스트·글쓰기 지시 안으로 옮긴다. 계획·진행 상태: `automation/autopilot.md`.
+
 ## 이어받기 (다른 세션도 바로 할 수 있게)
 - 운영자 지시 기록: `automation/operator-notes.md` (운영자가 새로 지시하면 여기에 바로 적는다).
 - 35분 감시·새 글 외부 검수 절차: `automation/monitor.md` (검수 지시문 `automation/review-prompt.md`, 검수한 글 `automation/reviewed.txt`).
