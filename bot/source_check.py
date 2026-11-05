@@ -122,10 +122,24 @@ def _fraction_forms(number: str) -> list[str]:
 
 
 def _korean_forms(number: str) -> list[str]:
-    """7000(만 원) → '7천'(만원): 법령·공문은 천 단위를 한글로 쓰는 경우가 많다."""
-    if "." in number or int(number) < 1000 or int(number) % 1000:
+    """7000(만 원) → '7천', 3300 → '3천300', 15000 → '1억5천': 법령·공문은 천·억 단위를 한글로 쓰는 경우가 많다
+    (11/5 #553: 소득세법 '3천300만원'을 3,300만 원과 같은 값으로 못 봐 '페이지에 없음' 오탐)."""
+    if "." in number or int(number) < 1000:
         return []
-    return [rf"(?<![\d.]){int(number) // 1000}\s*천"]
+    n = int(number)
+    forms = []
+    if n < 10000:  # 1천~9천999 (만 원 단위로 쓰는 경우)
+        rest = n % 1000
+        forms.append(rf"(?<![\d.]){n // 1000}\s*천\s*{rest if rest else ''}(?!\d)")
+    else:  # 1억 이상 (만 원 단위 1만 = 1억)
+        eok, rest = divmod(n, 10000)
+        if rest == 0:
+            forms.append(rf"(?<![\d.]){eok}\s*억(?!\s*\d)")
+        elif rest % 1000 == 0:
+            forms.append(rf"(?<![\d.]){eok}\s*억\s*{rest // 1000}\s*천")
+        else:
+            forms.append(rf"(?<![\d.]){eok}\s*억\s*{rest}(?!\d)")
+    return forms
 
 
 def has_number(text: str, number: str) -> bool:

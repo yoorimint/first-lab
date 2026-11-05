@@ -907,6 +907,9 @@ class SourceCheckTest(unittest.TestCase):
         self.assertTrue(sc.has_number("100분의 20을 곱한", "20"))
         self.assertFalse(sc.has_number("1천분의 50", "0.5"))
         self.assertTrue(sc.has_number("총급여액 7천만원 이하", "7000"))  # 7,000만 원
+        self.assertTrue(sc.has_number("총급여액이 3천300만원 이하인 경우", "3300"))  # 11/5 #553
+        self.assertTrue(sc.has_number("1억5천만원 이하", "15000"))
+        self.assertFalse(sc.has_number("3천만원", "3300"))
         self.assertEqual(sc.readable_url("https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=1"),
                          "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=1")
 
