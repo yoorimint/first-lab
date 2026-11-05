@@ -1,0 +1,647 @@
+{
+ "title": "2027 기준 중위소득: 4인 6,929,885원, 생계급여 기준 32%",
+ "excerpt": "2027년 기준 중위소득은 4인 가구 월 6,929,885원, 1인 가구 2,736,042원으로 6.70% 올라요. 생계급여 4인 2,217,563원 등 가구원별 기준과 계산 예시를 정리했어요.",
+ "content_html": "<p>2027년 기준 중위소득은 <strong>4인 가구 월 6,929,885원</strong>, 1인 가구 월 2,736,042원이에요. 2026년보다 6.70% 올랐고, 2027년 1월 1일부터 적용돼요. 이 금액의 32%가 생계급여 선정기준이라서 4인 가구는 소득인정액이 월 2,217,563원 이하이면 생계급여 대상이 될 수 있어요(부양의무자 기준도 함께 봐요). 의료급여는 40%, 주거급여는 48%, 교육급여는 50%가 기준이에요.</p>\n<h2>2027 기준 중위소득과 생계·의료급여 기준표</h2>\n<p>보건복지부 고시 제2026-157호에 정해진 가구원 수별 금액이에요. 모두 월 기준이에요.</p>\n<table><thead><tr><th>가구원 수</th><th>기준 중위소득</th><th>생계급여(32%)</th><th>의료급여(40%)</th></tr></thead><tbody>\n<tr><td>1인</td><td>2,736,042원</td><td>875,533원</td><td>1,094,417원</td></tr>\n<tr><td>2인</td><td>4,480,645원</td><td>1,433,806원</td><td>1,792,258원</td></tr>\n<tr><td>3인</td><td>5,718,091원</td><td>1,829,789원</td><td>2,287,236원</td></tr>\n<tr><td>4인</td><td>6,929,885원</td><td>2,217,563원</td><td>2,771,954원</td></tr>\n<tr><td>5인</td><td>8,063,019원</td><td>2,580,166원</td><td>3,225,208원</td></tr>\n<tr><td>6인</td><td>9,129,201원</td><td>2,921,344원</td><td>3,651,680원</td></tr>\n<tr><td>7인</td><td>10,152,665원</td><td>3,248,853원</td><td>4,061,066원</td></tr>\n</tbody></table>\n<h3>8인 이상 가구 계산법</h3>\n<p>8인 이상은 표에 없고, 7인 금액에 7인과 6인의 차이를 늘어난 가구원 수만큼 더해요. 식은 '7인 금액 + (7인 금액 − 6인 금액) × (가구원 수 − 7)'이에요. 이 식으로 계산하면 8인 가구 기준 중위소득은 11,176,129원, 생계급여 선정기준은 3,576,362원, 의료급여 선정기준은 4,470,452원이에요.</p>\n<h2>2026년과 비교하면 얼마나 올랐나</h2>\n<table><thead><tr><th>가구원 수</th><th>2026년</th><th>2027년</th><th>증가액</th></tr></thead><tbody>\n<tr><td>1인</td><td>2,564,238원</td><td>2,736,042원</td><td>171,804원</td></tr>\n<tr><td>2인</td><td>4,199,292원</td><td>4,480,645원</td><td>281,353원</td></tr>\n<tr><td>3인</td><td>5,359,036원</td><td>5,718,091원</td><td>359,055원</td></tr>\n<tr><td>4인</td><td>6,494,738원</td><td>6,929,885원</td><td>435,147원</td></tr>\n<tr><td>5인</td><td>7,556,719원</td><td>8,063,019원</td><td>506,300원</td></tr>\n<tr><td>6인</td><td>8,555,952원</td><td>9,129,201원</td><td>573,249원</td></tr>\n</tbody></table>\n<p>인상률 6.70%는 기준 중위소득을 정하기 시작한 2015년 이후 가장 높은 수준이에요. 생계급여 선정기준도 같이 올라서 1인 가구는 820,556원에서 875,533원으로 54,977원, 4인 가구는 2,078,316원에서 2,217,563원으로 139,247원 늘어요.</p>\n<h2>주거급여·교육급여 기준</h2>\n<p>주거급여는 기준 중위소득의 48%, 교육급여는 50%가 선정기준이에요. 1~4인 가구 금액은 아래와 같아요.</p>\n<table><thead><tr><th>가구원 수</th><th>주거급여(48%)</th><th>교육급여(50%)</th></tr></thead><tbody>\n<tr><td>1인</td><td>1,313,300원</td><td>1,368,021원</td></tr>\n<tr><td>2인</td><td>2,150,710원</td><td>2,240,323원</td></tr>\n<tr><td>3인</td><td>2,744,684원</td><td>2,859,046원</td></tr>\n<tr><td>4인</td><td>3,326,345원</td><td>3,464,943원</td></tr>\n</tbody></table>\n<p>2027년 주거급여 기준임대료(1인 가구)는 서울 38.1만 원, 경기·인천 31.3만 원, 광역시·세종·수도권 외 특례시 25.9만 원, 그 밖의 지역 23.4만 원이에요. 4인 가구는 서울 59.6만 원이에요. 교육급여의 교육활동지원비(2027년 안)는 초등학생 513,000원, 중학생 714,000원, 고등학생 945,000원이에요.</p>\n<h2>내 가구가 해당하는지 보는 법: 소득인정액</h2>\n<p>기준과 비교하는 금액은 월급 그대로가 아니라 <strong>소득인정액</strong>이에요. 소득인정액은 가구의 소득평가액에 재산을 월 소득으로 바꾼 금액(재산의 소득환산액)을 더한 값이에요. 재산은 재산가액에서 기본재산액과 부채를 뺀 뒤 소득환산율을 곱해 더해요. 그래서 재산에서 부채를 뺀 금액이 기본재산액 이하이면 소득으로 잡히지 않지만, 그보다 많은 예금·자동차·집이 있으면 월급이 기준보다 낮아도 소득인정액이 기준을 넘을 수 있어요.</p>\n<h3>생계급여 계산 예시</h3>\n<p>생계급여는 선정기준에서 소득인정액을 뺀 만큼 받아요. 받는 생계급여와 소득인정액을 합한 금액이 선정기준 이상이 되도록 정해져 있기 때문이에요.</p>\n<ul>\n<li>2인 가구, 소득인정액 월 100만 원: 1,433,806원 − 1,000,000원 = <strong>월 433,806원</strong></li>\n<li>4인 가구, 소득인정액 월 150만 원: 2,217,563원 − 1,500,000원 = <strong>월 717,563원</strong></li>\n<li>1인 가구, 소득인정액 0원: 선정기준 전액인 <strong>월 875,533원</strong></li>\n</ul>\n<p>실제 금액은 신청 뒤 소득·재산 조사로 정해진 소득인정액으로 계산돼요.</p>\n<h2>신청은 어디서 하나</h2>\n<p>급여는 수급권자 본인이나 친족, 그 밖의 관계인이 관할 시장·군수·구청장에게 신청할 수 있어요. 사회복지 전담공무원이 수급권자의 동의를 받아 대신 신청(직권신청)할 수도 있어요. 신청할 때는 수급권자와 부양의무자가 금융·신용·보험 정보 제공 동의서를 내야 하고, 소득·재산 신고서나 통장 사본 같은 자료를 요청받을 수 있어요. 다만 시장·군수·구청장은 전산망 등으로 먼저 자료를 확보하고, 필요한 최소한의 자료만 요구해야 해요. 궁금한 점은 보건복지상담센터(국번 없이 129)에 물어볼 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>기준 중위소득 100%면 중간 소득이라는 뜻인가요?</h3>\n<p>국민 가구소득의 중위값을 보건복지부가 중앙생활보장위원회 심의·의결을 거쳐 고시한 값이에요. 복지 급여의 기준으로 쓰려고 정하는 금액이라 통계상 실제 중위소득과 같지는 않을 수 있어요.</p>\n<h3>2026년에 받던 생계급여도 1월부터 오르나요?</h3>\n<p>고시가 2027년 1월 1일부터 시행돼서 2027년 생계급여는 새 선정기준으로 계산돼요. 가구원 수와 소득인정액이 그대로이고 2027년에도 자격이 유지되면, 1인 가구는 54,977원, 4인 가구는 139,247원 늘어난 금액이 돼요.</p>\n<h3>보장시설에 사는 수급자도 같은 기준인가요?</h3>\n<p>보장시설에 위탁해 받는 생계급여는 기준이 따로 있어요. 수급자 1인당 최저보장수준은 시설 규모에 따라 월 455,332원(30인 미만), 397,143원(30인 이상 100인 미만), 374,391원(100인 이상 300인 미만), 374,347원(300인 이상)이에요.</p>\n<h3>급여는 생계급여만 있나요?</h3>\n<p>생계급여 말고도 주거·의료·교육급여, 해산급여, 장제급여, 자활급여가 있어요. 필요에 따라 전부 또는 일부를 받아요. 다만 근로능력이 있는 수급자가 자활에 필요한 사업에 참가하는 조건을 지키지 않으면, 조건을 이행할 때까지 본인 생계급여의 전부 또는 일부를 받지 못할 수 있어요.</p>\n",
+ "tags": [
+  "2027 기준 중위소득",
+  "생계급여",
+  "의료급여",
+  "기초생활수급자"
+ ],
+ "category": "생활정보",
+ "images": [
+  {
+   "prompt": "a warm family dinner table at home with rice, soup and side dishes, seen from above, soft evening light, no people faces",
+   "alt": "집 식탁에 차려진 저녁 밥상"
+  }
+ ],
+ "keyword": "2027기준중위소득",
+ "status": "auto",
+ "law_change": "고시|2100000283464",
+ "review": [
+  {
+   "claim": "제목: 2027 기준 중위소득 4인 6,929,885원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10409020000&bid=0026&act=view&list_no=1491489",
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제목: 생계급여 기준 32% — 소득인정액이 기준 중위소득의 32% 이하 (보건복지부 고시 제2026-157호 제3조, 법정 하한 30% 이상: 국민기초생활 보장법 제8조)",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "요약: 1인 가구 2,736,042원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요약·본문: 6.70% 인상",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요약: 생계급여 4인 2,217,563원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 1월 1일부터 적용",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득인정액이 선정기준 이하이면 생계급여 대상이 될 수 있음(부양의무자 기준도 봄) (국민기초생활 보장법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "의료급여 40% (국민기초생활 보장법 제12조의3)",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주거급여 48%",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "교육급여 50%",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근거: 보건복지부 고시 제2026-157호",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10409020000&bid=0026&act=view&list_no=1491489",
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 금액은 모두 월 기준",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 1인: 기준 중위소득 2,736,042원 / 생계급여 875,533원 / 의료급여 1,094,417원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 2인: 기준 중위소득 4,480,645원 / 생계급여 1,433,806원 / 의료급여 1,792,258원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 3인: 기준 중위소득 5,718,091원 / 생계급여 1,829,789원 / 의료급여 2,287,236원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 4인: 기준 중위소득 6,929,885원 / 생계급여 2,217,563원 / 의료급여 2,771,954원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 5인: 기준 중위소득 8,063,019원 / 생계급여 2,580,166원 / 의료급여 3,225,208원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 6인: 기준 중위소득 9,129,201원 / 생계급여 2,921,344원 / 의료급여 3,651,680원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표 7인: 기준 중위소득 10,152,665원 / 생계급여 3,248,853원 / 의료급여 4,061,066원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "8인 이상: 7인 금액 + (7인−6인) × (가구원 수 − 7)",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "8인 기준 중위소득 11,176,129원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "8인 생계급여 선정기준 3,576,362원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "8인 의료급여 선정기준 4,470,452원",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교표 1인: 2026년 2,564,238원 → 2027년 2,736,042원, 증가액 171,804원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교표 2인: 2026년 4,199,292원 → 2027년 4,480,645원, 증가액 281,353원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교표 3인: 2026년 5,359,036원 → 2027년 5,718,091원, 증가액 359,055원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교표 4인: 2026년 6,494,738원 → 2027년 6,929,885원, 증가액 435,147원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교표 5인: 2026년 7,556,719원 → 2027년 8,063,019원, 증가액 506,300원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교표 6인: 2026년 8,555,952원 → 2027년 9,129,201원, 증가액 573,249원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "6.70%는 2015년 이후 가장 높은 수준",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "생계급여 1인 820,556원 → 875,533원, 54,977원 증가",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "생계급여 4인 2,078,316원 → 2,217,563원, 139,247원 증가",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준임대료 1인 서울 38.1만 원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준임대료 1인 경기·인천 31.3만 원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준임대료 1인 광역시·세종·수도권 외 특례시 25.9만 원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준임대료 1인 그 밖의 지역 23.4만 원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준임대료 4인 서울 59.6만 원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "교육활동지원비(2027년 안) 초 513,000원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "교육활동지원비 중 714,000원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "교육활동지원비 고 945,000원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비교 금액은 월급이 아니라 소득인정액 (국민기초생활 보장법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득인정액 = 소득평가액 + 재산의 소득환산액 (국민기초생활 보장법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "생계급여 = 선정기준 − 소득인정액",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "받는 생계급여+소득인정액 ≥ 선정기준이 되도록 정함 (국민기초생활 보장법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법",
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 2인, 소득인정액 100만 원 → 월 433,806원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 4인, 소득인정액 150만 원 → 월 717,563원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 1인, 소득인정액 0원 → 월 875,533원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "실제 금액은 조사로 정해진 소득인정액으로 계산 (국민기초생활 보장법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수급권자 본인·친족·그 밖의 관계인이 관할 시장·군수·구청장에게 신청 (국민기초생활 보장법 제21조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 기준 중위소득은 국민 가구소득 중위값을 복지부가 중앙생활보장위원회 심의·의결을 거쳐 고시 (국민기초생활 보장법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법",
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 통계상 실제 중위소득과 같지 않을 수 있음 (국민기초생활 보장법 제6조의2)",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453",
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 고시 2027.1.1 시행 → 2027년 생계급여는 새 기준",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 소득인정액 그대로면 1인 54,977원·4인 139,247원 늘어남",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 보장시설 위탁 생계급여는 기준이 따로 있음 (국민기초생활 보장법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법",
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 생계 외 주거·의료·교육·해산·장제·자활급여 (국민기초생활 보장법 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 필요에 따라 전부 또는 일부를 받음 (국민기초생활 보장법 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주거급여(48%) 1인 1,313,300원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "교육급여(50%) 1인 1,368,021원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "주거급여(48%) 2인 2,150,710원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "교육급여(50%) 2인 2,240,323원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "주거급여(48%) 3인 2,744,684원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "교육급여(50%) 3인 2,859,046원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "주거급여(48%) 4인 3,326,345원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "교육급여(50%) 4인 3,464,943원",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "재산은 재산가액에서 기본재산액과 부채를 뺀 뒤 소득환산율을 곱해 더함, 재산에서 부채를 뺀 금액이 기본재산액 이하이면 소득으로 잡히지 않음 (국민기초생활 보장법 제6조의3)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "사회복지 전담공무원이 수급권자 동의를 받아 직권신청 가능 (국민기초생활 보장법 제21조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "수급권자와 부양의무자가 금융·신용·보험 정보 제공 동의서 제출 (국민기초생활 보장법 제21조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "소득·재산 신고서나 통장 사본 같은 자료를 요청받을 수 있음, 시장·군수·구청장은 전산망 등으로 먼저 확보하고 필요한 최소한의 자료만 요구 (국민기초생활보장법 시행규칙 제35조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법시행규칙"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보건복지상담센터 국번 없이 129",
+   "urls": [
+    "https://www.mohw.go.kr"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "FAQ: 가구원 수·소득인정액 그대로이고 2027년에도 자격 유지되면 1인 54,977원·4인 139,247원 증가",
+   "urls": [
+    "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보장시설 1인당 최저보장수준 455,332원(30인 미만), 397,143원(30인 이상 100인 미만), 374,391원(100인 이상 300인 미만), 374,347원(300인 이상)",
+   "urls": [
+    "https://www.mohw.go.kr/boardDownload.es?bid=0026&list_no=1491489&seq=1"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "근로능력이 있는 수급자가 자활에 필요한 사업 참가 조건을 이행하지 않으면 조건 이행 때까지 본인 생계급여 전부 또는 일부를 지급하지 않을 수 있음 (국민기초생활 보장법 제30조, 제9조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민기초생활보장법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  }
+ ],
+ "sources": [
+  {
+   "name": "보건복지부 2027년 기준 중위소득 보도자료",
+   "url": "https://www.mohw.go.kr/board.es?mid=a10503000000&bid=0027&act=view&list_no=1491453"
+  },
+  {
+   "name": "보건복지부 고시 제2026-157호 기준 중위소득·생계급여·의료급여 선정기준",
+   "url": "https://www.mohw.go.kr/board.es?mid=a10409020000&bid=0026&act=view&list_no=1491489"
+  },
+  {
+   "name": "국가법령정보센터 국민기초생활 보장법",
+   "url": "https://www.law.go.kr/법령/국민기초생활보장법"
+  }
+ ]
+}
