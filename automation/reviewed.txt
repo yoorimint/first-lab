@@ -87,3 +87,5 @@ calc:property-holding-tax
 549 냉장고 정리 방법
 553 근로소득세 계산법
 567 ESTA 신청 방법
+561 부동산 양도세 계산기
+calc:capital-gains-tax

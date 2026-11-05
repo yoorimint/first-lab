@@ -252,5 +252,246 @@
       "tax": 840000
     },
     "boundary": true
+  },
+  {
+    "why": "A 1주택 보유 3년·거주 2년: 표2 12%+8%=20% 시작점 (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "expense": 30000000,
+      "status": "one",
+      "hold": 3,
+      "live": 2
+    },
+    "expect": {
+      "lthd_pct": 20,
+      "base": 120700000,
+      "rate": 35,
+      "tax": 26805000,
+      "total": 29485500
+    }
+  },
+  {
+    "why": "A 1주택 보유 3년·거주 1년: 거주 2년 미만 → 표1 6% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "expense": 30000000,
+      "status": "one",
+      "hold": 3,
+      "live": 1
+    },
+    "expect": {
+      "lthd_pct": 6,
+      "base": 142260000,
+      "tax": 34351000,
+      "total": 37786100
+    }
+  },
+  {
+    "why": "A 1주택 보유 2년·거주 2년: 보유 3년 미만 → 공제 0% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "expense": 30000000,
+      "status": "one",
+      "hold": 2,
+      "live": 2
+    },
+    "expect": {
+      "lthd_pct": 0,
+      "base": 151500000,
+      "rate": 38,
+      "tax": 37630000,
+      "total": 41393000
+    }
+  },
+  {
+    "why": "A 1주택 보유 11년·거주 11년: 각 40% 상한 → 80% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "expense": 30000000,
+      "status": "one",
+      "hold": 11,
+      "live": 11
+    },
+    "expect": {
+      "lthd_pct": 80,
+      "base": 28300000,
+      "rate": 15,
+      "tax": 2985000,
+      "total": 3283500
+    }
+  },
+  {
+    "why": "A 1주택 보유 20년·거주 2년: 40%+8%=48% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "sale": 1500000000,
+      "acquire": 700000000,
+      "expense": 30000000,
+      "status": "one",
+      "hold": 20,
+      "live": 2
+    },
+    "expect": {
+      "lthd_pct": 48,
+      "base": 77580000,
+      "rate": 24,
+      "tax": 12859200,
+      "total": 14145120
+    }
+  },
+  {
+    "why": "B 일반 보유 14년: 표1 28% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "sale": 500000000,
+      "acquire": 400000000,
+      "expense": 0,
+      "live": 0,
+      "hold": 14
+    },
+    "expect": {
+      "lthd_pct": 28,
+      "base": 69500000,
+      "tax": 10920000,
+      "total": 12012000
+    }
+  },
+  {
+    "why": "B 일반 보유 15년: 표1 상한 30% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "sale": 500000000,
+      "acquire": 400000000,
+      "expense": 0,
+      "live": 0,
+      "hold": 15
+    },
+    "expect": {
+      "lthd_pct": 30,
+      "base": 67500000,
+      "tax": 10440000,
+      "total": 11484000
+    }
+  },
+  {
+    "why": "B 일반 보유 20년: 15년 이후도 30% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "sale": 500000000,
+      "acquire": 400000000,
+      "expense": 0,
+      "live": 0,
+      "hold": 20
+    },
+    "expect": {
+      "lthd_pct": 30,
+      "base": 67500000,
+      "tax": 10440000,
+      "total": 11484000
+    }
+  },
+  {
+    "why": "1주택 12억 1원(취득 5억, 5년·5년): 비과세 아님, 안분 차익 0원 (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "one",
+      "sale": 1200000001,
+      "acquire": 500000000,
+      "expense": 0,
+      "hold": 5,
+      "live": 5
+    },
+    "expect": {
+      "tax": 0,
+      "exempt": false
+    }
+  },
+  {
+    "why": "일반 차익 200만 원(보유 2년): 기본공제 250만 원보다 작아 과세표준 0 (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "general",
+      "sale": 102000000,
+      "acquire": 100000000,
+      "expense": 0,
+      "hold": 2,
+      "live": 0
+    },
+    "expect": {
+      "base": 0,
+      "tax": 0
+    }
+  },
+  {
+    "why": "3주택 중과 보유 0년: 단기 70%와 기본+30%p 중 큰 쪽 70% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "heavy3",
+      "sale": 500000000,
+      "acquire": 300000000,
+      "expense": 0,
+      "hold": 0,
+      "live": 0
+    },
+    "expect": {
+      "base": 197500000,
+      "tax": 138250000
+    }
+  },
+  {
+    "why": "토지 보유 0년: 1년 미만 50% (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "land",
+      "status": "general",
+      "sale": 300000000,
+      "acquire": 200000000,
+      "expense": 0,
+      "hold": 0,
+      "live": 0
+    },
+    "expect": {
+      "base": 97500000,
+      "tax": 48750000
+    }
+  },
+  {
+    "why": "2주택 중과 보유 1년, 50억: 기본+20%p 쪽이 단기 60%보다 큼 (11/5 외부 검수 독립 계산)",
+    "boundary": true,
+    "input": {
+      "asset": "house",
+      "status": "heavy2",
+      "sale": 5000000000,
+      "acquire": 1000000000,
+      "expense": 0,
+      "hold": 1,
+      "live": 0
+    },
+    "expect": {
+      "base": 3997500000,
+      "tax": 2532435000
+    }
   }
 ]
