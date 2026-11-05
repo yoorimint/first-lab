@@ -59,7 +59,7 @@ def check(post: dict, items: list[dict]) -> list[str]:
         if body.count(find) != 1:
             errors.append(f"{i}번: 찾을 문구가 본문에 {body.count(find)}번 (1번이어야 함): {find[:40]}")
         tag = p.get("tag", "p")
-        if re.search(r"</(?:p|li|tr|td|h\d)>", find):  # 닫는 태그를 넣으면 다음 문단까지 바뀔 수 있음 (11/5 #51·#59·#70)
+        if re.search(rf"</(?:p|li|{tag}|h\d)>", find):  # 표 칸(</td>)은 줄(tr) 안이라 괜찮음  # 닫는 태그를 넣으면 다음 문단까지 바뀔 수 있음 (11/5 #51·#59·#70)
             errors.append(f"{i}번: 찾을 문구에 닫는 태그(</p> 등)를 넣지 않는다 — 문단 안의 글자만: {find[-40:]}")
         if p.get("replace_paragraph", "").lstrip().startswith(f"<{tag}"):
             errors.append(f"{i}번: 고친 문구는 <{tag}> 안쪽만 (겉 태그까지 넣으면 이중 문단이 됨, 11/5 #578)")
