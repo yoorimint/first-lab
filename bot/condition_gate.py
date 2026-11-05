@@ -17,8 +17,11 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
+import os
 import re
 import urllib.parse
+from pathlib import Path
 
 # 제목에 없으면 안 되는 '범위' 낱말: 대상·장소·기간·차종 등 (숫자가 이것과만 같이 나오면 조건)
 SCOPE = re.compile(
@@ -140,7 +143,33 @@ def related_exceptions(articles: dict[str, str], article: str) -> list[tuple[str
     return out[:6]
 
 
+LAW_CACHE_DIR = Path(os.environ.get("FIRSTLAB_LAW_CACHE", "/tmp/firstlab-law-cache"))
+
+
+def _cached(kind: str, key: str, make):
+    """같은 날 같은 법령은 다시 받지 않음 (글쓰기 작업이 근거 대조를 여러 번 돌림 — 11/5 한 번에 9분)."""
+    import datetime as _dt
+    import hashlib
+    path = LAW_CACHE_DIR / f"{kind}-{_dt.date.today():%Y%m%d}-{hashlib.sha1(key.encode()).hexdigest()[:16]}.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        pass
+    value = make()
+    if value:  # 못 받은 것(빈 값)은 저장하지 않음 — 다음에 다시 시도
+        try:
+            LAW_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
+        except OSError:
+            pass
+    return value
+
+
 def law_articles(base_url: str) -> dict[str, str]:
+    return _cached("articles", base_url, lambda: _law_articles(base_url))
+
+
+def _law_articles(base_url: str) -> dict[str, str]:
     """'https://www.law.go.kr/법령/<이름>' → 현행 판 본문 조문 {번호: 글자} (법제처 API, 부칙 없음). 못 받으면 {}."""
     import datetime as dt
     from . import law_api
@@ -162,7 +191,9 @@ def exception_articles(review: list[dict] | None, articles_of=None) -> list[str]
                         for i in review or [])
     cache, done, out = {}, set(), []
     for item in review or []:
-        if not _ok(item):
+        if not _ok(item) or "해당 없음" in str(item.get("claim", "")):
+            # '제N조 해당 없음 — 이유' 항목은 그 조문을 쓴 주장이 아니라 확인 기록 → 그 조문의 특례를 또 요구하지 않음
+            # (11/5 일용직 4대보험 글: 해당 없음 항목마다 새 특례 조문이 요구돼 근거 대조를 9분씩 계속 다시 돌림)
             continue
         for url in item.get("urls", []):
             if "law.go.kr" not in str(url):

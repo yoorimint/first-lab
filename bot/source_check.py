@@ -87,6 +87,14 @@ def _raw(url: str) -> tuple[bytes, str | None, str] | None:
 
 
 def fetch(url: str) -> str | None:
+    """law.go.kr 본문은 같은 날 다시 받지 않음 (condition_gate._cached) — 근거 대조를 여러 번 돌려도 빠르게."""
+    if "law.go.kr" in urllib.parse.unquote(url):
+        from .condition_gate import _cached
+        return _cached("page", url, lambda: _fetch(url))
+    return _fetch(url)
+
+
+def _fetch(url: str) -> str | None:
     """공식 페이지 글자. 못 열거나 껍데기 페이지면 None, PDF 등 문서면 "". 법령 이름 주소는 본문 주소로 한 번 더 연다."""
     plain_url = urllib.parse.unquote(url)
     if "law.go.kr/" in plain_url and "/법령/" in plain_url:

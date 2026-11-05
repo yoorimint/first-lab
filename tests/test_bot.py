@@ -2487,6 +2487,29 @@ class ExcerptExclusionTest(unittest.TestCase):
         self.assertEqual(g.excerpt_vs_exclusions(ex, faq), [])
 
 
+class ExceptionAckTest(unittest.TestCase):
+    def test_ack_items_do_not_cascade(self):
+        """'제N조 해당 없음' 확인 항목의 조문 특례를 또 요구하지 않음 (11/5 일용직 4대보험 글: 근거 대조 9분씩 되풀이)."""
+        from bot import condition_gate as g
+        arts = {"제48조의3": "제48조의3(특례) 내용", "제48조의4": "제48조의4(플랫폼 특례) 제48조의3에도 불구하고 따로 정한다."}
+        url = "https://www.law.go.kr/법령/보험료징수법/제48조의3"
+        ack = [{"claim": "제48조의3 해당 없음 — 노무제공자 특례 (보험료징수법 제48조의3)", "verdict": "맞음", "action": "유지", "urls": [url]}]
+        self.assertEqual(g.exception_articles(ack, lambda base: arts), [])
+        real = [dict(ack[0], claim="노무제공자 보험료는 따로 정해요 (보험료징수법 제48조의3)")]
+        self.assertTrue(g.exception_articles(real, lambda base: arts))
+
+    def test_law_cache_same_day(self):
+        import tempfile
+        from bot import condition_gate as g
+        calls = []
+        with mock.patch.object(g, "LAW_CACHE_DIR", Path(tempfile.mkdtemp())):
+            make = lambda: calls.append(1) or {"제1조": "x"}  # noqa: E731
+            self.assertEqual(g._cached("articles", "u", make), {"제1조": "x"})
+            self.assertEqual(g._cached("articles", "u", make), {"제1조": "x"})
+            self.assertEqual(len(calls), 1)                                   # 두 번째는 저장본
+            self.assertEqual(g._cached("articles", "v", lambda: {}), {})      # 못 받은 것은 저장 안 함
+
+
 class LeadThresholdTest(unittest.TestCase):
     """#771 경기 극저신용대출: 요약·첫 문단 '하위 10%' ↔ 본문 '…이라면 하위 20%', 제목 '피해자' ↔ 본문 '불법사금융 피해자'."""
 
