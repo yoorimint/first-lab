@@ -2075,6 +2075,38 @@ class EvidenceFileTest(unittest.TestCase):
             self.assertTrue(data["keyword"] and data["review"], path.name)
 
 
+class ConditionGateTest(unittest.TestCase):
+    """조건 누락을 관문이 막음 (11/5 운영자 '막을 대책 세워서 어떻게든 해야지, 평생 니가 고칠 거가')."""
+
+    def test_headline_number_only_true_with_scope(self):
+        from bot import condition_gate as g
+        body = ("<p>P1·P2 여객주차장은 월~목 10,000원, P3는 7,000원이에요.</p><p>P1·P2 3박 4일은 목요일 10,000원에 금요일 15,000원을 더해요.</p>"
+                "<p>P3에 세우면 7,000원 + 10,000원이에요.</p>")
+        self.assertTrue(g.headline_scope("김해공항 주차장 요금: 월~목 하루 최대 10,000원", "", body))      # #655
+        self.assertEqual(g.headline_scope("김해공항 주차장 요금: P1·P2 월~목 하루 최대 10,000원", "", body), [])
+        body2 = "<p>7월 1일 입사면 다음 해 비례 연차는 약 7.6일이에요.</p><p>7월 1일부터 184일이라 약 7.6일이에요.</p>"
+        self.assertTrue(g.headline_scope("회계연도 연차: 7월 입사면 비례 연차 7.6일", "", body2))           # #651
+        self.assertEqual(g.headline_scope("회계연도 연차: 7월 1일 입사면 비례 연차 7.6일", "", body2), [])
+        self.assertEqual(g.headline_scope("설날 2월 17일", "", "<p>2026년 설날은 2월 17일, 음력 1월 1일이에요.</p>"), [])  # 날짜 자체는 비교 안 함
+        self.assertEqual(g.headline_scope("연차 15일", "", "<p>1년 80% 출근하면 15일이에요.</p>"), [])     # 조건 없는 값
+
+    def test_exception_in_other_article(self):
+        from bot import condition_gate as g
+        law = {"제53조": "제53조(증여재산 공제) 거주자가 증여를 받은 경우에는 다음 각 호의 금액을 공제한다.",
+               "제53조의2": "제53조의2(혼인ㆍ출산 증여재산 공제) ① 혼인일 전후 2년 이내에 증여를 받는 경우에는 제2항 및 제53조제2호에 따른 공제와 별개로 1억원을 공제한다.",
+               "제54조": "제54조(준용규정) 제53조를 준용한다."}
+        self.assertEqual(g.related_exceptions(law, "제53조"), [("제53조의2", "혼인ㆍ출산 증여재산 공제")])
+        review = [{"claim": "부모·자녀 5,000만 원 (상속세및증여세법 제53조)", "urls": ["https://www.law.go.kr/법령/상속세및증여세법"],
+                   "verdict": "맞음", "action": "유지"}]
+        got = g.exception_articles(review, lambda url: law)                                          # #640
+        self.assertEqual(len(got), 1)
+        self.assertIn("제53조의2(혼인ㆍ출산 증여재산 공제)", got[0])
+        checked = review + [{"claim": "제53조의2 혼인·출산 공제 해당 없음 — 당첨금 증여는 혼인과 무관한 경우가 대부분이라 안내만",
+                             "urls": ["https://www.law.go.kr/법령/상속세및증여세법/제53조의2"], "verdict": "맞음", "action": "유지"}]
+        self.assertEqual(g.exception_articles(checked, lambda url: law), [])
+        self.assertEqual(g.exception_articles(review, lambda url: {}), [])                           # 못 열면 막지 않음
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

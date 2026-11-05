@@ -98,7 +98,7 @@ def _small_workplace(review: list[dict], headline: str) -> list[str]:
     return []
 
 
-def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body_html: str = "") -> list[str]:
+def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body_html: str = "", law_fetcher=None) -> list[str]:
     """통과 못 한 이유 목록 (빈 목록이면 통과).
     제목·요약문의 숫자는 독자가 가장 먼저 믿는 값이라, 검수된(맞음) 주장 안에 있어야 한다."""
     if not review:
@@ -113,6 +113,10 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
         out.append(f"제목·요약문 숫자 {', '.join(sorted(missing))} 가 검수된 주장에 없음")
     out += _regional_only(review, f"{title} {excerpt}")
     out += _small_workplace(review, f"{title} {excerpt}")
+    # 조건 누락 (11/5 운영자 '막을 대책 세워서 어떻게든 해야지') — bot/condition_gate.py
+    from . import condition_gate
+    out += condition_gate.headline_scope(title, excerpt, body_html)
+    out += condition_gate.exception_articles(review, law_fetcher)
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:
             continue  # 완화·삭제: 본문에 단정형으로 남지 않음

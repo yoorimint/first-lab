@@ -356,6 +356,11 @@ def main(argv: list[str]) -> None:
         print(f"- [제목 조건 확인] {x} → 제목·요약에 조건(최대·이하·기준 등)을 붙이거나 조건 없는 값으로")
     for x in absolute_sentences(data.get("content_html", "")):
         print(f"- [단정 문장] {x} → 예외(제외 대상·조건·상한·하한)를 원문에서 확인")
+    from . import condition_gate  # 서버 관문과 같은 검사 — 여기서 고치면 보류되지 않음
+    for x in condition_gate.headline_scope(data.get("title", ""), data.get("excerpt", ""), data.get("content_html", "")):
+        print(f"- [관문: 제목 조건] {x}")
+    for x in condition_gate.exception_articles(review):
+        print(f"- [관문: 특례·예외 조문] {x}")
     for a in amended(review):
         print(f"- [최근 개정 조문 {a['article']} {', '.join(a['dates'])}] {a['claim']} → 안내 페이지·기사 값이 아니라 현행 조문·부칙으로 다시 확인")
 
