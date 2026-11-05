@@ -10,7 +10,7 @@ import random
 import subprocess
 from datetime import datetime, timedelta, timezone
 
-from . import freshness, indexnow
+from . import freshness, indexnow, seasons
 from .settings import wp_cli
 
 QUEUE_META = "_firstlab_queue"
@@ -50,6 +50,23 @@ def ready_drafts() -> list[int]:
     return [int(x) for x in out.split()]
 
 
+def _draft_texts(ids: list[int]) -> dict[int, str]:
+    """초안 번호 → '주소 키워드 + 제목' (한 번의 조회로, 계절 판단용)."""
+    import json
+    import urllib.parse
+    if not ids:
+        return {}
+    try:
+        rows = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--post__in={','.join(map(str, ids))}",
+                                 "--fields=ID,post_name,post_title", "--format=json", "--posts_per_page=-1") or "[]")
+    except Exception:  # noqa: BLE001 — 못 읽으면 계절 순서 없이 기존 순서
+        return {}
+    if not isinstance(rows, list):
+        return {}
+    return {int(r["ID"]): urllib.parse.unquote(r.get("post_name", "")) + " " + r.get("post_title", "")
+            for r in rows if isinstance(r, dict) and "ID" in r}
+
+
 def _has_pending_images(post_id) -> bool:
     """한도 소진으로 아직 사진을 못 넣은 글인지 (publisher.PENDING_META)."""
     try:
@@ -67,7 +84,9 @@ def publish_next(now_kst: datetime) -> str | None:
     ids = ready_drafts()
     if not ids:
         return None
-    ordered = sorted(ids, key=_has_pending_images)  # 사진이 다 들어간 글 먼저 (같으면 오래된 순)
+    texts = _draft_texts(ids)
+    # 시즌 중인 글 먼저, 시즌 지난 글은 뒤로 (bot/seasons.py) → 그 안에서 사진이 다 들어간 글 먼저 → 오래된 순
+    ordered = sorted(ids, key=lambda i: (seasons.rank(texts.get(i, ""), now_kst.date()), _has_pending_images(i)))
     held = []
     post_id = None
     for candidate in ordered[:MAX_FRESH_CHECKS]:

@@ -1229,5 +1229,38 @@ class TopicDirectionTest(unittest.TestCase):
         self.assertGreater(topic_weight("실업급여신청"), topic_weight("냉장고정리방법"))
         self.assertLess(topic_weight("상하이여행준비물"), 0)
 
+
+class SeasonTest(unittest.TestCase):
+    """계절 공개 순서 (11/5 운영자 승인): 시즌 중인 글 먼저, 시즌 지난 글은 뒤로."""
+
+    def test_rank(self):
+        import datetime as dt
+        from bot import seasons
+        self.assertEqual(seasons.rank("종합소득세신고기간 종합소득세 신고기간", dt.date(2026, 4, 10)), seasons.IN)
+        self.assertEqual(seasons.rank("종합소득세신고기간", dt.date(2026, 11, 5)), seasons.OFF)
+        self.assertEqual(seasons.rank("부가가치세계산기", dt.date(2026, 1, 10)), seasons.IN)  # 연도를 넘는 구간
+        self.assertEqual(seasons.rank("연말정산 서류", dt.date(2026, 12, 1)), seasons.IN)
+        self.assertEqual(seasons.rank("실업급여신청절차", dt.date(2026, 11, 5)), seasons.NONE)
+
+    def test_publish_prefers_in_season_and_defers_off_season(self):
+        import json as _json
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import freshness, schedule
+        calls = []
+        rows = [{"ID": 80, "post_name": "종합소득세신고기간", "post_title": "종합소득세 신고기간"},
+                {"ID": 85, "post_name": "실업급여신청절차", "post_title": "실업급여"},
+                {"ID": 90, "post_name": "에너지바우처신청", "post_title": "에너지바우처"}]
+
+        def wp(*args):
+            calls.append(args)
+            if args[:2] == ("post", "list"):
+                return _json.dumps(rows) if "--format=json" in args else "80\n85\n90\n"
+            return "글" if "--field=post_title" in args else ""
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp), mock.patch.object(freshness, "check_post", return_value=[]):
+            schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+        # 11월: 에너지바우처(시즌 중) 먼저 — 종합소득세(시즌 지남)는 가장 오래됐어도 뒤로
+        self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "90")
+
 if __name__ == "__main__":
     unittest.main()
