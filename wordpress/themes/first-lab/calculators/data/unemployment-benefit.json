@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly_checked": 2026,
+  "basis_date": "2026-11-04", "law_checked": ["고용보험법|2026-11-27", "고용보험법|2027-01-01"], "yearly_checked": 2026,
   "sources": [
     {"name": "고용보험법 (제40조 수급 요건, 제45조 기초일액, 제46조 구직급여일액 60%·80%, 제50조·별표 1 소정급여일수)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0"},
     {"name": "고용보험법 시행령 제68조 (급여기초 임금일액 상한 11만3500원)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0"},

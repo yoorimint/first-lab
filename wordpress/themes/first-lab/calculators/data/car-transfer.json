@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-05", "yearly_checked": 2027,
+  "basis_date": "2026-11-05", "law_checked": ["지방세법|2027-01-01"], "yearly_checked": 2027,
   "sources": [
     {"name": "국가법령정보센터 지방세법 (제10조의5 차량 과세표준, 제12조 차량 세율, 제17조 면세점 50만 원)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282559"},
     {"name": "국가법령정보센터 지방세특례제한법 (제67조 경형자동차 과세특례, 제177조의2 최소납부세제)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=286607"},

@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly_checked": 2026,
+  "basis_date": "2026-11-04", "law_checked": ["국민건강보험법|2026-11-27", "국민건강보험법|2026-12-24", "국민건강보험법|2027-01-01", "국민건강보험법 시행령|2026-12-24", "노인장기요양보험법|2026-11-27"], "laws": ["노인장기요양보험법"], "yearly_checked": 2026,
   "sources": [
     {"name": "국민건강보험법 (지역가입자 월별 보험료 = 소득 + 재산, 임의계속가입)", "url": "https://www.law.go.kr/법령/국민건강보험법"},
     {"name": "국민건강보험법 시행령 (보험료율 1만분의 719, 재산보험료부과점수당 211.5원, 별표 4 재산등급별 점수·기본공제 1억 원)", "url": "https://www.law.go.kr/법령/국민건강보험법시행령"},
@@ -9,7 +9,6 @@
   ],
   "rate_per_10000": 719,
   "ltc_rate_per_1000000": 9448,
-  "ltc_ratio_round": false,
   "point_value": 211.5,
   "half_rate_income": 0.5,
   "low_income_month": 280000,
@@ -29,5 +28,5 @@
   "property_top_points": 2341,
   "yearly_recheck": "2026-12-15",
   "yearly_pending": "보험료 상한·하한 고시(12월)·장기요양 0.9994% 시행령 공포 확인",
-  "scheduled": [{"from": "2026-11-27", "values": {"ltc_ratio_round": true}, "source": {"name": "노인장기요양보험법 제9조① (2026.5.26 개정, 2026.11.27 시행: 건강보험료율 대비 장기요양보험료율의 비율은 소수점 이하 다섯째자리에서 반올림)", "url": "https://www.law.go.kr/법령/노인장기요양보험법/제9조"}}, {"from": "2027-01-01", "texts": [["13.14%", "13.90%"]], "values": {"ltc_rate_per_1000000": 9994}, "source": {"name": "보건복지부 2027년 장기요양보험료율 소득 대비 0.9994% (건강보험료 대비 13.90%) 장기요양위원회 의결 (2026.10.30)", "url": "https://www.mohw.go.kr/board.es?mid=a10503010100&bid=0027&act=view&list_no=1492396"}}]
+  "scheduled": [{"from": "2027-01-01", "texts": [["13.14%", "13.90%"]], "values": {"ltc_rate_per_1000000": 9994}, "source": {"name": "보건복지부 2027년 장기요양보험료율 소득 대비 0.9994% (건강보험료 대비 13.90%) 장기요양위원회 의결 (2026.10.30)", "url": "https://www.mohw.go.kr/board.es?mid=a10503010100&bid=0027&act=view&list_no=1492396"}}]
 }

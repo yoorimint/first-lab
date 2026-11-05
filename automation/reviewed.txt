@@ -113,3 +113,4 @@ calc:cbm
 calc:fiscal-annual-leave
 655 김해공항 주차장 요금: 10분 300원, 월~목 하루 최대 10,000원
 calc:gimhae-airport-parking
+254 지역 의료보험료 계산

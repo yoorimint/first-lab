@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-05", "yearly": false,
+  "basis_date": "2026-11-05", "law_checked": ["근로기준법|2026-12-08", "근로기준법|2026-12-10", "근로기준법|2027-01-01"], "yearly": false,
   "sources": [
     {"name": "근로기준법 제60조·제61조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
     {"name": "민법 제160조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/민법"},

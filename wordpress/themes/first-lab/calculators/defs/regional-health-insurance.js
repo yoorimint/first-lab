@@ -43,10 +43,10 @@
       const capped = sum > d.monthly_max;
       // 상한·하한은 소득+재산 합계에 적용 (국민건강보험법 제69조⑤⑥, 시행령 제32조 2호 나목) — 11/5 외부 검수: 하한을 소득 보험료에만 적용했던 오류
       const health = Math.min(Math.max(sum, d.monthly_min), d.monthly_max);
-      // 장기요양: 건강보험료 × 장기요양보험료율 ÷ 건강보험료율. 2026.11.27 부터는 그 비율을 소수점 이하 다섯째자리에서 반올림
-      // (노인장기요양보험법 제9조①, 2026.5.26 개정 — data 의 ltc_ratio_round 가 그날 scheduled 로 켜짐)
-      const ltcRatio = (d.ltc_rate_per_1000000 * 100) / d.rate_per_10000; // 1만분의 단위
-      const ltc = FirstLabCalc.util.floor((health * (d.ltc_ratio_round ? Math.round(ltcRatio) : ltcRatio)) / 10000);
+      // 장기요양: 건강보험료 × (장기요양보험료율 ÷ 건강보험료율, 소수점 이하 다섯째자리에서 반올림) — 노인장기요양보험법 제9조①
+      // (2026.5.26 개정, 부칙 제3조: 2026년 11월분 보험료부터. 실수령액 계산기와 같은 식)
+      const ltcRatio = Math.round((d.ltc_rate_per_1000000 * 100) / d.rate_per_10000); // 1만분의 단위 (0.9448/7.19 → 1314)
+      const ltc = FirstLabCalc.util.floor((health * ltcRatio) / 10000);
       const total = health + ltc;
 
       const rows = [

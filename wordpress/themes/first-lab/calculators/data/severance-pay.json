@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly": false,
+  "basis_date": "2026-11-04", "law_checked": ["근로기준법|2026-12-08", "근로기준법|2026-12-10", "근로기준법|2027-01-01"], "yearly": false,
   "sources": [
     {"name": "근로자퇴직급여 보장법 (제4조 적용 제외, 제8조 30일분 평균임금, 제9조 14일 이내 지급)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284455&efYd=20260918&chrClsCd=010202&ancYnChk=0"},
     {"name": "근로기준법 제2조 (평균임금: 3개월 임금총액 ÷ 총일수, 통상임금보다 적으면 통상임금)", "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=285279&efYd=20261008&chrClsCd=010202&ancYnChk=0"},
