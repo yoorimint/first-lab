@@ -100,3 +100,4 @@ calc:take-home-pay
 calc:weekly-holiday-pay
 595 연말정산 계산기: 환급액 계산 순서와 자녀공제 9세 기준
 calc:year-end-tax
+625 종이 세금계산서 양식: 필수 4칸·전자 의무 8천만 원 기준
