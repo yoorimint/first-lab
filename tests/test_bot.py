@@ -1165,6 +1165,15 @@ class FreshnessTest(unittest.TestCase):
         # 개정 뒤에 쓴 글은 통과
         self.assertEqual(freshness.problems(record, [], dt.date(2026, 7, 2), dt.date(2026, 11, 5), fetcher=lambda u: self.LAW), [])
 
+    def test_old_draft_without_article_checks_whole_law(self):
+        """조문 번호 없는 예전 초안: 근거 법령이 검수 뒤 시행됐으면 다시 확인 (11/5 운영자: 공개 직전 확인)."""
+        import datetime as dt
+        from bot import freshness
+        review = [{"claim": "납부지연가산세 1일 0.022%", "urls": ["https://www.law.go.kr/법령/국세기본법"], "verdict": "맞음", "action": "유지"}]
+        law = "부칙 제1조(시행일) 이 법은 2026년 7월 1일부터 시행한다."
+        self.assertEqual(len(freshness.problems({}, review, dt.date(2026, 6, 1), dt.date(2026, 11, 5), fetcher=lambda u: law)), 1)
+        self.assertEqual(freshness.problems({}, review, dt.date(2026, 7, 2), dt.date(2026, 11, 5), fetcher=lambda u: law), [])
+
     def test_number_disappeared_from_official_page(self):
         import datetime as dt
         from bot import freshness

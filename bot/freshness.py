@@ -32,6 +32,13 @@ def changed_since(text: str, article: str, since: dt.date, today: dt.date) -> li
     return sorted({f"{x:%Y.%m.%d}" for x in dates if since < x <= today})
 
 
+def law_effective_since(text: str, since: dt.date, today: dt.date) -> list[str]:
+    """법령 전체 부칙의 시행일 중 since 뒤 ~ today (조문 번호를 모르는 예전 초안용 — 넓게 잡아 다시 확인하게 함)."""
+    dates = [dt.date(int(y), int(m), int(d)) for y, m, d in
+             re.findall(r"(20\d\d)년\s*(\d{1,2})월\s*(\d{1,2})일부터\s*시행", text)]
+    return sorted({f"{x:%Y.%m.%d}" for x in dates if since < x <= today})
+
+
 def _review_from_queue(keyword: str) -> list[dict]:
     """예전 초안(근거 대조에 laws 가 없는 것)은 저장소 큐 파일의 검수 기록에서 근거를 찾는다."""
     for path in QUEUE_DIR.glob("*.json"):
@@ -58,6 +65,14 @@ def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, f
         found = changed_since(page(base) or "", art, since, today)
         if found:
             out.append(f"{urllib.parse.unquote(base).rsplit('/', 1)[-1]} {art} {', '.join(found)} 개정·시행")
+    # 조문 번호 없이 법령만 근거로 단 주장 (11/5 조문 번호 규칙 전에 쓴 초안): 그 법령이 검수 뒤 시행됐는지
+    covered = {base for base, _ in laws}
+    whole = sorted({source_check.law_page(str(u)) for item in review if _ok(item) for u in item.get("urls", [])
+                    if "law.go.kr" in str(u) and not source_check.claim_article(item, str(u))} - covered)
+    for base in whole:
+        found = law_effective_since(page(base) or "", since, today)
+        if found:
+            out.append(f"{urllib.parse.unquote(base).rsplit('/', 1)[-1][:30]} {', '.join(found)} 시행 (조문 확인 필요)")
     for item in record.get("found", []):
         texts = [t for t in (page(u) for u in item.get("urls", [])) if t]
         if not texts:
