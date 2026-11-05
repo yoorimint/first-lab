@@ -198,9 +198,11 @@ def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "")
     try:
         url = routine.fire(settings.routine_fire_url, settings.routine_token, text)
         add_log(state, True, f"{label}: Claude 글쓰기 작업 시작 {url}")
+        state["last_fire_ok_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")  # /health (외부 알림)
         return True
     except Exception as e:  # noqa: BLE001 - 응답 형식이 바뀌어도(미리보기 기능) 봇이 멈추지 않게 (11/5 검토)
         add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패 - {str(e)[:150]}")
+        state["last_fire_error_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         return False
 
 

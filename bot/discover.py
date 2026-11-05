@@ -54,6 +54,26 @@ def _modifier_heads(conn, today: str, limit_heads: int) -> list[str]:
     return [r["keyword"] for r in rows[:limit_heads]]
 
 
+def secrets_expiring(today=None, days: int = 30) -> list[str]:
+    """비밀값 파일의 NAME_EXPIRES=YYYY-MM-DD 중 days 일 안에 끝나는 것 (값은 읽지 않음)."""
+    from datetime import date, timedelta
+    from .config import SECRETS_FILE, load_secrets
+    today = today or date.today()
+    try:
+        secrets = load_secrets(SECRETS_FILE) if SECRETS_FILE.exists() else {}
+    except OSError:
+        return []
+    out = []
+    for key, value in secrets.items():
+        if key.endswith("_EXPIRES"):
+            try:
+                if date.fromisoformat(value.strip()) - today <= timedelta(days=days):
+                    out.append(f"{key[:-8]}({value.strip()})")
+            except ValueError:
+                continue
+    return sorted(out)
+
+
 def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
     ads = ads_client()
     stats = {"calls": 0, "new": 0, "errors": 0, "trends": 0}
@@ -194,6 +214,10 @@ def main() -> None:
     add_log(state, ok, msg)
     for line in failures:
         add_log(state, False, line)
+    expiring = secrets_expiring()  # 비밀값 이름_EXPIRES=YYYY-MM-DD 를 set-secrets.sh 로 넣어 두면 30일 전부터 알림 (/health → 메일)
+    state["secrets_expiring"] = expiring
+    if expiring:
+        add_log(state, False, f"곧 만료되는 키: {', '.join(expiring)} — 서버 set-secrets.sh 로 새 값과 새 만료일")
     # 발행된 글 갱신 (서치콘솔 반영 직후, 주당 한도 안에서 하루 최대 1개)
     from .refresh import run_weekly
 

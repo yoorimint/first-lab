@@ -1,0 +1,45 @@
+# 자동 운영 건강 점검 (하루 1번) — 이상하면 이 작업이 실패 → GitHub 가 저장소 주인에게 메일을 보냄.
+# Claude 예약 작업과 상관없는 알림 통로 (11/5 검토: 토큰 만료·요금제 한도로 글쓰기가 멈추면 알릴 곳이 없었음).
+# 값은 공개 /wp-json/firstlab/v1/health (비밀값 없음, wordpress/mu-plugins/first-lab-api.php).
+name: Health check
+
+on:
+  schedule:
+    - cron: "23 0 * * *"   # 매일 09:23 (한국 시간)
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check first-lab.kr
+        run: |
+          curl -fsS --max-time 30 https://first-lab.kr/wp-json/firstlab/v1/health -o health.json
+          python3 - <<'PY'
+          import json, sys
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+          h = json.load(open("health.json"))
+          now = datetime.now(ZoneInfo("Asia/Seoul")).replace(tzinfo=None)
+          def at(key):
+              try:
+                  return datetime.strptime(h.get(key) or "", "%Y-%m-%d %H:%M")
+              except ValueError:
+                  return None
+          problems = []
+          done = at("last_done_at")
+          if done and now - done > timedelta(hours=72):
+              problems.append(f"글쓰기 결과가 {int((now - done).total_seconds() // 3600)}시간째 없음 (요금제 한도·예약 작업 토큰·오류 확인)")
+          ok, err = at("last_fire_ok_at"), at("last_fire_error_at")
+          if err and (not ok or err > ok):
+              problems.append(f"글쓰기 작업 실행이 실패 중 (마지막 실패 {h.get('last_fire_error_at')})")
+          if h.get("deploy_stuck"):
+              problems.append("배포가 1시간 넘게 막힘 (GitHub Actions 'Deploy server config' 확인)")
+          if h.get("expiring"):
+              problems.append(f"곧 만료되는 키: {', '.join(h['expiring'])} (서버 set-secrets.sh 로 새 값)")
+          print(json.dumps(h, ensure_ascii=False))
+          if problems:
+              print("\n".join("❌ " + p for p in problems))
+              sys.exit(1)
+          print("✅ 이상 없음")
+          PY

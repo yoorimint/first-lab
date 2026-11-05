@@ -62,6 +62,28 @@ add_action(
 			)
 		);
 		// 감시 세션 외부 검수용: 글 번호로 지금 본문 (patches·보류 수정이 반영된 실제 내용, automation/unreviewed.py)
+		// 자동 운영 건강 상태 (공개, 비밀값 없음) — GitHub Actions 가 하루 1번 확인해 이상하면 실패 → 운영자에게 메일
+		// (Claude 와 상관없는 알림 통로: 예약 작업 토큰이 끊기거나 요금제 한도로 글쓰기가 멈춰도 알 수 있게, 11/5 검토)
+		register_rest_route(
+			'firstlab/v1',
+			'/health',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => '__return_true',
+				'callback'            => static function () {
+					$state = (array) get_option( 'firstlab_bot_state', array() );
+					return array(
+						'now'             => current_time( 'Y-m-d H:i' ),
+						'last_done_at'    => (string) ( $state['last_done_at'] ?? '' ),     // 마지막 글·검수 결과가 서버에 들어온 시각
+						'last_fire_ok_at' => (string) ( $state['last_fire_ok_at'] ?? '' ),  // 마지막 글쓰기 작업 실행 성공
+						'last_fire_error_at' => (string) ( $state['last_fire_error_at'] ?? '' ),
+						'deploy_stuck'    => ! empty( $state['deploy_alert'] ),
+						'expiring'        => array_values( (array) ( $state['secrets_expiring'] ?? array() ) ), // 곧 만료되는 키 이름만
+						'ready_count'     => count( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_queue', 'meta_value' => 'ready', 'numberposts' => -1, 'fields' => 'ids' ) ) ),
+					);
+				},
+			)
+		);
 		register_rest_route(
 			'firstlab/v1',
 			'/post/(?P<id>\d+)',

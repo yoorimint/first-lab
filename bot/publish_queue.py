@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import hashlib
+from datetime import datetime
 import json
 from pathlib import Path
 
@@ -225,6 +226,8 @@ def main() -> None:
             _marker(path).touch()
             msg = f"{label}: {msg}"
             add_log(state, True, msg)
+            if label in ("직접 작성 글", "대기 글 검수(직접)", "보류 수정"):
+                state["last_done_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")  # /health (외부 알림)
         except Exception as e:  # noqa: BLE001 - 한 파일 실패가 배포를 막지 않게 (다음 배포 때 다시 시도)
             fails = _bump_file_fail(path)
             if fails >= MAX_FILE_FAILS:  # 다시 해도 안 되는 파일을 배포마다 영원히 돌리지 않게 (11/5 검토)

@@ -2265,6 +2265,26 @@ class ReviewDoneConsistencyTest(unittest.TestCase):
             self.assertIn(pid, done, f"{path.name}: automation/reviewed.txt 에 {pid} 없음 — 커밋에서 빠짐")
 
 
+class HealthAlertTest(unittest.TestCase):
+    """감시 세션·Claude 없이도 멈춤을 알리는 통로 (/health + GitHub Actions 메일, 11/5 검토)."""
+
+    def test_secrets_expiring(self):
+        import datetime as dt
+        import tempfile
+        from bot import config, discover
+        p = Path(tempfile.mkdtemp()) / "s.env"
+        p.write_text("DATA_GO_KR_KEY=abc\nDATA_GO_KR_KEY_EXPIRES=2026-12-01\nCF_EXPIRES=2027-06-01\n", encoding="utf-8")
+        with mock.patch.object(config, "SECRETS_FILE", p):
+            self.assertEqual(discover.secrets_expiring(dt.date(2026, 11, 10)), ["DATA_GO_KR_KEY(2026-12-01)"])
+
+    def test_health_route_and_workflow(self):
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("'/health'", php)
+        wf = (ROOT / ".github" / "workflows" / "health.yml").read_text(encoding="utf-8")
+        self.assertIn("firstlab/v1/health", wf)
+        self.assertIn("sys.exit(1)", wf)
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt
