@@ -2035,6 +2035,22 @@ class SourceRecheckTest(unittest.TestCase):
         self.assertEqual(state[recheck.CURSOR], "7")
 
 
+class ListedCasesTest(unittest.TestCase):
+    """조문이 나열한 경우(각 호)를 글쓰기 세션에 보여 줌 — 일부만 쓰는 조건 누락 (11/5 #651 유산·사산휴가, #687 대체공휴일 3호)."""
+
+    def test_cases_from_article(self):
+        from bot import source_check
+        body = ("제3조(대체공휴일) ① 공휴일이 다음 각 호의 어느 하나에 해당하는 경우에는 다음의 첫 번째 비공휴일을 대체공휴일로 한다. "
+                "1. 토요일이나 일요일과 겹치는 경우 2. 일요일과 겹치는 경우 3. 토요일ㆍ일요일이 아닌 날에 다른 공휴일과 겹치는 경우 ② 그 밖의 사항")
+        cases = source_check.listed_cases(body)
+        self.assertEqual(len(cases), 3)
+        self.assertIn("다른 공휴일과 겹치는 경우", cases[2])
+        self.assertEqual(source_check.listed_cases("제1조(목적) 이 법은 목적이 있다."), [])
+        got = source_check.law_exceptions([{"claim": "대체공휴일 (제3조)", "urls": ["https://www.law.go.kr/법령/관공서의공휴일에관한규정/제3조"],
+                                            "verdict": "맞음", "action": "유지"}], fetcher=lambda url: body)
+        self.assertEqual(len(got[0]["cases"]), 3)
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

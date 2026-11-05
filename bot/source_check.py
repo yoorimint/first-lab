@@ -220,6 +220,20 @@ def law_page(url: str) -> str:
     return re.sub(r"(/법령/[^/?#]+)/.*$", r"\1", urllib.parse.unquote(url))
 
 
+def listed_cases(article_body: str, limit: int = 12) -> list[str]:
+    """'다음 각 호의 어느 하나에 해당하는 …' 처럼 경우를 나열한 조문의 각 호 (글이 그중 일부만 쓰는 일이 잦음 —
+    11/5 #651 연차 출근 간주 제60조⑥에서 유산·사산휴가 빠짐, #687 대체공휴일 제3조①에서 '평일에 다른 공휴일과 겹침' 빠짐)."""
+    text = re.sub(r"<[^>]*>", "", article_body)
+    out = []
+    for m in re.finditer(r"다음 각 호[^.]*?\.", text):
+        rest = text[m.end():]
+        stop = re.search(r"\s[②-⑳]\s?", rest)
+        block = rest[: stop.start() if stop else 2500]
+        items = re.split(r"\s(?=\d{1,2}\.\s)", " " + block)
+        out += [re.sub(r"\s+", " ", x).strip()[:160] for x in items if re.match(r"\s*\d{1,2}\.\s", x)]
+    return out[:limit]
+
+
 def law_exceptions(review: list[dict] | None, fetcher=fetch) -> list[dict]:
     """글이 근거로 단 법령 조문마다 예외·단서 문장. 글쓴이가 그 예외를 글에 넣었는지 확인하게 한다."""
     out, cache, done = [], {}, set()
@@ -234,10 +248,11 @@ def law_exceptions(review: list[dict] | None, fetcher=fetch) -> list[dict]:
             done.add((base, art))
             if base not in cache:
                 cache[base] = fetcher(base)
-            found = exceptions_in(article_text(cache[base] or "", art))
-            if found:
+            body = article_text(cache[base] or "", art)
+            found, cases = exceptions_in(body), listed_cases(body)
+            if found or cases:
                 name = base.rsplit("/", 1)[-1] if "/법령/" in base else str(item.get("claim", ""))[:20]
-                out.append({"law": name, "article": art, "exceptions": found})
+                out.append({"law": name, "article": art, "exceptions": found, "cases": cases})
     return out
 
 
@@ -332,6 +347,10 @@ def main(argv: list[str]) -> None:
         print(f"- [예외 확인: {law['law']} {law['article']}] 이 조문의 단서·예외가 글에 필요한지 확인:")
         for x in law["exceptions"]:
             print(f"    · {x}")
+        if law.get("cases"):
+            print(f"  [경우 나열: {law['law']} {law['article']}] 이 조문이 나열한 경우를 글이 모두 다루는지(일부만 쓰면 '등'·'다음 중 하나'로) 확인:")
+            for x in law["cases"]:
+                print(f"    · {x}")
     data = json.loads(open(argv[1], encoding="utf-8").read())
     for x in headline_conditions(review, data.get("title", ""), data.get("excerpt", "")):
         print(f"- [제목 조건 확인] {x} → 제목·요약에 조건(최대·이하·기준 등)을 붙이거나 조건 없는 값으로")
