@@ -1608,11 +1608,15 @@ class NaverHubTest(unittest.TestCase):
         self.assertAlmostEqual(g({"docs": 400000, "hits": 2, "old": 2}, 5000), 3.699 * 28 / 30 + 0.5, places=2)  # 경쟁 글이 다 낡음
         self.assertGreater(g({"docs": 900, "hits": 3}, 5000), g({"docs": 900, "hits": 3}, 50))  # 같은 경쟁이면 검색량 큰 쪽
         self.assertEqual(g({"docs": 0, "hits": 0}, 9000), 0.0)        # 글 0개(성인어 등)는 가짜 황금
-        self.assertEqual(g({"docs": 400000}, 5000), 0.0)              # 정면 경쟁을 모르는 옛 조회는 0 (다시 조회)
+        self.assertAlmostEqual(g({"docs": 400000}, 5000), 3.699 * (5000 / 400000) / 0.3, places=3)  # 정면 경쟁 모르면 표준 황금지수만
+        self.assertAlmostEqual(g({"docs": 1000, "hits": 25, "old": 0}, 5000), 3.699, places=2)   # 황금지수 5(≥0.3) → 둘 중 좋은 쪽
+        self.assertEqual(h.gold_label({"docs": 600000, "hits": 25}, 5000), "포화")             # 둘 다 나쁠 때만 포화 (지수 0.008·경쟁 25)
+        self.assertEqual(h.gold_label({"docs": 400000, "hits": 25}, 5000), "보통")             # 지수 0.0125 는 포화 아님
+        self.assertEqual(h.gold_label({"docs": 10000, "hits": 25}, 5000), "황금")              # 황금지수 0.5 → 황금
         self.assertEqual(h.gold_label({"docs": 5000, "hits": 2}, 1000), "황금")
         self.assertEqual(h.gold_label({"docs": 5000, "hits": 3}, 1000), "좋음")
-        self.assertEqual(h.gold_label({"docs": 5000, "hits": 9}, 1000), "보통")
-        self.assertEqual(h.gold_label({"docs": 5000, "hits": 25}, 1000), "포화")
+        self.assertEqual(h.gold_label({"docs": 50000, "hits": 9}, 1000), "보통")
+        self.assertEqual(h.gold_label({"docs": 5000, "hits": 25}, 1000), "좋음")   # 정면 경쟁은 많아도 황금지수 0.2
         self.assertEqual(h.gold_label({"docs": 5, "hits": 0}, 1000), "확인 필요(글 거의 없음)")
         for product in ("스케쳐스윈터부츠", "아크테릭스세륨후디", "카시오F91W", "캐나다구스롯지"):  # 11/5 첫 조회에서 황금으로 올라온 상품명
             self.assertFalse(h.is_info(product), product)
@@ -1626,9 +1630,9 @@ class NaverHubTest(unittest.TestCase):
         gs = 3 * (1 - 6 / 30) + 0.5 * 3 / 6
         self.assertAlmostEqual(h.signal_score(sig, 1000, 12), 2 * gs + 1.0)    # 황금 점수×2 + 다음 달 성수기
         self.assertAlmostEqual(h.signal_score(sig, 1000, 12, "홈택스 로그인"), 1.0)   # 사이트 찾아가는 검색은 황금 가점 없음
-        self.assertAlmostEqual(h.signal_score({"docs": 50000, "hits": 30, "old": 0, "low": "7"}, 1000, 7), -0.5)
+        self.assertAlmostEqual(h.signal_score({"docs": 50000, "hits": 30, "old": 0, "low": "7"}, 1000, 7), 2 * 3 * (0.02 / 0.3) - 0.5)  # 지수 0.02·경쟁 30 → 지수 쪽만
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
-        self.assertEqual(h.describe(sig, 1000), f"좋음 {gs:.1f} / 성수기 1·2월 / 상위 30개 중 정면 경쟁 6개(1년 넘은 글 3개)")
+        self.assertEqual(h.describe(sig, 1000), f"좋음 {gs:.1f} / 성수기 1·2월 / 황금지수 0.02(검색 1,000/글 50,000) / 상위 30개 중 정면 경쟁 6개(1년 넘은 글 3개)")
 
     def test_daily_limit_per_kind(self):
         import datetime as dt
@@ -1677,10 +1681,10 @@ class NaverHubTest(unittest.TestCase):
             msg = h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=("i", "k"))
         self.assertEqual(sorted(saved_batches[0]), ["근로장려금 신청", "연말정산 계산기"])  # 돈·계산기 먼저, 캠핑은 다음 날, 로그인은 안 봄
         self.assertIn("황금 1개", msg)                                       # 연말정산 계산기: 검색 1회당 0.2개
-        self.assertIn("연말정산계산기 3.6(검색 5,000/정면 경쟁 1개)", msg)
+        self.assertIn("연말정산계산기 3.7(검색 5,000/정면 경쟁 1개)", msg)   # 황금지수 5 → 만점
         got = {c["keyword"]: c for c in select_keyword.ranked_candidates(conn, settings, limit=10)}
         self.assertIn("연말정산 계산기", got)                                # 오늘 수집분이 아니어도 황금이면 후보
-        self.assertTrue(got["연말정산 계산기"]["naver"].startswith("황금 3.6"))
+        self.assertTrue(got["연말정산 계산기"]["naver"].startswith("황금 3.7"))
         self.assertNotIn("캠핑 준비물", got)                                 # 오늘 수집분도 황금도 아님
         self.assertIn("키 없음", h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=()))
 
@@ -1697,7 +1701,7 @@ class NaverHubTest(unittest.TestCase):
         left = {r[0] for r in conn.execute("SELECT norm FROM keywords")}
         self.assertIn("육아휴직급여", left)               # 오래됐어도 황금·좋음은 남김
         self.assertNotIn("캠핑준비물", left)
-        self.assertIn("hits IS NOT NULL AND hits <= ?", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("(n.hits <= ? OR k.total >= n.docs * ?)", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
 
     def test_blog_totals_saves_chunks_and_stops_on_429(self):
         import datetime as dt

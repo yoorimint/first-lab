@@ -40,15 +40,16 @@ GOLD_HEAD_MIN = 1000    # 황금·좋음(상위 30개 중 정면 경쟁 8개 이
 
 def _modifier_heads(conn, today: str, limit_heads: int) -> list[str]:
     """롱테일 조합을 만들 큰 키워드: 황금·좋음 키워드 먼저(그 주변 롱테일도 글이 적을 가능성), 다음 돈·계산기 주제, 검색량 순."""
-    from .naver_hub import GOOD_HITS, load
+    from .naver_hub import GOOD_HITS, GOOD_INDEX, load
     from .select_keyword import topic_weight
     load(conn)  # naver_signals 표 준비
     rows = conn.execute(
-        "SELECT k.keyword, k.norm, k.total, n.hits FROM keywords k LEFT JOIN naver_signals n ON n.norm = k.norm"
+        "SELECT k.keyword, k.norm, k.total, n.hits, n.docs FROM keywords k LEFT JOIN naver_signals n ON n.norm = k.norm"
         " WHERE k.mod_done=0 AND k.status NOT IN ('rejected','excluded') AND ("
-        " (k.last_checked=? AND k.total>=?) OR (n.hits IS NOT NULL AND n.hits <= ? AND k.total>=?))",
-        (today, HEAD_MIN_VOLUME, GOOD_HITS, GOLD_HEAD_MIN)).fetchall()
-    rows = sorted(rows, key=lambda r: (r["hits"] is not None and r["hits"] <= GOOD_HITS, topic_weight(r["norm"]), r["total"]),
+        " (k.last_checked=? AND k.total>=?) OR (n.docs IS NOT NULL AND (n.hits <= ? OR k.total >= n.docs * ?) AND k.total>=?))",
+        (today, HEAD_MIN_VOLUME, GOOD_HITS, GOOD_INDEX, GOLD_HEAD_MIN)).fetchall()
+    rows = sorted(rows, key=lambda r: (r["docs"] is not None and ((r["hits"] is not None and r["hits"] <= GOOD_HITS) or r["total"] >= r["docs"] * GOOD_INDEX),
+                                       topic_weight(r["norm"]), r["total"]),
                   reverse=True)
     return [r["keyword"] for r in rows[:limit_heads]]
 
@@ -107,12 +108,13 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
 
         # 3) 정리: 오래된 후보 삭제 (쓴 것·부적합·제외 기록은 보관)
         cutoff = (datetime.now() - timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
-        from .naver_hub import GOOD_HITS, load
+        from .naver_hub import GOOD_HITS, GOOD_INDEX, load
         load(conn)
         stats["pruned"] = conn.execute(  # 황금·좋음(검색 1회당 글 1개 미만)으로 확인된 키워드는 오래돼도 남김 (글감 후보)
             "DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ? AND norm NOT IN ("
-            " SELECT norm FROM naver_signals WHERE hits IS NOT NULL AND hits <= ?)",
-            (cutoff, GOOD_HITS)).rowcount
+            " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm"
+            " WHERE n.docs IS NOT NULL AND (n.hits <= ? OR k.total >= n.docs * ?))",
+            (cutoff, GOOD_HITS, GOOD_INDEX)).rowcount
         conn.commit()
         info = summary(conn)
     return {**stats, **info}

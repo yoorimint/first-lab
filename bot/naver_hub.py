@@ -38,13 +38,16 @@ CHECK_TOP = 60               # 성수기를 볼 상위 후보 수 (+ 그 대표 
 REFRESH_DAYS = 30            # 같은 키워드는 이 기간 지나야 다시 조회
 TREND_MONTHS = 24
 PEAK, LOW = 0.8, 0.4         # 월평균이 최고 달의 80% 이상이면 성수기, 40% 이하면 비수기
-# 황금 점수 = log10(월 검색량) × (1 − 정면 경쟁 글 수 ÷ SAMPLE) + 낡은 경쟁 가점 — '검색은 어느 정도 있는데 노리는 글은 적은 것'.
-#   정면 경쟁 글 = 네이버 블로그 검색 상위 SAMPLE 개 중 제목에 키워드가 그대로 든 글 (실제로 이겨야 할 상대를 직접 셈).
-#   전체 문서 수는 쓰지 않음: 네이버는 단어가 모두 든 글을 세서 붙여 쓴 롱테일을 부풀림 ('주휴수당계산' 수십만, 11/5 확인),
-#   상위 비율을 전체 수에 곱해 추정해도 관련도순이라 상위에 일치 글이 몰려 부풀림이 남음 (11/5 운영자 질문에 다시 검토).
-#   예) 검색 5,000·정면 경쟁 2개 → 3.4 / 검색 5,000·경쟁 25개 → 0.6
+# 황금 점수 = log10(월 검색량) × max(표준 황금지수 쪽, 정면 경쟁 쪽) + 낡은 경쟁 가점 — '검색은 어느 정도 있는데 글은 적은 것'.
+#   ① 표준 황금지수 = 검색량 ÷ 네이버 블로그 문서 수 (한국 키워드 도구들의 방식) → min(지수 ÷ 0.3, 1)
+#      약점: 네이버 문서 수는 단어가 모두 든 글을 세서 붙여 쓴 롱테일을 부풀림 ('주휴수당계산' 수십만, 11/5) → 황금을 놓침
+#   ② 정면 경쟁 = 네이버 상위 SAMPLE 개 중 제목에 키워드가 그대로 든 글 수 (해외 KGR 의 'allintitle' 과 같은 생각) → 1 − 수 ÷ 30
+#      약점: 같은 뜻을 다른 말로 쓴 제목은 못 셈 → 경쟁을 낮게 볼 수 있음
+#   둘이 서로 약점을 메워서 하나라도 기회면 인정 (11/5 운영자 '공부하고 와라' → 업계 방식 조사 후 결정).
+#   12월 서치콘솔 노출·클릭으로 어느 쪽이 더 잘 맞혔는지 비교해 비중 조정 (automation/operator-notes.md).
 GOLD_WEIGHT = 2.0            # 글감 점수에 더하는 배수 (운영자 지시: 황금 점수 높은 것부터)
 GOLD_HITS, GOOD_HITS, SAT_HITS = 2, 8, 25  # 상위 SAMPLE 개 중 정면 경쟁 글 수: 2개 이하 황금, 8개 이하 좋음, 25개 이상 포화
+GOLD_INDEX, GOOD_INDEX, SAT_INDEX = 0.3, 0.1, 0.01  # 표준 황금지수(검색량 ÷ 문서 수): 0.3 이상 황금(키워드파인더 '×100 ≥ 30'), 0.1 이상 좋음
 OLD_DAYS, OLD_BONUS = 365, 0.5  # 정면 경쟁 글이 1년 넘게 낡았으면 최신 기준 글이 이길 여지 → 가점(낡은 비율 × 0.5)
 FEW_DOCS = 10                # 글이 이보다 적으면 검색 도구가 만든 어색한 조합일 수도 → '확인 필요' 표시 (점수는 그대로)
 # 사이트를 찾아가는 검색: 검색량은 커도 사람들이 공식 사이트로 바로 가서 글을 안 읽음 → 황금 찾기·가점에서 뺌
@@ -190,26 +193,37 @@ def per_search(sig: dict | None, total: int) -> float | None:
     return sig["docs"] / total
 
 
+def gold_index(sig: dict | None, total: int) -> float | None:
+    """표준 황금지수 = 검색량 ÷ 블로그 문서 수 (클수록 좋음)."""
+    if not sig or sig.get("docs") is None or total <= 0:
+        return None
+    return total / max(sig["docs"], 1)
+
+
 def gold_score(sig: dict | None, total: int) -> float:
-    """황금 점수 = log10(검색량) × (1 − 정면 경쟁 ÷ SAMPLE) + 낡은 경쟁 가점. 정면 경쟁을 모르면 0 (다시 조회 대상)."""
-    if not sig or sig.get("hits") is None or total <= 0 or (sig.get("docs") or 0) < FEW_DOCS:
+    """황금 점수 = log10(검색량) × max(min(황금지수 ÷ 0.3, 1), 1 − 정면 경쟁 ÷ 30) + 낡은 경쟁 가점."""
+    if not sig or sig.get("docs") is None or total <= 0 or sig["docs"] < FEW_DOCS:
         return 0.0  # 글이 거의 없으면(성인어·어색한 조합 등 네이버가 0으로 보이는 말) 가점 안 줌 — 가짜 황금 방지
-    hits = min(sig["hits"], SAMPLE)
+    by_index = min(gold_index(sig, total) / GOLD_INDEX, 1.0)
+    hits = sig.get("hits")
+    by_title = 1 - min(hits, SAMPLE) / SAMPLE if hits is not None else 0.0
     bonus = OLD_BONUS * (sig.get("old") or 0) / hits if hits else 0.0
-    return math.log10(max(total, 1)) * (1 - hits / SAMPLE) + bonus
+    return math.log10(max(total, 1)) * max(by_index, by_title) + bonus
 
 
 def gold_label(sig: dict | None, total: int) -> str:
-    if not sig or sig.get("hits") is None:
+    """둘 중 더 좋은 쪽 기준 등급. 포화는 둘 다 나쁠 때만."""
+    index = gold_index(sig, total)
+    if index is None:
         return ""
-    if (sig.get("docs") or 0) < FEW_DOCS:
+    if sig["docs"] < FEW_DOCS:
         return "확인 필요(글 거의 없음)"
-    hits = sig["hits"]
-    if hits <= GOLD_HITS:
+    hits = sig.get("hits")
+    if index >= GOLD_INDEX or (hits is not None and hits <= GOLD_HITS):
         return "황금"
-    if hits <= GOOD_HITS:
+    if index >= GOOD_INDEX or (hits is not None and hits <= GOOD_HITS):
         return "좋음"
-    return "포화" if hits >= SAT_HITS else "보통"
+    return "포화" if index < SAT_INDEX and (hits is None or hits >= SAT_HITS) else "보통"
 
 
 def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") -> float:
@@ -236,6 +250,9 @@ def describe(sig: dict | None, total: int) -> str:
         parts.append(f"{label} {gold_score(sig, total):.1f}")
     if sig.get("peak"):
         parts.append(f"성수기 {'·'.join(sig['peak'].split(','))}월")
+    index = gold_index(sig, total)
+    if index is not None:
+        parts.append(f"황금지수 {index:.2f}(검색 {total:,}/글 {sig['docs']:,})")
     if sig.get("hits") is not None:
         parts.append(f"상위 {SAMPLE}개 중 정면 경쟁 {sig['hits']}개" + (f"(1년 넘은 글 {sig['old']}개)" if sig.get("old") else ""))
     return " / ".join(parts)

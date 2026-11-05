@@ -120,7 +120,7 @@ fi
 
 # 황금 키워드 첫 조회 (11/5 운영자 지시: 무료인 동안 하루 한도까지 키워드 창고 전체를 훑음 — 다음부터는 매일 키워드 수집 끝에 자동).
 # 2만 회라 10분 넘게 걸려서 배포를 막지 않게 따로 돌린다 (결과는 봇 기록·/var/lib/first-lab/bot/golden-first.log)
-GOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-golden4.done  # 4: 정면 경쟁(상위 30개 제목 일치 수) 방식으로 다시 (대기 글 포함)
+GOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-golden5.done  # 5: 표준 황금지수 + 정면 경쟁 둘 다 (대기 글 포함)
 if [ ! -f "$GOLD_MARK" ] && grep -q '^NAVER_HUB_ID=' "$SECRETS" && ! pgrep -f "bot.naver_hub --daily" >/dev/null; then
   log "황금 키워드 첫 조회 시작 (따로 실행)"
   touch "$GOLD_MARK"
