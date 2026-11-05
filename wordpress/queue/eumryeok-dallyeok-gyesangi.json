@@ -1,0 +1,441 @@
+{
+ "title": "음력 달력 계산기: 2026 설날 2월 17일·추석 9월 25일",
+ "excerpt": "양력↔음력을 바로 바꾸는 음력 달력 계산기예요. 2026년 설날은 양력 2월 17일, 추석은 9월 25일. 윤달·음력 생일·간지까지 정리했어요.",
+ "content_html": "<p>양력 날짜를 음력으로, 음력 날짜를 양력으로 바꾸려면 아래 계산기에 날짜만 넣으면 돼요. 2026년은 음력 1월 1일(설날)이 양력 2월 17일, 음력 8월 15일(추석)이 양력 9월 25일이에요. 윤달이 낀 해는 같은 음력 날짜가 평달·윤달 두 번 있으니 꼭 둘 중 하나를 골라야 해요.</p>\n<p>[firstlab_calc id=\"lunar-calendar\"]</p>\n<h2>음력 달력 계산기 쓰는 법</h2>\n<ol>\n<li>바꾸는 방향을 고릅니다: '양력 → 음력' 또는 '음력 → 양력'.</li>\n<li>양력은 날짜 칸에, 음력은 연도·월·일 칸에 넣어요. 음력 날짜가 윤달이면 '윤달'을 골라요.</li>\n<li>결과에서 바꾼 날짜와 요일, 그 달이 29일까지인지 30일까지인지, 그해 간지·띠, 그날 일진을 봐요.</li>\n<li>결과 표 아래쪽에는 같은 음력 월·일(평달)이 올해부터 3년 동안 양력 며칠인지 나와요. 음력 생일·제사 날짜를 달력에 미리 적을 때 편해요.</li>\n</ol>\n<p>계산 범위는 양력 1900년 1월 31일부터 2050년 1월 22일까지(음력 1900~2049년)예요. 음력 달 길이와 윤달은 한국천문연구원 음양력 변환 결과와 맞춰 봤어요.</p>\n<h2>계산 예시: 음력 생일의 올해 양력 날짜</h2>\n<p>양력 1990년 5월 15일에 태어났다면 음력으로는 1990년 4월 21일이에요. 음력 4월 21일을 해마다 양력으로 바꾸면 이렇게 달라져요.</p>\n<table>\n<thead><tr><th>음력 날짜</th><th>양력 날짜</th></tr></thead>\n<tbody>\n<tr><td>2026년 4월 21일</td><td>6월 6일 (토)</td></tr>\n<tr><td>2027년 4월 21일</td><td>5월 26일 (수)</td></tr>\n<tr><td>2028년 4월 21일</td><td>5월 15일 (월)</td></tr>\n</tbody>\n</table>\n<p>음력 한 해가 양력보다 짧아서 같은 음력 날짜는 대부분 해마다 양력으로 열흘 남짓 앞당겨지고, 윤달이 낀 해를 지나면 다시 뒤로 밀려요.</p>\n<h2>2026·2027년 음력 명절 양력 날짜</h2>\n<table>\n<thead><tr><th>명절 (음력)</th><th>2026년</th><th>2027년</th></tr></thead>\n<tbody>\n<tr><td>설 연휴 (12월 말일~1월 2일)</td><td>2월 16일~18일 (월~수)</td><td>2월 6일~8일 (토~월)</td></tr>\n<tr><td>부처님 오신 날 (4월 8일)</td><td>5월 24일 (일)</td><td>5월 13일 (목)</td></tr>\n<tr><td>추석 연휴 (8월 14~16일)</td><td>9월 24일~26일 (목~토)</td><td>9월 14일~16일 (화~목)</td></tr>\n</tbody>\n</table>\n<p>설날 전날은 음력 12월의 마지막 날이라, 12월이 29일까지인 해는 29일, 30일까지인 해는 30일이에요. 대체공휴일 규정상 부처님 오신 날은 토·일요일과 겹치면, 설·추석 연휴는 일요일과 겹치면 그다음 첫 평일(공휴일이 아닌 날)이 대체공휴일이에요. 그래서 2026년은 5월 25일(월), 2027년은 설날(2월 7일)이 일요일이라 2월 9일(화)이 대체공휴일이에요. 2026년 추석 연휴 마지막 날은 토요일이지만 설·추석은 토요일과 겹쳐도 대체공휴일이 없어요.</p>\n<h2>윤달: 같은 음력 날짜가 두 번인 해</h2>\n<p>음력은 달이 차고 기우는 주기로 한 달을 정해서, 12달이 양력 1년보다 열흘쯤 짧아요. 이 차이가 쌓이면 한 달을 더 넣는데 이 달이 윤달이에요. 윤달은 바로 앞 평달과 같은 이름을 써요.</p>\n<ul>\n<li>2025년 윤6월: 양력 7월 25일~8월 22일. 음력 2025년 6월 1일은 평달이면 양력 6월 25일, 윤달이면 7월 25일이에요.</li>\n<li>다음 윤달: 2028년 윤5월(양력 6월 23일부터), 2031년 윤3월, 2033년 윤11월이에요.</li>\n</ul>\n<p>윤달이 없는 해는 354일이나 355일, 윤달이 있는 해는 383~385일이에요 (음력 1900~2049년 기준).</p>\n<h2>음력 30일 생일은 없는 해도 있어요</h2>\n<p>음력 한 달은 29일(작은달) 아니면 30일(큰달)이고, 같은 달이라도 해마다 길이가 바뀌어요. 예를 들어 음력 6월 30일은 2026년에는 양력 8월 12일이지만, 2027년과 2028년에는 6월이 29일까지라 그 날짜가 없어요. 계산기의 '앞으로 3년' 표에 '없음'으로 나오면 그해엔 29일로 할지 다음 날(7월 1일)로 할지 가족끼리 미리 정해 두면 편해요.</p>\n<h2>띠와 간지는 음력 설 기준</h2>\n<p>2026년은 병오(丙午)년 말띠, 2027년은 정미(丁未)년 양띠예요. 계산기의 간지·띠는 음력 해 기준이라 양력 1월~설 전 날짜는 앞 해로 나와요. 예를 들어 양력 2026년 1월 20일은 음력 2025년 12월 2일이라 을사(乙巳)년 뱀띠예요. 사주처럼 입춘으로 해를 나누는 방식은 결과가 다를 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>윤년과 윤달은 같은 건가요?</h3>\n<p>아니에요. 윤년은 양력(그레고리력)에서 2월 29일을 더해 1년이 366일이 되는 해고, 윤달은 음력에서 한 달을 더 넣는 거예요.</p>\n<h3>음력 날짜는 누가 정하나요?</h3>\n<p>천문법에 따라 날짜는 양력을 기준으로 하고 음력을 함께 쓸 수 있어요. 우주항공청장이 공휴일·24절기 등을 표기한 월력요항을 관보에 싣고, 음양력 변환은 한국천문연구원 누리집(astro.kasi.re.kr)의 음양력 변환 계산에서 할 수 있어요.</p>\n<h3>1900년 이전이나 2050년 날짜도 바꿀 수 있나요?</h3>\n<p>이 계산기는 음력 1900~2049년까지만 계산해요. 1900년 이전 날짜나 2050년 날짜는 한국천문연구원 음양력 변환에서 바꿔 봐요. 그곳도 양력 2050년 12월 31일까지만 돼요.</p>\n",
+ "tags": [
+  "음력 달력",
+  "양력 음력 변환",
+  "윤달",
+  "음력 생일"
+ ],
+ "category": "생활정보",
+ "images": [
+  {
+   "prompt": "a full moon rising over a quiet traditional Korean hanok village rooftops at dusk",
+   "alt": "해 질 녘 한옥 마을 지붕 위로 떠오르는 보름달"
+  }
+ ],
+ "keyword": "음력달력계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "2026년 설날(음력 1월 1일)은 양력 2월 17일",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=01&dd=01",
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 추석(음력 8월 15일)은 양력 9월 25일",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=08&dd=15",
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "윤달이 낀 해는 같은 음력 날짜가 평달·윤달 두 번 있음 (음력 2025년 6월 1일 두 결과)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2025&mm=06&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기는 양력→음력·음력→양력 방향을 고르고, 윤달을 고를 수 있음",
+   "urls": [
+    "https://astro.kasi.re.kr/life/pageView/8"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "결과에 날짜·요일, 그 달 29일/30일, 간지·띠, 일진, 같은 음력 월·일의 3년 양력 날짜가 나옴",
+   "urls": [
+    "https://astro.kasi.re.kr/life/pageView/8"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산 범위 양력 1900년 1월 31일~2050년 1월 22일 (음력 1900~2049년): 음력 1900-01-01 = 1900-01-31, 음력 2049-12-29 = 2050-01-22",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=1900&mm=01&dd=01",
+    "https://astro.kasi.re.kr/life/solc?yyyy=2050&mm=01&dd=22"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 달 길이와 윤달은 한국천문연구원 음양력 변환 결과와 맞춰 봄",
+   "urls": [
+    "https://astro.kasi.re.kr/life/pageView/8"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "양력 1990년 5월 15일 = 음력 1990년 4월 21일",
+   "urls": [
+    "https://astro.kasi.re.kr/life/solc?yyyy=1990&mm=05&dd=15"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 2026년 4월 21일 = 양력 6월 6일 (토)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=04&dd=21"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 2027년 4월 21일 = 양력 5월 26일 (수)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=04&dd=21"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 2028년 4월 21일 = 양력 5월 15일 (월)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2028&mm=04&dd=21"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "같은 음력 날짜는 대부분 해마다 양력으로 열흘 남짓 앞당겨지고 윤달 해를 지나면 뒤로 밀림",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=04&dd=21",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=04&dd=21",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2028&mm=04&dd=21"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "설 연휴는 음력 12월 말일·1월 1일·2일 (관공서의 공휴일에 관한 규정 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관공서의공휴일에관한규정"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 설 연휴 2월 16일~18일 (월~수)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=01&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 설 연휴 2월 6일~8일 (토~월)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2027",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=12&dd=30"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "부처님 오신 날은 음력 4월 8일 (관공서의 공휴일에 관한 규정 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관공서의공휴일에관한규정"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 부처님 오신 날 5월 24일 (일)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=04&dd=08"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 부처님 오신 날 5월 13일 (목)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2027",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=04&dd=08"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추석 연휴는 음력 8월 14~16일 (관공서의 공휴일에 관한 규정 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관공서의공휴일에관한규정"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 추석 연휴 9월 24일~26일 (목~토)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 추석 연휴 9월 14일~16일 (화~목)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2027",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=08&dd=15"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "설날 전날은 음력 12월 마지막 날이라 29일 또는 30일 (음력 2025년 12월 29일까지, 2026년 12월 30일까지)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/solc?yyyy=2026&mm=02&dd=16",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=12&dd=30"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "부처님 오신 날은 토·일요일, 설·추석은 일요일과 겹치면 그다음 첫 비공휴일이 대체공휴일 (관공서의 공휴일에 관한 규정 제3조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관공서의공휴일에관한규정"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 부처님 오신 날 대체공휴일 5월 25일 (월)",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 설날 2월 7일 일요일 → 2월 9일 (화) 대체공휴일",
+   "urls": [
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2027"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 추석 연휴 마지막 날 토요일이어도 대체공휴일 없음 (관공서의 공휴일에 관한 규정 제3조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관공서의공휴일에관한규정",
+    "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2026"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 12달은 양력 1년보다 열흘쯤 짧음 (평년 354·355일)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=01&dd=01",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=01&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "윤달은 바로 앞 평달과 같은 이름 (6월 다음 윤6월)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2025&mm=06&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2025년 윤6월은 양력 7월 25일~8월 22일",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2025&mm=06&dd=01",
+    "https://astro.kasi.re.kr/life/solc?yyyy=2025&mm=08&dd=22"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 2025년 6월 1일은 평달 양력 6월 25일, 윤달 7월 25일",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2025&mm=06&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "다음 윤달 2028년 윤5월 (양력 6월 23일부터)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2028&mm=05&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "그다음 윤달 2031년 윤3월",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2031&mm=03&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "그다음 윤달 2033년 윤11월",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2033&mm=11&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "윤달 없는 해 354·355일, 있는 해 383~385일 (음력 1900~2049년)",
+   "urls": [
+    "https://astro.kasi.re.kr/life/pageView/8"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 한 달은 29일 또는 30일이고 같은 달도 해마다 길이가 바뀜",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=06&dd=30",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=06&dd=30"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "음력 2026년 6월 30일 = 양력 8월 12일",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=06&dd=30"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027·2028년 음력 6월은 29일까지라 6월 30일이 없음",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=06&dd=29",
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2028&mm=06&dd=29"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 병오(丙午)년 말띠",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2026&mm=01&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 정미(丁未)년 양띠",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc?yyyy=2027&mm=01&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "양력 2026년 1월 20일 = 음력 2025년 12월 2일, 을사(乙巳)년 뱀띠",
+   "urls": [
+    "https://astro.kasi.re.kr/life/solc?yyyy=2026&mm=01&dd=20"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "윤년은 그레고리력에서 2월 29일을 더해 366일이 되는 해 (천문법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/천문법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "날짜는 양력 기준이고 음력을 함께 쓸 수 있음 (천문법 제5조)",
+   "urls": [
+    "https://www.law.go.kr/법령/천문법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "우주항공청장이 공휴일·24절기 등을 표기한 월력요항을 관보에 게재 (천문법 제5조)",
+   "urls": [
+    "https://www.law.go.kr/법령/천문법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "이 계산기는 음력 1900~2049년만 계산",
+   "urls": [
+    "https://astro.kasi.re.kr/life/pageView/8"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "24절기는 양력 날짜로 거의 일정",
+   "urls": [
+    "https://www.law.go.kr/법령/천문법"
+   ],
+   "verdict": "확인불가",
+   "action": "삭제"
+  },
+  {
+   "claim": "음양력 변환은 한국천문연구원 누리집(astro.kasi.re.kr)의 음양력 변환 계산에서 할 수 있음",
+   "urls": [
+    "https://astro.kasi.re.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "1900년 이전·2050년 날짜는 한국천문연구원 음양력 변환에서, 양력 2050년 12월 31일까지",
+   "urls": [
+    "https://astro.kasi.re.kr/life/lunc/getMaxDate",
+    "https://astro.kasi.re.kr/life/solc?yyyy=2050&mm=12&dd=31",
+    "https://astro.kasi.re.kr/life/solc?yyyy=1850&mm=03&dd=01"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "계산기 결과 표 아래쪽에 같은 음력 월·일(평달)의 올해부터 3년 양력 날짜",
+   "urls": [
+    "https://astro.kasi.re.kr/life/pageView/8"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  }
+ ],
+ "sources": [
+  {
+   "name": "한국천문연구원 음양력 변환 계산",
+   "url": "https://astro.kasi.re.kr/life/pageView/8"
+  },
+  {
+   "name": "한국천문연구원 2027년 월력요항",
+   "url": "https://astro.kasi.re.kr/kor/life/post/calendarData?search_year=2027"
+  },
+  {
+   "name": "국가법령정보센터 관공서의 공휴일에 관한 규정",
+   "url": "https://www.law.go.kr/법령/관공서의공휴일에관한규정"
+  }
+ ]
+}
