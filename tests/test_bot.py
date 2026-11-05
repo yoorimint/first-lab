@@ -2686,6 +2686,13 @@ class ExcerptApplyDateTest(unittest.TestCase):
         self.assertEqual(g.excerpt_apply_date("2026년 11월 27일 이후 거짓 신고하면 가산금이 10%에서 40%로 올라요.", body), [])
         self.assertEqual(g.excerpt_apply_date("2026년 11월 27일부터 가산금이 10%에서 40%로 올라요.", "<p>올라요.</p>"), [])
 
+    def test_existing_value_mixed_into_start_date(self):
+        """#857: 요약 '2027년 2월 25일부터 벌점 10점, 범칙금 6만 원' ↔ 본문 '지금도 범칙금 6만 원'."""
+        from bot import condition_gate as g
+        body = "<p>지금도 어기면 범칙금(승용차 6만 원)이 나오는데, 2027년 2월 25일부터는 벌점 10점도 붙어요.</p>"
+        self.assertTrue(g.excerpt_apply_date("2027년 2월 25일부터 벌점 10점, 승용차 범칙금은 6만 원이에요.", body))
+        self.assertEqual(g.excerpt_apply_date("지금도 범칙금 6만 원인데, 2027년 2월 25일부터는 벌점 10점도 붙어요.", body), [])
+
     def test_transition_in_body(self):
         """#832: 요약 '2026년 1월 1일부터 생일 전후 6개월' ↔ 본문 '2026년 전 발급자는 예전 기간 중 하나'."""
         from bot import condition_gate as g
