@@ -104,3 +104,5 @@ calc:year-end-tax
 613 연장근로수당 계산: 월 250만 원·연장 10시간이면 179,425원
 calc:overtime-pay
 calc:lottery-tax
+630 연차 개수 계산기: 1년 미만 11일·1년 15일·최대 25일
+calc:annual-leave

@@ -199,5 +199,141 @@
       "base": "2026-11-05"
     },
     "expect_error": true
+  },
+  {
+    "why": "윤년 2/29 입사, 1년 되기 전날 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2024-02-29",
+      "base": "2025-02-28"
+    },
+    "expect": {
+      "months": 11,
+      "years": 0,
+      "monthly": 11,
+      "current": 0,
+      "total": 11,
+      "next_date": "2025-03-01",
+      "next_days": 15
+    }
+  },
+  {
+    "why": "윤년 2/29 입사, 다음 해 3/1에 15일 (민법 제160조③) (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2024-02-29",
+      "base": "2025-03-01"
+    },
+    "expect": {
+      "months": 12,
+      "years": 1,
+      "monthly": 11,
+      "current": 15,
+      "total": 26,
+      "next_date": "2026-03-01",
+      "next_days": 15
+    }
+  },
+  {
+    "why": "윤년 2/29 입사 4년 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2024-02-29",
+      "base": "2028-02-29"
+    },
+    "expect": {
+      "months": 48,
+      "years": 4,
+      "monthly": 11,
+      "current": 16,
+      "total": 73,
+      "next_date": "2029-03-01",
+      "next_days": 17
+    }
+  },
+  {
+    "why": "5년 하루 전 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2021-11-05",
+      "base": "2026-11-04"
+    },
+    "expect": {
+      "months": 59,
+      "years": 4,
+      "monthly": 11,
+      "current": 16,
+      "total": 73,
+      "next_date": "2026-11-05",
+      "next_days": 17
+    }
+  },
+  {
+    "why": "딱 5년 → 17일 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2021-11-05",
+      "base": "2026-11-05"
+    },
+    "expect": {
+      "months": 60,
+      "years": 5,
+      "monthly": 11,
+      "current": 17,
+      "total": 90,
+      "next_date": "2027-11-05",
+      "next_days": 17
+    }
+  },
+  {
+    "why": "평년 1/29 입사: 2/29가 없어 3/1에 첫 1일 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2023-01-29",
+      "base": "2023-02-28"
+    },
+    "expect": {
+      "months": 0,
+      "years": 0,
+      "monthly": 0,
+      "current": 0,
+      "total": 0,
+      "next_date": "2023-03-01",
+      "next_days": 1
+    }
+  },
+  {
+    "why": "기준일 = 입사일 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2025-01-01",
+      "base": "2025-01-01"
+    },
+    "expect": {
+      "months": 0,
+      "years": 0,
+      "monthly": 0,
+      "current": 0,
+      "total": 0,
+      "next_date": "2025-02-01",
+      "next_days": 1
+    }
+  },
+  {
+    "why": "근로관계가 토요일(1/31)에 끝나면 그날 기준 26일 — 마지막 근무일 1/30(금)을 넣으면 11일로 잘못 나옴 (11/5 검수, 직접 계산)",
+    "boundary": true,
+    "input": {
+      "start": "2025-01-31",
+      "base": "2026-01-31"
+    },
+    "expect": {
+      "months": 12,
+      "years": 1,
+      "monthly": 11,
+      "current": 15,
+      "total": 26,
+      "next_date": "2027-01-31",
+      "next_days": 15
+    }
   }
 ]

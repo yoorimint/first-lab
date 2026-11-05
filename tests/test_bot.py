@@ -1813,6 +1813,19 @@ class RatesTest(unittest.TestCase):
             self.assertIn("키 없음", bok_api.run(dt.date(2026, 11, 28)))
 
 
+class SmallWorkplaceGateTest(unittest.TestCase):
+    """11/5 #613·#630: 근로기준법 가산수당·연차는 4명 이하 미적용인데 요약에 조건이 두 번 빠짐 → 관문이 막음."""
+
+    def test_requires_condition_in_headline(self):
+        from bot.review_gate import _small_workplace
+        review = [{"claim": "연차는 1년 80% 출근 시 15일 (근로기준법 제60조)"}]
+        self.assertTrue(_small_workplace(review, "연차 개수 계산기: 1년 15일 / 연차는 1년 80% 출근하면 15일이에요."))
+        self.assertEqual(_small_workplace(review, "연차 계산기 / 상시 5명 이상 사업장에서 연차는 15일"), [])
+        self.assertEqual(_small_workplace(review, "연차 계산기 / 5인 이상 회사 기준"), [])
+        self.assertEqual(_small_workplace([{"claim": "주휴수당 (근로기준법 제55조)"}], "주휴수당 계산"), [])  # 제55조는 4명 이하도 적용
+        self.assertEqual(_small_workplace([{"claim": "근로기준법 제60조의2"}], "x"), [])
+
+
 class BenefitWatchTest(unittest.TestCase):
     """새로 생긴 혜택 (11/5 운영자: 검색량 없는 새 정책도 먼저 쓰기) — 전국·광역, 개인·가구·소상공인, 안 쓴 것만."""
 

@@ -83,6 +83,21 @@ def min_claims(body_html: str) -> int:
     return max(MIN_CLAIMS, len(text) // CHARS_PER_CLAIM)
 
 
+# 근로기준법 중 상시 4명 이하 사업장에는 적용되지 않는 조문 (시행령 별표1에 없는 근로시간·휴가 조문) — 이 조문을 근거로 한 글은
+# 제목·요약에 '5명(5인) 이상' 조건을 밝혀야 함 (11/5 #613 연장수당·#630 연차 두 번 요약에서 빠짐)
+SMALL_EXCLUDED = {50, 51, 52, 53, 56, 57, 58, 59, 60, 61, 62}
+_LABOR_ARTICLE = re.compile(r"근로기준법\s*제(\d+)조(?!의)")
+_SMALL_WORDS = re.compile(r"[5５]\s*(?:명|인)|다섯\s*명|4\s*(?:명|인)\s*이하")
+
+
+def _small_workplace(review: list[dict], headline: str) -> list[str]:
+    cited = {int(n) for item in review for n in _LABOR_ARTICLE.findall(str(item.get("claim", "")))}
+    hit = sorted(cited & SMALL_EXCLUDED)
+    if hit and not _SMALL_WORDS.search(headline):
+        return [f"근로기준법 제{hit[0]}조는 상시 4명 이하 사업장에 적용되지 않음 — 제목이나 요약에 '상시 5명 이상 사업장' 조건을 적기"]
+    return []
+
+
 def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body_html: str = "") -> list[str]:
     """통과 못 한 이유 목록 (빈 목록이면 통과).
     제목·요약문의 숫자는 독자가 가장 먼저 믿는 값이라, 검수된(맞음) 주장 안에 있어야 한다."""
@@ -97,6 +112,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     if missing:
         out.append(f"제목·요약문 숫자 {', '.join(sorted(missing))} 가 검수된 주장에 없음")
     out += _regional_only(review, f"{title} {excerpt}")
+    out += _small_workplace(review, f"{title} {excerpt}")
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:
             continue  # 완화·삭제: 본문에 단정형으로 남지 않음
