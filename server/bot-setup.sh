@@ -124,6 +124,9 @@ if [ ! -f "$RATES_MARK" ] && grep -q '^BOK_ECOS_KEY=' "$SECRETS"; then
   (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.bok_api --daily) && touch "$RATES_MARK" || echo "금리 첫 저장 실패 (다음 배포 때 다시)"
 fi
 
+# 황금 키워드 집계를 봇 기록에 (호출 없음, 배포마다 — 운영자가 '몇 개 찾았나' 물을 때 바로 답하게)
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.naver_hub --report | cut -c1-300) || true
+
 # 황금 키워드 첫 조회 (11/5 운영자 지시: 무료인 동안 하루 한도까지 키워드 창고 전체를 훑음 — 다음부터는 매일 키워드 수집 끝에 자동).
 # 2만 회라 10분 넘게 걸려서 배포를 막지 않게 따로 돌린다 (결과는 봇 기록·/var/lib/first-lab/bot/golden-first.log)
 GOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-golden6.done  # 6: 황금지수(검색량 ÷ 글 수) 하나로 — 운영자 결정 (대기 글 포함)

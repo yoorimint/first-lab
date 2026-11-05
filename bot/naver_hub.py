@@ -330,9 +330,10 @@ def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
 
     try:
         blog_totals(batch, keys, today, save=save)
-    except LimitReached as e:
-        return f"황금 키워드: 오늘 {saved}개 조회 후 상한 ({e})"
-    return f"황금 키워드: 오늘 {saved}개 조회 (남은 미조회 {max(0, len(fresh) - len(batch)):,}개) / " + golden_report(conn, rows)
+        head = f"황금 키워드: 오늘 {saved}개 조회 (남은 미조회 {max(0, len(fresh) - len(batch)):,}개)"
+    except LimitReached as e:  # 한도에 닿아도 지금까지의 집계는 남김 (11/5: 집계 없이 끝나 '몇 개 찾았나'에 답 못 함)
+        head = f"황금 키워드: 오늘 {saved}개 조회 후 상한 ({e}), 남은 미조회 {max(0, len(fresh) - saved):,}개"
+    return head + " / " + golden_report(conn, rows)
 
 
 def golden_report(conn, rows=None, top_n: int = 5) -> str:
@@ -347,9 +348,10 @@ def golden_report(conn, rows=None, top_n: int = 5) -> str:
             scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], sig["docs"]))
     scored.sort(reverse=True)
     gold = [x for x in scored if x[1] == "황금"]
-    shown = [x for x in scored if x[1] in ("황금", "좋음")]  # '확인 필요(글 거의 없음)'·포화는 목록에서 뺌
+    good = [x for x in scored if x[1] == "좋음"]
+    shown = gold + good  # '확인 필요(글 거의 없음)'·포화는 목록에서 뺌 (황금 먼저, 그 안에서 점수순)
     top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/글 {d:,})" for g, _, n, t, d in shown[:top_n])
-    return f"조회 {len(scored):,}개 중 황금 {len(gold):,}개 — 황금 점수 상위: {top or '없음'}"
+    return f"정보 검색 {len(scored):,}개 중 황금 {len(gold):,}개·좋음 {len(good):,}개 — 상위: {top or '없음'}"
 
 
 def refresh_signals(conn, candidates: list[dict], today: dt.date | None = None, keys=None) -> str:
@@ -458,6 +460,16 @@ def main(argv: list[str]) -> int:
         from .keyword_db import connect
         with connect() as conn:
             msg = refresh_queue(conn)
+        from .state import add_log, load_state, save_state
+        state = load_state()
+        add_log(state, True, msg)
+        save_state(state)
+        print(msg, flush=True)
+        return 0
+    if argv[1:] == ["--report"]:  # 지금까지 조회한 결과 집계만 (호출 없음)
+        from .keyword_db import connect
+        with connect() as conn:
+            msg = "황금 키워드 집계: " + golden_report(conn, top_n=10)
         from .state import add_log, load_state, save_state
         state = load_state()
         add_log(state, True, msg)

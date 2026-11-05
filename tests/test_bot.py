@@ -1677,7 +1677,7 @@ class NaverHubTest(unittest.TestCase):
         with mock.patch.object(h, "GOLD_SCAN", 2), mock.patch.object(h, "blog_totals", side_effect=fake_totals):
             msg = h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=("i", "k"))
         self.assertEqual(sorted(saved_batches[0]), ["근로장려금 신청", "연말정산 계산기"])  # 돈·계산기 먼저, 캠핑은 다음 날, 로그인은 안 봄
-        self.assertIn("황금 1개", msg)                                       # 연말정산 계산기: 검색 1회당 0.2개
+        self.assertIn("황금 1개", msg)                                       # 연말정산 계산기: 황금지수 5
         self.assertIn("연말정산계산기 3.7(검색 5,000/글 1,000)", msg)   # 황금지수 5 → 만점
         got = {c["keyword"]: c for c in select_keyword.ranked_candidates(conn, settings, limit=10)}
         self.assertIn("연말정산 계산기", got)                                # 오늘 수집분이 아니어도 황금이면 후보
