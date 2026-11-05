@@ -2625,6 +2625,13 @@ class AttachmentTextTest(unittest.TestCase):
         self.assertEqual(sc.attachment_text(page, "https://blog.example.com/a", raw_of), "")   # 공공기관만
         self.assertEqual(sc.doc_text(b"not a doc"), "")
 
+    def test_percent_claims_are_checked(self):
+        """비율은 두 자리여도 대조 (11/5 #861 '3자녀 20%·2자녀 10%'가 숫자 주장 0개)."""
+        from bot import source_check as sc
+        self.assertEqual(sc.key_numbers("자녀 3명 이상이면 통행료의 20% (유료도로법 시행령 제8조)"), ["20"])
+        self.assertTrue(sc.has_number("통행료의 100분의 20을 감면", "20"))
+        self.assertEqual(sc.key_numbers("구간 예시: 5,000만 원 × 2.5% × 30/365 = 102,739원"), [])   # 계산식 가정 비율은 빼기
+
     def test_man_unit_numbers(self):
         from bot import source_check as sc
         self.assertTrue(sc.has_number("생계급여 87 만 5533 원", "875533"))

@@ -41,9 +41,15 @@ MAX_NUMBERS = 3        # 숫자가 이보다 많은 주장은 계산 과정 나�
 
 def key_numbers(claim: str) -> list[str]:
     """대조할 숫자: 세 자리 이상(쉼표 뺌) 또는 소수. 계산 결과 주장은 대조하지 않음."""
+    # 비율(20%·10%)은 두 자리여도 대조 — 글의 핵심 숫자인데 빠져서 다자녀 통행료 글(#861)이 '숫자 주장 0개'로 나옴 (11/5).
+    # 법령은 '100분의 20' 으로 쓰지만 has_number 의 분수 표기가 함께 찾음. 비율은 계산 결과가 아니라 규칙 값이라
+    # '3명 이상이면 20%' 처럼 계산 표시('이면')가 있어도 대조한다.
+    pct = {m for m in re.findall(r"(\d+(?:\.\d+)?)\s*(?:%|퍼센트)", claim)}
     if any(m in claim for m in CALC_MARKS):
-        return []
-    nums = sorted(n for n in _numbers(claim) if "." in n or len(n.lstrip("0")) >= 3)
+        if any(m in claim for m in ("=", "×", "재계산", "예시")):
+            return []  # 계산식의 비율은 예시 가정값(예금 금리 2.5% 등)이라 근거 페이지에 없음 — 표본 20개 중 2개 오탐
+        return sorted(pct) if len(pct) <= MAX_NUMBERS else []
+    nums = sorted({n for n in _numbers(claim) if "." in n or len(n.lstrip("0")) >= 3} | pct)
     return nums if len(nums) <= MAX_NUMBERS else []
 
 
