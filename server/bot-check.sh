@@ -38,6 +38,9 @@ else:
 PY
 (cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.naver_hub --diag 2>&1 | tail -1) || true
 tail -2 /var/lib/first-lab/bot/golden-first.log 2>/dev/null | cut -c1-400 || true
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api 2>&1 | tail -1) || true
+# 은행 대출금리 통계(신규취급액 기준) 항목 코드 확인용 — 주택담보·전세·신용 항목만 (연결 뒤 지움)
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api items 121Y006 2>&1 | grep -E "주택담보|전세|신용|가계대출" | head -12) || true
 
 echo -e "\n==> 봇 프로세스"
 systemctl status firstlab-bot.service --no-pager 2>/dev/null | sed -n '1,4p' || true

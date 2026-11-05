@@ -1748,6 +1748,19 @@ class NaverHubTest(unittest.TestCase):
             self.assertEqual(trend.call_args.args[0], ["연말정산 환급"])  # 대표 주제는 이미 받아 둔 것이라 키워드만
 
 
+class BokApiTest(unittest.TestCase):
+    def test_base_rate_latest_and_no_key(self):
+        import datetime as dt
+        from bot import bok_api
+        rows = {"StatisticSearch": {"row": [{"TIME": "20260101", "DATA_VALUE": "2.75"}, {"TIME": "20261015", "DATA_VALUE": "2.5"}]}}
+        with mock.patch.object(bok_api, "_key", return_value="k"), \
+                mock.patch("urllib.request.urlopen", return_value=mock.MagicMock(__enter__=lambda s: s, __exit__=lambda *a: False,
+                                                                                  read=lambda: json.dumps(rows).encode())):
+            self.assertEqual(bok_api.base_rate(dt.date(2026, 11, 5)), ("20261015", 2.5))
+        with mock.patch.object(bok_api, "_key", return_value=""):
+            self.assertIsNone(bok_api.base_rate(dt.date(2026, 11, 5)))   # 키 없으면 영향 없음
+
+
 class BenefitApiTest(unittest.TestCase):
     """혜택 정보 API: 키는 서버에만, 인코딩된 키·원래 키 모두 처리, 통로는 허용한 경로·변수만."""
 
