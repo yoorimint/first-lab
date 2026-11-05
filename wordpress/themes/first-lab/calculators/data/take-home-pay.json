@@ -1,5 +1,5 @@
 {
- "basis_date": "2026-11-05",
+ "basis_date": "2026-11-05", "yearly_checked": 2026,
  "won10_keys": ["pension", "health", "income_tax", "local_tax"],
  "sources": [
   {

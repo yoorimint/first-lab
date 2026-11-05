@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04",
+  "basis_date": "2026-11-04", "yearly": false,
   "sources": [
     {"name": "금융감독원 파인 대출이자계산기", "url": "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"},
     {"name": "한국주택금융공사 월별 상환원리금 안내", "url": "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"}

@@ -1775,6 +1775,31 @@ class NaverHubTest(unittest.TestCase):
             self.assertEqual(trend.call_args.args[0], ["연말정산 환급"])  # 대표 주제는 이미 받아 둔 것이라 키워드만
 
 
+class CalcYearlyTest(unittest.TestCase):
+    """계산기 연초 값 감시 (11/5): 11/15 부터 다음 해 값 확인이 안 된 계산기를 글쓰기 세션에 넘김 (bot/calc_watch.py)."""
+
+    def _dir(self, files):
+        import tempfile
+        d = Path(tempfile.mkdtemp())
+        for name, data in files.items():
+            (d / f"{name}.json").write_text(json.dumps(data), encoding="utf-8")
+        return d
+
+    def test_due_switches_to_next_year_from_nov15(self):
+        import datetime as dt
+        from bot import calc_watch
+        d = self._dir({"a": {"yearly_checked": 2026}, "b": {"yearly": False}, "c": {"yearly_checked": 2027}})
+        self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 11, 14), d)], [])
+        self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 11, 15), d)], ["a"])
+        self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2027, 1, 10), d)], ["a"])  # 해가 바뀌어도 남으면 계속
+
+    def test_real_calculators_declare_yearly(self):
+        from bot import calc_watch
+        for path in calc_watch.DATA_DIR.glob("*.json"):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertTrue(data.get("yearly") is False or isinstance(data.get("yearly_checked"), int), path.name)
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

@@ -4,6 +4,9 @@
  * 계산기 하나 = 파일 3개 (같은 id)
  *   defs/<id>.js    입력 항목 + compute()  → FirstLabCalc.register({...})
  *   data/<id>.json  요율·금액, 기준일(basis_date), 출처(sources)  ← 해마다 바뀌는 값은 여기만 고친다
+ *                   "scheduled": [{"from": "2027-01-01", "values": {키: 새 값}, "source": {"name", "url"}}]
+ *                   = 이미 확정된 다음 값. 그날부터 화면이 자동으로 새 값을 쓴다 (util.dataOn) — 감시 세션 없이 연초를 넘기려고 (11/5)
+ *                   "yearly_checked": 2027 = 연초에 바뀌는 값을 그 해 것으로 확인함 (해마다 안 바뀌는 계산기는 "yearly": false)
  *   tests/<id>.json 검증 사례 (공식 예시·법령 문구 기준)  → node tests/test_calculators.mjs 로 배포 전 검사
  * 본문에는 독립된 줄에 [firstlab_calc id="<id>"] (mu-plugins/first-lab-calculators.php 가 아래 div 로 바꿈)
  *
@@ -45,6 +48,18 @@
     korDate(t) {
       const d = new Date(t);
       return `${d.getUTCFullYear()}년 ${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일`;
+    },
+    /** 그날 적용되는 data: scheduled 중 from <= 날짜인 것의 values 를 덮어쓰고, 기준일·출처도 바꿈 */
+    dataOn(data, iso) {
+      const out = { ...data, sources: [...(data.sources || [])] };
+      const due = (data.scheduled || []).filter((s) => s.from <= iso).sort((a, b) => (a.from < b.from ? -1 : 1));
+      for (const s of due) {
+        Object.assign(out, s.values);
+        if (s.from > out.basis_date) out.basis_date = s.from;
+        if (s.source) out.sources.unshift(s.source);
+      }
+      delete out.scheduled;
+      return out;
     },
     /** 방문자 기기 기준 오늘 'YYYY-MM-DD' */
     todayIso() {
@@ -117,6 +132,7 @@
     const def = defs[box.dataset.calc];
     let data = null;
     try { data = JSON.parse(box.dataset.rates || 'null'); } catch (e) { data = null; }
+    if (data) data = util.dataOn(data, util.todayIso());
     if (!def || !data) {
       box.textContent = '계산기를 불러오지 못했습니다.';
       return;

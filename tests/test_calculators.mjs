@@ -4,6 +4,8 @@
 // 기준선 사례("boundary": true)가 2개 이상 있어야 한다: 공제액·과락 점수·면세점·구간 경계·상한/하한에 딱 맞는 값과
 // 바로 아래/위 값 (11/5 새 계산기 2개 모두 기준선에서 틀림: 평균 59.996 을 60 으로 올려 합격, 공동명의 비율).
 // 잘못된 입력 사례는 "expect_error": true — compute() 가 InputError(화면 안내 문장)를 내야 통과.
+// 연초 값: data 에 "yearly": false 또는 "yearly_checked": <연도> 필수 (bot/calc_watch.py 가 다음 해 확인 안 된 계산기를 글쓰기 세션에 넘김).
+// 미리 넣은 다음 값("scheduled")은 키가 data 에 있어야 하고, 출처와 그 날짜 사례("today": "YYYY-MM-DD")가 있어야 한다.
 // data.links(결과 행의 관련 글 주소)는 대기열 글 키워드(wordpress/queue/*.json)나 고정 페이지(wordpress/pages/*.html) 주소여야 한다.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -57,6 +59,17 @@ for (const id of ids) {
   if (!(data.sources || []).length || data.sources.some((s) => !s.name || !/^https:\/\//.test(s.url || ''))) {
     fail(id, 'data.sources 에 이름과 https 주소가 있는 출처가 필요함');
   }
+  if (data.yearly !== false && !Number.isInteger(data.yearly_checked)) {
+    fail(id, 'data 에 "yearly_checked": <확인한 연도> (해마다 바뀌는 값이 없으면 "yearly": false) 가 필요함 — 연초 값 감시 (bot/calc_watch.py)');
+  }
+  for (const [n, sch] of (data.scheduled || []).entries()) {
+    const where = `data.scheduled[${n}]`;
+    if (!util.parseDate(sch.from) || sch.from <= data.basis_date) fail(id, `${where}.from 이 기준일 뒤의 날짜(YYYY-MM-DD)가 아님`);
+    for (const key of Object.keys(sch.values || {})) if (!(key in data)) fail(id, `${where}.values.${key}: data 에 없는 키 (오타면 새 값이 안 쓰임)`);
+    if (!Object.keys(sch.values || {}).length) fail(id, `${where}.values 가 비어 있음`);
+    if (!sch.source || !sch.source.name || !/^https:\/\//.test(sch.source.url || '')) fail(id, `${where}.source 에 이름과 https 주소가 필요함`);
+    if (!(cases || []).some((c) => (c.today || '') >= sch.from)) fail(id, `${where}: ${sch.from} 부터의 사례("today": "${sch.from}")가 없음`);
+  }
   if (!Array.isArray(cases) || cases.length < MIN_CASES) fail(id, `검증 사례가 ${MIN_CASES}개 이상 필요함`);
   else if (cases.filter((c) => c.boundary === true).length < MIN_BOUNDARY) {
     fail(id, `기준선 사례("boundary": true)가 ${MIN_BOUNDARY}개 이상 필요함 — 공제액·합격 점수·면세점·세율 구간·상한/하한에 딱 맞는 값과 바로 아래/위 값을, 계산기 말고 법령대로 손으로 계산해 넣기`);
@@ -79,12 +92,17 @@ for (const id of ids) {
 
   for (const [i, c] of (cases || []).entries()) {
     let out;
+    const day = c.today || data.basis_date; // 사례 날짜 (없으면 기준일) — 그날 적용되는 값으로 계산 (calc.js util.dataOn)
+    const todayIso = util.todayIso;
+    util.todayIso = () => day;
     try {
-      out = def.compute(c.input, data, util);
+      out = def.compute(c.input, util.dataOn(data, day), util);
     } catch (e) {
       if (c.expect_error === true && e instanceof util.InputError) { checked += 1; continue; }
       fail(id, `사례 ${i + 1} 계산 오류: ${e.message}`);
       continue;
+    } finally {
+      util.todayIso = todayIso;
     }
     if (c.expect_error === true) { fail(id, `사례 ${i + 1} (${c.why}): 잘못된 입력인데 안내 문장(InputError) 없이 계산됨`); continue; }
     // 세금·보험료 징수액은 10원 미만 끝수를 버림 (국고금관리법 제47조①) — data.won10_keys 에 적은 값은 10원 단위여야 함

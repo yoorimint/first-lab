@@ -44,6 +44,8 @@ add_action(
 							static fn( $b ) => ! in_array( $b['key'] ?? '', (array) ( $state['new_benefits_done'] ?? array() ), true ) ) ),
 						// 최신 금리 (한국은행 ECOS, bot/bok_api.py) — 대출·이자 글의 금리 예시는 이 값 기준 (daily-writer.md)
 						'rates'         => $state['rates'] ?? null,
+						// 다음 해 요율·금액 확인이 안 된 계산기 (bot/calc_watch.py, 11/15~) — daily-writer.md 4-2
+						'calc_yearly'   => (array) ( $state['calc_yearly'] ?? array() ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
 						'target_length' => (int) ( $settings['target_length'] ?? 3000 ),
@@ -212,6 +214,7 @@ function firstlab_api_maintenance(): array {
 		'ready_count' => count( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_queue', 'meta_value' => 'ready', 'numberposts' => -1, 'fields' => 'ids' ) ) ),
 		'held_drafts' => $held,
 		'rates'       => $state['rates'] ?? null, // 한국은행 최신 금리
+		'calc_yearly' => $state['calc_yearly'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)
 		'law_watch'   => $state['law_changes'] ?? null, // 법령 감시: 곧 시행될 개정·입법예고(확정 아님) — 감시 세션 확인용
 		// 공개 대기 글 전체 (감시 세션이 외부 검수 안 한 글을 글 번호로 찾음 — automation/unreviewed.py)
 		'ready_posts' => array_map(

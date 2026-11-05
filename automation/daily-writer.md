@@ -97,7 +97,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 이미 있는 계산기(`defs/*.js`)로 되면 새로 만들지 말고 그걸 넣는다.
 - 없으면 새로 만든다 (id 는 영문 소문자-하이픈):
   - `defs/<id>.js`: `car-inspection.js` 와 같은 형식 (입력 항목 + compute). 화면 문구는 본문과 같은 말투.
-  - `data/<id>.json`: 요율·금액은 전부 여기에. `basis_date`(오늘), `sources`(조사한 공식 출처 이름·주소)
+  - `data/<id>.json`: 요율·금액은 전부 여기에. `basis_date`(오늘), `sources`(조사한 공식 출처 이름·주소), `yearly_checked`(올해 — 해마다 바뀌는 값이 없으면 대신 `"yearly": false`)
   - `tests/<id>.json`: 검증 사례 3개 이상. 계산기로 낸 값을 그대로 기대값으로 쓰지 않는다. 기대값 만드는 법은 두 종류:
     - **기관이 정한 값**(요금표·세율·공제·과태료 기준): 공식 기관 계산 예시나 법령 문구로 직접 확인한 값
     - **표준 수학 공식**(대출 상환, 비율·단위 환산 등): 공식을 Python 으로 따로 계산한 값 + 극단값(금리 0%, 1개월 등) + 본문 표의 숫자와 같은지
@@ -107,6 +107,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 기관이 정한 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
   표준 수학 공식은 공식 기관의 계산 예시가 없어도 위 방법으로 검증해 만든다.
 - 본문에 넣는 법: `content_html` 의 계산 예시 근처에 **독립된 줄**로 `<p>[firstlab_calc id="<id>"]</p>`
+- **연초 값**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 글보다 먼저 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 아직 확정 전이면 고치지 않는다.
 - 계산기는 별도 커밋으로 먼저 올린다: `git add wordpress/themes/first-lab/calculators wordpress/pages && git commit -m "계산기: <이름>"`
 
 ## 5. 올리기
