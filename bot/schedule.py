@@ -79,6 +79,9 @@ MAX_FRESH_CHECKS = 3  # 한 번에 공개 직전 확인을 하는 초안 수 (�
 HOLD_META = "_firstlab_hold"  # bot/review_gate.HOLD_META 와 같음 (순환 import 피함)
 
 
+MAX_WAIT_KEEP = 21  # 대기열이 이보다 길면 가장 오래된 글들(넘는 만큼)을 먼저 — 하루 1편 공개면 약 21일 기다린 글
+
+
 def publish_next(now_kst: datetime) -> str | None:
     """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
     ids = ready_drafts()
@@ -89,7 +92,12 @@ def publish_next(now_kst: datetime) -> str | None:
     # → 시즌 중인 글 → 사진이 다 들어간 글 → 오래된 순
     gold = naver_hub.publish_priority({i: texts.get(i, "").split(" ")[0] for i in ids}, now_kst.month)
     rank = {i: seasons.rank(texts.get(i, ""), now_kst.date()) for i in ids}
-    ordered = sorted(ids, key=lambda i: (rank[i] == seasons.OFF, -round(gold.get(i, 0.0), 2), rank[i], _has_pending_images(i)))
+    # 외부 검수를 마친 글을 먼저 (검수 전에 공개되지 않게), 21일 넘게 기다린 글은 황금 점수와 상관없이 먼저 (계속 밀리지 않게) — 11/5 검토
+    from .review_queue import reviewed_ids
+    reviewed = reviewed_ids()
+    old = set(ids[: max(0, len(ids) - MAX_WAIT_KEEP)]) if len(ids) > MAX_WAIT_KEEP else set()
+    ordered = sorted(ids, key=lambda i: (rank[i] == seasons.OFF, i not in reviewed, i not in old,
+                                         -round(gold.get(i, 0.0), 2), rank[i], _has_pending_images(i)))
     held = []
     post_id = None
     for candidate in ordered[:MAX_FRESH_CHECKS]:

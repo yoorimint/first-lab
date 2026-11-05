@@ -39,6 +39,11 @@ def law_effective_since(text: str, since: dt.date, today: dt.date) -> list[str]:
     return sorted({f"{x:%Y.%m.%d}" for x in dates if since < x <= today})
 
 
+def _slug_key(text: str) -> str:
+    """키워드 ↔ 글 주소 비교 (워드프레스는 주소를 소문자로, 띄어쓰기를 '-' 로 바꿈 — 11/5 검토: ITQ자격증조회·HSCODE조회 못 찾음)."""
+    return re.sub(r"[\s-]+", "", text.strip().lower())
+
+
 def _review_from_queue(keyword: str) -> list[dict]:
     """예전 초안(근거 대조에 laws 가 없는 것)은 저장소 큐 파일의 검수 기록에서 근거를 찾는다."""
     for path in QUEUE_DIR.glob("*.json"):
@@ -46,7 +51,7 @@ def _review_from_queue(keyword: str) -> list[dict]:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        if str(data.get("keyword", "")).strip() == keyword and data.get("review"):
+        if _slug_key(str(data.get("keyword", ""))) == _slug_key(keyword) and data.get("review"):
             return data["review"]  # 글 파일에 없으면 근거 기록 파일(type evidence)의 것
     return []
 

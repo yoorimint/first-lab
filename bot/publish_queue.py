@@ -37,6 +37,24 @@ def _marker(path: Path) -> Path:
     return DONE_DIR / f"{path.stem}-{digest}"
 
 
+MAX_FILE_FAILS = 3
+
+
+def _bump_file_fail(path: Path) -> int:
+    """같은 내용의 파일이 실패한 횟수 (완료 표시 파일 옆 .fail)."""
+    fail = _marker(path).with_suffix(".fail")
+    try:
+        n = int(fail.read_text().strip() or 0) + 1
+    except (OSError, ValueError):
+        n = 1
+    try:
+        DONE_DIR.mkdir(parents=True, exist_ok=True)
+        fail.write_text(str(n))
+    except OSError:
+        pass
+    return n
+
+
 def pending() -> list[Path]:
     return [p for p in sorted(QUEUE_DIR.glob("*.json")) if not _marker(p).exists()]
 
@@ -79,6 +97,11 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token))
     if failed:  # 설정 페이지 '검수 보류 초안' 목록에 이유와 함께 보이게
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
+    elif status == "draft" and (data.get("status") == "draft" or (aligned and "제목(확인 필요)" in aligned)):
+        # 관문은 통과했는데 초안으로 남는 글(글쓴이가 draft 로 올림·제목 숫자 확인 필요)도 보류 목록으로 —
+        # 안 그러면 대기열에도 보류에도 없어 12/5 뒤 영영 방치됨 (11/5 검토)
+        why = "제목 숫자가 본문에 없음 (제목·본문 맞추기)" if aligned and "제목(확인 필요)" in aligned else "글쓴이가 초안으로 둠 (핵심 근거 보강 필요)"
+        wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, why)
     if not failed:
         freshness.mark_verified(post_id)  # 공개 직전 확인(bot/freshness.py)의 기준일
     # 근거 링크를 열어 주장 숫자 대조 — 지금은 기록만 (bot/source_check.py)
@@ -197,7 +220,12 @@ def main() -> None:
             msg = f"{label}: {msg}"
             add_log(state, True, msg)
         except Exception as e:  # noqa: BLE001 - 한 파일 실패가 배포를 막지 않게 (다음 배포 때 다시 시도)
-            msg = f"{label} 실패 ({path.name}): {e}"
+            fails = _bump_file_fail(path)
+            if fails >= MAX_FILE_FAILS:  # 다시 해도 안 되는 파일을 배포마다 영원히 돌리지 않게 (11/5 검토)
+                _marker(path).touch()
+                msg = f"{label} 포기 ({path.name}, {fails}번 실패): {e}"
+            else:
+                msg = f"{label} 실패 ({path.name}, {fails}/{MAX_FILE_FAILS}번째): {e}"
             add_log(state, False, msg)
         print(msg, flush=True)
     # 새 글(키워드 사용됨)·후보 제외가 반영됐으니 1분 안에 후보 목록을 새로 만들게 함 (읽기 API 가 옛 후보를 주지 않도록)

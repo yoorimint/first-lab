@@ -123,7 +123,7 @@ function firstlab_api_held_drafts(): array {
 			'meta_key'    => '_firstlab_hold',
 			'orderby'     => 'date',
 			'order'       => 'ASC',
-			'numberposts' => 50, // 쉬는 글(포기·3번 막힘)이 앞을 막지 않게 넉넉히
+			'numberposts' => -1, // 쉬는 글(포기·3번 막힘)이 쌓여도 새 보류 글이 보이게 (11/5 검토)
 		)
 	);
 	// 고쳐도 3번 막혔거나 포기한 글은 30일 동안 빼서 다른 보류 글이 차례를 받게 함 (bot/hold.py TRIES_META, 11/5 '평생 보류로 있나?')

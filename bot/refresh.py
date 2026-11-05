@@ -254,12 +254,36 @@ def apply_direct(data: dict, state: dict) -> str:
         raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음 (확인만 했으면 \"checked\": true)")
     # checked: 재검증해 보니 고칠 게 없음 → 갱신 날짜만 기록 (안 하면 근거 변경 표시가 안 풀려 매일 같은 글이 다시 뽑힘)
     _save(post_id, new_html, title, excerpt)
+    _renew_evidence(post_id, data.get("review"))
     _count_done(state)
     target = state.get("refresh_target") or {}
     if target.get("id") == post_id:
         state.pop("refresh_target", None)
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
     return f"'{title}' - {target.get('why', '')} → 수정 - {str(data.get('changes', ''))[:80]}"
+
+
+def _renew_evidence(post_id: int, review: list | None) -> None:
+    """갱신한 글의 근거 기록을 새로 (11/5 검토: 옛 숫자가 기록에 남아 공개 글 다시 보기가 같은 글을 끝없이 다시 올림).
+    검수 기록을 받았으면 그것으로 다시 대조, 없으면 지금 공식 페이지에 없는 숫자 항목만 기록에서 뺌. 확인한 날도 오늘로."""
+    from . import freshness, source_check
+    save = lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val)  # noqa: E731
+    try:
+        if review:
+            source_check.record(post_id, review, save)
+        else:
+            record = json.loads(wp_cli("post", "meta", "get", str(post_id), source_check.META) or "{}")
+            kept = []
+            for item in record.get("found", []):
+                texts = [t for t in (source_check.fetch(u) for u in item.get("urls", [])) if t]
+                if not texts or all(any(source_check.has_number(t, n) for t in texts) for n in item.get("numbers", [])):
+                    kept.append(item)
+            if len(kept) != len(record.get("found", [])):
+                record["found"] = kept
+                save(str(post_id), source_check.META, json.dumps(record, ensure_ascii=False))
+        freshness.mark_verified(post_id)
+    except Exception:  # noqa: BLE001 - 기록 정리가 실패해도 갱신은 반영됨
+        pass
 
 
 def run_weekly(settings: BotSettings, state: dict) -> list[str]:

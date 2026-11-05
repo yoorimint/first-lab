@@ -12,6 +12,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def _refreshed_ids() -> set[int]:
+    from .settings import wp_cli
+    out = wp_cli("eval", "echo wp_json_encode( array_map( 'intval', get_posts( array( 'post_type' => 'post', 'post_status' => 'any', "
+                         "'numberposts' => -1, 'fields' => 'ids', 'meta_key' => '_firstlab_refreshed' ) ) ) );")
+    return set(json.loads(out or "[]"))
+
+
 def run() -> str:
     sys.path.insert(0, str(ROOT / "automation"))
     from verify_patches import problems  # noqa: E402
@@ -19,8 +26,11 @@ def run() -> str:
     from . import wpbulk
     from .state import add_log, load_state, save_state
     patches = json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8"))
+    bulk = wpbulk.posts()
+    refreshed = _refreshed_ids()
+    # 갱신(refresh)으로 다시 쓴 글은 예전 패치 문구가 없는 게 정상 → 확인에서 뺌 (11/5 검토: 영원히 안 풀리는 항목)
     posts = {int(pid): {"title": p.get("title", ""), "excerpt": p.get("excerpt", ""), "content_html": p.get("content", ""),
-                        "status": p.get("status", "")} for pid, p in wpbulk.posts().items()}
+                        "status": "trash" if int(pid) in refreshed else p.get("status", "")} for pid, p in bulk.items()}
     found = problems(patches, posts)
     state = load_state()
     state["patch_problems"] = found[:20]

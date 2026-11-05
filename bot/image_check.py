@@ -58,8 +58,8 @@ def apply_check(data: dict) -> str:
     elif new_scene:
         s = load_settings()
         try:
+            wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))  # 실패해도 횟수는 올림 (11/5 검토: 끝없이 다시 시도)
             photo.make(post_id, new_scene, (s.cf_account_id, s.cf_api_token))  # 다른 오류면 예외 → 다음 배포 때 다시
-            wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
         except images.QuotaExceeded:
             wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
             # 한도 소진: 사진 채우기 대기로 넘김 (대기 중인 글은 검사 목록에서 빠져 같은 요청이 쌓이지 않음)
@@ -68,6 +68,10 @@ def apply_check(data: dict) -> str:
             return f"글 {post_id} 대표 사진 {'교체' if current else '추가'}: 한도 소진 → 오전 9시 이후 자동"
         return f"글 {post_id} 대표 사진 {'교체' if current else '추가'} → 새 사진 다시 검사"
     if not current and not remove:  # 대표 사진이 없는 글은 검사 끝으로 치지 않음 → 다음 검사 때 add 로 사진을 받게
+        if rounds >= MAX_ROUND:  # 여러 번 해도 사진이 안 생기면 제목 카드로 두고 끝 (11/5 검토: #176 검사 파일 8개)
+            wp_cli("post", "meta", "update", str(post_id), CHECKED_META, "1")
+            return f"글 {post_id} 사진을 {rounds}번 못 넣음 → 제목 카드로 두고 검사 끝"
+        wp_cli("post", "meta", "update", str(post_id), ROUND_META, str(rounds + 1))
         return f"글 {post_id} 대표 사진 없음 → 다음 사진 검사에서 추가"
     wp_cli("post", "meta", "update", str(post_id), CHECKED_META, "1")
     return f"글 {post_id} 사진 검사 끝" + (" (사진 빼고 제목 카드)" if remove else " (이상 없음)")

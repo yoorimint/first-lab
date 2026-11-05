@@ -123,6 +123,9 @@ def _plain(html: str) -> str:
 def numbers_match(short_text: str, content_html: str) -> bool:
     """제목·요약문의 숫자가 모두 본문에 있는지 (검수가 본문만 고쳐 어긋나는 경우를 잡는다).
     연도(2026 등)는 본문에 '올해'처럼 쓰는 경우가 많아 비교에서 뺀다."""
+    # '7가지·4단계' 같은 글 구조 숫자는 관문(review_gate)처럼 뺀다 — 안 빼면 관문은 통과했는데 여기서 초안으로 떨어져
+    # 대기열·보류 어디에도 안 들어가는 글이 생김 (11/5 검토)
+    short_text = re.sub(r"\d+\s*(?:단계|가지)", "", short_text or "")
     short = {n for n in _numbers(short_text) if not re.fullmatch(r"(19|20)\d\d", n)}
     return short <= _numbers(_plain(content_html))
 

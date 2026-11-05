@@ -2219,6 +2219,40 @@ class StateThreeWayTest(unittest.TestCase):
             self.assertEqual(st.load_state()["log"], [])
 
 
+class PipelineReviewFixesTest(unittest.TestCase):
+    """11/5 전체 검토에서 찾은 공개 단계 결함 (한 번 고친 뒤 다시 안 생기게)."""
+
+    def test_structure_numbers_ignored_in_title_check(self):
+        from bot.writer import numbers_match
+        self.assertTrue(numbers_match("캠핑 준비물 체크리스트 7가지", "<p>텐트와 침낭</p>"))
+        self.assertFalse(numbers_match("과태료 30만 원", "<p>과태료가 있어요</p>"))
+
+    def test_different_numbers_are_not_similar_topic(self):
+        from bot import publisher
+        posts = json.dumps([{"ID": 1, "post_name": "2026최저임금"}])
+        with mock.patch.object(publisher, "wp_cli", return_value=posts):
+            self.assertEqual(publisher.similar_post("2027최저임금"), ("", ""))
+            self.assertEqual(publisher.similar_post("2026최저임금표")[0], "1")
+
+    def test_slug_key_matches_wordpress_slug(self):
+        from bot.freshness import _slug_key
+        self.assertEqual(_slug_key("ITQ자격증조회"), _slug_key("itq자격증조회"))
+        self.assertEqual(_slug_key("HS CODE 조회"), _slug_key("hs-code-조회"))
+
+    def test_failing_queue_file_gives_up(self):
+        import tempfile
+        from bot import publish_queue as pq
+        d = Path(tempfile.mkdtemp())
+        f = d / "x.json"
+        f.write_text("{}", encoding="utf-8")
+        with mock.patch.object(pq, "DONE_DIR", d / "done"):
+            self.assertEqual([pq._bump_file_fail(f) for _ in range(3)], [1, 2, 3])
+
+    def test_changed_mark_latest_date(self):
+        from bot import changed
+        self.assertTrue(changed.pending("2026-10-25 고용보험법 / 2026-11-05 기준금리", "2026-10-30"))
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

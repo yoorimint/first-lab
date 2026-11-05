@@ -1,6 +1,8 @@
 """워드프레스에 글 저장 (WP-CLI): 블록 형식 변환 + 대표 사진(AI 1장, 실패하면 제목 카드). 본문에는 사진을 넣지 않는다."""
 from __future__ import annotations
 
+import re
+
 from . import images, photo
 from .blocks import to_blocks
 from .categories import slug_of
@@ -60,9 +62,11 @@ def similar_post(keyword: str) -> tuple[str, str]:
     key = keyword.replace(" ", "")
     posts = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=publish,future,draft",
                               "--fields=ID,post_name", "--format=json") or "[]")
+    digits = re.findall(r"\d+", key)
     for p in posts:
         slug = urllib.parse.unquote(p["post_name"]).replace("-", "")
-        if slug and SequenceMatcher(None, key, slug).ratio() >= SIMILAR_RATIO:
+        # 숫자가 다르면 다른 주제 ('2026최저임금'↔'2027최저임금', '1주택자'↔'2주택자' — 11/5 검토)
+        if slug and re.findall(r"\d+", slug) == digits and SequenceMatcher(None, key, slug).ratio() >= SIMILAR_RATIO:
             return str(p["ID"]), slug
     return "", ""
 
