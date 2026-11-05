@@ -26,11 +26,11 @@
       if (!(idx >= 0 && idx < table.length)) throw new u.InputError('고용보험 가입 기간을 골라 주세요.');
 
       // 기초일액 = 평균임금 (3개월 임금 ÷ 일수), 상한 11만3500원
-      const avg = Math.floor(wage / days);
+      const avg = FirstLabCalc.util.floor(wage / days);
       const base = Math.min(avg, d.daily_wage_cap);
       // 하한 = 최저임금 × 소정근로시간 × 80%
-      const minDaily = Math.floor(d.min_wage_hour * hours * d.min_rate);
-      const calc = Math.floor(base * d.benefit_rate);
+      const minDaily = FirstLabCalc.util.floor(d.min_wage_hour * hours * d.min_rate);
+      const calc = FirstLabCalc.util.floor(base * d.benefit_rate);
       const daily = Math.max(calc, minDaily);
       const benefitDays = table[idx];
       const total = daily * benefitDays;

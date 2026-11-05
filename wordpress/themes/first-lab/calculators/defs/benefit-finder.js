@@ -56,7 +56,7 @@
   /** 240000000 → '2억 4,000만 원' (만 원 단위가 아니면 '…원') */
   const manwon = (n) => {
     if (n % 10000 !== 0) return won(n);
-    const eok = Math.floor(n / 100000000);
+    const eok = FirstLabCalc.util.floor(n / 100000000);
     const man = (n % 100000000) / 10000;
     return [eok ? `${eok.toLocaleString('ko-KR')}억` : '', man ? `${man.toLocaleString('ko-KR')}만` : ''].filter(Boolean).join(' ') + ' 원';
   };

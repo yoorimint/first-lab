@@ -5,7 +5,7 @@
   /** 과세표준 × 세율 − 누진공제 (원 미만 버림). 세율은 % 정수로 계산해 소수 오차를 막는다 */
   function baseTax(base, brackets) {
     const b = brackets.find((x) => x.upto === null || base <= x.upto);
-    return { tax: Math.max(0, Math.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
+    return { tax: Math.max(0, FirstLabCalc.util.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
   }
 
   FirstLabCalc.register({
@@ -35,8 +35,8 @@
       const { tax, rate } = baseTax(base, d.brackets);
       const determined = Math.max(0, tax - credit);
       const due = determined - prepaid;
-      const local = Math.floor(determined / d.local_ratio_div);
-      const localDue = local - Math.floor(prepaid / d.local_ratio_div);
+      const local = FirstLabCalc.util.floor(determined / d.local_ratio_div);
+      const localDue = local - FirstLabCalc.util.floor(prepaid / d.local_ratio_div);
 
       const rows = [
         ['소득공제 합계', u.won(deduction)],

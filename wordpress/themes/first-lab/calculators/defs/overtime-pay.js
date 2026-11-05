@@ -24,6 +24,11 @@
       { name: 'night_hours', label: '연장이 아닌 야간근로 시간', type: 'number', min: 0, step: 0.5, default: 0, help: '원래 근무시간 안에 들어 있는 밤 10시~아침 6시 근무예요. 기본 임금은 이미 받으니 가산분(50%)만 더해요.' },
       { name: 'holiday_hours', label: '휴일근로 하루 시간', type: 'number', min: 0, step: 0.5, default: 0, help: '주휴일·약정휴일에 일한 하루 시간이에요. 8시간까지 50%, 넘은 시간은 100% 가산.' },
       { name: 'holiday_days', label: '휴일근로한 날 수', type: 'number', min: 0, step: 1, default: 0 },
+      {
+        name: 'public_parttime', label: '국가·지자체 기관에서 일하는 단시간근로자인가요', type: 'select', default: 'no',
+        options: [['no', '아니요'], ['yes', '네 (근로자 수와 관계없이 계약 초과 근로 50% 가산)']],
+        help: '기간제법 제3조③·제6조③: 국가·지방자치단체 기관의 단시간근로자는 4명 이하여도 계약한 시간을 넘은 근로에 50% 이상 가산해요.',
+      },
     ],
 
     compute(v, d, u) {
@@ -42,29 +47,33 @@
       if (!(hd >= 0) || !Number.isInteger(hd)) throw new u.InputError('휴일근로한 날 수는 0 이상의 정수로 넣어 주세요.');
       if (hh > 24) throw new u.InputError('휴일근로 하루 시간은 24시간까지 넣어 주세요.');
       if (otNight > ot) throw new u.InputError('밤 시간은 연장근로 시간보다 클 수 없어요.');
+      // 휴일 시간만 넣고 날 수를 비우면 받을 수 있는 휴일수당이 0원으로 나왔음 (11/5 검수) → 안내
+      if (hh > 0 && hd === 0) throw new u.InputError('휴일근로한 날 수를 넣어 주세요 (하루 시간만 넣으면 0일로 계산돼요).');
 
       const hourly = v.pay_type === 'hourly' ? amount : amount / baseHours;
       const covered = employees >= d.min_employees;
       const within = Math.min(hh, d.holiday_split_hours) * hd;
       const over = Math.max(hh - d.holiday_split_hours, 0) * hd;
 
-      const otPay = Math.floor(hourly * ot * (covered ? d.overtime_rate : 1));
-      const otNightPay = covered ? Math.floor(hourly * otNight * d.night_add_rate) : 0;
-      const nightPay = covered ? Math.floor(hourly * night * d.night_add_rate) : 0;
-      const holidayPay = Math.floor(hourly * within * (covered ? d.holiday_rate_within : 1))
-        + Math.floor(hourly * over * (covered ? d.holiday_rate_over : 1));
+      const publicPt = v.public_parttime === 'yes';
+      const otCovered = covered || publicPt; // 기간제법 제6조③ (국가·지자체 기관 단시간근로자는 인원 무관)
+      const otPay = FirstLabCalc.util.floor(hourly * ot * (otCovered ? d.overtime_rate : 1));
+      const otNightPay = covered ? FirstLabCalc.util.floor(hourly * otNight * d.night_add_rate) : 0;
+      const nightPay = covered ? FirstLabCalc.util.floor(hourly * night * d.night_add_rate) : 0;
+      const holidayPay = FirstLabCalc.util.floor(hourly * within * (covered ? d.holiday_rate_within : 1))
+        + FirstLabCalc.util.floor(hourly * over * (covered ? d.holiday_rate_over : 1));
       const total = otPay + otNightPay + nightPay + holidayPay;
 
       const rows = [
-        ['통상시급', v.pay_type === 'hourly' ? u.won(hourly) : `${u.won(Math.floor(hourly))} (${u.won(amount)} ÷ ${num(baseHours)}시간)`],
-        ['연장근로수당', `${u.won(otPay)} (${num(ot)}시간 × ${covered ? '1.5배' : '1배'})`],
+        ['통상시급', v.pay_type === 'hourly' ? u.won(hourly) : `${num(hourly).toLocaleString('ko-KR')}원 (${u.won(amount)} ÷ ${num(baseHours)}시간)`],
+        ['연장근로수당', `${u.won(otPay)} (${num(ot)}시간 × ${otCovered ? '1.5배' : '1배'})`],
         ['연장 중 야간 가산', covered ? `${u.won(otNightPay)} (${num(otNight)}시간 × 0.5배)` : '0원 (4명 이하 사업장)'],
         ['야간근로 가산', covered ? `${u.won(nightPay)} (${num(night)}시간 × 0.5배)` : '0원 (4명 이하 사업장)'],
         ['휴일근로수당', `${u.won(holidayPay)} (8시간 이내 ${num(within)}시간 × ${covered ? '1.5배' : '1배'}, 초과 ${num(over)}시간 × ${covered ? '2배' : '1배'})`],
         ['합계', u.won(total)],
       ];
       const notes = [];
-      if (!covered) notes.push('상시 4명 이하 사업장은 연장·야간·휴일 가산(50%·100%) 규정이 적용되지 않아요. 근로계약서·취업규칙에 가산을 정했다면 그 기준을 따라요.');
+      if (!covered) notes.push('상시 4명 이하 사업장은 연장·야간·휴일 가산(50%·100%) 규정이 적용되지 않아요. 근로계약서·취업규칙에 가산을 정했다면 그 기준을 따라요. 다만 국가·지방자치단체 기관의 단시간근로자는 계약한 시간을 넘은 근로에 50% 이상 가산해요 (기간제법 제6조③).');
       if (hourly < d.min_wage_2026) notes.push(`통상시급이 2026년 최저임금(시급 ${u.won(d.min_wage_2026)})보다 낮아요. 통상임금이나 기준시간을 다시 확인해 보세요.`);
       notes.push(`연장근로는 당사자가 합의해도 원칙적으로 1주 ${d.weekly_overtime_limit}시간까지예요 (고용노동부장관 인가를 받은 특별연장근로 등은 예외).`);
       notes.push('휴일근로는 연장 가산과 겹쳐 받지 않아요. 휴일 밤 10시~아침 6시 근무는 야간 가산 칸에 따로 넣어요. 각 줄은 원 미만을 버렸어요.');

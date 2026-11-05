@@ -55,13 +55,13 @@
       const useOrdinary = ordinary > avgExact;
       const daily = useOrdinary ? ordinary : avgExact;
       const eligible = end >= oneYearAfter(start);
-      const pay = eligible ? Math.floor(daily * d.days_per_year * tenure / 365) : 0;
+      const pay = eligible ? FirstLabCalc.util.floor(daily * d.days_per_year * tenure / 365) : 0;
 
       const rows = [
         ['재직일수', `${tenure.toLocaleString('ko-KR')}일`],
         ['평균임금 계산 기간', `${u.korDate(periodStart)} ~ ${u.korDate(u.addDays(end, -1))} (${days3m}일)`],
         ['3개월 임금 + 상여금·연차수당 3/12', u.won(total)],
-        ['1일 평균임금', u.won(Math.floor(avgExact))],
+        ['1일 평균임금', u.won(FirstLabCalc.util.floor(avgExact))],
       ];
       if (useOrdinary) rows.push(['1일 통상임금 (평균임금보다 커서 이 금액 적용)', u.won(ordinary)]);
       rows.push(['퇴직금 (세전)', eligible ? u.won(pay) : '계속근로 1년 미만이라 법정 퇴직금 대상이 아니에요']);
@@ -73,7 +73,7 @@
         '세금(퇴직소득세)을 떼기 전 금액이에요.',
       ];
       return {
-        values: { tenure_days: tenure, days_3m: days3m, wage_total: total, avg_daily: Math.floor(avgExact), eligible, severance: pay },
+        values: { tenure_days: tenure, days_3m: days3m, wage_total: total, avg_daily: FirstLabCalc.util.floor(avgExact), eligible, severance: pay },
         rows,
         notes,
       };

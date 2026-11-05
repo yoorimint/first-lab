@@ -43,7 +43,7 @@
       let rows;
 
       if (v.mode === 'add') {
-        const tax = Math.floor(amount * d.rate);
+        const tax = FirstLabCalc.util.floor(amount * d.rate);
         values = { supply: amount, tax, total: amount + tax };
         rows = [['공급가액', u.won(amount)], ['부가세 (10%)', u.won(tax)], ['합계', u.won(amount + tax)]];
         notes.push('원 미만은 버렸어요.');
@@ -54,7 +54,7 @@
         rows = [['합계 (부가세 포함)', u.won(amount)], ['공급가액 (합계 ÷ 1.1)', u.won(supply)], ['부가세 (합계 - 공급가액)', u.won(tax)]];
         notes.push('공급가액은 원 미만을 반올림했어요. 영수증마다 끝자리 처리 방식이 달라 1원 차이가 날 수 있어요.');
       } else if (v.mode === 'general') {
-        const sales = Math.floor(amount * d.rate);
+        const sales = FirstLabCalc.util.floor(amount * d.rate);
         const pay = sales - purchase;
         values = { sales_tax: sales, purchase_tax: purchase, pay };
         rows = [['매출세액 (공급가액 × 10%)', u.won(sales)], ['매입세액', u.won(purchase)]];
@@ -63,8 +63,8 @@
       } else if (v.mode === 'simple') {
         const ratio = d.simple.value_added_rates[v.industry];
         if (ratio === undefined) throw new u.InputError('업종을 골라 주세요.');
-        const gross = Math.floor((amount * Math.round(ratio * 100) * Math.round(d.rate * 100)) / 10000);
-        const credit = Math.floor(purchase * d.simple.purchase_credit_rate);
+        const gross = FirstLabCalc.util.floor((amount * Math.round(ratio * 100) * Math.round(d.rate * 100)) / 10000);
+        const credit = FirstLabCalc.util.floor(purchase * d.simple.purchase_credit_rate);
         const exempt = amount < d.simple.exempt_below;
         const pay = exempt ? 0 : Math.max(0, gross - credit);
         values = { gross, credit, pay, exempt };

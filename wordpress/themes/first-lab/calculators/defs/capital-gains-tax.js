@@ -6,9 +6,9 @@
   /** 과세표준 × (기본세율 + 가산) − 누진공제 (원 미만 버림). 세율은 % 정수로 계산 */
   function progressive(base, brackets, addPct) {
     const b = brackets.find((x) => x.upto === null || base <= x.upto);
-    return { tax: Math.max(0, Math.floor((base * (b.rate_pct + addPct)) / 100) - b.deduction), rate: b.rate_pct + addPct };
+    return { tax: Math.max(0, FirstLabCalc.util.floor((base * (b.rate_pct + addPct)) / 100) - b.deduction), rate: b.rate_pct + addPct };
   }
-  const flat = (base, pct) => ({ tax: Math.floor((base * pct) / 100), rate: pct });
+  const flat = (base, pct) => ({ tax: FirstLabCalc.util.floor((base * pct) / 100), rate: pct });
   const bigger = (a, b) => (b.tax > a.tax ? b : a);
 
   FirstLabCalc.register({
@@ -51,7 +51,7 @@
       }
 
       // 12억 초과 1세대 1주택: 12억 넘는 부분 비율만 과세 (시행령 제160조)
-      const taxableGain = status === 'one' ? Math.floor((gain * (sale - d.high_price)) / sale) : gain;
+      const taxableGain = status === 'one' ? FirstLabCalc.util.floor((gain * (sale - d.high_price)) / sale) : gain;
 
       let lthdPct = 0;
       if (status === 'one' && hold >= d.lthd_one_house.min_hold && live >= d.lthd_one_house.min_live) {
@@ -60,7 +60,7 @@
       } else if (!status.startsWith('heavy') && hold >= d.lthd_general.min_years) {
         lthdPct = Math.min(d.lthd_general.max_pct, hold * d.lthd_general.pct_per_year);
       }
-      const lthd = Math.floor((taxableGain * lthdPct) / 100);
+      const lthd = FirstLabCalc.util.floor((taxableGain * lthdPct) / 100);
       const income = taxableGain - lthd;
       const base = Math.max(0, income - d.basic_deduction);
 
@@ -70,7 +70,7 @@
       if (hold < 1) r = bigger(r, flat(base, sr.under1));
       else if (hold < 2) r = bigger(r, flat(base, sr.under2));
       const tax = r.tax;
-      const local = Math.floor(tax / d.local_ratio_div);
+      const local = FirstLabCalc.util.floor(tax / d.local_ratio_div);
 
       if (status === 'one') notes.push('12억 원을 넘는 1세대 1주택이라 양도차익 중 (양도가액 − 12억 원) ÷ 양도가액 비율만 과세했어요.');
       if (status === 'one' && live < d.lthd_one_house.min_live && hold >= 3) notes.push('거주기간이 2년 미만이라 장기보유특별공제는 1년에 2%(최대 30%) 표로 계산했어요.');

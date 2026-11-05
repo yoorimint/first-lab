@@ -10,7 +10,7 @@
     if (days <= 0) return 0;
     if (days <= f.base_days) return f.base;
     if (days >= f.max_from_day) return f.max;
-    return Math.min(f.max, f.base + f.step_amount * Math.floor((days - f.step_from_day) / f.step_days));
+    return Math.min(f.max, f.base + f.step_amount * FirstLabCalc.util.floor((days - f.step_from_day) / f.step_days));
   }
 
   FirstLabCalc.register({

@@ -34,8 +34,8 @@
 
       let months = 0; // 근속 개월 수 (입사일 + k개월 날짜가 기준일 이하인 최대 k)
       while (plusMonths(start, months + 1) <= base) months += 1;
-      const years = Math.floor(months / 12);
-      const daysFor = (k) => Math.min(d.max_days, d.base_days + Math.floor((k - 1) / 2)); // k번째 해 연차
+      const years = FirstLabCalc.util.floor(months / 12);
+      const daysFor = (k) => Math.min(d.max_days, d.base_days + FirstLabCalc.util.floor((k - 1) / 2)); // k번째 해 연차
       const monthly = Math.min(months, d.first_year_max); // 1년 미만 1개월 개근마다 1일, 최대 11일
       let annualTotal = 0;
       for (let k = 1; k <= years; k += 1) annualTotal += daysFor(k);

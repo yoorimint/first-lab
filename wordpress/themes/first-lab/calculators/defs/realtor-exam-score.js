@@ -37,7 +37,7 @@
       const judge = (scores) => {
         // 판정은 반올림 전 합계로 (59.996점을 60점으로 올려 합격 처리하면 안 됨), 표시는 소수 둘째 자리 내림
         const sum = scores.reduce((a, b) => a + b, 0);
-        const avg = Math.floor((sum / scores.length) * 100 + 1e-9) / 100;
+        const avg = FirstLabCalc.util.floor((sum / scores.length) * 100 + 1e-9) / 100;
         const fails = scores.filter((s) => s < d.subject_min).length;
         return { avg, fails, pass: fails === 0 && sum >= d.average_min * scores.length };
       };

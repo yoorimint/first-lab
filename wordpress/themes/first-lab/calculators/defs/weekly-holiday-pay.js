@@ -33,10 +33,10 @@
       const eligibleHours = hours >= d.min_weekly_hours ? Math.min(hours, d.full_week_hours) : 0; // 개근했을 때 기준
       // 정수로 곱한 뒤 마지막에 나눔: (23 ÷ 40 × 8) × 10,320 = 47,471.99… 를 버리면 1원이 빠짐 (11/5 검수)
       const centi = Math.round(eligibleHours * 100);
-      const fullPay = Math.floor((centi * d.full_day_hours * wage) / (d.full_week_hours * 100));
+      const fullPay = FirstLabCalc.util.floor((centi * d.full_day_hours * wage) / (d.full_week_hours * 100));
       const holidayHours = v.attended === 'yes' ? (centi * d.full_day_hours) / (d.full_week_hours * 100) : 0;
       const pay = v.attended === 'yes' ? fullPay : 0;
-      const monthly = Math.floor((fullPay * 365) / 84); // 매주 개근할 때 (결근한 주만 빠짐)
+      const monthly = FirstLabCalc.util.floor((fullPay * 365) / 84); // 매주 개근할 때 (결근한 주만 빠짐)
       const rows = [
         ['주휴시간', holidayHours ? `${hoursText(holidayHours)} (${hoursText(Math.min(hours, d.full_week_hours))} ÷ ${d.full_week_hours} × ${d.full_day_hours})` : '0시간'],
         ['한 주 주휴수당', u.won(pay)],

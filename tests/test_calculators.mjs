@@ -40,6 +40,10 @@ for (const id of ids) {
   const def = defs[id];
   if (!def) { fail(id, `defs/${id}.js 가 id '${id}' 로 register 하지 않음`); continue; }
 
+  // 소수 오차 버림 금지: Math.floor/Math.trunc 대신 util.floor/trunc (3,800,000÷209×11×1.5 = 299,999.99… → 1원 빠짐, 11/5 두 번)
+  const src = fs.readFileSync(path.join(DIR, 'defs', `${id}.js`), 'utf8');
+  if (/Math\.(floor|trunc)\(/.test(src)) fail(id, 'Math.floor/Math.trunc 대신 FirstLabCalc.util.floor/trunc 를 써야 함 (소수 오차로 1원 빠짐)');
+
   let data;
   let cases;
   try {

@@ -56,10 +56,10 @@
       }
 
       const taxFree = base <= d.tax_free_max; // 지방세법 제17조 면세점: 취득가액 50만 원 이하 비과세
-      const gross = taxFree ? 0 : Math.floor((base * Math.round(rule.rate * 1000)) / 1000); // 1천분의 N 을 정수로 계산
+      const gross = taxFree ? 0 : FirstLabCalc.util.floor((base * Math.round(rule.rate * 1000)) / 1000); // 1천분의 N 을 정수로 계산
       // 면제라도 산출세액이 200만 원을 넘으면 85%만 감면 (지방세특례제한법 제177조의2 최소납부세제)
       const relief = rule.exempt
-        ? (gross <= d.min_tax.free_max ? gross : Math.floor((gross * Math.round(d.min_tax.relief_rate * 100)) / 100))
+        ? (gross <= d.min_tax.free_max ? gross : FirstLabCalc.util.floor((gross * Math.round(d.min_tax.relief_rate * 100)) / 100))
         : Math.min(gross, rule.relief || 0);
       const tax = gross - relief;
       const penalty = penaltyFor(lateDays, d.penalty);

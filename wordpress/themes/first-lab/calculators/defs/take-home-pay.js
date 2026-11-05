@@ -15,7 +15,7 @@
     const base = d.table_top[k];
     if (taxable === d.table_top_thousand * 1000) return base;
     const b = d.over_top.find((o) => taxable > o.from && (o.to === null || taxable <= o.to));
-    return base + b.add + Math.floor(((taxable - b.from) * b.factor_pct * b.rate_pct) / 10000);
+    return base + b.add + FirstLabCalc.util.floor(((taxable - b.from) * b.factor_pct * b.rate_pct) / 10000);
   }
 
   // 별표 2 제4호: 11명 초과 = 11명 세액 − (10명 세액 − 11명 세액) × 초과 인원
@@ -54,7 +54,7 @@
 
     compute(v, d, u) {
       // 보험료·국세·지방세 징수액은 10원 미만 끝수를 버림 (국고금관리법 제47조①, 국민건강보험법 제107조, 국민연금법 제117조, 지방세기본법 제59조)
-      const floor10 = (n) => Math.floor(n / 10) * 10;
+      const floor10 = (n) => FirstLabCalc.util.floor(n / 10) * 10;
       const pay = Number(v.pay);
       const nontax = Number(v.nontax) || 0;
       const fam = Number(v.family);
@@ -72,16 +72,16 @@
       let pensionBase = 0;
       let pension = 0;
       if (v.pension !== 'no') {
-        pensionBase = Math.min(Math.max(Math.floor(taxable / 1000) * 1000, d.pension_min), d.pension_max);
+        pensionBase = Math.min(Math.max(FirstLabCalc.util.floor(taxable / 1000) * 1000, d.pension_min), d.pension_max);
         pension = floor10((pensionBase * d.pension_rate_employee_per_10000) / 10000);
       }
       // 건강보험: 보수월액 × 7.19% 의 절반, 근로자 몫 상한·하한 (국민건강보험법 제69조⑥, 보건복지부고시)
       const health = Math.min(Math.max(floor10((taxable * d.health_rate_per_10000) / 20000), d.health_employee_min), d.health_employee_max);
       // 장기요양: 건강보험료 × (장기요양보험료율 ÷ 건강보험료율, 소수점 이하 다섯째자리에서 반올림) — 노인장기요양보험법 제9조① (2026.5.26 개정, 2026년 11월분부터)
       const ltcRatio = Math.round((d.ltc_rate_per_1000000 * 100) / d.health_rate_per_10000); // 0.9448/7.19 = 0.131404… → 0.1314 (1만분의 1314)
-      const ltc = Math.floor((health * ltcRatio) / 10000);
+      const ltc = FirstLabCalc.util.floor((health * ltcRatio) / 10000);
       // 고용보험(실업급여): 보수 × 0.9%
-      const employment = Math.floor((taxable * d.employment_rate_employee_per_1000) / 1000);
+      const employment = FirstLabCalc.util.floor((taxable * d.employment_rate_employee_per_1000) / 1000);
       const insurance = pension + health + ltc + employment;
 
       // 소득세: 간이세액표 − 자녀 공제(음수면 0) → 80·100·120%
@@ -108,7 +108,7 @@
       ];
       const notes = ['국민연금·건강보험·소득세·지방소득세는 10원 미만을 버렸어요 (국고금관리법 제47조). 장기요양·고용보험은 원 미만을 버렸고, 회사 급여명세서와 끝자리가 몇십 원 다를 수 있어요.'];
       if (credit > 0) notes.push(`8세 이상 20세 이하 자녀 ${children}명 공제 ${u.won(credit)}을 간이세액표 세액에서 뺐어요.`);
-      if (v.pension !== 'no' && pensionBase !== Math.floor(taxable / 1000) * 1000) {
+      if (v.pension !== 'no' && pensionBase !== FirstLabCalc.util.floor(taxable / 1000) * 1000) {
         notes.push(`국민연금은 기준소득월액 ${u.won(d.pension_min)}~${u.won(d.pension_max)} 범위로 계산해요.`);
       }
       notes.push('국민연금·건강보험은 실제로는 회사가 신고한 기준 금액으로 매겨져서, 이번 달 월급으로 계산한 값과 다를 수 있어요.');

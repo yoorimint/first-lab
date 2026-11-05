@@ -16,7 +16,7 @@
 
   function baseTax(base, brackets) {
     const b = brackets.find((x) => x.upto === null || base <= x.upto);
-    return { tax: Math.max(0, Math.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
+    return { tax: Math.max(0, FirstLabCalc.util.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
   }
 
   FirstLabCalc.register({
@@ -53,8 +53,8 @@
         surchargePct = v.relation === 'grandparent_minor' && price > d.skip_generation.minor_over_amount
           ? d.skip_generation.minor_over_pct : d.skip_generation.rate_pct;
       }
-      const surcharge = Math.floor((tax * surchargePct) / 100);
-      const credit = v.on_time === 'no' ? 0 : Math.floor(((tax + surcharge) * d.filing_credit_pct) / 100);
+      const surcharge = FirstLabCalc.util.floor((tax * surchargePct) / 100);
+      const credit = v.on_time === 'no' ? 0 : FirstLabCalc.util.floor(((tax + surcharge) * d.filing_credit_pct) / 100);
       const pay = tax + surcharge - credit;
 
       const rows = [

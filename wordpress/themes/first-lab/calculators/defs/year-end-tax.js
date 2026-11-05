@@ -6,22 +6,22 @@
   /** 근로소득공제 (원 미만 버림, 최대 2,000만 원, 총급여보다 클 수 없음) */
   function wageDeduction(salary, d) {
     const r = d.wage_deduction.find((x) => x.upto === null || salary <= x.upto);
-    const amount = r.base + Math.floor(((salary - r.over) * r.rate_pct) / 100);
+    const amount = r.base + FirstLabCalc.util.floor(((salary - r.over) * r.rate_pct) / 100);
     return Math.min(amount, d.wage_deduction_max, salary);
   }
 
   function baseTax(base, brackets) {
     const b = brackets.find((x) => x.upto === null || base <= x.upto);
-    return { tax: Math.max(0, Math.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
+    return { tax: Math.max(0, FirstLabCalc.util.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
   }
 
   /** 근로소득세액공제 = min(산출세액 기준 공제액, 총급여 기준 한도) */
   function wageCredit(tax, salary, c) {
     const raw = tax <= c.threshold
-      ? Math.floor((tax * c.low_pct) / 100)
-      : c.high_base + Math.floor(((tax - c.threshold) * c.high_pct) / 100);
+      ? FirstLabCalc.util.floor((tax * c.low_pct) / 100)
+      : c.high_base + FirstLabCalc.util.floor(((tax - c.threshold) * c.high_pct) / 100);
     const l = c.limits.find((x) => x.upto === null || salary <= x.upto);
-    const limit = Math.max(l.floor, l.start - Math.floor(((salary - l.over) * l.per_mille) / 1000));
+    const limit = Math.max(l.floor, l.start - FirstLabCalc.util.floor(((salary - l.over) * l.per_mille) / 1000));
     return { credit: Math.min(raw, limit), limit };
   }
 
@@ -66,7 +66,7 @@
       const wageDed = wageDeduction(salary, d);
       const earned = salary - wageDed;
       const deduction = people * d.basic_deduction_per_person + other;
-      const base = Math.max(0, Math.floor(earned - deduction)); // 과세표준 1원 미만 버림 (국고금관리법 제47조②)
+      const base = Math.max(0, FirstLabCalc.util.floor(earned - deduction)); // 과세표준 1원 미만 버림 (국고금관리법 제47조②)
       const { tax, rate } = baseTax(base, d.brackets);
       const { credit: wage, limit } = wageCredit(tax, salary, d.wage_credit);
       const child = childCredit(children, d.child_credit);
@@ -74,10 +74,10 @@
       const credits = wage + child + standard + otherCredit;
       const determined = Math.max(0, tax - credits);
       // 더 낼·돌려받을 금액은 10원 미만 버림 (국고금관리법 제47조①, 지방세기본법 제59조) — 환급은 0 쪽으로 버려야 환급액이 커지지 않음
-      const trunc10 = (n) => Math.trunc(n / 10) * 10;
+      const trunc10 = (n) => FirstLabCalc.util.trunc(n / 10) * 10;
       const due = trunc10(determined - prepaid);
-      const local = Math.floor(determined / d.local_ratio_div);
-      const localDue = trunc10(local - Math.floor(prepaid / d.local_ratio_div));
+      const local = FirstLabCalc.util.floor(determined / d.local_ratio_div);
+      const localDue = trunc10(local - FirstLabCalc.util.floor(prepaid / d.local_ratio_div));
       const total = due + localDue;
 
       const rows = [

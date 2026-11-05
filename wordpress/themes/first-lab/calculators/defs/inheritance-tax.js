@@ -10,7 +10,7 @@
 
   function baseTax(base, brackets) {
     const b = brackets.find((x) => x.upto === null || base <= x.upto);
-    return { tax: Math.max(0, Math.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
+    return { tax: Math.max(0, FirstLabCalc.util.floor((base * b.rate_pct) / 100) - b.deduction), rate: b.rate_pct };
   }
 
   const num = (x) => Number(x) || 0;
@@ -80,12 +80,12 @@
         const shareNum = heirs === 'spouse_only' ? 1 : s.share_spouse * 2;
         const shareDen = heirs === 'spouse_only' ? 1 : (s.share_spouse + s.share_child * children) * 2;
         const base0 = estate - Math.min(num(v.debts), estate) + gifts - giftsNonheir;
-        const legal = Math.floor((base0 * shareNum) / shareDen) - spouseGiftBase;
+        const legal = FirstLabCalc.util.floor((base0 * shareNum) / shareDen) - spouseGiftBase;
         spouse = Math.max(s.min, Math.min(num(v.spouse_amount), legal, s.max));
       }
 
       const fd = d.financial;
-      const financial = fin <= fd.full_upto ? fin : Math.min(Math.max(Math.floor((fin * fd.rate_pct) / 100), fd.min), fd.max);
+      const financial = fin <= fd.full_upto ? fin : Math.min(Math.max(FirstLabCalc.util.floor((fin * fd.rate_pct) / 100), fd.min), fd.max);
 
       const wanted = personal + spouse + financial;
       const cap = Math.max(0, taxable - (taxable > d.limit_gift_over ? gifts - giftDeducted : 0));
@@ -96,9 +96,9 @@
       const tax = base < d.min_taxable_base ? 0 : raw.tax; // 과세표준 50만 원 미만이면 부과하지 않음 (제25조②)
       // 증여세액공제 (제28조): 과세가액 5억 원 이하면 없음, 한도는 산출세액 × (증여재산 과세표준 ÷ 상속세 과세표준)
       const giftBase = gifts - giftDeducted;
-      const giftLimit = base > 0 && taxable > d.limit_gift_over ? Math.floor((tax * Math.min(giftBase, base)) / base) : 0;
+      const giftLimit = base > 0 && taxable > d.limit_gift_over ? FirstLabCalc.util.floor((tax * Math.min(giftBase, base)) / base) : 0;
       const giftCredit = Math.min(num(v.gift_tax_paid), giftLimit);
-      const credit = v.on_time !== 'yes' ? 0 : Math.floor(((tax - giftCredit) * d.filing_credit_pct) / 100);
+      const credit = v.on_time !== 'yes' ? 0 : FirstLabCalc.util.floor(((tax - giftCredit) * d.filing_credit_pct) / 100);
       const pay = tax - giftCredit - credit;
 
       const rows = [

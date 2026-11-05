@@ -230,5 +230,102 @@
       "holiday_days": 0
     },
     "expect_error": true
+  },
+  {
+    "why": "월 380만 원·209시간·연장 11시간: 3,800,000×11×1.5÷209 = 정확히 300,000원 (소수 곱셈 뒤 버림이면 299,999원)",
+    "boundary": true,
+    "input": {
+      "pay_type": "monthly",
+      "amount": 3800000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 11,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0,
+      "public_parttime": "no"
+    },
+    "expect": {
+      "ot_pay": 300000,
+      "total": 300000
+    }
+  },
+  {
+    "why": "월 380만 원·야간 11시간: 3,800,000×11×0.5÷209 = 정확히 100,000원",
+    "boundary": true,
+    "input": {
+      "pay_type": "monthly",
+      "amount": 3800000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 11,
+      "holiday_hours": 0,
+      "holiday_days": 0,
+      "public_parttime": "no"
+    },
+    "expect": {
+      "night_pay": 100000,
+      "total": 100000
+    }
+  },
+  {
+    "why": "휴일 8시간 1일: 2,500,000×8×1.5÷209 = 143,540.67 → 143,540원",
+    "boundary": true,
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 8,
+      "holiday_days": 1,
+      "public_parttime": "no"
+    },
+    "expect": {
+      "holiday_pay": 143540,
+      "total": 143540
+    }
+  },
+  {
+    "why": "국가·지자체 기관 단시간근로자·3명·계약 초과 5시간: 10,320×5×1.5 = 77,400원 (기간제법 제6조③, 인원 무관)",
+    "boundary": true,
+    "input": {
+      "pay_type": "hourly",
+      "amount": 10320,
+      "base_hours": 209,
+      "employees": 3,
+      "ot_hours": 5,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0,
+      "public_parttime": "yes"
+    },
+    "expect": {
+      "ot_pay": 77400,
+      "total": 77400
+    }
+  },
+  {
+    "why": "휴일 시간만 넣고 날 수 0 → 안내 (0원으로 잘못 나오던 것)",
+    "expect_error": true,
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 8,
+      "holiday_days": 0,
+      "public_parttime": "no"
+    },
+    "expect": {}
   }
 ]

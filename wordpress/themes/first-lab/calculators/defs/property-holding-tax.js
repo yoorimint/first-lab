@@ -19,7 +19,7 @@
       if (b.upto === null || base <= b.upto) break;
       lo = b.upto;
     }
-    return Math.floor(tax);
+    return FirstLabCalc.util.floor(tax);
   }
 
   const pick = (table, n) => (table.find((t) => n >= t.from) || { pct: 0 }).pct;
@@ -45,17 +45,17 @@
       if (age < 0 || years < 0) throw new u.InputError('나이와 보유 기간은 0 이상으로 넣어 주세요.');
 
       const deduction = d.deduction[kind];
-      const base = Math.floor((Math.max(0, price - deduction) * d.fair_ratio_pct) / 100);
+      const base = FirstLabCalc.util.floor((Math.max(0, price - deduction) * d.fair_ratio_pct) / 100);
       const tax = progressive(base, d.brackets[kind === 'three' ? 'three' : 'two']);
       // 재산세 공정시장가액비율: 공동명의여도 재산세는 1세대 1주택(지방세법 시행령 제109조①2호) → 45%
       const ratio = kind === 'one' || kind === 'joint' ? d.property_tax.ratio_pct_one : d.property_tax.ratio_pct_other;
-      const propertyCredit = Math.min(tax, Math.floor((base * ratio * d.property_tax.top_rate_permille) / 100000));
+      const propertyCredit = Math.min(tax, FirstLabCalc.util.floor((base * ratio * d.property_tax.top_rate_permille) / 100000));
       const calcTax = tax - propertyCredit;
       let creditPct = 0;
       if (kind === 'one') creditPct = Math.min(d.credit_max_pct, pick(d.age_credit, age) + pick(d.hold_credit, years));
-      const credit = Math.floor((calcTax * creditPct) / 100);
+      const credit = FirstLabCalc.util.floor((calcTax * creditPct) / 100);
       const jongbu = calcTax - credit;
-      const rural = Math.floor((jongbu * d.rural_pct) / 100);
+      const rural = FirstLabCalc.util.floor((jongbu * d.rural_pct) / 100);
       const total = jongbu + rural;
 
       const rows = [
