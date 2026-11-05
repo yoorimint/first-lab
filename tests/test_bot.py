@@ -2624,6 +2624,13 @@ class AttachmentTextTest(unittest.TestCase):
         self.assertEqual(sc.attachment_text(page, "https://blog.example.com/a", raw_of), "")   # 공공기관만
         self.assertEqual(sc.doc_text(b"not a doc"), "")
 
+    def test_man_unit_numbers(self):
+        from bot import source_check as sc
+        self.assertTrue(sc.has_number("생계급여 87 만 5533 원", "875533"))
+        self.assertTrue(sc.has_number("215만 710원", "2150710"))
+        self.assertTrue(sc.has_number("300만 원", "3000000"))
+        self.assertFalse(sc.has_number("87만 5534원", "875533"))
+
 
 class CitedUrlsTest(unittest.TestCase):
     def test_reviewer_gets_writer_sources(self):

@@ -197,8 +197,16 @@ def _korean_forms(number: str) -> list[str]:
     return forms
 
 
+def _man_forms(number: str) -> list[str]:
+    """875533 → '87만 5533' / '87 만 5533' (보도자료 표가 만 단위로 끊어 씀 — 11/5 #842 생계급여 금액 '페이지에 없음' 오탐)."""
+    if not number.isdigit() or int(number) < 10000:
+        return []
+    man, rest = divmod(int(number), 10000)
+    return [rf"(?<![\d.]){man}\s*만\s*{rest}(?!\d)" if rest else rf"(?<![\d.]){man}\s*만\s*원"]
+
+
 def has_number(text: str, number: str) -> bool:
-    patterns = [rf"(?<![\d.]){re.escape(number)}(?!\d)"] + _fraction_forms(number) + _korean_forms(number)
+    patterns = [rf"(?<![\d.]){re.escape(number)}(?!\d)"] + _fraction_forms(number) + _korean_forms(number) + _man_forms(number)
     return any(re.search(p, text) for p in patterns)
 
 
