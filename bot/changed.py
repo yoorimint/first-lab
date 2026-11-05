@@ -33,7 +33,8 @@ def flag(post_ids, value: str, wp=None) -> list[str]:
         from .settings import wp_cli as wp
     marked = []
     for pid in post_ids:
-        old = wp("post", "meta", "get", str(pid), META).strip()
+        from .settings import wp_meta
+        old = wp_meta(pid, META, wp)
         new = merged(old, value)
         if new != old:
             wp("post", "meta", "update", str(pid), META, new)

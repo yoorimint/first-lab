@@ -114,6 +114,14 @@ def wp_cli(*args: str, stdin: str | None = None) -> str:
     return result.stdout
 
 
+def wp_meta(post_id, key: str, wp=None) -> str:
+    """글 메타 값. 없으면 '' — WP-CLI 'post meta get' 은 값이 없으면 오류로 끝남 (11/5: 처음 표시하는 글에서 표시·보류 횟수가 실패)."""
+    try:
+        return (wp or wp_cli)("post", "meta", "get", str(post_id), key).strip()
+    except subprocess.CalledProcessError:
+        return ""
+
+
 def option_missing(e: subprocess.CalledProcessError) -> bool:
     """wp option get 실패가 '옵션이 아직 없음'인지 (그 밖의 실패는 일시 오류)."""
     return "Could not get" in str(e.stderr or "") or "does not exist" in str(e.stderr or "")

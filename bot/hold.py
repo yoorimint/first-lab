@@ -29,7 +29,8 @@ def _get(post_id: int, field: str) -> str:
 
 def _bump_tries(post_id: int, give_up: bool = False) -> int:
     import datetime as dt
-    raw = wp_cli("post", "meta", "get", str(post_id), TRIES_META).strip()
+    from .settings import wp_meta
+    raw = wp_meta(post_id, TRIES_META, wp_cli)
     tries = int(raw.split("|")[0]) if raw.split("|")[0].isdigit() else 0
     tries = MAX_TRIES if give_up else tries + 1
     wp_cli("post", "meta", "update", str(post_id), TRIES_META, f"{tries}|{dt.date.today():%Y-%m-%d}")
@@ -66,7 +67,10 @@ def apply_fix(data: dict) -> str:
         later = f" — {tries}번 막혀 {RETRY_DAYS}일 뒤 다시" if tries >= MAX_TRIES else f" ({tries}/{MAX_TRIES}번째)"
         return f"'{title}' 고쳤지만 재검사 미통과 → 계속 보류{later}: {'; '.join(failed)[:150]}"
     wp_cli("post", "meta", "delete", str(post_id), review_gate.HOLD_META)
-    wp_cli("post", "meta", "delete", str(post_id), TRIES_META)
+    try:
+        wp_cli("post", "meta", "delete", str(post_id), TRIES_META)
+    except Exception:  # noqa: BLE001 - 없는 메타 지우기도 WP-CLI 는 오류 (11/5 #746: 통과했는데 대기열에 못 들어감)
+        pass
     schedule.mark_ready(post_id)
     freshness.mark_verified(post_id)  # 다시 검수했으니 공개 직전 확인 기준일도 오늘
     # 새 검수 기록으로 근거 대조도 다시 저장 (공개 직전 확인·법령 감시·공개 글 다시 보기가 이 근거를 봄)

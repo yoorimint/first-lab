@@ -272,7 +272,8 @@ def _renew_evidence(post_id: int, review: list | None) -> None:
         if review:
             source_check.record(post_id, review, save)
         else:
-            record = json.loads(wp_cli("post", "meta", "get", str(post_id), source_check.META) or "{}")
+            from .settings import wp_meta
+            record = json.loads(wp_meta(post_id, source_check.META, wp_cli) or "{}")
             kept = []
             for item in record.get("found", []):
                 texts = [t for t in (source_check.fetch(u) for u in item.get("urls", [])) if t]

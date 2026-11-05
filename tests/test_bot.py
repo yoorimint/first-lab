@@ -2302,6 +2302,24 @@ class PatchNoSwallowTest(unittest.TestCase):
         self.assertTrue(any("닫는 태그" in e for e in apply_review.check(post, bad)))
 
 
+class WpMetaMissingTest(unittest.TestCase):
+    """WP-CLI 는 없는 메타를 읽으면 오류로 끝남 — 처음 표시·처음 보류 횟수에서 실패하던 일 (11/5 #746 보류 수정 실패)."""
+
+    def test_flag_first_mark_and_hold_tries(self):
+        import subprocess
+        from bot import changed, hold
+        calls = []
+
+        def wp(*a):
+            calls.append(a)
+            if a[:3] == ("post", "meta", "get"):
+                raise subprocess.CalledProcessError(1, ["wp"], "", "")
+            return ""
+        self.assertEqual(changed.flag(["5"], "2026-11-05 x", wp), ["5"])
+        with mock.patch("bot.settings.wp_cli", side_effect=wp), mock.patch.object(hold, "wp_cli", side_effect=wp):
+            self.assertEqual(hold._bump_tries(7), 1)
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

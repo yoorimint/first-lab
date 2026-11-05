@@ -66,6 +66,7 @@ queue_once 2026-11-04-queue-direct 80 85 90 99   # 기존 직접 작성 초안 (
 queue_once 2026-11-04-queue-119 119             # 베트남 여행 준비물: 공식 기관 목록 누락(korea.kr·airport.kr)으로 잘못 보류됐던 글
 queue_once 2026-11-04-queue-144 144             # 건강보험료 환급금: 정부24(gov.kr) 누락·'틀림→수정' 판정 해석 오류로 잘못 보류됐던 글
 queue_once 2026-11-05-queue-567 567             # ESTA 신청: 미국 정부(.gov) 근거를 관문이 공식 출처로 못 알아봐 잘못 보류 (sources.FOREIGN_GOV 로 고침, 고친 관문 재검사 통과)
+queue_once 2026-11-05-queue-746 746             # HS코드: 보류 수정이 관문을 통과했는데 없는 메타 지우기 오류로 대기열에 못 들어감 (bot/hold.py 고침)
 # 독립 검수에서 핵심(단말기 부담금·지원 기간)을 확인 못 한 글 → 다시 쓸 때까지 대기열에서 뺌 (초안으로 남김)
 UNQUEUE_MARK=/var/lib/first-lab/bot/once-2026-11-04-unqueue-85.done
 if [ ! -f "$UNQUEUE_MARK" ]; then
