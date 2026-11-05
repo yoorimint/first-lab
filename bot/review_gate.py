@@ -16,6 +16,8 @@ from __future__ import annotations
 import re
 import urllib.parse
 
+from pathlib import Path
+
 from .sources import is_official
 
 KEPT = ("유지", "수정")
@@ -98,6 +100,28 @@ def _small_workplace(review: list[dict], headline: str) -> list[str]:
     return []
 
 
+REVIEWED = Path(__file__).resolve().parents[1] / "automation" / "reviewed.txt"
+_CALC_TAG = re.compile(r'\[firstlab_calc id="([a-z0-9-]+)"\]')
+
+
+def reviewed_calcs(path: Path = REVIEWED) -> set[str] | None:
+    """검수 기록의 'calc:<이름>' (독립 검수를 마친 계산기). 기록 파일이 없으면 None (막지 않음)."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+    return {w[5:] for w in (ln.split()[0] for ln in lines if ln.strip() and not ln.startswith("#")) if w.startswith("calc:")}
+
+
+def unreviewed_calcs(body_html: str, path: Path = REVIEWED) -> list[str]:
+    """본문에 넣은 계산기가 독립 검수 전이면 공개하지 않는다 (11/5 운영자: 계산기는 검수 없이 바로 공개되고 있었음)."""
+    done = reviewed_calcs(path)
+    if done is None:
+        return []
+    return [f"본문 계산기 '{c}' 독립 검수 전 — 계산기 파일(defs·data·tests)을 독립 검수한 뒤 automation/reviewed.txt 에 'calc:{c}' 줄 추가"
+            for c in sorted(set(_CALC_TAG.findall(body_html or ""))) if c not in done]
+
+
 def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body_html: str = "", law_fetcher=None) -> list[str]:
     """통과 못 한 이유 목록 (빈 목록이면 통과).
     제목·요약문의 숫자는 독자가 가장 먼저 믿는 값이라, 검수된(맞음) 주장 안에 있어야 한다."""
@@ -111,6 +135,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     missing = (_headline_numbers(title) | _headline_numbers(excerpt)) - _numbers(verified)
     if missing:
         out.append(f"제목·요약문 숫자 {', '.join(sorted(missing))} 가 검수된 주장에 없음")
+    out += unreviewed_calcs(body_html)
     out += _regional_only(review, f"{title} {excerpt}")
     out += _small_workplace(review, f"{title} {excerpt}")
     # 조건 누락 (11/5 운영자 '막을 대책 세워서 어떻게든 해야지') — bot/condition_gate.py

@@ -121,14 +121,20 @@ for file in "$REPO_DIR"/wordpress/pages/*.html; do
   if [ -z "$title" ]; then
     echo "경고: $slug 페이지 제목 줄(<!-- title: ... -->)을 못 읽음 → 이 페이지는 건너뜀"; continue
   fi
-  echo "  페이지 $slug → $title"
+  # 계산기 페이지는 독립 검수(automation/reviewed.txt 의 calc:<이름>)를 마친 것만 공개, 아니면 비공개로 둠
+  # (11/5 운영자: 계산기가 검수 없이 바로 공개돼 검수가 10~50분 뒤에 따라감). 검수가 끝나면 다음 배포에서 공개.
+  status=publish
+  if [[ "$slug" == *-calculator ]] && ! grep -qE "^calc:${slug%-calculator}([[:space:]]|$)" "$REPO_DIR/automation/reviewed.txt"; then
+    status=draft
+  fi
+  echo "  페이지 $slug → $title ($status)"
   content=$(tail -n +2 "$file")
   id=$(wp post list --post_type=page --name="$slug" --post_status=any --field=ID)
   if [ -z "$id" ]; then
-    id=$(wp post create --post_type=page --post_status=publish --post_name="$slug" \
+    id=$(wp post create --post_type=page --post_status="$status" --post_name="$slug" \
           --post_title="$title" --post_content="$content" --porcelain)
   else
-    wp post update "$id" --post_status=publish --post_title="$title" --post_content="$content"
+    wp post update "$id" --post_status="$status" --post_title="$title" --post_content="$content"
   fi
   if [ "$slug" = "privacy-policy" ]; then
     wp option update wp_page_for_privacy_policy "$id"

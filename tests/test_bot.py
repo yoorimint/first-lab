@@ -2449,6 +2449,39 @@ class LeadThresholdTest(unittest.TestCase):
         self.assertEqual(g.title_qualifier("극저신용대출: 불법사금융 피해자 11월 30일까지 접수", self.BODY), [])
 
 
+class CalcReviewGateTest(unittest.TestCase):
+    """독립 검수 전 계산기는 공개하지 않는다 (11/5 운영자 '계산기들은 전부 발행처리했네?')."""
+
+    def test_post_with_unreviewed_calc_is_held(self):
+        import tempfile
+        from bot import review_gate
+        with tempfile.TemporaryDirectory() as d:
+            rec = Path(d, "reviewed.txt")
+            rec.write_text("# 설명\n12 어떤 글\ncalc:vat\n", encoding="utf-8")
+            body = '<p>예시</p><p>[firstlab_calc id="vat"]</p><p>[firstlab_calc id="new-calc"]</p>'
+            got = review_gate.unreviewed_calcs(body, rec)
+            self.assertEqual(len(got), 1)
+            self.assertIn("calc:new-calc", got[0])
+            self.assertEqual(review_gate.unreviewed_calcs(body, Path(d, "없음.txt")), [])   # 기록 파일이 없으면 막지 않음
+        self.assertTrue(any("new-calc" in p for p in review_gate.problems([{"claim": "x"}], body_html=body)))
+
+    def test_calc_pages_published_only_when_reviewed(self):
+        setup = (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8")
+        self.assertIn('grep -qE "^calc:${slug%-calculator}', setup)
+        self.assertIn('--post_status="$status"', setup)
+        self.assertNotIn("--post_status=publish", setup)
+        # 실제 판정: 검수 기록이 있는 계산기만 publish, 계산기 아닌 페이지는 늘 publish
+        import subprocess
+        import tempfile
+        cond = re.search(r"^  status=publish\n.*?^  fi$", setup, re.S | re.M).group(0)
+        with tempfile.TemporaryDirectory() as d:
+            Path(d, "automation").mkdir()
+            Path(d, "automation", "reviewed.txt").write_text("calc:vat\ncalc:vat-extra 메모\n", encoding="utf-8")
+            for slug, want in (("vat-calculator", "publish"), ("new-calculator", "draft"), ("vat-ext-calculator", "draft"), ("about", "publish")):
+                out = subprocess.run(["bash", "-c", f'REPO_DIR={d}; slug={slug}\n{cond}\necho $status'], capture_output=True, text=True)
+                self.assertEqual(out.stdout.strip(), want, slug)
+
+
 class CitedUrlsTest(unittest.TestCase):
     def test_reviewer_gets_writer_sources(self):
         """검수 파일에 글쓴이 근거 주소 + 지시문이 '확인불가 전에 열기' (11/5 #775 고시를 안 열어 확인불가 19건)."""
