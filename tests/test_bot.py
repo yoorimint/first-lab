@@ -2454,6 +2454,17 @@ class TickDeployTest(unittest.TestCase):
         self.assertIn("aaaaaaa", tick.deploy_problem([run("c", "in_progress", None), run("a", "completed", "failure")]))
         self.assertIsNone(tick.deploy_problem([run("h", "completed", "failure", "Health check")]))                     # 배포가 아닌 작업
 
+    def test_billing_block_is_named(self):
+        """11/5: 비공개 저장소 Actions 무료 분 소진 → 작업이 러너 없이 실패, 로그 404. 표시(annotation)로 원인을 바로 보임."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import tick
+        msg = "The job was not started because recent account payments have failed or your spending limit needs to be increased."
+        self.assertTrue(tick.billing_blocked([{"message": "ubuntu-latest label will migrate"}, {"message": msg}]))
+        self.assertFalse(tick.billing_blocked([{"message": "Process completed with exit code 1."}]))
+        pages = {"/jobs": {"jobs": [{"id": 9, "name": "gate", "conclusion": "failure"}]}, "/annotations": [{"message": msg}]}
+        with mock.patch.object(tick, "get", side_effect=lambda u: next(v for k, v in pages.items() if u.endswith(k))):
+            self.assertIn("결제", tick.failure_reason({"id": 1}))
+
 
 class SetupScriptTest(unittest.TestCase):
     """배포 스크립트 (11/5 51e51cf 배포 실패: 권한 설정 중 SQLite 임시 파일이 사라져 chmod 실패 →

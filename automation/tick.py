@@ -31,6 +31,26 @@ def deploy_problem(runs: list[dict]) -> str | None:
     return None
 
 
+BILLING_WORDS = ("spending limit", "payments have failed")
+
+
+def billing_blocked(annotations: list[dict]) -> bool:
+    """배포 작업이 러너 없이 바로 실패한 이유가 GitHub 결제·사용 한도인지 (11/5: 비공개 저장소 무료 분 소진 → 모든 배포가 2초 만에 실패, 로그 없음)."""
+    return any(w in (a.get("message") or "") for a in annotations for w in BILLING_WORDS)
+
+
+def failure_reason(run: dict) -> str:
+    """실패한 배포의 첫 실패 작업 표시(annotation)로 원인 한 줄 — 로그가 없는 실패(러너 시작 안 됨)도 보이게."""
+    jobs = get(f"https://api.github.com/repos/yoorimint/first-lab/actions/runs/{run['id']}/jobs")["jobs"]
+    bad = next((j for j in jobs if j.get("conclusion") == "failure"), None)
+    if not bad:
+        return ""
+    notes = get(f"https://api.github.com/repos/yoorimint/first-lab/check-runs/{bad['id']}/annotations")
+    if billing_blocked(notes):
+        return " — GitHub 결제·사용 한도 문제로 작업이 시작되지 않음 (운영자: GitHub Billing 확인 또는 저장소 공개 전환)"
+    return f" — {bad['name']} 작업 실패"
+
+
 def main() -> int:
     problems = []
     now = datetime.now(ZoneInfo("Asia/Seoul")).replace(tzinfo=None)
@@ -43,6 +63,10 @@ def main() -> int:
             print(f"  {r['name'][:16]} {r['status']} {r['conclusion']} {r['head_sha'][:7]} {r['created_at'][11:16]}Z")
         bad = deploy_problem(runs)
         if bad:
+            try:
+                bad += failure_reason(next(r for r in runs if r["head_sha"][:7] in bad))
+            except Exception as e:  # noqa: BLE001
+                bad += f" (원인 확인 실패: {e})"
             problems.append(bad)
     except Exception as e:  # noqa: BLE001
         print(f"  GitHub 확인 실패: {e}")
