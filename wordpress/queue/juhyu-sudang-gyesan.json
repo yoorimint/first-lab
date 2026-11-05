@@ -1,0 +1,354 @@
+{
+ "title": "주휴수당 계산: 주 20시간 41,280원·40시간 82,560원",
+ "excerpt": "주휴수당은 (1주 소정근로시간 ÷ 40) × 8시간 × 시급이에요. 2026년 시급 10,320원이면 주 20시간 41,280원, 주 40시간 82,560원. 15시간·개근 조건까지 정리했어요.",
+ "content_html": "<p>주휴수당은 <strong>(1주 소정근로시간 ÷ 40) × 8시간 × 시급</strong>으로 계산해요. 2026년 최저임금 시급 10,320원이면 주 20시간 일하는 경우 한 주 41,280원, 주 40시간이면 82,560원이에요. 받으려면 4주 평균 1주 소정근로시간이 15시간 이상이고, 그 주에 일하기로 한 날을 모두 나와야 해요.</p>\n<h2>주휴수당 받는 조건 2가지</h2>\n<ul>\n<li><strong>1주 소정근로시간 15시간 이상</strong>: 4주 동안(4주 미만으로 일하면 그 기간)을 평균한 1주 소정근로시간이 15시간 미만이면 주휴수당이 없어요. 소정근로시간은 근로계약으로 정한 시간이라 연장근로는 넣지 않아요.</li>\n<li><strong>그 주 소정근로일 개근</strong>: 일하기로 한 날에 임의로 안 나온 날이 있으면 그 주 주휴수당은 없어요. 지각·조퇴는 결근으로 보지 않아요.</li>\n</ul>\n<p>상시 근로자 4명 이하 사업장에도 주휴수당 규정이 적용돼요. 다만 동거하는 친족만 쓰는 사업장과 가사 사용인에게는 근로기준법이 적용되지 않아요. 근로계약 기간이 1주(7일)뿐이어도 그 1주 동안 근로관계가 이어지고, 주 15시간 이상 일하기로 한 소정근로일에 모두 나왔다면 받을 수 있어요.</p>\n<h2>주 소정근로시간별 주휴수당 표</h2>\n<p>같은 일을 하는 통상근로자가 주 5일·40시간 일하는 사업장 기준이에요. 주휴시간은 하루 8시간이 최대라서 주 40시간을 넘게 일하기로 정해도 8시간으로 계산해요.</p>\n<table>\n<thead><tr><th>1주 소정근로시간</th><th>주휴시간</th><th>2026년 (10,320원)</th><th>2027년 (10,700원)</th></tr></thead>\n<tbody>\n<tr><td>15시간 미만</td><td>없음</td><td>0원</td><td>0원</td></tr>\n<tr><td>15시간</td><td>3시간</td><td>30,960원</td><td>32,100원</td></tr>\n<tr><td>20시간</td><td>4시간</td><td>41,280원</td><td>42,800원</td></tr>\n<tr><td>25시간</td><td>5시간</td><td>51,600원</td><td>53,500원</td></tr>\n<tr><td>30시간</td><td>6시간</td><td>61,920원</td><td>64,200원</td></tr>\n<tr><td>40시간 이상</td><td>8시간</td><td>82,560원</td><td>85,600원</td></tr>\n</tbody>\n</table>\n<p>2027년 최저임금은 시급 10,700원으로 결정 고시됐고 2027년 1월 1일부터 적용돼요.</p>\n<h2>요일마다 일하는 시간이 다를 때 계산 예시</h2>\n<p>법으로 정한 단시간근로자 계산법은 <strong>4주 동안의 소정근로시간 ÷ 통상근로자의 4주 소정근로일 수</strong>로 하루 소정근로시간을 내고, 여기에 시급을 곱하는 방식이에요. 주 5일 사업장이면 위의 ÷ 40 × 8 식과 결과가 같아요.</p>\n<ol>\n<li>가정: 월·수·금 하루 6시간, 시급 10,320원, 통상근로자는 주 5일</li>\n<li>4주 소정근로시간: 18시간 × 4주 = 72시간</li>\n<li>하루 소정근로시간: 72시간 ÷ 20일 = 3.6시간</li>\n<li>한 주 주휴수당: 3.6시간 × 10,320원 = 37,152원</li>\n<li>매주 받으면 한 달 평균: 37,152원 × 365 ÷ 7 ÷ 12 = 161,434원</li>\n</ol>\n<p>통상근로자가 주 6일 일하는 사업장처럼 근무 일수가 다르면 나누는 일수가 달라져 결과도 달라져요. 주 5일 사업장이라면 내 시급과 시간을 넣어 바로 계산해 보세요.</p>\n<p>[firstlab_calc id=\"weekly-holiday-pay\"]</p>\n<h2>월급제와 209시간의 관계</h2>\n<p>월급이 최저임금 이상인지 따질 때는 월급을 시간으로 나눠 시급으로 바꿔요. 이때 나누는 시간은 1주 소정근로시간에 유급 주휴시간을 더하고, 1년 평균 주 수를 곱해 12로 나눈 시간이에요. 주 40시간이면 (40 + 8) × 365 ÷ 7 ÷ 12 = 약 209시간이에요. 2026년 최저임금 월 환산액 2,156,880원과 2027년 2,236,300원은 이 209시간 기준이에요. 시급제라면 주휴수당이 시급에 포함돼 있는지 근로계약서의 임금 항목을 확인해 보세요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>계약은 주 14시간인데 가끔 더 일하면 받을 수 있나요?</h3>\n<p>주휴수당은 계약으로 정한 소정근로시간으로 따져요. 정한 시간보다 더 일한 연장근로는 넣지 않아서, 계약이 주 15시간 미만이면 더 일한 주에도 주휴수당이 생기지 않아요.</p>\n<h3>연차휴가를 쓴 날이 있으면 결근인가요?</h3>\n<p>아니에요. 휴가·휴일·휴업으로 쉰 날은 결근으로 처리하지 않아요. 결근은 일하기로 한 날에 임의로 안 나온 날이에요.</p>\n<h3>한 주 결근하면 그 달 주휴수당을 다 못 받나요?</h3>\n<p>개근은 1주 단위로 따져요. 결근한 그 주의 주휴수당만 없고, 다른 주에 개근했다면 그 주 주휴수당은 받아요.</p>\n<h3>못 받은 주휴수당은 언제까지 청구할 수 있나요?</h3>\n<p>주휴수당도 임금이라서 3년 동안 청구하지 않으면 시효로 사라져요. 받지 못했다면 고용노동부 고객상담센터(1350)에서 상담을 받을 수 있어요.</p>",
+ "tags": [
+  "주휴수당",
+  "주휴수당 계산",
+  "최저임금",
+  "아르바이트"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a young part-time worker arranging fresh bread on shelves in a bright neighborhood bakery, seen from behind",
+   "alt": "동네 빵집에서 빵을 진열하는 아르바이트생의 뒷모습"
+  }
+ ],
+ "keyword": "주휴수당계산",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 주 20시간 41,280원·주 40시간 82,560원 (시급 10,320원 × 4시간·8시간)",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202403221010432241000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 주휴수당 = (1주 소정근로시간 ÷ 40) × 8시간 × 시급, 통상근로자 주 5일·40시간 사업장 (근로기준법 시행령 제9조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839889",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 2026년 시급 10,320원이면 주 20시간 41,280원, 주 40시간 82,560원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 15시간·개근 조건 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조",
+    "https://www.law.go.kr/법령/근로기준법시행령/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 최저임금 시급 10,320원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4주 평균 1주 소정근로시간 15시간 미만이면 주휴(제55조) 적용 안 됨, 4주 미만이면 그 기간 평균 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주 동안의 소정근로일을 개근해야 유급휴일 (근로기준법 시행령 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주에 평균 1회 이상 유급휴일 보장 (근로기준법 제55조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제55조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소정근로시간은 근로자와 사용자 사이에 정한 근로시간, 연장근로는 넣지 않음 (근로기준법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제2조",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "결근은 소정근로일에 임의로 안 나온 날, 지각·조퇴는 결근 아님",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202403221010432241000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상시 4명 이하 사업장에도 제18조·제55조제1항 적용 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839883",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202403221010432241000"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "동거하는 친족만 사용하는 사업장과 가사 사용인에게는 근로기준법 적용 안 됨 (근로기준법 제11조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제11조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "근로계약 기간이 1주(7일)뿐이어도 1주 근로관계 존속·15시간 이상·개근이면 주휴수당 발생 (근로기준법 제2조)",
+   "urls": [
+    "https://www.moel.go.kr/policy/policydata/view.do?bbs_seq=20210802167",
+    "https://www.korea.kr/multi/visualNewsView.do?newsId=148939357",
+    "https://www.law.go.kr/법령/근로기준법/제2조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "주휴시간은 하루 8시간이 최대, 주 40시간 넘게 정해도 8시간 (근로기준법 제50조)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202403221010432241000",
+    "https://www.law.go.kr/법령/근로기준법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 15시간 미만 0원",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 15시간 3시간, 30,960원 / 32,100원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 20시간 4시간, 41,280원 / 42,800원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 25시간 5시간, 51,600원 / 53,500원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 30시간 6시간, 61,920원 / 64,200원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 40시간 이상 8시간, 82,560원 / 85,600원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 최저임금 시급 10,700원 결정 고시(2026년 8월 5일), 2027년 1월 1일부터 적용",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "단시간근로자 1일 소정근로시간 = 4주 소정근로시간 ÷ 통상근로자 4주 총 소정근로일 수, × 시급 (근로기준법 시행령 제9조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839889",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주 5일 사업장이면 ÷ 40 × 8 식과 결과가 같음 (근로기준법 시행령 제9조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839889",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 18시간 × 4주 = 72시간",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 72시간 ÷ 20일 = 3.6시간 (근로기준법 시행령 제9조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839889"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 3.6시간 × 10,320원 = 37,152원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 37,152원 × 365 ÷ 7 ÷ 12 = 161,434원",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "통상근로자가 주 6일이면 나누는 일수가 달라짐 (근로기준법 시행령 제9조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839889",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주 5일 사업장이라면 계산기로 시급·시간을 넣어 계산 (계산기 defs/weekly-holiday-pay.js) (근로기준법 시행령 제9조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=150839889"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "월급을 시급으로 바꾸는 시간 = (1주 소정근로시간 + 유급 주휴시간) × 1년 평균 주 수 ÷ 12 (최저임금법 시행령 제5조)",
+   "urls": [
+    "https://www.law.go.kr/법령/최저임금법시행령/제5조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "(40 + 8) × 365 ÷ 7 ÷ 12 = 약 209시간",
+   "urls": [
+    "https://www.law.go.kr/법령/최저임금법시행령/제5조",
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "2026년 월 환산액 2,156,880원, 2027년 2,236,300원은 209시간 기준",
+   "urls": [
+    "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "FAQ: 계약 주 15시간 미만이면 가끔 더 일한 주에도 주휴수당 없음 (연장근로 제외)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202205161509553271000",
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 휴가·휴일·휴업으로 쉰 날은 결근 아님",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202403221010432241000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 개근은 1주 단위, 결근한 그 주만 주휴수당 없음 (근로기준법 시행령 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 임금채권은 3년간 행사하지 않으면 시효로 소멸 (근로기준법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "FAQ: 고용노동부 고객상담센터 1350",
+   "urls": [
+    "https://www.moel.go.kr/index.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "최저임금위원회 연도별 최저임금 결정현황",
+   "url": "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"
+  },
+  {
+   "name": "국가법령정보센터 근로기준법 제18조 (단시간근로자의 근로조건)",
+   "url": "https://www.law.go.kr/법령/근로기준법/제18조"
+  },
+  {
+   "name": "국가법령정보센터 근로기준법 시행령 제30조 (휴일)",
+   "url": "https://www.law.go.kr/법령/근로기준법시행령/제30조"
+  }
+ ]
+}
