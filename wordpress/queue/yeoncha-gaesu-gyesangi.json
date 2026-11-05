@@ -1,0 +1,362 @@
+{
+ "title": "연차 개수 계산기: 1년 미만 11일·1년 15일·최대 25일",
+ "excerpt": "연차는 1년 미만이면 1개월 개근마다 1일(최대 11일), 1년 80% 출근하면 15일, 근속 3년부터 2년마다 1일 늘어 최대 25일이에요. 입사일과 기준일만 넣으면 계산돼요.",
+ "content_html": "<p>연차 개수는 <strong>근속 기간</strong>으로 정해져요. 입사 후 1년이 안 됐으면 1개월 개근할 때마다 1일씩 최대 11일, 1년간 80% 이상 출근하고 1년을 채운 다음 날 15일이 생겨요. 근속 3년이 되면 16일로 늘고, 그 뒤 2년마다 1일씩 더해 최대 25일이에요. 그래서 입사 1년 다음 날까지 다니면 첫 2년 동안 받는 연차는 11일 + 15일 = 26일이에요.</p>\n<h2>연차 개수 계산기</h2>\n<p>입사일과 기준일(오늘 또는 마지막 근무일)을 넣으면 입사일 기준으로 지금까지 생긴 연차와 다음 연차가 생기는 날이 나와요. 매달 개근하고 해마다 80% 이상 출근했다고 보고 계산해요.</p>\n<p>[firstlab_calc id=\"annual-leave\"]</p>\n<h2>근속 연수별 연차 개수</h2>\n<p>1년을 넘게 일한 해부터는 15일에, 최초 1년을 넘는 근속 연수 2년마다 1일을 더해요. 더한 일수를 합쳐도 25일이 한도예요.</p>\n<table>\n<thead><tr><th>근속 연수</th><th>그해 생기는 연차</th></tr></thead>\n<tbody>\n<tr><td>1년 미만</td><td>1개월 개근마다 1일 (최대 11일)</td></tr>\n<tr><td>1년·2년</td><td>15일</td></tr>\n<tr><td>3년·4년</td><td>16일</td></tr>\n<tr><td>5년</td><td>17일</td></tr>\n<tr><td>10년</td><td>19일</td></tr>\n<tr><td>15년</td><td>22일</td></tr>\n<tr><td>20년</td><td>24일</td></tr>\n<tr><td>21년 이상</td><td>25일</td></tr>\n</tbody>\n</table>\n<h2>계산 예시: 2024년 3월 4일 입사</h2>\n<p>2026년 11월 5일 기준으로 근속 2년 8개월이에요.</p>\n<ol>\n<li>첫 1년(2024년 4월 4일~2025년 2월 4일): 매달 1일씩 11일</li>\n<li>2025년 3월 4일: 1년째 연차 15일</li>\n<li>2026년 3월 4일: 2년째 연차 15일</li>\n</ol>\n<p>입사 후 생긴 연차는 모두 11 + 15 + 15 = 41일이고, 다음 연차는 2027년 3월 4일에 16일이 생겨요.</p>\n<h2>1년 계약직은 11일, 하루 더 다니면 26일</h2>\n<p>연차는 1개월·1년의 근로를 마친 <strong>다음 날</strong> 생겨요. 2025년 1월 1일에 입사해 2025년 12월 31일에 계약이 끝나면 15일은 생기지 않고 1개월 개근분 11일만 받아요. 2026년 1월 1일까지 근로관계가 이어지면 15일이 더 생겨 26일이 돼요. 1개월 개근분도 마찬가지로, 1월 1일 입사면 첫 1일은 2월 1일에 생겨요.</p>\n<h2>연차 개수가 달라지는 경우</h2>\n<ul>\n<li><strong>출근율 80% 미만</strong>: 그해에는 15일 대신 1개월 개근할 때마다 1일이 생겨요. 업무상 부상·질병으로 쉰 기간, 출산전후휴가·유산·사산 휴가, 육아휴직 기간, 육아기·임신기 근로시간 단축으로 줄어든 시간은 출근한 것으로 봐요.</li>\n<li><strong>상시 4명 이하 사업장</strong>: 연차 유급휴가 규정이 적용되지 않아요. 동거하는 친족만 쓰는 사업장과 가사 사용인에게는 근로기준법 자체가 적용되지 않아요.</li>\n<li><strong>단시간 근로자</strong>: 4주 평균 1주 소정근로시간이 15시간 미만이면 연차가 없어요. 15시간 이상이면 생기지만, 같은 일을 하는 통상 근로자와 비교한 근로시간 비율에 맞춰 줄어요.</li>\n<li><strong>회계연도 기준 회사</strong>: 1월 1일처럼 회사가 정한 날에 모든 직원 연차를 한꺼번에 주는 곳은 입사 연도의 일수가 계산기와 다르게 보일 수 있어요. 퇴사할 때 입사일 기준보다 적게 받았다면 회사에 정산을 요청할 수 있으니, 취업규칙을 확인해 두세요.</li>\n</ul>\n<h2>안 쓴 연차는 언제 없어지나요</h2>\n<p>연차는 생긴 날부터 1년 안에 쓰지 않으면 없어져요. 입사 1년 미만 때 생긴 연차는 입사 1년이 되는 날까지 써야 해요. 다만 사용자(회사)의 귀책사유로 못 쓴 경우는 없어지지 않아요. 회사가 법에서 정한 방식대로 서면으로 사용을 촉진했는데도 쓰지 않았다면 수당을 받지 못하고, 촉진 없이 없어진 연차는 미사용 연차수당으로 받아요. 연차휴가 기간에는 취업규칙 등에서 정하는 통상임금 또는 평균임금을 받아요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>연차는 원하는 날에 쓸 수 있나요?</h3>\n<p>회사는 근로자가 청구한 시기에 연차를 줘야 해요. 다만 그 시기에 쉬면 사업 운영에 막대한 지장이 있는 경우에는 회사가 시기를 바꿀 수 있어요.</p>\n<h3>반차나 시간 단위로도 쓸 수 있나요?</h3>\n<p>2027년 6월 10일부터 근로자가 대통령령으로 정하는 시간 단위와 일수 범위에서 연차를 나눠 청구하면 회사는 이를 줘야 해요. 연차를 청구하거나 썼다는 이유로 해고하거나 불리하게 대하는 것도 이때부터 금지 조항으로 들어가요.</p>\n<h3>육아휴직을 쓴 해에도 15일이 생기나요?</h3>\n<p>육아휴직 기간은 출근한 것으로 보기 때문에, 그 기간을 출근으로 넣어 계산한 1년 출근율이 80% 이상이면 다음 해 15일이 생겨요.</p>\n",
+ "tags": [
+  "연차 개수",
+  "연차 계산기",
+  "연차휴가",
+  "근로기준법"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "an empty office desk by a sunny window with a coffee mug and a small potted plant, a packed travel bag resting on the chair",
+   "alt": "햇살 드는 사무실 책상 위 커피잔과 의자 위 여행 가방"
+  }
+ ],
+ "keyword": "연차개수계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 1년 미만 11일·1년 15일·최대 25일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 1년 미만이면 1개월 개근마다 1일(최대 11일) (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 1년 80% 출근하면 15일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 근속 3년부터 2년마다 1일 늘어 최대 25일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "[요약] 입사일과 기준일만 넣으면 계산됨 (계산기 입력 2칸)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "1년간 80% 이상 출근하고 1년을 채운 다음 날 15일 생김 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근속 3년이 되면 16일, 그 뒤 2년마다 1일 더해 최대 25일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "입사 1년 다음 날까지 다니면 첫 2년 연차 11일 + 15일 = 26일",
+   "urls": [
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기: 매달 개근·해마다 80% 이상 출근 가정, 입사일 기준",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "최초 1년을 넘는 근속 연수 2년마다 1일 가산, 25일 한도 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 1년·2년 15일, 3년·4년 16일, 5년 17일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 10년 19일, 15년 22일, 20년 24일, 21년 이상 25일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 2024년 3월 4일 입사, 2026년 11월 5일 기준 근속 2년 8개월",
+   "urls": [
+    "https://www.law.go.kr/법령/민법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 첫 1년 2024년 4월 4일~2025년 2월 4일 매달 1일씩 11일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 2025년 3월 4일 15일, 2026년 3월 4일 15일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예시: 합계 11 + 15 + 15 = 41일, 2027년 3월 4일에 16일",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연차는 1개월·1년의 근로를 마친 다음 날 생김",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052",
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "2025년 1월 1일 입사, 2025년 12월 31일 계약 종료면 15일 없이 11일",
+   "urls": [
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 1월 1일까지 근로관계가 이어지면 15일 더해 26일",
+   "urls": [
+    "https://www.scourt.go.kr/sjudge/1663226175597_161615.pdf",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1월 1일 입사면 첫 1일은 2월 1일에 생김 (민법 제160조)",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052",
+    "https://www.law.go.kr/법령/민법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "출근율 80% 미만인 해는 15일 대신 1개월 개근마다 1일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "출근 간주: 업무상 부상·질병 휴업, 출산전후휴가·유산·사산 휴가, 육아휴직, 육아기·임신기 근로시간 단축 시간 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "상시 4명 이하 사업장은 연차 유급휴가 규정 미적용 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동거 친족만 쓰는 사업장과 가사 사용인에게는 근로기준법 미적용 (근로기준법 제11조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "4주 평균 1주 소정근로시간 15시간 미만이면 연차 없음 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "15시간 이상 단시간 근로자는 통상 근로자 근로시간 비율로 줄어듦 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "회계연도 기준 회사는 입사 연도 일수가 입사일 기준과 다를 수 있음",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000266243",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202306071525097031000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴사할 때 입사일 기준보다 적게 받았으면 정산 요청 가능",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202306071525097031000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연차는 생긴 날부터 1년 안에 안 쓰면 소멸 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 미만 때 생긴 연차는 입사 1년이 되는 날까지 사용 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사용자(회사)의 귀책사유로 못 쓴 경우는 소멸하지 않음 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "법에서 정한 서면 사용 촉진에도 안 쓰면 수당 없음 (근로기준법 제61조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "촉진 없이 소멸한 연차는 미사용 연차수당으로 받음 (근로기준법 제61조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202306071525097031000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연차휴가 기간에는 취업규칙 등에서 정하는 통상임금 또는 평균임금 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "회사는 청구한 시기에 연차를 줘야 하고, 사업 운영에 막대한 지장이 있으면 시기 변경 가능 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "2027년 6월 10일부터 대통령령으로 정하는 시간 단위·일수 범위에서 나눠 청구하면 줘야 함 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "2027년 6월 10일부터 연차 청구·사용을 이유로 한 해고·불리한 처우 금지 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "육아휴직 기간을 출근으로 넣은 1년 출근율이 80% 이상이면 다음 해 15일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 근로기준법 제60조 (연차 유급휴가)",
+   "url": "https://www.law.go.kr/법령/근로기준법/제60조"
+  },
+  {
+   "name": "고용노동부 보도자료 연차유급휴가 행정해석 변경",
+   "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+  }
+ ]
+}
