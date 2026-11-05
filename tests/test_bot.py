@@ -2532,6 +2532,10 @@ class CitedUrlsTest(unittest.TestCase):
         self.assertEqual(unreviewed.cited_urls(post), ["https://a.go.kr", "https://law.go.kr/x"])
         self.assertEqual(unreviewed.cited_urls({}), [])
         self.assertIn("cited_urls", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
+        prompt = (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8")
+        for need in ("independent implementation", "pdftotext", "every label"):   # 계산기 검수 깊이 (11/5 #784 글쓰기 검수 틀림 0 → 외부 6건)
+            self.assertIn(need, prompt)
+        self.assertIn("review-prompt.md` 의 계산기 항목", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
 
 class LeadMinimumTest(unittest.TestCase):
