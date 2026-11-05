@@ -10,8 +10,10 @@ firstlab_bot_request = 관리자가 '지금 글 1개 만들기'를 누른 시각
 """
 from __future__ import annotations
 
+import fcntl
 import json
 import subprocess
+from contextlib import contextmanager
 from datetime import datetime
 
 from .settings import wp_cli
@@ -21,6 +23,7 @@ REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
 DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired", "publish_fired", "continuous", "maint_fired")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
 MAX_LOG = 30
+STATE_LOCK = "/run/firstlab-state.lock"  # 봇(1분)·배포(글 올리기)·키워드 수집이 상태를 동시에 저장할 때 순서 맞춤
 MAX_USED = 2000
 
 
@@ -38,10 +41,36 @@ def load_state() -> dict:
     return state
 
 
+@contextmanager
+def _state_lock():
+    try:
+        handle = open(STATE_LOCK, "a")
+    except OSError:  # 잠금 파일을 못 만드는 환경(테스트 등)에서는 잠금 없이
+        yield
+        return
+    with handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)
+        yield
+
+
+def merge_stored(state: dict, stored: dict) -> None:
+    """읽은 뒤에 다른 실행이 저장한 기록·사용 키워드를 합친다 (통째로 덮어쓰면 사라짐).
+    11/5 오전: 봇이 사진 채우기로 길게 도는 사이 배포가 남긴 '직접 작성 글' 기록을 봇이 덮어써,
+    연속 작성이 글이 올라온 줄 모르고 60분 제한까지 기다림."""
+    mine = {(e.get("time"), e.get("msg")) for e in state["log"]}
+    extra = [e for e in stored.get("log", []) if (e.get("time"), e.get("msg")) not in mine]
+    if extra:
+        state["log"] = sorted(state["log"] + extra, key=lambda e: str(e.get("time", "")), reverse=True)
+    seen = set(state["used_keywords"])
+    state["used_keywords"] += [k for k in stored.get("used_keywords", []) if k not in seen]
+
+
 def save_state(state: dict) -> None:
-    state["used_keywords"] = state["used_keywords"][-MAX_USED:]
-    state["log"] = state["log"][:MAX_LOG]
-    wp_cli("option", "update", STATE_OPTION, json.dumps(state, ensure_ascii=False), "--format=json")
+    with _state_lock():
+        merge_stored(state, load_state())
+        state["used_keywords"] = state["used_keywords"][-MAX_USED:]
+        state["log"] = state["log"][:MAX_LOG]
+        wp_cli("option", "update", STATE_OPTION, json.dumps(state, ensure_ascii=False), "--format=json")
 
 
 def add_spend(state: dict, usd: float) -> None:

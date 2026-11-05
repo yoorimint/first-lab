@@ -1013,5 +1013,23 @@ class ErrorTypeRegistryTest(unittest.TestCase):
             if re.search(r"찾지 못했|못 찾았|확인되지 않았", text) and not superseded(p, self.PATCHES[i + 1:]):
                 self.fail(f"patches.json {i}번(글 {p['post']}): '없음' 단정 문구 — 확인처 안내로 쓰기")
 
+
+class StateMergeTest(unittest.TestCase):
+    """11/5: 봇 실행 중 배포가 남긴 '직접 작성 글' 기록을 봇 저장이 덮어써 연속 작성이 멈춤 → 저장 때 합친다."""
+
+    def test_save_keeps_log_written_by_other_process(self):
+        from bot import state as st
+        mine = {"plan": {}, "done": {}, "used_keywords": ["a"], "log": [{"time": "2026-11-05 09:30", "ok": True, "msg": "사진 채우기"}]}
+        stored = {"used_keywords": ["a", "b"], "log": [{"time": "2026-11-05 08:56", "ok": True, "msg": "직접 작성 글: 증여세"},
+                                                      {"time": "2026-11-05 08:46", "ok": True, "msg": "연속 작성 41번째"}]}
+        written = []
+        with mock.patch.object(st, "load_state", return_value=stored), \
+             mock.patch.object(st, "wp_cli", side_effect=lambda *a: written.append(a) or ""), \
+             mock.patch.object(st, "STATE_LOCK", "/nonexistent-dir/x.lock"):
+            st.save_state(mine)
+        saved = json.loads(written[-1][3])
+        self.assertEqual([e["msg"] for e in saved["log"]], ["사진 채우기", "직접 작성 글: 증여세", "연속 작성 41번째"])
+        self.assertEqual(saved["used_keywords"], ["a", "b"])
+
 if __name__ == "__main__":
     unittest.main()
