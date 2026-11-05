@@ -213,6 +213,27 @@ def describe(sig: dict | None, total: int) -> str:
     return " / ".join(parts)
 
 
+def is_gold(sig: dict | None, total: int, keyword: str = "") -> bool:
+    """황금·좋음 (검색 1회당 글 1개 미만, 글 10개 이상, 사이트 찾아가는 검색 아님) — 글쓰기·공개를 먼저 할 키워드."""
+    return gold_label(sig, total) in ("황금", "좋음") and not is_navigational(keyword)
+
+
+def publish_priority(keywords: dict[int, str], month: int) -> dict[int, float]:
+    """초안 번호 → 공개 우선 점수 (황금 점수×2 + 성수기). 키워드 창고·신호가 없으면 빈 값 (공개 순서는 예전대로)."""
+    from .keyword_db import DB_PATH, connect
+    if not keywords or not DB_PATH.exists():
+        return {}
+    try:
+        with connect() as conn:
+            sigs = load(conn)
+            totals = {r["norm"]: r["total"] for r in conn.execute(
+                f"SELECT norm, total FROM keywords WHERE norm IN ({','.join('?' * len(keywords))})",
+                [norm(k) for k in keywords.values()])}
+    except Exception:  # noqa: BLE001 — 순서 정하기용이라 실패해도 공개는 계속
+        return {}
+    return {pid: signal_score(sigs.get(norm(k)), totals.get(norm(k), 0), month, k) for pid, k in keywords.items()}
+
+
 def load(conn) -> dict[str, dict]:
     conn.execute(SCHEMA)
     return {r["norm"]: dict(r) for r in conn.execute("SELECT * FROM naver_signals")}

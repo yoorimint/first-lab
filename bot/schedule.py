@@ -10,7 +10,7 @@ import random
 import subprocess
 from datetime import datetime, timedelta, timezone
 
-from . import freshness, indexnow, seasons
+from . import freshness, indexnow, naver_hub, seasons
 from .settings import wp_cli
 
 QUEUE_META = "_firstlab_queue"
@@ -85,8 +85,11 @@ def publish_next(now_kst: datetime) -> str | None:
     if not ids:
         return None
     texts = _draft_texts(ids)
-    # 시즌 중인 글 먼저, 시즌 지난 글은 뒤로 (bot/seasons.py) → 그 안에서 사진이 다 들어간 글 먼저 → 오래된 순
-    ordered = sorted(ids, key=lambda i: (seasons.rank(texts.get(i, ""), now_kst.date()), _has_pending_images(i)))
+    # 시즌 지난 글은 맨 뒤 (bot/seasons.py) → 황금 점수·성수기 높은 글 먼저 (운영자 지시 11/5, bot/naver_hub.py)
+    # → 시즌 중인 글 → 사진이 다 들어간 글 → 오래된 순
+    gold = naver_hub.publish_priority({i: texts.get(i, "").split(" ")[0] for i in ids}, now_kst.month)
+    rank = {i: seasons.rank(texts.get(i, ""), now_kst.date()) for i in ids}
+    ordered = sorted(ids, key=lambda i: (rank[i] == seasons.OFF, -round(gold.get(i, 0.0), 2), rank[i], _has_pending_images(i)))
     held = []
     post_id = None
     for candidate in ordered[:MAX_FRESH_CHECKS]:

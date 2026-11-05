@@ -1283,6 +1283,55 @@ class FreshnessTest(unittest.TestCase):
         self.assertIn("보류", msg)
 
 
+class GoldFirstTest(unittest.TestCase):
+    """11/5 운영자 지시: 황금 키워드는 점수 높은 것부터 쓰고 공개한다."""
+
+    def test_publish_order_gold_first_but_off_season_last(self):
+        import json as _json
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import freshness, naver_hub, schedule
+        calls = []
+        rows = [{"ID": 80, "post_name": "%EC%BA%A0%ED%95%91%EC%A4%80%EB%B9%84%EB%AC%BC", "post_title": "캠핑"},      # 캠핑준비물
+                {"ID": 85, "post_name": "%EC%97%B0%EB%A7%90%EC%A0%95%EC%82%B0", "post_title": "연말정산"},          # 연말정산
+                {"ID": 90, "post_name": "%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5", "post_title": "해수욕장 개장"}]    # 해수욕장 (여름, 11월엔 지남)
+
+        def wp(*args):
+            calls.append(args)
+            if args[:2] == ("post", "list") and "--format=json" in args:
+                return _json.dumps(rows)
+            if args[:2] == ("post", "list"):
+                return "80\n85\n90\n"
+            return "글" if "--field=post_title" in args else ""
+        prio = {80: 0.5, 85: 6.0, 90: 9.0}
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp), \
+             mock.patch.object(naver_hub, "publish_priority", return_value=prio), \
+             mock.patch.object(schedule.seasons, "rank", side_effect=lambda text, today: schedule.seasons.OFF if "해수욕장" in text else schedule.seasons.NONE), \
+             mock.patch.object(freshness, "check_post", return_value=[]):
+            schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+        self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "85")  # 황금 점수 높은 글 먼저, 시즌 지난 글은 점수가 높아도 뒤
+
+    def test_candidates_gold_group_first(self):
+        import sqlite3
+        from bot import keyword_db, naver_hub, select_keyword
+        from bot.settings import BotSettings
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.executescript(keyword_db.SCHEMA)
+        keyword_db._migrate(conn)
+        conn.execute("CREATE TABLE IF NOT EXISTS gsc_signals (norm TEXT PRIMARY KEY, kind TEXT, note TEXT)")
+        for kw, total in (("퇴직금 계산기", 9000), ("육아휴직 급여 신청", 1200)):
+            conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES (?,?,?,?,?)",
+                         (kw, keyword_db.norm(kw), total, "2026-11-05", "2026-11-05"))
+        naver_hub.load(conn)
+        conn.execute("INSERT INTO naver_signals(norm, docs, docs_checked) VALUES ('육아휴직급여신청', 100, '2026-11-05')")   # 황금
+        conn.execute("INSERT INTO naver_signals(norm, docs, docs_checked) VALUES ('퇴직금계산기', 400000, '2026-11-05')")  # 포화
+        got = select_keyword.ranked_candidates(conn, BotSettings(min_volume=500, max_volume=30000), limit=5)
+        self.assertEqual(got[0]["keyword"], "육아휴직 급여 신청")
+        self.assertTrue(got[0]["gold"])
+        self.assertFalse(got[1]["gold"])
+
+
 class TopicDirectionTest(unittest.TestCase):
     """11/5 운영자 결정: 계산기·돈 주제 우선, 같은 뜻 다른 표기는 이미 쓴 주제로."""
 
