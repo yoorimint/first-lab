@@ -185,7 +185,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   규칙은 `bot.refresh.RETITLE_SYSTEM` (본문에 있는 숫자만, 과장·낚시 금지, 제목 60자·요약문 120자 이내).
   파일에는 `content_html` 대신 `"title"`, `"excerpt"` 를 넣는다. 숫자가 본문에 없으면 서버가 거부한다.
 - 보강·재검증 공통: `content_html` 의 구조·말투, 이미지(figure)·링크(a) 태그는 그대로 둔다. 본문을 줄이지 않는다 (기존의 80% 미만이면 서버가 거부).
-  제목은 바꾸지 않는다. 조사는 3단계와 같은 원칙.
+  제목은 바꾸지 않는다 — 단 `gold_keyword` 가 있으면 그 검색어(예: 주휴수당뜻)의 답을 맨 앞 단락에 넣고, 제목에도 그 말을 넣어 `"title"`·`"excerpt"` 를 같이 올린다 (없으면 서버가 거부). 조사는 3단계와 같은 원칙.
 - `wordpress/queue/refresh-<id>-<오늘 날짜>.json` 으로 저장:
   `{"type": "refresh", "post_id": <id>, "base_modified": "<응답 값 그대로>", "content_html": "<고친 본문 전체>", "changes": "<무엇을 바꿨는지 한 줄>"}`
   (제목 모드는 `content_html` 대신 `"title": "...", "excerpt": "..."`)

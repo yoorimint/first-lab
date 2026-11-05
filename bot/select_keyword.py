@@ -7,7 +7,7 @@ from difflib import SequenceMatcher
 
 from . import competition, naver_hub
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
-from .keyword_filter import is_allowed, is_question, subject
+from .keyword_filter import subject_intent, is_allowed, is_question, subject
 from .llm import LLMBusy
 from .safety import classify
 from .scoring import find_head, score
@@ -89,16 +89,18 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
 
     used_cores = {_core(u) for u in used}
     used_unified = {_core(unify(u)) for u in used}
-    used_subjects = {subject(u) for u in used}  # 이미 쓴 글의 주제 → 같은 주제 키워드는 새 글 대신 그 글 보강(refresh.py)
+    # 이미 쓴 글의 (주제, 검색 목적) → 둘 다 같은 키워드만 새 글 대신 그 글 보강(refresh.py). 목적이 다르면 새 글
+    # (11/5 운영자: 주휴수당 뜻 ↔ 주휴수당 계산은 검색 의도가 다름)
+    used_subjects = {subject_intent(u) for u in used}
     head_difficulty = _head_difficulty(conn, volumes)
     month = dt.date.today().month
 
     def overlaps_used(n: str) -> bool:
         """이미 쓴 글과 같은 주제인 키워드를 막는다 (같은 주제 글이 여러 개면 서로 순위를 깎아 먹음).
-        막음: 퇴직금계산 ↔ 퇴직금계산방법, 자동차정기검사비용 ↔ 자동차정기검사조회(주제가 같고 수식어만 다름),
+        막음: 퇴직금계산 ↔ 퇴직금계산방법, 자동차정기검사비용 ↔ 자동차정기검사가격(주제·목적이 같음),
               다이어트식단 ↔ 다이어트식단표(2글자 이내 차이)
-        허용: 퇴직금계산 → 퇴직금계산1년미만"""
-        if _core(n) in used_cores or subject(n) in used_subjects:
+        허용: 퇴직금계산 → 퇴직금계산1년미만, 주휴수당계산 → 주휴수당뜻(목적이 다름)"""
+        if _core(n) in used_cores or subject_intent(n) in used_subjects:
             return True
         if any((u in n or n in u) and abs(len(n) - len(u)) <= 2 for u in used):
             return True

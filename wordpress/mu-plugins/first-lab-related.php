@@ -20,11 +20,19 @@ add_filter(
 			array(
 				'category__in'        => $cats,
 				'post__not_in'        => array( $post_id ),
-				'numberposts'         => FIRSTLAB_RELATED_COUNT,
+				'numberposts'         => 40,
 				'post_status'         => 'publish',
 				'ignore_sticky_posts' => true,
 			)
 		) : array();
+		// 같은 주제(제목이 많이 겹치는) 글을 먼저 — 주휴수당 뜻 ↔ 주휴수당 계산처럼 목적이 다른 같은 주제 글끼리 서로 연결 (11/5 운영자)
+		$title = get_the_title( $post_id );
+		$score = static function ( $p ) use ( $title ) {
+			similar_text( $title, get_the_title( $p ), $pct );
+			return $pct;
+		};
+		usort( $related, static fn( $a, $b ) => $score( $b ) <=> $score( $a ) );
+		$related = array_slice( $related, 0, FIRSTLAB_RELATED_COUNT );
 		if ( ! $related ) {
 			return $content;
 		}

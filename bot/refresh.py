@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from . import changed, factcheck
 from .blocks import to_blocks
 from .keyword_db import connect, norm
-from .keyword_filter import subject
+from .keyword_filter import subject, subject_intent
 from .llm import make_llm
 from .search_console import SCHEMA as GSC_SCHEMA
 from .settings import BotSettings, wp_cli
@@ -86,12 +86,29 @@ def _history(conn, page: str) -> tuple[dict | None, dict | None]:
 def siblings(conn, post_url: str, limit: int = 8) -> list[tuple[str, int]]:
     """글 주소(=키워드)와 같은 주제인, 아직 안 쓴 검색어 (검색량순)."""
     slug = urllib.parse.unquote(post_url.rstrip("/").rsplit("/", 1)[-1])
-    subj = subject(norm(slug))
-    if len(subj) < 3:
+    subj = subject_intent(norm(slug))   # 주제·검색 목적이 같은 것만 (목적이 다르면 새 글 — select_keyword)
+    if len(subj[0]) < 3:
         return []
     rows = conn.execute("SELECT keyword, norm, total FROM keywords WHERE status IN ('new','ok') AND norm LIKE ?"
-                        " ORDER BY total DESC LIMIT 200", (f"%{subj}%",)).fetchall()
-    return [(r["keyword"], r["total"]) for r in rows if subject(r["norm"]) == subj][:limit]
+                        " ORDER BY total DESC LIMIT 200", (f"%{subj[0]}%",)).fetchall()
+    return [(r["keyword"], r["total"]) for r in rows if subject_intent(r["norm"]) == subj][:limit]
+
+
+def gold_sibling(hub: dict, sibs: list[tuple[str, int]]) -> str:
+    """같은 주제·목적 검색어 중 황금 키워드 (11/5 운영자: 황금 키워드는 제목·본문에 그 말이 있어야 먹는다 → 바로 보강)."""
+    from . import naver_hub
+    for kw, total in sibs:
+        if naver_hub.is_gold(hub.get(norm(kw)), total, kw):
+            return kw
+    return ""
+
+
+def title_has_keyword(title: str, keyword: str) -> bool:
+    """제목에 그 검색어의 주제와 목적 말이 다 있는지 ('주휴수당 뜻과 계산: …' ↔ 주휴수당뜻)."""
+    subj, _ = subject_intent(norm(keyword))
+    tail = norm(keyword)[len(subj):] if norm(keyword).startswith(subj) else ""
+    t = norm(title)
+    return subj in t and (not tail or tail in t)
 
 
 def top_queries(conn, page: str, limit: int = 5) -> list[dict]:
@@ -109,16 +126,28 @@ def pick_targets(conn, limit: int, fixes_only: bool = False) -> list[tuple[dict,
     posts = json.loads(wp_cli("eval", _POSTS_PHP) or "[]")
     now = datetime.now()
     recent = (now - timedelta(days=MIN_DAYS_BETWEEN)).strftime("%Y-%m-%d")
-    picks: list[tuple[int, dict, str, str]] = []
+    picks: list[tuple[float, dict, str, str]] = []
+    try:
+        from . import naver_hub
+        hub = naver_hub.load(conn)   # 황금 키워드 신호 (한 번만 읽음)
+    except Exception:  # noqa: BLE001 - 신호 표가 없으면 예전 그대로
+        hub = {}
     for p in posts:
         law = p.get("law_changed") or ""
         if changed.pending(law, max(p["refreshed"] or "", p.get("verified") or "")):  # 근거가 마지막 확인 뒤에 바뀜
             picks.append((-1, p, "recheck", f"근거 변경: {law}"))
             continue
-        if fixes_only or (p["refreshed"] and p["refreshed"] >= recent):
+        if fixes_only:
+            continue
+        p["siblings"] = siblings(conn, p["url"])
+        gold = gold_sibling(hub, p["siblings"])
+        if gold:  # 최근에 갱신했어도 — 보강하면 그 키워드는 '사용됨'이 되어 다시 안 뽑힘 (apply_direct)
+            p["gold_keyword"] = gold
+            picks.append((0.5, p, "enhance", f"황금 키워드 '{gold}' — 같은 주제·목적이라 새 글 대신 이 글을 보강 (제목·본문에 그 말)"))
+            continue
+        if p["refreshed"] and p["refreshed"] >= recent:
             continue
         latest, older = _history(conn, p["url"])
-        p["siblings"] = siblings(conn, p["url"])
         sib_volume = sum(v for _, v in p["siblings"])
         imp = latest["impressions"] if latest else 0
         pos = latest["position"] if latest else 999
@@ -232,7 +261,8 @@ def plan_direct(state: dict, fixes_only: bool = False) -> list[str]:
     with connect() as conn:
         queries = top_queries(conn, post["url"])
     state["refresh_target"] = {"id": post["id"], "title": post["title"], "url": post["url"], "mode": mode,
-                               "why": why, "siblings": [k for k, _ in post.get("siblings", [])], "queries": queries}
+                               "why": why, "siblings": [k for k, _ in post.get("siblings", [])], "queries": queries,
+                               "gold_keyword": post.get("gold_keyword", "")}
     return [f"글 갱신 대상 준비 (매일 글쓰기 세션이 처리): '{post['title']}' - {why}"]
 
 
@@ -250,15 +280,23 @@ def apply_direct(data: dict, state: dict) -> str:
         if len(new_html) < len(old) * MIN_KEEP_RATIO:
             raise RuntimeError(f"고친 본문이 너무 짧음 ({len(new_html)}자 < 기존 {len(old)}자의 80%) → 반영 안 함")
     title, excerpt = _checked_title(data, new_html or old) if data.get("title") else ("", "")
+    target = state.get("refresh_target") or {}
+    gold = target.get("gold_keyword") if target.get("id") == post_id else ""
+    if gold and not title_has_keyword(title or wp_cli("post", "get", str(post_id), "--field=post_title"), gold):
+        raise RuntimeError(f"황금 키워드 '{gold}' 보강인데 제목에 그 말이 없음 → 반영 안 함 (제목에 '{gold}' 의 주제와 목적 말을 넣기)")
     if new_html is None and not title and data.get("checked") is not True:
         raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음 (확인만 했으면 \"checked\": true)")
     # checked: 재검증해 보니 고칠 게 없음 → 갱신 날짜만 기록 (안 하면 근거 변경 표시가 안 풀려 매일 같은 글이 다시 뽑힘)
     _save(post_id, new_html, title, excerpt)
     _renew_evidence(post_id, data.get("review"))
     _count_done(state)
-    target = state.get("refresh_target") or {}
     if target.get("id") == post_id:
         state.pop("refresh_target", None)
+    if gold:  # 이 글이 그 검색어를 맡음 → 다시 새 글·보강 대상으로 안 뽑힘
+        from .keyword_db import set_status
+        with connect() as conn:
+            set_status(conn, gold, "used", f"글 {post_id} 보강으로 답함")
+            conn.commit()
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
     return f"'{title}' - {target.get('why', '')} → 수정 - {str(data.get('changes', ''))[:80]}"
 

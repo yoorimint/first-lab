@@ -93,10 +93,16 @@ class SelectionTest(unittest.TestCase):
         return s
 
     def test_same_subject_as_written_post_is_skipped(self):
-        conn = memory_db([("자동차정기검사비용", 5380, "used", None), ("자동차정기검사조회", 9820, "new", None),
-                          ("자동차종합검사비용", 6500, "new", None)])
+        """주제·검색 목적이 같으면 막고(기존 글 보강), 목적이 다르면 새 글 (11/5 운영자 '주휴수당 뜻이랑 계산은 다른 거잖아')."""
+        conn = memory_db([("자동차정기검사비용", 5380, "used", None), ("자동차정기검사가격", 9820, "new", None),
+                          ("자동차정기검사조회", 9000, "new", None), ("자동차종합검사비용", 6500, "new", None),
+                          ("주휴수당계산", 5000, "used", None), ("주휴수당뜻", 8180, "new", None),
+                          ("주휴수당계산방법", 3000, "new", None)])
         picked = [c["keyword"] for c in ranked_candidates(conn, self.settings())]
-        self.assertNotIn("자동차정기검사조회", picked)
+        self.assertNotIn("자동차정기검사가격", picked)   # 비용 = 비용 → 기존 글 보강
+        self.assertNotIn("주휴수당계산방법", picked)     # 계산 = 계산
+        self.assertIn("자동차정기검사조회", picked)      # 비용 ≠ 조회 → 새 글
+        self.assertIn("주휴수당뜻", picked)              # 계산 ≠ 정의 → 새 글
         self.assertIn("자동차종합검사비용", picked)
 
     def test_difficulty_estimated_from_same_head(self):
@@ -558,9 +564,31 @@ class MiscTest(unittest.TestCase):
 
     def test_refresh_siblings(self):
         conn = memory_db([("자동차정기검사비용", 5380, "used", None), ("자동차정기검사조회", 9820, "new", None),
-                          ("자동차정기검사기간", 3000, "new", None), ("자동차종합검사비용", 6500, "new", None)])
+                          ("자동차정기검사가격", 4000, "new", None), ("자동차정기검사요금", 3000, "new", None),
+                          ("자동차종합검사비용", 6500, "new", None)])
         url = "https://first-lab.kr/" + urllib.parse.quote("자동차정기검사비용") + "/"
-        self.assertEqual([k for k, _ in refresh.siblings(conn, url)], ["자동차정기검사조회", "자동차정기검사기간"])
+        # 같은 목적(비용)만 이 글의 보강 대상 — 조회는 따로 새 글
+        self.assertEqual([k for k, _ in refresh.siblings(conn, url)], ["자동차정기검사가격", "자동차정기검사요금"])
+
+    def test_gold_sibling_enhance_puts_keyword_in_title(self):
+        """같은 주제·목적 황금 키워드는 새 글 대신 바로 보강, 제목에 그 말이 없으면 반영 안 함, 보강하면 그 키워드는 '사용됨'."""
+        from bot import naver_hub
+        self.assertTrue(refresh.title_has_keyword("주휴수당 뜻과 계산: 주 15시간 이상이면 받아요", "주휴수당뜻"))
+        self.assertFalse(refresh.title_has_keyword("주휴수당 계산: 주 20시간 41,280원", "주휴수당뜻"))
+        with mock.patch.object(naver_hub, "is_gold", side_effect=lambda sig, total, kw="": kw == "주휴수당의미"):
+            self.assertEqual(refresh.gold_sibling({}, [("주휴수당개념", 100), ("주휴수당의미", 900)]), "주휴수당의미")
+            self.assertEqual(refresh.gold_sibling({}, [("주휴수당개념", 100)]), "")
+        state = {"refresh_target": {"id": 7, "gold_keyword": "주휴수당뜻", "why": "황금"}}
+        wp = lambda *a: {"--field=post_modified": "m", "--field=post_content": "<p>" + "가" * 100 + "</p>",  # noqa: E731
+                         "--field=post_title": "주휴수당 계산: 주 20시간 41,280원"}.get(a[-1], "")
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp), mock.patch.object(refresh, "_save"), \
+                mock.patch.object(refresh, "_renew_evidence"):
+            with self.assertRaises(RuntimeError):
+                refresh.apply_direct({"post_id": 7, "content_html": "<p>" + "가" * 100 + "</p>"}, state)
+
+    def test_related_box_prefers_same_subject(self):
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php").read_text(encoding="utf-8")
+        self.assertIn("similar_text", php)   # 같은 주제 글끼리 먼저 연결 (주휴수당 뜻 ↔ 계산)
 
     def test_popular_page_sums_clicks_per_page(self):
         rows = [{"page": "a", "clicks": 3}, {"page": "b", "clicks": 4}, {"page": "a", "clicks": 3}]
