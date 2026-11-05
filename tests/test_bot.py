@@ -1515,7 +1515,7 @@ class LawApiVersionsTest(unittest.TestCase):
 
 
 class NaverHubTest(unittest.TestCase):
-    """네이버 API HUB (11/5 운영자 승인: 검색어 트렌드·블로그 문서 수만, 하루 호출 상한)."""
+    """네이버 API HUB (11/5 운영자 승인: 블로그 문서 수·검색어 트렌드만, 종류별 하루 상한) — 황금 키워드·성수기."""
 
     def test_season_and_score(self):
         from bot import naver_hub as h
@@ -1525,44 +1525,76 @@ class NaverHubTest(unittest.TestCase):
         self.assertNotIn(3, low)
         self.assertIn(7, low)
         self.assertEqual(h.season({"2026-01": 50.0}), ([], []))  # 1년치 안 되면 계절 판단 안 함
+        self.assertEqual(h.gold_tier({"docs": 299}, 1000), (3.0, "황금"))      # 검색 1회당 0.299개
+        self.assertEqual(h.gold_tier({"docs": 300}, 1000), (2.0, "좋음"))      # 경계 0.3 은 황금 아님
+        self.assertEqual(h.gold_tier({"docs": 2999}, 1000), (1.0, "보통 이상"))
+        self.assertEqual(h.gold_tier({"docs": 30000}, 1000), (0.0, ""))       # 30 은 포화 아님 (초과부터)
+        self.assertEqual(h.gold_tier({"docs": 30001}, 1000), (-1.0, "포화"))
         sig = {"docs": 500, "peak": "1,2", "low": "6,7,8"}
-        self.assertEqual(h.signal_score(sig, 1000, 12), 2.0)   # 문서 적음 +1, 다음 달이 성수기 +1
-        self.assertEqual(h.signal_score({"docs": 50000, "peak": "1,2", "low": "6,7,8"}, 1000, 7), -1.5)  # 포화 −1, 비수기 −0.5
+        self.assertEqual(h.signal_score(sig, 1000, 12), 3.0)   # 좋음 +2, 다음 달 성수기 +1
+        self.assertEqual(h.signal_score({"docs": 50000, "peak": "1,2", "low": "6,7,8"}, 1000, 7), -1.5)
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
-        self.assertEqual(h.describe(sig, 1000), "성수기 1·2월 / 블로그 글 500개(검색 1회당 0.5개)")
-        self.assertEqual(h.describe(None, 1000), "")
+        self.assertEqual(h.describe(sig, 1000), "좋음 / 성수기 1·2월 / 블로그 글 500개(검색 1회당 0.5개)")
 
-    def test_daily_limit(self):
+    def test_daily_limit_per_kind(self):
         import datetime as dt
         import tempfile
         from bot import naver_hub as h
         with tempfile.TemporaryDirectory() as d:
-            counter = Path(d) / "calls"
             today = dt.date(2026, 11, 5)
-            h._spend(today, h.DAILY_LIMIT, counter)
+            h._spend(today, h.LIMITS["blog"], "blog", Path(d))
             with self.assertRaises(h.LimitReached):
-                h._spend(today, 1, counter)
-            h._spend(dt.date(2026, 11, 6), 1, counter)        # 다음 날은 다시 0부터
+                h._spend(today, 1, "blog", Path(d))
+            h._spend(today, 1, "trend", Path(d))              # 종류가 다르면 따로 셈
+            h._spend(dt.date(2026, 11, 6), 1, "blog", Path(d))  # 다음 날은 다시 0부터
 
-    def test_refresh_signals_stores_and_skips_recent(self):
-        import datetime as dt
+    def _db(self):
         import sqlite3
-        from bot import naver_hub as h
+        from bot import keyword_db
         conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
+        conn.executescript(keyword_db.SCHEMA)
+        keyword_db._migrate(conn)
+        conn.execute("CREATE TABLE IF NOT EXISTS gsc_signals (norm TEXT PRIMARY KEY, kind TEXT, note TEXT)")
+        rows = [("연말정산 계산기", 5000, "2026-11-01"), ("캠핑 준비물", 9000, "2026-11-01"), ("근로장려금 신청", 3000, "2026-11-05")]
+        for kw, total, day in rows:
+            conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES (?,?,?,?,?)",
+                         (kw, keyword_db.norm(kw), total, day, day))
+        return conn
+
+    def test_scan_golden_money_first_and_candidate_pool(self):
+        import datetime as dt
+        from bot import naver_hub as h, select_keyword
+        from bot.settings import BotSettings
+        conn = self._db()
+        settings = BotSettings(min_volume=500, max_volume=30000)
+        docs = {"연말정산 계산기": 1000, "캠핑 준비물": 900000, "근로장려금 신청": 50000}
+        with mock.patch.object(h, "GOLD_SCAN", 2), \
+                mock.patch.object(h, "blog_totals", side_effect=lambda words, k, t: {w: docs[w] for w in words}) as bt:
+            msg = h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=("i", "k"))
+        self.assertEqual(sorted(bt.call_args.args[0]), ["근로장려금 신청", "연말정산 계산기"])  # 돈·계산기 주제 먼저, 캠핑은 다음 날
+        self.assertIn("황금 1개", msg)                                       # 연말정산 계산기: 검색 1회당 0.2개
+        self.assertIn("연말정산계산기(검색 5,000/글 1,000)", msg)
+        got = {c["keyword"]: c for c in select_keyword.ranked_candidates(conn, settings, limit=10)}
+        self.assertIn("연말정산 계산기", got)                                # 오늘 수집분이 아니어도 황금이면 후보
+        self.assertTrue(got["연말정산 계산기"]["naver"].startswith("황금"))
+        self.assertNotIn("캠핑 준비물", got)                                 # 오늘 수집분도 황금도 아님
+        self.assertIn("키 없음", h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=()))
+
+    def test_refresh_signals_trend_and_skip_recent(self):
+        import datetime as dt
+        from bot import naver_hub as h
+        conn = self._db()
         today = dt.date(2026, 11, 5)
         series = {f"{y}-{m:02d}": (90.0 if m == 1 else 10.0) for y in (2025, 2026) for m in range(1, 13)}
         with mock.patch.object(h, "monthly_trend", return_value={"연말정산 계산기": series}) as trend, \
-                mock.patch.object(h, "blog_total", return_value=1234):
-            msg = h.refresh_signals(conn, [{"keyword": "연말정산 계산기"}], today, keys=("i", "k"))
-            self.assertIn("1개", msg)
-            row = h.load(conn)["연말정산계산기"]
-            self.assertEqual((row["docs"], row["peak"]), (1234, "1"))
+                mock.patch.object(h, "blog_totals", side_effect=lambda words, k, t: {w: 10 for w in words}):
             h.refresh_signals(conn, [{"keyword": "연말정산 계산기"}], today, keys=("i", "k"))
-            self.assertEqual(trend.call_count, 1)  # 30일 안에 다시 조회 안 함 (호출 자체를 안 함)
+            self.assertEqual(h.load(conn)["연말정산계산기"]["peak"], "1")
+            h.refresh_signals(conn, [{"keyword": "연말정산 계산기"}], today, keys=("i", "k"))
+            self.assertEqual(trend.call_count, 1)               # 30일 안에 다시 조회 안 함
             h.refresh_signals(conn, [{"keyword": "연말정산 환급", "head": "연말정산 계산기"}], today, keys=("i", "k"))
             self.assertEqual(trend.call_args.args[0], ["연말정산 환급"])  # 대표 주제는 이미 받아 둔 것이라 키워드만
-        self.assertIn("키 없음", h.refresh_signals(conn, [], today, keys=()))
 
 
 class BenefitApiTest(unittest.TestCase):

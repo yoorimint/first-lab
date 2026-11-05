@@ -31,7 +31,7 @@ else:
     try:  # 호출 2회 (하루 상한 안에서 셈)
         today = dt.date.today()
         series = naver_hub.monthly_trend(["연말정산"], keys, today).get("연말정산", {})
-        print(f"네이버 API HUB: 정상 (연말정산 블로그 문서 {naver_hub.blog_total('연말정산', keys, today)}개, "
+        print(f"네이버 API HUB: 정상 (연말정산 블로그 문서 {naver_hub.blog_totals(['연말정산'], keys, today).get('연말정산')}개, "
               f"트렌드 {len(series)}개월, 성수기 {naver_hub.season(series)[0]}월)")
     except Exception as e:  # noqa: BLE001
         print(f"네이버 API HUB: 실패 ({type(e).__name__}: {str(e)[:120]})")

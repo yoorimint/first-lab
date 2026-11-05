@@ -128,7 +128,8 @@ def _refresh_hub_signals(settings) -> str:
         from .keyword_db import connect
         from .select_keyword import ranked_candidates
         with connect() as conn:
-            return naver_hub.refresh_signals(conn, ranked_candidates(conn, settings, limit=naver_hub.CHECK_TOP))
+            gold = naver_hub.scan_golden(conn, settings)  # 먼저 황금 키워드 찾기 → 그 결과가 후보 순위에 반영된 뒤 성수기
+            return gold + " / " + naver_hub.refresh_signals(conn, ranked_candidates(conn, settings, limit=naver_hub.CHECK_TOP))
     except Exception as e:  # noqa: BLE001
         return f"네이버 API HUB 실패: {e}"
 

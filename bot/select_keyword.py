@@ -1,10 +1,9 @@
 """키워드 창고에서 다음 글감 고르기: 필터 → 점수 → 중복 제외 → AI 안전 검사."""
 from __future__ import annotations
 
+import datetime as dt
 import random
 from difflib import SequenceMatcher
-
-import datetime as dt
 
 from . import competition, naver_hub
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
@@ -74,11 +73,14 @@ def _head_difficulty(conn, volumes: dict[str, int]) -> dict[str, float]:
 def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict]:
     """점수순 후보 (안전 검사 전). 이미 쓴 글과 겹치는 키워드는 제외."""
     latest = conn.execute("SELECT MAX(last_checked) FROM keywords").fetchone()[0]
-    rows = conn.execute(  # 가장 최근 수집일(=오늘)의 키워드 + 서치콘솔 기회 키워드(검색량 범위 무관)
+    hub = naver_hub.load(conn)  # 블로그 문서 수·검색 성수기 (네이버 API HUB, 없으면 빈 값)
+    rows = conn.execute(  # 가장 최근 수집일(=오늘)의 키워드 + 서치콘솔 기회 키워드(검색량 범위 무관) + 황금 키워드(검색 1회당 글 1개 미만)
         "SELECT * FROM keywords WHERE status IN ('new','ok') AND ("
         " (last_checked=? AND total BETWEEN ? AND ?)"
-        " OR norm IN (SELECT norm FROM gsc_signals WHERE kind='opportunity'))",
-        (latest, settings.min_volume, settings.max_volume),
+        " OR norm IN (SELECT norm FROM gsc_signals WHERE kind='opportunity')"
+        " OR (total BETWEEN ? AND ? AND norm IN (SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm"
+        "     WHERE n.docs IS NOT NULL AND n.docs < k.total)))",
+        (latest, settings.min_volume, settings.max_volume, settings.min_volume, settings.max_volume),
     ).fetchall()
     used = [r["norm"] for r in conn.execute("SELECT norm FROM keywords WHERE status='used'")]
     volumes = {r["norm"]: r["total"] for r in conn.execute("SELECT norm, total FROM keywords")}
@@ -89,7 +91,6 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     used_unified = {_core(unify(u)) for u in used}
     used_subjects = {subject(u) for u in used}  # 이미 쓴 글의 주제 → 같은 주제 키워드는 새 글 대신 그 글 보강(refresh.py)
     head_difficulty = _head_difficulty(conn, volumes)
-    hub = naver_hub.load(conn)  # 블로그 문서 수·검색 성수기 (네이버 API HUB, 없으면 빈 값)
     month = dt.date.today().month
 
     def overlaps_used(n: str) -> bool:
