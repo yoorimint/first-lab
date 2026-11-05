@@ -16,7 +16,7 @@ import re
 import urllib.parse
 from pathlib import Path
 
-from . import source_check
+from . import law_api, source_check
 from .publisher import existing_post_id
 from .review_gate import _ok
 from .settings import wp_cli
@@ -53,6 +53,26 @@ def watched_laws() -> dict[str, set[str]]:
                 if key:
                     laws.setdefault(key, set()).add(keyword)
     return laws
+
+
+def cited_articles() -> dict[str, dict[str, set[str]]]:
+    """근거 법령 주소 → {조문('제40조', 모르면 '') → 그 조문을 근거로 쓴 글 키워드들}."""
+    out: dict[str, dict[str, set[str]]] = {}
+    for path in QUEUE_DIR.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        keyword = str(data.get("keyword", "")).strip()
+        for item in data.get("review") or []:
+            if not _ok(item):
+                continue
+            for url in item.get("urls", []):
+                key = law_key(str(url))
+                if key:
+                    art = source_check.claim_article(item, str(url)) or ""
+                    out.setdefault(key, {}).setdefault(art, set()).add(keyword)
+    return out
 
 
 def law_key(url: str) -> str | None:
@@ -94,8 +114,9 @@ def effective_dates(text: str) -> list[tuple[dt.date, list[str]]]:
     return out
 
 
-def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch, names: set | None = None) -> tuple[list[dict], list[dict]]:
-    """(앞으로 시행될 개정, 막 시행된 개정). names 를 주면 읽은 법령 이름을 모은다 (입법예고·시행 예정 판 대조용)."""
+def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch, names: set | None = None,
+         name_of: dict | None = None) -> tuple[list[dict], list[dict]]:
+    """(앞으로 시행될 개정, 막 시행된 개정). names 를 주면 읽은 법령 이름을, name_of 를 주면 주소 → 이름을 모은다."""
     upcoming, just, seen = [], [], set()
     bases = sorted(laws)[:MAX_LAWS]
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
@@ -107,6 +128,8 @@ def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch, 
         name = title_of(text) or law_name(base)
         if names is not None:
             names.add(name)
+        if name_of is not None:
+            name_of[base] = name
         for when, articles in effective_dates(text):
             key = (name, when, tuple(articles))
             if key in seen:  # 같은 법을 다른 주소로 적은 경우 한 번만
@@ -128,8 +151,6 @@ def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch, 
 PROPOSAL_LIST = "https://opinion.lawmaking.go.kr/gcom/ogLmPp?pageIndex={page}"  # 국민참여입법센터 (부처)입법예고
 PROPOSAL_PAGES = 5
 _PROPOSAL_ROW = re.compile(r'href="/gcom/ogLmPp/(\d+)"[^>]*>([^<]+)</a>.*?소관부처[^>]*>\s*<p>([^<]*)</p>.*?접수기간">\s*<p>([^<]*)</p><p>~?([^<]*)</p>', re.S)
-EFLAW = "https://www.law.go.kr/DRF/lawSearch.do?OC={oc}&target=eflaw&type=XML&display=20&query={q}"  # 법제처 공개 데이터: 시행일 기준 법령
-OC_SECRET = "LAW_OPEN_API_OC"  # 법제처 공개 데이터 사용 신청 아이디 (서버 set-secrets.sh 로만)
 
 
 def _raw_text(url: str) -> str:
@@ -160,23 +181,63 @@ def proposals(names: set[str], fetch_page=_raw_text) -> list[dict]:
     return out
 
 
-def scheduled_versions(names: set[str], today: dt.date, oc: str, fetch_xml=_raw_text) -> list[dict]:
-    """법제처 공개 데이터(시행일 법령)로 공포됐지만 아직 시행 전인 판 — 법 전체가 나중에 시행되는 개정까지. OC 가 있을 때만."""
-    if not oc:
-        return []
-    out = []
-    for name in sorted(names):
-        xml = fetch_xml(EFLAW.format(oc=urllib.parse.quote(oc), q=urllib.parse.quote(name)))
-        for block in re.findall(r"<law[ >].*?</law>", xml, re.S):
-            title = re.search(r"<법령명한글>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</법령명한글>", block)
-            when = re.search(r"<시행일자>(\d{8})</시행일자>", block)
-            if not title or not when or title.group(1).strip() != name:
-                continue
-            date = dt.date(int(when.group(1)[:4]), int(when.group(1)[4:6]), int(when.group(1)[6:]))
-            if today < date <= today + dt.timedelta(days=LOOKAHEAD_DAYS):
-                out.append({"law": name, "url": "", "date": f"{date:%Y-%m-%d}", "articles": [], "posts": [],
-                            "key": f"{name}|{date:%Y-%m-%d}", "source": "시행 예정 판"})
-    return out
+def api_changes(cited: dict[str, dict[str, set[str]]], name_of: dict[str, str], today: dt.date,
+                api=law_api) -> tuple[list[dict], list[dict]]:
+    """법제처 공개 API(시행일 기준 판)로 (앞으로 시행될 판, 막 시행된 판). 판마다 우리 글의 근거 조문이 실제로 바뀌는지 비교.
+    부칙 읽기(scan)가 못 보는 '법 전체가 나중에 시행되는 개정'까지 잡고, 근거 조문이 안 바뀌는 판은 글 재검증 표시를 안 한다."""
+    by_name: dict[str, dict[str, set[str]]] = {}
+    for base, arts in cited.items():
+        name = name_of.get(base)
+        if name:
+            for art, posts in arts.items():
+                by_name.setdefault(name, {}).setdefault(art, set()).update(posts)
+
+    def one(name: str) -> tuple[list[dict], list[dict]]:
+        vers = api.versions(name)
+        now = api.current(vers, today)
+        if not now:
+            return [], []
+        arts = by_name[name]
+        whole = sorted(p for p in arts.get("", set()) if p)  # 조문 번호 없이 법만 근거로 쓴 글
+        def item(v: dict, changed: list[str]) -> dict:
+            posts = set(whole) | {p for a in changed for p in arts[a] if p}
+            return {"law": name, "url": "", "date": f"{v['date']:%Y-%m-%d}", "articles": changed,
+                    "posts": sorted(posts)[:10], "key": f"{name}|{v['date']:%Y-%m-%d}", "source": "법제처 API"}
+        upcoming = []
+        for v in (v for v in vers if today < v["date"] <= today + dt.timedelta(days=LOOKAHEAD_DAYS)):
+            upcoming.append(item(v, []))
+        for art in (a for a in arts if a):
+            for ch in api.upcoming_changes(name, art, today, vers):
+                for u in upcoming:
+                    if u["date"] == f"{ch['date']:%Y-%m-%d}":
+                        u["articles"].append(art)
+                        u["posts"] = sorted(set(u["posts"]) | {p for p in arts[art] if p})[:10]
+        just = []
+        before = [v for v in vers if v["date"] < now["date"]]
+        if before and today - now["date"] <= dt.timedelta(days=JUST_DAYS):
+            changed = []
+            for art in (a for a in arts if a):
+                new, old = api.article(name, art, now), api.article(name, art, before[-1])
+                if new and old and not api.same_text(new["text"], old["text"]):
+                    changed.append(art)
+            if changed or whole:
+                just.append(item(now, changed))
+        return upcoming, just
+
+    upcoming, just = [], []
+    names = sorted(by_name)[:MAX_LAWS]
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+        for up, js in pool.map(one, names):
+            upcoming += up
+            just += js
+    return upcoming, just
+
+
+def merge(old: list[dict], new: list[dict]) -> list[dict]:
+    """같은 법·같은 시행일이면 API 결과(근거 조문까지 비교)를 쓴다."""
+    by_key = {x["key"]: x for x in old}
+    by_key.update({x["key"]: x for x in new})
+    return sorted(by_key.values(), key=lambda x: x["date"])
 
 
 def mark_posts(just: list[dict]) -> list[str]:
@@ -198,19 +259,23 @@ def run(today: dt.date | None = None) -> str:
     today = today or dt.date.today()
     laws = watched_laws()
     names: set[str] = set()
-    upcoming, just = scan(laws, today, names=names)
-    from .config import load_secrets
-    oc = load_secrets().get(OC_SECRET, "")
-    known = {u["key"] for u in upcoming}
-    extra = [v for v in scheduled_versions(names, today, oc) if v["key"] not in known]
-    upcoming = sorted(upcoming + extra, key=lambda x: x["date"])
+    name_of: dict[str, str] = {}
+    upcoming, just = scan(laws, today, names=names, name_of=name_of)
+    api_note = "법제처 API 없음 → 부칙 읽기만"
+    if law_api.available():
+        try:
+            api_up, api_just = api_changes(cited_articles(), name_of, today)
+            upcoming, just = merge(upcoming, api_up), merge(just, api_just)
+            hit = sum(1 for x in api_up if x["articles"])
+            api_note = f"법제처 API 시행 예정 판 {len(api_up)}건 중 근거 조문 바뀜 {hit}건"
+        except (OSError, ValueError) as e:  # API 이상이어도 부칙 읽기 결과는 저장
+            api_note = f"법제처 API 실패({type(e).__name__}) → 부칙 읽기만"
     pre = proposals(names)
-    marked = mark_posts(just)
+    marked = mark_posts([j for j in just if j["posts"]])
     state = load_state()  # 저장 때 다른 실행 기록과 합쳐짐 (bot/state.save_state)
     state["law_changes"] = {"checked": f"{today:%Y-%m-%d}", "upcoming": upcoming[:30], "proposals": pre[:30]}
-    msg = (f"법령 감시: 근거 법령 {len(laws)}개 확인, 앞으로 시행 {len(upcoming)}건(시행 예정 판 {len(extra)}건"
-           f"{'' if oc else ', 법제처 공개 데이터 신청 전이라 생략'}), 입법예고 {len(pre)}건(확정 아님), "
-           f"막 시행 {len(just)}건(재검증 표시 {len(marked)}편)")
+    msg = (f"법령 감시: 근거 법령 {len(laws)}개 확인, 앞으로 시행 {len(upcoming)}건({api_note}), "
+           f"입법예고 {len(pre)}건(확정 아님), 막 시행 {len(just)}건(재검증 표시 {len(marked)}편)")
     add_log(state, True, msg)
     save_state(state)
     return msg

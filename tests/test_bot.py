@@ -1094,11 +1094,33 @@ class LawTextTest(unittest.TestCase):
         from bot import lawtext
         body = "제20조(살처분 명령) ④ 시장ㆍ군수ㆍ구청장은 광견병 예방주사를 맞지 아니한 개가 배회하면 억류할 수 있다. 다만, 소유자가 있으면 그러하지 아니하다. 제21조(도태) ① 권고한다."
         out = io.StringIO()
-        with mock.patch.object(lawtext, "law_body", return_value=body), redirect_stdout(out):
+        with mock.patch.object(lawtext.law_api, "versions", return_value=[]), \
+                mock.patch.object(lawtext, "law_body", return_value=body), redirect_stdout(out):  # API 없을 때 화면 읽기
             self.assertEqual(lawtext.main(["x", "가축전염병예방법", "제20조"]), 0)
         self.assertIn("배회하면 억류", out.getvalue())
         self.assertIn("[예외·단서]", out.getvalue())
         self.assertNotIn("도태", out.getvalue())
+
+    def test_api_first_shows_current_version_and_upcoming_change(self):
+        """법제처 API 가 되면 현행 판(시행일 기준) 조문과 앞으로 바뀌는 판을 보여 준다 — ID 로 받으면 미래 판이 오므로 판을 골라야 함."""
+        import datetime as dt
+        import io
+        from contextlib import redirect_stdout
+        from bot import lawtext
+        today = dt.date.today()
+        vers = [{"mst": "1", "date": today - dt.timedelta(days=30), "status": "현행"},
+                {"mst": "2", "date": today + dt.timedelta(days=20), "status": "시행예정"}]
+        texts = {"1": "제9조(산정) ① 비율을 곱한다. 다만, 경감한다.", "2": "제9조(산정) ① 비율(다섯째자리에서 반올림)을 곱한다."}
+        out = io.StringIO()
+        with mock.patch.object(lawtext.law_api, "versions", return_value=vers), \
+                mock.patch.object(lawtext.law_api, "article", side_effect=lambda n, a, v: {"text": texts[v["mst"]], "changed": False, "date": v["date"]}), \
+                redirect_stdout(out):
+            self.assertEqual(lawtext.main(["x", "노인장기요양보험법", "제9조"]), 0)
+        got = out.getvalue()
+        self.assertIn("비율을 곱한다", got)          # 현행 판
+        self.assertIn("[예외·단서] 다만, 경감한다.", got)
+        self.assertIn("[시행 예정 개정]", got)       # 미래 판은 따로 표시
+        self.assertIn("반올림", got)
 
 
 class SchemaPluginTest(unittest.TestCase):
@@ -1356,11 +1378,25 @@ class LawWatchTest(unittest.TestCase):
         got = law_watch.proposals({"지방세법"}, fetch_page=lambda u: row if "pageIndex=1" in u else "")
         self.assertEqual([g["title"] for g in got], ["지방세법 시행령 일부개정령안 입법예고"])  # 지방세기본법은 다른 법
         self.assertEqual(got[0]["period"], "2026. 11. 5. ~ 2026. 12. 15.")
-        xml = ("<LawSearch><law id='1'><법령명한글><![CDATA[고용보험법]]></법령명한글><시행일자>20270101</시행일자></law>"
-               "<law id='2'><법령명한글><![CDATA[고용보험법]]></법령명한글><시행일자>20260918</시행일자></law></LawSearch>")
-        sched = law_watch.scheduled_versions({"고용보험법"}, dt.date(2026, 11, 5), "oc", fetch_xml=lambda u: xml)
-        self.assertEqual([x["key"] for x in sched], ["고용보험법|2027-01-01"])
-        self.assertEqual(law_watch.scheduled_versions({"고용보험법"}, dt.date(2026, 11, 5), ""), [])  # 신청 전이면 건너뜀
+
+    def test_api_changes_compares_cited_articles(self):
+        """법제처 API 판 비교: 근거 조문이 실제로 바뀌는 판만 그 조문·글을 붙이고, 막 시행된 판은 바뀐 조문 글만 재검증."""
+        import datetime as dt
+        from bot import law_api, law_watch
+        d = dt.date
+        vers = [{"mst": "1", "date": d(2026, 8, 20), "status": "연혁"}, {"mst": "2", "date": d(2026, 10, 20), "status": "현행"},
+                {"mst": "3", "date": d(2026, 11, 27), "status": "시행예정"}, {"mst": "4", "date": d(2027, 1, 1), "status": "시행예정"}]
+        texts = {("제9조", "1"): "옛 9조", ("제9조", "2"): "새 9조 <개정 2026.5.26>", ("제9조", "3"): "새 9조",
+                 ("제9조", "4"): "더 새 9조", ("제3조", "1"): "3조", ("제3조", "2"): "3조", ("제3조", "3"): "3조", ("제3조", "4"): "3조"}
+        fake_article = lambda name, art, v: {"text": texts[(art, v["mst"])], "changed": False, "date": v["date"]}
+        cited = {"/법령/노인장기요양보험법": {"제9조": {"월급계산기"}, "제3조": {"요양등급"}}}
+        with mock.patch.object(law_api, "versions", return_value=vers), mock.patch.object(law_api, "article", side_effect=fake_article):
+            up, just = law_watch.api_changes(cited, {"/법령/노인장기요양보험법": "노인장기요양보험법"}, d(2026, 11, 5))
+        self.assertEqual([(u["date"], u["articles"], u["posts"]) for u in up],
+                         [("2026-11-27", [], []), ("2027-01-01", ["제9조"], ["월급계산기"])])  # 11/27 은 '<개정>' 표시만 달라 같은 조문
+        self.assertEqual([(j["date"], j["articles"], j["posts"]) for j in just], [("2026-10-20", ["제9조"], ["월급계산기"])])  # 3조 글은 재검증 안 함
+        merged = law_watch.merge([{"key": "노인장기요양보험법|2027-01-01", "date": "2027-01-01", "articles": ["부칙"]}], up)
+        self.assertEqual([m["articles"] for m in merged], [[], ["제9조"]])  # 같은 판이면 API 결과로
 
     def test_refresh_picks_law_changed_post_first(self):
         from bot import refresh

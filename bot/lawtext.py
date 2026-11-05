@@ -6,10 +6,13 @@ law.go.kr 은 WebFetch 로 열면 빈 페이지가 오는 경우가 많아, 검�
 """
 from __future__ import annotations
 
+import datetime as dt
 import re
 import sys
 import time
+import xml.etree.ElementTree as ET
 
+from . import law_api
 from .source_check import article_text, exceptions_in, fetch, recent_changes
 
 TRIES = 3
@@ -26,10 +29,34 @@ def law_body(name: str) -> str | None:
     return None
 
 
+def from_api(name: str, arts: list[str], today: dt.date) -> bool:
+    """법제처 공개 API 로 현행 판 조문과 앞으로 바뀌는 내용을 보여 줌. 못 쓰면 False (화면 읽기로)."""
+    vers = law_api.versions(name)
+    now = law_api.current(vers, today)
+    if not now:
+        return False
+    print(f"[법제처 API] {name} 현행 판: {now['date']:%Y-%m-%d} 시행")
+    for art in arts:
+        got = law_api.article(name, art, now)
+        print(f"\n== {name} {art} ==\n{got['text'] if got else '조문을 찾지 못함'}")
+        if not got:
+            continue
+        for x in exceptions_in(got["text"]):
+            print(f"  [예외·단서] {x}")
+        for ch in law_api.upcoming_changes(name, art, today, vers):
+            print(f"  [시행 예정 개정] {ch['date']:%Y-%m-%d}부터 바뀜 → {ch['text'][:300]}")
+    return True
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print("사용: python3 -m bot.lawtext <법령명> <제N조> [제M조 ...]  예) python3 -m bot.lawtext 고용보험법 제46조")
         return 2
+    try:
+        if from_api(argv[1], argv[2:], dt.date.today()):
+            return 0
+    except (OSError, ValueError, ET.ParseError):  # API 응답 이상 → 화면 읽기로
+        pass
     body = law_body(argv[1])
     if not body:
         print(f"{argv[1]}: 열지 못함 (법령 이름을 국가법령정보센터 표기대로, 띄어쓰기 없이)")
