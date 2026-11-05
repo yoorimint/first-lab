@@ -117,7 +117,9 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     from . import condition_gate
     out += condition_gate.headline_scope(title, excerpt, body_html)
     out += condition_gate.lead_vs_body(body_html)
+    out += condition_gate.excerpt_vs_exclusions(excerpt, body_html)
     out += condition_gate.exception_articles(review, law_fetcher)
+    out += condition_gate.transition_rules(review, body_html)
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:
             continue  # 완화·삭제: 본문에 단정형으로 남지 않음

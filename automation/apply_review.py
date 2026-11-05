@@ -64,7 +64,8 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
             return f"check:{name} 를 저장소 코드·테스트에서 못 찾음 — 검사를 먼저 만들기"
         from bot import condition_gate
         fn = {"headline_scope": lambda: condition_gate.headline_scope(post["title"], post["excerpt"], post["content_html"]),
-              "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"])}.get(name)
+              "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"]),
+              "excerpt_vs_exclusions": lambda: condition_gate.excerpt_vs_exclusions(post["excerpt"], post["content_html"])}.get(name)
         if fn and not fn():
             return f"check:{name} 가 고치기 전 글에 안 걸림 — 이 오류를 실제로 잡는 검사가 아님"
         return None

@@ -6,9 +6,13 @@
 2. 다른 조문의 특례·예외 (exception_articles): 글이 근거로 단 조문(제N조)을 같은 법의 다른 조문이 '제N조에도 불구하고',
    '제N조에 따른 공제와 별개로'처럼 바꾸거나 더하면, 검수 기록이 그 조문도 확인했어야 통과 (#640 증여공제 제53조 ← 혼인·출산 제53조의2).
    글에 넣을 필요가 없으면 검수 기록에 그 조문을 '해당 없음 — 이유'로 적으면 된다. 법령을 못 열면 막지 않는다.
+3. 첫 문단 단정 ↔ 본문 예외 (lead_vs_body, #748), 요약 '받아요' ↔ 본문 '못 받는 경우' (excerpt_vs_exclusions, #762).
+4. 부칙 경과조치 (transition_rules, #762): 근거 조문이 최근 개정되고 부칙이 '시행 전에 이직한 사람은 종전 규정'이면,
+   그 숫자를 쓴 문장에 적용 시점('2026년 1월 1일 이후 …', '종전')이 있어야 한다 (하루 상한 68,100원 ← 2025년 퇴사자는 66,000원).
 """
 from __future__ import annotations
 
+import datetime as dt
 import re
 import urllib.parse
 
@@ -171,3 +175,123 @@ def exception_articles(review: list[dict] | None, articles_of=None) -> list[str]
                 if not re.search(rf"{re.escape(num)}(?![의\d])", text_all):
                     out.append(f"{name} {art} 의 특례·예외 조문 {num}({head}) 을 확인하지 않음 — 글에 반영하거나 검수 기록에 '{num} 해당 없음 — 이유' 항목으로")
     return out
+
+
+# 요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762 '…남기면, 12개월 근무 뒤 남은 구직급여의 절반을 받아요' ↔ 본문 '못 받는 경우' 목록)
+EXCLUSION_HEAD = re.compile(r"<h[23][^>]*>([^<?]*(?:못 받|받을 수 없|제외|안 되는|대상이 아닌|지원 안|불가)[^<?]*)</h[23]>")  # 묻는 제목(…나요?) 제외
+PROMISE = re.compile(r"(받아요|받을 수 있어요|지원돼요|돌려받아요|지원받아요)")
+HEDGE = re.compile(r"(제외|빼고|못 받|않|단,|다만|경우|등은|확인|조건|대상)")
+
+
+def excerpt_vs_exclusions(excerpt: str, body_html: str) -> list[str]:
+    head = EXCLUSION_HEAD.search(body_html or "")
+    if not head:
+        return []
+    for s in re.split(r"(?<=[.!?])\s+", _plain(excerpt)):
+        if PROMISE.search(s) and not HEDGE.search(s):
+            return [f"요약 '{s[:50]}' 는 조건 없이 받는다고 하는데 본문에 '{head.group(1).strip()}' 이 있음 — 요약에도 '(… 등은 제외)' 넣기"]
+    return []
+
+
+# 부칙 경과조치 (11/5 #762)
+TRANSITION_DAYS = 730  # 개정 전 퇴사·신청자가 아직 받는 기간 (구직급여 최대 270일 + 조기재취업 청구 12개월 뒤)
+_BUCHIK = re.compile(r"부\s*칙\s*<[^<>]{0,40}?(20\d\d)\.\s*(\d{1,2})\.\s*(\d{1,2})\.\s*>")
+_TRANSITION = re.compile(r"개정\s*규정에도\s*불구하고[^.]{0,60}?종전")
+
+
+def transitions(page_text: str, article: str, today: dt.date) -> list[tuple[dt.date, str]]:
+    """법령 본문 글자(부칙 포함)에서 article 의 '시행 전 … 개정규정에도 불구하고 종전의 규정에 따른다' 중 최근·앞으로 시행되는 것."""
+    text = page_text or ""
+    heads = list(_BUCHIK.finditer(text))
+    out = []
+    for i, h in enumerate(heads):
+        block = text[h.end(): heads[i + 1].start() if i + 1 < len(heads) else len(text)]
+        m = re.search(r"(20\d\d)년\s*(\d{1,2})월\s*(\d{1,2})일부터 시행", block)
+        try:
+            date = dt.date(*map(int, (m or h).groups()))
+        except ValueError:
+            continue
+        if (today - date).days > TRANSITION_DAYS:
+            continue
+        for sent in re.split(r"(?<=다\.)\s+", block):
+            ref = re.search(rf"{re.escape(article)}(?![의\d]|\s*\()(제\d+항)?(제\d+호)?", sent)  # '제14조(…경과조치)' 제목은 제외
+            # 호(제N호)까지 짚은 경과조치는 그 호만 바뀐 것 — 조 단위로 단 주장과는 대개 무관 (오탐: 증여공제 제53조제4호·원천징수 제129조제1항제N호)
+            if "시행 전" in sent and _TRANSITION.search(sent) and ref and not ref.group(2):
+                out.append((date, re.sub(r"\s+", " ", sent).strip()[:160]))
+    return out
+
+
+def _nums(text: str) -> set[str]:
+    """금액·비율 숫자 ('11만3500원' → '11만3500', '68,100' → '68100'), 조·항·호 번호와 날짜는 뺌."""
+    text = re.sub(r"제\d+(?:조(?:의\d+)?|항|호)|\d{4}[.년]\s*\d{1,2}[.월]\s*\d{1,2}[.일]?", " ", text or "")
+    return {n.replace(",", "") for n in re.findall(r"\d+(?:[.,]\d+)*(?:만\d*)?", text) if len(n.replace(",", "")) >= 2}
+
+
+def changed_numbers(base_url: str, article: str, date: dt.date) -> set[str] | None:
+    """그 개정(date 시행)으로 article 에 새로 생긴 숫자 (법제처 API 로 직전 판과 비교). 못 받으면 None."""
+    from . import law_api
+    name = urllib.parse.unquote(base_url).split("/법령/")[-1].split("/")[0]
+    try:
+        vers = law_api.versions(name)
+        cur = next((v for v in vers if v["date"] == date), None) or law_api.current(vers, date)
+        prev = [v for v in vers if cur and v["date"] < cur["date"]]
+        if not cur or not prev:
+            return None
+        new, old = law_api.article(name, article, cur), law_api.article(name, article, prev[-1])
+        return (_nums(new["text"]) - _nums(old["text"])) if new and old else None
+    except Exception:  # noqa: BLE001 - 못 받으면 막지 않음
+        return None
+
+
+def _dated(sentence: str, date: dt.date) -> bool:
+    y, m = date.year, date.month
+    marks = ("종전", f"{y}년 {m}월", f"{y}.{m}.", f"{y}. {m}.", f"{y}년부터", f"{y}년 이후", f"{y - 1}년 이전", f"{y - 1}년까지")
+    return any(k in sentence for k in marks)
+
+
+def _page_text(base_url: str) -> str:
+    from . import source_check
+    return source_check.fetch(base_url) or ""
+
+
+def transition_rules(review: list[dict] | None, body_html: str, page_of=None, changed_of=None,
+                     today: dt.date | None = None) -> list[str]:
+    """주장의 숫자가 최근 개정으로 바뀌었고 부칙이 '시행 전 …은 종전 규정'이면, 그 숫자를 쓴 본문 문장에 적용 시점이 있어야 함."""
+    from . import law_api, source_check
+    from .review_gate import _ok
+    if page_of is None or changed_of is None:
+        if not law_api.available():  # 법령을 받을 수 있는 곳(서버·글쓰기 작업)에서만 — 오프라인·테스트에서는 막지 않음
+            return []
+        page_of, changed_of = page_of or _page_text, changed_of or changed_numbers
+    today = today or dt.date.today()
+    sents = _sentences(body_html)
+    cache, done, out = {}, set(), []
+    for item in review or []:
+        if not _ok(item):
+            continue
+        full = str(item.get("claim", ""))
+        claim = full.split(" (")[0]
+        nums = [n for n in re.findall(r"\d[\d,]*\d", claim) if len(n.replace(",", "")) >= 4]
+        for url in item.get("urls", []):
+            if "law.go.kr" not in str(url):
+                continue
+            art = source_check.claim_article(item, str(url))
+            base = source_check.law_page(str(url))
+            if not art or (base, art, claim) in done:
+                continue
+            done.add((base, art, claim))
+            if base not in cache:
+                try:
+                    cache[base] = page_of(base) or ""
+                except Exception:  # noqa: BLE001 - 못 받으면 막지 않음
+                    cache[base] = ""
+            for date, rule in transitions(cache[base], art, today):
+                if not (_nums(full) & (changed_of(base, art, date) or set())):
+                    continue  # 그 개정이 이 주장의 숫자를 바꾸지 않음 (오탐: 복권 원천징수 30%는 제129조 개정과 무관)
+                hits = [s for s in sents if nums and any(_num_pattern(n).search(s) for n in nums)]
+                if hits and not all(_dated(s, date) for s in hits):
+                    name = urllib.parse.unquote(base).rsplit("/", 1)[-1][:20]
+                    out.append(f"{name} {art} 는 {date:%Y.%m.%d} 개정, 부칙 '{rule[:60]}…' — '{hits[0][:40]}' 에 적용 시점"
+                               f"('{date.year}년 {date.month}월 {date.day}일 이후 …, 그 전은 종전 기준')을 적기")
+                    break
+    return list(dict.fromkeys(out))[:3]

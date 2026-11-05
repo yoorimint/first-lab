@@ -2369,6 +2369,59 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class ExcerptExclusionTest(unittest.TestCase):
+    """요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762, 글쓰기 작업 검수가 놓침)."""
+
+    BODY = "<p>조기재취업 수당은 남은 구직급여의 절반이에요.</p><h2>못 받는 경우</h2><ul><li>월 300만 원 이상 받으면 못 받아요.</li></ul>"
+
+    def test_flag_and_pass(self):
+        from bot import condition_gate as g
+        ex = "소정급여일수를 2분의 1 이상 남기면, 12개월 근무 뒤 남은 구직급여의 절반을 받아요. 조건을 정리했어요."
+        self.assertTrue(g.excerpt_vs_exclusions(ex, self.BODY))
+        fixed = ex.replace("절반을 받아요.", "절반을 받을 수 있어요(월 300만 원 이상 재취업 등은 제외).")
+        self.assertEqual(g.excerpt_vs_exclusions(fixed, self.BODY), [])
+        faq = self.BODY.replace("<h2>못 받는 경우</h2>", "<h3>복권이 찢어지면 못 받나요?</h3>")  # 묻는 제목은 제외 목록이 아님
+        self.assertEqual(g.excerpt_vs_exclusions(ex, faq), [])
+
+
+class TransitionRuleTest(unittest.TestCase):
+    """부칙 경과조치: 개정으로 바뀐 숫자는 적용 시점과 함께 (11/5 #762 하루 상한 68,100원 ← 2025년 이전 퇴사자는 66,000원)."""
+
+    PAGE = ("부      칙     <대통령령 제35934호 2025. 12. 23.>  제1조(시행일)  이 영은 2026년 1월 1일부터 시행한다. "
+            "제4조(급여기초 임금일액 및 구직급여일액의 상한액에 관한 경과조치)  이 영 시행 전에 이직한 사람의 구직급여의 산정 기초가 되는 "
+            "임금일액 및 구직급여일액은 제68조제1항 제104조의8제4항의 개정규정에도 불구하고 종전의 규정에 따른다. "
+            "제5조(가산세에 관한 경과조치)  이 영 시행 전에 공급한 경우에는 제60조제1항제2호의 개정규정에도 불구하고 종전의 규정에 따른다. "
+            "제14조(납세조합 세액공제에 관한 경과조치)  이 영 시행 전에 발생한 소득은 제150조제3항의 개정규정에도 불구하고 종전의 규정에 따른다. ")
+    URL = "https://www.law.go.kr/법령/고용보험법시행령/제68조"
+    REVIEW = [{"claim": "하루 상한 68,100원 (기초일액 상한 11만3500원 × 60%) (고용보험법 시행령 제68조)", "verdict": "맞음",
+               "action": "유지", "urls": [URL]}]
+    BODY = "<p>구직급여일액은 평균임금의 60%인데, 하루 상한은 68,100원이에요.</p>"
+
+    def run_gate(self, body, review=None, changed=frozenset({"11만3500"}), today=None):
+        import datetime as dt
+        from bot import condition_gate as g
+        return g.transition_rules(review or self.REVIEW, body, page_of=lambda b: self.PAGE,
+                                  changed_of=lambda b, a, d: set(changed), today=today or dt.date(2026, 11, 5))
+
+    def test_flag_and_pass(self):
+        self.assertTrue(self.run_gate(self.BODY))
+        fixed = self.BODY.replace("하루 상한은", "2026년 1월 1일 이후 퇴사했다면 하루 상한은").replace("이에요", "(그 전 퇴사는 종전 66,000원)이에요")
+        self.assertEqual(self.run_gate(fixed), [])
+
+    def test_no_false_alarm(self):
+        import datetime as dt
+        self.assertEqual(self.run_gate(self.BODY, changed=set()), [])                     # 그 개정이 주장 숫자를 안 바꿈
+        self.assertEqual(self.run_gate(self.BODY, today=dt.date(2028, 6, 1)), [])         # 오래된 개정
+        for art in ("제60조", "제14조"):                                                    # 호까지 짚은 경과조치 / 부칙 조 제목
+            review = [dict(self.REVIEW[0], claim=f"공급가액 1,000,000원 (부가가치세법 {art})", urls=[f"https://www.law.go.kr/법령/고용보험법시행령/{art}"])]
+            self.assertEqual(self.run_gate("<p>공급가액 1,000,000원이에요.</p>", review=review, changed={"1000000"}), [])
+
+    def test_offline_never_blocks(self):
+        from bot import condition_gate as g, law_api
+        with mock.patch.object(law_api, "available", return_value=False):
+            self.assertEqual(g.transition_rules(self.REVIEW, self.BODY), [])
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt
