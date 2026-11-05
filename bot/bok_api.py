@@ -88,7 +88,7 @@ def latest_rates(today: dt.date | None = None) -> dict:
 def run(today: dt.date | None = None) -> str:
     """매일(키워드 수집 끝): 최신 금리를 상태에 저장 → 글쓰기 세션이 /next 의 rates 로 봄.
     기준금리가 바뀌었으면 '기준금리'가 든 공개 글에 재검증 표시 (bot/refresh.py 가 가장 먼저 수치 재검증)."""
-    from .law_watch import LAW_META
+    from .changed import flag, live_posts_with
     from .settings import wp_cli
     from .state import add_log, load_state, save_state
     today = today or dt.date.today()
@@ -103,10 +103,7 @@ def run(today: dt.date | None = None) -> str:
     if old is not None and "base" in rates and rates["base"]["value"] != old:
         from .wpbulk import posts
         value = f"{today:%Y-%m-%d} 기준금리 {old}%→{rates['base']['value']}%"
-        for pid, p in posts().items():
-            if p.get("status") == "publish" and any(w in (p.get("content") or "") for w in RATE_WORDS):
-                wp_cli("post", "meta", "update", pid, LAW_META, value)
-                marked.append(pid)
+        marked = flag(live_posts_with(posts(), lambda text: any(w in text for w in RATE_WORDS)), value, wp_cli)
     state["rates"] = {"checked": f"{today:%Y-%m-%d}", **rates}
     parts = [f"기준금리 {rates['base']['value']}%" if "base" in rates else ""]
     parts += [f"{v['name']} {v['value']}%({v['month']})" for k, v in rates.items() if k != "base"]

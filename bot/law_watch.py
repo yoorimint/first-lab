@@ -27,7 +27,7 @@ LOOKAHEAD_DAYS = 120   # 이 안에 시행되는 개정을 글감으로
 JUST_DAYS = 30         # 최근 이 안에 시행된 개정은 기존 글 재검증
 MAX_LAWS = 150         # 하루에 여는 법령 수
 WORKERS = 6            # 동시에 여는 수 (law.go.kr 이 끊지 않을 정도)
-LAW_META = "_firstlab_law_changed"  # '시행일 법령명' — 갱신 대상 표시
+from .changed import META as LAW_META, flag  # noqa: E402  '시행일 법령명' — 갱신 대상 표시 (bot/changed.py)
 _EFFECTIVE = re.compile(r"(.{0,160}?)(?:개정규정은|이 법은|이 영은|이 규칙은|이 고시는)\s*(20\d\d)년\s*(\d{1,2})월\s*(\d{1,2})일부터\s*시행")
 
 
@@ -248,10 +248,7 @@ def mark_posts(just: list[dict]) -> list[str]:
             post_id = existing_post_id(keyword) if keyword else ""
             if not post_id or wp_cli("post", "get", post_id, "--field=post_status").strip() != "publish":
                 continue
-            value = f"{item['date']} {item['law']}"
-            if wp_cli("post", "meta", "get", post_id, LAW_META).strip() != value:
-                wp_cli("post", "meta", "update", post_id, LAW_META, value)
-                marked.append(post_id)
+            marked += flag([post_id], f"{item['date']} {item['law']}", wp_cli)
     return marked
 
 

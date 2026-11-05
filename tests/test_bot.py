@@ -1800,6 +1800,107 @@ class CalcYearlyTest(unittest.TestCase):
             self.assertTrue(data.get("yearly") is False or isinstance(data.get("yearly_checked"), int), path.name)
 
 
+class ChangedMarkTest(unittest.TestCase):
+    """근거가 바뀐 글 표시 (11/5 운영자 '모든 글 업데이트 안 하나'): 혜택 내용·계산기 값·금리·법령이 바뀌면 글에 표시 →
+    공개 글은 주당 한도와 상관없이 재검증, 초안은 공개 직전 보류."""
+
+    def _wp(self, store):
+        def wp(*a):
+            if a[2] == "get":
+                return store.get(a[3], "")
+            store[a[3]] = a[5]
+            return ""
+        return wp
+
+    def test_flag_keeps_unhandled_reasons(self):
+        from bot import changed
+        store = {"1": "2026-11-01 근로기준법"}
+        self.assertEqual(changed.flag(["1"], "2026-11-05 혜택 내용 변경: 구직급여", self._wp(store)), ["1"])
+        self.assertEqual(store["1"], "2026-11-05 혜택 내용 변경: 구직급여 / 2026-11-01 근로기준법")
+        self.assertEqual(changed.flag(["1"], "2026-11-05 혜택 내용 변경: 구직급여", self._wp(store)), [])  # 같은 표시 두 번 안 함
+        self.assertTrue(changed.pending(store["1"], "2026-11-04"))
+        self.assertFalse(changed.pending(store["1"], "2026-11-05"))  # 그날 이후 확인했으면 처리됨
+
+    def test_benefit_content_change_marks_posts(self):
+        import datetime as dt
+        import tempfile
+        from bot import benefit_watch
+        row = {"서비스ID": "S1", "서비스명": "국민취업지원제도", "지원내용": "월 50만 원 6개월"}
+        rows = lambda r: (lambda path, page, perPage, **kw: {"data": [r] if kw["cond[소관기관유형::EQ]"] == "중앙행정기관" else []})  # noqa: E731
+        bulk = {"7": {"status": "publish", "title": "국민취업지원제도 신청", "content": "..."},
+                "8": {"status": "draft", "title": "실업급여", "content": "국민취업지원제도와 차이"},
+                "9": {"status": "publish", "title": "연말정산", "content": "공제"}}
+        snap = Path(tempfile.mkdtemp()) / "snap.json"
+        store = {}
+        msg = benefit_watch.watch_changes(dt.date(2026, 11, 5), rows(row), bulk, self._wp(store), snap)
+        self.assertEqual(store, {})                       # 처음 본 혜택은 저장만
+        self.assertIn("처음 저장 1", msg)
+        benefit_watch.watch_changes(dt.date(2026, 11, 6), rows(row), bulk, self._wp(store), snap)
+        self.assertEqual(store, {})                       # 내용 그대로면 표시 없음
+        changed_row = {**row, "지원내용": "월 60만 원 6개월"}
+        msg = benefit_watch.watch_changes(dt.date(2026, 11, 7), rows(changed_row), bulk, self._wp(store), snap)
+        self.assertEqual(sorted(store), ["7", "8"])       # 이름이 나오는 공개 글·초안만
+        self.assertIn("2026-11-07 혜택 내용 변경(정부24): 국민취업지원제도", store["7"])
+        self.assertIn("재확인 표시 2편", msg)
+        self.assertIn("API 못 받음", benefit_watch.watch_changes(dt.date(2026, 11, 8), lambda *a, **k: None, bulk, self._wp(store), snap))
+
+    def test_calc_value_switch_marks_posts_with_old_value(self):
+        import datetime as dt
+        import tempfile
+        from bot import calc_watch
+        d = Path(tempfile.mkdtemp())
+        (d / "overtime-pay.json").write_text(json.dumps({"basis_date": "2026-11-05", "min_wage": 10320, "rate": 0.0475,
+            "scheduled": [{"from": "2027-01-01", "values": {"min_wage": 10700, "rate": 0.05}}]}), encoding="utf-8")
+        bulk = {"1": {"status": "publish", "title": "최저임금", "content": "시급 10,320원"},
+                "2": {"status": "publish", "title": "대출", "content": "금리 4.75%"},          # 계산기 없는 글의 흔한 비율은 안 건드림
+                "3": {"status": "draft", "title": "연장수당", "content": '4.75% [firstlab_calc id="overtime-pay"]'},
+                "4": {"status": "trash", "title": "x", "content": "10,320원"}}
+        state, store = {}, {}
+        self.assertEqual(calc_watch.mark_switches(dt.date(2026, 12, 31), state, bulk, self._wp(store), d), [])  # 시행 전
+        logs = calc_watch.mark_switches(dt.date(2027, 1, 1), state, bulk, self._wp(store), d)
+        self.assertEqual(sorted(store), ["1", "3"])
+        self.assertIn("min_wage 10320→10700", store["1"])
+        self.assertIn("2편", logs[0])
+        self.assertEqual(calc_watch.mark_switches(dt.date(2027, 1, 2), state, bulk, self._wp(store), d), [])  # 한 번만
+
+    def test_draft_with_new_mark_is_held_before_publish(self):
+        import datetime as dt
+        from bot import changed, freshness
+
+        def wp(*a):
+            if a[:3] == ("post", "meta", "get"):
+                return {freshness.VERIFIED_META: "2026-11-01", changed.META: "2026-11-05 혜택 내용 변경(정부24): 구직급여"}.get(a[4], "")
+            return "x"
+        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a: []):
+            self.assertEqual(freshness.check_post(1, dt.date(2026, 11, 6)), ["쓴 뒤 근거 변경: 2026-11-05 혜택 내용 변경(정부24): 구직급여"])
+            self.assertEqual(freshness.check_post(1, dt.date(2026, 11, 4)), [])   # 아직 안 온 날짜 표시는 무시
+
+    def test_recheck_without_changes_records_date(self):
+        from bot import refresh
+        calls = []
+
+        def wp(*a):
+            calls.append(a)
+            return "2026-11-05 10:00:00" if "--field=post_modified" in a else ("<p>본문</p>" if "--field=post_content" in a else "제목")
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp):
+            with self.assertRaises(RuntimeError):
+                refresh.apply_direct({"post_id": 3}, {})
+            refresh.apply_direct({"post_id": 3, "checked": True, "changes": "확인 결과 그대로"}, {})
+        self.assertTrue(any(a[:5] == ("post", "meta", "update", "3", refresh.META_KEY) for a in calls))
+        self.assertFalse(any(a[:2] == ("post", "update") for a in calls))   # 본문·제목은 그대로
+
+    def test_refresh_fixes_beyond_weekly_cap(self):
+        from bot import refresh
+        posts = [{"id": 1, "title": "a", "url": "u1", "date": "2026-10-01", "refreshed": "2026-11-01", "verified": "",
+                  "law_changed": "2026-11-05 혜택 내용 변경: x", "has_number": True},
+                 {"id": 2, "title": "b", "url": "u2", "date": "2026-01-01", "refreshed": "", "verified": "2026-11-06",
+                  "law_changed": "2026-11-05 근로기준법", "has_number": True}]   # 표시 뒤에 검수 통과 → 처리됨
+        conn = sqlite3.connect(":memory:")
+        with mock.patch.object(refresh, "wp_cli", return_value=json.dumps(posts)):
+            picks = refresh.pick_targets(conn, 5, fixes_only=True)
+        self.assertEqual([(p["id"], mode) for p, mode, _ in picks], [(1, "recheck")])
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt
@@ -1814,7 +1915,7 @@ class BokApiTest(unittest.TestCase):
 
 
 class RatesTest(unittest.TestCase):
-    """한국은행 금리: 매일 저장, 기준금리가 바뀌면 '기준금리'가 든 공개 글만 재검증 표시."""
+    """한국은행 금리: 매일 저장, 기준금리가 바뀌면 '기준금리'가 든 공개 글·초안에 재검증 표시."""
 
     def test_base_rate_change_marks_published_posts(self):
         import datetime as dt
@@ -1829,10 +1930,11 @@ class RatesTest(unittest.TestCase):
                 mock.patch.object(wpbulk, "posts", return_value=bulk), \
                 mock.patch("bot.settings.wp_cli", side_effect=lambda *a: calls.append(a) or ""):
             msg = bok_api.run(dt.date(2026, 11, 28))
-        self.assertEqual([c[3] for c in calls], ["10"])                     # 공개 글 중 '기준금리'가 든 글만
-        self.assertEqual(calls[0][4], law_watch.LAW_META)
-        self.assertIn("3.0%→2.75%", calls[0][5])
-        self.assertIn("재검증 표시 1편", msg)
+        updates = [c for c in calls if c[2] == "update"]
+        self.assertEqual([c[3] for c in updates], ["10", "11"])  # '기준금리'가 든 공개 글·초안 (초안은 공개 직전 보류, freshness)
+        self.assertEqual(updates[0][4], law_watch.LAW_META)
+        self.assertIn("3.0%→2.75%", updates[0][5])
+        self.assertIn("재검증 표시 2편", msg)
         self.assertEqual(save.call_args.args[0]["rates"]["base"]["value"], 2.75)
         with mock.patch.object(bok_api, "_key", return_value=""):
             self.assertIn("키 없음", bok_api.run(dt.date(2026, 11, 28)))

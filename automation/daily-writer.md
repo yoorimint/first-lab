@@ -164,7 +164,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   `{"type": "refresh", "post_id": <id>, "base_modified": "<응답 값 그대로>", "content_html": "<고친 본문 전체>", "changes": "<무엇을 바꿨는지 한 줄>"}`
   (제목 모드는 `content_html` 대신 `"title": "...", "excerpt": "..."`)
   (`base_modified` 는 그 사이 운영자가 글을 고쳤으면 덮어쓰지 않게 하는 값이다. 바꾸지 말 것)
-- 고칠 게 없으면 파일을 만들지 않는다.
+- 확인해 보니 고칠 게 없으면 `{"type": "refresh", "post_id": <id>, "base_modified": "<응답 값>", "checked": true, "changes": "확인 결과 그대로: <확인한 것 한 줄>"}` 만 올린다 (안 올리면 같은 글이 매일 다시 나옴).
 - 5단계와 같이 검사 → 커밋(`매일 갱신: <글 제목>`) → main 에 올림 → 배포 확인.
 
 ## 7. 마무리 보고 (세션 마지막 메시지)

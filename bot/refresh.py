@@ -20,7 +20,7 @@ import re
 import urllib.parse
 from datetime import datetime, timedelta
 
-from . import factcheck
+from . import changed, factcheck
 from .blocks import to_blocks
 from .keyword_db import connect, norm
 from .keyword_filter import subject
@@ -57,6 +57,7 @@ foreach ( get_posts( array( 'post_status' => 'publish', 'numberposts' => 500 ) )
         'date' => get_the_date( 'Y-m-d', $p ),
         'refreshed' => (string) get_post_meta( $p->ID, '_firstlab_refreshed', true ),
         'law_changed' => (string) get_post_meta( $p->ID, '_firstlab_law_changed', true ),
+        'verified' => (string) get_post_meta( $p->ID, '_firstlab_verified_at', true ),
         'has_number' => (bool) preg_match( '/\d/', wp_strip_all_tags( $p->post_content ) ),
     );
 }
@@ -101,8 +102,9 @@ def top_queries(conn, page: str, limit: int = 5) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def pick_targets(conn, limit: int) -> list[tuple[dict, str, str]]:
-    """(글, 방식 'retitle'|'enhance'|'recheck', 이유) 목록."""
+def pick_targets(conn, limit: int, fixes_only: bool = False) -> list[tuple[dict, str, str]]:
+    """(글, 방식 'retitle'|'enhance'|'recheck', 이유) 목록.
+    fixes_only: 근거가 바뀐 글(bot/changed.py 표시)만 — 주당 갱신 한도를 다 써도 틀려진 글은 고친다."""
     conn.executescript(GSC_SCHEMA)
     posts = json.loads(wp_cli("eval", _POSTS_PHP) or "[]")
     now = datetime.now()
@@ -110,10 +112,10 @@ def pick_targets(conn, limit: int) -> list[tuple[dict, str, str]]:
     picks: list[tuple[int, dict, str, str]] = []
     for p in posts:
         law = p.get("law_changed") or ""
-        if law and law[:10] > (p["refreshed"] or ""):  # 근거 법령 개정이 마지막 갱신 뒤에 시행 (bot/law_watch.py)
-            picks.append((-1, p, "recheck", f"근거 법령 개정 시행: {law}"))
+        if changed.pending(law, max(p["refreshed"] or "", p.get("verified") or "")):  # 근거가 마지막 확인 뒤에 바뀜
+            picks.append((-1, p, "recheck", f"근거 변경: {law}"))
             continue
-        if p["refreshed"] and p["refreshed"] >= recent:
+        if fixes_only or (p["refreshed"] and p["refreshed"] >= recent):
             continue
         latest, older = _history(conn, p["url"])
         p["siblings"] = siblings(conn, p["url"])
@@ -219,10 +221,10 @@ def _count_done(state: dict) -> None:
     state["refresh"] = {week: state.get("refresh", {}).get(week, 0) + 1}
 
 
-def plan_direct(state: dict) -> list[str]:
+def plan_direct(state: dict, fixes_only: bool = False) -> list[str]:
     """월정액 방식: 오늘 갱신할 글을 골라 두기만 한다 (매일 글쓰기 세션이 처리)."""
     with connect() as conn:
-        targets = pick_targets(conn, 1)
+        targets = pick_targets(conn, 1, fixes_only)
     if not targets:
         state.pop("refresh_target", None)
         return []
@@ -248,8 +250,9 @@ def apply_direct(data: dict, state: dict) -> str:
         if len(new_html) < len(old) * MIN_KEEP_RATIO:
             raise RuntimeError(f"고친 본문이 너무 짧음 ({len(new_html)}자 < 기존 {len(old)}자의 80%) → 반영 안 함")
     title, excerpt = _checked_title(data, new_html or old) if data.get("title") else ("", "")
-    if new_html is None and not title:
-        raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음")
+    if new_html is None and not title and data.get("checked") is not True:
+        raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음 (확인만 했으면 \"checked\": true)")
+    # checked: 재검증해 보니 고칠 게 없음 → 갱신 날짜만 기록 (안 하면 근거 변경 표시가 안 풀려 매일 같은 글이 다시 뽑힘)
     _save(post_id, new_html, title, excerpt)
     _count_done(state)
     target = state.get("refresh_target") or {}
@@ -262,11 +265,12 @@ def apply_direct(data: dict, state: dict) -> str:
 def run_weekly(settings: BotSettings, state: dict) -> list[str]:
     """하루 1번 호출. 이번 주(월요일 시작) 갱신 수가 한도 미만이면 최대 1개 갱신 (주중에 고르게 분산)."""
     done = state.setdefault("refresh", {}).get(_week(), 0)
-    if settings.refresh_per_week <= done:
+    fixes_only = settings.refresh_per_week <= done  # 한도를 넘어도 근거가 바뀐 글은 계속 (틀린 채 두지 않음)
+    if settings.write_mode == "direct":
+        return plan_direct(state, fixes_only)
+    if fixes_only:
         state.pop("refresh_target", None)
         return []
-    if settings.write_mode == "direct":
-        return plan_direct(state)
     if not settings.api_key:
         return []
     if settings.daily_cost_cap > 0 and spent_today(state) >= settings.daily_cost_cap:

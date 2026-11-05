@@ -15,7 +15,7 @@ import re
 import urllib.parse
 from pathlib import Path
 
-from . import source_check
+from . import changed, source_check
 from .review_gate import _ok
 from .settings import wp_cli
 
@@ -97,7 +97,14 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
     except Exception:  # noqa: BLE001
         record = {}
     review = [] if record.get("laws") else _review_from_queue(urllib.parse.unquote(get("post_name")))
-    return problems(record, review, since, today)
+    out = problems(record, review, since, today)
+    try:  # 쓴 뒤에 근거(법령·금리·혜택 내용·계산기 값)가 바뀌었다는 표시 (bot/changed.py)
+        mark = wp_cli("post", "meta", "get", str(post_id), changed.META).strip()
+    except Exception:  # noqa: BLE001
+        mark = ""
+    if changed.pending(mark, f"{since:%Y-%m-%d}") and mark[:10] <= f"{today:%Y-%m-%d}":
+        out.append(f"쓴 뒤 근거 변경: {mark[:150]}")
+    return out
 
 
 def mark_verified(post_id: int | str, when: dt.date | None = None) -> None:
