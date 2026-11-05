@@ -2597,6 +2597,14 @@ class VariantOnlyTest(unittest.TestCase):
         self.assertEqual(g.variant_only("<h2>신청</h2><p>본인만 신청할 수 있어요. 서류만 내면 돼요.</p>"), [])   # 갈래가 없는 글
 
 
+class LawAbsenceTest(unittest.TestCase):
+    def test_flag_and_pass(self):
+        """#690 \'파킹통장은 법에 있는 상품 이름이 아니에요\' — 확인 못 한 부정 단정."""
+        from bot import condition_gate as g
+        self.assertTrue(g.law_absence("<p>'파킹통장'은 법에 있는 상품 이름이 아니에요. 금감원에서 볼 수 있어요.</p>"))
+        self.assertEqual(g.law_absence("<p>'파킹통장'은 이런 상품을 부르는 별칭이에요.</p><p>법에 따라 1억 원까지 보호돼요.</p>"), [])
+
+
 class TransitionRuleTest(unittest.TestCase):
     """부칙 경과조치: 개정으로 바뀐 숫자는 적용 시점과 함께 (11/5 #762 하루 상한 68,100원 ← 2025년 이전 퇴사자는 66,000원)."""
 

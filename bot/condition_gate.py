@@ -9,7 +9,8 @@
 3. 첫 문단 단정 ↔ 본문 예외 (lead_vs_body, #748), 요약 '받아요' ↔ 본문 '못 받는 경우' (excerpt_vs_exclusions, #762),
    요약·첫 문단 기준 '하위 10%' ↔ 본문 '…이라면 하위 20%' (lead_thresholds, #771), 제목 '피해자' ↔ 본문은 늘 '불법사금융 피해자' (title_qualifier, #771),
    첫 문단 '3개월 이상 일해야' ↔ 본문 '일용근로자는 … 45일 이상이면' (lead_minimums, #775),
-   갈래(5등급제·9등급제)를 나눠 설명하는 글에서 갈래 없이 '…만 적어요' (variant_only, #784).
+   갈래(5등급제·9등급제)를 나눠 설명하는 글에서 갈래 없이 '…만 적어요' (variant_only, #784),
+   '법에 있는 상품 이름이 아니에요'처럼 법령 전체를 봐야 아는 부정 단정 (law_absence, #690).
 4. 부칙 경과조치 (transition_rules, #762): 근거 조문이 최근 개정되고 부칙이 '시행 전에 이직한 사람은 종전 규정'이면,
    그 숫자를 쓴 문장에 적용 시점('2026년 1월 1일 이후 …', '종전')이 있어야 한다 (하루 상한 68,100원 ← 2025년 퇴사자는 66,000원).
 """
@@ -384,3 +385,13 @@ def variant_only(body_html: str) -> list[str]:
             if _ONLY.search(sent) and not any(v in sent for v in variants):
                 out.append(f"'{sent[:50]}' 는 '…만' 단정인데 글이 {'·'.join(variants[:3])} 을 나눠 설명함 — 어느 갈래 이야기인지 적기")
     return out[:3]
+
+
+# 법령 전체를 뒤져야 알 수 있는 '법에 … 없어요/아니에요' 단정 (11/5 #690 "'파킹통장'은 법에 있는 상품 이름이 아니에요" —
+# 확인 못 한 것을 없다고 단정하는 유형 absence). 별칭이라고만 쓰면 뜻이 같다.
+_LAW_ABSENCE = re.compile(r"(법|법령|법률|규정)(에|상|으로)[^.?!]{0,20}(이름|용어|상품|제도|규정|조항|근거)[^.?!]{0,10}(아니에요|아니고|없어요|없고|없습니다)")
+
+
+def law_absence(body_html: str) -> list[str]:
+    return [f"'{s[:50]}' 는 법령 전체를 봐야 아는 부정 단정 — '○○를 부르는 별칭이에요'처럼 확인한 사실로"
+            for s in _sentences(body_html) if _LAW_ABSENCE.search(s)][:2]

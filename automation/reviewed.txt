@@ -140,3 +140,4 @@ calc:lunar-calendar
 calc:school-grade
 784 내신 등급 계산기: 5등급제 1등급 10%·9등급제 4%, 석차로 계산
 calc:graduation-year
+690 파킹통장 뜻: 1,000만 원 30일 예시 세후 17,397원

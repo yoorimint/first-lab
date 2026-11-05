@@ -33,7 +33,7 @@
   "absence": {
     "name": "확인 못 한 것을 '없다'고 단정",
     "prevention": "수정 문구에 '찾지 못했/확인되지 않았' 금지(테스트) + 검수 지시문·감시 절차 규칙",
-    "checks": [
+    "checks": ["tests/test_bot.py::class LawAbsenceTest", 
       "tests/test_bot.py::def test_no_absence_wording_in_fixes",
       "automation/review-prompt.md::never propose wording that asserts something does NOT exist"
     ],
