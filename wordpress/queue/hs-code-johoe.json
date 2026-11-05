@@ -1,0 +1,377 @@
+{
+ "title": "HS코드 조회 방법: 10자리 HSK 찾기와 사전심사 30일",
+ "excerpt": "HS코드는 관세법령정보포털 '세계HS'에서 조회해요. 앞 6자리는 세계 공통, 우리나라는 10자리 HSK를 쓰고, 애매하면 사전심사로 30일 안에 품목번호를 받아요.",
+ "content_html": "<p>HS코드는 관세청 <strong>관세법령정보포털(CLIP)</strong>의 '세계HS' 검색에서 품명이나 번호로 조회해요. 앞 6자리는 세계 공통이고, 우리나라는 여기에 4자리를 더한 <strong>10자리(HSK)</strong>를 써요. 찾아봐도 어느 번호인지 애매하면 수출입신고 전에 관세평가분류원에 <strong>품목분류 사전심사</strong>를 신청하면, 신청을 받은 날부터 30일(보정·분석 기간 등은 빼고) 안에 법적 효력이 있는 품목번호를 받을 수 있어요.</p>\n<h2>HS코드 자리 읽는 법</h2>\n<p>HS는 관세·통계·운송에 함께 쓰려고 만든 국제 품목분류표예요. 1988년 1월 발효됐고, 모든 물품을 부·류·호·소호 순으로 나눠요.</p>\n<table><thead><tr><th>자리</th><th>이름</th><th>내용</th></tr></thead><tbody>\n<tr><td>앞 2자리</td><td>류</td><td>제01류~제97류 (제77류는 유보)</td></tr>\n<tr><td>앞 4자리</td><td>호</td><td>국제 공통</td></tr>\n<tr><td>앞 6자리</td><td>소호</td><td>국제 공통, HS협약이 정한 마지막 단위</td></tr>\n<tr><td>10자리</td><td>HSK</td><td>우리나라가 관세·통계용으로 더 나눈 번호</td></tr>\n</tbody></table>\n<p>예를 들어 커피는 제09류(커피·향신료)에 들어가요. 그 아래에서 호(4자리)·소호(6자리)·10자리 순으로 점점 좁혀져요.</p>\n<h2>관세법령정보포털에서 조회하는 순서</h2>\n<ol>\n<li>관세법령정보포털(unipass.customs.go.kr/clip) 첫 화면의 검색 탭에서 '세계HS'를 골라요.</li>\n<li>품명(예: 커피)이나 알고 있는 번호 앞자리로 검색해요. 같은 첫 화면에 '세번·상품검색'도 있어요.</li>\n<li>품명으로 잘 안 나오면 '속견표'의 제01류~제97류 목록에서 물건이 속한 류부터 찾아보면 범위를 좁히기 쉬워요.</li>\n<li>속견표 화면에 '한국 [2026년]'처럼 적용 연도가 나오니 올해 표인지 봐요. 공공데이터포털의 관세청 HSK 분류 자료도 연 단위로 갱신돼요.</li>\n<li>비슷한 물건이 실제로 어떻게 분류됐는지는 품목분류사례 메뉴(영문 화면 'Classification Case')에서 참고할 수 있어요.</li>\n</ol>\n<h2>애매하면 품목분류 사전심사</h2>\n<p>사전심사는 관세법 제86조에 따른 제도로, 결과를 받은 물품과 같은 물품을 신고하면 세관장이 그 번호를 그대로 적용해요.</p>\n<table><thead><tr><th>항목</th><th>내용</th></tr></thead><tbody>\n<tr><td>신청인</td><td>수출입하려는 사람, 수출 물품 제조자, 관세사·관세법인·통관취급법인</td></tr>\n<tr><td>신청 시기</td><td>수출입신고 전</td></tr>\n<tr><td>신청처·방법</td><td>관세평가분류원, 인터넷(전자통관시스템)·우편·방문</td></tr>\n<tr><td>제출 자료</td><td>신청서(신청서·물품설명서), 견본, 품목별 증빙서류(예: 기계류 카탈로그, 조제식료품 성분표)</td></tr>\n<tr><td>처리 기간</td><td>신청받은 날부터 30일 (보정·분석·위원회 심의 기간 등 제외)</td></tr>\n<tr><td>보정 요구</td><td>자료가 부족하면 20일 이내 기간을 정해 요구</td></tr>\n<tr><td>분석수수료</td><td>분석이 필요한 물품만 품목당 3만 원</td></tr>\n<tr><td>결과 효력</td><td>품목분류가 변경되기 전까지 유효</td></tr>\n</tbody></table>\n<p>견본을 내기 어려운 물건은 견본 미제출 사유서와 컬러 대체사진 3매로 갈음할 수 있어요. 분석수수료는 분석 시작 전까지 내요. 예를 들어 3개 품목을 신청했는데 그중 2개만 성분 분석이 필요하면 수수료는 3만 원 × 2 = 6만 원이에요.</p>\n<h3>반려될 수 있는 경우</h3>\n<ul>\n<li>정한 보정 기간 안에 자료를 보완하지 않은 경우</li>\n<li>신청한 물품과 같은 물품을 이미 수출입신고한 경우</li>\n<li>이의신청 같은 불복이나 소송이 진행 중인 경우</li>\n<li>신청인이 반려를 요청한 경우</li>\n<li>분석수수료를 기한 안에 내지 않은 경우</li>\n<li>냉장·냉동처럼 보관·운송에 따라 상태가 바뀌는 물품 등</li>\n</ul>\n<p>그래서 첫 수입·수출 신고를 하기 전에 신청하는 게 핵심이에요.</p>\n<h2>결과에 동의하지 않으면 재심사</h2>\n<p>사전심사 결과를 통지받은 날부터 30일 이내에 재심사를 신청할 수 있어요. 재심사 신청서와 견본·증빙서류, 품목분류 사전심사서 사본을 함께 내고, 관세청은 신청받은 날부터 60일(위원회 심의 기간 등 제외) 안에 다시 통지해요. 사전심사 결과에 대한 재심사는 1회예요. 다만 나중에 관세청이 품목분류를 변경해 통지하면, 그 통지를 받은 날부터 30일 이내에 다시 재심사를 신청할 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>해외 거래처가 알려준 HS코드를 그대로 써도 되나요?</h3>\n<p>세계 공통은 앞 6자리까지라서, 뒤 4자리는 우리나라 HSK로 다시 찾아야 해요. 나라마다 6자리 뒤를 관세·통계 목적에 맞게 따로 나누기 때문이에요.</p>\n<h3>전화로 물어볼 곳이 있나요?</h3>\n<p>관세 일반 문의는 지역번호 없이 125로 할 수 있어요.</p>\n<h3>사전심사 결과는 다른 사람도 볼 수 있나요?</h3>\n<p>관세청이 품목분류와 품명·용도·규격 등을 고시하거나 공표해요. 다만 영업 비밀이 담긴 경우처럼 공개가 적당하지 않으면 공표하지 않을 수 있어요.</p>\n<h3>분석수수료에 부가가치세가 붙나요?</h3>\n<p>분석수수료는 세외수입이라 세금계산서 대상이 아니고 부가가치세도 포함되지 않아요.</p>",
+ "tags": [
+  "HS코드",
+  "품목분류",
+  "관세법령정보포털"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "plain unmarked cardboard boxes stacked on wooden pallets in a bright empty warehouse, soft daylight",
+   "alt": "밝은 창고 팔레트 위에 쌓인 상자"
+  }
+ ],
+ "review": [
+  {
+   "claim": "HS코드는 관세법령정보포털(CLIP) '세계HS' 검색에서 품명이나 번호로 조회",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/index.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "앞 6자리는 세계 공통, 우리나라는 4자리를 더한 10자리(HSK)",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168",
+    "https://www.data.go.kr/data/15049720/fileData.do",
+    "https://www.law.go.kr/법령/관세법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "품목분류 사전심사는 수출입신고 전에 관세평가분류원에 신청 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법",
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사전심사는 신청을 받은 날부터 30일(보정·분석 기간 등 제외) 안에 통지 (관세법시행령 제106조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령",
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사전심사 결과는 법적 효력이 있는 품목번호",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "HS는 관세·통계·운송에 함께 쓰는 국제 품목분류표, 1988년 1월 발효",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "모든 물품을 부·류·호·소호 순으로 분류",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "류는 제01류~제97류, 제77류는 유보",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/hsinfosrch/openULS0201001Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4자리 호·6자리 소호는 국제 공통, 6자리 소호가 HS협약이 정한 마지막 단위",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "10자리 HSK는 우리나라가 관세·통계용으로 더 나눈 번호 (관세법시행령 제98조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령",
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "커피는 제09류(커피·향신료)",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/hsinfosrch/openULS0201001Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "그 아래에서 호(4자리)·소호(6자리)·10자리 순으로 좁혀짐",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "관세법령정보포털 주소 unipass.customs.go.kr/clip",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/index.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "첫 화면 검색 탭에서 '세계HS'를 고르고 품명·번호 앞자리로 검색, 같은 화면에 '세번·상품검색'도 있음",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/index.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "속견표의 제01류~제97류 목록에서 류부터 찾아보면 범위를 좁히기 쉬움",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/hsinfosrch/openULS0201001Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "속견표 화면에 '한국 [2026년]'처럼 적용 연도 표시",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/hsinfosrch/openULS0201001Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공공데이터포털의 관세청 HSK 분류 자료는 연 단위로 갱신",
+   "urls": [
+    "https://www.data.go.kr/data/15049720/fileData.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "품목분류사례 메뉴(영문 'Classification Case')에서 분류 사례 참고",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/prlstclsfsrch/openULS0203001S.do",
+    "https://unipass.customs.go.kr/clip/index.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "같은 물품을 신고하면 세관장이 사전심사 결과 번호를 그대로 적용 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신청인은 수출입하려는 사람, 수출 물품 제조자, 관세사·관세법인·통관취급법인 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법",
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신청 시기는 수출입신고 전 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신청 방법은 인터넷(전자통관시스템)·우편·방문",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제출 자료는 신청서(신청서·물품설명서), 견본, 품목별 증빙서류(기계류 카탈로그, 조제식료품 성분표) (관세법시행령 제106조)",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do",
+    "https://www.law.go.kr/법령/관세법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "처리 기간 30일, 보정·분석·위원회 심의 기간 등 제외 (관세법시행령 제106조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "자료가 부족하면 20일 이내 기간을 정해 보정 요구 (관세법시행령 제106조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "분석수수료는 분석이 필요한 물품만 품목당 3만 원 (관세법시행규칙 제33조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙",
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사전심사 결과는 품목분류가 변경되기 전까지 유효 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "견본을 내기 어려우면 견본 미제출 사유서와 컬러 대체사진 3매로 갈음",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "분석수수료는 분석 시작 전까지 납부",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3개 품목 중 2개만 분석이 필요하면 수수료 3만 원 × 2 = 6만 원 (관세법시행규칙 제33조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "반려: 보정 기간 안에 보완 안 함, 같은 물품을 이미 신고함, 불복·소송 진행 중, 신청인 반려 요청 (관세법시행령 제106조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령",
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "반려: 분석수수료를 기한 안에 안 냄, 냉장·냉동처럼 보관·운송에 따라 상태가 바뀌는 물품 등",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "재심사는 통지받은 날부터 30일 이내 신청 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "재심사 신청서와 견본·증빙서류, 품목분류 사전심사서 사본 제출",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "재심사는 신청받은 날부터 60일(위원회 심의 기간 등 제외) 안에 통지 (관세법시행령 제106조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사전심사 결과에 대한 재심사는 1회, 관세청이 품목분류를 변경해 통지하면 그 통지를 받은 날부터 30일 이내 재심사 신청 가능 (관세법 제87조)",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do",
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "해외 거래처 코드는 앞 6자리까지만 공통, 나라마다 6자리 뒤를 관세·통계 목적으로 따로 나눔",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "관세 일반 문의는 지역번호 없이 125",
+   "urls": [
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2890&cntntsId=865"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "관세청이 사전심사 품목분류와 품명·용도·규격 등을 고시·공표, 영업 비밀 등은 공표하지 않을 수 있음 (관세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "분석수수료는 세외수입이라 세금계산서 대상이 아니고 부가가치세 미포함",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "keyword": "HSCODE조회",
+ "status": "auto",
+ "sources": [
+  {
+   "name": "관세법령정보포털 품목분류 사전심사제도 안내",
+   "url": "https://unipass.customs.go.kr/clip/ctensrch/openULS0404009Q.do"
+  },
+  {
+   "name": "관세법령정보포털 속견표 (HS 류별 목록)",
+   "url": "https://unipass.customs.go.kr/clip/hsinfosrch/openULS0201001Q.do"
+  },
+  {
+   "name": "관세청 용어사전 통일 상품명 및 부호체계(HS)",
+   "url": "https://www.customs.go.kr/kcs/ad/tr/trTermView.do?mi=2902&termId=2168"
+  }
+ ]
+}
