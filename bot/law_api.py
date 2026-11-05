@@ -86,7 +86,12 @@ def versions(name: str) -> list[dict]:
         date = _date(law.findtext("시행일자") or "")
         if (law.findtext("법령명한글") or "").replace(" ", "") == name.replace(" ", "") and date:  # 띄어쓰기 무관
             out.append({"mst": law.findtext("법령일련번호"), "date": date, "status": (law.findtext("현행연혁코드") or "").strip()})
-    return sorted(out, key=lambda v: v["date"])
+    # 같은 날 시행되는 판이 여럿이면(같은 날 시행되는 개정이 따로 공포됨) 가장 나중 판(법령일련번호 큰 것)만 — 그 판에 모두 반영돼 있음
+    by_date: dict[dt.date, dict] = {}
+    for v in out:
+        if v["date"] not in by_date or int(v["mst"] or 0) > int(by_date[v["date"]]["mst"] or 0):
+            by_date[v["date"]] = v
+    return sorted(by_date.values(), key=lambda v: v["date"])
 
 
 def jo_code(article: str) -> str | None:

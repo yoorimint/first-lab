@@ -86,7 +86,18 @@ def patch_content(content: str, patch: dict) -> str | None:
         return None
     if patch.get("remove_element"):  # 그 요소(표의 한 줄, 목록 한 항목 등)만 삭제
         return content.replace(m.group(0), "", 1)
-    return content.replace(m.group(0), f"<{tag}{m.group('attrs') or ''}>{patch['replace_paragraph']}</{tag}>")
+    return content.replace(m.group(0), f"<{tag}{m.group('attrs') or ''}>{inner(patch['replace_paragraph'], tag)}</{tag}>")
+
+
+def inner(text: str, tag: str) -> str:
+    """고칠 문장에 겉 태그('<p>…</p>')까지 적었으면 벗김 — 그대로 넣으면 '<p><p>…</p></p>' 이중 문단이 됨 (11/5 #578)."""
+    m = re.fullmatch(rf"\s*<{tag}(?:\s[^>]*)?>(.*)</{tag}>\s*", text, flags=re.S)
+    return m.group(1) if m and f"<{tag}" not in m.group(1) else text
+
+
+def unnest(content: str) -> str:
+    """이미 생긴 이중 문단 '<p><p>…</p></p>' → '<p>…</p>'."""
+    return re.sub(r"<p>(\s*)<p>((?:(?!</p>).)*)</p>(\s*)</p>", r"<p>\2</p>", content, flags=re.S)
 
 
 def apply_patches(bulk: dict[str, dict] | None = None) -> None:
@@ -109,6 +120,10 @@ def apply_patches(bulk: dict[str, dict] | None = None) -> None:
             except subprocess.CalledProcessError:
                 continue
         updated = patch_content(content, patch)
+        if updated is None and unnest(content) != content:  # 예전 패치가 만든 이중 문단 바로잡기
+            updated = unnest(content)
+        elif updated is not None:
+            updated = unnest(updated)
         if updated is None:
             if "insert_after" in patch:  # 넣은 블록이 그대로 있는지 확인용 (편집기 저장으로 지워지면 다시 넣음)
                 print(f"[확인] {pid} '{patch['insert_after']}' {content.count(patch['insert_after'])}개", flush=True)

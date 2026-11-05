@@ -1482,6 +1482,38 @@ class LawApiTest(unittest.TestCase):
         self.assertIsNone(bad_kind)
 
 
+class NestedParagraphTest(unittest.TestCase):
+    def test_patch_strips_outer_tag_and_repairs_nested(self):
+        """11/5 #578: 고친 문구에 '<p>…</p>' 까지 넣어 '<p><p>…</p></p>' 이 됨 → 적용 때 벗기고, 이미 생긴 것은 바로잡고, 반영 도구가 거부."""
+        from bot.fix_posts import patch_content, unnest
+        content = "<p>앞 문장.</p>\n\n<p>옛 문장이 여기 있어요.</p>"
+        got = patch_content(content, {"find": "옛 문장", "replace_paragraph": "<p>새 문장이에요.</p>"})
+        self.assertIn("<p>새 문장이에요.</p>", got)
+        self.assertNotIn("<p><p>", got)
+        self.assertEqual(unnest("<h2>x</h2>\n<p><p>버팀목 대출은…</p></p>\n<p>다음</p>"), "<h2>x</h2>\n<p>버팀목 대출은…</p>\n<p>다음</p>")
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        post = {"content_html": "<p>옛 문장이 여기 있어요.</p>", "title": "t", "excerpt": "e"}
+        errs = apply_review.check(post, [{"type": "wrong_fact", "why": "w", "find": "옛 문장", "replace_paragraph": "<p>새 문장</p>"}])
+        self.assertTrue(any("안쪽만" in e for e in errs))
+
+
+class LawApiVersionsTest(unittest.TestCase):
+    def test_versions_one_per_date_latest_promulgation(self):
+        """같은 시행일 판이 여럿이면 마지막 공포 판 하나만 (실제 소득세법 2027.1.1 판이 6개로 나와 감시 목록이 중복됨)."""
+        from bot import law_api
+        xml = ("<LawSearch>"
+               "<law id='1'><법령일련번호>100</법령일련번호><법령명한글><![CDATA[소득세법]]></법령명한글><시행일자>20270101</시행일자><현행연혁코드>시행예정</현행연혁코드></law>"
+               "<law id='2'><법령일련번호>120</법령일련번호><법령명한글><![CDATA[소득세법]]></법령명한글><시행일자>20270101</시행일자><현행연혁코드>시행예정</현행연혁코드></law>"
+               "<law id='3'><법령일련번호>90</법령일련번호><법령명한글><![CDATA[소득세법]]></법령명한글><시행일자>20260701</시행일자><현행연혁코드>현행</현행연혁코드></law>"
+               "<law id='4'><법령일련번호>95</법령일련번호><법령명한글><![CDATA[소득세법 시행령]]></법령명한글><시행일자>20260701</시행일자><현행연혁코드>현행</현행연혁코드></law>"
+               "</LawSearch>")
+        with mock.patch.object(law_api, "fetch", return_value=xml):
+            got = law_api.versions("소득세법")
+        self.assertEqual([(v["mst"], str(v["date"])) for v in got], [("90", "2026-07-01"), ("120", "2027-01-01")])
+        self.assertEqual(law_api.jo_code("제167조의10"), "016710")
+
+
 class BenefitApiTest(unittest.TestCase):
     """혜택 정보 API: 키는 서버에만, 인코딩된 키·원래 키 모두 처리, 통로는 허용한 경로·변수만."""
 

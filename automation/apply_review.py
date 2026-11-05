@@ -36,6 +36,9 @@ def check(post: dict, items: list[dict]) -> list[str]:
         find = p.get("find", "")
         if body.count(find) != 1:
             errors.append(f"{i}번: 찾을 문구가 본문에 {body.count(find)}번 (1번이어야 함): {find[:40]}")
+        tag = p.get("tag", "p")
+        if p.get("replace_paragraph", "").lstrip().startswith(f"<{tag}"):
+            errors.append(f"{i}번: 고친 문구는 <{tag}> 안쪽만 (겉 태그까지 넣으면 이중 문단이 됨, 11/5 #578)")
         if find and find in p.get("replace_paragraph", ""):
             errors.append(f"{i}번: 고친 문구 안에 찾을 문구가 그대로 있음 (고친 뒤에도 다시 걸림): {find[:40]}")
     return errors

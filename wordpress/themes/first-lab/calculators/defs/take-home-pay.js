@@ -39,7 +39,7 @@
     intro: '세전 월급과 비과세 금액, 공제대상가족 수를 넣으면 4대보험과 소득세를 빼고 통장에 들어오는 금액을 계산해요.',
     inputs: [
       { name: 'pay', label: '세전 월급 (원)', type: 'number', min: 0, step: 1, default: 3000000, help: '기본급·수당을 더한 한 달 총액이에요. 연봉이면 12로 나눠서 넣어요.' },
-      { name: 'nontax', label: '비과세 금액 (원)', type: 'number', min: 0, step: 1, default: 200000, help: '식대(월 20만 원까지) 같은 비과세 수당 합계예요. 없으면 0을 넣어요.' },
+      { name: 'nontax', label: '비과세 금액 (원)', type: 'number', min: 0, step: 1, default: 200000, help: '식대(월 20만 원까지) 같은 비과세 수당 합계예요. 없으면 0을 넣어요. 국외근로 비과세는 건강보험료에는 포함돼서 여기 넣으면 건강보험료가 적게 나와요.' },
       { name: 'family', label: '공제대상가족 수 (본인 포함)', type: 'number', min: 1, step: 1, default: 1, help: '본인과 기본공제를 받는 배우자·부양가족을 각각 1명으로 세요.' },
       { name: 'children', label: '그중 8세 이상 20세 이하 자녀 수', type: 'number', min: 0, step: 1, default: 0 },
       {
