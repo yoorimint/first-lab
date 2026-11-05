@@ -42,7 +42,7 @@
       "tests/test_calculators.mjs::MIN_BOUNDARY",
       "tests/test_bot.py::def test_every_calculator_reviewed_or_listed"
     ],
-    "writer_tip": "계산 예시·계산기는 법령 식대로 다시 계산하고 기준선(딱 그 값, 바로 아래·위)을 확인."
+    "writer_tip": "계산 예시·계산기는 법령 식대로 다시 계산하고 기준선(딱 그 값, 바로 아래·위)을 확인. 글에서 '계산기로 ○○를 알 수 있다'고 쓰는 것은 계산기 입력·결과에 실제로 있는 것만."
   },
   "headline": {
     "name": "제목·요약이 본문·근거와 불일치",
@@ -87,7 +87,7 @@
       "automation/review-prompt.md::Year-dependent items must be confirmed",
       "tests/test_bot.py::class AuditSampleTest"
     ],
-    "writer_tip": "올해 개정 여부를 법령 현행본으로 확인. 보도자료·기사 값은 날짜를 밝히고 현행 원문으로 다시 확인."
+    "writer_tip": "올해 개정 여부를 법령 현행본(부칙의 시행일 포함)으로 확인. 보도자료·기사 값은 날짜를 밝히고 현행 원문으로 다시 확인."
   },
   "feature": {
     "name": "오류 아님 (계산기 추가 등)",
