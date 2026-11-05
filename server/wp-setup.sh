@@ -104,6 +104,9 @@ find "$THEME_DIR" -type d -exec chmod 750 {} + && find "$THEME_DIR" -type f -exe
 wp theme is-active "$THEME" || wp theme activate "$THEME"
 # 파비콘: 구글·브라우저는 /favicon.ico 를 먼저 찾는다 (없으면 검색 결과에 지구본 기본 아이콘)
 install -o "$WP_USER" -g www-data -m 644 "$THEME_DIR/assets/icons/favicon.ico" "$WEB_ROOT/favicon.ico"
+# IndexNow 키 파일: 글 공개 때 검색엔진에 바로 알리기(bot/indexnow.py) — 키는 공개값
+INDEXNOW_KEY=$(python3 -c 'import re,sys; print(re.search(r"^KEY = \"([0-9a-f]+)\"", open(sys.argv[1]).read(), re.M).group(1))' "$REPO_DIR/bot/indexnow.py")
+printf '%s' "$INDEXNOW_KEY" > "$WEB_ROOT/$INDEXNOW_KEY.txt" && chown "$WP_USER:www-data" "$WEB_ROOT/$INDEXNOW_KEY.txt" && chmod 644 "$WEB_ROOT/$INDEXNOW_KEY.txt"
 for t in $(wp theme list --status=inactive --field=name); do
   if [ "$t" != "$PARENT_THEME" ]; then wp theme delete "$t"; fi
 done

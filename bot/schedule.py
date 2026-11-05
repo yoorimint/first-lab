@@ -10,6 +10,7 @@ import random
 import subprocess
 from datetime import datetime, timedelta, timezone
 
+from . import indexnow
 from .settings import wp_cli
 
 QUEUE_META = "_firstlab_queue"
@@ -68,4 +69,6 @@ def publish_next(now_kst: datetime) -> str | None:
            f"--post_date={now_kst:%Y-%m-%d %H:%M:%S}", f"--post_date_gmt={now_utc:%Y-%m-%d %H:%M:%S}")
     wp_cli("post", "meta", "delete", str(post_id), QUEUE_META)
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
-    return f"'{title}' 공개 (대기 {len(ids) - 1}편 남음)"
+    slug = wp_cli("post", "get", str(post_id), "--field=post_name").strip()
+    pinged = indexnow.notify([f"{indexnow.SITE}/{slug}/"]) if slug else "IndexNow: 주소 없음"  # 검색엔진에 바로 알림
+    return f"'{title}' 공개 (대기 {len(ids) - 1}편 남음, {pinged})"

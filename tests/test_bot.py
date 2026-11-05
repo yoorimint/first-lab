@@ -1104,5 +1104,35 @@ class ApplyReviewTest(unittest.TestCase):
         good = [{"type": "outdated", "why": "x", "find": "1점이에요", "replace_paragraph": "1점이고 바뀌어요", "tag": "p"}]
         self.assertEqual(apply_review.check(post, good), [])
 
+
+class IndexNowTest(unittest.TestCase):
+    """글이 공개되는 순간 검색엔진에 알린다 (11/5 운영자 승인)."""
+
+    def test_payload_and_publish_ping(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import indexnow, schedule
+        p = indexnow.payload(["https://first-lab.kr/a/"])
+        self.assertEqual((p["host"], p["keyLocation"]), ("first-lab.kr", f"https://first-lab.kr/{indexnow.KEY}.txt"))
+        self.assertRegex(indexnow.KEY, r"^[0-9a-f]{32}$")
+
+        def wp(*args):
+            if args[:2] == ("post", "list"):
+                return "80\n"
+            return {"--field=post_title": "글", "--field=post_name": "%ec%9d%b4%ec%82%ac"}.get(args[-1], "")
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp), \
+             mock.patch.object(indexnow, "notify", return_value="IndexNow 알림 200 (1개)") as ping:
+            msg = schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+        ping.assert_called_once_with(["https://first-lab.kr/%ec%9d%b4%ec%82%ac/"])
+        self.assertIn("IndexNow", msg)
+
+    def test_key_file_deployed(self):
+        self.assertIn("INDEXNOW_KEY", (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8"))
+
+    def test_editorial_policy_linked(self):
+        self.assertTrue((ROOT / "wordpress" / "pages" / "editorial-policy.html").read_text(encoding="utf-8").startswith("<!-- title: 검수 원칙 -->"))
+        self.assertIn("/editorial-policy/", (ROOT / "wordpress" / "themes" / "first-lab" / "parts" / "footer.html").read_text(encoding="utf-8"))
+        self.assertIn("/editorial-policy/", (ROOT / "wordpress" / "mu-plugins" / "first-lab-author-box.php").read_text(encoding="utf-8"))
+
 if __name__ == "__main__":
     unittest.main()
