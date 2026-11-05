@@ -29,7 +29,7 @@ jobs:
           if [ "${{ github.event_name }}" = "push" ]; then
             echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"; echo "need=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          # 비공개 저장소라 인증 필요 (작업 토큰)
+          # 작업 토큰으로 읽음 (11/6 비공개였을 때 인증 없는 읽기가 실패 — 11/6 공개 전환 뒤에도 그대로 둠, 다시 비공개가 돼도 안 깨지게)
           main=$(curl -fsS --max-time 20 -H "Authorization: Bearer ${{ github.token }}" \
             "https://api.github.com/repos/${{ github.repository }}/commits/main" | python3 -c "import json,sys; print(json.load(sys.stdin)['sha'])" || true)
           [ -n "$main" ] || { echo "main 버전을 못 읽음"; exit 1; }
