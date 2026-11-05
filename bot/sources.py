@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import html
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -19,11 +20,17 @@ TIMEOUT = 10
 HEADING = "공식 안내 바로가기"
 
 
+# 외국 정부 주소 (여행·비자 글의 근거): 미국 .gov, 영국·호주 등 .gov.XX, 일본·태국 등 .go.XX, 프랑스 .gouv.XX,
+# 스페인어권 .gob.XX, 캐나다 .gc.ca, EU europa.eu — 정부만 쓸 수 있는 주소 (11/5 #567 ESTA: 미국 정부 근거가 '공식 출처 없음'으로 보류)
+FOREIGN_GOV = re.compile(r"(?:^|\.)(?:[a-z0-9-]+\.)*(?:gov|gov\.[a-z]{2}|go\.[a-z]{2}|gouv\.[a-z]{2}|gob\.[a-z]{2}|gc\.ca|europa\.eu)$")
+
+
 def is_official(url: str) -> bool:
     parts = urllib.parse.urlsplit(url.strip())
     host = (parts.hostname or "").lower()
     official = any(host.endswith(s) or host == s[1:] for s in OFFICIAL_SUFFIXES)
     official = official or any(host == h or host.endswith("." + h) for h in OFFICIAL_HOSTS)
+    official = official or bool(FOREIGN_GOV.search(host))
     return parts.scheme == "https" and official
 
 
