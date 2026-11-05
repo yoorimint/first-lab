@@ -1601,6 +1601,23 @@ class DeploySpeedTest(unittest.TestCase):
     def test_deploy_timeout_raised(self):
         self.assertIn("command_timeout: 30m", (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8"))
 
+    def test_deploy_uses_main_head_not_default_branch(self):
+        """예약 실행은 기본 브랜치에서 돌아 github.sha 가 main 보다 뒤처질 수 있음 → 검사·배포·기록 모두 gate 가 정한 main 버전 (11/5)."""
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        gate, rest = wf.split("\n  check:")
+        check, deploy = rest.split("\n  deploy:")
+        self.assertIn("refs/heads/main", gate)
+        self.assertIn("ref: ${{ needs.gate.outputs.sha }}", check)
+        self.assertNotIn("github.sha", deploy)
+        self.assertEqual(deploy.count("needs.gate.outputs.sha"), 2)
+        self.assertIn("needs: [gate, check]", deploy)
+
+    def test_reviewed_list_change_deploys(self):
+        """서버가 automation/reviewed.txt 를 읽음 (계산기 공개·검수 관문) → 이 파일만 바뀌어도 배포."""
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        paths = next(l for l in wf.splitlines() if l.strip().startswith("paths:"))
+        self.assertIn('"automation/reviewed.txt"', paths)
+
 class LawApiTest(unittest.TestCase):
     """법령 API: 서버는 신청값으로 직접, 다른 곳은 사이트 통로(토큰), 둘 다 없으면 None (화면 읽기로)."""
 
