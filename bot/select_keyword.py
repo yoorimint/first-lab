@@ -79,7 +79,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         " (last_checked=? AND total BETWEEN ? AND ?)"
         " OR norm IN (SELECT norm FROM gsc_signals WHERE kind='opportunity')"
         " OR (total BETWEEN ? AND ? AND norm IN (SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm"
-        "     WHERE n.docs IS NOT NULL AND n.docs < k.total)))",
+        "     WHERE n.docs IS NOT NULL AND COALESCE(n.exact, n.docs) < k.total)))",
         (latest, settings.min_volume, settings.max_volume, settings.min_volume, settings.max_volume),
     ).fetchall()
     used = [r["norm"] for r in conn.execute("SELECT norm FROM keywords WHERE status='used'")]

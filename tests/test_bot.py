@@ -1623,7 +1623,8 @@ class NaverHubTest(unittest.TestCase):
         self.assertAlmostEqual(h.signal_score(sig, 1000, 12, "홈택스 로그인"), 1.0)   # 사이트 찾아가는 검색은 황금 가점 없음
         self.assertAlmostEqual(h.signal_score({"docs": 50000, "low": "7"}, 1000, 7), 2 * 3 / 51 - 0.5)
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
-        self.assertEqual(h.describe(sig, 1000), "좋음 2.0 / 성수기 1·2월 / 블로그 글 500개(검색 1회당 0.5개)")
+        self.assertEqual(h.describe(sig, 1000), "좋음 2.0 / 성수기 1·2월 / 이 주제 블로그 글 약 500개(검색 1회당 0.5개)")
+        self.assertAlmostEqual(h.gold_score({"docs": 900000, "exact": 1000}, 5000), h.gold_score({"docs": 1000}, 5000))  # 추정 글 수 우선
 
     def test_daily_limit_per_kind(self):
         import datetime as dt
@@ -1692,7 +1693,7 @@ class NaverHubTest(unittest.TestCase):
         left = {r[0] for r in conn.execute("SELECT norm FROM keywords")}
         self.assertIn("육아휴직급여", left)               # 오래됐어도 황금·좋음은 남김
         self.assertNotIn("캠핑준비물", left)
-        self.assertIn("n.docs < k.total", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("COALESCE(n.exact, n.docs) < k.total", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
 
     def test_blog_totals_saves_chunks_and_stops_on_429(self):
         import datetime as dt
@@ -1705,14 +1706,27 @@ class NaverHubTest(unittest.TestCase):
             calls.append(params["query"])
             if params["query"] == "c":
                 raise urllib.error.HTTPError("u", 429, "too many", {}, None)
-            return {"total": 7}
+            return {"total": 7, "items": []}
         saved = []
         with tempfile.TemporaryDirectory() as d, mock.patch.object(h, "COUNTER_DIR", Path(d)), \
                 mock.patch.object(h, "CHUNK", 2), mock.patch.object(h, "WORKERS", 1), mock.patch.object(h, "_call", fake_call):
             got = h.blog_totals(["a", "b", "c", "d", "e"], ("i", "k"), dt.date(2026, 11, 5), save=saved.append)
-        self.assertEqual(got, {"a": 7, "b": 7})          # 429 가 난 묶음부터 멈춤, 앞 묶음은 저장됨
-        self.assertEqual(saved, [{"a": 7, "b": 7}])
+        seven = {"docs": 7, "hits": 0, "exact": 0}
+        self.assertEqual(got, {"a": seven, "b": seven})  # 429 가 난 묶음부터 멈춤, 앞 묶음은 저장됨
+        self.assertEqual(saved, [{"a": seven, "b": seven}])
         self.assertNotIn("e", calls)
+
+    def test_exact_estimate_from_titles(self):
+        """네이버 문서 수는 단어가 모두 든 글 수라 붙여 쓴 롱테일이 부풀어 보임 (11/5: '주휴수당계산' 수십만)
+        → 상위 제목 중 키워드가 그대로 든 비율로 '그 주제 글 수' 추정."""
+        from bot import naver_hub as h
+        items = [{"title": "<b>주휴수당</b> <b>계산</b> 방법"}, {"title": "주휴 수당계산기 총정리"},
+                 {"title": "주휴수당 받는 조건"}, {"title": "알바 계산 실수"}]
+        with mock.patch.object(h, "_call", return_value={"total": 400000, "items": items}):
+            got = h._one_total("주휴수당계산", ("i", "k"))
+        self.assertEqual(got, {"docs": 400000, "hits": 2, "exact": 200000})   # 4개 중 2개 제목에 '주휴수당계산'
+        with mock.patch.object(h, "_call", return_value={"total": 0, "items": []}):
+            self.assertEqual(h._one_total("없는말", ("i", "k")), {"docs": 0, "hits": 0, "exact": 0})
 
     def test_refresh_signals_trend_and_skip_recent(self):
         import datetime as dt

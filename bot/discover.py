@@ -44,11 +44,11 @@ def _modifier_heads(conn, today: str, limit_heads: int) -> list[str]:
     from .select_keyword import topic_weight
     load(conn)  # naver_signals 표 준비
     rows = conn.execute(
-        "SELECT k.keyword, k.norm, k.total, n.docs FROM keywords k LEFT JOIN naver_signals n ON n.norm = k.norm"
+        "SELECT k.keyword, k.norm, k.total, COALESCE(n.exact, n.docs) AS est FROM keywords k LEFT JOIN naver_signals n ON n.norm = k.norm"
         " WHERE k.mod_done=0 AND k.status NOT IN ('rejected','excluded') AND ("
-        " (k.last_checked=? AND k.total>=?) OR (n.docs IS NOT NULL AND n.docs < k.total AND k.total>=?))",
+        " (k.last_checked=? AND k.total>=?) OR (n.docs IS NOT NULL AND COALESCE(n.exact, n.docs) < k.total AND k.total>=?))",
         (today, HEAD_MIN_VOLUME, GOLD_HEAD_MIN)).fetchall()
-    rows = sorted(rows, key=lambda r: (r["docs"] is not None and r["docs"] < r["total"], topic_weight(r["norm"]), r["total"]),
+    rows = sorted(rows, key=lambda r: (r["est"] is not None and r["est"] < r["total"], topic_weight(r["norm"]), r["total"]),
                   reverse=True)
     return [r["keyword"] for r in rows[:limit_heads]]
 
@@ -109,7 +109,7 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
         cutoff = (datetime.now() - timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%d")
         stats["pruned"] = conn.execute(  # 황금·좋음(검색 1회당 글 1개 미만)으로 확인된 키워드는 오래돼도 남김 (글감 후보)
             "DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ? AND norm NOT IN ("
-            " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm WHERE n.docs IS NOT NULL AND n.docs < k.total)",
+            " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm WHERE n.docs IS NOT NULL AND COALESCE(n.exact, n.docs) < k.total)",
             (cutoff,)).rowcount
         conn.commit()
         info = summary(conn)
