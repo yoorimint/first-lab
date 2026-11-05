@@ -17,7 +17,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from . import hold, image_check, refresh, related, review_gate, source_check, sources
+from . import freshness, hold, image_check, refresh, related, review_gate, source_check, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, existing_post_id, publish, similar_post
 from .settings import load_settings, wp_cli
@@ -75,6 +75,8 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token))
     if failed:  # 설정 페이지 '검수 보류 초안' 목록에 이유와 함께 보이게
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
+    if not failed:
+        freshness.mark_verified(post_id)  # 공개 직전 확인(bot/freshness.py)의 기준일
     # 근거 링크를 열어 주장 숫자 대조 — 지금은 기록만 (bot/source_check.py)
     notes.append(source_check.record(post_id, data.get("review"),
                                      lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val)))

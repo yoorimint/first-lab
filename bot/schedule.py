@@ -10,7 +10,7 @@ import random
 import subprocess
 from datetime import datetime, timedelta, timezone
 
-from . import indexnow
+from . import freshness, indexnow
 from .settings import wp_cli
 
 QUEUE_META = "_firstlab_queue"
@@ -58,12 +58,32 @@ def _has_pending_images(post_id) -> bool:
         return False
 
 
+MAX_FRESH_CHECKS = 3  # 한 번에 공개 직전 확인을 하는 초안 수 (봇 1분 실행 시간)
+HOLD_META = "_firstlab_hold"  # bot/review_gate.HOLD_META 와 같음 (순환 import 피함)
+
+
 def publish_next(now_kst: datetime) -> str | None:
     """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
     ids = ready_drafts()
     if not ids:
         return None
-    post_id = next((i for i in ids if not _has_pending_images(i)), ids[0])  # 사진이 다 들어간 글 먼저
+    ordered = sorted(ids, key=_has_pending_images)  # 사진이 다 들어간 글 먼저 (같으면 오래된 순)
+    held = []
+    post_id = None
+    for candidate in ordered[:MAX_FRESH_CHECKS]:
+        try:
+            reasons = freshness.check_post(candidate, now_kst.date())
+        except Exception:  # noqa: BLE001 — 확인이 실패하면 막지 않음 (바뀌었다는 증거가 있을 때만 보류)
+            reasons = []
+        if not reasons:
+            post_id = candidate
+            break
+        # 쓴 뒤 근거가 바뀜 → 공개하지 않고 보류 (글쓰기 세션이 보류 수정 절차로 다시 확인)
+        wp_cli("post", "meta", "update", str(candidate), HOLD_META, ("공개 전 확인: " + "; ".join(reasons))[:300])
+        wp_cli("post", "meta", "delete", str(candidate), QUEUE_META)
+        held.append(f"{candidate}({reasons[0][:40]})")
+    if post_id is None:
+        return f"공개 보류 {len(held)}편: {', '.join(held)}" if held else None
     now_utc = now_kst.astimezone(timezone.utc)
     wp_cli("post", "update", str(post_id), "--post_status=publish",
            f"--post_date={now_kst:%Y-%m-%d %H:%M:%S}", f"--post_date_gmt={now_utc:%Y-%m-%d %H:%M:%S}")
@@ -71,4 +91,5 @@ def publish_next(now_kst: datetime) -> str | None:
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
     slug = wp_cli("post", "get", str(post_id), "--field=post_name").strip()
     pinged = indexnow.notify([f"{indexnow.SITE}/{slug}/"]) if slug else "IndexNow: 주소 없음"  # 검색엔진에 바로 알림
-    return f"'{title}' 공개 (대기 {len(ids) - 1}편 남음, {pinged})"
+    extra = f", 공개 전 확인으로 보류 {', '.join(held)}" if held else ""
+    return f"'{title}' 공개 (대기 {len(ids) - 1 - len(held)}편 남음, {pinged}{extra})"

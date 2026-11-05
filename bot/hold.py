@@ -6,7 +6,7 @@
 """
 from __future__ import annotations
 
-from . import review_gate, schedule
+from . import freshness, review_gate, schedule
 from .blocks import to_blocks
 from .refresh import _html
 from .settings import wp_cli
@@ -43,4 +43,5 @@ def apply_fix(data: dict) -> str:
         return f"'{title}' 고쳤지만 재검사 미통과 → 계속 보류: {'; '.join(failed)[:150]}"
     wp_cli("post", "meta", "delete", str(post_id), review_gate.HOLD_META)
     schedule.mark_ready(post_id)
+    freshness.mark_verified(post_id)  # 다시 검수했으니 공개 직전 확인 기준일도 오늘
     return f"'{title}' 재검사 통과 → 공개 대기열 ({str(data.get('changes', ''))[:80]})"

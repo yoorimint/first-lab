@@ -171,7 +171,11 @@ def check(review: list[dict] | None, fetcher=fetch) -> dict:
         if all(u in pages and pages[u] is None for u in urls):  # 근거가 전부 못 여는·껍데기 페이지 (PDF 는 제외)
             claims.append({"claim": claim[:120], "numbers": [], "missing": [], "status": UNREADABLE, "urls": urls[:3]})
     counts = {s: sum(c["status"] == s for c in claims) for s in (FOUND, MISSING, UNOPENED, UNREADABLE)}
-    return {"counts": counts, "claims": [c for c in claims if c["status"] != FOUND]}
+    found = [{"claim": c["claim"][:80], "numbers": c["numbers"], "urls": c["urls"]} for c in claims if c["status"] == FOUND][:30]
+    laws = sorted({(law_page(str(u)), art) for item in review or [] if _ok(item) for u in item.get("urls", [])
+                   for art in [claim_article(item, str(u))] if art})
+    # found·laws: 공개 직전 확인(bot/freshness.py)이 '쓸 때 확인된 숫자가 아직 페이지에 있는지·근거 조문이 그 뒤 바뀌었는지' 다시 본다
+    return {"counts": counts, "claims": [c for c in claims if c["status"] != FOUND], "found": found, "laws": [list(x) for x in laws]}
 
 
 RECENT_DAYS = 365  # 이 기간 안에 개정·시행된 조문은 안내 페이지가 아직 옛 내용일 수 있음 (11/5 #512 납부지연 가산세 2026.7.1 개정)

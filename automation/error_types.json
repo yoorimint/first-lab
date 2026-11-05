@@ -102,7 +102,8 @@
       "automation/review-prompt.md::Year-dependent items must be confirmed",
       "tests/test_bot.py::class AuditSampleTest",
       "tests/test_bot.py::def test_recent_amendment_flag",
-      "automation/review-checklist.md::부칙 시행일"
+      "automation/review-checklist.md::부칙 시행일",
+      "tests/test_bot.py::def test_law_changed_after_draft_is_held"
     ],
     "writer_tip": "올해 개정 여부를 법령 현행본(부칙의 시행일 포함)으로 확인. 보도자료·기사 값은 날짜를 밝히고 현행 원문으로 다시 확인.",
     "cause": "안내 페이지·기사가 개정 전 내용인데 법령 현행본·부칙 시행일을 확인하지 않음 (#113·#512 2026.7.1 개정)."

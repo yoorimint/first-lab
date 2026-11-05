@@ -1148,5 +1148,48 @@ class IndexNowTest(unittest.TestCase):
         self.assertIn("/editorial-policy/", (ROOT / "wordpress" / "themes" / "first-lab" / "parts" / "footer.html").read_text(encoding="utf-8"))
         self.assertIn("/editorial-policy/", (ROOT / "wordpress" / "mu-plugins" / "first-lab-author-box.php").read_text(encoding="utf-8"))
 
+
+class FreshnessTest(unittest.TestCase):
+    """공개 직전 확인 (11/5 운영자: 초안을 쓰고 나중에 공개하면 그사이 법이 바뀔 수 있음)."""
+
+    LAW = ("제47조의4(납부지연가산세) ① 납부일의 전날까지 계산한다. <개정 2025. 12. 23.> 제47조의5(원천징수) ① ... "
+           "부칙 제1조(시행일) 다만 제47조의4 및 제47조의5의 개정규정은 2026년 7월 1일부터 시행한다.")
+
+    def test_law_changed_after_draft_is_held(self):
+        import datetime as dt
+        from bot import freshness
+        record = {"laws": [["https://www.law.go.kr/법령/국세기본법", "제47조의4"]], "found": []}
+        got = freshness.problems(record, [], dt.date(2026, 6, 1), dt.date(2026, 11, 5), fetcher=lambda u: self.LAW)
+        self.assertEqual(len(got), 1)
+        self.assertIn("2026.07.01", got[0])
+        # 개정 뒤에 쓴 글은 통과
+        self.assertEqual(freshness.problems(record, [], dt.date(2026, 7, 2), dt.date(2026, 11, 5), fetcher=lambda u: self.LAW), [])
+
+    def test_number_disappeared_from_official_page(self):
+        import datetime as dt
+        from bot import freshness
+        record = {"laws": [], "found": [{"claim": "응시료 28,000원", "numbers": ["28000"], "urls": ["https://www.q-net.or.kr/a"]}]}
+        now_page = "응시수수료 30,000원"
+        self.assertEqual(len(freshness.problems(record, [], dt.date(2026, 11, 1), dt.date(2026, 11, 5), fetcher=lambda u: now_page)), 1)
+        self.assertEqual(freshness.problems(record, [], dt.date(2026, 11, 1), dt.date(2026, 11, 5), fetcher=lambda u: None), [])  # 못 열면 막지 않음
+
+    def test_publish_holds_changed_draft_and_publishes_next(self):
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import freshness, schedule
+        calls = []
+
+        def wp(*args):
+            calls.append(args)
+            if args[:2] == ("post", "list"):
+                return "80\n85\n"
+            return "글" if "--field=post_title" in args else ""
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp), \
+             mock.patch.object(freshness, "check_post", side_effect=lambda pid, today: ["국세기본법 제47조의4 2026.07.01 개정·시행"] if pid == 80 else []):
+            msg = schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
+        self.assertIn(("post", "meta", "update", "80", "_firstlab_hold"), [c[:5] for c in calls])
+        self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "85")
+        self.assertIn("보류", msg)
+
 if __name__ == "__main__":
     unittest.main()
