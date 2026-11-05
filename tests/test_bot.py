@@ -2182,23 +2182,6 @@ class DeployWatchTest(unittest.TestCase):
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=125), "ddd", "eee"))     # 배포가 진행 중이면 알림 없음
 
 
-class ContinuousEndTest(unittest.TestCase):
-    """넘긴 뒤(12/5~)에는 연속 작성이 스스로 꺼지고 예약 시각 방식으로 (3만 원 요금제)."""
-
-    def test_stops_after_date(self):
-        from datetime import datetime
-        from bot import run
-        from bot.settings import BotSettings
-        settings = BotSettings(direct_times=["07:40", "13:10", "19:40"])
-        state = {"log": [], "continuous": {"fired_at": "2026-12-05 07:00"}}
-        with mock.patch.object(run, "continuous_on", return_value=True), mock.patch.object(run, "set_continuous") as off, \
-                mock.patch.object(run, "fire_routine") as fire:
-            run.continuous_step(state, settings, datetime(2026, 12, 5, 8, 0))
-        off.assert_called_once_with(False)
-        fire.assert_not_called()
-        self.assertIn("예약 시각 07:40, 13:10, 19:40", state["log"][0]["msg"])
-
-
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

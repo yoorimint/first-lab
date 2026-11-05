@@ -230,11 +230,6 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
     if settings.write_mode != "direct" or not continuous_on():
         state.pop("continuous", None)
         return
-    if now.strftime("%Y-%m-%d") > settings.continuous_until:  # 넘긴 뒤(3만 원 요금제): 예약 시각 방식으로 스스로 바꿈
-        set_continuous(False)
-        state.pop("continuous", None)
-        add_log(state, True, f"연속 작성 종료일({settings.continuous_until}) 지남 → 예약 시각 {', '.join(settings.direct_times)} 에만 작성")
-        return
     c = state.get("continuous") or {}
     stamp = now.strftime("%Y-%m-%d %H:%M")
     fails, count = c.get("fails", 0), c.get("count", 0)
