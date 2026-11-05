@@ -23,6 +23,14 @@ def get(url: str, token: bool = False) -> dict:
         return json.loads(resp.read().decode("utf-8"))
 
 
+def deploy_problem(runs: list[dict]) -> str | None:
+    """가장 최근에 끝난 배포가 실패일 때만 문제 (뒤 배포가 성공했으면 이미 풀린 것 — 11/5 지난 실패를 계속 문제로 보임)."""
+    done = [r for r in runs if r.get("name", "").startswith("Deploy") and r.get("status") == "completed"]
+    if done and done[0].get("conclusion") == "failure":
+        return f"최근 배포 실패 {done[0]['head_sha'][:7]} (run {done[0]['id']})"
+    return None
+
+
 def main() -> int:
     problems = []
     now = datetime.now(ZoneInfo("Asia/Seoul")).replace(tzinfo=None)
@@ -33,9 +41,9 @@ def main() -> int:
         runs = get("https://api.github.com/repos/yoorimint/first-lab/actions/runs?per_page=6")["workflow_runs"]
         for r in runs[:4]:
             print(f"  {r['name'][:16]} {r['status']} {r['conclusion']} {r['head_sha'][:7]} {r['created_at'][11:16]}Z")
-        failed = [r for r in runs[:3] if r["conclusion"] == "failure"]
-        if failed:
-            problems.append(f"최근 배포 실패 {failed[0]['head_sha'][:7]} (run {failed[0]['id']})")
+        bad = deploy_problem(runs)
+        if bad:
+            problems.append(bad)
     except Exception as e:  # noqa: BLE001
         print(f"  GitHub 확인 실패: {e}")
     h = get(f"{SITE}/wp-json/firstlab/v1/health")

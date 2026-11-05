@@ -2369,6 +2369,16 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class TickDeployTest(unittest.TestCase):
+    def test_only_latest_finished_deploy_counts(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import tick
+        run = lambda sha, st, c, name="Deploy server code": {"name": name, "status": st, "conclusion": c, "head_sha": sha * 7, "id": 1}  # noqa: E731
+        self.assertIsNone(tick.deploy_problem([run("b", "completed", "success"), run("a", "completed", "failure")]))   # 뒤 배포가 성공
+        self.assertIn("aaaaaaa", tick.deploy_problem([run("c", "in_progress", None), run("a", "completed", "failure")]))
+        self.assertIsNone(tick.deploy_problem([run("h", "completed", "failure", "Health check")]))                     # 배포가 아닌 작업
+
+
 class SetupScriptTest(unittest.TestCase):
     """배포 스크립트 (11/5 51e51cf 배포 실패: 권한 설정 중 SQLite 임시 파일이 사라져 chmod 실패 →
     복구가 conf.d 캐시 설정만 지워 nginx 설정 검사 실패, 디스크 설정이 깨진 채 남음)."""
