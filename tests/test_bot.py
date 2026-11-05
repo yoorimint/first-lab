@@ -1117,6 +1117,53 @@ class SchemaPluginTest(unittest.TestCase):
         self.assertIn("html_entity_decode", self.SRC)  # 11/5 배포 확인: citation 주소에 &amp; 가 그대로 들어감
 
 
+class CalculatorLinksTest(unittest.TestCase):
+    """계산기 결과의 관련 글 링크(data.links): 공개된 글·페이지 주소만 화면에 넣는다.
+    11/5 혜택 찾기 계산기: 관련 글(에너지바우처·실업급여 조건·내일배움카드)이 대기열엔 있어도 사이트엔 아직 비공개라 그대로 넣으면 404."""
+
+    PLUGIN = ROOT / "wordpress" / "mu-plugins" / "first-lab-calculators.php"
+    THEME = ROOT / "wordpress" / "themes" / "first-lab"
+    STUB = r"""<?php
+define('ABSPATH', '/');
+define('OBJECT', 'OBJECT');
+function add_shortcode(...$a) {}
+function get_stylesheet_directory() { return getenv('FL_THEME'); }
+function get_stylesheet_directory_uri() { return ''; }
+function get_page_by_path($slug, $output, $types) {
+    $posts = array('에너지바우처신청' => 'publish', '내일배움카드자격' => 'draft');
+    return isset($posts[$slug]) ? (object) array('st' => $posts[$slug]) : null;
+}
+function get_post_status($post) { return $post->st; }
+function wp_json_encode($data, $flags) { return json_encode($data, $flags); }
+require getenv('FL_PLUGIN');
+echo firstlab_calc_rates(getenv('FL_DATA'));
+"""
+
+    def rates(self, rel):
+        import os
+        import shutil
+        import subprocess
+        import tempfile
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(self.STUB)
+        try:
+            env = {**os.environ, "FL_THEME": str(self.THEME), "FL_PLUGIN": str(self.PLUGIN), "FL_DATA": rel}
+            return subprocess.run(["php", f.name], capture_output=True, text=True, env=env, check=True).stdout
+        finally:
+            os.unlink(f.name)
+
+    def test_unpublished_links_removed(self):
+        data = json.loads(self.rates("/data/benefit-finder.json"))
+        self.assertEqual(data["links"], {"energy_voucher": "/에너지바우처신청/"})  # 초안·없는 글 주소는 빠짐
+        self.assertEqual(data["basis_date"], "2026-11-05")  # 나머지 값은 그대로
+
+    def test_calculator_without_links_unchanged(self):
+        raw = (self.THEME / "calculators" / "data" / "vat.json").read_text(encoding="utf-8")
+        self.assertEqual(self.rates("/data/vat.json"), raw)
+
+
 class ApplyReviewTest(unittest.TestCase):
     """검수 반영: 패치가 하나라도 검사에 걸리면 아무것도 저장·기록하지 않는다 (11/5 #542: 패치 실패에도 검수 완료가 기록됨)."""
 

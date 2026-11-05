@@ -1,0 +1,1564 @@
+[
+  {
+    "why": "기본(40세 재직 단독, 2025년 소득 1,500만 원): 단독 2,200만 원 미만 → 근로장려금 가능, 내일배움카드는 45세 미만 재직자라 대규모기업·월 300만 원 확인 필요",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "no",
+      "energy_amount": 0,
+      "unemployment": "no",
+      "naeil_card": "check",
+      "eitc": "likely",
+      "eitc_type": "single",
+      "eitc_reduced": false,
+      "child_credit": "no",
+      "basic_pension": "no",
+      "basic_pension_type": "single",
+      "likely_count": 1
+    }
+  },
+  {
+    "why": "에너지바우처: 주거급여 세대, 본인 64세·세대원 특성 없음 → 특성 기준 미충족",
+    "input": {
+      "age": 64,
+      "household_size": 1,
+      "welfare": "other",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "no",
+      "energy_amount": 0
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 주거급여 세대, 본인 만 65세(1961.12.31 이전 출생) → 1인 세대 295,200원",
+    "input": {
+      "age": 65,
+      "household_size": 1,
+      "welfare": "other",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 295200
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 64세지만 1961년 12월생(노인 특성 선택) → 대상",
+    "input": {
+      "age": 64,
+      "household_size": 1,
+      "welfare": "other",
+      "trait": "elderly",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 295200
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 생계급여 + 영유아, 2인 세대 407,500원",
+    "input": {
+      "age": 30,
+      "household_size": 2,
+      "welfare": "livelihood",
+      "trait": "infant",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 407500
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 의료급여 + 장애인, 3인 세대 532,700원",
+    "input": {
+      "age": 40,
+      "household_size": 3,
+      "welfare": "other",
+      "trait": "disabled",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 532700
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 한부모, 4인 세대 701,300원",
+    "input": {
+      "age": 40,
+      "household_size": 4,
+      "welfare": "livelihood",
+      "trait": "single_parent",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 701300
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 5인 세대도 '4인 이상' 701,300원",
+    "input": {
+      "age": 40,
+      "household_size": 5,
+      "welfare": "other",
+      "trait": "multi_child",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 701300
+    },
+    "boundary": true
+  },
+  {
+    "why": "에너지바우처: 장애인이 있어도 수급 세대가 아니면 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 3,
+      "welfare": "none",
+      "trait": "disabled",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "energy_voucher": "no",
+      "energy_amount": 0
+    }
+  },
+  {
+    "why": "실업급여: 권고사직, 피보험 단위기간 179일 → 180일 미만",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 179,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no"
+    },
+    "boundary": true
+  },
+  {
+    "why": "실업급여: 권고사직, 피보험 단위기간 180일 → 수급 요건 충족",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 180,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "실업급여: 개인 사정 자진 퇴사 → 제58조 2호 수급자격 없음",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "voluntary",
+      "insured_days": 300,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no"
+    }
+  },
+  {
+    "why": "실업급여: 자진 퇴사지만 정당한 사유(시행규칙 별표 2) → 가능성 있음",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "voluntary_just",
+      "insured_days": 300,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "likely"
+    }
+  },
+  {
+    "why": "실업급여: 중대한 귀책사유 해고 → 제58조 1호 수급자격 없음",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "misconduct",
+      "insured_days": 300,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no"
+    }
+  },
+  {
+    "why": "실업급여: 64세 권고사직 300일 → 가능성 있음",
+    "input": {
+      "age": 64,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 300,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "실업급여: 65세 → 65세 이후 새로 고용됐는지 확인 필요(제10조③)",
+    "input": {
+      "age": 65,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 300,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "check"
+    },
+    "boundary": true
+  },
+  {
+    "why": "실업급여: 재직 중이면 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": 500,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no"
+    }
+  },
+  {
+    "why": "실업급여·내일배움카드: 공무원은 고용보험 적용 제외(제10조①3호), 내일배움카드도 제외(제4조②1호)",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "public",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no",
+      "naeil_card": "no"
+    }
+  },
+  {
+    "why": "실업급여: 자영업 중이면 해당 안 됨, 내일배움카드는 매출·사업기간 확인",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "self",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no",
+      "naeil_card": "check"
+    }
+  },
+  {
+    "why": "내일배움카드: 74세 구직자 → 제외 대상 아님 (실업급여는 0일이라 안 됨)",
+    "input": {
+      "age": 74,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 0,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "likely",
+      "unemployment": "no"
+    },
+    "boundary": true
+  },
+  {
+    "why": "내일배움카드: 만 75세 → 제외(제4조②2호)",
+    "input": {
+      "age": 75,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 0,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "no"
+    },
+    "boundary": true
+  },
+  {
+    "why": "내일배움카드: 44세 재직자 → 대규모기업·월 300만 원 이상인지 확인(제4조②11호)",
+    "input": {
+      "age": 44,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "check"
+    },
+    "boundary": true
+  },
+  {
+    "why": "내일배움카드: 45세 재직자 → 대규모기업 기준(45세 미만) 밖",
+    "input": {
+      "age": 45,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "내일배움카드: 생계급여 수급자 → 조건부 수급자면 가능(제4조②9호)",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "livelihood",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": 0,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "check"
+    }
+  },
+  {
+    "why": "내일배움카드: 학생 → 고3·졸업 2년 이내 대학생만 가능(제4조②10호·10의2호)",
+    "input": {
+      "age": 20,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "student",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "check",
+      "eitc": "no"
+    }
+  },
+  {
+    "why": "내일배움카드: 주부(구직 안 함) 50세 → 제외 대상 아님",
+    "input": {
+      "age": 50,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "naeil_card": "likely",
+      "unemployment": "no"
+    }
+  },
+  {
+    "why": "근로장려금: 단독가구 21,999,999원 → 2,200만 원 미만",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 21999999,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_type": "single"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 단독가구 22,000,000원 → 기준금액과 같으면 '미만' 아님",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 22000000,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "no",
+      "eitc_type": "single"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 홑벌이(배우자 300만 원 미만) 31,999,999원",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "one",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 31999999,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_type": "one"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 홑벌이 32,000,000원 → 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "one",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 32000000,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "no",
+      "eitc_type": "one"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 맞벌이 43,999,999원",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "dual",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 43999999,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_type": "dual"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 맞벌이 44,000,000원 → 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "dual",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 44000000,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "no",
+      "eitc_type": "dual"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 배우자 없이 70세 이상 부모 부양 → 홑벌이 기준 3,200만 원 적용 (25,000,000원)",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "yes",
+      "earned": "yes",
+      "income": 25000000,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_type": "one"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 같은 25,000,000원이라도 단독가구면 2,200만 원 이상이라 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 25000000,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "no",
+      "eitc_type": "single"
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 재산 169,999,999원 → 감액 없음",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 169999999
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_reduced": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 재산 170,000,000원 → 1억7천만 원 이상 50%",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 170000000
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_reduced": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 재산 239,999,999원 → 2억4천만 원 미만, 50%",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 239999999
+    },
+    "expect": {
+      "eitc": "likely",
+      "eitc_reduced": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 재산 240,000,000원 → 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 240000000
+    },
+    "expect": {
+      "eitc": "no",
+      "eitc_reduced": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "근로장려금: 근로·사업소득 없음 → 신청 자격 없음",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "eitc": "no"
+    }
+  },
+  {
+    "why": "자녀장려금: 맞벌이·자녀 2명 69,999,999원 → 가능, 근로장려금은 4,400만 원 이상이라 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "dual",
+      "children": 2,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 69999999,
+      "property": 0
+    },
+    "expect": {
+      "child_credit": "likely",
+      "child_reduced": false,
+      "eitc": "no",
+      "eitc_type": "dual"
+    },
+    "boundary": true
+  },
+  {
+    "why": "자녀장려금: 70,000,000원 → 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "dual",
+      "children": 2,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 70000000,
+      "property": 0
+    },
+    "expect": {
+      "child_credit": "no"
+    },
+    "boundary": true
+  },
+  {
+    "why": "자녀장려금: 한부모·자녀 1명(배우자 없이 자녀 → 홑벌이) 재산 239,999,999원 → 둘 다 50%",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 1,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 20000000,
+      "property": 239999999
+    },
+    "expect": {
+      "child_credit": "likely",
+      "child_reduced": true,
+      "eitc": "likely",
+      "eitc_type": "one",
+      "eitc_reduced": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "자녀장려금: 재산 240,000,000원 → 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 1,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 20000000,
+      "property": 240000000
+    },
+    "expect": {
+      "child_credit": "no",
+      "eitc": "no"
+    },
+    "boundary": true
+  },
+  {
+    "why": "자녀장려금: 자녀 0명 → 해당 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "one",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 20000000,
+      "property": 0
+    },
+    "expect": {
+      "child_credit": "no",
+      "eitc": "likely",
+      "eitc_type": "one"
+    }
+  },
+  {
+    "why": "자녀장려금: 자녀가 있어도 근로·사업소득 없으면 안 됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 2,
+      "parent70": "no",
+      "earned": "no",
+      "income": 0,
+      "property": 0
+    },
+    "expect": {
+      "child_credit": "no",
+      "eitc": "no"
+    }
+  },
+  {
+    "why": "기초연금: 64세 → 해당 안 됨",
+    "input": {
+      "age": 64,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 0,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "no"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 만 65세, 소득·재산 없음 → 가능성 있음",
+    "input": {
+      "age": 65,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 0,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "likely",
+      "basic_pension_type": "single"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 단독 연 29,640,000원(월 2,470,000원 = 선정기준액 '이하')",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 29640000,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 단독 연 29,640,001원 → 공제 전 금액이 기준 초과, 공제 따져 봐야 함",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 29640001,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "check"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 부부 연 47,424,000원(월 3,952,000원 = 247만 원 × 160%)",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "one",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 47424000,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "likely",
+      "basic_pension_type": "couple"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 부부 연 47,424,001원 → 조건 더 확인",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "one",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 47424001,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "check",
+      "basic_pension_type": "couple"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 소득 0, 재산 761,000,000원 → (7억6,100만-2,000만)×4%÷12 = 2,470,000원",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 0,
+      "property": 761000000
+    },
+    "expect": {
+      "basic_pension": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 소득 0, 재산 761,000,001원 → 조건 더 확인",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 0,
+      "property": 761000001
+    },
+    "expect": {
+      "basic_pension": "check"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 월 247만 원 소득 + 재산 2,000만 원(금융재산 공제 안쪽) → 가능성 있음",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 29640000,
+      "property": 20000000
+    },
+    "expect": {
+      "basic_pension": "likely"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 월 247만 원 소득 + 재산 20,000,025원 → 25원×4%÷12만큼 초과 → 조건 더 확인",
+    "input": {
+      "age": 70,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 29640000,
+      "property": 20000025
+    },
+    "expect": {
+      "basic_pension": "check"
+    },
+    "boundary": true
+  },
+  {
+    "why": "기초연금: 공무원·사학연금 대상 → 조건 더 확인",
+    "input": {
+      "age": 66,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "public",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 0,
+      "property": 0
+    },
+    "expect": {
+      "basic_pension": "check"
+    }
+  },
+  {
+    "why": "68세 단독·주거급여·연금소득 600만 원·재산 5,000만 원: 에너지바우처 295,200원, 내일배움카드, 기초연금(600만+(5,000만-2,000만)×4%=720만 ≤ 2,964만)",
+    "input": {
+      "age": 68,
+      "household_size": 1,
+      "welfare": "other",
+      "trait": "none",
+      "job": "none",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "no",
+      "income": 6000000,
+      "property": 50000000
+    },
+    "expect": {
+      "energy_voucher": "likely",
+      "energy_amount": 295200,
+      "unemployment": "no",
+      "naeil_card": "likely",
+      "eitc": "no",
+      "child_credit": "no",
+      "basic_pension": "likely",
+      "likely_count": 3
+    }
+  },
+  {
+    "why": "잘못된 입력: 나이 빈칸",
+    "input": {
+      "age": "",
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 나이 음수",
+    "input": {
+      "age": -1,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 나이 소수",
+    "input": {
+      "age": 40.5,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 세대원 0명",
+    "input": {
+      "age": 40,
+      "household_size": 0,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 소득 음수",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": -1,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 소득 빈칸",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": "",
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 재산 빈칸",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": ""
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 재산 음수",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": -100
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 자녀 수 음수",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": -1,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 자녀 수 소수",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 1.5,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 퇴사했는데 피보험 단위기간 빈칸",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 피보험 단위기간 음수",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "unemployed",
+      "quit_reason": "involuntary",
+      "insured_days": -5,
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 입력: 목록에 없는 선택값",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "abc",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "재직자는 피보험 단위기간 빈칸이어도 계산됨",
+    "input": {
+      "age": 40,
+      "household_size": 1,
+      "welfare": "none",
+      "trait": "none",
+      "job": "employed",
+      "quit_reason": "involuntary",
+      "insured_days": "",
+      "spouse": "none",
+      "children": 0,
+      "parent70": "no",
+      "earned": "yes",
+      "income": 15000000,
+      "property": 0
+    },
+    "expect": {
+      "unemployment": "no"
+    }
+  }
+]

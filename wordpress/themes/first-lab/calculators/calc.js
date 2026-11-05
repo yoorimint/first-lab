@@ -9,6 +9,8 @@
  *
  * compute(values, data, util) 는 { values, rows, notes } 를 돌려준다.
  *   values: 검사용 값 (숫자·날짜 문자열), rows: 화면 표 [[항목, 내용], ...], notes: 안내 문장 목록
+ *   rows 의 세 번째 값(선택)은 관련 글 주소 → 내용 뒤에 '관련 글 보기' 링크. 주소는 data 의 "links" 에 두면
+ *   공개 안 된 글(초안·예약) 주소는 화면에 넣기 전에 빠진다 (mu-plugins/first-lab-calculators.php)
  *   입력이 모자라면 throw new util.InputError('안내 문장')
  */
 (function (root) {
@@ -89,7 +91,8 @@
   function render(out, result) {
     out.replaceChildren(
       el('table', { class: 'firstlab-calc__table' },
-        el('tbody', null, result.rows.map(([k, v]) => el('tr', null, el('th', { scope: 'row' }, k), el('td', null, v))))),
+        el('tbody', null, result.rows.map(([k, v, href]) => el('tr', null, el('th', { scope: 'row' }, k),
+          el('td', null, v, href ? [' ', el('a', { href }, '관련 글 보기')] : null))))),
       result.notes && result.notes.length
         ? el('ul', { class: 'firstlab-calc__notes' }, result.notes.map((n) => el('li', null, n)))
         : null);
