@@ -114,6 +114,8 @@ done
 # ---------- 고정 페이지 (wordpress/pages/<slug>.html → 페이지) ----------
 # 파일 첫 줄 <!-- title: 제목 --> 이 페이지 제목. 없으면 만들고, 있으면 내용을 갱신.
 log "고정 페이지 동기화"
+pages_csv=$(wp post list --post_type=page --post_status=any --fields=ID,post_name,post_status --format=csv)
+repo_slugs=$(for f in "$REPO_DIR"/wordpress/pages/*.html; do basename "$f" .html; done)
 for file in "$REPO_DIR"/wordpress/pages/*.html; do
   slug=$(basename "$file" .html)
   # 서버 로캘과 무관하게 UTF-8 로 읽음 (sed 는 로캘에 따라 한글 제목을 못 읽은 적이 있음)
@@ -129,12 +131,17 @@ for file in "$REPO_DIR"/wordpress/pages/*.html; do
   fi
   echo "  페이지 $slug → $title ($status)"
   content=$(tail -n +2 "$file")
-  id=$(wp post list --post_type=page --name="$slug" --post_status=any --field=ID)
+  # 초안도 찾도록 전체 목록에서 고름 (--name 은 초안을 못 찾아 '-2' 중복을 만듦), 중복은 휴지통으로 (되살릴 수 있음)
+  # shellcheck disable=SC2086
+  read -r id extras <<<"$(printf '%s\n' "$pages_csv" | python3 "$REPO_DIR/server/page_ids.py" "$slug" $repo_slugs)" || true
+  for x in $extras; do
+    wp post delete "$x" >/dev/null && echo "  중복 페이지 $x 휴지통으로 ($slug)"
+  done
   if [ -z "$id" ]; then
     id=$(wp post create --post_type=page --post_status="$status" --post_name="$slug" \
           --post_title="$title" --post_content="$content" --porcelain)
   else
-    wp post update "$id" --post_status="$status" --post_title="$title" --post_content="$content"
+    wp post update "$id" --post_status="$status" --post_name="$slug" --post_title="$title" --post_content="$content"
   fi
   if [ "$slug" = "privacy-policy" ]; then
     wp option update wp_page_for_privacy_policy "$id"

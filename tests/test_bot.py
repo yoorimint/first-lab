@@ -2497,6 +2497,32 @@ class CalcReviewGateTest(unittest.TestCase):
                 self.assertEqual(out.stdout.strip(), want, slug)
 
 
+class PageIdsTest(unittest.TestCase):
+    """초안 페이지를 못 찾아 '-2' 페이지를 또 만든 일 (11/5 school-grade-calculator-2)."""
+
+    def test_pick_keeps_one_and_finds_drafts(self):
+        sys.path.insert(0, str(ROOT / "server"))
+        import page_ids
+        rows = ("ID,post_name,post_status\n780,school-grade-calculator,draft\n787,school-grade-calculator-2,publish\n"
+                "5,about,publish\n9,vat-calculator,publish\n11,vat-calculator-2,publish\n")
+        self.assertEqual(page_ids.pick(rows, "school-grade-calculator"), ("787", ["780"]))   # 공개된 것을 남기고 주소는 원래대로
+        self.assertEqual(page_ids.pick("ID,post_name,post_status\n780,school-grade-calculator,draft\n", "school-grade-calculator"), ("780", []))
+        self.assertEqual(page_ids.pick(rows, "about"), ("5", []))
+        self.assertEqual(page_ids.pick(rows, "vat-calculator", {"vat-calculator", "vat-calculator-2"}), ("9", []))  # 다른 저장소 페이지는 안 건드림
+        self.assertEqual(page_ids.pick(rows, "new-calculator"), ("", []))
+        setup = (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8")
+        self.assertNotIn('--name="$slug"', setup)
+        self.assertIn('--post_name="$slug" --post_title', setup)
+        self.assertNotIn("delete \"$x\" --force", setup)   # 중복은 휴지통으로만
+
+    def test_shell_reads_ids(self):
+        import subprocess
+        out = subprocess.run(["bash", "-c", 'csv=$(printf "ID,post_name,post_status\\n1,a,draft\\n2,a-2,publish\\n"); '
+                              f'read -r id extras <<<"$(printf \'%s\\n\' "$csv" | python3 {ROOT}/server/page_ids.py a a b)"; echo "$id|$extras"'],
+                             capture_output=True, text=True)
+        self.assertEqual(out.stdout.strip(), "2|1")
+
+
 class CitedUrlsTest(unittest.TestCase):
     def test_reviewer_gets_writer_sources(self):
         """검수 파일에 글쓴이 근거 주소 + 지시문이 '확인불가 전에 열기' (11/5 #775 고시를 안 열어 확인불가 19건)."""
