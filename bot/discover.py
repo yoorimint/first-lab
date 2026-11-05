@@ -121,15 +121,11 @@ def _apply_search_console() -> str:
         return f"서치콘솔 오류: {e}"
 
 
-def _refresh_hub_signals(settings) -> str:
+def _refresh_hub_signals() -> str:
     """상위 후보의 블로그 문서 수·검색 성수기 (bot/naver_hub.py, 하루 호출 상한 안). 실패해도 수집은 성공."""
     try:
         from . import naver_hub
-        from .keyword_db import connect
-        from .select_keyword import ranked_candidates
-        with connect() as conn:
-            gold = naver_hub.scan_golden(conn, settings)  # 먼저 황금 키워드 찾기 → 그 결과가 후보 순위에 반영된 뒤 성수기
-            return gold + " / " + naver_hub.refresh_signals(conn, ranked_candidates(conn, settings, limit=naver_hub.CHECK_TOP))
+        return naver_hub.run_daily()  # 먼저 황금 키워드 찾기 → 그 결과가 후보 순위에 반영된 뒤 성수기
     except Exception as e:  # noqa: BLE001
         return f"네이버 API HUB 실패: {e}"
 
@@ -163,7 +159,7 @@ def main() -> None:
                f"새 키워드 {r['new']:,}개 (보관 {r['total']:,}개, {int(time.time() - started)}초)")
         ok = True
         msg += " / " + _apply_search_console()
-        msg += " / " + _refresh_hub_signals(settings)
+        msg += " / " + _refresh_hub_signals()
     except Exception as e:  # noqa: BLE001
         msg, ok = f"키워드 수집 실패: {e}", False
     print(msg, flush=True)

@@ -111,6 +111,13 @@ copy_secret_option() {  # 비밀값 이름, 옵션 이름, 설명
 copy_secret_option LAW_OPEN_API_OC firstlab_law_oc "법령 API 신청값"
 copy_secret_option DATA_GO_KR_KEY firstlab_data_key "공공데이터 인증키"
 
+# 황금 키워드 첫 조회 (11/5 운영자 승인 직후 한 번 — 다음부터는 매일 키워드 수집 끝에 자동, bot/naver_hub.py)
+GOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-golden.done
+if [ ! -f "$GOLD_MARK" ] && grep -q '^NAVER_HUB_ID=' "$SECRETS"; then
+  log "황금 키워드 첫 조회 (네이버 블로그 문서 수·성수기)"
+  (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.naver_hub --daily)  # 봇·수집과 같은 사용자(root) — 비밀값·키워드 창고 접근 && touch "$GOLD_MARK" || echo "황금 키워드 첫 조회 실패 (다음 배포 때 다시)"
+fi
+
 log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.pending_images) || echo "사진 없는 글 표시 실패 (봇 동작에는 영향 없음)"

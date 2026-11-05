@@ -250,7 +250,21 @@ def refresh_signals(conn, candidates: list[dict], today: dt.date | None = None, 
     return f"네이버 성수기: 후보·대표 주제 {len(need_trend)}개 갱신"
 
 
+def run_daily() -> str:
+    """황금 키워드 찾기 → 성수기 (키워드 수집 끝, 또는 배포 때 한 번)."""
+    from .keyword_db import connect
+    from .select_keyword import ranked_candidates
+    from .settings import load_settings
+    settings = load_settings()
+    with connect() as conn:
+        gold = scan_golden(conn, settings)
+        return gold + " / " + refresh_signals(conn, ranked_candidates(conn, settings, limit=CHECK_TOP))
+
+
 def main(argv: list[str]) -> int:
+    if argv[1:] == ["--daily"]:
+        print(run_daily(), flush=True)
+        return 0
     keys = _keys()
     if not keys:
         print("네이버 API HUB: 키 없음")
