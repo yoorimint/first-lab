@@ -1,0 +1,15 @@
+{
+  "basis_date": "2026-11-05",
+  "won10_keys": ["income_tax", "local_tax", "total"],
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제14조 분리과세, 제84조 과세최저한, 제129조 원천징수세율)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국가법령정보센터 지방세법 (제103조의13 개인지방소득세 특별징수 10%)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국가법령정보센터 국고금관리법 (제47조 10원 미만 끝수)", "url": "https://www.law.go.kr/법령/국고금관리법"},
+    {"name": "동행복권 당첨자 가이드 (원천징수 세율 22%·33%, 지급처)", "url": "https://www.dhlottery.co.kr/guide/wnrGuide?tab=3"}
+  ],
+  "exempt_max": 2000000,
+  "high_threshold": 300000000,
+  "rate_low": 0.2,
+  "rate_high": 0.3,
+  "local_rate": 0.1
+}
