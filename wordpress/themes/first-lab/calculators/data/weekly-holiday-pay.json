@@ -1,0 +1,15 @@
+{
+  "basis_date": "2026-11-05",
+  "sources": [
+    {"name": "근로기준법 제18조·제55조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
+    {"name": "근로기준법 시행령 제30조·별표 2 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법시행령"},
+    {"name": "최저임금위원회 연도별 최저임금 결정현황", "url": "https://www.minimumwage.go.kr/minWage/policy/decisionMain.do"},
+    {"name": "고용노동부 빠른인터넷상담 주휴수당 계산", "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202403221010432241000"}
+  ],
+  "min_weekly_hours": 15,
+  "full_week_hours": 40,
+  "full_day_hours": 8,
+  "max_input_hours": 68,
+  "min_wage_2026": 10320,
+  "min_wage_2027": 10700
+}

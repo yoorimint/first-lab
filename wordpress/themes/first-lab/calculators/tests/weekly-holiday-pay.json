@@ -1,0 +1,118 @@
+[
+  {
+    "why": "주 40시간·시급 10,320원(2026 최저임금, 최저임금위원회): 8시간 × 10,320 = 82,560원",
+    "input": {
+      "wage": 10320,
+      "hours": 40,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 8,
+      "pay": 82560,
+      "monthly": 358742
+    }
+  },
+  {
+    "why": "고용노동부 상담 예시: 주 20시간, 통상근로자 주 5일 → 80시간 ÷ 20일 = 4시간 × 10,000원 = 40,000원",
+    "input": {
+      "wage": 10000,
+      "hours": 20,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 4,
+      "pay": 40000,
+      "monthly": 173809
+    }
+  },
+  {
+    "why": "기준선: 주 15시간 딱(근로기준법 제18조③ 15시간 미만만 제외) → 3시간 × 10,320 = 30,960원",
+    "input": {
+      "wage": 10320,
+      "hours": 15,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 3,
+      "pay": 30960,
+      "monthly": 134528
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 주 14.5시간 → 15시간 미만이라 0원",
+    "input": {
+      "wage": 10320,
+      "hours": 14.5,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 0,
+      "pay": 0,
+      "monthly": 0
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 주 45시간(4명 이하 사업장 약정) → 8시간 상한 82,560원",
+    "input": {
+      "wage": 10320,
+      "hours": 45,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 8,
+      "pay": 82560,
+      "monthly": 358742
+    },
+    "boundary": true
+  },
+  {
+    "why": "결근한 주(시행령 제30조① 개근) → 0원",
+    "input": {
+      "wage": 10320,
+      "hours": 40,
+      "attended": "no"
+    },
+    "expect": {
+      "holiday_hours": 0,
+      "pay": 0,
+      "monthly": 0
+    }
+  },
+  {
+    "why": "2027년 최저임금 10,700원 × 8시간 = 85,600원",
+    "input": {
+      "wage": 10700,
+      "hours": 40,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 8,
+      "pay": 85600,
+      "monthly": 371952
+    }
+  },
+  {
+    "why": "주 17시간: 17 ÷ 40 × 8 = 3.4시간 × 10,320 = 35,088원",
+    "input": {
+      "wage": 10320,
+      "hours": 17,
+      "attended": "yes"
+    },
+    "expect": {
+      "holiday_hours": 3.4,
+      "pay": 35088,
+      "monthly": 152465
+    }
+  },
+  {
+    "why": "시급 0원은 안내 문장",
+    "input": {
+      "wage": 0,
+      "hours": 20,
+      "attended": "yes"
+    },
+    "expect_error": true
+  }
+]
