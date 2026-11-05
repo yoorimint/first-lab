@@ -96,6 +96,16 @@ runuser -u firstlab -- wp --path=/var/www/first-lab option update firstlab_api_t
   || runuser -u firstlab -- wp --path=/var/www/first-lab option add firstlab_api_token_hash "$TOKEN_HASH" --quiet || true
 echo "토큰 준비됨 (끝자리 $(grep '^FIRSTLAB_API_TOKEN=' "$SECRETS" | tail -1 | tail -c 5))"
 
+# 법령 API 신청값 → 워드프레스 옵션 (API 통로 /law 가 씀, first-lab-api.php). 값은 출력하지 않음
+LAW_OC=$(grep '^LAW_OPEN_API_OC=' "$SECRETS" | tail -1 | cut -d= -f2- | tr -d '\n' || true)
+if [ -n "$LAW_OC" ]; then
+  runuser -u firstlab -- wp --path=/var/www/first-lab option update firstlab_law_oc "$LAW_OC" --autoload=no --quiet 2>/dev/null \
+    || runuser -u firstlab -- wp --path=/var/www/first-lab option add firstlab_law_oc "$LAW_OC" --autoload=no --quiet || true
+  echo "법령 API 신청값: 있음"
+else
+  echo "법령 API 신청값: 없음 (화면 읽기 방식으로 동작)"
+fi
+
 log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.pending_images) || echo "사진 없는 글 표시 실패 (봇 동작에는 영향 없음)"

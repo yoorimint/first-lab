@@ -214,3 +214,73 @@ function firstlab_api_maintenance(): array {
 		),
 	);
 }
+
+/*
+ * 법제처 국가법령정보 공동활용 API 통로: GET /wp-json/firstlab/v1/law?kind=search|service&target=law&query=…
+ *
+ * 왜: 법령 API 는 신청한 서버 주소에서만 쓰도록 등록돼 있고 신청값(OC)은 서버에만 둔다. 글쓰기·감시 세션(다른 컴퓨터)은
+ * 이 통로로 같은 API 를 쓴다 (bot/law_api.py). OC 는 bot-setup.sh 가 서버 비밀값에서 옵션으로 옮겨 둔다.
+ * 법령 사이트 화면 읽기는 연결이 자주 끊기고 화면이 바뀌면 틀리게 읽어서 바꿈 (11/5 운영자 신청).
+ */
+const FIRSTLAB_LAW_TARGETS = array( 'law', 'eflaw', 'admrul', 'ordin', 'lsHistory' ); // 법령, 시행일 기준 법령, 행정규칙(고시·훈령), 자치법규(조례), 개정 이력
+const FIRSTLAB_LAW_PARAMS  = array( 'query', 'MST', 'ID', 'JO', 'LID', 'efYd', 'nw', 'display', 'page', 'sort', 'type', 'search', 'ancYd', 'efYdRange' );
+
+add_action(
+	'rest_api_init',
+	static function () {
+		register_rest_route(
+			'firstlab/v1',
+			'/law',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => 'firstlab_api_allowed',
+				'callback'            => 'firstlab_api_law',
+			)
+		);
+	}
+);
+
+/** 법령 API 주소 (OC 포함, 밖으로 내보내지 않음). 허용 안 된 값이면 null. */
+function firstlab_law_url( array $args, string $oc ): ?string {
+	$kind   = $args['kind'] ?? 'search';
+	$target = $args['target'] ?? 'law';
+	if ( ! in_array( $kind, array( 'search', 'service' ), true ) || ! in_array( $target, FIRSTLAB_LAW_TARGETS, true ) ) {
+		return null;
+	}
+	$query = array( 'OC' => $oc, 'target' => $target, 'type' => 'XML' );
+	foreach ( FIRSTLAB_LAW_PARAMS as $name ) {
+		if ( isset( $args[ $name ] ) && '' !== (string) $args[ $name ] ) {
+			$query[ $name ] = (string) $args[ $name ];
+		}
+	}
+	$page = 'search' === $kind ? 'lawSearch.do' : 'lawService.do';
+	return 'https://www.law.go.kr/DRF/' . $page . '?' . http_build_query( $query );
+}
+
+function firstlab_api_law( WP_REST_Request $request ) {
+	$oc = (string) get_option( 'firstlab_law_oc', '' );
+	if ( '' === $oc ) {
+		return new WP_Error( 'no_oc', '서버에 법령 API 신청값(LAW_OPEN_API_OC)이 없음', array( 'status' => 503 ) );
+	}
+	$url = firstlab_law_url( $request->get_query_params(), $oc );
+	if ( null === $url ) {
+		return new WP_Error( 'bad_args', 'kind 는 search|service, target 은 ' . implode( '|', FIRSTLAB_LAW_TARGETS ), array( 'status' => 400 ) );
+	}
+	$key    = 'firstlab_law_' . md5( $url );
+	$cached = get_transient( $key );
+	if ( false !== $cached ) {
+		return $cached;
+	}
+	$res = wp_remote_get( $url, array( 'timeout' => 30 ) );
+	if ( is_wp_error( $res ) ) {
+		return new WP_Error( 'law_fetch', $res->get_error_message(), array( 'status' => 502 ) );
+	}
+	$out = array(
+		'status' => (int) wp_remote_retrieve_response_code( $res ),
+		'body'   => str_replace( $oc, '***', (string) wp_remote_retrieve_body( $res ) ), // 오류 응답에 OC 가 섞여 나와도 감춤
+	);
+	if ( 200 === $out['status'] && '' !== $out['body'] ) {
+		set_transient( $key, $out, 6 * HOUR_IN_SECONDS ); // 같은 조문을 하루에 여러 번 묻지 않게
+	}
+	return $out;
+}

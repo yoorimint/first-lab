@@ -1362,5 +1362,39 @@ class DeploySpeedTest(unittest.TestCase):
     def test_deploy_timeout_raised(self):
         self.assertIn("command_timeout: 30m", (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8"))
 
+class LawApiTest(unittest.TestCase):
+    """법령 API: 서버는 신청값으로 직접, 다른 곳은 사이트 통로(토큰), 둘 다 없으면 None (화면 읽기로)."""
+
+    def test_proxy_with_token_and_none_without(self):
+        from bot import law_api
+        with mock.patch.object(law_api, "_server_oc", return_value=""), \
+                mock.patch.dict("os.environ", {"FIRSTLAB_API_TOKEN": "t"}), \
+                mock.patch.object(law_api, "_get", return_value=json.dumps({"status": 200, "body": "<LawSearch/>"})) as get:
+            self.assertEqual(law_api.fetch("search", "law", query="고용보험법"), "<LawSearch/>")
+            url, headers = get.call_args[0]
+            self.assertTrue(url.startswith(law_api.PROXY) and "kind=search" in url)
+            self.assertEqual(headers, {"X-Firstlab-Token": "t"})
+        with mock.patch.object(law_api, "_server_oc", return_value=""), mock.patch.dict("os.environ", {}, clear=True):
+            self.assertIsNone(law_api.fetch("search", "law", query="x"))
+        with mock.patch.object(law_api, "_server_oc", return_value="oc1"), \
+                mock.patch.object(law_api, "_get", side_effect=OSError("끊김")):
+            self.assertIsNone(law_api.fetch("service", "law", MST="1"))  # 실패해도 예외 대신 None
+
+    def test_site_route_whitelist(self):
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("define('ABSPATH',1); function add_action(){} require '" + str(ROOT / "wordpress/mu-plugins/first-lab-api.php") + "';"
+                "echo json_encode([firstlab_law_url(['kind'=>'service','target'=>'law','MST'=>'9','JO'=>'004000','evil'=>'x'],'OC1'),"
+                "firstlab_law_url(['kind'=>'search','target'=>'../etc'],'OC1'), firstlab_law_url(['kind'=>'x'],'OC1')]);")
+        ok, bad_target, bad_kind = json.loads(subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout)
+        self.assertTrue(ok.startswith("https://www.law.go.kr/DRF/lawService.do?OC=OC1&target=law&type=XML"))
+        self.assertIn("JO=004000", ok)
+        self.assertNotIn("evil", ok)
+        self.assertIsNone(bad_target)
+        self.assertIsNone(bad_kind)
+
+
 if __name__ == "__main__":
     unittest.main()
