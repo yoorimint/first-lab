@@ -1514,6 +1514,53 @@ class LawApiVersionsTest(unittest.TestCase):
         self.assertEqual(law_api.jo_code("제167조의10"), "016710")
 
 
+class NaverHubTest(unittest.TestCase):
+    """네이버 API HUB (11/5 운영자 승인: 검색어 트렌드·블로그 문서 수만, 하루 호출 상한)."""
+
+    def test_season_and_score(self):
+        from bot import naver_hub as h
+        series = {f"{y}-{m:02d}": (100.0 if m in (1, 2) else 50.0 if m == 3 else 10.0) for y in (2025, 2026) for m in range(1, 13)}
+        peak, low = h.season(series)
+        self.assertEqual(peak, [1, 2])                        # 연말정산처럼 1~2월에 몰림
+        self.assertNotIn(3, low)
+        self.assertIn(7, low)
+        self.assertEqual(h.season({"2026-01": 50.0}), ([], []))  # 1년치 안 되면 계절 판단 안 함
+        sig = {"docs": 500, "peak": "1,2", "low": "6,7,8"}
+        self.assertEqual(h.signal_score(sig, 1000, 12), 2.0)   # 문서 적음 +1, 다음 달이 성수기 +1
+        self.assertEqual(h.signal_score({"docs": 50000, "peak": "1,2", "low": "6,7,8"}, 1000, 7), -1.5)  # 포화 −1, 비수기 −0.5
+        self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
+
+    def test_daily_limit(self):
+        import datetime as dt
+        import tempfile
+        from bot import naver_hub as h
+        with tempfile.TemporaryDirectory() as d:
+            counter = Path(d) / "calls"
+            today = dt.date(2026, 11, 5)
+            h._spend(today, h.DAILY_LIMIT, counter)
+            with self.assertRaises(h.LimitReached):
+                h._spend(today, 1, counter)
+            h._spend(dt.date(2026, 11, 6), 1, counter)        # 다음 날은 다시 0부터
+
+    def test_refresh_signals_stores_and_skips_recent(self):
+        import datetime as dt
+        import sqlite3
+        from bot import naver_hub as h
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        today = dt.date(2026, 11, 5)
+        series = {f"{y}-{m:02d}": (90.0 if m == 1 else 10.0) for y in (2025, 2026) for m in range(1, 13)}
+        with mock.patch.object(h, "monthly_trend", return_value={"연말정산 계산기": series}) as trend, \
+                mock.patch.object(h, "blog_total", return_value=1234):
+            msg = h.refresh_signals(conn, [{"keyword": "연말정산 계산기"}], today, keys=("i", "k"))
+            self.assertIn("1개", msg)
+            row = h.load(conn)["연말정산계산기"]
+            self.assertEqual((row["docs"], row["peak"]), (1234, "1"))
+            h.refresh_signals(conn, [{"keyword": "연말정산 계산기"}], today, keys=("i", "k"))
+            self.assertEqual(trend.call_count, 1)  # 30일 안에 다시 조회 안 함 (호출 자체를 안 함)
+        self.assertIn("키 없음", h.refresh_signals(conn, [], today, keys=()))
+
+
 class BenefitApiTest(unittest.TestCase):
     """혜택 정보 API: 키는 서버에만, 인코딩된 키·원래 키 모두 처리, 통로는 허용한 경로·변수만."""
 

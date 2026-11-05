@@ -14,7 +14,7 @@
 - 운영자에게 수작업을 시키지 않는다. 비밀값(토큰·비밀번호)만 예외: 채팅으로 받지 않고 서버 `set-secrets.sh` 로만.
 
 ## 지켜 온 결정
-- 글은 Claude 월정액(예약 작업)으로 쓴다. API 비용을 더하지 않는다. 네이버 검색 API 는 쓰지 않는다.
+- 글은 Claude 월정액(예약 작업)으로 쓴다. API 비용을 더하지 않는다. 네이버 API 는 NAVER API HUB 의 검색어 트렌드·블로그 문서 수 두 가지만, 하루 호출 상한 안에서 (11/5 운영자 승인, bot/naver_hub.py). 유료 전환 공지가 나오면 끈다. 그 밖의 네이버 검색 API 는 쓰지 않는다.
 - 사진은 글마다 AI 대표 사진 1장 (홈 목록·공유 미리보기용). 본문 안에는 사진을 넣지 않고, 글 화면 맨 위에 대표 사진만 보인다 (bot/photo.py, first-lab-home.php).
 - 저장소는 공개 저장소: 비밀값을 커밋·출력하지 않는다.
 - main 에 올리면 자동 배포된다. 올리기 전에 `python3 -m unittest discover -s tests && node tests/test_calculators.mjs` 종료코드 확인.

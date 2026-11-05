@@ -22,6 +22,19 @@ body = law_api.fetch("service", "law", ID="001761") or ""
 print("법령 API:", "정상" if body else "실패 (신청 승인·등록한 서버 주소 확인)")
 got = benefit_api.fetch("serviceList", perPage=1)
 print("공공서비스 혜택 API:", "정상" if got and got.get("data") else "실패")
+import datetime as dt
+from bot import naver_hub
+keys = naver_hub._keys()
+if not keys:
+    print("네이버 API HUB: 키 없음")
+else:
+    try:  # 호출 2회 (하루 상한 안에서 셈)
+        today = dt.date.today()
+        series = naver_hub.monthly_trend(["연말정산"], keys, today).get("연말정산", {})
+        print(f"네이버 API HUB: 정상 (연말정산 블로그 문서 {naver_hub.blog_total('연말정산', keys, today)}개, "
+              f"트렌드 {len(series)}개월, 성수기 {naver_hub.season(series)[0]}월)")
+    except Exception as e:  # noqa: BLE001
+        print(f"네이버 API HUB: 실패 ({type(e).__name__}: {str(e)[:120]})")
 PY
 
 echo -e "\n==> 봇 프로세스"

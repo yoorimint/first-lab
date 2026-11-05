@@ -4,7 +4,9 @@ from __future__ import annotations
 import random
 from difflib import SequenceMatcher
 
-from . import competition
+import datetime as dt
+
+from . import competition, naver_hub
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
 from .keyword_filter import is_allowed, is_question, subject
 from .llm import LLMBusy
@@ -87,6 +89,8 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     used_unified = {_core(unify(u)) for u in used}
     used_subjects = {subject(u) for u in used}  # 이미 쓴 글의 주제 → 같은 주제 키워드는 새 글 대신 그 글 보강(refresh.py)
     head_difficulty = _head_difficulty(conn, volumes)
+    hub = naver_hub.load(conn)  # 블로그 문서 수·검색 성수기 (네이버 API HUB, 없으면 빈 값)
+    month = dt.date.today().month
 
     def overlaps_used(n: str) -> bool:
         """이미 쓴 글과 같은 주제인 키워드를 막는다 (같은 주제 글이 여러 개면 서로 순위를 깎아 먹음).
@@ -107,6 +111,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         head = find_head(r["norm"], r["total"], volumes)
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
         sc += topic_weight(r["norm"])
+        sc += naver_hub.signal_score(hub.get(r["norm"]) or hub.get(head or ""), r["total"], month)
         difficulty, estimated = r["difficulty"], False
         if difficulty is None and (head or r["norm"]) in head_difficulty:
             difficulty, estimated = head_difficulty[head or r["norm"]], True  # 조회 안 한 키워드: 같은 주제로 추정
