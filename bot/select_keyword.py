@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+from difflib import SequenceMatcher
 
 from . import competition
 from .keyword_db import competition_checks_today, norm, set_competition, set_status
@@ -22,6 +23,32 @@ COMP_PER_RUN = 3   # 글 1개 쓸 때 경쟁도를 새로 조회할 최대 후�
 
 
 _GENERIC_SUFFIXES = ("하는법", "방법", "총정리", "정리", "알아보기", "알아보자", "안내", "가이드")
+
+# 같은 뜻 다른 표기 → 같은 주제로 비교 (11/5: '부동산양도세계산기'가 이미 쓴 '부동산양도소득세계산기'와 별개 후보로 계속 1위)
+SYNONYMS = (("양도소득세", "양도세"), ("종합부동산세", "종부세"), ("나의", "내"), ("수급조건", "조건"), ("자격조건", "조건"),
+            ("대출조회", "조회"), ("업체", ""), ("고용보험실업급여", "실업급여"))
+SIMILAR_USED = 0.85  # 표기를 맞춘 뒤 이만큼 비슷하면 이미 쓴 주제 (bot/publisher.SIMILAR_RATIO 와 같은 기준)
+
+# 주제 비중 (11/5 운영자 결정: 계산기·돈 주제 우선) — 광고 단가가 높고, AI 요약이 대신하기 어렵고, 우리 검수가 가장 가치 있는 주제.
+# 여행 준비물·생활 요령은 빼지 않고 낮춤 (단가 낮고 경쟁 많고 AI 요약에 클릭을 뺏기기 쉬움).
+TOPIC_BONUS = (
+    (("계산기", "계산"), 2.0),
+    (("세금", "소득세", "양도세", "증여세", "상속세", "부가세", "종부세", "취득세", "연말정산", "환급", "공제",
+      "보험", "대출", "이자", "연금", "급여", "수당", "지원금", "바우처", "퇴직금", "신용"), 1.0),
+)
+TOPIC_PENALTY = ((("준비물", "리스트", "정리방법", "청소", "인테리어", "여행"), -1.0),)
+
+
+def unify(n: str) -> str:
+    """비교용 표기 통일 ('나의신용점수조회' → '내신용점수조회')."""
+    for a, b in SYNONYMS:
+        n = n.replace(a, b)
+    return n
+
+
+def topic_weight(n: str) -> float:
+    """주제 비중 가감 (해당 묶음마다 한 번)."""
+    return sum(w for words, w in TOPIC_BONUS + TOPIC_PENALTY if any(x in n for x in words))
 
 
 def _core(n: str) -> str:
@@ -57,6 +84,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     signals = load_signals(conn)
 
     used_cores = {_core(u) for u in used}
+    used_unified = {_core(unify(u)) for u in used}
     used_subjects = {subject(u) for u in used}  # 이미 쓴 글의 주제 → 같은 주제 키워드는 새 글 대신 그 글 보강(refresh.py)
     head_difficulty = _head_difficulty(conn, volumes)
 
@@ -67,7 +95,10 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         허용: 퇴직금계산 → 퇴직금계산1년미만"""
         if _core(n) in used_cores or subject(n) in used_subjects:
             return True
-        return any((u in n or n in u) and abs(len(n) - len(u)) <= 2 for u in used)
+        if any((u in n or n in u) and abs(len(n) - len(u)) <= 2 for u in used):
+            return True
+        un = _core(unify(n))
+        return any(SequenceMatcher(None, un, uu).ratio() >= SIMILAR_USED for uu in used_unified)
 
     result = []
     for r in rows:
@@ -75,6 +106,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
             continue
         head = find_head(r["norm"], r["total"], volumes)
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
+        sc += topic_weight(r["norm"])
         difficulty, estimated = r["difficulty"], False
         if difficulty is None and (head or r["norm"]) in head_difficulty:
             difficulty, estimated = head_difficulty[head or r["norm"]], True  # 조회 안 한 키워드: 같은 주제로 추정

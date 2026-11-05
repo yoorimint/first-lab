@@ -1213,5 +1213,21 @@ class FreshnessTest(unittest.TestCase):
         self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "85")
         self.assertIn("보류", msg)
 
+
+class TopicDirectionTest(unittest.TestCase):
+    """11/5 운영자 결정: 계산기·돈 주제 우선, 같은 뜻 다른 표기는 이미 쓴 주제로."""
+
+    def test_synonym_duplicates_and_weights(self):
+        from difflib import SequenceMatcher
+        from bot.select_keyword import SIMILAR_USED, _core, topic_weight, unify
+        same = lambda a, b: SequenceMatcher(None, _core(unify(a)), _core(unify(b))).ratio() >= SIMILAR_USED  # noqa: E731
+        self.assertTrue(same("부동산양도세계산기", "부동산양도소득세계산기"))
+        self.assertTrue(same("나의신용점수조회", "내신용점수조회"))
+        self.assertTrue(same("실업급여수급조건", "고용보험실업급여조건"))
+        self.assertFalse(same("실업급여조건6개월", "고용보험실업급여조건"))  # 세부 질문은 따로 쓸 수 있음
+        self.assertGreater(topic_weight("주식평단가계산기"), topic_weight("실업급여신청"))
+        self.assertGreater(topic_weight("실업급여신청"), topic_weight("냉장고정리방법"))
+        self.assertLess(topic_weight("상하이여행준비물"), 0)
+
 if __name__ == "__main__":
     unittest.main()
