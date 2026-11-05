@@ -50,21 +50,29 @@ def ready_drafts() -> list[int]:
     return [int(x) for x in out.split()]
 
 
-def _draft_texts(ids: list[int]) -> dict[int, str]:
-    """초안 번호 → '주소 키워드 + 제목' (한 번의 조회로, 계절 판단용)."""
+def _draft_info(ids: list[int]) -> dict[int, dict]:
+    """초안 번호 → {'text': '주소 키워드 + 제목'(계절·황금 점수용), 'date': 쓴 시각(대기 기간용, 못 읽으면 None)} — 한 번의 조회로."""
     import json
     import urllib.parse
     if not ids:
         return {}
     try:
         rows = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--post__in={','.join(map(str, ids))}",
-                                 "--fields=ID,post_name,post_title", "--format=json", "--posts_per_page=-1") or "[]")
+                                 "--fields=ID,post_name,post_title,post_date", "--format=json", "--posts_per_page=-1") or "[]")
     except Exception:  # noqa: BLE001 — 못 읽으면 계절 순서 없이 기존 순서
         return {}
     if not isinstance(rows, list):
         return {}
-    return {int(r["ID"]): urllib.parse.unquote(r.get("post_name", "")) + " " + r.get("post_title", "")
-            for r in rows if isinstance(r, dict) and "ID" in r}
+    out = {}
+    for r in rows:
+        if not isinstance(r, dict) or "ID" not in r:
+            continue
+        try:
+            date = datetime.strptime(str(r.get("post_date", "")), "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            date = None
+        out[int(r["ID"])] = {"text": urllib.parse.unquote(r.get("post_name", "")) + " " + r.get("post_title", ""), "date": date}
+    return out
 
 
 def _has_pending_images(post_id) -> bool:
@@ -79,7 +87,8 @@ MAX_FRESH_CHECKS = 3  # 한 번에 공개 직전 확인을 하는 초안 수 (�
 HOLD_META = "_firstlab_hold"  # bot/review_gate.HOLD_META 와 같음 (순환 import 피함)
 
 
-MAX_WAIT_KEEP = 21  # 대기열이 이보다 길면 가장 오래된 글들(넘는 만큼)을 먼저 — 하루 1편 공개면 약 21일 기다린 글
+MAX_WAIT = timedelta(days=21)  # 이만큼 기다린 글은 황금 점수와 상관없이 먼저 (계속 밀리지 않게)
+# 11/6: 예전엔 '대기열 뒤 21편을 뺀 나머지'로 셈 — 하루 30편씩 쌓이자 하루도 안 된 글까지 '오래된 글'이 돼 황금 점수가 거의 안 쓰임
 
 
 def publish_next(now_kst: datetime) -> str | None:
@@ -87,17 +96,19 @@ def publish_next(now_kst: datetime) -> str | None:
     ids = ready_drafts()
     if not ids:
         return None
-    texts = _draft_texts(ids)
-    # 시즌 지난 글은 맨 뒤 (bot/seasons.py) → 황금 점수·성수기 높은 글 먼저 (운영자 지시 11/5, bot/naver_hub.py)
-    # → 시즌 중인 글 → 사진이 다 들어간 글 → 오래된 순
-    gold = naver_hub.publish_priority({i: texts.get(i, "").split(" ")[0] for i in ids}, now_kst.month)
-    rank = {i: seasons.rank(texts.get(i, ""), now_kst.date()) for i in ids}
-    # 외부 검수를 마친 글을 먼저 (검수 전에 공개되지 않게), 21일 넘게 기다린 글은 황금 점수와 상관없이 먼저 (계속 밀리지 않게) — 11/5 검토
+    info = _draft_info(ids)
+    texts = {i: info.get(i, {}).get("text", "") for i in ids}
+    # 순서: 시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 대표 사진이 들어간 글
+    #       → 황금 점수·성수기 높은 글(운영자 지시 11/5, bot/naver_hub.py) → 시즌 중인 글 → 오래된 순
+    # 사진: 11/6 #583 이 사진 대기(한도 소진, 오전 9시 채움) 상태로 08:31 에 제목 카드만 단 채 공개됨 — 하루 1편이라 사진 있는 글이 먼저
+    gold = naver_hub.publish_priority({i: texts[i].split(" ")[0] for i in ids}, now_kst.month)
+    rank = {i: seasons.rank(texts[i], now_kst.date()) for i in ids}
     from .review_queue import reviewed_ids
     reviewed = reviewed_ids()
-    old = set(ids[: max(0, len(ids) - MAX_WAIT_KEEP)]) if len(ids) > MAX_WAIT_KEEP else set()
-    ordered = sorted(ids, key=lambda i: (rank[i] == seasons.OFF, i not in reviewed, i not in old,
-                                         -round(gold.get(i, 0.0), 2), rank[i], _has_pending_images(i)))
+    cutoff = now_kst.replace(tzinfo=None) - MAX_WAIT
+    old = {i for i in ids if info.get(i, {}).get("date") and info[i]["date"] <= cutoff}
+    ordered = sorted(ids, key=lambda i: (rank[i] == seasons.OFF, i not in reviewed, i not in old, _has_pending_images(i),
+                                         -round(gold.get(i, 0.0), 2), rank[i]))
     held = []
     post_id = None
     for candidate in ordered[:MAX_FRESH_CHECKS]:

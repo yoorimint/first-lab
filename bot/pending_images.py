@@ -19,10 +19,13 @@ QUEUE_DIR = Path(__file__).resolve().parent.parent / "wordpress" / "queue"
 
 
 def pending_posts() -> list[str]:
-    """사진을 기다리는 글 번호 (공개 대기열 글 먼저, 그 안에서는 오래된 순)."""
-    ids = wp_cli("post", "list", "--post_type=post", "--post_status=draft,publish",
-                 f"--meta_key={photo.PENDING_META}", "--orderby=date", "--order=ASC", "--field=ID").split()
-    return sorted(ids, key=lambda i: photo.meta(i, QUEUE_META) != READY)
+    """사진을 기다리는 글 번호: 이미 공개된 글 먼저(방문자에게 제목 카드가 보이는 중 — 11/6 #583 이 대기 초안 100편 뒤에 섰음),
+    그다음 공개 대기열 글, 그 안에서는 오래된 순."""
+    def ids(status: str) -> list[str]:
+        return wp_cli("post", "list", "--post_type=post", f"--post_status={status}",
+                      f"--meta_key={photo.PENDING_META}", "--orderby=date", "--order=ASC", "--field=ID").split()
+    drafts = sorted(ids("draft"), key=lambda i: photo.meta(i, QUEUE_META) != READY)
+    return ids("publish") + drafts
 
 
 def fill_post(post_id: str, cloudflare: tuple[str, str]) -> str:

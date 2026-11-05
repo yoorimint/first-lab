@@ -1494,6 +1494,54 @@ class GoldFirstTest(unittest.TestCase):
             schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
         self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "85")  # 황금 점수 높은 글 먼저, 시즌 지난 글은 점수가 높아도 뒤
 
+    def _publish_pick(self, rows, prio, pending=()):
+        import json as _json
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import freshness, naver_hub, review_queue, schedule
+        calls = []
+
+        def wp(*args):
+            calls.append(args)
+            if args[:2] == ("post", "list"):
+                return _json.dumps(rows) if "--format=json" in args else "\n".join(str(r["ID"]) for r in rows)
+            if args[:3] == ("post", "meta", "get") and args[4] == "_firstlab_img_pending":
+                return '[{"prompt": "x"}]' if int(args[3]) in pending else ""
+            return "글" if "--field=post_title" in args else ""
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp), \
+             mock.patch.object(naver_hub, "publish_priority", return_value=prio), \
+             mock.patch.object(review_queue, "reviewed_ids", return_value={r["ID"] for r in rows}), \
+             mock.patch.object(schedule.seasons, "rank", return_value=schedule.seasons.NONE), \
+             mock.patch.object(freshness, "check_post", return_value=[]):
+            schedule.publish_next(datetime(2026, 11, 6, 8, 31, tzinfo=ZoneInfo("Asia/Seoul")))
+        return int(next(c for c in calls if c[:2] == ("post", "update"))[2])
+
+    def test_old_means_waited_21_days_not_queue_position(self):
+        """11/6: '대기열 뒤 21편 말고 전부 오래된 글'로 세서 하루 30편씩 쌓이자 황금 점수가 거의 안 쓰임 → 쓴 날짜로 21일."""
+        recent = [{"ID": 100 + i, "post_name": f"k{i}", "post_title": "t", "post_date": "2026-11-05 10:00:00"} for i in range(30)]
+        self.assertEqual(self._publish_pick(recent, {129: 9.0}), 129)                       # 모두 하루 안 된 글 → 황금 점수 높은 글
+        old = [{"ID": 50, "post_name": "o", "post_title": "t", "post_date": "2026-10-10 10:00:00"}]
+        self.assertEqual(self._publish_pick(old + recent, {129: 9.0}), 50)                  # 21일 넘게 기다린 글은 먼저
+
+    def test_photo_ready_before_gold(self):
+        """11/6 #583: 사진 대기(한도 소진) 글이 황금 점수로 먼저 뽑혀 제목 카드만 단 채 공개됨 → 사진 있는 글 먼저."""
+        rows = [{"ID": 80, "post_name": "a", "post_title": "t", "post_date": "2026-11-05 10:00:00"},
+                {"ID": 85, "post_name": "b", "post_title": "t", "post_date": "2026-11-05 11:00:00"}]
+        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}, pending={80}), 85)
+        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}), 80)
+
+    def test_published_posts_get_photos_first(self):
+        """공개된 글은 방문자에게 제목 카드가 보이는 중 → 사진 채우기에서 대기 초안보다 먼저 (11/6 #583)."""
+        from bot import pending_images
+
+        def wp(*args):
+            if args[:2] == ("post", "list"):
+                return "583\n" if "--post_status=publish" in args else "300\n301\n"
+            return ""
+        with mock.patch.object(pending_images, "wp_cli", side_effect=wp), \
+             mock.patch.object(pending_images.photo, "meta", side_effect=lambda i, k: "ready" if i == "301" else ""):
+            self.assertEqual(pending_images.pending_posts(), ["583", "301", "300"])
+
     def test_refresh_queue_orders_waiting_drafts(self):
         """대기 중인 글도 키워드를 다시 조회해 줄 세움: 창고에 없는 키워드는 검색량을 채우고 '쓴 키워드'로 표시."""
         import datetime as dt

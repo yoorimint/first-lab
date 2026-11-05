@@ -501,7 +501,7 @@ def refresh_queue(conn, today: dt.date | None = None, keys=None, drafts=None, ad
     if drafts is None:
         from . import schedule
         ids = schedule.ready_drafts()
-        drafts = {i: t.split(" ")[0] for i, t in schedule._draft_texts(ids).items() if t.strip()}
+        drafts = {i: d["text"].split(" ")[0] for i, d in schedule._draft_info(ids).items() if d["text"].strip()}
     words = list(dict.fromkeys(k for k in drafts.values() if k))
     if not words:
         return "대기 글 키워드: 없음"
