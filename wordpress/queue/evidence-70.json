@@ -1,0 +1,158 @@
+{
+ "type": "evidence",
+ "post_id": 70,
+ "keyword": "우체국방문택배신청",
+ "review": [
+  {
+   "claim": "우체국 방문택배는 인터넷우체국(epost.go.kr)이나 우체국 앱의 '방문접수소포' 메뉴에서 신청한다.",
+   "urls": [
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L02",
+    "https://parcel.epost.go.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "FAQ: '① 우체국 앱, 인터넷우체국 로그인 ② 방문접수·창구소포>방문접수소포 예약화면에서 … 예약 신청'. 글에 없는 조건: 서비스 지역은 관할 지방우정청이 정하며 '서비스 불가지역'이면 신청이 안 됨(FAQ 2쪽)."
+  },
+  {
+   "claim": "방문접수 요금은 상자 크기와 무게에 따라 5,000원에서 14,000원이다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L01"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "note": "일반(익일배달) 5,000·8,000·10,000·14,000원(부가세 포함). 글에 없는 조건: 제주→육지 익일배달은 7,500~16,500원이고, 착불 500원·안심소포 1,000원 등 부가 수수료는 따로 붙음."
+  },
+  {
+   "claim": "한 상자는 30kg, 세 변 길이 합 160cm(한 변은 100cm 이내)까지 보낼 수 있다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "'중량은 최대 30kg 이하이며, 크기(가로, 세로, 높이의 합)는 최소 35㎝ 이상, 최대 160㎝ 이하입니다. 다만, 한 변의 최대 길이는 100㎝ 이내'. 글에 없는 조건: 최소 35cm."
+  },
+  {
+   "claim": "접수정보를 직접 입력하고 카드로 미리 결제한 뒤 물건 둘 장소까지 지정하면 한 건에 500원이 할인된다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L01",
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L02"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "note": "'개당 500원 감액 (고객이 직접 모바일 등으로 접수정보 입력 & 사전결제 & 보관장소 지정 시)'. 글에 없는 조건(FAQ L01 4번): '요금즉납(선불)을 대상으로 하여 착불 수량은 제외됩니다.'"
+  },
+  {
+   "claim": "요금표: 1구간 5kg·80cm 이하 5,000원(제주→육지 7,500원), 2구간 10kg·100cm 8,000원(10,500원), 3구간 20kg·120cm 10,000원(12,500원), 4구간 30kg·160cm 14,000원(16,500원), D+2일은 일반과 같음.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L01"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "요금안내 페이지와 FAQ(2025.6.1 기준)가 같은 값. 참고: FAQ L02 3번은 옛 요금(4구간 12,000원·14,500원)을 아직 싣고 있으나, 현행 요금안내는 14,000·16,500원."
+  },
+  {
+   "claim": "무게와 크기가 서로 다른 구간이면 더 비싼 구간 요금을 낸다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L01"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "'중량/크기 중 큰 값을 기준으로 다음 단계의 요금을 적용합니다.' / '중량단계와 크기단계가 상이한 경우 높은 단계를 기준으로 요금을 적용'."
+  },
+  {
+   "claim": "제주에서 육지로 다음 날 배달을 고르면 2,500원이 더 붙고, D+2일 배달을 고르면 일반 지역과 같다. 육지에서 제주로 보내는 소포는 D+2일 배달이다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "note": "'제주지역 제주행(육지→제주)은 D+2일 배달, 제주발(제주→육지)은 우체국별 접수 마감시간에 따라 익일배달 또는 D+2일 배달'. 글에 없는 조건: 제주발은 보내는 사람이 고르는 게 아니라 접수 마감시간에 따라 정해짐. 도서지역 등은 배달 기간이 다를 수 있음."
+  },
+  {
+   "claim": "계산 예시: 4kg·95cm → 2구간 8,000원(사전결제 7,500원), 15kg·110cm → 3구간 10,000원(9,500원), 3kg·60cm 제주→육지 → 7,500원(7,000원).",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "요금표 값과 500원 감액으로 계산하면 맞음."
+  },
+  {
+   "claim": "상자를 물건 크기에 맞게 고르면 한 구간 차이로 3,000원 정도 아낄 수 있다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "note": "구간 차이는 1→2구간 3,000원, 2→3구간 2,000원, 3→4구간 4,000원. '3,000원 정도'는 1→2구간에만 맞음."
+  },
+  {
+   "claim": "콜센터는 1588-1300이다.",
+   "urls": [
+    "https://parcel.epost.go.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "'방문접수소포 상담문의 1588-1300 평일:09:00~18:00 토요일/공휴일 휴무 (발신자부담)'. 글에 없는 조건: 평일 9~18시만 운영."
+  },
+  {
+   "claim": "방문을 원하는 날짜를 고를 수 있고 토요일과 공휴일에는 방문하지 않는다.",
+   "urls": [
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L02"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "'방문 희망일로 지정하신 요청일에 방문합니다. 단, 휴무일(토요일·관공서 공휴일)은 방문이 불가'. 명절·기상악화 때는 늦어질 수 있음."
+  },
+  {
+   "claim": "특정 시간에 맞춰 방문하기는 어렵고 정확한 방문 시간은 관할 우체국에 물어봐야 한다.",
+   "urls": [
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L02"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "'정해진 배달순서에 따라 방문접수 업무를 하고 있습니다. 특정시간에 방문이 어려운 점 양해' / '방문접수(픽업)시간 문의는 우편고객만족센터(1588-1300) 또는 해당 방문접수우체국'."
+  },
+  {
+   "claim": "'예약 조회/취소'에서 확인·취소할 수 있고, 관할 우체국에서 이미 방문접수를 준비 중인 건은 인터넷으로 취소할 수 없어 해당 우체국이나 1588-1300에 연락해야 한다.",
+   "urls": [
+    "https://www.epost.go.kr/bbs.RetrieveFaqFrontView.comm?codetype=L&code=L02"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "'관할우체국에서 방문접수 준비중인 신청건은 인터넷에서 취소가 불가하며, 해당 우체국 및 우편고객센터(1588-1300)에 연락하셔서 취소'."
+  },
+  {
+   "claim": "창구소포 간편사전접수는 직접 우체국에 가져가는 대신 방문접수보다 저렴하다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp",
+    "https://parcel.epost.go.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "창구 등기소포 4,000~13,000원 vs 방문접수 5,000~14,000원. 창구는 접수정보를 미리 넣으면 1~2개에도 3% 감액. ''21.6.1.부터 소포 1통도 접수정보를 미리 입력하고 접수하면 소포요금을 할인'."
+  },
+  {
+   "claim": "20kg이 넘는 짐이나 상자 여러 개를 보낼 때는 방문접수가 편하다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "note": "글에 없는 조건(요금안내 '분할접수'): '분할 전 20kg ~ 30kg 고중량 소포 요금을 기준으로 3,000원 감액(20kg 초과 소포 1개를 2개로 분할 & 각 10kg 초과하도록 분할 & 접수시각·발송인·수취인 동일 시)', 창구·방문접수 모두, 중복감액 가능."
+  },
+  {
+   "claim": "방문접수소포는 30kg, 세 변 합 160cm까지만 보낼 수 있고, 넘는 짐은 여러 상자로 나눠 각각 신청하며 요금도 상자마다 따로 계산된다.",
+   "urls": [
+    "https://parcel.epost.go.kr/parcel/use_guide/charge_1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "note": "한도는 요금안내 '이용시 유의사항'과 같음."
+  }
+ ]
+}

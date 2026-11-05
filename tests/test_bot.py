@@ -2051,6 +2051,30 @@ class ListedCasesTest(unittest.TestCase):
         self.assertEqual(len(got[0]["cases"]), 3)
 
 
+class EvidenceFileTest(unittest.TestCase):
+    """예전 봇 글 근거 기록 파일 (11/5 운영자): 근거 대조를 저장하고 확인한 날을 남김."""
+
+    def test_save_evidence(self):
+        from bot import publish_queue
+        calls = []
+        with mock.patch.object(publish_queue, "wp_cli", side_effect=lambda *a: calls.append(a) or ""), \
+                mock.patch.object(publish_queue.source_check, "check", return_value={"counts": {}, "claims": [], "found": [], "laws": []}), \
+                mock.patch.object(publish_queue.freshness, "mark_verified") as verified:
+            msg = publish_queue.save_evidence({"type": "evidence", "post_id": 85, "keyword": "하이패스카드신청",
+                                               "review": [{"claim": "c", "urls": ["https://www.law.go.kr/법령/유료도로법시행령/제8조"], "verdict": "맞음", "action": "유지"}]})
+        self.assertTrue(any(a[:4] == ("post", "meta", "update", "85") and a[4] == publish_queue.source_check.META for a in calls))
+        verified.assert_called_once_with("85")
+        self.assertIn("글 85", msg)
+        with self.assertRaises(ValueError):
+            publish_queue.save_evidence({"post_id": 1, "review": []})
+
+    def test_real_evidence_files_point_to_posts(self):
+        for path in sorted((ROOT / "wordpress" / "queue").glob("evidence-*.json")):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(data["type"], "evidence")
+            self.assertTrue(data["keyword"] and data["review"], path.name)
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt
