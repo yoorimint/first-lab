@@ -115,7 +115,8 @@ copy_secret_option DATA_GO_KR_KEY firstlab_data_key "공공데이터 인증키"
 GOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-golden.done
 if [ ! -f "$GOLD_MARK" ] && grep -q '^NAVER_HUB_ID=' "$SECRETS"; then
   log "황금 키워드 첫 조회 (네이버 블로그 문서 수·성수기)"
-  (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.naver_hub --daily)  # 봇·수집과 같은 사용자(root) — 비밀값·키워드 창고 접근 && touch "$GOLD_MARK" || echo "황금 키워드 첫 조회 실패 (다음 배포 때 다시)"
+  # 봇·수집과 같은 사용자(root)로 — 비밀값·키워드 창고 접근
+  (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.naver_hub --daily) && touch "$GOLD_MARK" || echo "황금 키워드 첫 조회 실패 (다음 배포 때 다시)"
 fi
 
 log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
