@@ -4,6 +4,9 @@
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import re
 
 # 의료·의약품: AI 오류 시 실제 피해 + 구글 YMYL 엄격 평가
@@ -72,9 +75,39 @@ BRANDS = [
 ]
 
 
+# 글쓰기 세션이 '특정 브랜드·회사 상품'이라 건너뛰며 적은 브랜드 (publish_queue.skip_keywords) — 표에 없는 브랜드도 배워서 막음
+LEARNED_BRANDS = Path("/var/lib/first-lab/bot/learned-brands.json")
+MIN_BRAND = 3   # 'kb'·'db' 처럼 짧으면 다른 말에 섞여 오탐 → 3글자 이상만 배움
+
+
+def learned_brands(path: Path | None = None) -> list[str]:
+    try:
+        return [str(b) for b in json.loads((path or LEARNED_BRANDS).read_text(encoding="utf-8"))]
+    except (OSError, ValueError):
+        return []
+
+
+def learn_brands(brands, path: Path | None = None) -> list[str]:
+    """새로 배운 브랜드 (정규화, 3글자 이상)."""
+    path = path or LEARNED_BRANDS
+    have = learned_brands(path)
+    new = [b for b in dict.fromkeys(str(x).lower().replace(" ", "") for x in brands)
+           if len(b) >= MIN_BRAND and b not in have and b not in BRANDS]
+    if new:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(have + new, ensure_ascii=False), encoding="utf-8")
+        _learned_cache.clear()
+    return new
+
+
+_learned_cache: list[list[str]] = []
+
+
 def is_brand(keyword: str) -> bool:
     k = keyword.lower().replace(" ", "")
-    return any(b in k for b in BRANDS)
+    if not _learned_cache:
+        _learned_cache.append(learned_brands())
+    return any(b in k for b in BRANDS) or any(b in k for b in _learned_cache[0])
 
 
 # 롱테일 조합 수식어: 큰 키워드 뒤에 붙여 실제 검색량이 있는 조합을 찾는다 (정보형 위주, 후기·추천·순위 같은 상품형은 제외)

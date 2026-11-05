@@ -1796,6 +1796,22 @@ class CalcYearlyTest(unittest.TestCase):
         self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 12, 14), d)], [])   # 확정 기다리는 중
         self.assertEqual([i["id"] for i in calc_watch.due(dt.date(2026, 12, 15), d)], ["a"])
 
+    def test_law_change_flags_calculator_until_handled(self):
+        import datetime as dt
+        import tempfile
+        from bot import calc_watch
+        d = self._dir({"a": {"yearly": False, "sources": [{"name": "근로자퇴직급여 보장법 제8조", "url": "https://x"}]},
+                       "b": {"yearly": False, "sources": [{"name": "국세청 안내", "url": "https://x"}], "laws": ["소득세법"]}})
+        up = [{"law": "근로자퇴직급여 보장법", "date": "2027-01-01", "key": "근로자퇴직급여 보장법|2027-01-01", "articles": ["제8조"]},
+              {"law": "소득세법", "date": "2026-11-01", "key": "소득세법|2026-11-01", "articles": []}]   # 이미 시행된 것은 빼고
+        got = calc_watch.law_due(dt.date(2026, 11, 5), up, d)
+        self.assertEqual([(i["id"], i["law_change"]) for i in got], [("a", "근로자퇴직급여 보장법|2027-01-01")])
+        (d / "a.json").write_text(json.dumps({"yearly": False, "sources": [{"name": "근로자퇴직급여 보장법", "url": "https://x"}],
+                                              "law_checked": ["근로자퇴직급여 보장법|2027-01-01"]}), encoding="utf-8")
+        self.assertEqual(calc_watch.law_due(dt.date(2026, 11, 5), up, d), [])   # 상관없다고 확인하면 다시 안 나옴
+        self.assertIn("국민건강보험법 시행령", calc_watch.laws_in("국가법령정보센터 국민건강보험법 시행령 (보험료율)"))
+        self.assertNotIn("국가법령정보센터 국민건강보험법 시행령", calc_watch.laws_in("국가법령정보센터 국민건강보험법 시행령"))
+
     def test_real_calculators_declare_yearly(self):
         from bot import calc_watch
         for path in calc_watch.DATA_DIR.glob("*.json"):
@@ -1902,6 +1918,51 @@ class ChangedMarkTest(unittest.TestCase):
         with mock.patch.object(refresh, "wp_cli", return_value=json.dumps(posts)):
             picks = refresh.pick_targets(conn, 5, fixes_only=True)
         self.assertEqual([(p["id"], mode) for p, mode, _ in picks], [(1, "recheck")])
+
+
+class GoldenNoteTest(unittest.TestCase):
+    """새 글 기록에 황금 키워드 정보 (11/5 운영자 '김해공항 주차장 황금 키워드인가?')."""
+
+    def test_note(self):
+        from bot import naver_hub, publish_queue
+        conn = sqlite3.connect(":memory:")
+        self.assertEqual(publish_queue.golden_note(conn, "없는키워드", 500), "네이버 신호 없음 (검색량 500)")
+        conn.execute("INSERT INTO naver_signals (norm, docs, docs_checked) VALUES ('국민연금수령나이', 3000, '2026-11-05')")
+        self.assertIn("황금지수 1.33(검색 4,000/글 3,000)", publish_queue.golden_note(conn, "국민연금 수령나이", 4000))
+
+
+class LearnedBrandTest(unittest.TestCase):
+    """글쓰기 세션이 브랜드·회사 상품이라 건너뛴 브랜드를 배워 같은 브랜드 후보를 막음 (11/5)."""
+
+    def test_learn_and_block(self):
+        import tempfile
+        from bot import keyword_filter as kf
+        path = Path(tempfile.mkdtemp()) / "brands.json"
+        self.assertEqual(kf.learn_brands(["SBI저축은행", "폴로", "SBI 저축은행", "삼성화재"], path), ["sbi저축은행"])  # 짧은 말·이미 있는 브랜드 제외
+        self.assertEqual(kf.learned_brands(path), ["sbi저축은행"])
+        with mock.patch.object(kf, "LEARNED_BRANDS", path):
+            kf._learned_cache.clear()
+            self.assertTrue(kf.is_brand("SBI저축은행대환대출"))
+            self.assertFalse(kf.is_brand("저축은행 대환대출 조건"))
+        kf._learned_cache.clear()
+
+    def test_skip_rejects_same_brand_candidates(self):
+        import tempfile
+        from bot import keyword_filter as kf, publish_queue
+        path = Path(tempfile.mkdtemp()) / "brands.json"
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.execute("CREATE TABLE keywords (keyword TEXT, norm TEXT, status TEXT, reason TEXT)")
+        for k in ("SBI저축은행신용대출", "SBI저축은행대환대출", "저축은행대환대출"):
+            conn.execute("INSERT INTO keywords VALUES (?, ?, 'new', '')", (k, k.lower()))
+        ctx = mock.MagicMock()
+        ctx.__enter__.return_value = conn
+        with mock.patch.object(kf, "LEARNED_BRANDS", path), mock.patch.object(publish_queue, "connect", return_value=ctx):
+            msg = publish_queue.skip_keywords({"keywords": [{"keyword": "SBI저축은행신용대출", "why": "특정 회사 상품", "brand": "SBI저축은행"}]})
+        status = {r["keyword"]: r["status"] for r in conn.execute("SELECT keyword, status FROM keywords")}
+        self.assertEqual(status, {"SBI저축은행신용대출": "rejected", "SBI저축은행대환대출": "rejected", "저축은행대환대출": "new"})
+        self.assertIn("같은 브랜드 후보 1개 제외", msg)
+        kf._learned_cache.clear()
 
 
 class BokApiTest(unittest.TestCase):

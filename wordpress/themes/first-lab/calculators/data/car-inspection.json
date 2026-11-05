@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly_checked": 2026,
+  "basis_date": "2026-11-04", "laws": ["자동차관리법 시행규칙"], "yearly_checked": 2026,
   "sources": [
     {"name": "한국교통안전공단 수수료 안내", "url": "https://main.kotsa.or.kr/portal/contents.do?menuCode=01010102"},
     {"name": "강동구 자동차 정기(종합)검사 안내", "url": "https://gangdong.go.kr/web/newportal/contents/gdp_001_003_005"},

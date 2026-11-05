@@ -7,7 +7,7 @@
   "review"(독립 검수 기록 → review_gate.py. 통과 못 하면 공개하지 않고 초안 보류).
 글 갱신 파일: {"type": "refresh", "post_id", "base_modified", "content_html", "changes"} → refresh.apply_direct
 보류 초안 수정 파일: {"type": "fix_hold", ...} → hold.apply_fix (다시 관문 검사 후 대기열)
-후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why"}], "law_changes": [key], "new_benefits": [key]}
+후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why", "brand"(브랜드·회사 상품이면 그 이름)}], "law_changes": [key], "new_benefits": [key]}
   → 글쓰기 세션이 부적합하다고 본 후보·다룰 내용 없는 제도/혜택 글감을 다시 안 뜨게 함
 사진 검사 파일: {"type": "image_check", "post_id", "replace", "remove"} → image_check.apply_check (엉터리 글자 사진 교체)
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
@@ -92,21 +92,44 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
         state["law_changes_done"] = (done + [str(data["law_change"])])[-200:]
         save_state(state)
     with connect() as conn:
-        exists = conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
+        exists = conn.execute("SELECT total FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
         if exists:
             set_status(conn, keyword, "used", f"post {post_id} (직접 작성)")
             conn.commit()
+        notes.append(golden_note(conn, keyword, exists[0] if exists else 0))
     kind = STATUS_LABEL[status]
     extra = f", {', '.join(notes)}" if notes else ""
     return f"[{kind}] '{article.title}' (키워드: {keyword}, 직접 작성, {image_note}{extra}) {link}"
 
 
+def golden_note(conn, keyword: str, total: int) -> str:
+    """기록에 남길 황금 키워드 정보 (11/5 운영자 '김해공항 주차장 황금 키워드인가?' — 글마다 바로 알 수 있게)."""
+    try:
+        from . import naver_hub
+        conn.execute(naver_hub.SCHEMA)
+        cur = conn.execute("SELECT * FROM naver_signals WHERE norm=?", (norm(keyword),))
+        row = cur.fetchone()
+        sig = dict(zip([c[0] for c in cur.description], row)) if row else None
+        text = naver_hub.describe(sig, int(total or 0), keyword)
+    except Exception as e:  # noqa: BLE001 - 기록용이라 실패해도 글은 올림
+        return f"네이버 신호 못 읽음({type(e).__name__})"
+    return f"네이버: {text}" if text else f"네이버 신호 없음 (검색량 {int(total or 0):,})"
+
+
 def skip_keywords(data: dict) -> str:
     """글쓰기 세션이 건너뛴 후보를 '부적합'으로 기록 (월정액 방식의 후보 안전 검사 대신)."""
     items = [i for i in data.get("keywords", []) if str(i.get("keyword", "")).strip()]
+    # 브랜드·회사 상품이라 건너뛴 것: 그 브랜드가 든 다른 후보도 한 번에 제외 (11/5 SBI저축은행신용대출 제외 뒤에도
+    # SBI저축은행대환대출이 상위 후보로 남아 글쓰기 세션이 매번 다시 건너뜀)
+    from .keyword_filter import learn_brands
+    new_brands = learn_brands(i["brand"] for i in items if str(i.get("brand", "")).strip())
     with connect() as conn:
         for item in items:
             set_status(conn, str(item["keyword"]).strip(), "rejected", f"글쓰기 세션 제외: {str(item.get('why', ''))[:80]}")
+        same_brand = 0
+        for brand in new_brands:
+            same_brand += conn.execute("UPDATE keywords SET status='rejected', reason=? WHERE status IN ('new','ok') AND norm LIKE ?",
+                                       (f"브랜드 '{brand}' (글쓰기 세션이 제외한 브랜드)", f"%{brand}%")).rowcount
         conn.commit()
     # 다룰 내용이 없는 '바뀌는 제도'·'새 혜택' 글감도 다시 안 주게 (안 그러면 다음 실행에 같은 첫 항목이 또 나옴)
     skipped = {"law_changes_done": [str(k) for k in data.get("law_changes", [])],
@@ -118,7 +141,8 @@ def skip_keywords(data: dict) -> str:
         save_state(state)
     extra = sum(len(v) for v in skipped.values())
     return (f"{len(items)}개 ({', '.join(str(i['keyword']) for i in items[:5])}{' 등' if len(items) > 5 else ''})"
-            + (f", 건너뛴 제도·혜택 글감 {extra}개" if extra else ""))
+            + (f", 건너뛴 제도·혜택 글감 {extra}개" if extra else "")
+            + (f", 새 브랜드 {', '.join(new_brands)} → 같은 브랜드 후보 {same_brand}개 제외" if new_brands else ""))
 
 
 def main() -> None:

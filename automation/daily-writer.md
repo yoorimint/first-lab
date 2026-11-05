@@ -27,7 +27,7 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
   - `recent_posts` 에 이미 같은 주제(앞뒤 수식어만 다른 것)가 있는 키워드
 - 처음으로 통과한 후보 1개를 고른다. 후보 키워드(`keyword`)는 띄어쓰기 없는 원문 그대로 쓴다.
 - 위 기준으로 **건너뛴 후보**는 다시 안 뜨게 기록한다 (`recent_posts` 와 겹쳐서 건너뛴 것은 제외. 서버가 이미 막음):
-  `wordpress/queue/skip-<날짜>-<시각>.json` = `{"type": "skip", "keywords": [{"keyword": "<원문>", "why": "<이유 한 줄>"}], "law_changes": [], "new_benefits": []}`
+  `wordpress/queue/skip-<날짜>-<시각>.json` = `{"type": "skip", "keywords": [{"keyword": "<원문>", "why": "<이유 한 줄>", "brand": "<특정 브랜드·회사 상품이면 그 이름, 예: SBI저축은행>"}], "law_changes": [], "new_benefits": []}` (brand 를 적으면 그 브랜드가 든 다른 후보도 서버가 한 번에 뺀다)
   새 글과 같은 커밋에 넣는다. 건너뛴 게 없으면 만들지 않는다.
 
 ## 2. 쓰기 규칙 불러오기
@@ -107,7 +107,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - 기관이 정한 요율·기준 중 하나라도 공식 출처로 확인 못 하면 계산기를 만들지 않는다 (글만 올린다).
   표준 수학 공식은 공식 기관의 계산 예시가 없어도 위 방법으로 검증해 만든다.
 - 본문에 넣는 법: `content_html` 의 계산 예시 근처에 **독립된 줄**로 `<p>[firstlab_calc id="<id>"]</p>`
-- **연초 값**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 글보다 먼저 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 아직 확정 전이면 값은 고치지 않고 `"yearly_recheck": "<확정 예상일>"` 와 `"yearly_pending"`(무엇을 기다리는지) 만 적는다 (그날까지 다시 안 나옴). 항목의 `pending` 에 지난번에 기다리던 것이 있다.
+- **연초 값·근거 법령 개정**: 1단계 응답의 `calc_yearly` 에 계산기가 있으면 (한 번에 3건까지) 글보다 먼저. `law_change` 가 있는 항목은 그 개정의 `articles`(바뀌는 조문)를 `python3 -m bot.lawtext <법령명> <제N조>` 로 보고, 계산기 값·식·안내가 바뀌면 그 시행일(`date`)로 `scheduled` 를 넣고, 상관없으면 data 의 `"law_checked"` 목록에 그 `law_change` 값을 더한다. 그 밖의 항목은 그 계산기의 다음 해 요율·금액을 공식 출처(법령·고시·부처 발표)로 확인한다 — 확정된 것은 `data/<id>.json` 의 `scheduled`(`{"from": 시행일, "values": {키: 새 값}, "source": {...}}`)에 넣고 그 날짜 사례(`"today"`)를 tests 에 더한 뒤 `yearly_checked` 를 그 해로 올린다. 값이 그대로인 것이 확인되면 `yearly_checked` 만 올린다. 아직 확정 전이면 값은 고치지 않고 `"yearly_recheck": "<확정 예상일>"` 와 `"yearly_pending"`(무엇을 기다리는지) 만 적는다 (그날까지 다시 안 나옴). 항목의 `pending` 에 지난번에 기다리던 것이 있다.
 - 계산기는 별도 커밋으로 먼저 올린다: `git add wordpress/themes/first-lab/calculators wordpress/pages && git commit -m "계산기: <이름>"`
 
 ## 5. 올리기

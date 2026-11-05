@@ -1,0 +1,10 @@
+{"type": "skip", "keywords": [
+ {"keyword": "SBI저축은행대환대출", "why": "특정 회사 상품 (감시 세션: 같은 회사 상품을 글쓰기 세션이 이미 두 번 건너뜀)", "brand": "SBI저축은행"},
+ {"keyword": "롯데캐피탈신용대출", "why": "특정 회사 상품", "brand": "롯데캐피탈"},
+ {"keyword": "오클리아이자켓", "why": "특정 브랜드 상품 (쇼핑 검색)", "brand": "오클리"},
+ {"keyword": "만다리나덕서류가방", "why": "특정 브랜드 상품 (쇼핑 검색)", "brand": "만다리나덕"},
+ {"keyword": "카시오계산기", "why": "특정 브랜드 상품 (쇼핑 검색)", "brand": "카시오"},
+ {"keyword": "AIA치아보험", "why": "특정 회사 상품", "brand": "AIA"},
+ {"keyword": "케이비자동차보험", "why": "특정 회사 상품", "brand": "케이비"},
+ {"keyword": "어도비결제취소", "why": "특정 회사 서비스", "brand": "어도비"}
+], "law_changes": [], "new_benefits": []}

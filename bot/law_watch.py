@@ -265,7 +265,7 @@ NOTICE_QUERIES = (("최저임금", "고용노동부"), ("기준 중위소득", "
 NOTICE_DAYS = 120             # 최근 이만큼 안에 고시됐거나 아직 시행 전인 고시
 
 
-def core_changes(today: dt.date, api=law_api) -> list[dict]:
+def core_changes(today: dt.date, api=law_api, names=None) -> list[dict]:
     """생활 핵심 법령의 시행 예정 판 (LOOKAHEAD_DAYS 안) + 바로 앞 판과 비교해 실제로 바뀌는 조문 (글쓴이가 무엇을 쓸지 알게).
     바뀌는 조문이 없으면(부칙·별표만 등) 글감에서 뺌."""
     def one(name: str) -> list[dict]:
@@ -284,7 +284,7 @@ def core_changes(today: dt.date, api=law_api) -> list[dict]:
 
     out = []
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
-        for items in pool.map(one, CORE_LAWS):
+        for items in pool.map(one, names or CORE_LAWS):
             out += items
     return out
 
@@ -331,7 +331,9 @@ def run(today: dt.date | None = None) -> str:
         except (OSError, ValueError) as e:  # API 이상이어도 부칙 읽기 결과는 저장
             api_note = f"법제처 API 실패({type(e).__name__}) → 부칙 읽기만"
         try:  # 우리 글과 상관없는 생활 핵심 법령·해마다 나오는 기준값 고시 (먼저 쓸 글감)
-            core, notices = core_changes(today), notice_changes(today)
+            from .calc_watch import calc_laws  # 계산기 근거 법령도 같이 (개정되면 계산기 값 고치기 — bot/calc_watch.py)
+            watch = sorted(set(CORE_LAWS) | {law for laws_ in calc_laws().values() for law in laws_})
+            core, notices = core_changes(today, names=watch), notice_changes(today)
             upcoming = merge(upcoming, core + notices)
             api_note += f", 생활 핵심 법령 시행 예정 {len(core)}건, 기준값 고시 {len(notices)}건"
         except (OSError, ValueError) as e:

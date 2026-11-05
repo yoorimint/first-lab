@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-04", "yearly_checked": 2027,
+  "basis_date": "2026-11-04", "laws": ["부가가치세법", "부가가치세법 시행령"], "yearly_checked": 2027,
   "sources": [
     {"name": "국세청 부가가치세 기본정보 (세율·간이과세 업종별 부가가치율)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7693&mi=2272"},
     {"name": "국세청 부가가치세 세액계산 방법 (일반·간이과세자 납부세액, 공급대가 0.5% 공제, 납부의무 면제)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7806"},
