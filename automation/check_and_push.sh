@@ -15,10 +15,16 @@ run_tests
 git add -A
 git diff --cached --quiet && { echo "바뀐 것 없음"; exit 0; }
 git commit -q -m "$msg"
+pushed=""
 for wait in 2 4 8 16; do
-  git fetch -q origin main && git rebase -q origin/main && run_tests && git push -q origin HEAD:main && break
+  git fetch -q origin main && git rebase -q origin/main && run_tests && git push -q origin HEAD:main && { pushed=1; break; }
   sleep "$wait"
 done
+# 네 번 다 실패하면 성공처럼 끝내지 않음 (11/6 GitHub 'commit_refs_rules' 거부가 4번 반복됐는데 커밋 줄을 찍고 끝나 올라간 줄 앎)
+[ -n "$pushed" ] || { echo "!! main 에 올리기 실패 (커밋은 이 컴퓨터에만 있음) — 다음 차례에 git push origin HEAD:main 다시"; exit 1; }
 branch=$(git rev-parse --abbrev-ref HEAD)
-[ "$branch" != "main" ] && git push -q -f origin "HEAD:$branch" || true
+# 작업 브랜치도 같은 커밋으로 (main 위에 다시 쌓았으니 일반 push 로 충분 — 11/6 '-f' 가 권한에 막히고 '|| true' 가 숨겨 브랜치가 계속 뒤처짐)
+if [ "$branch" != "main" ]; then
+  git push -q origin "HEAD:$branch" || echo "!! 작업 브랜치 $branch 올리기 실패 (main 은 올라감) — git status 로 확인"
+fi
 git log --oneline -1 | cut -c1-80

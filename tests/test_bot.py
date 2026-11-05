@@ -2733,6 +2733,14 @@ class CheckAndPushTest(unittest.TestCase):
         code = "\n".join(l for l in sh.splitlines() if not l.lstrip().startswith("#"))
         self.assertNotIn("| tail -1 &&", code)
 
+    def test_push_failures_are_not_hidden(self):
+        """11/6: 네 번 실패한 main push 를 성공처럼 끝냄 · 브랜치 '-f' push 가 권한에 막히고 '|| true' 가 숨김."""
+        sh = (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8")
+        code = "\n".join(l for l in sh.splitlines() if not l.lstrip().startswith("#"))
+        self.assertIn('[ -n "$pushed" ] ||', code)
+        self.assertNotIn("push -q -f", code)
+        self.assertNotIn("|| true", code)
+
 
 class CitedUrlsTest(unittest.TestCase):
     def test_reviewer_gets_writer_sources(self):
