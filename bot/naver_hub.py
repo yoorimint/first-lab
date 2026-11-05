@@ -49,7 +49,9 @@ OLD_DAYS = 365              # 정면 경쟁 글 중 1년 넘은 글 수 (참고 
 FEW_DOCS = 10                # 글이 이보다 적으면 검색 도구가 만든 어색한 조합일 수도 → '확인 필요' 표시 (점수는 그대로)
 # 사이트를 찾아가는 검색: 검색량은 커도 사람들이 공식 사이트로 바로 가서 글을 안 읽음 → 황금 찾기·가점에서 뺌
 NAVIGATIONAL = ("로그인", "홈페이지", "바로가기", "사이트", "고객센터", "전화번호", "콜센터", "앱다운", "어플다운",
-                "다운로드", "인터넷뱅킹", "공식", "주소", "위치", "영업시간", "운영시간")
+                "다운로드", "인터넷뱅킹", "공식", "주소", "위치", "영업시간", "운영시간",
+                # 네이버가 검색 결과 맨 위에 계산기·조회창·실시간 값을 바로 보여 주는 검색 (블로그 글을 거의 안 엶, 11/5 첫 집계 상위가 전부 이것)
+                "환율", "택배", "시세", "복권", "로또", "날씨", "운세", "주가", "날짜계산")
 WORKERS = 8
 CHUNK = 500                  # 이만큼씩 부르고 저장 (중간에 막혀도 받은 만큼은 남김)
 SCHEMA = ("CREATE TABLE IF NOT EXISTS naver_signals (norm TEXT PRIMARY KEY, docs INTEGER, docs_checked TEXT,"
@@ -336,10 +338,15 @@ def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
     return head + " / " + golden_report(conn, rows)
 
 
-def golden_report(conn, rows=None, top_n: int = 5) -> str:
-    """지금까지 찾은 황금 키워드 수와 황금 점수 상위."""
+def golden_report(conn, rows=None, top_n: int = 5, volume: tuple[int, int] | None = None) -> str:
+    """지금까지 찾은 황금 키워드 수와 황금 점수 상위 — 글감 후보와 같은 검색량 범위(설정의 최소~최대)로 셈."""
     if rows is None:
-        rows = conn.execute("SELECT keyword, norm, total FROM keywords WHERE status IN ('new','ok')").fetchall()
+        if volume is None:
+            from .settings import load_settings
+            st = load_settings()
+            volume = (st.min_volume, st.max_volume)
+        rows = conn.execute("SELECT keyword, norm, total FROM keywords WHERE status IN ('new','ok') AND total BETWEEN ? AND ?",
+                            volume).fetchall()
     sigs = load(conn)
     scored = []
     for r in rows:
