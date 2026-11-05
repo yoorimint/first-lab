@@ -23,6 +23,7 @@ def main_sha() -> str:
 
 def check(state: dict, now: datetime, deployed: str, main: str) -> str | None:
     """상태를 갱신하고, 막혔으면 알림 문장."""
+    now = now.replace(tzinfo=None)  # 봇은 KST 시각(시간대 있음)을 넘김 — 저장한 시각(시간대 없음)과 빼려면 맞춰야 함 (11/5 검토: TypeError)
     w = state.get("deploy_watch") or {}
     stamp = now.strftime("%Y-%m-%d %H:%M")
     if deployed != w.get("deployed"):
@@ -48,9 +49,9 @@ def run(state: dict, now: datetime | None = None) -> None:
     try:
         deployed = DEPLOYED.read_text(encoding="utf-8").strip()
         main = main_sha()
-    except (OSError, subprocess.SubprocessError):
-        return  # 확인 못 하면 판단 안 함
-    alert = check(state, now, deployed, main)
+        alert = check(state, now, deployed, main)
+    except Exception:  # noqa: BLE001 - 배포 감지가 1분 봇(공개·실행)을 멈추면 안 됨
+        return
     if alert and state.get("deploy_alert_logged", "")[:13] != now.strftime("%Y-%m-%d %H"):
         add_log(state, False, alert)   # 한 시간에 한 번만 기록
         state["deploy_alert_logged"] = now.strftime("%Y-%m-%d %H:%M")

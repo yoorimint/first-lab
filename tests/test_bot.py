@@ -2181,6 +2181,15 @@ class DeployWatchTest(unittest.TestCase):
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=80), "ccc", "ddd"))
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=125), "ddd", "eee"))     # 배포가 진행 중이면 알림 없음
 
+    def test_kst_aware_time_from_bot(self):
+        """봇은 datetime.now(KST)(시간대 있음)를 넘김 — 11/5 검토에서 TypeError 로 봇이 멈출 뻔함."""
+        from datetime import datetime, timedelta
+        from zoneinfo import ZoneInfo
+        from bot import deploy_watch as dw
+        kst, state = ZoneInfo("Asia/Seoul"), {}
+        self.assertIsNone(dw.check(state, datetime(2026, 11, 5, 10, 0, tzinfo=kst), "aaa", "bbb"))
+        self.assertIn("분째", dw.check(state, datetime(2026, 11, 5, 11, 5, tzinfo=kst), "aaa", "bbb"))
+
 
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
