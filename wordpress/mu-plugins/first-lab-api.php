@@ -46,6 +46,8 @@ add_action(
 						'rates'         => $state['rates'] ?? null,
 						// 다음 해 요율·금액 확인이 안 된 계산기 (bot/calc_watch.py, 11/15~) — daily-writer.md 4-2
 						'calc_yearly'   => (array) ( $state['calc_yearly'] ?? array() ),
+						// 공개 대기 글이 많으면 새 글 대신 외부 검수할 대기 글 (bot/review_queue.py, daily-writer.md 0단계)
+						'review_target' => $state['review_target'] ?? null,
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
 						'target_length' => (int) ( $settings['target_length'] ?? 3000 ),

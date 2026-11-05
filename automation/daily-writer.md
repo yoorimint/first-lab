@@ -21,6 +21,11 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/firstlab/v1/next
 ```
 - 응답의 `write_mode` 가 `"direct"` 가 아니면(설정 페이지에서 "API 봇" 선택) 글을 쓰지 말고 "봇 방식이라 쉼"으로 끝낸다.
+- **대기 글 검수 먼저**: 응답의 `review_target` 이 있으면(공개 대기 글이 20편 넘게 쌓임) 이번 실행은 **새 글을 쓰지 않고** 그 글 1편을 외부 검수한다 —
+  `automation/monitor.md` '감시 차례마다' 2번 절차 그대로: `python3 automation/unreviewed.py <post_id>` 로 본문 받기 → `automation/review-prompt.md` 로 하위 에이전트 검수
+  → '틀림'은 근거 원문을 내가 직접 열어 확인한 뒤에만 고치고, 못 열면 '확인하세요'로 완화 (공식 페이지에서 확인된 숫자는 지우지 않는다 — 도구가 막음)
+  → `python3 automation/apply_review.py <post_id> "<제목>" [패치.json]` → `wordpress/queue/reviewdone-<post_id>-<날짜시각>.json` = `{"type": "review_done", "post_id": <id>, "title": "<제목>", "patches": <고친 곳 수>}`
+  → 5단계처럼 검사·커밋(`대기 글 검수: <제목>`)·main 에 올림 → 보고하고 끝낸다. (6단계 글 갱신·5-1 보류 수정은 그대로 해도 된다)
 - `candidates` 는 점수순 후보다. 위에서부터 보고 아래에 해당하면 건너뛴다:
   - 날마다 값이 바뀌는 시세·가격(예: 오늘의 금 시세, 농산물 가격) — 글이 금방 틀린 정보가 됨
   - 특정 회사·브랜드 상품 비교, 추천·순위·이벤트, 의료·건강 진단, 정치·종교

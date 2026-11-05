@@ -38,6 +38,7 @@ RETRY_REVIEW_MIN = 20   # AI 혼잡 시 사전 검토 재시도 간격(분)
 RETRY_MANUAL_MIN = 5    # AI 혼잡 시 수동 요청 재시도 간격(분)
 MANUAL_RETRIES = 12     # 수동 요청 최대 재시도 횟수
 CONTINUOUS_TIMEOUT_MIN = 60  # 연속 작성: 한 편이 이 시간 안에 안 올라오면 실패로 보고 다음 편 실행
+DONE_MARKS = ("직접 작성 글:", "대기 글 검수(직접):")  # 글쓰기 작업 한 번이 끝났다는 기록 (새 글 또는 대기 글 검수, bot/review_queue.py)
 CONTINUOUS_MAX_FAILS = 3     # 연속으로 이만큼 실패하면 연속 작성을 자동으로 멈춤 (사용량 한도·후보 소진 등)
 
 
@@ -206,7 +207,7 @@ def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "")
 def latest_post_log(state: dict) -> str:
     """가장 최근 '직접 작성 글' 기록 (시각+내용). 없으면 ''."""
     for e in state.get("log", []):  # 최신이 앞
-        if e.get("ok") and "직접 작성 글:" in str(e.get("msg", "")):
+        if e.get("ok") and any(m in str(e.get("msg", "")) for m in DONE_MARKS):
             return f"{e.get('time', '')} {e.get('msg', '')}"
     return ""
 
@@ -219,7 +220,7 @@ def post_arrived_since(state: dict, since: str, seen: str | None = None) -> bool
     if seen is not None:
         latest = latest_post_log(state)
         return bool(latest) and latest != seen
-    return any(e.get("ok") and str(e.get("time", "")) > since and "직접 작성 글:" in str(e.get("msg", ""))
+    return any(e.get("ok") and str(e.get("time", "")) > since and any(m in str(e.get("msg", "")) for m in DONE_MARKS)
                for e in state.get("log", []))
 
 
@@ -253,6 +254,11 @@ def refresh_dashboard(state: dict, settings: BotSettings) -> None:
     with connect() as conn:
         state["keywords"] = summary(conn)
         state["candidates"] = ranked_candidates(conn, settings, limit=20)
+    try:  # 대기 글이 많으면 새 글 대신 외부 검수할 글 (bot/review_queue.py)
+        from .review_queue import target
+        state["review_target"] = target()
+    except Exception:  # noqa: BLE001 - 못 구하면 새 글 쓰기로
+        state["review_target"] = None
 
 
 def main() -> None:

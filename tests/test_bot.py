@@ -2144,6 +2144,27 @@ class HoldRetryTest(unittest.TestCase):
         self.assertIn("'_firstlab_hold_tries'", php)
 
 
+class ReviewQueueTest(unittest.TestCase):
+    """대기 글이 많으면 새 글 대신 외부 검수 안 된 대기 글을 검수 (11/5 운영자 '니가 없어도 돌아가게')."""
+
+    def test_pick(self):
+        import tempfile
+        from bot import review_queue as rq
+        path = Path(tempfile.mkdtemp()) / "reviewed.txt"
+        path.write_text("10 첫 글\n11 둘째 (재검수)\ncalc:cbm\n", encoding="utf-8")
+        self.assertEqual(rq.reviewed_ids(path), {10, 11})
+        ready = [{"post_id": i, "title": f"t{i}"} for i in range(10, 10 + rq.REVIEW_WHEN_READY)]
+        got = rq.pick(ready, rq.reviewed_ids(path))
+        self.assertEqual((got["post_id"], got["unreviewed"]), (12, rq.REVIEW_WHEN_READY - 2))
+        self.assertIsNone(rq.pick(ready[:-1], set()))                       # 대기 글이 적으면 새 글 쓰기
+        self.assertIsNone(rq.pick(ready, {r["post_id"] for r in ready}))     # 다 검수했으면 새 글 쓰기
+
+    def test_review_run_counts_as_done(self):
+        from bot import run
+        state = {"log": [{"time": "2026-11-05 19:00", "ok": True, "msg": "대기 글 검수(직접): 글 12 't' 고친 곳 3개"}]}
+        self.assertTrue(run.post_arrived_since(state, "2026-11-05 18:00", seen=""))
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

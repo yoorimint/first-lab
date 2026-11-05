@@ -10,6 +10,7 @@
 후보 제외 파일: {"type": "skip", "keywords": [{"keyword", "why", "brand"(브랜드·회사 상품이면 그 이름)}], "law_changes": [key], "new_benefits": [key]}
   → 글쓰기 세션이 부적합하다고 본 후보·다룰 내용 없는 제도/혜택 글감을 다시 안 뜨게 함
 사진 검사 파일: {"type": "image_check", "post_id", "replace", "remove"} → image_check.apply_check (엉터리 글자 사진 교체)
+대기 글 검수 완료 파일: {"type": "review_done", "post_id", "title", "patches"} → 기록만 (연속 작성이 '한 번 끝남'으로 셈)
 근거 기록 파일: {"type": "evidence", "post_id", "keyword", "review": [글쓰기 검수와 같은 형식]} → 근거 기록이 없던 예전 봇 글에
   근거 대조 기록을 만듦 (11/5 운영자 '예전 봇 글도 근거 기록 만들어라') → 법령 감시·공개 직전 확인·공개 글 다시 보기가 이 글도 봄
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
@@ -181,6 +182,9 @@ def main() -> None:
             elif data.get("type") == "skip":
                 label = "후보 제외(직접)"
                 msg = skip_keywords(data)
+            elif data.get("type") == "review_done":  # 글쓰기 작업이 새 글 대신 대기 글을 외부 검수함 (bot/review_queue.py)
+                label = "대기 글 검수(직접)"
+                msg = f"글 {int(data['post_id'])} '{str(data.get('title', ''))[:40]}' 고친 곳 {int(data.get('patches', 0))}개"
             elif data.get("type") == "evidence":
                 label = "근거 기록"
                 msg = save_evidence(data)
