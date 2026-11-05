@@ -1523,24 +1523,26 @@ class GoldFirstTest(unittest.TestCase):
         old = [{"ID": 50, "post_name": "o", "post_title": "t", "post_date": "2026-10-10 10:00:00"}]
         self.assertEqual(self._publish_pick(old + recent, {129: 9.0}), 50)                  # 21일 넘게 기다린 글은 먼저
 
-    def test_photo_ready_before_gold(self):
-        """11/6 #583: 사진 대기(한도 소진) 글이 황금 점수로 먼저 뽑혀 제목 카드만 단 채 공개됨 → 사진 있는 글 먼저."""
+    def test_gold_first_even_if_photo_pending(self):
+        """11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진 줘야지' — 공개는 황금 점수 순, 사진 대기는 같은 점수일 때만 뒤로."""
         rows = [{"ID": 80, "post_name": "a", "post_title": "t", "post_date": "2026-11-05 10:00:00"},
                 {"ID": 85, "post_name": "b", "post_title": "t", "post_date": "2026-11-05 11:00:00"}]
-        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}, pending={80}), 85)
-        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}), 80)
+        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}, pending={80}), 80)
+        self.assertEqual(self._publish_pick(rows, {80: 5.0, 85: 5.0}, pending={80}), 85)
 
-    def test_published_posts_get_photos_first(self):
-        """공개된 글은 방문자에게 제목 카드가 보이는 중 → 사진 채우기에서 대기 초안보다 먼저 (11/6 #583)."""
+    def test_photos_follow_publish_order(self):
+        """사진 채우기: 공개된 글 → 대기열 글을 공개 순서(황금 점수)대로 → 나머지 초안."""
         from bot import pending_images
 
         def wp(*args):
             if args[:2] == ("post", "list"):
-                return "583\n" if "--post_status=publish" in args else "300\n301\n"
+                return "583\n" if "--post_status=publish" in args else "300\n301\n302\n"
             return ""
         with mock.patch.object(pending_images, "wp_cli", side_effect=wp), \
-             mock.patch.object(pending_images.photo, "meta", side_effect=lambda i, k: "ready" if i == "301" else ""):
-            self.assertEqual(pending_images.pending_posts(), ["583", "301", "300"])
+             mock.patch.object(pending_images.photo, "meta", side_effect=lambda i, k: "" if i == "300" else "ready"), \
+             mock.patch.object(pending_images.schedule, "publish_order", return_value=[302, 301]) as order:
+            self.assertEqual(pending_images.pending_posts(), ["583", "302", "301", "300"])
+        self.assertEqual(sorted(order.call_args[0][0]), [301, 302])   # 공개 대기열 글만 줄 세움
 
     def test_refresh_queue_orders_waiting_drafts(self):
         """대기 중인 글도 키워드를 다시 조회해 줄 세움: 창고에 없는 키워드는 검색량을 채우고 '쓴 키워드'로 표시."""

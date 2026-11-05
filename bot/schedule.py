@@ -91,24 +91,28 @@ MAX_WAIT = timedelta(days=21)  # 이만큼 기다린 글은 황금 점수와 상
 # 11/6: 예전엔 '대기열 뒤 21편을 뺀 나머지'로 셈 — 하루 30편씩 쌓이자 하루도 안 된 글까지 '오래된 글'이 돼 황금 점수가 거의 안 쓰임
 
 
-def publish_next(now_kst: datetime) -> str | None:
-    """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
-    ids = ready_drafts()
-    if not ids:
-        return None
+def publish_order(ids: list[int], now_kst: datetime, photo_tiebreak: bool = False) -> list[int]:
+    """대기 초안의 공개 순서 (사진 채우기도 이 순서로 — bot/pending_images, 11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진').
+    시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 황금 점수·성수기 높은 글(운영자 지시 11/5,
+    bot/naver_hub.py) → 시즌 중인 글 → (photo_tiebreak: 사진이 다 들어간 글 — 글마다 조회라 공개 때만) → 오래된 순."""
     info = _draft_info(ids)
     texts = {i: info.get(i, {}).get("text", "") for i in ids}
-    # 순서: 시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 대표 사진이 들어간 글
-    #       → 황금 점수·성수기 높은 글(운영자 지시 11/5, bot/naver_hub.py) → 시즌 중인 글 → 오래된 순
-    # 사진: 11/6 #583 이 사진 대기(한도 소진, 오전 9시 채움) 상태로 08:31 에 제목 카드만 단 채 공개됨 — 하루 1편이라 사진 있는 글이 먼저
     gold = naver_hub.publish_priority({i: texts[i].split(" ")[0] for i in ids}, now_kst.month)
     rank = {i: seasons.rank(texts[i], now_kst.date()) for i in ids}
     from .review_queue import reviewed_ids
     reviewed = reviewed_ids()
     cutoff = now_kst.replace(tzinfo=None) - MAX_WAIT
     old = {i for i in ids if info.get(i, {}).get("date") and info[i]["date"] <= cutoff}
-    ordered = sorted(ids, key=lambda i: (rank[i] == seasons.OFF, i not in reviewed, i not in old, _has_pending_images(i),
-                                         -round(gold.get(i, 0.0), 2), rank[i]))
+    return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i],
+                                      _has_pending_images(i) if photo_tiebreak else False))
+
+
+def publish_next(now_kst: datetime) -> str | None:
+    """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
+    ids = ready_drafts()
+    if not ids:
+        return None
+    ordered = publish_order(ids, now_kst, photo_tiebreak=True)
     held = []
     post_id = None
     for candidate in ordered[:MAX_FRESH_CHECKS]:
