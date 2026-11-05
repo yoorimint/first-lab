@@ -94,8 +94,8 @@ def effective_dates(text: str) -> list[tuple[dt.date, list[str]]]:
     return out
 
 
-def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch) -> tuple[list[dict], list[dict]]:
-    """(앞으로 시행될 개정, 막 시행된 개정)."""
+def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch, names: set | None = None) -> tuple[list[dict], list[dict]]:
+    """(앞으로 시행될 개정, 막 시행된 개정). names 를 주면 읽은 법령 이름을 모은다 (입법예고·시행 예정 판 대조용)."""
     upcoming, just, seen = [], [], set()
     bases = sorted(laws)[:MAX_LAWS]
     with ThreadPoolExecutor(max_workers=WORKERS) as pool:
@@ -105,6 +105,8 @@ def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch) 
         if not text:
             continue
         name = title_of(text) or law_name(base)
+        if names is not None:
+            names.add(name)
         for when, articles in effective_dates(text):
             key = (name, when, tuple(articles))
             if key in seen:  # 같은 법을 다른 주소로 적은 경우 한 번만
@@ -121,6 +123,60 @@ def scan(laws: dict[str, set[str]], today: dt.date, fetcher=source_check.fetch) 
                 just.append(item)
     upcoming.sort(key=lambda x: x["date"])
     return upcoming, just
+
+
+PROPOSAL_LIST = "https://opinion.lawmaking.go.kr/gcom/ogLmPp?pageIndex={page}"  # 국민참여입법센터 (부처)입법예고
+PROPOSAL_PAGES = 5
+_PROPOSAL_ROW = re.compile(r'href="/gcom/ogLmPp/(\d+)"[^>]*>([^<]+)</a>.*?소관부처[^>]*>\s*<p>([^<]*)</p>.*?접수기간">\s*<p>([^<]*)</p><p>~?([^<]*)</p>', re.S)
+EFLAW = "https://www.law.go.kr/DRF/lawSearch.do?OC={oc}&target=eflaw&type=XML&display=20&query={q}"  # 법제처 공개 데이터: 시행일 기준 법령
+OC_SECRET = "LAW_OPEN_API_OC"  # 법제처 공개 데이터 사용 신청 아이디 (서버 set-secrets.sh 로만)
+
+
+def _raw_text(url: str) -> str:
+    got = source_check._raw(url)
+    return got[0].decode("utf-8", "ignore") if got else ""
+
+
+def matches(title: str, names: set[str]) -> str:
+    """입법예고 제목이 우리 근거 법령의 개정인지 ('지방세법 시행령 일부개정령안' ↔ '지방세법 시행령'). 맞으면 그 이름."""
+    compact = title.replace(" ", "")
+    for name in sorted(names, key=len, reverse=True):  # 긴 이름 먼저 ('지방세법 시행령' 이 '지방세법' 보다 먼저)
+        n = name.replace(" ", "")
+        if n and compact.startswith(n) and re.match(r"(일부|전부)?개정|제정|폐지|시행", compact[len(n):] or "개정"):
+            return name
+    return ""
+
+
+def proposals(names: set[str], fetch_page=_raw_text) -> list[dict]:
+    """입법예고 중 우리 근거 법령의 것 — 확정 아님(바뀌거나 무산될 수 있음), 지켜볼 목록."""
+    out, seen = [], set()
+    for page in range(1, PROPOSAL_PAGES + 1):
+        for pid, title, ministry, start, end in _PROPOSAL_ROW.findall(fetch_page(PROPOSAL_LIST.format(page=page))):
+            law = matches(title.strip(), names)
+            if law and pid not in seen:
+                seen.add(pid)
+                out.append({"law": law, "title": title.strip(), "ministry": ministry.strip(),
+                            "period": f"{start.strip()} ~ {end.strip()}", "url": f"https://opinion.lawmaking.go.kr/gcom/ogLmPp/{pid}"})
+    return out
+
+
+def scheduled_versions(names: set[str], today: dt.date, oc: str, fetch_xml=_raw_text) -> list[dict]:
+    """법제처 공개 데이터(시행일 법령)로 공포됐지만 아직 시행 전인 판 — 법 전체가 나중에 시행되는 개정까지. OC 가 있을 때만."""
+    if not oc:
+        return []
+    out = []
+    for name in sorted(names):
+        xml = fetch_xml(EFLAW.format(oc=urllib.parse.quote(oc), q=urllib.parse.quote(name)))
+        for block in re.findall(r"<law[ >].*?</law>", xml, re.S):
+            title = re.search(r"<법령명한글>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</법령명한글>", block)
+            when = re.search(r"<시행일자>(\d{8})</시행일자>", block)
+            if not title or not when or title.group(1).strip() != name:
+                continue
+            date = dt.date(int(when.group(1)[:4]), int(when.group(1)[4:6]), int(when.group(1)[6:]))
+            if today < date <= today + dt.timedelta(days=LOOKAHEAD_DAYS):
+                out.append({"law": name, "url": "", "date": f"{date:%Y-%m-%d}", "articles": [], "posts": [],
+                            "key": f"{name}|{date:%Y-%m-%d}", "source": "시행 예정 판"})
+    return out
 
 
 def mark_posts(just: list[dict]) -> list[str]:
@@ -141,11 +197,20 @@ def mark_posts(just: list[dict]) -> list[str]:
 def run(today: dt.date | None = None) -> str:
     today = today or dt.date.today()
     laws = watched_laws()
-    upcoming, just = scan(laws, today)
+    names: set[str] = set()
+    upcoming, just = scan(laws, today, names=names)
+    from .config import load_secrets
+    oc = load_secrets().get(OC_SECRET, "")
+    known = {u["key"] for u in upcoming}
+    extra = [v for v in scheduled_versions(names, today, oc) if v["key"] not in known]
+    upcoming = sorted(upcoming + extra, key=lambda x: x["date"])
+    pre = proposals(names)
     marked = mark_posts(just)
     state = load_state()  # 저장 때 다른 실행 기록과 합쳐짐 (bot/state.save_state)
-    state["law_changes"] = {"checked": f"{today:%Y-%m-%d}", "upcoming": upcoming[:30]}
-    msg = f"법령 감시: 근거 법령 {len(laws)}개 확인, 앞으로 시행 {len(upcoming)}건, 막 시행 {len(just)}건(재검증 표시 {len(marked)}편)"
+    state["law_changes"] = {"checked": f"{today:%Y-%m-%d}", "upcoming": upcoming[:30], "proposals": pre[:30]}
+    msg = (f"법령 감시: 근거 법령 {len(laws)}개 확인, 앞으로 시행 {len(upcoming)}건(시행 예정 판 {len(extra)}건"
+           f"{'' if oc else ', 법제처 공개 데이터 신청 전이라 생략'}), 입법예고 {len(pre)}건(확정 아님), "
+           f"막 시행 {len(just)}건(재검증 표시 {len(marked)}편)")
     add_log(state, True, msg)
     save_state(state)
     return msg

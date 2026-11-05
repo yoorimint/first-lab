@@ -1299,6 +1299,22 @@ class LawWatchTest(unittest.TestCase):
                          "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918")
         self.assertIsNone(law_key("https://www.law.go.kr/LSW/flDownload.do?flSeq=1"))  # 별표 PDF
 
+    def test_proposals_and_scheduled_versions(self):
+        import datetime as dt
+        from bot import law_watch
+        row = ('<a href="/gcom/ogLmPp/89364" title="x">지방세법 시행령 일부개정령안 입법예고</a> <td data-th="소관부처 (법령종류)">'
+               '<p>행정안전부</p></td><td data-th="입법의견 접수기간"><p>2026. 11. 5.</p><p>~2026. 12. 15.</p></td>'
+               '<a href="/gcom/ogLmPp/89372" title="y">지방세기본법 시행령 일부개정령안 입법예고</a> <td data-th="소관부처 (법령종류)">'
+               '<p>행정안전부</p></td><td data-th="입법의견 접수기간"><p>2026. 11. 5.</p><p>~2026. 12. 15.</p></td>')
+        got = law_watch.proposals({"지방세법"}, fetch_page=lambda u: row if "pageIndex=1" in u else "")
+        self.assertEqual([g["title"] for g in got], ["지방세법 시행령 일부개정령안 입법예고"])  # 지방세기본법은 다른 법
+        self.assertEqual(got[0]["period"], "2026. 11. 5. ~ 2026. 12. 15.")
+        xml = ("<LawSearch><law id='1'><법령명한글><![CDATA[고용보험법]]></법령명한글><시행일자>20270101</시행일자></law>"
+               "<law id='2'><법령명한글><![CDATA[고용보험법]]></법령명한글><시행일자>20260918</시행일자></law></LawSearch>")
+        sched = law_watch.scheduled_versions({"고용보험법"}, dt.date(2026, 11, 5), "oc", fetch_xml=lambda u: xml)
+        self.assertEqual([x["key"] for x in sched], ["고용보험법|2027-01-01"])
+        self.assertEqual(law_watch.scheduled_versions({"고용보험법"}, dt.date(2026, 11, 5), ""), [])  # 신청 전이면 건너뜀
+
     def test_refresh_picks_law_changed_post_first(self):
         from bot import refresh
         posts = [{"id": 1, "title": "a", "url": "u1", "date": "2026-11-01", "refreshed": "", "has_number": True, "law_changed": ""},

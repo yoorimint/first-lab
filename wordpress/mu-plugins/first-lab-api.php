@@ -206,6 +206,7 @@ function firstlab_api_maintenance(): array {
 		'continuous'  => get_option( 'firstlab_bot_continuous', '0' ),
 		'ready_count' => count( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_queue', 'meta_value' => 'ready', 'numberposts' => -1, 'fields' => 'ids' ) ) ),
 		'held_drafts' => $held,
+		'law_watch'   => $state['law_changes'] ?? null, // 법령 감시: 곧 시행될 개정·입법예고(확정 아님) — 감시 세션 확인용
 		// 공개 대기 글 전체 (감시 세션이 외부 검수 안 한 글을 글 번호로 찾음 — automation/unreviewed.py)
 		'ready_posts' => array_map(
 			static fn( $p ) => array( 'post_id' => $p->ID, 'title' => $p->post_title, 'slug' => urldecode( $p->post_name ) ),
