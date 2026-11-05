@@ -111,7 +111,8 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         head = find_head(r["norm"], r["total"], volumes)
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
         sc += topic_weight(r["norm"])
-        sc += naver_hub.signal_score(hub.get(r["norm"]) or hub.get(head or ""), r["total"], month)
+        sig = hub.get(r["norm"]) or hub.get(head or "")
+        sc += naver_hub.signal_score(sig, r["total"], month)
         difficulty, estimated = r["difficulty"], False
         if difficulty is None and (head or r["norm"]) in head_difficulty:
             difficulty, estimated = head_difficulty[head or r["norm"]], True  # 조회 안 한 키워드: 같은 주제로 추정
@@ -129,7 +130,8 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
                        "difficulty": r["difficulty"],
                        "comp_info": r["comp_info"] or (f"같은 주제 추정 {difficulty}" if estimated else ""),
                        "gsc": {"opportunity": "서치콘솔 기회", "good_head": "잘 되는 주제",
-                               "bad_head": "안 되는 주제"}.get(gsc or "", "")})
+                               "bad_head": "안 되는 주제"}.get(gsc or "", ""),
+                       "naver": naver_hub.describe(sig, r["total"])})  # 글쓰기 세션이 보는 근거 (성수기·블로그 글 수)
     result.sort(key=lambda x: x["score"], reverse=True)
     picked, per_head = [], {}
     for c in result:

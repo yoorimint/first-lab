@@ -125,6 +125,19 @@ def signal_score(sig: dict | None, total: int, month: int) -> float:
     return s
 
 
+def describe(sig: dict | None, total: int) -> str:
+    """후보 목록에 붙일 한 줄: '성수기 1·2월 / 블로그 글 1,234개(검색 1회당 0.6개)'."""
+    if not sig:
+        return ""
+    parts = []
+    if sig.get("peak"):
+        parts.append(f"성수기 {'·'.join(sig['peak'].split(','))}월")
+    if sig.get("docs") is not None:
+        ratio = f"(검색 1회당 {sig['docs'] / total:.1f}개)" if total else ""
+        parts.append(f"블로그 글 {sig['docs']:,}개{ratio}")
+    return " / ".join(parts)
+
+
 def load(conn) -> dict[str, dict]:
     conn.execute(SCHEMA)
     return {r["norm"]: dict(r) for r in conn.execute("SELECT * FROM hub_signals")}

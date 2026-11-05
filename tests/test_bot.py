@@ -1529,6 +1529,8 @@ class NaverHubTest(unittest.TestCase):
         self.assertEqual(h.signal_score(sig, 1000, 12), 2.0)   # 문서 적음 +1, 다음 달이 성수기 +1
         self.assertEqual(h.signal_score({"docs": 50000, "peak": "1,2", "low": "6,7,8"}, 1000, 7), -1.5)  # 포화 −1, 비수기 −0.5
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
+        self.assertEqual(h.describe(sig, 1000), "성수기 1·2월 / 블로그 글 500개(검색 1회당 0.5개)")
+        self.assertEqual(h.describe(None, 1000), "")
 
     def test_daily_limit(self):
         import datetime as dt
