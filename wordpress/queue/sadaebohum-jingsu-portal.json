@@ -1,0 +1,475 @@
+{
+ "title": "사대보험 징수포털 사용법: 다음 달 10일 납부·카드 수수료 0.8%",
+ "excerpt": "사대보험 징수포털(사회보험 통합징수 포털)에서 4대 보험료를 조회·납부하고 납부확인서를 받는 법, 카드 수수료 0.8%, 연체금 계산, 자동이체 감액 250원까지 정리했어요.",
+ "content_html": "<p>사대보험 징수포털의 정식 이름은 <strong>사회보험 통합징수 포털(si4n.nhis.or.kr)</strong>이에요. 국민건강보험공단이 2011년부터 건강보험·국민연금·고용보험·산재보험의 보험료 징수를 한곳에서 처리하면서 만든 사이트라서, <strong>4대 보험료 조회·납부, 자동이체 신청, 납부확인서·완납증명서 발급</strong>을 여기서 한 번에 할 수 있어요. 보험료는 그 달 것을 <strong>다음 달 10일까지</strong> 내야 하니, 고지서를 받으면 이 날짜부터 챙기면 돼요. 지역가입자 건강보험료나 농어업인 연금보험료처럼 신청하면 분기별로 낼 수 있는 경우도 있어요.</p>\n\n<h2>징수포털에서 할 수 있는 일</h2>\n<table>\n<thead><tr><th>메뉴</th><th>주요 기능</th></tr></thead>\n<tbody>\n<tr><td>보험료 납부</td><td>보험료 조회/납부, 보험료 대납, 납부결과 확인</td></tr>\n<tr><td>고지내역 조회</td><td>고지/납부 현황, 산출내역 조회, 징수포털 고지내역</td></tr>\n<tr><td>신청서비스</td><td>이메일·모바일 고지, 고지서 재발급, 자동이체, 납부기한 연장, 환급금 조회/신청, 심사청구</td></tr>\n<tr><td>제증명 발급</td><td>납부확인서, 완납증명서, 수납확인서, 진위확인</td></tr>\n</tbody>\n</table>\n<p>사업장은 공동인증서로 로그인하는 게 좋아요. 아이디·비밀번호로 로그인하면 일부 서비스만 쓸 수 있어요. 자격 취득·상실이나 보험료 부과처럼 징수 말고 다른 업무는 각 담당 공단에서 처리해요.</p>\n\n<h2>보험료 납부 방법 4가지</h2>\n<table>\n<thead><tr><th>방법</th><th>이용 시간</th><th>알아 둘 점</th></tr></thead>\n<tbody>\n<tr><td>은행 즉시이체</td><td>07:30~23:30</td><td>기업은행·신한은행 원계좌만, 실시간 반영</td></tr>\n<tr><td>신용카드</td><td>04:00~23:30</td><td>수수료 0.8%(체크카드 0.5%) 납부자 부담</td></tr>\n<tr><td>가상계좌</td><td>04:30~23:30</td><td>발급 당일에만 입금 가능</td></tr>\n<tr><td>인터넷지로</td><td>23:30까지</td><td>금융기관마다 시간이 다름</td></tr>\n</tbody>\n</table>\n<p>카드 수수료는 생각보다 커요. 보험료 300,000원을 신용카드로 내면 수수료가 2,400원, 체크카드면 1,500원이에요. 이 수수료는 나중에 정산으로 환급이 생겨도 돌려받지 못해요. 직불카드·해외 발급 카드·기프트카드·명의인이 없는 체크카드로는 낼 수 없어요. 전화번호로 만든 평생계좌는 즉시이체에 쓸 수 없고, 일부만 내고 싶으면 보험별 조회 화면에서 골라야 해요.</p>\n\n<h2>늦게 내면 붙는 연체금 계산</h2>\n<p>건강보험료는 납부기한이 지나면 하루마다 체납액의 1,500분의 1이 연체금으로 붙고, 처음 30일 동안은 체납액의 1,000분의 20까지만 붙어요. 그 뒤에도 안 내면 하루마다 6,000분의 1이 더해져 체납액의 1,000분의 50까지 늘어나요.</p>\n<ul>\n<li>건강보험료 150,000원을 10일 늦게 내면: 150,000 ÷ 1,500 × 10 = 1,000원</li>\n<li>30일 늦게 내면: 처음 30일 한도인 3,000원</li>\n</ul>\n<p>고지서가 늦게 왔다면 신청해서 납부기한을 1개월 범위에서 늘릴 수 있어요. 천재지변 같은 부득이한 사유가 있으면 연체금을 걷지 않을 수도 있어요.</p>\n\n<h2>자동이체·전자고지 신청하면 좋은 점</h2>\n<ul>\n<li>출금일은 매월 10일과 말일 중에 고를 수 있어요. 말일로 골랐는데 잔액이 모자라 못 나가면 정기 출금일인 10일에 다시 출금해요.</li>\n<li>신청은 평일 06:00~22:00에 할 수 있어요 (주말·공휴일 제외).</li>\n<li>고용·산재보험료는 자동이체로 완납하면 각 250원이 줄어요. 고지 금액이 250원 이하면 감액되지 않아요.</li>\n<li>건강보험료는 자동이체로 완납하면 다음 달 보험료에서 200원(보수 외 소득월액 보험료·임의계속가입자는 해당 없음), 연금보험료는 그달 보험료에서 230원이 줄어요.</li>\n<li>국민연금 고지서를 이메일로 받으면 200원이 감액돼요. 이메일 고지와 모바일 고지는 같이 신청할 수 없어요.</li>\n</ul>\n<p>모바일 고지는 카카오톡 알림톡으로 오고, 카카오톡이 없으면 문자(LMS)로 와요. 종이 고지서를 다시 받고 싶으면 매월 5일 이전에 재발급을 신청해야 해요.</p>\n\n<h2>납부확인서·완납증명서 발급</h2>\n<p>제증명 발급 메뉴에서 건강보험·국민연금·고용산재보험·합산보험·4대보험 중 하나를 고르고, 증명서 종류와 발급 용도를 선택하면 돼요. 개인은 건강보험·연금보험료 납부확인서를, 사업장은 고용·산재보험료와 합산 보험료 납부확인서까지 받을 수 있어요. 개인은 출력이나 팩스 전송이 되고, 사업장은 출력만 돼요.</p>\n<p>인터넷으로 받은 증명서는 공단 지사에서 받은 것과 효력이 같고, 발급일로부터 90일 동안 발급 사실(진위)을 확인을 할 수 있어요. 다만 납부한 내역이 반영되는 데 영업일 기준 최대 3일이 걸려서, 막 낸 보험료는 그 사이 미납으로 보일 수 있어요. 대출·입찰 서류처럼 급하면 이 기간을 감안해서 미리 내 두세요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>보험료를 두 번 냈으면 어떻게 돌려받나요?</h3>\n<p>신청서비스의 보험료 환급금 조회/신청에서 확인하고 신청해요. 낼 보험료가 남아 있으면 그쪽에 먼저 충당될 수 있어서 안내 금액보다 적을 수 있어요. 고용·산재보험료 반환금은 근로복지공단 토탈서비스에서 신청해요.</p>\n<h3>다른 사업장 보험료를 대신 낼 수 있나요?</h3>\n<p>보험료 대납 메뉴로 낼 수 있어요. 사업장 보험료만 되고, 그 사업장의 통합납부자번호 11자리가 필요해요.</p>\n<h3>전화 문의는 어디로 하나요?</h3>\n<p>국민건강보험공단 고객센터 1577-1000(유료)이고, 상담은 평일 오전 9시부터 오후 6시까지예요.</p>",
+ "tags": [
+  "사대보험징수포털",
+  "4대보험 납부",
+  "납부확인서"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm home office desk by a window with a laptop closed, a cup of coffee and a small potted plant in soft morning light",
+   "alt": "아침 햇살이 드는 창가 책상 위 노트북과 커피"
+  }
+ ],
+ "keyword": "사대보험징수포털",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "제목: 사대보험 징수포털 보험료는 다음 달 10일 납부 (국민건강보험법 제78조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법",
+    "https://www.law.go.kr/법령/국민연금법",
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 보험료 다음 달 10일까지 (국민연금법 제89조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용·산재 월별보험료 다음 달 10일까지 (고용보험및산업재해보상보험의보험료징수등에관한법률 제16조의7)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제목·요약: 신용카드 수수료 0.8%(체크카드 0.5%) 납부자 부담",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do",
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "정식 이름 사회보험 통합징수 포털(si4n.nhis.or.kr)",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민건강보험공단이 2011년부터 건강보험·국민연금·고용보험·산재보험 징수를 한곳에서 처리",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4대 보험료 조회·납부, 자동이체 신청, 납부확인서·완납증명서 발급",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보험료 납부 메뉴: 보험료 조회/납부, 보험료 대납, 납부결과 확인",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do",
+    "https://si4n.nhis.or.kr/jpca/JpCab00103.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고지내역 조회 메뉴: 고지/납부 현황, 산출내역 조회, 징수포털 고지내역",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do",
+    "https://si4n.nhis.or.kr/jpca/JpCab00103.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신청서비스: 이메일·모바일 고지, 고지서 재발급, 자동이체, 납부기한 연장, 환급금 조회/신청, 심사청구",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do",
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제증명 발급: 납부확인서, 완납증명서, 수납확인서, 진위확인",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do",
+    "https://si4n.nhis.or.kr/jpca/JpCab00105.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "징수 외 자격·부과 업무는 각 담당 공단",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "은행 즉시이체 07:30~23:30, 기업은행·신한은행 원계좌만, 실시간 반영",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신용카드 04:00~23:30",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "가상계좌 04:30~23:30, 발급 당일에만 입금",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "인터넷지로 23:30까지, 금융기관마다 시간이 다름",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보험료 300,000원 신용카드 수수료 2,400원, 체크카드 1,500원",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "카드 수수료는 정산 환급이 생겨도 돌려받지 못함",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "직불카드·해외 발급 카드·기프트카드·명의인이 없는 체크카드로는 납부 불가",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "전화번호로 만든 평생계좌는 즉시이체 불가",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "일부만 내려면 보험별 조회 화면에서 선택",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00103.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "건강보험료 연체금 하루 1,500분의 1, 처음 30일은 1,000분의 20까지 (국민건강보험법 제80조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "30일 뒤 하루 6,000분의 1 더해져 1,000분의 50까지 (국민건강보험법 제80조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "150,000원을 10일 늦게 내면 1,000원 (국민건강보험법 제80조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "30일 늦게 내면 한도인 3,000원 (국민건강보험법 제80조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고지서 송달 지연 등은 신청해 납부기한 1개월 범위 연장 (국민건강보험법 제78조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법",
+    "https://www.law.go.kr/법령/국민연금법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "출금일 10일·말일 선택, 말일을 골랐는데 잔액이 모자라면 정기 출금일 10일에 다시 출금",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do",
+    "https://www.nhis.or.kr/nhis/minwon/minwonServiceBoard.do?mode=view&articleNo=10945553"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "자동이체 신청 평일 06:00~22:00 (주말·공휴일 제외)",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do",
+    "https://www.nhis.or.kr/nhis/minwon/minwonServiceBoard.do?mode=view&articleNo=10945553"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "요약: 고용·산재보험료 자동이체 완납 시 각 250원 감액",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "고지 금액 250원 이하면 감액 안 됨",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "국민연금 고지서 이메일 수신 시 200원 감액",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "이메일 고지와 모바일 고지 중복 신청 불가",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "모바일 고지는 카카오톡 알림톡, 미설치 시 문자(LMS)",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "종이 고지서 재발급은 매월 5일 이전 신청",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "제증명: 건강보험·국민연금·고용산재보험·합산보험·4대보험 탭 선택 후 종류·발급 용도 선택",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00105.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "개인은 건강·연금 납부확인서, 사업장은 고용·산재·합산 보험료 납부확인서까지",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050356"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "개인은 출력·팩스, 사업장은 출력만",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050356"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "인터넷 발급 증명서는 공단 지사 발급과 효력 같음",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050356"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "발급일로부터 90일 동안 진위 확인",
+   "urls": [
+    "http://www.nhis.or.kr/nhis/minwon/jpAeb00101.do",
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050356",
+    "https://si4n.nhis.or.kr/jpca/JpCab00105.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "납부 반영에 영업일 기준 최대 3일, 그 사이 미납으로 보일 수 있음",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00105.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "이중 납부 환급은 보험료 환급금 조회/신청",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "환급금은 낼 보험료에 먼저 충당되어 안내 금액보다 적을 수 있음",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "고용·산재보험료 반환금은 근로복지공단 토탈서비스에서 신청",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "보험료 대납은 사업장 보험료만, 통합납부자번호 11자리 필요",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00103.do",
+    "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "rechecked": true
+  },
+  {
+   "claim": "고객센터 1577-1000(유료), 평일 오전 9시~오후 6시",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00101.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험료 자동이체 완납 시 다음 달 200원 감액(보수 외 소득월액 보험료·임의계속가입자 해당 없음), 연금보험료 그달 230원 감액",
+   "urls": [
+    "https://www.nhis.or.kr/nhis/minwon/minwonServiceBoard.do?mode=view&articleNo=10945553"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "사업장은 공동인증서 로그인 권장, 아이디·비밀번호 로그인은 일부 서비스만",
+   "urls": [
+    "https://si4n.nhis.or.kr/jpca/JpCab00102.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "지역가입자 건강보험료·보수 외 소득월액보험료는 분기별 납부 가능 (국민건강보험법 제78조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "농어업인은 신청하면 연금보험료 분기별 납부 (국민연금법 제89조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "천재지변 등 부득이한 사유면 연체금을 징수하지 않을 수 있음 (국민건강보험법 제80조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "신용카드로 낸 보험료는 납부 취소 불가",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "삭제"
+  }
+ ],
+ "sources": [
+  {
+   "name": "사회보험통합징수포털 납부방법 안내",
+   "url": "https://si4n.nhis.or.kr/jpca/JpCac00101.do"
+  },
+  {
+   "name": "사회보험통합징수포털 신청서비스 이용안내",
+   "url": "https://si4n.nhis.or.kr/jpca/JpCab00104.do"
+  },
+  {
+   "name": "정부24 4대 사회보험료 납부확인서",
+   "url": "https://www.gov.kr/portal/service/serviceInfo/PTR000050356"
+  }
+ ]
+}
