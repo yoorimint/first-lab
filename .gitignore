@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# 하위 에이전트 작업 폴더 (커밋하지 않음)
+.claude/worktrees/
