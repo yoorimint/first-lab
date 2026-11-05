@@ -1311,6 +1311,33 @@ class GoldFirstTest(unittest.TestCase):
             schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
         self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "85")  # 황금 점수 높은 글 먼저, 시즌 지난 글은 점수가 높아도 뒤
 
+    def test_refresh_queue_orders_waiting_drafts(self):
+        """대기 중인 글도 키워드를 다시 조회해 줄 세움: 창고에 없는 키워드는 검색량을 채우고 '쓴 키워드'로 표시."""
+        import datetime as dt
+        import sqlite3
+        from types import SimpleNamespace as NS
+        from bot import keyword_db, naver_hub as h
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.executescript(keyword_db.SCHEMA)
+        keyword_db._migrate(conn)
+        conn.execute("INSERT INTO keywords(keyword, norm, total, status, first_seen, last_checked) VALUES ('퇴직금계산기','퇴직금계산기',9000,'used','2026-11-01','2026-11-01')")
+
+        class Ads:
+            def keyword_stats(self, hints):
+                return [NS(keyword="에너지바우처신청", total=4000, ad_competition="", ad_clicks=0.0),
+                        NS(keyword="에너지바우처", total=90000, ad_competition="", ad_clicks=0.0)]  # 연관어는 넣지 않음
+        series = {f"{y}-{m:02d}": (90.0 if m in (11, 12) else 10.0) for y in (2025, 2026) for m in range(1, 13)}
+        with mock.patch.object(h, "blog_totals", side_effect=lambda w, k, t, save=None: {"퇴직금계산기": 400000, "에너지바우처신청": 800}), \
+                mock.patch.object(h, "monthly_trend", return_value={"에너지바우처신청": series}):
+            msg = h.refresh_queue(conn, dt.date(2026, 11, 5), keys=("i", "k"), drafts={80: "퇴직금계산기", 85: "에너지바우처신청"}, ads=Ads())
+        row = conn.execute("SELECT status, total FROM keywords WHERE norm='에너지바우처신청'").fetchone()
+        self.assertEqual((row["status"], row["total"]), ("used", 4000))      # 새 글 후보로 다시 안 뜸
+        self.assertIsNone(conn.execute("SELECT 1 FROM keywords WHERE norm='에너지바우처'").fetchone())
+        self.assertIn("공개 순서 상위: 에너지바우처신청", msg)               # 황금(0.2)·성수기(11월) → 먼저
+        prio = h.publish_priority({80: "퇴직금계산기", 85: "에너지바우처신청"}, 11, conn=conn)
+        self.assertGreater(prio[85], prio[80])
+
     def test_candidates_gold_group_first(self):
         import sqlite3
         from bot import keyword_db, naver_hub, select_keyword

@@ -218,17 +218,22 @@ def is_gold(sig: dict | None, total: int, keyword: str = "") -> bool:
     return gold_label(sig, total) in ("황금", "좋음") and not is_navigational(keyword)
 
 
-def publish_priority(keywords: dict[int, str], month: int) -> dict[int, float]:
+def publish_priority(keywords: dict[int, str], month: int, conn=None) -> dict[int, float]:
     """초안 번호 → 공개 우선 점수 (황금 점수×2 + 성수기). 키워드 창고·신호가 없으면 빈 값 (공개 순서는 예전대로)."""
     from .keyword_db import DB_PATH, connect
-    if not keywords or not DB_PATH.exists():
+    if not keywords or (conn is None and not DB_PATH.exists()):
         return {}
+
+    def read(c) -> tuple[dict, dict]:
+        return load(c), {r["norm"]: r["total"] for r in c.execute(
+            f"SELECT norm, total FROM keywords WHERE norm IN ({','.join('?' * len(keywords))})",
+            [norm(k) for k in keywords.values()])}
     try:
-        with connect() as conn:
-            sigs = load(conn)
-            totals = {r["norm"]: r["total"] for r in conn.execute(
-                f"SELECT norm, total FROM keywords WHERE norm IN ({','.join('?' * len(keywords))})",
-                [norm(k) for k in keywords.values()])}
+        if conn is not None:
+            sigs, totals = read(conn)
+        else:
+            with connect() as c:
+                sigs, totals = read(c)
     except Exception:  # noqa: BLE001 — 순서 정하기용이라 실패해도 공개는 계속
         return {}
     return {pid: signal_score(sigs.get(norm(k)), totals.get(norm(k), 0), month, k) for pid, k in keywords.items()}
@@ -240,6 +245,7 @@ def load(conn) -> dict[str, dict]:
 
 
 def _save_docs(conn, docs: dict[str, int | None], today: dt.date) -> int:
+    conn.execute(SCHEMA)  # 표가 아직 없을 수 있음 (새 창고·대기 글만 먼저 조회하는 경우)
     rows = [(norm(w), n, f"{today:%Y-%m-%d}") for w, n in docs.items() if n is not None]
     conn.executemany("INSERT INTO naver_signals(norm, docs, docs_checked) VALUES (?,?,?) "
                      "ON CONFLICT(norm) DO UPDATE SET docs=excluded.docs, docs_checked=excluded.docs_checked", rows)
@@ -330,6 +336,57 @@ def refresh_signals(conn, candidates: list[dict], today: dt.date | None = None, 
     return f"네이버 성수기: 후보·대표 주제 {len(need_trend)}개 갱신"
 
 
+def refresh_queue(conn, today: dt.date | None = None, keys=None, drafts=None, ads=None) -> str:
+    """공개 대기 글 키워드의 문서 수·성수기를 다시 받아 공개 순서(publish_priority)에 쓰게 한다 (운영자 지시 11/5).
+    검색량이 창고에 없는 키워드는 검색광고 API 로 채우고 '쓴 키워드'로 표시 (새 글 후보로 다시 뜨지 않게).
+    drafts: {초안 번호: 키워드} (없으면 서버 대기열에서 읽음)."""
+    from .keyword_db import set_status, upsert
+    today = today or dt.date.today()
+    keys = keys if keys is not None else _keys()
+    if not keys:
+        return "대기 글 키워드: 키 없음 → 건너뜀"
+    if drafts is None:
+        from . import schedule
+        ids = schedule.ready_drafts()
+        drafts = {i: t.split(" ")[0] for i, t in schedule._draft_texts(ids).items() if t.strip()}
+    words = list(dict.fromkeys(k for k in drafts.values() if k))
+    if not words:
+        return "대기 글 키워드: 없음"
+    missing = [w for w in words if conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(w),)).fetchone() is None]
+    filled = 0
+    if missing:
+        try:
+            if ads is None:
+                from .naver_ads import ads_client
+                ads = ads_client()
+            want = {norm(w) for w in missing}
+            for i in range(0, len(missing), 5):
+                upsert(conn, [st for st in ads.keyword_stats(missing[i:i + 5]) if norm(st.keyword) in want])
+            for w in missing:
+                row = conn.execute("SELECT keyword FROM keywords WHERE norm=?", (norm(w),)).fetchone()
+                if row:
+                    set_status(conn, row["keyword"], "used", "공개 대기 글")
+                    filled += 1
+            conn.commit()
+        except Exception:  # noqa: BLE001 — 검색량을 못 채워도 문서 수·성수기는 받음
+            pass
+    try:
+        _save_docs(conn, blog_totals(words, keys, today), today)
+        trends = monthly_trend(words, keys, today)
+    except (LimitReached, OSError, ValueError, KeyError) as e:
+        return f"대기 글 키워드: 실패 ({type(e).__name__}: {str(e)[:80]})"
+    for w in words:
+        peak, low = season(trends.get(w, {}))
+        conn.execute("INSERT INTO naver_signals(norm, peak, low, trend_checked) VALUES (?,?,?,?) "
+                     "ON CONFLICT(norm) DO UPDATE SET peak=excluded.peak, low=excluded.low, trend_checked=excluded.trend_checked",
+                     (norm(w), ",".join(map(str, peak)), ",".join(map(str, low)), f"{today:%Y-%m-%d}"))
+    conn.commit()
+    prio = publish_priority(drafts, today.month, conn=conn)
+    top = sorted(prio.items(), key=lambda x: -x[1])[:5]
+    return (f"대기 글 키워드 {len(words)}개 다시 조회(검색량 채움 {filled}) — 공개 순서 상위: "
+            + ", ".join(f"{drafts[i]} {p:.1f}" for i, p in top))
+
+
 def run_daily(log: bool = False) -> str:
     """황금 키워드 찾기 → 성수기 (키워드 수집 끝, 또는 배포 때 한 번). log=True 면 봇 기록에도 남김."""
     from .keyword_db import connect
@@ -337,8 +394,9 @@ def run_daily(log: bool = False) -> str:
     from .settings import load_settings
     settings = load_settings()
     with connect() as conn:
+        queue = refresh_queue(conn)  # 공개 대기 글 먼저 (적은 호출로 오늘 공개 순서에 바로 반영)
         gold = scan_golden(conn, settings)
-        msg = gold + " / " + refresh_signals(conn, ranked_candidates(conn, settings, limit=CHECK_TOP))
+        msg = queue + " / " + gold + " / " + refresh_signals(conn, ranked_candidates(conn, settings, limit=CHECK_TOP))
     if log:
         from .state import add_log, load_state, save_state
         state = load_state()
@@ -348,6 +406,16 @@ def run_daily(log: bool = False) -> str:
 
 
 def main(argv: list[str]) -> int:
+    if argv[1:] == ["--queue"]:  # 공개 대기 글만 (배포 때 한 번)
+        from .keyword_db import connect
+        with connect() as conn:
+            msg = refresh_queue(conn)
+        from .state import add_log, load_state, save_state
+        state = load_state()
+        add_log(state, True, msg)
+        save_state(state)
+        print(msg, flush=True)
+        return 0
     if argv[1:] == ["--daily"]:
         print(run_daily(log=True), flush=True)
         return 0

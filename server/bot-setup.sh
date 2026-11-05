@@ -111,6 +111,13 @@ copy_secret_option() {  # 비밀값 이름, 옵션 이름, 설명
 copy_secret_option LAW_OPEN_API_OC firstlab_law_oc "법령 API 신청값"
 copy_secret_option DATA_GO_KR_KEY firstlab_data_key "공공데이터 인증키"
 
+# 공개 대기 글 키워드 다시 조회 → 황금 점수·성수기로 공개 순서 (11/5 운영자 지시, 한 번 — 다음부터 매일 키워드 수집 끝에 자동)
+QGOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-queue-gold.done
+if [ ! -f "$QGOLD_MARK" ] && grep -q '^NAVER_HUB_ID=' "$SECRETS"; then
+  log "공개 대기 글 키워드 다시 조회"
+  (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.naver_hub --queue) && touch "$QGOLD_MARK" || echo "대기 글 키워드 조회 실패 (다음 배포 때 다시)"
+fi
+
 # 황금 키워드 첫 조회 (11/5 운영자 지시: 무료인 동안 하루 한도까지 키워드 창고 전체를 훑음 — 다음부터는 매일 키워드 수집 끝에 자동).
 # 2만 회라 10분 넘게 걸려서 배포를 막지 않게 따로 돌린다 (결과는 봇 기록·/var/lib/first-lab/bot/golden-first.log)
 GOLD_MARK=/var/lib/first-lab/bot/once-2026-11-05-golden2.done
