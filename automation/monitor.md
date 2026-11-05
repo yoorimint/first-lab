@@ -22,7 +22,7 @@
    - **고친 것마다 오류 유형(`"type"`)을 붙인다** — `automation/error_types.json` 에 있는 유형. 맞는 유형이 없으면 새 유형과 **막는 방법(코드·테스트, 안 되면 검수로만 잡는 이유)을 먼저 등록**해야 테스트가 통과한다 (11/5 운영자: 고친 모든 것에 재발 방지).
    - 패치를 쓴 뒤 `python3 automation/common_errors.py` 로 '자주 틀린 유형' 확인표를 다시 만든다 (글쓰기 독립 검수자가 읽음, 테스트가 최신인지 확인).
    - **반영은 `python3 automation/apply_review.py <글번호> "<제목>" [패치목록.json]` 로만** — 검사(유형·찾을 문구 1번·고친 문구에 안 남음) 통과해야 저장하고, 저장한 뒤에만 검수 완료 기록 (11/5 #542 순서 실수).
-   - 고치기: `wordpress/patches.json` (post, why, find, replace_paragraph, tag p/li/tr). find 문구는 고친 뒤에 남으면 안 됨 (테스트가 막음).
+   - 고치기: `wordpress/patches.json` (post, why, find, replace_paragraph, tag p/li/tr). find 문구는 고친 뒤에 남으면 안 됨 (테스트가 막음). 패치마다 `prevention` 필수 (check:<검사> 또는 review_only:<이유>, apply_review 가 막음) — review_only 가 automation/review-only-log.md 에 같은 꼴로 2번 쌓이면 검사로 옮긴다.
    - 같은 종류 오류가 2편 이상이면 → 글쓰기 단계(검수 관문 `bot/review_gate.py`, 지시서 `automation/daily-writer.md`)를 **코드로** 보강.
    - **계산기 따로 확인**: `unreviewed.py` 끝의 '계산기 검수 필요' 목록도 전부 검수 (글이 먼저 검수된 뒤 계산기만 추가되는 경우가 있음, 11/5 공인중개사 점수 계산기). 검수·수정 뒤 `calc:<이름>` 줄을 reviewed.txt 에 추가.
    - 검수한 **글 번호**를 `automation/reviewed.txt` 에 추가해 커밋 (`번호 제목`). 수정 패치를 실제로 써넣은 **다음에만** 추가한다 (패치 검사에 걸려 수정이 저장 안 됐는데 검수 완료로 기록된 적 있음, 11/5 #416).

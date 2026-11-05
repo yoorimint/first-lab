@@ -4,7 +4,10 @@
 앞 단계 실패에도 다음 단계가 돌았음). 한 도구가 순서대로 하고, 하나라도 틀리면 아무것도 바꾸지 않는다.
 
 사용: python3 automation/apply_review.py <글번호> "<제목>" [패치목록.json]
-  패치목록.json: [{"type", "why", "find", "replace_paragraph" | "remove_element", "tag"} 또는 {"type", "why", "set_title" | "set_excerpt"}]
+  패치목록.json: [{"type", "why", "find", "replace_paragraph" | "remove_element", "tag", "prevention"} 또는 {"type", "why", "set_title" | "set_excerpt", "prevention"}]
+  prevention (필수, 11/5 운영자 '하나라도 수정했으면 다음부터 그런 오류가 안 생기게 해야지'): 재발 방지 없이는 고치지 않는다.
+    "check:<함수·테스트 이름>"  이 오류를 다음부터 막는 코드 검사 (저장소에 있어야 함 — condition_gate 의 검사는 고치기 전 글에 실제로 걸려야 통과)
+    "review_only:<이유>"        코드로 못 막는 사실 오류(공식 값과 다름 등) — 이유를 남기고 automation/review-only-log.md 에 쌓임 (같은 꼴이 쌓이면 검사로 옮김)
   패치가 없으면(오류 0) 파일 없이 실행 → 검수 완료만 기록.
   본문은 /tmp/firstlab-review/post-<글번호>.json (automation/unreviewed.py 가 받아 둔 것) 과 대조한다.
 """
@@ -44,6 +47,30 @@ def verified_numbers(post: dict) -> list[str]:
     return sorted({n for item in found for n in item.get("numbers", [])})
 
 
+PREVENTION_LOG = ROOT / "automation" / "review-only-log.md"
+
+
+def _prevention_problem(post: dict, p: dict) -> str | None:
+    """재발 방지 표시가 없거나 거짓이면 이유."""
+    prev = str(p.get("prevention", "")).strip()
+    if prev.startswith("review_only:"):
+        if not TYPES.get(p.get("type"), {}).get("review_only"):
+            return f"'{p.get('type')}' 유형은 코드 검사가 있는 유형 — review_only 대신 check:<검사 이름> (검사가 못 잡았으면 검사를 고치고 테스트에 이 글 사례 추가)"
+        return None if len(prev) >= len("review_only:") + 10 else "review_only 이유가 너무 짧음 (왜 코드로 못 막는지)"
+    if prev.startswith("check:"):
+        name = prev[len("check:"):].strip()
+        code = "".join(f.read_text(encoding="utf-8") for f in list((ROOT / "bot").glob("*.py")) + list((ROOT / "tests").glob("*.py")))
+        if not re.fullmatch(r"\w+", name) or not re.search(rf"\b(def|class) {name}\b", code):
+            return f"check:{name} 를 저장소 코드·테스트에서 못 찾음 — 검사를 먼저 만들기"
+        from bot import condition_gate
+        fn = {"headline_scope": lambda: condition_gate.headline_scope(post["title"], post["excerpt"], post["content_html"]),
+              "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"])}.get(name)
+        if fn and not fn():
+            return f"check:{name} 가 고치기 전 글에 안 걸림 — 이 오류를 실제로 잡는 검사가 아님"
+        return None
+    return "prevention 없음 — 'check:<검사 이름>' 또는 'review_only:<이유>' (재발 방지 없이 고치지 않는다, 11/5 운영자)"
+
+
 def check(post: dict, items: list[dict]) -> list[str]:
     """저장 전 검사: 유형 등록, 찾을 문구가 지금 본문에 딱 한 번, 고친 문구에 찾을 문구가 남지 않음."""
     errors = []
@@ -53,6 +80,9 @@ def check(post: dict, items: list[dict]) -> list[str]:
             errors.append(f"{i}번: 오류 유형 '{p.get('type')}' 이 automation/error_types.json 에 없음")
         if not p.get("why"):
             errors.append(f"{i}번: why 없음")
+        bad = _prevention_problem(post, p)
+        if bad:
+            errors.append(f"{i}번: {bad}")
         if "set_title" in p or "set_excerpt" in p:
             continue
         find = p.get("find", "")
@@ -101,6 +131,11 @@ def main(argv: list[str]) -> int:
         data += [{"post": post_id, **with_title_fields(post, dict(p))} for p in items]
         PATCHES.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         rebuild_common_errors()
+        only = [p for p in items if str(p.get("prevention", "")).startswith("review_only:")]
+        if only:  # 코드로 못 막은 것은 쌓아 두고, 같은 꼴이 모이면 검사로 옮긴다
+            with PREVENTION_LOG.open("a", encoding="utf-8") as f:
+                for p in only:
+                    f.write(f"- #{post_id} [{p.get('type')}] {p['prevention'][len('review_only:'):].strip()} — {str(p.get('why', ''))[:80]}\n")
     with REVIEWED.open("a", encoding="utf-8") as f:  # 패치를 저장한 뒤에만
         f.write(f"{post_id} {title}\n")
     print(f"글 {post_id}: 패치 {len(items)}개 저장, 검수 완료 기록")

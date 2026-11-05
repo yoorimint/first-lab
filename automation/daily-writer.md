@@ -38,10 +38,11 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
   1. `python3 automation/unreviewed.py <post_id>` 로 본문 받기 (`/tmp/firstlab-review/post-<id>.json`)
   2. `automation/review-prompt.md` 의 `---` 아래 지시문에 그 파일 경로와 오늘 날짜를 넣어 하위 에이전트 1개에게 검수 (모델 지정 안 함)
   3. 검수자가 '틀림'이라 한 곳은 근거 원문을 **내가 직접 열어** 확인한 뒤에만 고친다. 못 열면 '○○에서 확인하세요'로 완화. 공식 페이지에서 확인된 숫자는 지우지 않는다 (도구가 막음)
-  4. 패치 목록 JSON: `[{"type": <automation/error_types.json 의 유형 하나>, "why": "근거 한 줄", "find": "본문에 딱 한 번 있는 문구", "replace_paragraph": "그 문단(p·li·tr) 안쪽 전체", "tag": "p|li|tr"}]` (제목은 `{"type", "why", "set_title"}`)
+  4. 패치 목록 JSON: `[{"type": <automation/error_types.json 의 유형 하나>, "why": "근거 한 줄", "find": "본문에 딱 한 번 있는 문구", "replace_paragraph": "그 문단(p·li·tr) 안쪽 전체", "tag": "p|li|tr", "prevention": "check:<검사 이름> 또는 review_only:<코드로 못 막는 이유>"}]` (제목은 `{"type", "why", "set_title", "prevention"}`)
+     - prevention 필수 (재발 방지 없이 고치지 않는다): 이 오류를 다음부터 잡는 검사 이름(`bot/condition_gate.py`·`review_gate.py` 의 함수) — 기존 검사가 못 잡았으면 검사를 고치고 이 글을 테스트 사례로 넣은 뒤 그 이름. 사실 자체가 틀린 것(wrong_fact·outdated·missing_condition)만 review_only 가능 — apply_review 가 검사함
   5. `python3 automation/apply_review.py <post_id> "<제목>" <패치.json>` (고칠 곳이 없으면 패치 파일 없이) — 오류가 나오면 그 문구대로 패치를 고쳐 다시
   6. `wordpress/queue/reviewdone-<post_id>-<날짜시각>.json` = `{"type": "review_done", "post_id": <id>, "title": "<제목>", "patches": <고친 곳 수>}`
-  7. 커밋에 `wordpress/queue wordpress/patches.json automation/reviewed.txt automation/common-errors.md` 를 **모두** 넣는다 (빠지면 같은 글을 매번 다시 검수함)
+  7. 커밋에 `wordpress/queue wordpress/patches.json automation/reviewed.txt automation/common-errors.md automation/review-only-log.md` (검사를 고쳤으면 `bot/ tests/` 도) 를 **모두** 넣는다 (빠지면 같은 글을 매번 다시 검수함)
 - `candidates` 는 점수순 후보다. 위에서부터 보고 아래에 해당하면 건너뛴다:
   - 날마다 값이 바뀌는 시세·가격(예: 오늘의 금 시세, 농산물 가격) — 글이 금방 틀린 정보가 됨
   - 특정 회사·브랜드 상품 비교, 추천·순위·이벤트, 의료·건강 진단, 정치·종교

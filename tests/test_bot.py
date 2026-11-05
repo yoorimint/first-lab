@@ -1198,7 +1198,8 @@ class ApplyReviewTest(unittest.TestCase):
         self.assertTrue(any("그대로 있음" in e for e in apply_review.check(post, bad)))
         unknown = [{"type": "없는유형", "why": "x", "find": "1점이에요", "replace_paragraph": "1점", "tag": "p"}]
         self.assertTrue(any("유형" in e for e in apply_review.check(post, unknown)))
-        good = [{"type": "outdated", "why": "x", "find": "1점이에요", "replace_paragraph": "1점이고 바뀌어요", "tag": "p"}]
+        good = [{"type": "outdated", "why": "x", "find": "1점이에요", "replace_paragraph": "1점이고 바뀌어요", "tag": "p",
+                 "prevention": "review_only:개정 시행일은 근거 페이지마다 달라 코드로 판단 불가"}]
         self.assertEqual(apply_review.check(post, good), [])
 
     def test_softening_keeps_verified_numbers(self):
@@ -1207,12 +1208,47 @@ class ApplyReviewTest(unittest.TestCase):
         import apply_review
         post = {"title": "t", "excerpt": "e", "content_html": "<ul><li>건강보험 200원, 연금 230원이 줄어요.</li></ul>",
                 "source_check": {"found": [{"claim": "200원·230원 감액", "numbers": ["200", "230"], "urls": ["https://x.or.kr"]}]}}
-        soft = [{"type": "unverified", "why": "x", "find": "연금 230원이 줄어요.", "replace_paragraph": "가입자마다 달라요. 공단에 확인하세요.", "tag": "li"}]
+        soft = [{"type": "unverified", "why": "x", "find": "연금 230원이 줄어요.", "replace_paragraph": "가입자마다 달라요. 공단에 확인하세요.", "tag": "li",
+                 "prevention": "check:numbers_match"}]
         self.assertTrue(any("200, 230" in e for e in apply_review.check(post, soft)))
         keep = [dict(soft[0], replace_paragraph="건강보험 200원, 연금 230원이 줄어요(지역가입자 기준). 사업장은 공단에 확인하세요.")]
         self.assertEqual(apply_review.check(post, keep), [])
-        fix = [dict(soft[0], type="wrong_fact", replace_paragraph="건강보험 300원이 줄어요.")]   # 숫자가 틀렸다고 고치는 유형은 허용
+        fix = [dict(soft[0], type="wrong_fact", replace_paragraph="건강보험 300원이 줄어요.", prevention="review_only:공식 금액이 무엇인지는 코드가 판단 불가")]   # 숫자가 틀렸다고 고치는 유형은 허용
         self.assertEqual(apply_review.check(post, fix), [])
+
+
+class PreventionRequiredTest(unittest.TestCase):
+    """고칠 때마다 재발 방지를 같이 (11/5 운영자 '하나라도 수정했으면 다음부터 그런 오류가 안 생기게 해야지')."""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        self.ar = apply_review
+        self.post = {"title": "백일해 예방접종", "excerpt": "e",   # #748 사례
+                     "content_html": "<p>반대로 성인이 맞는 Tdap은 국가 지원 대상이 아니라 병원마다 금액이 달라요.</p>"
+                                     "<h2>지원</h2><p>만 13세 이상은 백일해가 유행할 때 임시예방접종 대상이면 국가 지원을 받을 수 있어요.</p>"}
+        self.base = {"type": "missing_condition", "why": "x", "find": "국가 지원 대상이 아니라", "tag": "p",
+                     "replace_paragraph": "성인 Tdap은 유행 때 임시예방접종 대상인 경우가 아니면 국가 지원이 없어요."}
+
+    def errs(self, **kw):
+        return self.ar.check(self.post, [dict(self.base, **kw)])
+
+    def test_missing_prevention_blocked(self):
+        self.assertTrue(any("prevention 없음" in e for e in self.errs()))
+
+    def test_unknown_check_blocked(self):
+        self.assertTrue(any("못 찾음" in e for e in self.errs(prevention="check:없는검사")))
+        self.assertTrue(any("못 찾음" in e for e in self.errs(prevention="check:a")))   # 아무 글자나 이름으로 못 씀
+
+    def test_named_gate_must_fire_on_original(self):
+        self.assertEqual(self.errs(prevention="check:lead_vs_body"), [])
+        self.post["content_html"] = "<p>반대로 성인이 맞는 Tdap은 국가 지원 대상이 아니라 병원마다 금액이 달라요.</p>"
+        self.assertTrue(any("안 걸림" in e for e in self.errs(prevention="check:lead_vs_body")))
+
+    def test_review_only_only_for_uncodeable_types(self):
+        self.assertEqual(self.errs(prevention="review_only:어떤 예외가 빠졌는지는 법령 전체를 읽어야 앎"), [])
+        self.assertTrue(any("너무 짧음" in e for e in self.errs(prevention="review_only:몰라")))
+        self.assertTrue(any("코드 검사가 있는 유형" in e for e in self.errs(type="headline", prevention="review_only:제목이 본문과 다름을 고침")))
 
 
 class IndexNowTest(unittest.TestCase):
