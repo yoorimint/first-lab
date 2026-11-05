@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import re
+import urllib.parse
 
 from .sources import is_official
 
@@ -24,6 +25,7 @@ MIN_CLAIMS = 5  # 이보다 적으면 검수를 제대로 안 한 것으로 본�
 # 11/4 외부 검수: 글쓰기 검수는 글 1편에 주장 11~26개만 확인, 외부 검수는 같은 글에서 40~60개 → 틀린 곳은 모두 확인 안 한 문장에서 나옴.
 CHARS_PER_CLAIM = 70
 _NUM = re.compile(r"\d[\d,.]*")
+_LAW_ARTICLE = re.compile(r"제\d+조")
 # 광역 시·도 누리집 주소 → 제목·요약에 밝혀야 할 지역 이름 (하위 주소 포함, 예: news.seoul.go.kr)
 REGION_HOSTS = {
     "seoul.go.kr": ("서울",), "busan.go.kr": ("부산",), "daegu.go.kr": ("대구",), "incheon.go.kr": ("인천",),
@@ -102,6 +104,10 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
         verdict = str(item.get("verdict", "")).strip()
         if not _ok(item):
             out.append(f"'{claim}' 판정 {verdict or '없음'}인데 {item.get('action')}")
+        elif any("law.go.kr" in str(u) for u in item.get("urls", [])) and not _LAW_ARTICLE.search(
+                str(item.get("claim", "")) + " " + " ".join(urllib.parse.unquote(str(u)) for u in item.get("urls", []))):
+            # 법령 근거는 조문 번호가 있어야 그 조문의 예외·단서·개정을 코드가 찾아 보여 줄 수 있다 (11/5 예외 누락 재발 방지)
+            out.append(f"'{claim}' 법령 근거인데 조문 번호 없음 (주장에 '법령명 제N조' 적기)")
         elif str(item.get("action", "")).strip() == "수정" and item.get("rechecked") is not True:
             # 고친 문장은 독립 검수자가 다시 확인한 뒤에만 맞음 (11/5 재확인 결과가 오기 전에 올려 지적이 안 고쳐진 일)
             out.append(f"'{claim}' 고친 주장인데 검수자 재확인 기록(rechecked: true) 없음")

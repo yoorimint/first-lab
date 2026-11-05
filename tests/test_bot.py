@@ -353,6 +353,10 @@ class ReviewGateTest(unittest.TestCase):
         self.assertEqual(problems(fixed), [])  # 틀려서 공식 출처(정부24)대로 고치고 검수자가 다시 확인한 것은 통과
         unchecked = ok5 + [{"claim": "고친 주장", "urls": ["https://www.gov.kr/x"], "verdict": "틀림", "action": "수정"}]
         self.assertTrue(any("재확인" in p for p in problems(unchecked)))  # 11/5 재확인 결과 전에 올린 일
+        law_no_article = ok5 + [{"claim": "금액은 60%", "urls": ["https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=1"], "verdict": "맞음", "action": "유지"}]
+        self.assertTrue(any("조문 번호" in p for p in problems(law_no_article)))  # 조문을 알아야 예외를 찾아 줌
+        law_with_article = ok5 + [{"claim": "금액은 60% (고용보험법 제46조)", "urls": ["https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=1"], "verdict": "맞음", "action": "유지"}]
+        self.assertEqual(problems(law_with_article), [])
         self.assertEqual(problems(ok5, "검사 비용 23,000원", "수수료 23,000원이에요"), [])
         self.assertTrue(any("25000" in p for p in problems(ok5, "검사 비용 25,000원")))  # 제목 숫자가 검수 안 됨
         self.assertTrue(any("최소" in p for p in problems(ok)))  # 주장 2개뿐
@@ -874,6 +878,28 @@ class SourceCheckTest(unittest.TestCase):
         review = [{"claim": "납부지연가산세 13만 2,000원", "urls": ["https://www.law.go.kr/법령/국세기본법/제47조의4"], "verdict": "맞음", "action": "유지"}]
         got = sc.amended(review, fetcher=lambda u: law, today=today)
         self.assertEqual((got[0]["article"], got[0]["dates"][-1]), ("제47조의4", "2026.07.01"))
+
+    def test_law_exceptions_and_absolute_sentences(self):
+        """11/5 #535: 법 제46조②(하한)·제48조②(4년 상한)를 빼고 원칙만 씀 → 근거 조문의 예외 문장을 글쓴이에게 보여 준다."""
+        from bot import source_check as sc
+        law = ("제46조(구직급여일액) ①구직급여일액은 기초일액에 100분의 60을 곱한 금액으로 한다. "
+               "②제1항제1호에 따라 산정된 구직급여일액이 최저구직급여일액보다 낮은 경우에는 최저구직급여일액을 그 수급자격자의 구직급여일액으로 한다. "
+               "제47조(실업인정대상기간 중의 취업 등의 신고) ①수급자격자는 신고하여야 한다.")
+        review = [{"claim": "금액은 평균임금의 60%", "urls": ["https://www.law.go.kr/법령/고용보험법/제46조"], "verdict": "맞음", "action": "유지"}]
+        got = sc.law_exceptions(review, fetcher=lambda u: law)
+        self.assertEqual(got[0]["article"], "제46조")
+        self.assertTrue(any("최저구직급여일액보다 낮은 경우" in x for x in got[0]["exceptions"]))
+        self.assertEqual(sc.absolute_sentences("<p>제출 서류는 보험증명서 하나예요. 기한은 3개월이에요.</p>"), ["제출 서류는 보험증명서 하나예요."])
+
+    def test_article_from_claim_with_full_law_url(self):
+        """법령 전체 주소(lsInfoR)여도 주장의 '법령명 제N조'로 그 조문의 예외를 찾는다."""
+        from bot import source_check as sc
+        law = "제48조(수급기간) ①12개월 내에 지급한다. ②신고한 경우에는 그 기간을 가산한 기간(4년을 넘을 때에는 4년)에 지급한다. 제49조(대기기간) ①7일."
+        review = [{"claim": "수급기간 연장, 최대 4년 (고용보험법 제48조)", "urls": ["https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918"],
+                   "verdict": "맞음", "action": "유지"}]
+        got = sc.law_exceptions(review, fetcher=lambda u: law)
+        self.assertEqual(got[0]["article"], "제48조")
+        self.assertIn("4년을 넘을 때에는", got[0]["exceptions"][0])
 
     def test_law_notation(self):
         from bot import source_check as sc

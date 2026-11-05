@@ -169,6 +169,66 @@ def article_of(url: str) -> str | None:
     return m.group(1) if "law.go.kr" in url and m else None
 
 
+EXCEPTION_MARKS = ("다만", "제외한다", "제외하고", "그러하지 아니하다", "넘을 때에는", "한정한다", "에도 불구하고", "보다 낮은 경우", "초과하는 경우")
+ABSOLUTE = re.compile(r"(하나뿐|하나예요|하나인데|하나만|만 (?:돼요|가능|할 수)|에서만|모두|누구나|항상|반드시|없어요|불가|안 돼요|할 수 없어요)")
+
+
+def article_text(text: str, article: str) -> str:
+    """법령 본문에서 한 조문만 (다음 조문 제목 전까지)."""
+    start = text.find(article + "(")
+    if start < 0:
+        return ""
+    nxt = re.search(r"제\d+조(?:의\d+)?\(", text[start + len(article) + 1:])
+    return text[start: start + len(article) + 1 + (nxt.start() if nxt else 3000)]
+
+
+def exceptions_in(article_body: str, limit: int = 4) -> list[str]:
+    """조문 안의 예외·단서 문장 (글이 원칙만 쓰고 이걸 빠뜨리는 일이 많음 — 11/5 #491·#512·#535)."""
+    parts = re.split(r"(?<=다\.)\s+|(?=\s[②-⑳]\s?)", re.sub(r"<[^>]*>", "", article_body))
+    return [x.strip()[:200] for x in parts if any(m in x for m in EXCEPTION_MARKS)][:limit]
+
+
+def claim_article(item: dict, url: str) -> str | None:
+    """조문 번호: 주소('/법령/이름/제N조')에 없으면 주장 문장('고용보험법 제46조')에서."""
+    if "law.go.kr" not in url:
+        return None
+    m = re.search(r"제\d+조(?:의\d+)?", str(item.get("claim", "")))
+    return article_of(url) or (m.group(0) if m else None)
+
+
+def law_page(url: str) -> str:
+    """조문을 찾을 법령 본문 주소 ('/법령/이름/제N조' → '/법령/이름', lsInfoR 주소는 그대로)."""
+    return re.sub(r"(/법령/[^/?#]+)/.*$", r"\1", urllib.parse.unquote(url))
+
+
+def law_exceptions(review: list[dict] | None, fetcher=fetch) -> list[dict]:
+    """글이 근거로 단 법령 조문마다 예외·단서 문장. 글쓴이가 그 예외를 글에 넣었는지 확인하게 한다."""
+    out, cache, done = [], {}, set()
+    for item in review or []:
+        if not _ok(item):
+            continue
+        for url in item.get("urls", []):
+            art = claim_article(item, str(url))
+            base = law_page(str(url))
+            if not art or (base, art) in done:
+                continue
+            done.add((base, art))
+            if base not in cache:
+                cache[base] = fetcher(base)
+            found = exceptions_in(article_text(cache[base] or "", art))
+            if found:
+                name = base.rsplit("/", 1)[-1] if "/법령/" in base else str(item.get("claim", ""))[:20]
+                out.append({"law": name, "article": art, "exceptions": found})
+    return out
+
+
+def absolute_sentences(content_html: str, limit: int = 15) -> list[str]:
+    """본문에서 단정하는 문장 ('하나·만·모두·없어요·불가' …) — 예외를 원문에서 확인했는지 볼 목록."""
+    text = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", content_html or "")))
+    sents = re.split(r"(?<=요\.)\s+|(?<=다\.)\s+", text)
+    return [x.strip()[:160] for x in sents if ABSOLUTE.search(x)][:limit]
+
+
 def recent_changes(text: str, article: str, today: dt.date | None = None) -> list[str]:
     """조문 본문의 '<개정 …>'·'<신설 …>' 날짜와 부칙 '○○의 개정규정은 YYYY년 M월 D일부터 시행' 중 최근 1년·앞으로 시행되는 것."""
     today = today or dt.date.today()
@@ -190,10 +250,10 @@ def amended(review: list[dict] | None, fetcher=fetch, today: dt.date | None = No
         if not _ok(item):
             continue
         for url in item.get("urls", []):
-            art = article_of(str(url))
+            art = claim_article(item, str(url))
             if not art:
                 continue
-            base = re.sub(r"(/법령/[^/?#]+)/.*$", r"\1", urllib.parse.unquote(str(url)))
+            base = law_page(str(url))
             if base not in cache:
                 cache[base] = fetcher(base)
             found = recent_changes(cache[base] or "", art, today)
@@ -228,6 +288,13 @@ def main(argv: list[str]) -> None:
     print(summary(result))
     for c in result["claims"]:
         print(f"- [{c['status']}] {c['claim']}" + (f" (없는 숫자: {', '.join(c['missing'])})" if c["missing"] else ""))
+    for law in law_exceptions(review):
+        print(f"- [예외 확인: {law['law']} {law['article']}] 이 조문의 단서·예외가 글에 필요한지 확인:")
+        for x in law["exceptions"]:
+            print(f"    · {x}")
+    data = json.loads(open(argv[1], encoding="utf-8").read())
+    for x in absolute_sentences(data.get("content_html", "")):
+        print(f"- [단정 문장] {x} → 예외(제외 대상·조건·상한·하한)를 원문에서 확인")
     for a in amended(review):
         print(f"- [최근 개정 조문 {a['article']} {', '.join(a['dates'])}] {a['claim']} → 안내 페이지·기사 값이 아니라 현행 조문·부칙으로 다시 확인")
 
