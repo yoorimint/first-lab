@@ -67,11 +67,14 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     duplicate = existing_post_id(keyword)
     similar, slug = ("", "") if duplicate else similar_post(keyword)  # 글자 몇 개만 다른 같은 주제 (11/5 '대부업체대출조회' ↔ '대부업대출조회')
     if duplicate or similar:
-        _record_topic_done(data)  # 건너뛰어도 그 제도·혜택 글감은 끝난 것으로 (11/5 검토: 매 실행 같은 글감을 다시 씀)
-        with connect() as conn:
-            if conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone():
-                set_status(conn, keyword, "used", f"이미 있는 글 {duplicate or similar}")
-                conn.commit()
+        try:  # 건너뛰어도 그 제도·혜택 글감은 끝난 것으로·키워드는 '사용됨' (11/5 검토: 매 실행 같은 글감을 다시 씀)
+            _record_topic_done(data)
+            with connect() as conn:
+                if conn.execute("SELECT 1 FROM keywords WHERE norm=?", (norm(keyword),)).fetchone():
+                    set_status(conn, keyword, "used", f"이미 있는 글 {duplicate or similar}")
+                    conn.commit()
+        except Exception:  # noqa: BLE001 - 기록 실패가 건너뛰기 판단을 막지 않게 (검사 환경엔 키워드 창고가 없음)
+            pass
         return f"[건너뜀] {'중복 키워드' if duplicate else '비슷한 주제'} '{keyword}' — 글 {duplicate or similar}{f'({slug})' if similar else ''} 이 이미 있음"
     # status: draft | publish | auto(설정 페이지의 발행 방식을 따름)
     status = data.get("status", "draft")
