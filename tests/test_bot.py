@@ -2197,6 +2197,16 @@ class ReviewQueueTest(unittest.TestCase):
         self.assertIsNone(rq.pick(ready[:-1], set()))                       # 대기 글이 적으면 새 글 쓰기
         self.assertIsNone(rq.pick(ready, {r["post_id"] for r in ready}))     # 다 검수했으면 새 글 쓰기
 
+    def test_monitor_reviews_until_dec5(self):
+        """11/5 운영자: 12/5 까지 작성자는 새 글만, 대기 글 검수는 감시 세션 — 감시가 멈춰 쌓이면 작성자가 다시, 12/5 뒤엔 원래대로."""
+        from bot import review_queue as rq
+        ready = [{"post_id": i, "title": f"t{i}"} for i in range(100, 140)]
+        few = set(range(100, 135))                                         # 검수 안 된 것 5편
+        self.assertIsNone(rq.pick(ready, few, "2026-11-06"))
+        self.assertIsNotNone(rq.pick(ready, set(range(100, 115)), "2026-11-06"))   # 25편 밀림 → 작성자가 맡음
+        self.assertEqual(rq.pick(ready, few, "2026-12-05")["post_id"], 135)        # 12/5 부터 원래대로
+        self.assertEqual(rq.pick(ready, few)["post_id"], 135)                      # 날짜 없이 부르면 예전 그대로
+
     def test_any_run_end_counts_as_done(self):
         """보류 수정·계산기만 한 실행도 끝남으로 (11/5 22:13 실행 74번이 보류 수정만 하고 47분 멈춤)."""
         import tempfile

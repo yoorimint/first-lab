@@ -57,3 +57,8 @@
 - WP 첨부는 상태가 `inherit`, 첨부 이름은 올릴 때 준 한국어 제목 → 사진은 파일 경로(`_wp_attached_file`)로 찾는다 (`bot/images.attachment_id`).
 - GitHub 오류로 push 배포가 시작 안 된 적 있음 → 15분 따라잡기로 해결. 배포를 직접 실행할 권한은 없음(403).
 - Cloudflare 무료 한도 소진 응답: HTTP 429 + "daily free allocation" → `images.QuotaExceeded`.
+
+## 12/5 까지 (운영자 11/5): 작성자는 새 글만, 대기 글 외부 검수는 감시 세션
+- 글쓰기 작업은 대기 글 검수를 하지 않는다 (bot/review_queue.MONITOR_REVIEWS_UNTIL). 감시 세션이 `python3 automation/unreviewed.py` 의 '검수 필요' 글을 **전부** 외부 검수(review-prompt.md, model opus, 동시에 3~4편)하고 apply_review 로 반영 (재발 방지 필수).
+- 검수 안 된 대기 글이 10편 넘게 쌓이면 서버가 글쓰기 작업에게 다시 맡긴다 (감시 세션이 멈춰도 안 쌓이게). 12/5 가 지나면 자동으로 원래대로.
+- 공개 편수는 운영자가 정한다 (바꾸지 않음).
