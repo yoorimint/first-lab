@@ -158,6 +158,16 @@ def is_navigational(keyword: str) -> bool:
     return any(w in k for w in NAVIGATIONAL)
 
 
+def is_info(keyword: str) -> bool:
+    """정보를 찾는 검색만 황금 대상: 수식어(방법·신청·조건·계산·기간 …)가 붙었거나 돈·계산기 주제.
+    11/5 첫 조회에서 '스케쳐스윈터부츠·카시오F91W' 같은 상품명이 황금으로 올라옴 — 사려고 검색해서 블로그 글이 적을 뿐,
+    정보 글로는 들어올 사람이 없다."""
+    from .keyword_filter import MODIFIERS
+    from .select_keyword import topic_weight
+    k = norm(keyword)
+    return not is_navigational(k) and (topic_weight(k) > 0 or any(m in k for m in MODIFIERS))
+
+
 def per_search(sig: dict | None, total: int) -> float | None:
     """검색 1회당 블로그 글 수 (낮을수록 황금)."""
     if not sig or sig.get("docs") is None or total <= 0:
@@ -184,10 +194,10 @@ def gold_label(sig: dict | None, total: int) -> str:
 
 
 def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") -> float:
-    """글감 점수 조정 (select_keyword): 황금 점수 × GOLD_WEIGHT + 성수기. 사이트를 찾아가는 검색은 황금 가점 없음."""
+    """글감 점수 조정 (select_keyword): 황금 점수 × GOLD_WEIGHT + 성수기. 정보 검색(is_info)이 아니면 황금 가점 없음."""
     if not sig:
         return 0.0
-    s = 0.0 if is_navigational(keyword) else GOLD_WEIGHT * gold_score(sig, total)
+    s = GOLD_WEIGHT * gold_score(sig, total) if (not keyword or is_info(keyword)) else 0.0
     peak = [int(x) for x in (sig.get("peak") or "").split(",") if x]
     low = [int(x) for x in (sig.get("low") or "").split(",") if x]
     if month in peak or (month % 12 + 1) in peak:  # 이번 달 또는 다음 달이 성수기 → 지금 써야 시즌에 상위 노출
@@ -215,7 +225,7 @@ def describe(sig: dict | None, total: int) -> str:
 
 def is_gold(sig: dict | None, total: int, keyword: str = "") -> bool:
     """황금·좋음 (검색 1회당 글 1개 미만, 글 10개 이상, 사이트 찾아가는 검색 아님) — 글쓰기·공개를 먼저 할 키워드."""
-    return gold_label(sig, total) in ("황금", "좋음") and not is_navigational(keyword)
+    return gold_label(sig, total) in ("황금", "좋음") and is_info(keyword)
 
 
 def publish_priority(keywords: dict[int, str], month: int, conn=None) -> dict[int, float]:
@@ -255,7 +265,7 @@ def _save_docs(conn, docs: dict[str, int | None], today: dt.date) -> int:
 
 def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
     """키워드 창고에서 아직(또는 30일 넘게) 안 본 키워드를 돈·계산기 주제·검색량 순으로 GOLD_SCAN 개 문서 수 조회.
-    사이트를 찾아가는 검색(로그인·고객센터 등)은 조회하지 않는다."""
+    정보 검색(is_info)만 조회 — 상품명·사이트 찾아가는 검색은 한도를 쓰지 않는다."""
     from .keyword_filter import is_allowed
     from .select_keyword import topic_weight
 
@@ -271,8 +281,7 @@ def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
     def stale(n: str) -> bool:
         return ((known.get(n) or {}).get("docs_checked") or "") < cutoff
 
-    fresh = [r for r in rows if stale(r["norm"]) and is_allowed(r["keyword"], settings.blocked_words)
-             and not is_navigational(r["keyword"])]
+    fresh = [r for r in rows if stale(r["norm"]) and is_allowed(r["keyword"], settings.blocked_words) and is_info(r["keyword"])]
     fresh.sort(key=lambda r: (topic_weight(r["norm"]), r["total"]), reverse=True)
     batch = [r["keyword"] for r in fresh[:GOLD_SCAN]]
     saved = 0
@@ -296,7 +305,7 @@ def golden_report(conn, rows=None, top_n: int = 5) -> str:
     scored = []
     for r in rows:
         sig = sigs.get(r["norm"])
-        if sig and sig.get("docs") is not None and not is_navigational(r["keyword"]):
+        if sig and sig.get("docs") is not None and is_info(r["keyword"]):
             scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], sig["docs"]))
     scored.sort(reverse=True)
     gold = [x for x in scored if x[1] == "황금"]

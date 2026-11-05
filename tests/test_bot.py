@@ -1610,6 +1610,11 @@ class NaverHubTest(unittest.TestCase):
         self.assertEqual(h.gold_label({"docs": 300}, 1000), "좋음")                  # 0.3 은 황금 아님
         self.assertEqual(h.gold_label({"docs": 5}, 1000), "확인 필요(글 거의 없음)")  # 어색한 조합일 수도
         self.assertEqual(h.gold_label({"docs": 30001}, 1000), "포화")
+        for product in ("스케쳐스윈터부츠", "아크테릭스세륨후디", "카시오F91W", "캐나다구스롯지"):  # 11/5 첫 조회에서 황금으로 올라온 상품명
+            self.assertFalse(h.is_info(product), product)
+        for info in ("연차개수계산기", "육아휴직급여신청", "실업급여조건", "근로장려금"):
+            self.assertTrue(h.is_info(info), info)
+        self.assertEqual(h.signal_score({"docs": 10}, 9000, 7, "카시오F91W"), 0.0)   # 상품명은 황금 가점 없음
         self.assertTrue(h.is_navigational("홈택스 로그인"))
         self.assertTrue(h.is_navigational("국민연금공단고객센터전화번호"))
         self.assertFalse(h.is_navigational("연말정산 계산기"))

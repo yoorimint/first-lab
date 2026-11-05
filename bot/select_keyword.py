@@ -35,7 +35,7 @@ SIMILAR_USED = 0.85  # 표기를 맞춘 뒤 이만큼 비슷하면 이미 쓴 �
 TOPIC_BONUS = (
     (("계산기", "계산"), 2.0),
     (("세금", "소득세", "양도세", "증여세", "상속세", "부가세", "종부세", "취득세", "연말정산", "환급", "공제",
-      "보험", "대출", "이자", "연금", "급여", "수당", "지원금", "바우처", "퇴직금", "신용"), 1.0),
+      "보험", "대출", "이자", "연금", "급여", "수당", "지원금", "바우처", "퇴직금", "신용", "장려금", "보조금", "혜택"), 1.0),
 )
 TOPIC_PENALTY = ((("준비물", "리스트", "정리방법", "청소", "인테리어", "여행"), -1.0),)
 
@@ -109,6 +109,8 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     for r in rows:
         if not is_allowed(r["keyword"], settings.blocked_words) or overlaps_used(r["norm"]):
             continue
+        if r["last_checked"] != latest and not naver_hub.is_info(r["keyword"]):
+            continue  # 황금으로 들어온 옛 키워드는 정보 검색만 (상품명 제외)
         head = find_head(r["norm"], r["total"], volumes)
         sc = score(r["keyword"], r["norm"], r["total"], r["ad_comp"], r["ad_clicks"], r["prev_total"], head)
         sc += topic_weight(r["norm"])
