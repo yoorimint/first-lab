@@ -1761,6 +1761,31 @@ class BokApiTest(unittest.TestCase):
             self.assertIsNone(bok_api.base_rate(dt.date(2026, 11, 5)))   # 키 없으면 영향 없음
 
 
+class RatesTest(unittest.TestCase):
+    """한국은행 금리: 매일 저장, 기준금리가 바뀌면 '기준금리'가 든 공개 글만 재검증 표시."""
+
+    def test_base_rate_change_marks_published_posts(self):
+        import datetime as dt
+        from bot import bok_api, law_watch, wpbulk
+        rates = {"base": {"date": "20261127", "value": 2.75}, "mortgage": {"month": "202610", "value": 4.1, "name": "주택담보대출"}}
+        state = {"rates": {"base": {"date": "20261103", "value": 3.0}}, "log": []}
+        bulk = {"10": {"status": "publish", "content": "기준금리 3.0% 기준 예시"}, "11": {"status": "draft", "content": "기준금리"},
+                "12": {"status": "publish", "content": "전세 대출 이자"}}
+        calls = []
+        with mock.patch.object(bok_api, "_key", return_value="k"), mock.patch.object(bok_api, "latest_rates", return_value=rates), \
+                mock.patch("bot.state.load_state", return_value=state), mock.patch("bot.state.save_state") as save, \
+                mock.patch.object(wpbulk, "posts", return_value=bulk), \
+                mock.patch("bot.settings.wp_cli", side_effect=lambda *a: calls.append(a) or ""):
+            msg = bok_api.run(dt.date(2026, 11, 28))
+        self.assertEqual([c[3] for c in calls], ["10"])                     # 공개 글 중 '기준금리'가 든 글만
+        self.assertEqual(calls[0][4], law_watch.LAW_META)
+        self.assertIn("3.0%→2.75%", calls[0][5])
+        self.assertIn("재검증 표시 1편", msg)
+        self.assertEqual(save.call_args.args[0]["rates"]["base"]["value"], 2.75)
+        with mock.patch.object(bok_api, "_key", return_value=""):
+            self.assertIn("키 없음", bok_api.run(dt.date(2026, 11, 28)))
+
+
 class BenefitApiTest(unittest.TestCase):
     """혜택 정보 API: 키는 서버에만, 인코딩된 키·원래 키 모두 처리, 통로는 허용한 경로·변수만."""
 

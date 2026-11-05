@@ -184,6 +184,11 @@ def main() -> None:
         print(watch_laws(), flush=True)
     except Exception as e:  # noqa: BLE001
         print(f"법령 감시 실패: {e}", flush=True)
+    try:  # 최신 금리 (bot/bok_api.py) — 실패해도 수집·갱신은 계속
+        from .bok_api import run as update_rates
+        print(update_rates(), flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"금리 갱신 실패: {e}", flush=True)
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
     # 발행된 글 갱신 (서치콘솔 반영 직후, 주당 한도 안에서 하루 최대 1개)

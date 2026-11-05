@@ -36,8 +36,6 @@ else:
         print(f"네이버 API HUB: 실패 ({type(e).__name__}: {str(e)[:120]})")
 PY
 (cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api 2>&1 | tail -1) >> "$API_OUT" || true
-# 은행 대출금리 통계(신규취급액 기준) 항목 코드 확인용 — 주택담보·전세·신용 항목만 (연결 뒤 지움)
-(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api items 121Y006 2>&1 | grep -E "주택담보|전세|신용|가계대출" | head -12) >> "$API_OUT" || true
 cat "$API_OUT"
 # 감시 세션이 GitHub 배포 기록을 뒤지지 않고 /maintenance 로 보게 봇 기록에도 남김 (키 값은 없음)
 (cd "$REPO_DIR" && API_OUT="$API_OUT" /opt/first-lab-venv/bin/python - <<'PY') || true
