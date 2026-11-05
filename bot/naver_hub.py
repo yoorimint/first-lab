@@ -175,14 +175,20 @@ def is_navigational(keyword: str) -> bool:
     return any(w in k for w in NAVIGATIONAL)
 
 
+# 정보를 찾는 검색의 수식어 (절차·자격·기한·돈 규칙). 키워드 수집용 MODIFIERS 중 쇼핑·사전 성격('가격·시세·할인·견적·평균·뜻·
+# 비교·종류·장단점')과 상품명에 끼는 말('나이'→나이키)은 뺌 — 11/5 집계 상위가 '아로나민골드가격·나이키v2k런·치폴레뜻'이었음.
+INFO_MODIFIERS = ("방법", "하는법", "절차", "신청", "접수", "발급", "재발급", "등록", "변경", "해지", "취소", "조회", "갱신",
+                  "연장", "조건", "자격", "대상", "기준", "요금", "금액", "수수료", "지원금", "지원", "환급", "계산", "기간",
+                  "기한", "마감", "과태료", "벌금", "불이익", "서류", "세금", "차이", "해결방법")
+
+
 def is_info(keyword: str) -> bool:
     """정보를 찾는 검색만 황금 대상: 수식어(방법·신청·조건·계산·기간 …)가 붙었거나 돈·계산기 주제.
     11/5 첫 조회에서 '스케쳐스윈터부츠·카시오F91W' 같은 상품명이 황금으로 올라옴 — 사려고 검색해서 블로그 글이 적을 뿐,
     정보 글로는 들어올 사람이 없다."""
-    from .keyword_filter import MODIFIERS
     from .select_keyword import topic_weight
     k = norm(keyword)
-    return not is_navigational(k) and (topic_weight(k) > 0 or any(m in k for m in MODIFIERS))
+    return not is_navigational(k) and (topic_weight(k) > 0 or any(m in k for m in INFO_MODIFIERS))
 
 
 def per_search(sig: dict | None, total: int) -> float | None:

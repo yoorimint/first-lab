@@ -1620,6 +1620,8 @@ class NaverHubTest(unittest.TestCase):
         for info in ("연차개수계산기", "육아휴직급여신청", "실업급여조건", "근로장려금"):
             self.assertTrue(h.is_info(info), info)
         self.assertEqual(h.signal_score({"docs": 100, "hits": 0}, 9000, 7, "카시오F91W"), 0.0)   # 상품명은 황금 가점 없음
+        for shop in ("아로나민골드가격", "비맥스제트가격", "나이키v2k런", "치폴레뜻", "제네시스견적내기"):  # 11/5 두 번째 집계 상위 — 쇼핑·사전
+            self.assertFalse(h.is_info(shop), shop)
         for widget in ("환율계산기", "택배조회", "금1돈시세", "연금복권", "날짜계산기"):  # 11/5 첫 집계 상위 — 네이버가 바로 답함
             self.assertFalse(h.is_info(widget), widget)
         self.assertTrue(h.is_navigational("홈택스 로그인"))
