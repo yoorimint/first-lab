@@ -139,3 +139,4 @@ calc:lunar-calendar
 775 혼례비 대출: 연 1.5% 최대 1,250만 원, 혼인신고 3년 이내
 calc:school-grade
 784 내신 등급 계산기: 5등급제 1등급 10%·9등급제 4%, 석차로 계산
+calc:graduation-year

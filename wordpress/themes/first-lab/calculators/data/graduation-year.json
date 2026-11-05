@@ -1,0 +1,13 @@
+{
+  "basis_date": "2026-11-05", "yearly": false,
+  "sources": [
+    {"name": "국가법령정보센터 초·중등교육법 (제13조 취학 의무: 6세가 된 날이 속하는 해의 다음 해 3월 1일, 제24조 학년도 3월 1일~다음 해 2월 말일, 제39·42·46조 수업연한 6·3·3년)", "url": "https://www.law.go.kr/법령/초ㆍ중등교육법"},
+    {"name": "국가법령정보센터 초·중등교육법 연혁 (2007.8.3 법률 제8577호 이전 제13조: 만6세가 된 날의 다음날 이후 최초 학년초, 부칙: 제13조 개정규정 2008년 3월 1일 시행)", "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=79961"},
+    {"name": "국가법령정보센터 고등교육법 (제20조 학년도, 제31조 학사학위과정 4년 이상 6년 이하, 제48조 전문대학 2년 이상 3년 이하)", "url": "https://www.law.go.kr/법령/고등교육법"}
+  ],
+  "old_rule_last_year": 2002,
+  "old_rule_last_month": 2,
+  "verified_from_entry": 1998,
+  "min_birth_year": 1970,
+  "years": {"elementary": 6, "middle": 3, "high": 3}
+}
