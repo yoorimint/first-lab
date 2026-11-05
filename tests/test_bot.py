@@ -1396,5 +1396,38 @@ class LawApiTest(unittest.TestCase):
         self.assertIsNone(bad_kind)
 
 
+class BenefitApiTest(unittest.TestCase):
+    """혜택 정보 API: 키는 서버에만, 인코딩된 키·원래 키 모두 처리, 통로는 허용한 경로·변수만."""
+
+    def test_key_forms_and_proxy(self):
+        from bot import benefit_api
+        raw = benefit_api._direct_url("serviceList", "a+b/c==", {"page": 1})
+        self.assertTrue(raw.endswith("&serviceKey=a%2Bb%2Fc%3D%3D"))
+        self.assertTrue(benefit_api._direct_url("serviceList", "a%2Bb", {}).endswith("&serviceKey=a%2Bb"))  # 이미 인코딩된 키는 그대로
+        with mock.patch.object(benefit_api, "_server_key", return_value=""), \
+                mock.patch.dict("os.environ", {"FIRSTLAB_API_TOKEN": "t"}), \
+                mock.patch.object(benefit_api, "_get", return_value=json.dumps({"status": 200, "body": '{"data": [1]}'})):
+            self.assertEqual(benefit_api.fetch("serviceList", perPage=1), {"data": [1]})
+        with mock.patch.object(benefit_api, "_server_key", return_value=""), mock.patch.dict("os.environ", {}, clear=True):
+            self.assertIsNone(benefit_api.fetch("serviceList"))
+
+    def test_site_route_whitelist(self):
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("define('ABSPATH',1); function add_action(){} require '" + str(ROOT / "wordpress/mu-plugins/first-lab-api.php") + "';"
+                "echo json_encode([firstlab_benefit_url(['path'=>'serviceDetail','cond'=>['서비스ID::EQ'=>'X1'],'perPage'=>'5','evil'=>'1'],'k+1'),"
+                "firstlab_benefit_url(['path'=>'../x'],'k'), firstlab_benefit_url(['path'=>'serviceList'],'k%2B1')]);")
+        ok, bad, enc = json.loads(subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout)
+        self.assertTrue(ok.startswith("https://api.odcloud.kr/api/gov24/v3/serviceDetail?returnType=JSON"))
+        self.assertIn("perPage=5", ok)
+        self.assertIn(urllib.parse.quote("cond[서비스ID::EQ]", safe="") + "=X1", ok)
+        self.assertNotIn("evil", ok)
+        self.assertTrue(ok.endswith("&serviceKey=k%2B1"))
+        self.assertIsNone(bad)
+        self.assertTrue(enc.endswith("&serviceKey=k%2B1"))
+
+
 if __name__ == "__main__":
     unittest.main()

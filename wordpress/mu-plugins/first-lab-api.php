@@ -290,3 +290,76 @@ function firstlab_api_law( WP_REST_Request $request ) {
 	}
 	return $out;
 }
+
+/*
+ * 공공데이터포털 '대한민국 공공서비스(혜택) 정보' API 통로 (행정안전부, 정부24 혜택 목록):
+ * GET /wp-json/firstlab/v1/benefits?path=serviceList|serviceDetail|supportConditions&page=1&perPage=100&cond[서비스ID::EQ]=…
+ * 인증키(DATA_GO_KR_KEY)는 서버에만, bot-setup.sh 가 옵션으로 옮김. 지원금 글감·사실 확인·내용 바뀐 혜택 알림용 (bot/benefit_api.py).
+ */
+const FIRSTLAB_BENEFIT_PATHS = array( 'serviceList', 'serviceDetail', 'supportConditions' );
+
+add_action(
+	'rest_api_init',
+	static function () {
+		register_rest_route(
+			'firstlab/v1',
+			'/benefits',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => 'firstlab_api_allowed',
+				'callback'            => 'firstlab_api_benefits',
+			)
+		);
+	}
+);
+
+/** 혜택 API 주소 (인증키 포함, 밖으로 내보내지 않음). 허용 안 된 값이면 null. */
+function firstlab_benefit_url( array $args, string $key ): ?string {
+	$path = $args['path'] ?? 'serviceList';
+	if ( ! in_array( $path, FIRSTLAB_BENEFIT_PATHS, true ) ) {
+		return null;
+	}
+	$query = array( 'returnType' => 'JSON' );
+	foreach ( $args as $name => $value ) {
+		if ( in_array( $name, array( 'page', 'perPage' ), true ) ) {
+			$query[ $name ] = (string) (int) $value;
+		} elseif ( 'cond' === $name && is_array( $value ) ) { // cond[서비스ID::EQ]=… 같은 조건
+			foreach ( $value as $field => $v ) {
+				$query[ 'cond[' . $field . ']' ] = (string) $v;
+			}
+		}
+	}
+	// 포털이 주는 키는 '인코딩된 것'(% 포함)과 원래 것 두 가지 — 어느 쪽을 넣어도 되게
+	$encoded = false !== strpos( $key, '%' ) ? $key : rawurlencode( $key );
+	return 'https://api.odcloud.kr/api/gov24/v3/' . $path . '?' . http_build_query( $query ) . '&serviceKey=' . $encoded;
+}
+
+function firstlab_api_benefits( WP_REST_Request $request ) {
+	$key = (string) get_option( 'firstlab_data_key', '' );
+	if ( '' === $key ) {
+		return new WP_Error( 'no_key', '서버에 공공데이터 인증키(DATA_GO_KR_KEY)가 없음', array( 'status' => 503 ) );
+	}
+	$url = firstlab_benefit_url( $request->get_query_params(), $key );
+	if ( null === $url ) {
+		return new WP_Error( 'bad_args', 'path 는 ' . implode( '|', FIRSTLAB_BENEFIT_PATHS ), array( 'status' => 400 ) );
+	}
+	$cache = 'firstlab_benefit_' . md5( $url );
+	$hit   = get_transient( $cache );
+	if ( false !== $hit ) {
+		return $hit;
+	}
+	$res = wp_remote_get( $url, array( 'timeout' => 30 ) );
+	if ( is_wp_error( $res ) ) {
+		return new WP_Error( 'benefit_fetch', $res->get_error_message(), array( 'status' => 502 ) );
+	}
+	$hide = static fn( string $text ): string => str_replace( array( $key, rawurlencode( $key ), rawurldecode( $key ) ), '***', $text );
+	$out  = array(
+		'status'  => (int) wp_remote_retrieve_response_code( $res ),
+		'body'    => $hide( (string) wp_remote_retrieve_body( $res ) ),
+		'request' => $hide( $url ),
+	);
+	if ( 200 === $out['status'] ) {
+		set_transient( $cache, $out, 6 * HOUR_IN_SECONDS );
+	}
+	return $out;
+}
