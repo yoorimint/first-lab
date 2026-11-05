@@ -126,5 +126,76 @@
       "prize": 0
     },
     "expect_error": true
+  },
+  {
+    "why": "2,000,050원: 소득세 400,010, 지방소득세 40,001 → 40,000원 (10원 미만 버림)",
+    "boundary": true,
+    "input": {
+      "prize": 2000050
+    },
+    "expect": {
+      "income_tax": 400010,
+      "local_tax": 40000,
+      "total": 440010,
+      "net": 1560040
+    }
+  },
+  {
+    "why": "300,001,000원: 3억 넘는 1,000원에 30% → 소득세 60,000,300원",
+    "boundary": true,
+    "input": {
+      "prize": 300001000
+    },
+    "expect": {
+      "income_tax": 60000300,
+      "local_tax": 6000030,
+      "total": 66000330,
+      "net": 234000670
+    }
+  },
+  {
+    "why": "1,999,999,999원: 소득세 509,999,999.7 → 569,999,990원(3억까지 6천만 + 넘는 부분 30%)",
+    "boundary": true,
+    "input": {
+      "prize": 1999999999
+    },
+    "expect": {
+      "income_tax": 569999990,
+      "local_tax": 56999990,
+      "total": 626999980,
+      "net": 1373000019
+    }
+  },
+  {
+    "why": "잘못된 입력 '-1' → 안내",
+    "expect_error": true,
+    "input": {
+      "prize": "-1"
+    },
+    "expect": {}
+  },
+  {
+    "why": "잘못된 입력 '1.5' → 안내",
+    "expect_error": true,
+    "input": {
+      "prize": "1.5"
+    },
+    "expect": {}
+  },
+  {
+    "why": "잘못된 입력 '' → 안내",
+    "expect_error": true,
+    "input": {
+      "prize": ""
+    },
+    "expect": {}
+  },
+  {
+    "why": "잘못된 입력 '2000000000000' → 안내",
+    "expect_error": true,
+    "input": {
+      "prize": "2000000000000"
+    },
+    "expect": {}
   }
 ]

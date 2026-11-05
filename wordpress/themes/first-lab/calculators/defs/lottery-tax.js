@@ -16,6 +16,7 @@
       const prize = Number(v.prize);
       if (!(prize > 0)) throw new u.InputError('당첨금을 넣으면 결과가 나와요.');
       if (!Number.isInteger(prize)) throw new u.InputError('당첨금은 1원 단위 정수로 넣어 주세요.');
+      if (prize > d.max_input) throw new u.InputError('당첨금이 너무 커요. 1조 원 이하로 넣어 주세요.'); // 큰 수는 계산 정밀도가 깨짐 (11/5 검수)
       const f = FirstLabCalc.util.floor;
       const notes = [];
       let incomeTax = 0;
@@ -35,6 +36,7 @@
       const rows = [['당첨금 (세전)', u.won(prize)]];
       if (exempt) {
         rows.push(['세금', `0원 (${u.won(d.exempt_max)} 이하는 과세하지 않음)`]);
+        notes.push('나눠 받는 당첨금은 나눠 받는 금액의 합계로 200만 원 이하인지 따져요 (소득세법 제84조2호).');
       } else {
         const low = Math.min(prize, d.high_threshold);
         rows.push([`소득세 (3억 원까지 ${pct(d.rate_low)}${prize > d.high_threshold ? `, 넘는 부분 ${pct(d.rate_high)}` : ''})`, u.won(incomeTax)]);
@@ -47,6 +49,7 @@
       notes.push('세금은 10원 미만을 버렸어요.');
       notes.push('복권 당첨금은 지급할 때 세금을 떼고 끝나는 분리과세라 종합소득세 신고에 더하지 않아요.');
       notes.push('연금복권처럼 나눠 받는 당첨금은 이 계산과 달라요.');
+      notes.push('지급처가 복권 구입비(1장 값)를 필요경비로 빼고 세금을 떼면 세금이 몇백 원 적을 수 있어요. 정확한 금액은 지급처에서 확인해요.');
       return { values, rows, notes };
     },
   });

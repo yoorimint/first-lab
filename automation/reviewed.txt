@@ -103,3 +103,4 @@ calc:year-end-tax
 625 종이 세금계산서 양식: 필수 4칸·전자 의무 8천만 원 기준
 613 연장근로수당 계산: 월 250만 원·연장 10시간이면 179,425원
 calc:overtime-pay
+calc:lottery-tax

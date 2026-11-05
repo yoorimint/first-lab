@@ -1,5 +1,6 @@
 {
   "basis_date": "2026-11-05",
+  "max_input": 1000000000000,
   "won10_keys": ["income_tax", "local_tax", "total"],
   "sources": [
     {"name": "국가법령정보센터 소득세법 (제14조 분리과세, 제84조 과세최저한, 제129조 원천징수세율)", "url": "https://www.law.go.kr/법령/소득세법"},
