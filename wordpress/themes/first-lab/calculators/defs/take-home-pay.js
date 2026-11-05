@@ -73,9 +73,11 @@
         pensionBase = Math.min(Math.max(Math.floor(taxable / 1000) * 1000, d.pension_min), d.pension_max);
         pension = Math.floor((pensionBase * d.pension_rate_employee_per_10000) / 10000);
       }
-      // 건강보험: 보수월액 × 7.19% 의 절반, 장기요양: 건강보험료 × 0.9448/7.19
+      // 건강보험: 보수월액 × 7.19% 의 절반
       const health = Math.floor((taxable * d.health_rate_per_10000) / 20000);
-      const ltc = Math.floor((health * d.ltc_rate_per_1000000) / (d.health_rate_per_10000 * 100));
+      // 장기요양: 건강보험료 × (장기요양보험료율 ÷ 건강보험료율, 소수점 이하 다섯째자리에서 반올림) — 노인장기요양보험법 제9조① (2026.5.26 개정, 2026년 11월분부터)
+      const ltcRatio = Math.round((d.ltc_rate_per_1000000 * 100) / d.health_rate_per_10000); // 0.9448/7.19 = 0.131404… → 0.1314 (1만분의 1314)
+      const ltc = Math.floor((health * ltcRatio) / 10000);
       // 고용보험(실업급여): 보수 × 0.9%
       const employment = Math.floor((taxable * d.employment_rate_employee_per_1000) / 1000);
       const insurance = pension + health + ltc + employment;
@@ -95,7 +97,7 @@
         ['비과세 (빼고 계산)', u.won(nontax)],
         [v.pension === 'no' ? '국민연금 (안 냄)' : `국민연금 (${u.won(pensionBase)} × 4.75%)`, u.won(pension)],
         ['건강보험 (× 3.595%)', u.won(health)],
-        ['장기요양보험 (건강보험료 × 0.9448/7.19)', u.won(ltc)],
+        [`장기요양보험 (건강보험료 × ${(ltcRatio / 100).toFixed(2)}%)`, u.won(ltc)],
         ['고용보험 (× 0.9%)', u.won(employment)],
         [ratio === 100 ? '소득세 (간이세액표)' : `소득세 (간이세액표 × ${ratio}%)`, u.won(incomeTax)],
         ['지방소득세 (소득세 × 10%)', u.won(localTax)],
@@ -107,7 +109,8 @@
       if (v.pension !== 'no' && pensionBase !== Math.floor(taxable / 1000) * 1000) {
         notes.push(`국민연금은 기준소득월액 ${u.won(d.pension_min)}~${u.won(d.pension_max)} 범위로 계산해요.`);
       }
-      notes.push('국민연금·건강보험은 실제로는 회사가 신고한 기준 금액(보통 지난해 보수)으로 매겨져서, 이번 달 월급과 다를 수 있어요.');
+      notes.push('국민연금·건강보험은 실제로는 회사가 신고한 기준 금액으로 매겨져서, 이번 달 월급으로 계산한 값과 다를 수 있어요.');
+      notes.push('65세 이후 새로 고용된 사람은 고용보험 실업급여 보험료를 내지 않아요. 상여가 나오는 달은 계산 방식이 달라요.');
       return {
         values: { taxable, pension_base: pensionBase, pension, health, ltc, employment, table_tax: tableAmount, income_tax: incomeTax, local_tax: localTax, net },
         rows,
