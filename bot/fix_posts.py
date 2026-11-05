@@ -10,7 +10,7 @@ import subprocess
 import urllib.parse
 from pathlib import Path
 
-from .blocks import to_blocks
+from .blocks import repair_lists, to_blocks
 from .publisher import CARD_VERSION, set_featured_card, site_author_id
 from . import wpbulk
 from .settings import wp_cli
@@ -194,6 +194,11 @@ def main() -> None:
             content = content.replace('<figcaption class="wp-element-caption">AI 생성 이미지</figcaption>', "")
             wp_cli("post", "update", pid, f"--post_content={content}")
             print(f"[보정] {pid} 이미지 캡션 제거")
+        content, n = repair_lists(content)   # 11/6 이전 변환이 깨뜨린 '목록 안 목록' (#872)
+        if n:
+            wp_cli("post", "update", pid, f"--post_content={content}")
+            bulk[pid]["content"] = content
+            print(f"[보정] {pid} 깨진 목록 안 목록 {n}곳 되살림")
         if "<!-- wp:" not in content and "<h2" in content:
             wp_cli("post", "update", pid, f"--post_content={to_blocks(content)}")
             print(f"[보정] {pid} 블록 형식 변환")

@@ -490,6 +490,33 @@ class MiscTest(unittest.TestCase):
         self.assertIn('<!-- wp:shortcode -->\n[firstlab_calc id="car-inspection"]\n<!-- /wp:shortcode -->', out)
         self.assertIn("<p>문장 속 [firstlab_calc", out)
 
+    def test_nested_list_kept_whole(self):
+        """11/6 #872: 목록 안 목록을 '.*?</ul>' 로 끊어 '</li></ul>' 이 빈 문단이 되고 항목이 밖으로 빠짐."""
+        import re
+        from bot.blocks import to_blocks
+        src = "<ul>\n<li>나이</li>\n<li>위기: 다음 중\n<ul>\n<li>A</li>\n<li>B</li>\n</ul></li>\n</ul>\n<p>뒤</p>"
+        out = to_blocks(src)
+        self.assertNotRegex(out, r"<p>\s*</li>")
+        self.assertEqual(out.count("<!-- wp:list -->"), 2)                      # 바깥·안쪽 목록 블록
+        self.assertIn("<li>위기: 다음 중\n<!-- wp:list -->", out)              # 안쪽 목록이 그 항목 안에
+        strip = lambda h: re.sub(r"\s+", "", re.sub(r"<!-- /?wp:[^>]*-->|\sclass=\"[^\"]*\"", "", h))  # noqa: E731
+        self.assertEqual(strip(out), strip(src))                                # 글자·구조 그대로
+
+    def test_repair_broken_nested_list(self):
+        """이미 깨진 채 저장된 글(옛 변환 결과)은 배포 보정에서 되살림. 짝이 안 맞으면 손대지 않음."""
+        from bot.blocks import repair_lists, to_blocks
+        src = "<p>앞</p>\n<ul>\n<li>x</li>\n<li>위기\n<ul>\n<li>A</li>\n<li>B</li>\n</ul></li>\n</ul>\n<p>뒤</p>"
+        broken = ("<!-- wp:paragraph -->\n<p>앞</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:list -->\n<ul class=\"wp-block-list\">\n"
+                  "<!-- wp:list-item -->\n<li>x</li>\n<!-- /wp:list-item -->\n<!-- wp:list-item -->\n<li>위기\n<ul>\n<li>A</li>\n"
+                  "<!-- /wp:list-item -->\n<!-- wp:list-item -->\n<li>B</li>\n<!-- /wp:list-item -->\n</ul>\n<!-- /wp:list -->\n\n"
+                  "<!-- wp:paragraph -->\n<p></li>\n</ul></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>뒤</p>\n<!-- /wp:paragraph -->")
+        fixed, n = repair_lists(broken)
+        self.assertEqual(n, 1)
+        self.assertEqual(fixed.strip(), to_blocks(src).strip())
+        self.assertEqual(repair_lists(fixed), (fixed, 0))                       # 다시 돌려도 그대로
+        odd = broken.replace("<p></li>\n</ul></p>", "<p></li></p>")            # 짝이 끝내 안 맞음
+        self.assertEqual(repair_lists(odd)[1], 0)
+
     def test_patches_file_valid(self):
         for p in json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")):
             if "set_title" in p or "set_excerpt" in p:  # 제목·요약문 수정: 원래 값(from_…)이 있어야 한 번만 적용됨
