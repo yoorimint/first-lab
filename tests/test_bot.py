@@ -1426,6 +1426,9 @@ class LawApiTest(unittest.TestCase):
         with mock.patch.object(law_api, "_server_oc", return_value="oc1"), \
                 mock.patch.object(law_api, "_get", side_effect=OSError("끊김")):
             self.assertIsNone(law_api.fetch("service", "law", MST="1"))  # 실패해도 예외 대신 None
+        err = '<?xml version="1.0"?>\n<Response><result>사용자 정보 검증에 실패하였습니다.</result></Response>'
+        with mock.patch.object(law_api, "_server_oc", return_value="oc1"), mock.patch.object(law_api, "_get", return_value=err):
+            self.assertIsNone(law_api.fetch("search", "law", query="x"))  # 200 으로 온 오류 응답도 None
 
     def test_site_route_whitelist(self):
         import shutil

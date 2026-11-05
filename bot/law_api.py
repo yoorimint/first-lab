@@ -46,11 +46,17 @@ def fetch(kind: str, target: str = "law", **params) -> str | None:
         oc = _server_oc()
         if oc:
             query = urllib.parse.urlencode({"OC": oc, "target": target, "type": "XML", **params})
-            return _get(DRF.format(page=PAGES[kind]) + "?" + query) or None
+            body = _get(DRF.format(page=PAGES[kind]) + "?" + query)
+            return None if not body or is_error(body) else body
         got = via_site(kind, target, **params)
         return got.get("body") if got and got.get("status") == 200 else None
     except (OSError, ValueError):  # 연결 끊김·시간 초과·JSON 아님 → 화면 읽기로
         return None
+
+
+def is_error(body: str) -> bool:
+    """법제처는 오류도 200 으로 돌려준다: <Response><result>…실패…</result> (사용자 검증·필수 입력값)."""
+    return "<Response>" in body[:200] and "실패" in body[:400]
 
 
 def via_site(kind: str, target: str = "law", **params) -> dict | None:
