@@ -35,6 +35,10 @@ apply_settings_once 2026-11-04-keywords discover_calls=2000 max_volume=10000
 # 11/5 되돌림: 운영자 승인 없이 바뀐 글 작성 시각(07:40,13:10,19:40)을 원래 값(07:40, 직전 배포 기록)으로 — 운영자 '내가 끄고 설정 새로 해야지'
 apply_settings_once 2026-11-05-direct-times-restore direct_times=07:40
 
+# 글쓰기 결과(새 글·보류 수정·검수·갱신)를 먼저 — 뒤의 전체 글 보정이 길어져 배포 시간이 넘어도 새 글은 들어가게 (11/5 검토)
+log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
+
 log "기존 글 보정 (블록 형식, 대표 이미지)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.patch_check) || echo "패치 반영 확인 실패 (봇 동작에는 영향 없음)"
@@ -139,8 +143,6 @@ if [ ! -f "$GOLD_MARK" ] && grep -q '^NAVER_HUB_ID=' "$SECRETS" && ! pgrep -f "b
   setsid nohup bash -c "cd '$REPO_DIR' && '$VENV/bin/python' -m bot.naver_hub --daily" > /var/lib/first-lab/bot/golden-first.log 2>&1 < /dev/null &
 fi
 
-log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
-(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.pending_images) || echo "사진 없는 글 표시 실패 (봇 동작에는 영향 없음)"
 
 log "systemd 타이머 (1분마다 실행)"

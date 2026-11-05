@@ -135,6 +135,10 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
             " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm"
             " WHERE n.docs IS NOT NULL AND k.total >= n.docs * ?)",
             (cutoff, GOOD_INDEX)).rowcount
+        try:  # 지운 키워드의 네이버 신호도 지움 — 안 그러면 하루 1만9천 줄씩 끝없이 쌓여 봇이 느려짐 (11/5 검토)
+            conn.execute("DELETE FROM naver_signals WHERE norm NOT IN (SELECT norm FROM keywords)")
+        except Exception:  # noqa: BLE001 - 표가 아직 없으면 그냥 넘어감
+            pass
         conn.commit()
         info = summary(conn)
     return {**stats, **info}
