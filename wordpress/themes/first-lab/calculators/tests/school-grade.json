@@ -1,0 +1,14 @@
+[
+  {"why": "지침 예시(2022 개정) 96명, 1등 동점 19명 → 중간석차 10, 10.42% → 모두 2등급", "input": {"mode": "rank", "system": "five", "total": 96, "rank": 1, "ties": 19}, "expect": {"grade": 2, "cum1": 10, "midPct": 10.42, "usedMid": true}, "boundary": true},
+  {"why": "지침 예시(2022 개정) 120명, 2등 동점 15명 → 중간석차 9, 7.5% → 1등급", "input": {"mode": "rank", "system": "five", "total": 120, "rank": 2, "ties": 15}, "expect": {"grade": 1, "cum1": 12, "midPct": 7.5, "usedMid": true}},
+  {"why": "지침 예시(2015 개정) 96명, 1등 동점 7명 → 중간석차 4, 4.17% → 2등급", "input": {"mode": "rank", "system": "nine", "total": 96, "rank": 1, "ties": 7}, "expect": {"grade": 2, "cum1": 4, "midPct": 4.17, "usedMid": true}, "boundary": true},
+  {"why": "지침 예시(2015 개정) 130명, 2등 동점 6명 → 중간석차 4.5, 3.46% → 1등급", "input": {"mode": "rank", "system": "nine", "total": 130, "rank": 2, "ties": 6}, "expect": {"grade": 1, "cum1": 5, "midPct": 3.46, "usedMid": true}},
+  {"why": "96명 1등급 누적 인원 = 96×10%=9.6 → 반올림 10명: 10등(10.42%)은 동점 없으면 1등급 (지침 '곱한 값을 반올림')", "input": {"mode": "rank", "system": "five", "total": 96, "rank": 10, "ties": 1}, "expect": {"grade": 1, "cum1": 10, "midPct": 10.42, "usedMid": false}, "boundary": true},
+  {"why": "96명 11등 → 1등급 10명 밖 → 2등급 (2등급 누적 96×34%=32.64 → 33명)", "input": {"mode": "rank", "system": "five", "total": 96, "rank": 11, "ties": 1}, "expect": {"grade": 2, "cum1": 10, "usedMid": false}, "boundary": true},
+  {"why": "25명 × 10% = 2.5 → 반올림 3명: 3등 1등급", "input": {"mode": "rank", "system": "five", "total": 25, "rank": 3}, "expect": {"grade": 1, "cum1": 3}, "boundary": true},
+  {"why": "96명 2등 동점 3명(2~4등)은 모두 1등급 10명 안 → 경계 아님, 1등급", "input": {"mode": "rank", "system": "five", "total": 96, "rank": 2, "ties": 3}, "expect": {"grade": 1, "usedMid": false, "midPct": 3.13}},
+  {"why": "9등급제 200명 33등: 3등급 누적 200×23%=46, 2등급 22 → 3등급", "input": {"mode": "rank", "system": "nine", "total": 200, "rank": 33}, "expect": {"grade": 3, "cum1": 8, "midPct": 16.5}},
+  {"why": "학점 가중 평균: 1등급 4학점·2등급 4학점·3등급 3학점 → 21÷11 = 1.909 → 1.91 (본문 표)", "input": {"mode": "average", "system": "five", "g1": 1, "c1": 4, "g2": 2, "c2": 4, "g3": 3, "c3": 3}, "expect": {"avg": 1.91, "credits": 11, "subjects": 3}},
+  {"why": "석차+동석차가 수강자수를 넘음 → 안내", "input": {"mode": "rank", "system": "five", "total": 10, "rank": 10, "ties": 2}, "expect_error": true},
+  {"why": "5등급제에 6등급 입력 → 안내", "input": {"mode": "average", "system": "five", "g1": 6, "c1": 3}, "expect_error": true}
+]

@@ -1,0 +1,9 @@
+{
+  "basis_date": "2026-11-05", "yearly": false,
+  "sources": [
+    {"name": "경기도교육청 2026학년도 고등학교 학업성적관리 시행지침 (석차등급 비율·누적 인원 반올림·중간석차)", "url": "https://www.goe.go.kr/resource/goe/na/bbs_2675/2026/02/410e7664-15c3-434c-82a0-b6a4ee78eec1.pdf"},
+    {"name": "대한민국 정책브리핑 2028 대입제도 개편 확정 (내신 5등급, 융합 선택 9과목 석차등급 미기재)", "url": "https://m.korea.kr/news/policyNewsView.do?newsId=148924193"}
+  ],
+  "cutoffs": {"five": [10, 34, 66, 90, 100], "nine": [4, 11, 23, 40, 60, 77, 89, 96, 100]},
+  "small_class": {"five": 5, "nine": 13}
+}
