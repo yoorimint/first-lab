@@ -30,5 +30,11 @@
    "input": {"mode": "birth", "year": 2005, "month": "8", "entry_type": "0", "college": "6"},
    "expect": {"entry": 2012, "highGrad": 2024, "uniGrad": 2030}},
   {"why": "태어난 연도 빈칸 → 안내", "input": {"mode": "birth", "year": "", "month": "3"}, "expect_error": true},
-  {"why": "태어난 연도 소수 → 안내", "input": {"mode": "birth", "year": 1995.5, "month": "3"}, "expect_error": true}
+  {"why": "태어난 연도 소수 → 안내", "input": {"mode": "birth", "year": 1995.5, "month": "3"}, "expect_error": true},
+  {"why": "입학 연기 신청 절차(시행령 제15조③)는 2008.5.27 신설 — 2001년 5월생 연기(2009년 입학)는 2007년 신청이라 그 안내가 나오면 안 됨 (11/5 외부 검수)",
+   "input": {"mode": "birth", "year": 2001, "month": "5", "entry_type": "1", "college": "0", "gap": 0, "leave": 0},
+   "expect": {"entry": 2009}, "notes_exclude": ["입학 연기는"], "boundary": true},
+  {"why": "2002년 3월생 연기 → 제때 2009년, 연기 2010년 입학 — 2008년 10~12월 신청(신설 뒤)이라 안내가 나와야 함",
+   "input": {"mode": "birth", "year": 2002, "month": "3", "entry_type": "1", "college": "0", "gap": 0, "leave": 0},
+   "expect": {"entry": 2010}, "notes_include": ["입학 연기는"], "boundary": true}
 ]

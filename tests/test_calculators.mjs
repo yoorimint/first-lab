@@ -4,6 +4,7 @@
 // 기준선 사례("boundary": true)가 2개 이상 있어야 한다: 공제액·과락 점수·면세점·구간 경계·상한/하한에 딱 맞는 값과
 // 바로 아래/위 값 (11/5 새 계산기 2개 모두 기준선에서 틀림: 평균 59.996 을 60 으로 올려 합격, 공동명의 비율).
 // 잘못된 입력 사례는 "expect_error": true — compute() 가 InputError(화면 안내 문장)를 내야 통과.
+// 안내 문장은 "notes_include"/"notes_exclude": [문구] — 그 사례의 notes 에 있어야/없어야 통과.
 // 연초 값: data 에 "yearly": false 또는 "yearly_checked": <연도> 필수 (bot/calc_watch.py 가 다음 해 확인 안 된 계산기를 글쓰기 세션에 넘김).
 // 미리 넣은 다음 값("scheduled")은 키가 data 에 있어야 하고, 출처와 그 날짜 사례("today": "YYYY-MM-DD")가 있어야 한다.
 // scheduled 의 "texts": [[옛 표기, 새 표기]] — 계산기 페이지에 옛 표기가 있으면 새 표기도 있어야 함 (글은 bot/calc_watch.py 가 그날 재확인 표시).
@@ -121,6 +122,10 @@ for (const id of ids) {
       const got = out.values[key];
       if (got !== want) fail(id, `사례 ${i + 1} (${c.why}): ${key} = ${JSON.stringify(got)}, 기대값 ${JSON.stringify(want)}`);
     }
+    // 안내 문장도 사례로 확인 (11/5 졸업년도 계산기: 2001년생 입학 연기에 2008년 신설 신청 절차 안내가 나옴 — values 만 보면 못 잡음)
+    const notes = (out.notes || []).join(' ');
+    for (const want of c.notes_include || []) if (!notes.includes(want)) fail(id, `사례 ${i + 1} (${c.why}): 안내에 '${want}' 가 없음`);
+    for (const bad of c.notes_exclude || []) if (notes.includes(bad)) fail(id, `사례 ${i + 1} (${c.why}): 안내에 '${bad}' 가 나오면 안 됨`);
     if (!Array.isArray(out.rows) || !out.rows.length) fail(id, `사례 ${i + 1}: 화면에 보여줄 rows 가 없음`);
     checked += 1;
   }
