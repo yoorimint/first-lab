@@ -1,0 +1,234 @@
+[
+  {
+    "why": "월 250만 원 ÷ 209시간(고용노동부 환산) = 11,961.72원, 연장 10시간 × 1.5배(근로기준법 제56조①) = 179,425원",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 10,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "hourly": 11961.72,
+      "ot_pay": 179425,
+      "ot_night_pay": 0,
+      "night_pay": 0,
+      "holiday_pay": 0,
+      "total": 179425
+    }
+  },
+  {
+    "why": "2026 최저임금 시급 10,320원, 연장 4시간 중 2시간이 밤 → 61,920 + 10,320 = 72,240원",
+    "input": {
+      "pay_type": "hourly",
+      "amount": 10320,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 4,
+      "ot_night_hours": 2,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "hourly": 10320,
+      "ot_pay": 61920,
+      "ot_night_pay": 10320,
+      "night_pay": 0,
+      "holiday_pay": 0,
+      "total": 72240
+    }
+  },
+  {
+    "why": "기준선: 휴일 하루 8시간 딱(제56조②1 8시간 이내 50%) × 시급 10,320원 = 123,840원",
+    "input": {
+      "pay_type": "hourly",
+      "amount": 10320,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 8,
+      "holiday_days": 1
+    },
+    "expect": {
+      "hourly": 10320,
+      "ot_pay": 0,
+      "ot_night_pay": 0,
+      "night_pay": 0,
+      "holiday_pay": 123840,
+      "total": 123840
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 휴일 하루 10시간 → 8시간 × 1.5 + 2시간 × 2.0(제56조②2) = 123,840 + 41,280 = 165,120원",
+    "input": {
+      "pay_type": "hourly",
+      "amount": 10320,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 10,
+      "holiday_days": 1
+    },
+    "expect": {
+      "hourly": 10320,
+      "ot_pay": 0,
+      "ot_night_pay": 0,
+      "night_pay": 0,
+      "holiday_pay": 165120,
+      "total": 165120
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 상시 5명(제11조① 적용) → 연장 10시간 1.5배",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 10,
+      "ot_night_hours": 2,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "hourly": 11961.72,
+      "ot_pay": 179425,
+      "ot_night_pay": 11961,
+      "night_pay": 0,
+      "holiday_pay": 0,
+      "total": 191386
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 상시 4명(시행령 별표 1에 제56조 없음) → 가산 없이 1배, 야간 가산 0원",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 4,
+      "ot_hours": 10,
+      "ot_night_hours": 2,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "hourly": 11961.72,
+      "ot_pay": 119617,
+      "ot_night_pay": 0,
+      "night_pay": 0,
+      "holiday_pay": 0,
+      "total": 119617
+    },
+    "boundary": true
+  },
+  {
+    "why": "월급 300만 원, 연장 없는 야간 8시간 → 가산분 0.5배만 = 57,416원",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 3000000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 8,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "hourly": 14354.07,
+      "ot_pay": 0,
+      "ot_night_pay": 0,
+      "night_pay": 57416,
+      "holiday_pay": 0,
+      "total": 57416
+    }
+  },
+  {
+    "why": "휴일 8시간 2일 + 연장 12시간, 월급 250만 원",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 12,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 8,
+      "holiday_days": 2
+    },
+    "expect": {
+      "hourly": 11961.72,
+      "ot_pay": 215311,
+      "ot_night_pay": 0,
+      "night_pay": 0,
+      "holiday_pay": 287081,
+      "total": 502392
+    }
+  },
+  {
+    "why": "단시간: 월급 120만 원, 기준시간 104.29시간(주 20 + 주휴 4) × 365/7/12, 계약 초과 5시간 × 1.5(기간제법 제6조③)",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 1200000,
+      "base_hours": 104.29,
+      "employees": 5,
+      "ot_hours": 5,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect": {
+      "hourly": 11506.38,
+      "ot_pay": 86297,
+      "ot_night_pay": 0,
+      "night_pay": 0,
+      "holiday_pay": 0,
+      "total": 86297
+    }
+  },
+  {
+    "why": "통상임금 0원은 안내 문장",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 0,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 0,
+      "ot_night_hours": 0,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect_error": true
+  },
+  {
+    "why": "밤 시간이 연장시간보다 크면 안내 문장",
+    "input": {
+      "pay_type": "monthly",
+      "amount": 2500000,
+      "base_hours": 209,
+      "employees": 5,
+      "ot_hours": 2,
+      "ot_night_hours": 3,
+      "night_hours": 0,
+      "holiday_hours": 0,
+      "holiday_days": 0
+    },
+    "expect_error": true
+  }
+]
