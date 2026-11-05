@@ -48,3 +48,10 @@
 - 사진 한도 소진: 사진 기다리는 글은 다음 날 오전 9시 이후 자동으로 채워짐 → 오전 감시 때 확인.
 - 나중에: 예전 API 봇 초안 다시 쓰기(#85 하이패스 등), 서버 밖 백업.
 - 운영자 할 일(알림만): 애드센스 소유권 [확인], 공개 글 20~30편 뒤 심사 요청, 서치콘솔 사이트맵 제출.
+
+## 11/5 공공 API (운영자 신청 완료)
+- 법제처 국가법령정보 OPEN API: 서버 비밀값 `LAW_OPEN_API_OC`, 등록 IP 115.68.229.136·도메인 first-lab.kr. 서버는 직접, 다른 세션은 사이트 통로 `/wp-json/firstlab/v1/law` (토큰). 코드 `bot/law_api.py`.
+  - 법령 ID 로 본문을 받으면 아직 시행 전인 판이 올 수 있다 → 현행은 `versions()`(시행일 기준 목록) + `current()` 로 고른다.
+  - 조문 확인: `python3 -m bot.lawtext <법령명> <제N조>` 가 API 우선 (현행 판 + 시행 예정 개정 표시), 안 되면 화면 읽기.
+- 공공데이터포털 '대한민국 공공서비스(혜택) 정보': 서버 비밀값 `DATA_GO_KR_KEY`, 통로 `/wp-json/firstlab/v1/benefits`. 코드 `bot/benefit_api.py` (`python3 -m bot.benefit_api serviceList perPage=3`).
+- 배포 기록 '공공 API 점검' 줄에서 두 API 상태 확인.
