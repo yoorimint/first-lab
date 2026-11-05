@@ -136,6 +136,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - `wordpress/queue/fixhold-<post_id>-<날짜시각>.json` 으로 저장:
   `{"type": "fix_hold", "post_id": <id>, "base_modified": "<응답 값 그대로>", "content_html": "<고친 본문 전체>", "review": [...], "changes": "<한 줄>"}`
   제목·요약문을 바꿨으면 `"title"`, `"excerpt"` 도 넣는다. 서버가 다시 관문 검사 → 통과하면 공개 대기열.
+- 공식 근거를 끝내 못 찾는 등 고칠 수 없으면 `{"type": "fix_hold", "post_id": <id>, "give_up": true, "why": "<한 줄>"}` 만 올린다 (30일 동안 목록에서 빠지고 다음 보류 글로 넘어감).
 - 5단계와 같이 검사 → 커밋(`보류 수정: <글 제목>`) → main 에 올림.
 
 ## 5-2. 대표 사진 검사 (있을 때만, 실행 1번에 응답의 글 전부)

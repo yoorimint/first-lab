@@ -2107,6 +2107,43 @@ class ConditionGateTest(unittest.TestCase):
         self.assertEqual(g.exception_articles(review, lambda url: {}), [])                           # 못 열면 막지 않음
 
 
+class HoldRetryTest(unittest.TestCase):
+    """보류 글이 평생 보류로 남거나 다른 보류 글의 차례를 막지 않게 (11/5 운영자 '공개 막으면 평생 보류로 있나?')."""
+
+    def _wp(self, meta):
+        def wp(*a):
+            if a[:2] == ("post", "get"):
+                return {"--field=post_status": "draft", "--field=post_modified": "m",
+                        "--field=post_content": "<p>" + "가" * 100 + "</p>", "--field=post_title": "제목", "--field=post_excerpt": "요약"}.get(a[3], "")
+            if a[:3] == ("post", "meta", "get"):
+                return meta.get(a[4], "")
+            if a[:3] == ("post", "meta", "update"):
+                meta[a[4]] = a[5]
+            return ""
+        return wp
+
+    def test_failed_fixes_counted_and_give_up(self):
+        from bot import hold
+        meta = {}
+        with mock.patch.object(hold, "wp_cli", side_effect=self._wp(meta)), \
+                mock.patch.object(hold.review_gate, "problems", return_value=["검수 기록 없음"]):
+            for i in range(1, 4):
+                msg = hold.apply_fix({"post_id": 5, "base_modified": "m", "content_html": "<p>" + "가" * 100 + "</p>", "review": []})
+                self.assertTrue(meta[hold.TRIES_META].startswith(f"{i}|"))
+            self.assertIn("30일 뒤 다시", msg)                                   # 3번째에 쉬게 됨
+        meta2 = {}
+        with mock.patch.object(hold, "wp_cli", side_effect=self._wp(meta2)):
+            msg = hold.apply_fix({"post_id": 6, "give_up": True, "why": "공식 근거 없음"})
+        self.assertTrue(meta2[hold.TRIES_META].startswith(f"{hold.MAX_TRIES}|"))
+        self.assertIn("포기", meta2[hold.HOLD_META if hasattr(hold, "HOLD_META") else hold.review_gate.HOLD_META])
+        self.assertIn("30일 뒤 다시", msg)
+
+    def test_php_skips_resting_posts(self):
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("firstlab_api_hold_resting( $post->ID )", php)
+        self.assertIn("'_firstlab_hold_tries'", php)
+
+
 class BokApiTest(unittest.TestCase):
     def test_base_rate_latest_and_no_key(self):
         import datetime as dt

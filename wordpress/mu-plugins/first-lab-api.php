@@ -97,6 +97,18 @@ function firstlab_api_refresh_target( array $state ): ?array {
 /**
  * 검수 관문에서 막힌 초안 (오래된 것부터 3개) — 글쓰기 세션이 고쳐서 다시 올린다 (bot/hold.py).
  */
+/** 보류 수정 횟수 [횟수, 마지막 날짜] (bot/hold.py TRIES_META '횟수|날짜'). */
+function firstlab_api_hold_tries( int $post_id ): array {
+	$parts = explode( '|', (string) get_post_meta( $post_id, '_firstlab_hold_tries', true ) );
+	return array( (int) ( $parts[0] ?? 0 ), (string) ( $parts[1] ?? '' ) );
+}
+
+/** 3번 넘게 막혔거나 포기한 글이 아직 쉬는 중인지 (마지막 시도 뒤 30일). */
+function firstlab_api_hold_resting( int $post_id ): bool {
+	list( $tries, $last ) = firstlab_api_hold_tries( $post_id );
+	return $tries >= 3 && $last && strtotime( $last . ' +30 days' ) > time();
+}
+
 function firstlab_api_held_drafts(): array {
 	$out   = array();
 	$posts = get_posts(
@@ -105,11 +117,13 @@ function firstlab_api_held_drafts(): array {
 			'meta_key'    => '_firstlab_hold',
 			'orderby'     => 'date',
 			'order'       => 'ASC',
-			'numberposts' => 10,
+			'numberposts' => 50, // 쉬는 글(포기·3번 막힘)이 앞을 막지 않게 넉넉히
 		)
 	);
+	// 고쳐도 3번 막혔거나 포기한 글은 30일 동안 빼서 다른 보류 글이 차례를 받게 함 (bot/hold.py TRIES_META, 11/5 '평생 보류로 있나?')
+	usort( $posts, static fn( $a, $b ) => firstlab_api_hold_tries( $a->ID )[0] <=> firstlab_api_hold_tries( $b->ID )[0] );
 	foreach ( $posts as $post ) {
-		if ( 'ready' === get_post_meta( $post->ID, '_firstlab_queue', true ) || count( $out ) >= 3 ) {
+		if ( 'ready' === get_post_meta( $post->ID, '_firstlab_queue', true ) || count( $out ) >= 3 || firstlab_api_hold_resting( $post->ID ) ) {
 			continue;
 		}
 		$out[] = array(
@@ -213,6 +227,11 @@ function firstlab_api_maintenance(): array {
 		'continuous'  => get_option( 'firstlab_bot_continuous', '0' ),
 		'ready_count' => count( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_queue', 'meta_value' => 'ready', 'numberposts' => -1, 'fields' => 'ids' ) ) ),
 		'held_drafts' => $held,
+		// 고쳐도 3번 막혔거나 포기해 30일 쉬는 보류 글 (지우지 않음, 초안으로 남음)
+		'gave_up'     => array_values( array_map(
+			static fn( $p ) => array( 'post_id' => $p->ID, 'title' => $p->post_title, 'reason' => (string) get_post_meta( $p->ID, '_firstlab_hold', true ) ),
+			array_filter( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_hold_tries', 'numberposts' => -1 ) ), static fn( $p ) => firstlab_api_hold_resting( $p->ID ) )
+		) ),
 		'rates'       => $state['rates'] ?? null, // 한국은행 최신 금리
 		'calc_yearly' => $state['calc_yearly'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)
 		'law_watch'   => $state['law_changes'] ?? null, // 법령 감시: 곧 시행될 개정·입법예고(확정 아님) — 감시 세션 확인용
