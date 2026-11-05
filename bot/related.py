@@ -23,9 +23,9 @@ foreach ( get_posts( array( 'post_status' => 'publish', 'numberposts' => 300 ) )
         'cats'  => wp_get_post_categories( $p->ID, array( 'fields' => 'names' ) ),
     );
 }
-// 계산기 단독 페이지(슬러그 ...-calculator)도 링크 후보
+// 계산기 단독 페이지(슬러그 ...-calculator)도 링크 후보 — 그 계산기를 넣은 공개 글이 있으면 그 글이 이미 후보라 뺌 (11/6, 넘어가는 주소)
 foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => 100 ) ) as $p ) {
-    if ( str_ends_with( $p->post_name, '-calculator' ) ) {
+    if ( str_ends_with( $p->post_name, '-calculator' ) && ! ( function_exists( 'firstlab_calc_page_target' ) && firstlab_calc_page_target( $p ) ) ) {
         $out[] = array( 'title' => $p->post_title, 'slug' => $p->post_name, 'url' => get_permalink( $p ), 'cats' => array() );
     }
 }

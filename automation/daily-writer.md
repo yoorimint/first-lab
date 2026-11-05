@@ -125,7 +125,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   - `tests/<id>.json`: 검증 사례 3개 이상. 계산기로 낸 값을 그대로 기대값으로 쓰지 않는다. 기대값 만드는 법은 두 종류:
     - **기관이 정한 값**(요금표·세율·공제·과태료 기준): 공식 기관 계산 예시나 법령 문구로 직접 확인한 값
     - **표준 수학 공식**(대출 상환, 비율·단위 환산 등): 공식을 Python 으로 따로 계산한 값 + 극단값(금리 0%, 1개월 등) + 본문 표의 숫자와 같은지
-  - `wordpress/pages/<id>-calculator.html`: 단독 페이지 (첫 줄 `<!-- title: ○○ 계산기 -->`, 짧은 안내 + 계산기 + 결과 읽는 법)
+  - `wordpress/pages/<id>-calculator.html`: 단독 페이지 (첫 줄 `<!-- title: ○○ 계산기 -->`, 짧은 안내 + 계산기 + 결과 읽는 법). 그 계산기를 넣은 글이 공개되면 서버가 이 주소를 그 글로 넘긴다 — 계산기는 반드시 글에도 넣는다
   - 조건에 따라 나오는 안내 문장(신청 방법·예외 안내)은 그 경계 사례에 `"notes_include"`/`"notes_exclude": ["문구"]` 로 확인 (11/5 졸업년도 계산기: 값은 맞고 안내가 틀림).
   - 기준선 사례 2개 이상에 `"boundary": true` (공제액·합격 점수·면세점·구간 경계·상한/하한에 딱 맞는 값과 바로 아래/위 값).
   - 검사: `node tests/test_calculators.mjs` 가 통과해야 한다

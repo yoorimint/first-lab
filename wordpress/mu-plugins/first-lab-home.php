@@ -5,7 +5,7 @@
  *
  * [firstlab_feed]      : 현재 목록(메인 쿼리)을 사진 목록으로 출력. 홈 첫 페이지면 대표 글을 크게.
  *                        템플릿에서는 wp:html 블록에 넣는다 (wp:shortcode 블록은 자동 <p> 를 끼워 넣음).
- * [firstlab_calc_list] : 발행된 계산기 페이지(주소가 -calculator 로 끝남) 목록.
+ * [firstlab_calc_list] : 발행된 계산기 페이지(주소가 -calculator 로 끝남) 목록. 링크는 그 계산기를 넣은 공개 글이 있으면 그 글.
  *
  * 대표 글 순서: ① 관리자가 '맨 위에 고정'한 글 → ② 서치콘솔 클릭 1위 글(봇이 option firstlab_popular_url 에 저장,
  * bot/search_console.py) → ③ 최신 글.
@@ -123,7 +123,8 @@ add_shortcode(
 			static fn( $p ) => str_ends_with( urldecode( $p->post_name ), '-calculator' )
 		);
 		$items = array_map(
-			static fn( $p ) => sprintf( '<li><a href="%s">%s</a></li>', esc_url( get_permalink( $p ) ), esc_html( $p->post_title ) ),
+			// 계산기를 넣은 공개 글이 있으면 그 글로 (first-lab-calc-home.php — 검색어가 글 하나로 모이게)
+			static fn( $p ) => sprintf( '<li><a href="%s">%s</a></li>', esc_url( firstlab_calc_link( $p ) ), esc_html( $p->post_title ) ),
 			$pages
 		);
 		return $items ? '<ul class="fl-calc-list">' . implode( '', $items ) . '</ul>' : '<p>준비 중입니다.</p>';

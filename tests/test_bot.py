@@ -1242,6 +1242,75 @@ echo firstlab_calc_rates(getenv('FL_DATA'));
         self.assertEqual(self.rates("/data/vat.json"), raw)
 
 
+class CalcHomeTest(unittest.TestCase):
+    """계산기 대표 글 (11/6 운영자): 계산기를 넣은 공개 글이 있으면 단독 페이지는 그 글로 301·목록 링크도 그 글·사이트맵에서 뺌.
+    공개 글이 없으면 단독 페이지가 그대로 (계산기가 사라지지 않게)."""
+
+    STUB = r"""<?php
+define('ABSPATH', '/'); define('ARRAY_A', 'ARRAY_A');
+class WP_Post { function __construct(public $ID, public $post_type, public $post_name) {} }
+$GLOBALS['hooks'] = array();
+function add_action($h, $f) { $GLOBALS['hooks'][$h] = $f; }
+function add_filter($h, $f) { $GLOBALS['hooks'][$h] = $f; }
+class FakeDb { public $posts = 'wp_posts';
+  function esc_like($t) { return $t; }
+  function prepare($q, $like) { return $like; }
+  function get_results($like, $mode) {   // 공개 글 (먼저 공개된 순)
+    $all = array(array('id' => 10, 'title' => '양도세 계산 방법', 'body' => '[firstlab_calc id="capital-gains-tax"]'),
+                 array('id' => 11, 'title' => '부동산 양도세 계산기', 'body' => '[firstlab_calc id="capital-gains-tax"]'),
+                 array('id' => 12, 'title' => '대출 이자', 'body' => '[firstlab_calc id="loan-repayment"]'));
+    $needle = trim($like, '%');
+    return array_values(array_filter($all, fn($r) => str_contains($r['body'], $needle)));
+  } }
+$wpdb = new FakeDb();
+function get_post($id) { return new WP_Post($id, 'post', "p$id"); }
+function get_permalink($p) { return "/{$p->post_name}/"; }
+function get_pages($a) { return array(new WP_Post(1, 'page', 'capital-gains-tax-calculator'), new WP_Post(2, 'page', 'vat-calculator'),
+                                      new WP_Post(3, 'page', 'about')); }
+require getenv('FL_PLUGIN');
+$cg = new WP_Post(1, 'page', 'capital-gains-tax-calculator'); $vat = new WP_Post(2, 'page', 'vat-calculator');
+echo json_encode(array(
+  'id' => firstlab_calc_id_of_slug('capital-gains-tax-calculator'), 'not_calc' => firstlab_calc_id_of_slug('about'),
+  'target' => firstlab_calc_page_target($cg)?->ID, 'none' => firstlab_calc_page_target($vat),
+  'link_cg' => firstlab_calc_link($cg), 'link_vat' => firstlab_calc_link($vat),
+  'post_not_page' => firstlab_calc_page_target(new WP_Post(11, 'post', 'capital-gains-tax-calculator')),
+  'sitemap_skip' => $GLOBALS['hooks']['the_seo_framework_sitemap_exclude_ids'](array(99)),
+  'pick_first' => firstlab_calc_pick_home(array(array('id' => 5, 'title' => '방법'), array('id' => 6, 'title' => '설명'))),
+  'pick_none' => firstlab_calc_pick_home(array()),
+));
+"""
+
+    def run_php(self):
+        import os
+        import shutil
+        import subprocess
+        import tempfile
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(self.STUB)
+        try:
+            env = {**os.environ, "FL_PLUGIN": str(ROOT / "wordpress" / "mu-plugins" / "first-lab-calc-home.php")}
+            return json.loads(subprocess.run(["php", f.name], capture_output=True, text=True, env=env, check=True).stdout)
+        finally:
+            os.unlink(f.name)
+
+    def test_calc_page_goes_to_published_post(self):
+        r = self.run_php()
+        self.assertEqual((r["id"], r["not_calc"]), ("capital-gains-tax", ""))
+        self.assertEqual(r["target"], 11)                         # 제목에 '계산기'가 든 글 먼저 (먼저 공개된 10 보다)
+        self.assertIsNone(r["none"])                               # 넣은 공개 글이 없으면 단독 페이지 그대로
+        self.assertEqual((r["link_cg"], r["link_vat"]), ("/p11/", "/vat-calculator/"))
+        self.assertIsNone(r["post_not_page"])                      # 글 자체는 넘기지 않음
+        self.assertEqual(r["sitemap_skip"], [99, 1])               # 넘어가는 페이지만 사이트맵에서 뺌
+        self.assertEqual((r["pick_first"], r["pick_none"]), (5, None))
+
+    def test_list_and_related_use_home_post(self):
+        home = (ROOT / "wordpress" / "mu-plugins" / "first-lab-home.php").read_text(encoding="utf-8")
+        self.assertIn("firstlab_calc_link( $p )", home)
+        self.assertIn("firstlab_calc_page_target", (ROOT / "bot" / "related.py").read_text(encoding="utf-8"))
+
+
 class ApplyReviewTest(unittest.TestCase):
     """검수 반영: 패치가 하나라도 검사에 걸리면 아무것도 저장·기록하지 않는다 (11/5 #542: 패치 실패에도 검수 완료가 기록됨)."""
 
