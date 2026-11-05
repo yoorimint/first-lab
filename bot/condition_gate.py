@@ -8,7 +8,8 @@
    글에 넣을 필요가 없으면 검수 기록에 그 조문을 '해당 없음 — 이유'로 적으면 된다. 법령을 못 열면 막지 않는다.
 3. 첫 문단 단정 ↔ 본문 예외 (lead_vs_body, #748), 요약 '받아요' ↔ 본문 '못 받는 경우' (excerpt_vs_exclusions, #762),
    요약·첫 문단 기준 '하위 10%' ↔ 본문 '…이라면 하위 20%' (lead_thresholds, #771), 제목 '피해자' ↔ 본문은 늘 '불법사금융 피해자' (title_qualifier, #771),
-   첫 문단 '3개월 이상 일해야' ↔ 본문 '일용근로자는 … 45일 이상이면' (lead_minimums, #775).
+   첫 문단 '3개월 이상 일해야' ↔ 본문 '일용근로자는 … 45일 이상이면' (lead_minimums, #775),
+   갈래(5등급제·9등급제)를 나눠 설명하는 글에서 갈래 없이 '…만 적어요' (variant_only, #784).
 4. 부칙 경과조치 (transition_rules, #762): 근거 조문이 최근 개정되고 부칙이 '시행 전에 이직한 사람은 종전 규정'이면,
    그 숫자를 쓴 문장에 적용 시점('2026년 1월 1일 이후 …', '종전')이 있어야 한다 (하루 상한 68,100원 ← 2025년 퇴사자는 66,000원).
 """
@@ -358,3 +359,28 @@ def lead_minimums(excerpt: str, body_html: str) -> list[str]:
                     out.append(f"요약·첫 문단은 '{m.group(0)}' 로 단정했는데 본문에 대상별로 '{alt.group(0)}' 이 있음: '{other[:60]}' — 첫 문단에도 그 예외를")
                     break
     return list(dict.fromkeys(out))[:2]
+
+
+# 갈래를 나눠 설명하는 글의 '…만' 단정 (11/5 #784: 5등급제·9등급제 글에서 '융합 선택 과목은 성취도만 적고',
+# '과학탐구실험 … 3단계 성취도만' — 5등급제에만 맞는 말을 갈래 없이 씀, 같은 꼴 2번 → review-only-log 에서 검사로 옮김)
+_VARIANT = re.compile(r"(\d+등급제|[가-힣]+ 융자|[가-힣]+가입자|[가-힣]+제도)")
+_ONLY = re.compile(r"[가-힣A-Za-z)]만[ ,]+(?:적|받|돼|되|가능|해당|나와|내|써|인정|지원)")
+
+
+def variant_only(body_html: str) -> list[str]:
+    html = body_html or ""
+    heads = [_plain(h) for h in re.findall(r"<h[23][^>]*>(.*?)</h[23]>", html, re.S)]
+    variants = sorted(set(_VARIANT.findall(" ".join(heads))))
+    if len(variants) < 2:
+        return []
+    out, head = [], ""
+    for part in re.split(r"(<h[23][^>]*>.*?</h[23]>)", html, flags=re.S):
+        if re.match(r"<h[23]", part):
+            head = _plain(part)
+            continue
+        if any(v in head for v in variants):
+            continue  # 갈래 이름이 붙은 부분 안의 문장은 그 갈래 이야기
+        for sent in _sentences(part):
+            if _ONLY.search(sent) and not any(v in sent for v in variants):
+                out.append(f"'{sent[:50]}' 는 '…만' 단정인데 글이 {'·'.join(variants[:3])} 을 나눠 설명함 — 어느 갈래 이야기인지 적기")
+    return out[:3]

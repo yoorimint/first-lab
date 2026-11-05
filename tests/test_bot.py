@@ -2573,6 +2573,20 @@ class LeadMinimumTest(unittest.TestCase):
         self.assertEqual(g.lead_minimums("", "<p>3개월 이상 일해야 해요.</p><p>신청은 50만 원 이상이에요.</p>"), [])
 
 
+class VariantOnlyTest(unittest.TestCase):
+    """#784: 5등급제·9등급제를 나눠 설명하는 글에서 갈래 없이 '…만 적어요'."""
+
+    BODY = ("<h2>5등급제 비율</h2><p>1등급은 10%예요.</p><h2>9등급제 비율</h2><p>1등급은 4%예요.</p>"
+            "<h2>석차등급이 없는 과목</h2><ul><li>융합 선택 9과목은 성취도만 적고 석차등급은 '·'예요.</li></ul>")
+
+    def test_flag_and_pass(self):
+        from bot import condition_gate as g
+        self.assertTrue(g.variant_only(self.BODY))
+        self.assertEqual(g.variant_only(self.BODY.replace("융합 선택", "5등급제에서 융합 선택")), [])
+        self.assertEqual(g.variant_only(self.BODY.replace("석차등급이 없는 과목", "5등급제에서 석차등급이 없는 과목")), [])
+        self.assertEqual(g.variant_only("<h2>신청</h2><p>본인만 신청할 수 있어요. 서류만 내면 돼요.</p>"), [])   # 갈래가 없는 글
+
+
 class TransitionRuleTest(unittest.TestCase):
     """부칙 경과조치: 개정으로 바뀐 숫자는 적용 시점과 함께 (11/5 #762 하루 상한 68,100원 ← 2025년 이전 퇴사자는 66,000원)."""
 
