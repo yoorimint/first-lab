@@ -67,7 +67,8 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"]),
               "excerpt_vs_exclusions": lambda: condition_gate.excerpt_vs_exclusions(post["excerpt"], post["content_html"]),
               "lead_thresholds": lambda: condition_gate.lead_thresholds(post["excerpt"], post["content_html"]),
-              "title_qualifier": lambda: condition_gate.title_qualifier(post["title"], post["content_html"])}.get(name)
+              "title_qualifier": lambda: condition_gate.title_qualifier(post["title"], post["content_html"]),
+              "lead_minimums": lambda: condition_gate.lead_minimums(post["excerpt"], post["content_html"])}.get(name)
         if fn and not fn():
             return f"check:{name} 가 고치기 전 글에 안 걸림 — 이 오류를 실제로 잡는 검사가 아님"
         return None

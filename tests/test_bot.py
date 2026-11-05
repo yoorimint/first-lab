@@ -2449,6 +2449,32 @@ class LeadThresholdTest(unittest.TestCase):
         self.assertEqual(g.title_qualifier("극저신용대출: 불법사금융 피해자 11월 30일까지 접수", self.BODY), [])
 
 
+class CitedUrlsTest(unittest.TestCase):
+    def test_reviewer_gets_writer_sources(self):
+        """검수 파일에 글쓴이 근거 주소 + 지시문이 '확인불가 전에 열기' (11/5 #775 고시를 안 열어 확인불가 19건)."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import unreviewed
+        post = {"source_check": {"found": [{"urls": ["https://a.go.kr", "https://law.go.kr/x"]}], "claims": [{"urls": ["https://a.go.kr"]}]}}
+        self.assertEqual(unreviewed.cited_urls(post), ["https://a.go.kr", "https://law.go.kr/x"])
+        self.assertEqual(unreviewed.cited_urls({}), [])
+        self.assertIn("cited_urls", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
+
+
+class LeadMinimumTest(unittest.TestCase):
+    """#775 혼례비 대출: 첫 문단 '둘 다 3개월 이상 일하고 있어야' ↔ 본문 '일용근로자는 … 45일 이상이면'."""
+
+    BODY = ("<p>직접 융자는 연 1.5%예요. 둘 다 3개월 이상 일하고 있어야 하고, 3년 이내에 신청해요.</p>"
+            "<ul><li>사업장에서 3개월 이상 일하고 있는 근로자</li>"
+            "<li>일용근로자는 신청일 이전 90일 안에 근로일수가 45일 이상이면 돼요</li></ul>")
+
+    def test_flag_and_pass(self):
+        from bot import condition_gate as g
+        self.assertTrue(g.lead_minimums("", self.BODY))
+        fixed = self.BODY.replace("둘 다 3개월 이상 일하고", "둘 다 원칙적으로 3개월 이상 일하고(일용근로자는 최근 90일 중 45일 이상)")
+        self.assertEqual(g.lead_minimums("", fixed), [])
+        self.assertEqual(g.lead_minimums("", "<p>3개월 이상 일해야 해요.</p><p>신청은 50만 원 이상이에요.</p>"), [])
+
+
 class TransitionRuleTest(unittest.TestCase):
     """부칙 경과조치: 개정으로 바뀐 숫자는 적용 시점과 함께 (11/5 #762 하루 상한 68,100원 ← 2025년 이전 퇴사자는 66,000원)."""
 

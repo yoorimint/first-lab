@@ -7,7 +7,8 @@
    '제N조에 따른 공제와 별개로'처럼 바꾸거나 더하면, 검수 기록이 그 조문도 확인했어야 통과 (#640 증여공제 제53조 ← 혼인·출산 제53조의2).
    글에 넣을 필요가 없으면 검수 기록에 그 조문을 '해당 없음 — 이유'로 적으면 된다. 법령을 못 열면 막지 않는다.
 3. 첫 문단 단정 ↔ 본문 예외 (lead_vs_body, #748), 요약 '받아요' ↔ 본문 '못 받는 경우' (excerpt_vs_exclusions, #762),
-   요약·첫 문단 기준 '하위 10%' ↔ 본문 '…이라면 하위 20%' (lead_thresholds, #771), 제목 '피해자' ↔ 본문은 늘 '불법사금융 피해자' (title_qualifier, #771).
+   요약·첫 문단 기준 '하위 10%' ↔ 본문 '…이라면 하위 20%' (lead_thresholds, #771), 제목 '피해자' ↔ 본문은 늘 '불법사금융 피해자' (title_qualifier, #771),
+   첫 문단 '3개월 이상 일해야' ↔ 본문 '일용근로자는 … 45일 이상이면' (lead_minimums, #775).
 4. 부칙 경과조치 (transition_rules, #762): 근거 조문이 최근 개정되고 부칙이 '시행 전에 이직한 사람은 종전 규정'이면,
    그 숫자를 쓴 문장에 적용 시점('2026년 1월 1일 이후 …', '종전')이 있어야 한다 (하루 상한 68,100원 ← 2025년 퇴사자는 66,000원).
 """
@@ -331,3 +332,29 @@ def title_qualifier(title: str, body_html: str) -> list[str]:
             if mods.count(top) / len(mods) >= 0.6 and top not in title:
                 out.append(f"제목 '{word}' 는 본문에서 늘 '{top} {word}' — 제목에도 '{top}' 를 넣기 (대상을 잘못 알 수 있음)")
     return out
+
+
+# 요약·첫 문단 자격 기간 ↔ 본문의 대상별 다른 기간 (11/5 #775 '둘 다 3개월 이상 일하고 있어야' ↔ '일용근로자는 … 45일 이상이면')
+MINIMUM = re.compile(r"(\d[\d,.]*)\s*(개월|년|일|시간)\s*(이상|이하|미만|초과)")
+_WORK = re.compile(r"(일하|근무|근로|가입|거주|재직)")
+_GROUP = re.compile(r"[가-힣]{2,}(?:근로자|자영업자|종사자|가입자|수급자|계층|가족|세대)(?:는|은|이라면|이면)")
+
+
+def lead_minimums(excerpt: str, body_html: str) -> list[str]:
+    first = re.search(r"<p[^>]*>.*?</p>", body_html or "", re.S)
+    lead = _plain(excerpt) + " " + (_plain(first.group(0)) if first else "")
+    rest = _sentences(body_html[first.end():] if first else body_html)
+    out = []
+    for sent in re.split(r"(?<=[.!?])\s+", lead):
+        if not _WORK.search(sent):
+            continue
+        for m in MINIMUM.finditer(sent):
+            for other in rest:
+                if not (_GROUP.search(other) and _WORK.search(other)):
+                    continue
+                alt = next((a for a in MINIMUM.finditer(other) if a.group(3) == m.group(3)
+                            and (a.group(1), a.group(2)) != (m.group(1), m.group(2)) and a.group(0) not in lead), None)
+                if alt:
+                    out.append(f"요약·첫 문단은 '{m.group(0)}' 로 단정했는데 본문에 대상별로 '{alt.group(0)}' 이 있음: '{other[:60]}' — 첫 문단에도 그 예외를")
+                    break
+    return list(dict.fromkeys(out))[:2]

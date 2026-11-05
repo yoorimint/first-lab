@@ -63,11 +63,21 @@ def _get(path: str) -> dict:
         return json.load(resp)
 
 
+def cited_urls(post: dict) -> list[str]:
+    """글쓴이가 근거로 단 주소 (서버 근거 대조 기록에서). 검수자가 '확인불가'로 두기 전에 열어 볼 곳
+    (11/5 #775: 검수자가 글의 근거인 고시를 안 열고 19건을 확인불가로 — 모두 그 고시에 있었음)."""
+    check = post.get("source_check") or {}
+    urls = [u for c in check.get("found", []) + check.get("claims", []) for u in c.get("urls", [])]
+    return list(dict.fromkeys(str(u) for u in urls))
+
+
 def save_body(post_id: int) -> Path:
-    """서버의 지금 본문을 JSON 파일로 (title, excerpt, content_html)."""
+    """서버의 지금 본문을 JSON 파일로 (title, excerpt, content_html, cited_urls)."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     path = OUT_DIR / f"post-{post_id}.json"
-    path.write_text(json.dumps(_get(f"/post/{post_id}"), ensure_ascii=False), encoding="utf-8")
+    post = _get(f"/post/{post_id}")
+    post["cited_urls"] = cited_urls(post)
+    path.write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
     return path
 
 
