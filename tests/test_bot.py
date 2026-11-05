@@ -1328,7 +1328,8 @@ class GoldFirstTest(unittest.TestCase):
                 return [NS(keyword="에너지바우처신청", total=4000, ad_competition="", ad_clicks=0.0),
                         NS(keyword="에너지바우처", total=90000, ad_competition="", ad_clicks=0.0)]  # 연관어는 넣지 않음
         series = {f"{y}-{m:02d}": (90.0 if m in (11, 12) else 10.0) for y in (2025, 2026) for m in range(1, 13)}
-        with mock.patch.object(h, "blog_totals", side_effect=lambda w, k, t, save=None: {"퇴직금계산기": 400000, "에너지바우처신청": 800}), \
+        with mock.patch.object(h, "blog_totals", side_effect=lambda w, k, t, save=None: {"퇴직금계산기": {"docs": 400000, "hits": 29, "old": 0},
+                                                                                         "에너지바우처신청": {"docs": 800, "hits": 1, "old": 0}}), \
                 mock.patch.object(h, "monthly_trend", return_value={"에너지바우처신청": series}):
             msg = h.refresh_queue(conn, dt.date(2026, 11, 5), keys=("i", "k"), drafts={80: "퇴직금계산기", 85: "에너지바우처신청"}, ads=Ads())
         row = conn.execute("SELECT status, total FROM keywords WHERE norm='에너지바우처신청'").fetchone()
@@ -1351,8 +1352,8 @@ class GoldFirstTest(unittest.TestCase):
             conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES (?,?,?,?,?)",
                          (kw, keyword_db.norm(kw), total, "2026-11-05", "2026-11-05"))
         naver_hub.load(conn)
-        conn.execute("INSERT INTO naver_signals(norm, docs, docs_checked) VALUES ('육아휴직급여신청', 100, '2026-11-05')")   # 황금
-        conn.execute("INSERT INTO naver_signals(norm, docs, docs_checked) VALUES ('퇴직금계산기', 400000, '2026-11-05')")  # 포화
+        conn.execute("INSERT INTO naver_signals(norm, docs, hits, docs_checked) VALUES ('육아휴직급여신청', 800, 1, '2026-11-05')")   # 황금
+        conn.execute("INSERT INTO naver_signals(norm, docs, hits, docs_checked) VALUES ('퇴직금계산기', 400000, 29, '2026-11-05')")  # 포화
         got = select_keyword.ranked_candidates(conn, BotSettings(min_volume=500, max_volume=30000), limit=5)
         self.assertEqual(got[0]["keyword"], "육아휴직 급여 신청")
         self.assertTrue(got[0]["gold"])
@@ -1602,29 +1603,32 @@ class NaverHubTest(unittest.TestCase):
         self.assertIn(7, low)
         self.assertEqual(h.season({"2026-01": 50.0}), ([], []))  # 1년치 안 되면 계절 판단 안 함
         g = h.gold_score
-        self.assertAlmostEqual(g({"docs": 1000}, 5000), 3.699 / 1.2, places=2)      # 검색 5,000·글 1,000
-        self.assertAlmostEqual(g({"docs": 200000}, 20000), 4.301 / 11, places=2)    # 포화: 검색이 커도 낮음
-        self.assertGreater(g({"docs": 1000}, 5000), g({"docs": 5, "x": 0}, 50))      # 검색 50·글 5 보다 검색 5,000·글 1,000 이 위
-        self.assertGreater(g({"docs": 299}, 1000), g({"docs": 301}, 1000))           # 경계 없이 매끄럽게
-        self.assertEqual(h.gold_label({"docs": 299}, 1000), "황금")
-        self.assertEqual(h.gold_label({"docs": 300}, 1000), "좋음")                  # 0.3 은 황금 아님
-        self.assertEqual(h.gold_label({"docs": 5}, 1000), "확인 필요(글 거의 없음)")  # 어색한 조합일 수도
-        self.assertEqual(h.gold_label({"docs": 30001}, 1000), "포화")
+        self.assertAlmostEqual(g({"docs": 400000, "hits": 2, "old": 0}, 5000), 3.699 * 28 / 30, places=2)  # 정면 경쟁 2개
+        self.assertAlmostEqual(g({"docs": 400000, "hits": 25, "old": 0}, 5000), 3.699 * 5 / 30, places=2)  # 포화
+        self.assertAlmostEqual(g({"docs": 400000, "hits": 2, "old": 2}, 5000), 3.699 * 28 / 30 + 0.5, places=2)  # 경쟁 글이 다 낡음
+        self.assertGreater(g({"docs": 900, "hits": 3}, 5000), g({"docs": 900, "hits": 3}, 50))  # 같은 경쟁이면 검색량 큰 쪽
+        self.assertEqual(g({"docs": 0, "hits": 0}, 9000), 0.0)        # 글 0개(성인어 등)는 가짜 황금
+        self.assertEqual(g({"docs": 400000}, 5000), 0.0)              # 정면 경쟁을 모르는 옛 조회는 0 (다시 조회)
+        self.assertEqual(h.gold_label({"docs": 5000, "hits": 2}, 1000), "황금")
+        self.assertEqual(h.gold_label({"docs": 5000, "hits": 3}, 1000), "좋음")
+        self.assertEqual(h.gold_label({"docs": 5000, "hits": 9}, 1000), "보통")
+        self.assertEqual(h.gold_label({"docs": 5000, "hits": 25}, 1000), "포화")
+        self.assertEqual(h.gold_label({"docs": 5, "hits": 0}, 1000), "확인 필요(글 거의 없음)")
         for product in ("스케쳐스윈터부츠", "아크테릭스세륨후디", "카시오F91W", "캐나다구스롯지"):  # 11/5 첫 조회에서 황금으로 올라온 상품명
             self.assertFalse(h.is_info(product), product)
         for info in ("연차개수계산기", "육아휴직급여신청", "실업급여조건", "근로장려금"):
             self.assertTrue(h.is_info(info), info)
-        self.assertEqual(h.signal_score({"docs": 10}, 9000, 7, "카시오F91W"), 0.0)   # 상품명은 황금 가점 없음
+        self.assertEqual(h.signal_score({"docs": 100, "hits": 0}, 9000, 7, "카시오F91W"), 0.0)   # 상품명은 황금 가점 없음
         self.assertTrue(h.is_navigational("홈택스 로그인"))
         self.assertTrue(h.is_navigational("국민연금공단고객센터전화번호"))
         self.assertFalse(h.is_navigational("연말정산 계산기"))
-        sig = {"docs": 500, "peak": "1,2", "low": "6,7,8"}
-        self.assertAlmostEqual(h.signal_score(sig, 1000, 12), 2 * 3 / 1.5 + 1.0)    # 황금 점수×2 + 다음 달 성수기
+        sig = {"docs": 50000, "hits": 6, "old": 3, "peak": "1,2", "low": "6,7,8"}
+        gs = 3 * (1 - 6 / 30) + 0.5 * 3 / 6
+        self.assertAlmostEqual(h.signal_score(sig, 1000, 12), 2 * gs + 1.0)    # 황금 점수×2 + 다음 달 성수기
         self.assertAlmostEqual(h.signal_score(sig, 1000, 12, "홈택스 로그인"), 1.0)   # 사이트 찾아가는 검색은 황금 가점 없음
-        self.assertAlmostEqual(h.signal_score({"docs": 50000, "low": "7"}, 1000, 7), 2 * 3 / 51 - 0.5)
+        self.assertAlmostEqual(h.signal_score({"docs": 50000, "hits": 30, "old": 0, "low": "7"}, 1000, 7), -0.5)
         self.assertEqual(h.signal_score(None, 1000, 1), 0.0)
-        self.assertEqual(h.describe(sig, 1000), "좋음 2.0 / 성수기 1·2월 / 이 주제 블로그 글 약 500개(검색 1회당 0.5개)")
-        self.assertAlmostEqual(h.gold_score({"docs": 900000, "exact": 1000}, 5000), h.gold_score({"docs": 1000}, 5000))  # 추정 글 수 우선
+        self.assertEqual(h.describe(sig, 1000), f"좋음 {gs:.1f} / 성수기 1·2월 / 상위 30개 중 정면 경쟁 6개(1년 넘은 글 3개)")
 
     def test_daily_limit_per_kind(self):
         import datetime as dt
@@ -1659,7 +1663,8 @@ class NaverHubTest(unittest.TestCase):
         conn = self._db()
         settings = BotSettings(min_volume=500, max_volume=30000)
         conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES ('홈택스 로그인','홈택스로그인',20000,'2026-11-05','2026-11-05')")
-        docs = {"연말정산 계산기": 1000, "캠핑 준비물": 900000, "근로장려금 신청": 50000}
+        docs = {"연말정산 계산기": {"docs": 1000, "hits": 1, "old": 0}, "캠핑 준비물": {"docs": 900000, "hits": 28, "old": 0},
+                "근로장려금 신청": {"docs": 50000, "hits": 20, "old": 0}}
         saved_batches = []
 
         def fake_totals(words, k, t, save=None):
@@ -1672,10 +1677,10 @@ class NaverHubTest(unittest.TestCase):
             msg = h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=("i", "k"))
         self.assertEqual(sorted(saved_batches[0]), ["근로장려금 신청", "연말정산 계산기"])  # 돈·계산기 먼저, 캠핑은 다음 날, 로그인은 안 봄
         self.assertIn("황금 1개", msg)                                       # 연말정산 계산기: 검색 1회당 0.2개
-        self.assertIn("연말정산계산기 3.1(검색 5,000/글 1,000)", msg)
+        self.assertIn("연말정산계산기 3.6(검색 5,000/정면 경쟁 1개)", msg)
         got = {c["keyword"]: c for c in select_keyword.ranked_candidates(conn, settings, limit=10)}
         self.assertIn("연말정산 계산기", got)                                # 오늘 수집분이 아니어도 황금이면 후보
-        self.assertTrue(got["연말정산 계산기"]["naver"].startswith("황금 3.1"))
+        self.assertTrue(got["연말정산 계산기"]["naver"].startswith("황금 3.6"))
         self.assertNotIn("캠핑 준비물", got)                                 # 오늘 수집분도 황금도 아님
         self.assertIn("키 없음", h.scan_golden(conn, settings, dt.date(2026, 11, 5), keys=()))
 
@@ -1684,16 +1689,15 @@ class NaverHubTest(unittest.TestCase):
         conn = self._db()
         h.load(conn)
         conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES ('육아휴직급여','육아휴직급여',1500,'2026-10-01','2026-10-01')")
-        conn.execute("INSERT INTO naver_signals(norm, docs, docs_checked) VALUES ('육아휴직급여', 300, '2026-11-05')")  # 좋음, 검색 1,500
+        conn.execute("INSERT INTO naver_signals(norm, docs, hits, docs_checked) VALUES ('육아휴직급여', 3000, 4, '2026-11-05')")  # 좋음, 검색 1,500
         heads = discover._modifier_heads(conn, "2026-11-05", 10)
         self.assertEqual(heads[0], "육아휴직급여")      # 오늘 수집분·3,000 미만이어도 황금·좋음이면 롱테일 조합 먼저
         conn.execute("DELETE FROM keywords WHERE status IN ('new','ok') AND last_checked < ? AND norm NOT IN ("
-                     " SELECT n.norm FROM naver_signals n JOIN keywords k ON k.norm = n.norm WHERE n.docs IS NOT NULL AND n.docs < k.total)",
-                     ("2026-11-03",))
+                     " SELECT norm FROM naver_signals WHERE hits IS NOT NULL AND hits <= ?)", ("2026-11-03", h.GOOD_HITS))
         left = {r[0] for r in conn.execute("SELECT norm FROM keywords")}
         self.assertIn("육아휴직급여", left)               # 오래됐어도 황금·좋음은 남김
         self.assertNotIn("캠핑준비물", left)
-        self.assertIn("COALESCE(n.exact, n.docs) < k.total", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("hits IS NOT NULL AND hits <= ?", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
 
     def test_blog_totals_saves_chunks_and_stops_on_429(self):
         import datetime as dt
@@ -1711,22 +1715,20 @@ class NaverHubTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, mock.patch.object(h, "COUNTER_DIR", Path(d)), \
                 mock.patch.object(h, "CHUNK", 2), mock.patch.object(h, "WORKERS", 1), mock.patch.object(h, "_call", fake_call):
             got = h.blog_totals(["a", "b", "c", "d", "e"], ("i", "k"), dt.date(2026, 11, 5), save=saved.append)
-        seven = {"docs": 7, "hits": 0, "exact": 0}
+        seven = {"docs": 7, "hits": 0, "old": 0}
         self.assertEqual(got, {"a": seven, "b": seven})  # 429 가 난 묶음부터 멈춤, 앞 묶음은 저장됨
         self.assertEqual(saved, [{"a": seven, "b": seven}])
         self.assertNotIn("e", calls)
 
-    def test_exact_estimate_from_titles(self):
-        """네이버 문서 수는 단어가 모두 든 글 수라 붙여 쓴 롱테일이 부풀어 보임 (11/5: '주휴수당계산' 수십만)
-        → 상위 제목 중 키워드가 그대로 든 비율로 '그 주제 글 수' 추정."""
+    def test_head_on_competition_from_titles(self):
+        """정면 경쟁 = 상위 30개 중 제목에 키워드가 그대로 든 글 수 (전체 문서 수는 붙여 쓴 말을 부풀려 안 씀, 11/5)."""
+        import datetime as dt
         from bot import naver_hub as h
-        items = [{"title": "<b>주휴수당</b> <b>계산</b> 방법"}, {"title": "주휴 수당계산기 총정리"},
-                 {"title": "주휴수당 받는 조건"}, {"title": "알바 계산 실수"}]
+        items = [{"title": "<b>주휴수당</b> <b>계산</b> 방법", "postdate": "20240101"}, {"title": "주휴 수당계산기 총정리", "postdate": "20261001"},
+                 {"title": "주휴수당 받는 조건", "postdate": "20261001"}, {"title": "알바 계산 실수", "postdate": "20200101"}]
         with mock.patch.object(h, "_call", return_value={"total": 400000, "items": items}):
-            got = h._one_total("주휴수당계산", ("i", "k"))
-        self.assertEqual(got, {"docs": 400000, "hits": 2, "exact": 200000})   # 4개 중 2개 제목에 '주휴수당계산'
-        with mock.patch.object(h, "_call", return_value={"total": 0, "items": []}):
-            self.assertEqual(h._one_total("없는말", ("i", "k")), {"docs": 0, "hits": 0, "exact": 0})
+            got = h._one_total("주휴수당계산", ("i", "k"), dt.date(2026, 11, 5))
+        self.assertEqual(got, {"docs": 400000, "hits": 2, "old": 1})   # 제목 일치 2개, 그중 1년 넘은 글 1개
 
     def test_refresh_signals_trend_and_skip_recent(self):
         import datetime as dt

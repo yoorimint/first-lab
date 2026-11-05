@@ -38,12 +38,14 @@ CHECK_TOP = 60               # 성수기를 볼 상위 후보 수 (+ 그 대표 
 REFRESH_DAYS = 30            # 같은 키워드는 이 기간 지나야 다시 조회
 TREND_MONTHS = 24
 PEAK, LOW = 0.8, 0.4         # 월평균이 최고 달의 80% 이상이면 성수기, 40% 이하면 비수기
-# 황금 점수 = log10(월 검색량) ÷ (1 + 검색 1회당 블로그 글 수)  — '검색은 어느 정도 있는데 글은 적은 것'.
-#   비율만 쓰면 검색 50·글 5 같은 작은 키워드가 1등이 되므로 검색량 크기를 곱하고, 구간 없이 매끄럽게 (경계에서 점수가 튀지 않게).
-#   예) 검색 5,000·글 1,000 → 3.1 / 검색 1,000·글 100 → 2.7 / 검색 20,000·글 20만 → 0.4
+# 황금 점수 = log10(월 검색량) × (1 − 정면 경쟁 글 수 ÷ SAMPLE) + 낡은 경쟁 가점 — '검색은 어느 정도 있는데 노리는 글은 적은 것'.
+#   정면 경쟁 글 = 네이버 블로그 검색 상위 SAMPLE 개 중 제목에 키워드가 그대로 든 글 (실제로 이겨야 할 상대를 직접 셈).
+#   전체 문서 수는 쓰지 않음: 네이버는 단어가 모두 든 글을 세서 붙여 쓴 롱테일을 부풀림 ('주휴수당계산' 수십만, 11/5 확인),
+#   상위 비율을 전체 수에 곱해 추정해도 관련도순이라 상위에 일치 글이 몰려 부풀림이 남음 (11/5 운영자 질문에 다시 검토).
+#   예) 검색 5,000·정면 경쟁 2개 → 3.4 / 검색 5,000·경쟁 25개 → 0.6
 GOLD_WEIGHT = 2.0            # 글감 점수에 더하는 배수 (운영자 지시: 황금 점수 높은 것부터)
-GOLD_LABELS = ((0.3, "황금"), (1.0, "좋음"), (3.0, "보통"))  # 검색 1회당 글 수 미만 → 표시 이름
-SATURATED = 30.0             # 검색 1회당 글 30개 초과 → '포화' 표시
+GOLD_HITS, GOOD_HITS, SAT_HITS = 2, 8, 25  # 상위 SAMPLE 개 중 정면 경쟁 글 수: 2개 이하 황금, 8개 이하 좋음, 25개 이상 포화
+OLD_DAYS, OLD_BONUS = 365, 0.5  # 정면 경쟁 글이 1년 넘게 낡았으면 최신 기준 글이 이길 여지 → 가점(낡은 비율 × 0.5)
 FEW_DOCS = 10                # 글이 이보다 적으면 검색 도구가 만든 어색한 조합일 수도 → '확인 필요' 표시 (점수는 그대로)
 # 사이트를 찾아가는 검색: 검색량은 커도 사람들이 공식 사이트로 바로 가서 글을 안 읽음 → 황금 찾기·가점에서 뺌
 NAVIGATIONAL = ("로그인", "홈페이지", "바로가기", "사이트", "고객센터", "전화번호", "콜센터", "앱다운", "어플다운",
@@ -51,11 +53,8 @@ NAVIGATIONAL = ("로그인", "홈페이지", "바로가기", "사이트", "고�
 WORKERS = 8
 CHUNK = 500                  # 이만큼씩 부르고 저장 (중간에 막혀도 받은 만큼은 남김)
 SCHEMA = ("CREATE TABLE IF NOT EXISTS naver_signals (norm TEXT PRIMARY KEY, docs INTEGER, docs_checked TEXT,"
-          " peak TEXT, low TEXT, trend_checked TEXT, hits INTEGER, exact INTEGER)")
+          " peak TEXT, low TEXT, trend_checked TEXT, hits INTEGER, old INTEGER)")
 SAMPLE = 30                  # 상위 몇 개 글의 제목을 볼지 (호출 1회 그대로, 응답만 조금 커짐)
-# 네이버 문서 수는 단어가 모두 든 글을 센다 ('주휴수당계산' → '주휴수당'·'계산'이 따로 든 글까지, 11/5 확인).
-# 그래서 붙여 쓴 롱테일이 포화로 잘못 보임 → 상위 SAMPLE 개 제목 중 키워드가 그대로 든 비율로 '그 주제를 다룬 글 수'를 추정:
-#   exact ≈ 전체 문서 수 × (제목 일치 수 ÷ 받은 글 수). 황금 점수는 이 값으로 계산 (없던 옛 조회는 전체 문서 수).
 
 
 class LimitReached(RuntimeError):
@@ -102,17 +101,16 @@ def _title_key(text: str) -> str:
     return norm(re.sub(r"<[^>]+>", "", html.unescape(text or "")))
 
 
-def _one_total(query: str, keys: tuple[str, str]) -> dict | None:
-    """{docs: 전체 문서 수, hits: 상위 제목 중 키워드가 그대로 든 수, exact: 그 주제를 다룬 글 수 추정}."""
+def _one_total(query: str, keys: tuple[str, str], today: dt.date) -> dict | None:
+    """{docs: 전체 문서 수(표시용), hits: 상위 SAMPLE 개 중 제목에 키워드가 그대로 든 글 수, old: 그중 1년 넘은 글 수}."""
     try:
         got = _call("/search/v1/blog", keys, params={"query": query, "display": SAMPLE})
         if "total" not in got:
             return None
-        docs, items = int(got["total"]), got.get("items") or []
-        want = norm(query)
-        hits = sum(1 for it in items if want in _title_key(it.get("title", "")))
-        exact = round(docs * hits / len(items)) if items else 0
-        return {"docs": docs, "hits": hits, "exact": exact}
+        want, cutoff = norm(query), f"{today - dt.timedelta(days=OLD_DAYS):%Y%m%d}"
+        matched = [it for it in got.get("items") or [] if want in _title_key(it.get("title", ""))]
+        old = sum(1 for it in matched if str(it.get("postdate") or "99999999") < cutoff)
+        return {"docs": int(got["total"]), "hits": len(matched), "old": old}
     except urllib.error.HTTPError as e:
         if e.code == 429:
             raise Throttled("429") from e
@@ -130,7 +128,7 @@ def blog_totals(words: list[str], keys: tuple[str, str], today: dt.date, save=No
             chunk = words[i:i + CHUNK]
             _spend(today, len(chunk), "blog")
             try:
-                got = dict(zip(chunk, pool.map(lambda w: _one_total(w, keys), chunk)))
+                got = dict(zip(chunk, pool.map(lambda w: _one_total(w, keys, today), chunk)))
             except Throttled:
                 break
             out.update(got)
@@ -186,28 +184,32 @@ def is_info(keyword: str) -> bool:
 
 
 def per_search(sig: dict | None, total: int) -> float | None:
-    """검색 1회당 블로그 글 수 (낮을수록 황금)."""
+    """검색 1회당 블로그 문서 수 (표시용 — 점수에는 안 씀, 붙여 쓴 말이 부풀어서)."""
     if not sig or sig.get("docs") is None or total <= 0:
         return None
-    return (sig["exact"] if sig.get("exact") is not None else sig["docs"]) / total
+    return sig["docs"] / total
 
 
 def gold_score(sig: dict | None, total: int) -> float:
-    """황금 점수 = log10(검색량) ÷ (1 + 검색 1회당 글 수). 신호 없으면 0."""
-    ratio = per_search(sig, total)
-    return 0.0 if ratio is None else math.log10(max(total, 1)) / (1 + ratio)
+    """황금 점수 = log10(검색량) × (1 − 정면 경쟁 ÷ SAMPLE) + 낡은 경쟁 가점. 정면 경쟁을 모르면 0 (다시 조회 대상)."""
+    if not sig or sig.get("hits") is None or total <= 0 or (sig.get("docs") or 0) < FEW_DOCS:
+        return 0.0  # 글이 거의 없으면(성인어·어색한 조합 등 네이버가 0으로 보이는 말) 가점 안 줌 — 가짜 황금 방지
+    hits = min(sig["hits"], SAMPLE)
+    bonus = OLD_BONUS * (sig.get("old") or 0) / hits if hits else 0.0
+    return math.log10(max(total, 1)) * (1 - hits / SAMPLE) + bonus
 
 
 def gold_label(sig: dict | None, total: int) -> str:
-    ratio = per_search(sig, total)
-    if ratio is None:
+    if not sig or sig.get("hits") is None:
         return ""
-    if sig["docs"] < FEW_DOCS:
+    if (sig.get("docs") or 0) < FEW_DOCS:
         return "확인 필요(글 거의 없음)"
-    for limit, name in GOLD_LABELS:
-        if ratio < limit:
-            return name
-    return "포화" if ratio > SATURATED else ""
+    hits = sig["hits"]
+    if hits <= GOLD_HITS:
+        return "황금"
+    if hits <= GOOD_HITS:
+        return "좋음"
+    return "포화" if hits >= SAT_HITS else "보통"
 
 
 def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") -> float:
@@ -225,7 +227,7 @@ def signal_score(sig: dict | None, total: int, month: int, keyword: str = "") ->
 
 
 def describe(sig: dict | None, total: int) -> str:
-    """후보 목록에 붙일 한 줄: '황금 3.1 / 성수기 1·2월 / 블로그 글 500개(검색 1회당 0.5개)'."""
+    """후보 목록에 붙일 한 줄: '황금 3.4 / 성수기 1·2월 / 상위 30개 중 정면 경쟁 2개(1년 넘은 글 1개)'."""
     if not sig:
         return ""
     parts = []
@@ -234,10 +236,8 @@ def describe(sig: dict | None, total: int) -> str:
         parts.append(f"{label} {gold_score(sig, total):.1f}")
     if sig.get("peak"):
         parts.append(f"성수기 {'·'.join(sig['peak'].split(','))}월")
-    ratio = per_search(sig, total)
-    if ratio is not None:
-        est = sig["exact"] if sig.get("exact") is not None else sig["docs"]
-        parts.append(f"이 주제 블로그 글 약 {est:,}개(검색 1회당 {ratio:.1f}개)")
+    if sig.get("hits") is not None:
+        parts.append(f"상위 {SAMPLE}개 중 정면 경쟁 {sig['hits']}개" + (f"(1년 넘은 글 {sig['old']}개)" if sig.get("old") else ""))
     return " / ".join(parts)
 
 
@@ -270,7 +270,7 @@ def publish_priority(keywords: dict[int, str], month: int, conn=None) -> dict[in
 def load(conn) -> dict[str, dict]:
     conn.execute(SCHEMA)
     have = {r[1] for r in conn.execute("PRAGMA table_info(naver_signals)")}
-    for col in ("hits", "exact"):  # 11/5 첫 판에는 없던 열
+    for col in ("hits", "old"):  # 11/5 첫 판에는 없던 열
         if col not in have:
             conn.execute(f"ALTER TABLE naver_signals ADD COLUMN {col} INTEGER")
     return {r["norm"]: dict(r) for r in conn.execute("SELECT * FROM naver_signals")}
@@ -282,10 +282,10 @@ def _save_docs(conn, docs: dict[str, dict | int | None], today: dt.date) -> int:
     for w, got in docs.items():
         if got is None:
             continue
-        got = got if isinstance(got, dict) else {"docs": got, "hits": None, "exact": None}
-        rows.append((norm(w), got["docs"], got.get("hits"), got.get("exact"), f"{today:%Y-%m-%d}"))
-    conn.executemany("INSERT INTO naver_signals(norm, docs, hits, exact, docs_checked) VALUES (?,?,?,?,?) "
-                     "ON CONFLICT(norm) DO UPDATE SET docs=excluded.docs, hits=excluded.hits, exact=excluded.exact,"
+        got = got if isinstance(got, dict) else {"docs": got, "hits": None, "old": None}
+        rows.append((norm(w), got["docs"], got.get("hits"), got.get("old"), f"{today:%Y-%m-%d}"))
+    conn.executemany("INSERT INTO naver_signals(norm, docs, hits, old, docs_checked) VALUES (?,?,?,?,?) "
+                     "ON CONFLICT(norm) DO UPDATE SET docs=excluded.docs, hits=excluded.hits, old=excluded.old,"
                      " docs_checked=excluded.docs_checked", rows)
     conn.commit()
     return len(rows)
@@ -308,7 +308,7 @@ def scan_golden(conn, settings, today: dt.date | None = None, keys=None) -> str:
 
     def stale(n: str) -> bool:
         sig = known.get(n) or {}
-        return (sig.get("docs_checked") or "") < cutoff or sig.get("exact") is None  # 제목 일치 없이 본 옛 조회는 다시
+        return (sig.get("docs_checked") or "") < cutoff or sig.get("hits") is None  # 정면 경쟁 없이 본 옛 조회는 다시
 
     fresh = [r for r in rows if stale(r["norm"]) and is_allowed(r["keyword"], settings.blocked_words) and is_info(r["keyword"])]
     fresh.sort(key=lambda r: (topic_weight(r["norm"]), r["total"]), reverse=True)
@@ -334,13 +334,12 @@ def golden_report(conn, rows=None, top_n: int = 5) -> str:
     scored = []
     for r in rows:
         sig = sigs.get(r["norm"])
-        if sig and sig.get("docs") is not None and is_info(r["keyword"]):
-            est = sig["exact"] if sig.get("exact") is not None else sig["docs"]
-            scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], est))
+        if sig and sig.get("hits") is not None and is_info(r["keyword"]):
+            scored.append((gold_score(sig, r["total"]), gold_label(sig, r["total"]), r["norm"], r["total"], sig.get("hits")))
     scored.sort(reverse=True)
     gold = [x for x in scored if x[1] == "황금"]
     shown = [x for x in scored if x[1] in ("황금", "좋음")]  # '확인 필요(글 거의 없음)'·포화는 목록에서 뺌
-    top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/글 {d:,})" for g, _, n, t, d in shown[:top_n])
+    top = ", ".join(f"{n} {g:.1f}(검색 {t:,}/정면 경쟁 {h}개)" for g, _, n, t, h in shown[:top_n])
     return f"조회 {len(scored):,}개 중 황금 {len(gold):,}개 — 황금 점수 상위: {top or '없음'}"
 
 
