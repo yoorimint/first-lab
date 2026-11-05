@@ -1262,5 +1262,54 @@ class SeasonTest(unittest.TestCase):
         # 11월: 에너지바우처(시즌 중) 먼저 — 종합소득세(시즌 지남)는 가장 오래됐어도 뒤로
         self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "90")
 
+
+class LawWatchTest(unittest.TestCase):
+    """법령 변경 감시 (11/5 운영자 승인): 곧 시행될 개정은 글감으로, 막 시행된 개정은 기존 글 재검증."""
+
+    LAW = ("제46조(구직급여일액) ① ... 부칙 <법률 제21473호, 2026. 9. 2.> 제1조(시행일) 이 법은 2026년 9월 18일부터 시행한다. "
+           "다만, 제46조 및 제48조의 개정규정은 2027년 1월 1일부터 시행한다.")
+
+    def test_scan_upcoming_and_just_effective(self):
+        import datetime as dt
+        from bot import law_watch
+        laws = {"https://www.law.go.kr/법령/고용보험법": {"실업급여신청절차"}}
+        upcoming, just = law_watch.scan(laws, dt.date(2026, 10, 1), fetcher=lambda u: self.LAW)
+        self.assertEqual([(u["date"], u["articles"]) for u in upcoming], [("2027-01-01", ["제46조", "제48조"])])
+        self.assertEqual(just[0]["date"], "2026-09-18")
+        self.assertEqual(upcoming[0]["key"], "고용보험법|2027-01-01")
+        self.assertEqual(upcoming[0]["posts"], ["실업급여신청절차"])
+
+    def test_law_key_dedupes(self):
+        from bot.law_watch import law_key
+        self.assertEqual(law_key("https://www.law.go.kr/법령/고용보험법/제46조"), law_key("https://www.law.go.kr/법령/고용보험법"))
+        self.assertEqual(law_key("https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=284449&efYd=20260918"),
+                         "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918")
+        self.assertIsNone(law_key("https://www.law.go.kr/LSW/flDownload.do?flSeq=1"))  # 별표 PDF
+
+    def test_refresh_picks_law_changed_post_first(self):
+        from bot import refresh
+        posts = [{"id": 1, "title": "a", "url": "u1", "date": "2026-11-01", "refreshed": "", "has_number": True, "law_changed": ""},
+                 {"id": 2, "title": "b", "url": "u2", "date": "2026-11-01", "refreshed": "2026-10-01", "has_number": True,
+                  "law_changed": "2026-11-01 고용보험법"}]
+        with mock.patch.object(refresh, "wp_cli", return_value=json.dumps(posts)), \
+             mock.patch.object(refresh, "_history", return_value=(None, None)), mock.patch.object(refresh, "siblings", return_value=[]):
+            picks = refresh.pick_targets(sqlite3.connect(":memory:"), 1)
+        self.assertEqual((picks[0][0]["id"], picks[0][1]), (2, "recheck"))
+
+    def test_done_list_survives_concurrent_save(self):
+        from bot import state as st
+        mine = {"plan": {}, "done": {}, "used_keywords": [], "log": [], "law_changes_done": []}
+        stored = {"law_changes_done": ["고용보험법|2027-01-01"]}
+        written = []
+        with mock.patch.object(st, "load_state", return_value=stored), \
+             mock.patch.object(st, "wp_cli", side_effect=lambda *a: written.append(a) or ""), \
+             mock.patch.object(st, "STATE_LOCK", "/nonexistent-dir/x.lock"):
+            st.save_state(mine)
+        self.assertEqual(json.loads(written[-1][3])["law_changes_done"], ["고용보험법|2027-01-01"])
+
+    def test_writer_gets_law_changes(self):
+        self.assertIn("law_changes", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        self.assertIn("law_changes", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
 if __name__ == "__main__":
     unittest.main()

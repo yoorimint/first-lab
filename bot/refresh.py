@@ -56,6 +56,7 @@ foreach ( get_posts( array( 'post_status' => 'publish', 'numberposts' => 500 ) )
         'id' => $p->ID, 'title' => $p->post_title, 'url' => get_permalink( $p ),
         'date' => get_the_date( 'Y-m-d', $p ),
         'refreshed' => (string) get_post_meta( $p->ID, '_firstlab_refreshed', true ),
+        'law_changed' => (string) get_post_meta( $p->ID, '_firstlab_law_changed', true ),
         'has_number' => (bool) preg_match( '/\d/', wp_strip_all_tags( $p->post_content ) ),
     );
 }
@@ -108,6 +109,10 @@ def pick_targets(conn, limit: int) -> list[tuple[dict, str, str]]:
     recent = (now - timedelta(days=MIN_DAYS_BETWEEN)).strftime("%Y-%m-%d")
     picks: list[tuple[int, dict, str, str]] = []
     for p in posts:
+        law = p.get("law_changed") or ""
+        if law and law[:10] > (p["refreshed"] or ""):  # 근거 법령 개정이 마지막 갱신 뒤에 시행 (bot/law_watch.py)
+            picks.append((-1, p, "recheck", f"근거 법령 개정 시행: {law}"))
+            continue
         if p["refreshed"] and p["refreshed"] >= recent:
             continue
         latest, older = _history(conn, p["url"])

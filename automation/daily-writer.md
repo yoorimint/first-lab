@@ -14,6 +14,7 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 - 스크래치 폴더(작업 파일)는 저장소 밖에 둔다.
 
 ## 1. 글감 고르기
+- **바뀌는 제도 먼저**: 1단계 응답의 `law_changes`(우리 글의 근거 법령 중 곧 시행될 개정)가 있으면 첫 항목을 글감으로 한다 — "○○년 ○월부터 바뀌는 ○○" 처럼 시행일과 바뀌는 내용을 `python3 -m bot.lawtext <법령명> <제N조>` 로 원문 확인해 쓰고, 큐 JSON 에 `"law_change": "<항목의 key>"` 를 넣는다. 다룰 만한 내용이 없는 개정(용어 정리 등)이면 건너뛰고 보고에 적는다.
 ```
 curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/firstlab/v1/next
 ```

@@ -37,6 +37,8 @@ add_action(
 						'held_drafts'    => firstlab_api_held_drafts(),
 						'image_checks'   => firstlab_api_image_checks(), // 사진 검사할 글 (daily-writer.md 5-2)
 						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 20 ),
+						// 앞으로 시행될 근거 법령 개정 (bot/law_watch.py) — 아직 글을 안 쓴 것만 (daily-writer.md 1단계)
+						'law_changes'   => firstlab_api_law_changes( $state ),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
 						'target_length' => (int) ( $settings['target_length'] ?? 3000 ),
@@ -169,6 +171,18 @@ function firstlab_api_post( WP_REST_Request $request ) {
 		// 근거 대조 결과 (bot/source_check.py, 기록만): 감시 세션이 외부 검수 결과와 비교
 		'source_check' => json_decode( (string) get_post_meta( $post->ID, '_firstlab_source_check', true ), true ),
 	);
+}
+
+/** 법령 감시가 찾은 '앞으로 시행될 개정' 중 아직 글을 쓰지 않은 것 (이미 쓴 것은 law_changes_done). */
+function firstlab_api_law_changes( array $state ): array {
+	$done = (array) ( $state['law_changes_done'] ?? array() );
+	$out  = array();
+	foreach ( (array) ( $state['law_changes']['upcoming'] ?? array() ) as $item ) {
+		if ( ! in_array( $item['key'] ?? '', $done, true ) ) {
+			$out[] = $item;
+		}
+	}
+	return array_slice( $out, 0, 10 );
 }
 
 /** 토큰 확인 (원문은 서버 비밀값, 워드프레스에는 해시만). */

@@ -21,8 +21,9 @@ from .settings import wp_cli
 STATE_OPTION = "firstlab_bot_state"
 REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
-DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired", "publish_fired", "continuous", "maint_fired")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
+DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired", "publish_fired", "continuous", "maint_fired", "law_changes")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
 MAX_LOG = 30
+MERGE_LISTS = ("used_keywords", "law_changes_done")  # 저장 때 다른 실행의 값과 합칠 목록
 STATE_LOCK = "/run/firstlab-state.lock"  # 봇(1분)·배포(글 올리기)·키워드 수집이 상태를 동시에 저장할 때 순서 맞춤
 MAX_USED = 2000
 
@@ -61,8 +62,10 @@ def merge_stored(state: dict, stored: dict) -> None:
     extra = [e for e in stored.get("log", []) if (e.get("time"), e.get("msg")) not in mine]
     if extra:
         state["log"] = sorted(state["log"] + extra, key=lambda e: str(e.get("time", "")), reverse=True)
-    seen = set(state["used_keywords"])
-    state["used_keywords"] += [k for k in stored.get("used_keywords", []) if k not in seen]
+    for key in MERGE_LISTS:  # 여러 실행이 덧붙이는 목록은 합집합
+        mine_list = state.setdefault(key, [])
+        seen = set(mine_list)
+        mine_list += [k for k in stored.get(key, []) or [] if k not in seen]
 
 
 def save_state(state: dict) -> None:

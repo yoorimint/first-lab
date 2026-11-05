@@ -154,6 +154,11 @@ def main() -> None:
         msg, ok = f"키워드 수집 실패: {e}", False
     print(msg, flush=True)
     STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
+    try:  # 법령 변경 감시 (bot/law_watch.py) — 실패해도 수집·갱신은 계속
+        from .law_watch import run as watch_laws
+        print(watch_laws(), flush=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"법령 감시 실패: {e}", flush=True)
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
     # 발행된 글 갱신 (서치콘솔 반영 직후, 주당 한도 안에서 하루 최대 1개)
