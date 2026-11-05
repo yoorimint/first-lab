@@ -2288,7 +2288,9 @@ class DeployWatchTest(unittest.TestCase):
         state, t0 = {}, datetime(2026, 11, 5, 10, 0)
         self.assertIsNone(dw.check(state, t0, "aaa", "bbb"))
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=50), "aaa", "ccc"))      # main 이 움직여도 서버가 그대로면 시계 계속
-        self.assertIn("61분째", dw.check(state, t0 + timedelta(minutes=61), "aaa", "ccc"))
+        alert = dw.check(state, t0 + timedelta(minutes=61), "aaa", "ccc")
+        self.assertIn("61분째", alert)
+        self.assertIn("검사가 모두 통과하면 GitHub 쪽", alert)   # 11/6 결제·한도로 막힘 — 글쓰기 작업이 고칠 것 없이 헤매지 않게
         self.assertIn("deploy_alert", state)
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=70), "ccc", "ccc"))      # 올라가면 풀림
         self.assertNotIn("deploy_alert", state)

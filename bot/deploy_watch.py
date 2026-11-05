@@ -38,7 +38,8 @@ def check(state: dict, now: datetime, deployed: str, main: str) -> str | None:
         state.pop("deploy_alert", None)
         return None
     alert = (f"배포가 {int(waited)}분째 안 올라감 (서버 {deployed[:7]}, main {main[:7]}) — 배포 전 검사 실패일 가능성이 큼: "
-             "python3 -m unittest discover -s tests && node tests/test_calculators.mjs 로 원인을 찾아 고친다")
+             "python3 -m unittest discover -s tests && node tests/test_calculators.mjs 로 원인을 찾아 고친다. "
+             "검사가 모두 통과하면 GitHub 쪽 문제(11/6 결제·사용 한도로 작업 시작 안 됨) — 고칠 것 없음, 운영자 확인 필요")
     state["deploy_alert"] = alert
     return alert
 

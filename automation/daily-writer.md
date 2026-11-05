@@ -31,7 +31,7 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/firstlab/v1/next
 ```
 - 응답의 `write_mode` 가 `"direct"` 가 아니면(설정 페이지에서 "API 봇" 선택) 글을 쓰지 말고 "봇 방식이라 쉼"으로 끝낸다.
-- **배포가 막혔으면 그것부터**: 응답의 `deploy_alert` 가 있으면 GitHub 검사와 같게 root 가 아닌 사용자로 `useradd -M ci 2>/dev/null; runuser -u ci -- env HOME=/tmp python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` 를 돌려 (root 로는 권한 문제가 안 보임) 실패한 검사를 고쳐(대개 지난 실행이 올린 파일) 커밋·main 에 올리고, 그 뒤에 아래를 한다. 못 고치면 보고 첫 줄에 "배포 막힘: <실패한 검사>".
+- **배포가 막혔으면 그것부터**: 응답의 `deploy_alert` 가 있으면 GitHub 검사와 같게 root 가 아닌 사용자로 `useradd -M ci 2>/dev/null; runuser -u ci -- env HOME=/tmp python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` 를 돌려 (root 로는 권한 문제가 안 보임) 실패한 검사를 고쳐(대개 지난 실행이 올린 파일) 커밋·main 에 올리고, 그 뒤에 아래를 한다. 못 고치면 보고 첫 줄에 "배포 막힘: <실패한 검사>". 검사가 모두 통과하면 GitHub 쪽 문제(결제·한도 등)라 고칠 것이 없다 — 보고 첫 줄 "배포 막힘: GitHub 쪽(검사 통과)" 만 쓰고 바로 다음 일.
 - **고친 내용이 안 들어간 글**: 응답의 `patch_problems` 가 있으면 첫 항목의 글(글 번호)을 `python3 automation/unreviewed.py <번호>` 로 받아, 그 문구를 고친 본문으로 6단계 갱신 파일(`refresh`, `base_modified` 는 응답 대신 받은 글의 값)을 올린다.
 - **대기 글 검수** (`review_target` 이 있고 실행 순서상 차례일 때 — 새 글은 안 씀):
   0. 그 글 번호가 저장소 `automation/reviewed.txt` 에 이미 있으면 앞 실행이 끝낸 것 — 검수하지 말고 다음 무거운 일로
