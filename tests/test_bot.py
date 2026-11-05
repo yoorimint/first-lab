@@ -1073,5 +1073,20 @@ class LawTextTest(unittest.TestCase):
         self.assertIn("[예외·단서]", out.getvalue())
         self.assertNotIn("도태", out.getvalue())
 
+
+class SchemaPluginTest(unittest.TestCase):
+    """AEO·GEO (11/5 운영자 승인): 글 화면에 Article 구조화 데이터와 업데이트 날짜. 빠지면 검색·AI 가 작성자·시점·근거를 못 읽는다."""
+
+    SRC = (ROOT / "wordpress" / "mu-plugins" / "first-lab-schema.php").read_text(encoding="utf-8")
+
+    def test_article_fields(self):
+        for field in ("'Article'", "'datePublished'", "'dateModified'", "'author'", "'publisher'", "'image'", "'citation'", "'inLanguage'"):
+            self.assertIn(field, self.SRC)
+
+    def test_citation_uses_official_links_section(self):
+        # 글 끝 공식 링크 제목이 바뀌면 인용 출처가 비므로 같은 문구를 쓰는지 확인
+        from bot.sources import HEADING
+        self.assertIn(f"'{HEADING}'", self.SRC)
+
 if __name__ == "__main__":
     unittest.main()
