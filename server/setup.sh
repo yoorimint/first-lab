@@ -22,17 +22,26 @@ log "배포 버전: $(git -C "$REPO_DIR/.." log -1 --format='%h %s' 2>/dev/null 
 # ---------- 백업 & 실패 시 복구 ----------
 log "기존 설정 백업: $BACKUP"
 mkdir -p "$BACKUP"
-cp -a /etc/nginx/sites-available/$SITE "$BACKUP/" 2>/dev/null || true
+# nginx 설정은 서로 물려 있어(사이트 설정의 fastcgi_cache ↔ conf.d 의 캐시 영역) 한 묶음으로 백업·복구한다
+# (11/5 복구가 conf.d 만 지워 'zone firstlab_cache is unknown' — 디스크 설정이 깨진 채 남음)
+NGINX_FILES="/etc/nginx/sites-available/$SITE /etc/nginx/conf.d/$SITE-http.conf /etc/nginx/snippets/$SITE-ssl.conf /etc/nginx/snippets/$SITE-headers.conf"
+for f in $NGINX_FILES; do
+  [ -f "$f" ] && mkdir -p "$BACKUP/nginx$(dirname "$f")" && cp -a "$f" "$BACKUP/nginx$f"
+done
 cp -a /etc/php/$PHP_VER/fpm/pool.d "$BACKUP/"
 
 restore() {
   echo "!! 오류 발생 → 설정 복구 중"
-  cp -a "$BACKUP/$SITE" /etc/nginx/sites-available/$SITE 2>/dev/null || true
-  rm -f /etc/nginx/conf.d/$SITE-http.conf
+  for f in $NGINX_FILES; do
+    if [ -f "$BACKUP/nginx$f" ]; then cp -a "$BACKUP/nginx$f" "$f"; else rm -f "$f"; fi   # 처음 설치라 백업이 없으면 새 파일을 지움
+  done
   rm -rf /etc/php/$PHP_VER/fpm/pool.d && cp -a "$BACKUP/pool.d" /etc/php/$PHP_VER/fpm/
   systemctl restart php$PHP_VER-fpm || true
-  nginx -t && systemctl reload nginx
-  echo "!! 복구 완료 (사이트는 이전 상태로 동작)"
+  if nginx -t && systemctl reload nginx; then
+    echo "!! 복구 완료 (사이트는 이전 상태로 동작)"
+  else
+    echo "!! 복구 실패: nginx 설정 검사 실패 — 실행 중인 nginx 는 이전 설정으로 계속 동작, 재시작하면 멈춤 (다음 배포가 다시 설치)"
+  fi
 }
 trap restore ERR
 
@@ -45,9 +54,15 @@ log "파일 권한 설정 (소유자=$WP_USER, nginx는 읽기만)"
 mkdir -p "$TMP_DIR" "$CACHE_DIR"
 chown "$WP_USER:$WP_USER" "$TMP_DIR" && chmod 700 "$TMP_DIR"
 chown www-data:www-data "$CACHE_DIR"
-chown -R "$WP_USER:www-data" "$WEB_ROOT"
-find "$WEB_ROOT" -type d -exec chmod 2750 {} +  # setgid: 새로 생기는 파일·폴더(업로드 이미지 등)도 그룹 www-data 를 물려받아 nginx 가 읽을 수 있게
-find "$WEB_ROOT" -type f -exec chmod 640 {} +
+# 사이트가 도는 중이라 SQLite 임시 파일(-shm·-wal)이 찾은 뒤 지워질 수 있다 → 그 파일은 건너뛰고, 사라진 파일 오류는 무시
+# (11/5 'chmod: cannot access …/.ht.sqlite-shm' 로 배포 실패)
+LIVE=( \( -name '*.sqlite-shm' -o -name '*.sqlite-wal' -o -name '*.sqlite-journal' \) -prune -o )
+perm() {  # 사라진 파일 때문에 생긴 오류만이면 계속 (남은 오류는 기록)
+  find "$WEB_ROOT" -ignore_readdir_race "${LIVE[@]}" "$@" 2>&1 | grep -v "No such file or directory" | sed 's/^/  권한 경고: /' || true
+}
+perm -exec chown "$WP_USER:www-data" {} +
+perm -type d -exec chmod 2750 {} +  # setgid: 새로 생기는 파일·폴더(업로드 이미지 등)도 그룹 www-data 를 물려받아 nginx 가 읽을 수 있게
+perm -type f -exec chmod 640 {} +
 
 # ---------- 3. wp-config 보안 상수 ----------
 log "wp-config.php 보안 설정"

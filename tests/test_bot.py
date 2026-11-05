@@ -2369,6 +2369,41 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class SetupScriptTest(unittest.TestCase):
+    """배포 스크립트 (11/5 51e51cf 배포 실패: 권한 설정 중 SQLite 임시 파일이 사라져 chmod 실패 →
+    복구가 conf.d 캐시 설정만 지워 nginx 설정 검사 실패, 디스크 설정이 깨진 채 남음)."""
+
+    SETUP = ROOT / "server" / "setup.sh"
+
+    def test_permissions_skip_live_sqlite_files(self):
+        import os
+        import subprocess
+        import tempfile
+        text = self.SETUP.read_text(encoding="utf-8")
+        self.assertNotIn("chown -R", text)
+        block = re.search(r"^LIVE=\(.*?^perm -type f[^\n]*", text, re.S | re.M).group(0)
+        with tempfile.TemporaryDirectory() as d:
+            db, up = Path(d, "db"), Path(d, "up")
+            db.mkdir(), up.mkdir()
+            Path(db, ".ht.sqlite").write_text("x"), Path(db, ".ht.sqlite-shm").write_text("x"), Path(up, "a.jpg").write_text("x")
+            os.chmod(Path(db, ".ht.sqlite-shm"), 0o600)
+            script = f"set -euo pipefail\nWEB_ROOT={d}\nWP_USER=$(id -un)\n{block}\necho done"
+            out = subprocess.run(["bash", "-c", script], capture_output=True, text=True)
+            self.assertEqual(out.returncode, 0, out.stderr)
+            self.assertEqual(oct(os.stat(Path(up, "a.jpg")).st_mode & 0o777), "0o640")
+            self.assertEqual(oct(os.stat(Path(db, ".ht.sqlite-shm")).st_mode & 0o777), "0o600")  # 사이트가 쓰는 임시 파일은 안 건드림
+
+    def test_restore_puts_back_all_nginx_files(self):
+        text = self.SETUP.read_text(encoding="utf-8")
+        restore = re.search(r"^restore\(\) \{.*?^\}", text, re.S | re.M).group(0)
+        installed = set(re.findall(r'install -m 644 "\$REPO_DIR/nginx/[^"]+"\s+(\S+)', text))
+        files = re.search(r'^NGINX_FILES="([^"]+)"', text, re.M).group(1).split()
+        self.assertEqual({f.replace("$SITE", "first-lab") for f in installed}, {f.replace("$SITE", "first-lab") for f in files})
+        self.assertIn('cp -a "$BACKUP/nginx$f" "$f"', restore)       # 새로 설치한 nginx 파일은 모두 백업에서 되돌림
+        self.assertNotIn("rm -f /etc/nginx/conf.d", restore)          # 한 파일만 지워 서로 안 맞는 설정을 남기지 않음
+        self.assertIn("복구 실패", restore)                           # 실패를 '복구 완료'로 적지 않음
+
+
 class ExcerptExclusionTest(unittest.TestCase):
     """요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762, 글쓰기 작업 검수가 놓침)."""
 
