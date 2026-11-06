@@ -1562,6 +1562,25 @@ class SilentFailureTest(unittest.TestCase):
         self.assertIn("quality_report", (ROOT / "automation" / "tick.py").read_text(encoding="utf-8"))
 
 
+class AppendOnlyMergeTest(unittest.TestCase):
+    """끝에 줄만 붙이는 기록 파일은 동시에 붙여도 충돌 없이 양쪽을 남김 (11/6 reviewed.txt 충돌로 감시 세션 push 실패)."""
+
+    def test_union_merge(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as d:
+            run = lambda *a: subprocess.run(["git", "-C", d, *a], capture_output=True, text=True, check=True)  # noqa: E731
+            run("init", "-q", "-b", "main")
+            run("config", "user.email", "t@t"); run("config", "user.name", "t")
+            (Path(d) / ".gitattributes").write_text((ROOT / ".gitattributes").read_text(encoding="utf-8"), encoding="utf-8")
+            (Path(d) / "automation").mkdir()
+            f = Path(d) / "automation" / "reviewed.txt"
+            f.write_text("1 a\n", encoding="utf-8"); run("add", "-A"); run("commit", "-qm", "base")
+            run("checkout", "-qb", "other"); f.write_text("1 a\ncalc:x\n", encoding="utf-8"); run("commit", "-qam", "o")
+            run("checkout", "-q", "main"); f.write_text("1 a\n2 b\n", encoding="utf-8"); run("commit", "-qam", "m")
+            run("merge", "-q", "--no-edit", "other")
+            self.assertEqual(sorted(f.read_text(encoding="utf-8").split("\n")[:3]), ["1 a", "2 b", "calc:x"])
+
+
 class DomesticWorkerLawTest(unittest.TestCase):
     """'가사근로자는 근로기준법 제17조가 적용되지 않아요'만 쓰고 가사근로자법 제14조(서면 교부)·제26조(벌금)를 뺌 (11/6 #1036)."""
 

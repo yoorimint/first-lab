@@ -1,0 +1,5 @@
+# 끝에 줄만 붙이는 기록 파일: 동시에 붙이면(글쓰기 두 칸·감시 세션) 양쪽 줄을 다 남김 — 11/6 reviewed.txt 충돌로 push 실패
+automation/reviewed.txt merge=union
+automation/quality-log.csv merge=union
+automation/review-only-log.md merge=union
+automation/source-check-log.md merge=union
