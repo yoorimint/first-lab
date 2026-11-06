@@ -3062,6 +3062,45 @@ class LimitedEventYearTest(unittest.TestCase):
         self.assertIn('"limited_event_year"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
 
 
+class OfficialLinksTest(unittest.TestCase):
+    """본문에 글자로만 적힌 공식 사이트를 화면에서 링크로 (11/6 운영자 '공식사이트 링크 만들어라' — 자동차세 납부 조회 글)."""
+
+    def run_php(self, html):
+        import os
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("<?php define('ABSPATH', 1); function add_filter() {} function esc_url($s) { return $s; }\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-official-links.php'}';\n"
+                "echo firstlab_official_links(getenv('H'));")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            return subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env={**os.environ, "H": html}).stdout
+        finally:
+            os.unlink(f.name)
+
+    def test_domain_and_name(self):
+        out = self.run_php("<p>서울은 서울시 ETAX(etax.seoul.go.kr), 그 밖은 위택스(wetax.go.kr)에서 조회해요. 위택스 앱도 있어요.</p>")
+        self.assertIn('<a href="https://etax.seoul.go.kr"', out)
+        self.assertIn('>wetax.go.kr</a>', out)
+        self.assertEqual(out.count('class="firstlab-official"'), 2)     # 사이트마다 첫 곳만 (주소가 있으면 주소에)
+        self.assertIn("위택스 앱도", out)
+
+    def test_leaves_links_headings_and_lookalikes(self):
+        html = ('<h2>정부24 신청</h2><p><a href="https://www.hometax.go.kr">홈택스</a>와 홈택스 앱, '
+                'mygov.kr 과 정부24시간 상담</p>')
+        out = self.run_php(html)
+        self.assertIn("<h2>정부24 신청</h2>", out)              # 제목 안은 그대로
+        self.assertEqual(out.count("hometax.go.kr"), 1)         # 이미 링크가 있는 사이트는 더 안 붙임
+        self.assertNotIn('href="https://www.gov.kr"', out)      # 'mygov.kr'·'정부24시간'은 다른 말
+
+    def test_max_links(self):
+        out = self.run_php("<p>위택스 홈택스 정부24 복지로 고용24</p>")
+        self.assertEqual(out.count('class="firstlab-official"'), 3)
+
+
 class TocWebpTest(unittest.TestCase):
     """워드프레스 꿀팁 2·3번 (11/6 운영자 '2,3번만 해라'): 긴 글 목차, 화면용 사진 WebP."""
 
