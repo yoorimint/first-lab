@@ -2877,6 +2877,37 @@ class PlanCountTest(unittest.TestCase):
                 self.assertEqual(len(set(plan)), len(times), (day, times, plan))
 
 
+class ScheduleSavedTest(unittest.TestCase):
+    """설정 저장 직후 화면이 옛 계획을 보여 '반영 안 됨'으로 보임 (11/6 운영자) → 저장한 시각과 계획을 만든 시각이 다르면 알림.
+    설정 페이지(PHP)가 시각을 읽는 규칙이 봇(bot/settings.py)과 같아야 알림이 맞음."""
+
+    SAMPLES = ["09:00\n18:00", "9:00 20:30", "9시 30분\n18시", "09:00\n09:00", "25:00\n7:5", "", "08:00, 12:00, 15:00, 21:00"]
+
+    def test_php_reads_times_like_bot(self):
+        import os
+        import shutil
+        import subprocess
+        from bot.settings import _times
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        plugin = ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php"
+        src = plugin.read_text(encoding="utf-8")
+        func = src[src.index("function firstlab_bot_schedule_times"):src.index("function firstlab_bot_get")]
+        code = "<?php\n" + func + "foreach (json_decode(getenv('S'), true) as $t) echo json_encode(firstlab_bot_schedule_times($t)), \"\\n\";"
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            out = subprocess.run(["php", f.name], capture_output=True, text=True, check=True,
+                                 env={**os.environ, "S": json.dumps(self.SAMPLES)}).stdout.splitlines()
+        finally:
+            os.unlink(f.name)
+        self.assertEqual([json.loads(x) for x in out], [_times(t) for t in self.SAMPLES])
+
+    def test_bot_records_plan_source(self):
+        self.assertIn('state["plan_from"]', (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
+        self.assertIn("plan_from", (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8"))
+
+
 class PublishPlanVisibleTest(unittest.TestCase):
     """운영자가 바꾼 '예약 공개 시각'이 오늘 계획에 들어갔는지 감시가 볼 수 있게 (11/6 '09:00·18:00 두 줄로 바꿨다')."""
 

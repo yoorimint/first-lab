@@ -75,6 +75,22 @@ function firstlab_bot_defaults(): array {
 	return $defaults;
 }
 
+/** '09:00', '9:00 20:30', '9시 30분' → ['09:00', '20:30'] — bot/settings.py _times 와 같은 규칙 (테스트 ScheduleSavedTest 가 둘을 비교). */
+function firstlab_bot_schedule_times( string $text ): array {
+	preg_match_all( '/(\d{1,2})\s*[:시]\s*(\d{1,2})?/u', $text, $m, PREG_SET_ORDER );
+	$times = array();
+	foreach ( $m as $x ) {
+		$h = (int) $x[1];
+		$i = (int) ( $x[2] ?? 0 );
+		if ( $h < 24 && $i < 60 ) {
+			$times[ sprintf( '%02d:%02d', $h, $i ) ] = true;
+		}
+	}
+	$out = array_keys( $times );
+	sort( $out );
+	return $out;
+}
+
 function firstlab_bot_get(): array {
 	return wp_parse_args( (array) get_option( FIRSTLAB_BOT_OPTION, array() ), firstlab_bot_defaults() );
 }
@@ -382,6 +398,12 @@ function firstlab_bot_render_status(): void {
 		<?php
 		if ( ! $plan ) {
 			echo '예약 발행이 아니거나 아직 계획이 없습니다 (봇이 1분 안에 만듭니다).';
+		}
+		// 저장한 시각이 아직 계획에 안 들어갔으면 알림 (봇이 1분마다 다시 만듦 — 11/6 운영자 '저장해도 바로 반영이 안 되네')
+		$saved = firstlab_bot_schedule_times( (string) ( firstlab_bot_get()['schedule_times'] ?? '' ) );
+		$from  = (array) ( $state['plan_from'] ?? array() );
+		if ( $plan && $saved && $saved !== $from ) {
+			echo '<br><strong>저장한 공개 시각 ' . count( $saved ) . '개(' . esc_html( implode( ', ', $saved ) ) . ')는 봇이 1분 안에 오늘 계획으로 바꿉니다 — 잠시 뒤 새로고침하세요.</strong><br>';
 		}
 		foreach ( $plan as $i => $time ) {
 			echo esc_html( $time ) . ( in_array( $time, $done, true ) ? ' ✅ ' : ' ⏳ ' ) . '&nbsp; ';  // 완료 기록 = 예정 시각

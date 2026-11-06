@@ -352,6 +352,7 @@ def main() -> None:
         plan = schedule.plan_times(settings.schedule_times, settings.jitter_minutes, today)
         done = [t for t in state.get("done", {}).get(today, []) if isinstance(t, str)]
         state["plan"], state["done"] = {today: plan}, {today: done}  # 지난 날짜는 정리 (설정 페이지 '오늘 공개 계획')
+        state["plan_from"] = list(settings.schedule_times)  # 이 계획을 만든 설정 시각 — 설정 페이지가 '반영 대기'를 알림 (11/6)
         due = schedule.due_slot(plan, done, now.replace(tzinfo=None))
         if due:
             done.append(due)
