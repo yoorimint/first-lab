@@ -3126,6 +3126,43 @@ class OfficialLinksTest(unittest.TestCase):
         self.assertEqual(out.count("hometax.go.kr"), 1)         # 이미 링크가 있는 사이트는 더 안 붙임
         self.assertNotIn('href="https://www.gov.kr"', out)      # 'mygov.kr'·'정부24시간'은 다른 말
 
+    def test_verified_hosts_from_bot(self):
+        """목록 밖 공식 주소도 봇이 열어 본 기록이 있으면 링크 (11/6 운영자 '신뢰할 수 있는 공식 사이트면')."""
+        import os
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("<?php define('ABSPATH', 1); function add_filter() {} function esc_url($s) { return $s; }\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-official-links.php'}';\n"
+                "echo firstlab_official_autolink('<p>소방안전원(kfsi.or.kr)과 이상한 xx.go.kr</p>', "
+                "[['host' => 'kfsi.or.kr', 'url' => 'https://www.kfsi.or.kr'], ['host' => 'bad', 'url' => 'http://bad']]);")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            out = subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env=os.environ).stdout
+        finally:
+            os.unlink(f.name)
+        self.assertIn('<a href="https://www.kfsi.or.kr"', out)
+        self.assertNotIn('href="https://xx.go.kr"', out)     # 봇이 열어 보지 않은 주소는 링크 안 함
+        self.assertNotIn("http://bad", out)
+
+    def test_bot_records_only_reachable_official_hosts(self):
+        from bot import official_links as o
+        html = '<p>위택스(wetax.go.kr)·www.kfsi.or.kr·example.com·me@nps.or.kr·<a href="https://x.go.kr">hometax.go.kr</a> nope.go.kr</p>'
+        self.assertEqual(o.hosts_in(html), ["wetax.go.kr", "kfsi.or.kr", "nope.go.kr"])
+        ok = {"https://www.wetax.go.kr", "https://kfsi.or.kr"}
+        self.assertEqual(o.verify(o.hosts_in(html), check=lambda u: u in ok),
+                         [{"host": "wetax.go.kr", "url": "https://www.wetax.go.kr"}, {"host": "kfsi.or.kr", "url": "https://kfsi.or.kr"}])
+        calls = []
+        def wp(*a):
+            calls.append(a)
+            return json.dumps([{"id": 7, "content": html}]) if a[0] == "eval" else ""
+        self.assertEqual(o.run(wp=wp, check=lambda u: u in ok, today="2026-11-06"), "공식 사이트 링크 확인: 7(2)")
+        saved = json.loads(calls[-1][-1])
+        self.assertEqual((saved["hash"], len(saved["hosts"])), (o.content_hash(html), 2))
+        self.assertIn("official_links.run()", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
+
     def test_max_links(self):
         out = self.run_php("<p>위택스 홈택스 정부24 복지로 고용24</p>")
         self.assertEqual(out.count('class="firstlab-official"'), 3)

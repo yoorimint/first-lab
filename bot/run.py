@@ -392,6 +392,14 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001 - 사진 변환 실패가 봇을 멈추지 않게
             add_log(state, False, f"사진 WebP 변환 실패: {str(e)[:150]}")
 
+    # 본문에 적힌 공식 사이트 주소를 열어 보고 열리는 것만 링크 가능으로 기록 (bot/official_links.py, 11/6 운영자) — 10분마다 몇 편
+    if now.minute % 10 == 5:
+        try:
+            from . import official_links
+            official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
+        except Exception as e:  # noqa: BLE001 - 링크 확인 실패가 봇을 멈추지 않게
+            add_log(state, False, f"공식 사이트 링크 확인 실패: {str(e)[:150]}")
+
     # 근거 기록 없는 공개 대기 글 다시 대조 (bot/hold.missing_evidence) — 10분마다 1편. 배포 때 10편씩 하던 것을 옮김
     # (11/6: 공식 페이지를 여는 일이라 배포 '서버 적용'이 7분 넘게 걸리고, 그동안 다음 배포·글쓰기 끝 처리가 밀림)
     if now.minute % 10 == 7:

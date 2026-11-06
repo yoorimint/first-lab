@@ -6,6 +6,8 @@
  * 11/6 운영자 '공식사이트 링크 만들어라': 자동차세 납부 조회 글에 'wetax.go.kr' 이 글자로만 있어 독자가 바로 못 들어감.
  * 본문 외부 링크는 서버가 지움(bot/related.clean_links — 지어낸 주소 방지)이라, 링크는 저장 본문이 아니라 화면에서만 이 목록으로 붙인다.
  * 이미 그 사이트로 링크가 있거나, 제목·링크·코드 안의 글자는 건드리지 않는다.
+ * 목록 밖의 공식 주소(.go.kr·.or.kr 등)도: 봇이 본문 속 주소를 실제로 열어 보고 열리는 것만 글 메타(_firstlab_official_hosts)에
+ * 기록하면(bot/official_links.py) 그 주소도 링크로 (11/6 운영자 '신뢰할 수 있는 공식 사이트면 링크 넣어도 되지 않나 — 그렇게 만들어라').
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -30,14 +32,28 @@ function firstlab_official_sites(): array {
 	);
 }
 
-/** 본문 HTML → 공식 사이트 이름·주소 첫 곳을 링크로 (글자 부분만, 링크·제목·코드 안은 그대로). */
-function firstlab_official_autolink( string $html ): string {
+/** 봇이 열어 본 주소 기록 [['host' => 'wetax.go.kr', 'url' => 'https://www.wetax.go.kr'], ...] → 사이트 목록 꼴 (목록에 있는 주소는 뺌). */
+function firstlab_official_verified( array $hosts ): array {
+	$known = array_column( firstlab_official_sites(), 1 );
+	$out   = array();
+	foreach ( $hosts as $h ) {
+		$host = strtolower( (string) ( $h['host'] ?? '' ) );
+		$url  = (string) ( $h['url'] ?? '' );
+		if ( $host && 0 === strpos( $url, 'https://' ) && ! in_array( $host, $known, true ) ) {
+			$out[] = array( $url, $host, array() );
+		}
+	}
+	return $out;
+}
+
+/** 본문 HTML → 공식 사이트 이름·주소 첫 곳을 링크로 (글자 부분만, 링크·제목·코드 안은 그대로). $verified: 봇이 열어 본 주소. */
+function firstlab_official_autolink( string $html, array $verified = array() ): string {
 	$parts = preg_split( '/(<[^>]+>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE );
 	$skip  = 0; // <a>·<h1~6>·<code>·<script>·<style> 안
 	$done  = 0;
 	$sites = array_values(
 		array_filter(
-			firstlab_official_sites(),
+			array_merge( firstlab_official_sites(), firstlab_official_verified( $verified ) ),
 			static fn( $s ) => false === stripos( $html, '//' . $s[1] ) && false === stripos( $html, '//www.' . $s[1] ) // 이미 링크가 있으면 뺌
 		)
 	);
@@ -87,7 +103,8 @@ add_filter(
 		if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
-		return firstlab_official_autolink( (string) $content );
+		$meta = json_decode( (string) get_post_meta( get_the_ID(), '_firstlab_official_hosts', true ), true );
+		return firstlab_official_autolink( (string) $content, (array) ( $meta['hosts'] ?? array() ) );
 	},
 	7 // 목차(8)·운영 정보(9)·함께 보면 좋은 글(20) 전 — 본문 글자에만
 );
