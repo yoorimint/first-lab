@@ -193,7 +193,9 @@ def with_review(post: dict, queue_dir: Path | None = None) -> dict:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        if isinstance(data, dict) and data.get("review") and (path.name.startswith("fixhold-") or data.get("title") == post.get("title")):
+        own_fix = path.name.startswith(f"fixhold-{pid}-")  # 11/6 #1178: 다른 글의 fixhold 파일 검수 기록이 붙었음
+        if isinstance(data, dict) and data.get("review") and (own_fix or (not path.name.startswith("fixhold-")
+                                                                          and data.get("title") == post.get("title"))):
             return {**post, "review": data["review"]}
     return post
 

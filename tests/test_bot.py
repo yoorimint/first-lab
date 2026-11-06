@@ -1607,6 +1607,16 @@ class RouteArrowTest(unittest.TestCase):
             (q / "fixhold-7-1.json").write_text(json.dumps({"review": [{"claim": "고친 뒤"}]}, ensure_ascii=False), encoding="utf-8")
             self.assertEqual(apply_review.with_review({"post_id": 7, "title": "글 제목"}, q)["review"], [{"claim": "고친 뒤"}])
 
+    def test_other_posts_fixhold_review_not_attached(self):
+        """11/6 #1178: 다른 글(fixhold-1122-…)의 검수 기록이 붙어 단서 검사가 엉뚱한 법령을 봤음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        with tempfile.TemporaryDirectory() as d:
+            q = Path(d)
+            (q / "fixhold-3-1.json").write_text(json.dumps({"review": [{"claim": "남의 글"}]}, ensure_ascii=False), encoding="utf-8")
+            (q / "y.json").write_text(json.dumps({"title": "글 제목", "review": [{"claim": "내 글"}]}, ensure_ascii=False), encoding="utf-8")
+            self.assertEqual(apply_review.with_review({"post_id": 7, "title": "글 제목"}, q)["review"], [{"claim": "내 글"}])
+
 
 class ProvisoChecklistTest(unittest.TestCase):
     """근거 조문의 단서·예외 확인표 (11/6 운영자 '품질 1개 미만 — 1,2번 만들어라'): 외부 검수가 고친 곳의 74%가 빠진 조건·예외."""
