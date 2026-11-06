@@ -2954,6 +2954,51 @@ class LimitedEventYearTest(unittest.TestCase):
         self.assertIn('"limited_event_year"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
 
 
+class TocWebpTest(unittest.TestCase):
+    """워드프레스 꿀팁 2·3번 (11/6 운영자 '2,3번만 해라'): 긴 글 목차, 화면용 사진 WebP."""
+
+    def php(self, plugin, body):
+        import os
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        stub = ("<?php define('ABSPATH', 1); function add_filter() {} function add_action() {}"
+                " function wp_strip_all_tags($s) { return strip_tags($s); }"
+                " function esc_attr($s) { return htmlspecialchars($s, ENT_QUOTES); } function esc_html($s) { return htmlspecialchars($s, ENT_QUOTES); }\n")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(stub + f"require '{ROOT / 'wordpress' / 'mu-plugins' / plugin}';\n" + body)
+        try:
+            return subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env=os.environ).stdout
+        finally:
+            os.unlink(f.name)
+
+    def test_toc_for_long_posts_only(self):
+        long = "<p>처음</p>" + "".join(f"<h2 class=\"wp-block-heading\">소제목 {i}</h2><p>내용</p>" for i in range(1, 5))
+        out = self.php("first-lab-toc.php", f"echo firstlab_toc({json.dumps(long, ensure_ascii=False)});")
+        self.assertEqual(out.count('id="toc-'), 4)
+        self.assertLess(out.index("firstlab-toc"), out.index("<h2"))   # 첫 소제목 바로 위
+        self.assertIn('<a href="#toc-3">소제목 3</a>', out)
+        short = "<p>a</p><h2>하나</h2><h2>둘</h2>"
+        self.assertEqual(self.php("first-lab-toc.php", f"echo firstlab_toc({json.dumps(short, ensure_ascii=False)});"), short)
+        kept = self.php("first-lab-toc.php", "echo firstlab_toc('<h2 id=\"faq\">a</h2><h2>b</h2><h2>c</h2><h2>d</h2>');")
+        self.assertIn('href="#faq"', kept)   # 이미 있는 주소는 그대로
+
+    def test_srcset_prefers_webp(self):
+        out = self.php("first-lab-webp.php", """echo json_encode(array_keys(firstlab_webp_only([
+          1200 => ['url' => 'https://x/ai-1.jpg'], 1199 => ['url' => 'https://x/ai-1-1199x674.webp'], 768 => ['url' => 'https://x/ai-1-768x432.webp']])));
+          echo "\n", json_encode(array_keys(firstlab_webp_only([1200 => ['url' => 'a.jpg'], 768 => ['url' => 'b.jpg']])));""").split()
+        self.assertEqual(json.loads(out[0]), [1199, 768])
+        self.assertEqual(json.loads(out[1]), [1200, 768])   # 아직 WebP 가 없으면 그대로 (사진이 안 사라지게)
+
+    def test_backfill_summary(self):
+        from bot import webp
+        self.assertEqual(webp.summary({"done": [[1, "image/webp"], [2, "image/webp"]], "left": 40}), "사진 WebP 변환: 2/2장, 남은 40장")
+        self.assertIn("WebP 아님: 3(image/jpeg)", webp.summary({"done": [[3, "image/jpeg"]], "left": 0}))
+        self.assertIsNone(webp.summary({"done": [], "left": 0}))
+        self.assertIn("webp.run()", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
+
+
 class RelatedPostsTest(unittest.TestCase):
     """글 아래 '함께 보면 좋은 글'은 주제가 겹치는 글만 (11/6 운영자: 자동차보험료 계산 글에 주식 평단가 계산기 — '계산'만 겹침)."""
 

@@ -382,6 +382,16 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001 - 사진 실패가 글 작성·공개를 막지 않게
             add_log(state, False, f"사진 채우기 실패: {str(e)[:150]}")
 
+    # 이미 올린 대표 사진의 화면용 크기를 WebP 로 (bot/webp.py, 11/6 운영자) — 10분마다 몇 장
+    if now.minute % 10 == 3:
+        try:
+            from . import webp
+            line = webp.run()
+            if line:
+                add_log(state, "WebP 아님" not in line, line)  # 서버가 WebP 를 못 만들면 ❌ (매일 점검이 봄)
+        except Exception as e:  # noqa: BLE001 - 사진 변환 실패가 봇을 멈추지 않게
+            add_log(state, False, f"사진 WebP 변환 실패: {str(e)[:150]}")
+
     # 근거 기록 없는 공개 대기 글 다시 대조 (bot/hold.missing_evidence) — 10분마다 1편. 배포 때 10편씩 하던 것을 옮김
     # (11/6: 공식 페이지를 여는 일이라 배포 '서버 적용'이 7분 넘게 걸리고, 그동안 다음 배포·글쓰기 끝 처리가 밀림)
     if now.minute % 10 == 7:
