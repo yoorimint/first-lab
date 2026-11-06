@@ -1,0 +1,229 @@
+[
+ {
+  "why": "세전 100만 원: 소득세 3% 30,000원(소득세법 제129조①3호) + 지방소득세 10% 3,000원(지방세법 제103조의13) = 33,000원, 실수령 967,000원",
+  "input": {
+   "mode": "gross",
+   "amount": 1000000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "income_tax": 30000,
+   "local_tax": 3000,
+   "total": 33000,
+   "net": 967000
+  }
+ },
+ {
+  "why": "세전 300만 원: 90,000 + 9,000 = 99,000원, 실수령 2,901,000원 (본문 표)",
+  "input": {
+   "mode": "gross",
+   "amount": 3000000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "income_tax": 90000,
+   "local_tax": 9000,
+   "total": 99000,
+   "net": 2901000
+  }
+ },
+ {
+  "why": "세전 50만 원: 15,000원, 지방소득세 1,500원, 실수령 483,500원 (본문 표)",
+  "input": {
+   "mode": "gross",
+   "amount": 500000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "income_tax": 15000,
+   "local_tax": 1500,
+   "total": 16500,
+   "net": 483500
+  }
+ },
+ {
+  "why": "소액 부징수 경계 아래: 33,333원 × 3% = 999.99 → 10원 미만 버림 990원(국고금관리법 제47조) < 1,000원. 계속·반복 인적용역은 부징수 예외(시행령 제149조의3)라 그대로 990원·지방 90원",
+  "input": {
+   "mode": "gross",
+   "amount": 33333,
+   "kind": "repeat"
+  },
+  "expect": {
+   "income_tax": 990,
+   "local_tax": 90,
+   "total": 1080,
+   "net": 32253,
+   "small_exempt": false
+  },
+  "notes_include": [
+   "1,000원 미만이어도 떼요"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "같은 33,333원이 그 밖의 원천징수대상 사업소득이면 소득세 990원 < 1,000원 → 징수하지 않음 (소득세법 제86조1호), 지방소득세도 0원",
+  "input": {
+   "mode": "gross",
+   "amount": 33333,
+   "kind": "other"
+  },
+  "expect": {
+   "income_tax": 0,
+   "local_tax": 0,
+   "total": 0,
+   "net": 33333,
+   "small_exempt": true
+  },
+  "notes_include": [
+   "소액 부징수"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "소액 부징수 경계 위: 33,334원 × 3% = 1,000.02 → 1,000원 (1천원 미만 아님) → 징수, 지방 100원",
+  "input": {
+   "mode": "gross",
+   "amount": 33334,
+   "kind": "other"
+  },
+  "expect": {
+   "income_tax": 1000,
+   "local_tax": 100,
+   "total": 1100,
+   "net": 32234,
+   "small_exempt": false
+  },
+  "notes_exclude": [
+   "소액 부징수"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "역산: 실수령 100만 원 → 세전 1,034,120원 (31,020 + 3,100 = 34,120, 1,034,120 - 34,120 = 1,000,000; 1,034,119원이면 999,999원) — Python 으로 따로 계산",
+  "input": {
+   "mode": "net",
+   "amount": 1000000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "gross": 1034120,
+   "income_tax": 31020,
+   "local_tax": 3100,
+   "total": 34120,
+   "net": 1000000
+  }
+ },
+ {
+  "why": "역산: 실수령 967,000원 → 10원 버림 때문에 999,980원에서 이미 967,000원 (29,990 + 2,990 = 32,980)",
+  "input": {
+   "mode": "net",
+   "amount": 967000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "gross": 999980,
+   "total": 32980,
+   "net": 967000
+  }
+ },
+ {
+  "why": "극단값 1원: 3% = 0.03원 → 10원 미만 버림 0원, 실수령 1원",
+  "input": {
+   "mode": "gross",
+   "amount": 1,
+   "kind": "repeat"
+  },
+  "expect": {
+   "income_tax": 0,
+   "local_tax": 0,
+   "total": 0,
+   "net": 1
+  }
+ },
+ {
+  "why": "역산·그 밖의 사업소득: 실수령 10,000원 → 세전 10,000원 그대로 (300원 < 1,000원 소액 부징수, 제86조1호) — 11/6 검수에서 10,241원으로 틀리게 나온 사례",
+  "input": {
+   "mode": "net",
+   "amount": 10000,
+   "kind": "other"
+  },
+  "expect": {
+   "gross": 10000,
+   "income_tax": 0,
+   "total": 0,
+   "net": 10000
+  },
+  "notes_exclude": [
+   "딱 10,000원이 되는 금액이 없어요"
+  ]
+ },
+ {
+  "why": "역산 경계·그 밖의 사업소득: 실수령 33,333원 → 세전 33,333원 (990원 < 1,000원 부징수)",
+  "input": {
+   "mode": "net",
+   "amount": 33333,
+   "kind": "other"
+  },
+  "expect": {
+   "gross": 33333,
+   "total": 0,
+   "net": 33333
+  },
+  "boundary": true
+ },
+ {
+  "why": "역산 경계 위·그 밖의 사업소득: 실수령 33,334원 → 부징수 아님, 세전 34,464원 (1,030 + 100 = 1,130원)",
+  "input": {
+   "mode": "net",
+   "amount": 33334,
+   "kind": "other"
+  },
+  "expect": {
+   "gross": 34464,
+   "income_tax": 1030,
+   "local_tax": 100,
+   "net": 33334
+  },
+  "boundary": true
+ },
+ {
+  "why": "역산·계속반복: 실수령 10,000원 → 세전 10,330원 (300 + 30원), Python 으로 따로 계산",
+  "input": {
+   "mode": "net",
+   "amount": 10000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "gross": 10330,
+   "total": 330,
+   "net": 10000
+  }
+ },
+ {
+  "why": "세전 1원·계속반복: 뗀 세금 0원이면 '1,000원 미만이어도 떼요' 안내를 내지 않음",
+  "input": {
+   "mode": "gross",
+   "amount": 1,
+   "kind": "repeat"
+  },
+  "expect": {
+   "total": 0,
+   "net": 1
+  },
+  "notes_exclude": [
+   "1,000원 미만이어도 떼요"
+  ]
+ },
+ {
+  "why": "1원 늘면 실수령이 주는 구간: 1,034,000원 → 31,020 + 3,100, 실수령 999,880원 (1,033,999원은 999,889원) — 본문 FAQ",
+  "input": {
+   "mode": "gross",
+   "amount": 1034000,
+   "kind": "repeat"
+  },
+  "expect": {
+   "total": 34120,
+   "net": 999880
+  }
+ }
+]
