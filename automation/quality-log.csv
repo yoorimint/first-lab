@@ -91,3 +91,5 @@ date,post,fixes,types
 2026-11-06,1347,5,missing_condition:3 wrong_fact:2
 2026-11-06,1353,4,missing_condition:2 unverified:2
 2026-11-06,1360,7,missing_condition:1 outdated:6
+2026-11-06,1371,5,missing_condition:5
+2026-11-06,1373,1,wrong_fact:1
