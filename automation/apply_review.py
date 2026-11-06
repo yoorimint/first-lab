@@ -79,6 +79,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
         fn = {"headline_scope": lambda: condition_gate.headline_scope(post["title"], post["excerpt"], post["content_html"]),
               "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"]),
               "lead_vs_exceptions": lambda: condition_gate.lead_vs_exceptions(post["content_html"]),
+              "title_length": lambda: condition_gate.title_length(post["title"]),
               "transition_rules": lambda: condition_gate.transition_rules(post.get("review"), post["content_html"]),
               "excerpt_vs_exclusions": lambda: condition_gate.excerpt_vs_exclusions(post["excerpt"], post["content_html"]),
               "lead_thresholds": lambda: condition_gate.lead_thresholds(post["excerpt"], post["content_html"]),
@@ -137,13 +138,26 @@ def with_title_fields(post: dict, p: dict) -> dict:
     return p
 
 
+def current_post(post_id: int, fetch=None) -> dict:
+    """서버의 지금 본문으로 검사 (11/6: 예전에 받아 둔 검수 파일로 검사해 제목 길이 검사가 '안 걸림'으로 잘못 나옴 —
+    그사이 바뀐 본문이면 찾을 문구·검사 결과가 틀림). 서버를 못 읽으면 받아 둔 파일로."""
+    try:
+        if fetch is None:
+            sys.path.insert(0, str(Path(__file__).resolve().parent))
+            from unreviewed import save_body as fetch
+        return json.loads(fetch(post_id).read_text(encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print(f"서버 본문을 못 읽음({type(e).__name__}) → 받아 둔 파일로 검사")
+        return json.loads((OUT_DIR / f"post-{post_id}.json").read_text(encoding="utf-8"))
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print(__doc__)
         return 2
     post_id, title = int(argv[1]), argv[2]
     items = json.loads(Path(argv[3]).read_text(encoding="utf-8")) if len(argv) > 3 else []
-    post = json.loads((OUT_DIR / f"post-{post_id}.json").read_text(encoding="utf-8"))
+    post = current_post(post_id)
     errors = check(post, items)
     if errors:
         print("반영 안 함 (아무것도 바꾸지 않음):\n  " + "\n  ".join(errors))

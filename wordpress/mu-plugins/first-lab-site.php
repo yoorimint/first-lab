@@ -37,3 +37,16 @@ add_action(
 	},
 	2
 );
+
+// 글 제목에서 사이트 이름(' - 퍼스트랩') 빼기 (11/6 운영자 제목 SEO 3번): 검색 결과는 한글 30자 안팎에서 잘리는데 글 제목에
+// 7자가 더 붙어 핵심 숫자가 잘림. 홈·페이지(계산기 목록 등)는 그대로. The SEO Framework 필터.
+add_filter(
+	'the_seo_framework_use_title_branding',
+	static function ( $use, $args = null ) {
+		$id = is_array( $args ) && isset( $args['id'] ) ? (int) $args['id'] : ( null === $args && is_singular( 'post' ) ? (int) get_queried_object_id() : 0 );
+		return $id && 'post' === get_post_type( $id ) ? false : $use;
+	},
+	10,
+	2
+);
+

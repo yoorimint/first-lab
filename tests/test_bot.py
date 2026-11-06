@@ -3191,6 +3191,31 @@ class DeployCheckReportTest(unittest.TestCase):
         self.assertIn("named_values", (ROOT / "bot" / "bok_api.py").read_text(encoding="utf-8"))
 
 
+class TitleSeoTest(unittest.TestCase):
+    """제목 SEO (11/6 운영자 1~5번): 길이 관문·경고, 작가 규칙 형식, 글 제목에서 사이트 이름 빼기, 검사는 서버의 지금 본문으로."""
+
+    def test_title_length_gate(self):
+        from bot import condition_gate, review_gate
+        long = "기초연금 신청: 2027년 1월 21일 이후 65세가 되는 장애인연금 수급권자는 신청한 것으로 봐요"   # #847 55자
+        self.assertEqual(len(condition_gate.title_length(long)), 1)
+        self.assertEqual(condition_gate.title_length("기초연금 신청 방법: 자격·금액과 2027년 바뀌는 점"), [])
+        self.assertIn("title_length(title)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+        self.assertTrue(any("제목 55자" in x for x in review_gate.problems([{"claim": "2027년 1월 21일 65세", "urls": [], "verdict": "맞음", "action": "유지"}], long, "", "")))
+
+    def test_writer_rule_and_branding(self):
+        self.assertIn("35자 안팎·최대 45자", (ROOT / "bot" / "writer.py").read_text(encoding="utf-8"))
+        self.assertIn("the_seo_framework_use_title_branding", (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8"))
+        self.assertIn("TITLE_WARN", (ROOT / "bot" / "source_check.py").read_text(encoding="utf-8"))
+
+    def test_apply_review_uses_current_body(self):
+        import tempfile
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        d = Path(tempfile.mkdtemp()) / "post-1.json"
+        d.write_text(json.dumps({"title": "지금 제목"}), encoding="utf-8")
+        self.assertEqual(apply_review.current_post(1, fetch=lambda pid: d)["title"], "지금 제목")
+
+
 class LeadExceptionTest(unittest.TestCase):
     """첫 문단이 규칙을 그냥 말하고 예외는 아래에만 (11/5 #821·#828, 11/6 #928 — 같은 꼴 3번 → 검사, 글쓰기 사전 점검 경고)."""
 
