@@ -51,7 +51,8 @@ OFF_TOPIC = ("보관법", "보관방법", "정리법", "정리방법", "정리�
 
 
 def on_focus(n: str) -> bool:
-    return any(w in n for w in FOCUS)
+    from .seed_words import FOCUS_SEEDS  # 중심 주제 씨앗 단어 (수집과 같은 목록)
+    return any(w in n for w in FOCUS) or any(w.lower() in n.lower() for w in FOCUS_SEEDS)
 
 
 def off_topic(n: str) -> bool:

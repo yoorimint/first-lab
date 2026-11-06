@@ -2092,6 +2092,16 @@ class SiteFocusTest(unittest.TestCase):
         self.assertFalse(off_topic("실업급여신청"))
         self.assertIn('(x["gold"], x["focus"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
 
+    def test_seed_words_focus_first_no_off_topic(self):
+        from bot.seed_words import FOCUS_SEEDS, SEED_WORDS
+        from bot.select_keyword import off_topic, on_focus
+        self.assertEqual(SEED_WORDS[:len(FOCUS_SEEDS)], list(FOCUS_SEEDS))   # 중심 주제 씨앗을 먼저 수집
+        self.assertFalse([w for w in SEED_WORDS if off_topic(w)])
+        for w in ("레시피", "에어프라이어", "스킨케어", "오사카", "캠핑장"):
+            self.assertNotIn(w, SEED_WORDS)
+        self.assertTrue(on_focus("청년도약계좌조건"))   # 씨앗 목록으로도 중심 주제 판단
+        self.assertTrue(on_focus("경정청구기간"))
+
     def test_template_twin_held_but_first_and_rewritten_pass(self):
         """검사소 연작: 먼저 쓴 글은 그대로, 같은 틀로 찍은 뒤 글은 보류, 이 글만의 정보로 다시 쓰면 통과."""
         from bot import freshness
@@ -4669,6 +4679,22 @@ class EarlyTopicsTest(unittest.TestCase):
         with mock.patch.object(law_watch, "CORE_LAWS", ("근로기준법",)):
             got = law_watch.core_changes(d(2026, 11, 5), api=api)
         self.assertEqual([(g["date"], g["articles"]) for g in got], [("2026-12-10", ["제54조"])])  # 1/1 판은 '<개정>' 표시만 → 뺌
+
+    def test_written_items_do_not_crowd_out_new_ones(self):
+        """11/7: 저장 60칸이 이미 쓴 항목으로 차서 새 글감 0 — 안 쓴 것을 앞에, 넉넉히 저장."""
+        from bot import law_watch
+        items = [{"key": f"done{i}"} for i in range(70)] + [{"key": "new1"}, {"key": "new2"}]
+        got = law_watch.keep_upcoming(items, [f"done{i}" for i in range(70)])
+        self.assertEqual([g["key"] for g in got[:2]], ["new1", "new2"])
+        self.assertGreaterEqual(law_watch.UPCOMING_MAX, 150)
+
+    def test_core_laws_cover_focus_topics(self):
+        """11/7 운영자 '주제 좁히기 — 빠지는 거 없게': 일·4대보험·세금·복지 주요 법령을 시행 예정 글감으로 봄."""
+        from bot import law_watch
+        for name in ("산업재해보상보험법", "임금채권보장법", "고용보험 및 산업재해보상보험의 보험료징수 등에 관한 법률",
+                     "국세기본법", "종합부동산세법", "긴급복지지원법", "주거급여법", "구직자 취업촉진 및 생활안정지원에 관한 법률"):
+            self.assertIn(name, law_watch.CORE_LAWS)
+        self.assertEqual(len(law_watch.CORE_LAWS), len(set(law_watch.CORE_LAWS)))
 
     def test_notice_changes(self):
         import datetime as dt
