@@ -3084,6 +3084,14 @@ class PhpNameClashTest(unittest.TestCase):
         self.assertEqual([n for n, c in consts.items() if c > 1], [])
 
 
+    def test_plugins_installed_before_wp_commands(self):
+        """서버의 mu-plugin 이 치명적 오류면 wp 명령이 멈춤 → 고친 플러그인을 wp 명령보다 먼저 깔아야 배포가 스스로 복구됨 (11/6)."""
+        lines = (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8").splitlines()
+        install = next(i for i, l in enumerate(lines) if "wordpress/mu-plugins/*.php" in l)
+        first_wp = next(i for i, l in enumerate(lines) if re.match(r"\s*(\[.*\]\s*&&\s*)?wp\s", l) or "$(wp " in l)
+        self.assertLess(install, first_wp)
+
+
 class OfficialLinksTest(unittest.TestCase):
     """본문에 글자로만 적힌 공식 사이트를 화면에서 링크로 (11/6 운영자 '공식사이트 링크 만들어라' — 자동차세 납부 조회 글)."""
 

@@ -35,6 +35,14 @@ if [ ! -x /usr/local/bin/wp ]; then
   chmod 755 /usr/local/bin/wp
 fi
 
+# ---------- 저장소의 mu-plugins 배포 (wordpress/mu-plugins → wp-content/mu-plugins) — wp 명령보다 먼저 ----------
+# 11/6: 서버의 mu-plugin 이 치명적 오류(함수 이름 겹침)면 wp 명령이 모두 멈춰, 고친 파일을 복사하는 단계까지 못 가 배포가 계속 실패했음
+# → 고친 파일을 먼저 깔고 나서 wp 명령
+log "mu-plugins 배포"
+MU_DIR=$WEB_ROOT/wp-content/mu-plugins
+install -d -o "$WP_USER" -g www-data -m 750 "$MU_DIR"
+install -o "$WP_USER" -g www-data -m 640 "$REPO_DIR"/wordpress/mu-plugins/*.php "$MU_DIR"/
+
 # ---------- 기본 설정 ----------
 log "기본 설정 (사이트 제목, 시간대, 고유주소, 검색 노출, 핑백 끔)"
 wp option update blogname "$SITE_TITLE"
@@ -87,12 +95,6 @@ for uid in $(wp user list --role=administrator --field=ID); do
     wp user update "$uid" --display_name="$AUTHOR_NAME" --nickname="$AUTHOR_NAME" --user_nicename="$AUTHOR_SLUG-$uid"
   fi
 done
-
-# ---------- 저장소의 mu-plugins 배포 (wordpress/mu-plugins → wp-content/mu-plugins) ----------
-log "mu-plugins 배포"
-MU_DIR=$WEB_ROOT/wp-content/mu-plugins
-install -d -o "$WP_USER" -g www-data -m 750 "$MU_DIR"
-install -o "$WP_USER" -g www-data -m 640 "$REPO_DIR"/wordpress/mu-plugins/*.php "$MU_DIR"/
 
 # ---------- 테마 (wordpress/themes/<THEME> → wp-content/themes/<THEME>) ----------
 log "테마 배포"
