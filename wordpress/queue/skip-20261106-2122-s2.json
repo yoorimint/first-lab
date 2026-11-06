@@ -1,0 +1,10 @@
+{"type": "skip", "keywords": [
+ {"keyword": "병점자동차검사소", "why": "공단 검사소가 아닌 민간 업체로 보이고 공식 안내 없음"},
+ {"keyword": "하나손해보험원데이", "why": "특정 회사 보험 상품", "brand": "하나손해보험"},
+ {"keyword": "명품기저귀가방", "why": "상품 비교·추천"},
+ {"keyword": "위례산부인과", "why": "의료기관 추천"},
+ {"keyword": "배달용전기자전거렌탈", "why": "업체 상품 비교"},
+ {"keyword": "AIG생명보험", "why": "특정 회사 보험 상품", "brand": "AIG"},
+ {"keyword": "완정역미용실", "why": "특정 업체 추천"},
+ {"keyword": "아메리칸이글자전거", "why": "특정 브랜드 상품", "brand": "아메리칸이글"}
+], "law_changes": [], "new_benefits": [], "slot": 2}
