@@ -327,6 +327,55 @@ def notice_changes(today: dt.date, fetch=law_api.fetch) -> list[dict]:
     return out
 
 
+def watched_rules() -> dict[tuple[str, str], set[str]]:
+    """근거로 쓴 행정규칙·자치법규 (종류, 이름) → 그것을 근거로 쓴 글 키워드들 (bot/law_rules, 11/6)."""
+    from .law_rules import rule_of
+    rules: dict[tuple[str, str], set[str]] = {}
+    for path in QUEUE_DIR.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        keyword = str(data.get("keyword", "")).strip()
+        for item in data.get("review") or []:
+            for url in item.get("urls", []) if _ok(item) else []:
+                rule = rule_of(str(url))
+                if rule:
+                    rules.setdefault(rule, set()).add(keyword)
+    return rules
+
+
+def rule_changes(rules: dict[tuple[str, str], set[str]], seen: dict[str, str], today: dt.date,
+                 versions=None) -> tuple[list[dict], list[dict], dict[str, str]]:
+    """행정규칙·자치법규: 시행 예정 판(LOOKAHEAD_DAYS 안) → 글감, 지난번과 다른 판이 시행 중이면 → 근거 글 재검증.
+    seen: {'종류|이름': 지난번 본 시행 중 판 일련번호}. 처음 보는 것은 기록만 (지금 판으로 이미 썼으니 재검증 안 함)."""
+    from .law_rules import current
+    from .law_rules import versions as _versions
+    versions = versions or _versions
+    upcoming, just, now_seen = [], [], dict(seen)
+
+    def one(rule):
+        return rule, _safe(lambda r: versions(*r), [])(rule)
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+        results = list(pool.map(one, rules))
+    for (kind, name), vers in results:
+        if not vers:
+            continue
+        key, posts = f"{kind}|{name}", sorted(k for k in rules[(kind, name)] if k)
+        url = f"https://www.law.go.kr/{kind}/{name}"
+        cur = current(vers, today)
+        if cur and seen.get(key) and seen[key] != cur["seq"]:
+            just.append({"law": name, "url": url, "date": f"{(cur['start'] or today):%Y-%m-%d}", "articles": [], "posts": posts,
+                         "key": f"{key}|{cur['seq']}", "source": f"{kind} 개정"})
+        if cur:
+            now_seen[key] = cur["seq"]
+        for v in vers:
+            if v["start"] and today < v["start"] <= today + dt.timedelta(days=LOOKAHEAD_DAYS):
+                upcoming.append({"law": name, "url": url, "date": f"{v['start']:%Y-%m-%d}", "articles": [], "posts": posts,
+                                 "key": f"{key}|{v['seq']}", "source": f"{kind} 시행 예정"})
+    return upcoming, just, now_seen
+
+
 def run(today: dt.date | None = None) -> str:
     today = today or dt.date.today()
     laws = watched_laws()
@@ -350,10 +399,22 @@ def run(today: dt.date | None = None) -> str:
             api_note += f", 생활 핵심 법령 시행 예정 {len(core)}건, 기준값 고시 {len(notices)}건"
         except Exception as e:  # noqa: BLE001
             api_note += f", 핵심 법령·고시 실패({type(e).__name__})"
+        try:  # 근거로 쓴 행정규칙(고시)·자치법규(조례) — 화면이 껍데기라 부칙 읽기로는 못 봤음 (bot/law_rules, 11/6)
+            rules = watched_rules()
+            r_up, r_just, rule_seen = rule_changes(rules, load_state().get("rule_versions") or {}, today)
+            upcoming, just = merge(upcoming, r_up), merge(just, r_just)
+            api_note += f", 행정규칙·자치법규 {len(rules)}개(시행 예정 {len(r_up)}·개정 {len(r_just)})"
+        except Exception as e:  # noqa: BLE001
+            rule_seen = None
+            api_note += f", 행정규칙·자치법규 실패({type(e).__name__})"
+    else:
+        rule_seen = None
     pre = proposals(names)
     marked = mark_posts([j for j in just if j["posts"]])
     state = load_state()  # 저장 때 다른 실행 기록과 합쳐짐 (bot/state.save_state)
     state["law_changes"] = {"checked": f"{today:%Y-%m-%d}", "upcoming": upcoming[:60], "proposals": pre[:30]}
+    if rule_seen is not None:
+        state["rule_versions"] = rule_seen
     msg = (f"법령 감시: 근거 법령 {len(laws)}개 확인, 앞으로 시행 {len(upcoming)}건({api_note}), "
            f"입법예고 {len(pre)}건(확정 아님), 막 시행 {len(just)}건(재검증 표시 {len(marked)}편)")
     add_log(state, True, msg)

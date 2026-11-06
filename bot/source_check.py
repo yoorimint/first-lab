@@ -153,6 +153,10 @@ def fetch(url: str) -> str | None:
 
 def _fetch(url: str) -> str | None:
     """공식 페이지 글자. 못 열거나 껍데기 페이지면 None, PDF 등 문서면 "". 법령 이름 주소는 본문 주소로 한 번 더 연다."""
+    from .law_rules import rule_of, rule_text
+    rule = rule_of(url)
+    if rule:  # '/행정규칙/이름'·'/자치법규/이름' 화면은 껍데기 → 법제처 API 원문 (첨부 고시 PDF 포함, 11/6)
+        return rule_text(*rule)
     plain_url = urllib.parse.unquote(url)
     if "law.go.kr/" in plain_url and "/법령/" in plain_url:
         # '/법령/이름/제3조' 껍데기에는 본문 주소가 없어 '/법령/이름' 껍데기에서 찾는다

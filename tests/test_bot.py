@@ -1292,6 +1292,72 @@ class BenefitDetailTest(unittest.TestCase):
         self.assertIn("python3 -m bot.benefit_detail", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
 
+class LawRulesTest(unittest.TestCase):
+    """행정규칙(고시)·자치법규(조례) 원문 (11/6 운영자 'API 다 써서' 2번): law.go.kr '/행정규칙/이름' 화면은 껍데기라
+    근거 대조가 '못 엶'으로 끝나고 법령 감시도 안 봤음 (근거 주소 행정규칙 62곳·자치법규 14곳)."""
+
+    SEARCH = ("<OrdinSearch><law id='1'><자치법규일련번호>100</자치법규일련번호><자치법규명><![CDATA[대구광역시 수도급수 조례 시행규칙]]></자치법규명>"
+              "<시행일자>20250101</시행일자><공포일자>20241201</공포일자></law>"
+              "<law id='2'><자치법규일련번호>200</자치법규일련번호><자치법규명><![CDATA[대구광역시 수도급수 조례 시행규칙]]></자치법규명>"
+              "<시행일자>20260901</시행일자><공포일자>20260625</공포일자></law>"
+              "<law id='3'><자치법규일련번호>300</자치법규일련번호><자치법규명><![CDATA[대구광역시 수도급수 조례]]></자치법규명>"
+              "<시행일자>20260101</시행일자></law></OrdinSearch>")
+    BODY = ("<LawService><조><조내용><![CDATA[제18조의4(다자녀가정 감면) 1. 자녀가 3명 이상: 월 3,000원]]></조내용></조>"
+            "<별표><별표내용><![CDATA[<table><tr><td>가정용 1,000원</td></tr></table>]]></별표내용></별표></LawService>")
+    ADM = ("<AdmRulService><조문내용><![CDATA[]]></조문내용><첨부파일><첨부파일링크>http://law.go.kr/flDownload.do?flSeq=1 </첨부파일링크>"
+           "</첨부파일></AdmRulService>")
+
+    def fetch(self, kind, target, **kw):
+        if kind == "search":
+            return self.SEARCH
+        return self.BODY if kw.get("MST") == "200" else (self.ADM if target == "admrul" else "")
+
+    def test_rule_of_url(self):
+        from bot import law_rules as lr
+        self.assertEqual(lr.rule_of("https://www.law.go.kr/%EC%9E%90%EC%B9%98%EB%B2%95%EA%B7%9C/대구광역시수도급수조례/제39조"),
+                         ("자치법규", "대구광역시수도급수조례"))
+        self.assertEqual(lr.rule_of("https://www.law.go.kr/행정규칙/2026년적용최저임금고시"), ("행정규칙", "2026년적용최저임금고시"))
+        self.assertIsNone(lr.rule_of("https://www.law.go.kr/법령/고용보험법"))
+
+    def test_current_version_text(self):
+        import datetime as dt
+        from bot import law_rules as lr
+        vers = lr.versions("자치법규", "대구광역시수도급수조례시행규칙", fetch=self.fetch)   # 띄어쓰기 무관, 이름이 다른 조례는 뺌
+        self.assertEqual([v["seq"] for v in vers], ["100", "200"])
+        self.assertEqual(lr.current(vers, dt.date(2026, 11, 6))["seq"], "200")
+        self.assertEqual(lr.current(vers, dt.date(2026, 8, 1))["seq"], "100")                  # 시행 전 판은 아님
+        text = lr.rule_text("자치법규", "대구광역시수도급수조례시행규칙", dt.date(2026, 11, 6), fetch=self.fetch)
+        self.assertIn("월 3000원", text)                                                       # 쉼표 뺌 (숫자 대조용)
+        self.assertIn("가정용 1000원", text)                                                   # 별표 표도
+
+    def test_notice_text_from_attachment(self):
+        from bot import law_rules as lr, source_check
+        with mock.patch.object(source_check, "doc_text", return_value="시간급 10320원"):
+            text = lr.body_text("행정규칙", "1", fetch=self.fetch, raw_of=lambda url: (b"%PDF", None, "") if url.startswith("https://") else None)
+        self.assertIn("10320원", text)                                                         # 고시 본문은 첨부 PDF 에만
+
+    def test_source_check_and_lawtext_use_rules(self):
+        from bot import law_rules, source_check
+        with mock.patch.object(law_rules, "rule_text", return_value="월 3000원") as rt:
+            self.assertEqual(source_check._fetch("https://www.law.go.kr/자치법규/대구광역시수도급수조례시행규칙"), "월 3000원")
+        rt.assert_called_once_with("자치법규", "대구광역시수도급수조례시행규칙")
+        self.assertIn("_rule_body", (ROOT / "bot" / "lawtext.py").read_text(encoding="utf-8"))
+
+    def test_watch_marks_posts_when_rule_amended(self):
+        import datetime as dt
+        from bot import law_watch
+        rules = {("자치법규", "대구광역시수도급수조례시행규칙"): {"대구다자녀상수도요금감면"}}
+        vers = [{"seq": "100", "start": dt.date(2025, 1, 1)}, {"seq": "200", "start": dt.date(2026, 9, 1)},
+                {"seq": "300", "start": dt.date(2027, 1, 1)}]
+        up, just, seen = law_watch.rule_changes(rules, {}, dt.date(2026, 11, 6), versions=lambda k, n: vers)
+        self.assertEqual(just, [])                                                             # 처음 보는 것은 기록만
+        self.assertEqual(seen, {"자치법규|대구광역시수도급수조례시행규칙": "200"})
+        self.assertEqual([u["date"] for u in up], ["2027-01-01"])                               # 시행 예정 판은 글감
+        up, just, seen = law_watch.rule_changes(rules, {"자치법규|대구광역시수도급수조례시행규칙": "100"}, dt.date(2026, 11, 6),
+                                                versions=lambda k, n: vers)
+        self.assertEqual([(j["posts"], j["date"]) for j in just], [(["대구다자녀상수도요금감면"], "2026-09-01")])  # 바뀐 판 → 재검증
+
+
 class CalcHomeTest(unittest.TestCase):
     """계산기 대표 글 (11/6 운영자): 계산기를 넣은 공개 글이 있으면 단독 페이지는 그 글로 301·목록 링크도 그 글·사이트맵에서 뺌.
     공개 글이 없으면 단독 페이지가 그대로 (계산기가 사라지지 않게)."""

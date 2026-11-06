@@ -48,6 +48,16 @@ def from_api(name: str, arts: list[str], today: dt.date) -> bool:
     return True
 
 
+def _rule_body(name: str) -> str | None:
+    from .law_rules import KINDS, rule_text
+    for kind in KINDS:
+        text = rule_text(kind, name)
+        if text:
+            print(f"[법제처 API] {name}: {kind} 현행 판")
+            return text
+    return None
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 3:
         print("사용: python3 -m bot.lawtext <법령명> <제N조> [제M조 ...]  예) python3 -m bot.lawtext 고용보험법 제46조")
@@ -59,7 +69,9 @@ def main(argv: list[str]) -> int:
         pass
     body = law_body(argv[1])
     if not body:
-        print(f"{argv[1]}: 열지 못함 (법령 이름을 국가법령정보센터 표기대로, 띄어쓰기 없이)")
+        body = _rule_body(argv[1])   # 법령이 아니면 행정규칙(고시)·자치법규(조례) (bot/law_rules, 11/6)
+    if not body:
+        print(f"{argv[1]}: 열지 못함 (법령·행정규칙·자치법규 이름을 국가법령정보센터 표기대로, 띄어쓰기 없이)")
         return 1
     for art in argv[2:]:
         text = article_text(body, art)
