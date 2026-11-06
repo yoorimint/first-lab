@@ -1582,6 +1582,16 @@ class AppendOnlyMergeTest(unittest.TestCase):
             self.assertEqual(sorted(f.read_text(encoding="utf-8").split("\n")[:3]), ["1 a", "2 b", "calc:x"])
 
 
+    def test_generated_checklist_regenerated_not_unioned(self):
+        """11/7: 자주 틀린 유형표(생성 파일)를 union 으로 병합해 줄이 섞이고 테스트가 깨짐 → ours + 올리기 전 다시 만듦."""
+        attrs = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+        self.assertIn("automation/common-errors.md merge=ours", attrs)
+        self.assertNotIn("common-errors.md merge=union", attrs)
+        push = (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8")
+        self.assertIn("merge.ours.driver", push)
+        self.assertIn("python3 automation/common_errors.py", push)
+        self.assertIn("merge.ours.driver", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
 class RouteArrowTest(unittest.TestCase):
     """#1060 대장경테마파크 (11/6): 길 화살표 주장('대구→고령→해인사행 하루 21회')을 계산으로 봐서 숫자 대조를 안 했고,
     검수 반영 도구가 검수 기록을 안 붙여 review 를 보는 검사가 늘 '안 걸림', 시각 10:30 을 확인된 숫자 10 으로 셈."""

@@ -5,4 +5,5 @@ automation/review-only-log.md merge=union
 automation/source-check-log.md merge=union
 # 패치 목록(JSON): 양쪽에서 더한 패치를 합침 — 병합 도구는 automation/check_and_push.sh·글쓰기 push 명령이 git config 에 등록 (11/6 충돌)
 wordpress/patches.json merge=jsonlist
-automation/common-errors.md merge=union
+# 자주 틀린 유형표(생성 파일): 충돌하면 우리 쪽을 두고 올리기 전에 다시 만듦 (check_and_push.sh regen, 11/7 union 으로 줄이 섞여 테스트 실패)
+automation/common-errors.md merge=ours

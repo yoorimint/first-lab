@@ -148,7 +148,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
   서버가 실제로 열리는지 확인한 뒤 글 끝에 '공식 안내 바로가기'로 붙인다 (본문 안 외부 링크는 지워짐).
 - 검사: `python3 -m unittest discover -s tests && node tests/test_calculators.mjs`
 - 실행 끝에 한 번만 커밋하고 main 에 올린다 (운영자 승인된 자동 작업). 이번 실행에서 바뀐 것 전부:
-  `git config merge.jsonlist.driver "python3 automation/merge_json_list.py %O %A %B" && git add wordpress/queue wordpress/patches.json wordpress/themes/first-lab/calculators wordpress/pages automation/reviewed.txt automation/common-errors.md && git commit -m "<한 일 요약>" && git push origin HEAD:main`
+  `git config merge.jsonlist.driver "python3 automation/merge_json_list.py %O %A %B" && git config merge.ours.driver true && python3 automation/common_errors.py && git add wordpress/queue wordpress/patches.json wordpress/themes/first-lab/calculators wordpress/pages automation/reviewed.txt automation/common-errors.md && git commit -m "<한 일 요약>" && git push origin HEAD:main`
 - push 가 다른 실행과 겹쳐 거절되면(non-fast-forward) `git pull --rebase origin main` 후 한 번 더 push 한다.
   `patches.json`·`reviewed.txt` 가 충돌하면 양쪽 내용을 모두 남기고(둘 다 끝에 덧붙인 줄) `python3 automation/common_errors.py` 를 다시 돌린 뒤 이어서 rebase.
 - 배포 결과는 기다리지 않는다 (서버가 배포 밀림을 감지해 다음 실행의 `deploy_alert` 로 알려 줌).
