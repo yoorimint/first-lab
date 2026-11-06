@@ -1736,6 +1736,16 @@ class LawAnnexTest(unittest.TestCase):
             self.assertIn("2,133,000", law_api.annex_text({"mst": "1", "date": dt.date(2026, 1, 2)}))
 
 
+class MillionthRateTest(unittest.TestCase):
+    """11/6 #1228: 노인장기요양보험법 시행령 '100만분의 9,448'(0.9448%)을 같은 값으로 못 봐 '페이지에 없음'."""
+
+    def test_millionth_form(self):
+        import re
+        from bot.source_check import _fraction_forms
+        page = "장기요양보험료율은 100만분의 9448로 한다"  # 근거 대조는 쉼표를 뺀 글자로 비교
+        self.assertTrue(any(re.search(f, page) for f in _fraction_forms("0.9448")))
+
+
 class Hwp5TextTest(unittest.TestCase):
     """11/6 #1210: 대지급금 상한액 고시 첨부가 HWP 5.0 이라 근거 대조가 빈 글자 → 맞는 '310만 원'이 '페이지에 없음'.
     파일: 법제처 고시 첨부 원본 (flSeq=108704833, 공공 문서)."""

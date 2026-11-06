@@ -274,7 +274,8 @@ def _fraction_forms(number: str) -> list[str]:
     if not re.fullmatch(r"\d+(?:\.\d+)?", number):
         return []  # 날짜 '2027.1.1' 같은 것 — float 변환 실패로 근거 대조 전체가 멈췄음 (11/6 #1023 프리랜서 3.3%)
     forms = []
-    for denom, scale in (("100", 1), ("1천", 10), ("1000", 10), ("1만", 100), ("10000", 100), ("10만", 1000), ("100000", 1000)):
+    for denom, scale in (("100", 1), ("1천", 10), ("1000", 10), ("1만", 100), ("10000", 100), ("10만", 1000), ("100000", 1000),
+                         ("100만", 10000), ("1000000", 10000)):  # 장기요양 '100만분의 9,448' = 0.9448% (11/6 #1228)
         value = float(number) * scale
         if value == int(value):
             forms.append(rf"{denom}\s*분의\s*{int(value)}(?!\d)")
