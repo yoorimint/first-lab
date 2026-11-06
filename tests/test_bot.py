@@ -427,6 +427,21 @@ class ContinuousTest(unittest.TestCase):
         self.assertEqual(fire.call_count, 1)
         self.assertEqual(state["continuous"]["count"], 1)
 
+    def test_waits_for_fresh_candidates(self):
+        """11/6 09:45: 끝 표시와 같은 배포의 후보 제외가 후보 목록에 반영되기 전에 다음 편이 시작돼 옛 후보(방금 뺀 것)를 받음."""
+        state = {"log": [], "dashboard_at": ""}
+        fire, _ = self.run_step(state, 0)
+        self.assertEqual(fire.call_count, 0)                  # 후보 새로 만들기 전 → 이번 분은 기다림
+        state["dashboard_at"] = "2026-11-05 10:00"
+        fire, _ = self.run_step(state, 1)
+        self.assertEqual(fire.call_count, 1)
+
+    def test_more_candidates_info_first_within_gold(self):
+        from bot import run
+        self.assertEqual(run.CANDIDATES, 40)
+        self.assertIn("0, 40 )", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        self.assertIn('(x["gold"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
+
     def test_same_minute_previous_post_is_not_new(self):
         # 11/4 22:05: 직전 글 기록과 다음 편 시작이 같은 분 → 직전 글을 새 글로 착각해 두 편이 동시에 돎
         state = {"log": [{"time": "2026-11-05 10:05", "ok": True, "msg": "직접 작성 글: [공개 대기] '앞 글'"}]}

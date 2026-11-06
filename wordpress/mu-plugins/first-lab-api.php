@@ -36,7 +36,7 @@ add_action(
 						'refresh_target' => firstlab_api_refresh_target( $state ),
 						'held_drafts'    => firstlab_api_held_drafts(),
 						'image_checks'   => firstlab_api_image_checks(), // 사진 검사할 글 (daily-writer.md 5-2)
-						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 20 ),
+						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 40 ), // bot/run.CANDIDATES (11/6 20→40)
 						// 앞으로 시행될 근거 법령 개정 (bot/law_watch.py) — 아직 글을 안 쓴 것만 (daily-writer.md 1단계)
 						'law_changes'   => firstlab_api_law_changes( $state ),
 						// 새로 생긴 전국·광역 혜택 (bot/benefit_watch.py) — 검색량이 생기기 전에 먼저 쓰는 글감, 이미 쓴 것은 뺌

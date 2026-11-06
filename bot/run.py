@@ -235,6 +235,10 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
     if settings.write_mode != "direct" or not continuous_on():
         state.pop("continuous", None)
         return
+    if state.get("dashboard_at") == "":
+        # 방금 올라온 결과(후보 제외·새 글)로 후보 목록을 새로 만들기 전 — 이번 분에 시작하면 옛 후보를 받음
+        # (11/6 09:45 실행: '후보 20개는 직전 실행이 제외한 것' → 새 글 없이 끝남). 아래 refresh_dashboard 뒤 다음 분에 시작.
+        return
     c = state.get("continuous") or {}
     stamp = now.strftime("%Y-%m-%d %H:%M")
     fails, count = c.get("fails", 0), c.get("count", 0)
@@ -256,11 +260,14 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
     state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count, "seen": seen}
 
 
+CANDIDATES = 40  # 글쓰기 세션에 주는 후보 수 — 20개면 업체·상품을 빼고 나면 남는 게 없어 새 글 없이 끝나는 실행이 생김 (11/6 세 번 연속)
+
+
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
     """설정 페이지에 보여줄 창고 현황과 다음 후보 (안전 검사 전 포함)."""
     with connect() as conn:
         state["keywords"] = summary(conn)
-        state["candidates"] = ranked_candidates(conn, settings, limit=20)
+        state["candidates"] = ranked_candidates(conn, settings, limit=CANDIDATES)
     try:  # 대기 글이 많으면 새 글 대신 외부 검수할 글 (bot/review_queue.py)
         from .review_queue import target
         state["review_target"] = target()
