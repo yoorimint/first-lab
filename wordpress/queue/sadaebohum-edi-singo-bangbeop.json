@@ -1,0 +1,476 @@
+{
+ "title": "4대보험 EDI 신고 방법: 사이트별 가입·인증서와 신고 기한",
+ "excerpt": "4대보험 EDI 사이트 4곳(정보연계센터·건강보험·국민연금·토탈서비스)의 차이, 가입·인증서 등록 방법, 건강보험 14일·연금 고용 산재 다음 달 15일 신고 기한을 정리했어요.",
+ "content_html": "<p>4대보험 EDI는 사업장이 직원의 4대보험 취득·상실 같은 신고를 종이 대신 인터넷으로 내는 전자 민원 서비스예요. 쓸 수 있는 곳은 4대사회보험 정보연계센터, 건강보험 EDI, 국민연금 EDI, 고용·산재보험 토탈서비스 네 곳이고, 4대 공통 신고는 정보연계센터·건강보험 EDI·국민연금 EDI 중 한 곳에서 한 번에 낼 수 있어요. 기한은 건강보험 취득·상실 신고가 자격 변동일부터 14일 이내로 가장 짧으니, 입사·퇴사 후 14일 안에 공통 신고를 끝내는 걸 기준으로 잡으면 돼요.</p>\n\n<h2>4대보험 EDI 사이트 4곳 비교</h2>\n<p>4대사회보험 정보연계센터는 국민연금공단·국민건강보험공단·근로복지공단에 따로 하던 자격 신고 등을 한 기관에서 할 수 있게 2003년부터 운영 중인 시스템이에요. 나머지 세 곳은 각 공단의 EDI인데, 공통 신고와 함께 그 공단에만 있는 신고도 받아요.</p>\n<table>\n<thead><tr><th>사이트</th><th>주소</th><th>주로 하는 일</th><th>로그인</th></tr></thead>\n<tbody>\n<tr><td>4대사회보험 정보연계센터</td><td>4insure.or.kr</td><td>4대 공통 신고, 가입내역 확인서</td><td>사업장 회원가입 후 등록한 공동·금융인증서</td></tr>\n<tr><td>건강보험 EDI</td><td>edi.nhis.or.kr</td><td>건강보험 신고·조회</td><td>사업장 회원가입 후 인증서 등록</td></tr>\n<tr><td>국민연금 EDI</td><td>edi.nps.or.kr</td><td>4대 공통 신고, 납부예외·재개 등 연금 고유 신고, 증명서</td><td>사업장관리번호 + 공동·금융인증서</td></tr>\n<tr><td>고용·산재보험 토탈서비스</td><td>total.comwel.or.kr</td><td>고용·산재 신고, 보수총액 신고</td><td>공동인증서 또는 간편인증</td></tr>\n</tbody>\n</table>\n<p>국민연금 EDI 기준으로 이용료는 무료이고, 업무시간 이후나 주말에도 24시간 신고·신청할 수 있어요. 처리 결과도 바로 확인돼요.</p>\n\n<h2>사이트별 가입 방법</h2>\n<h3>건강보험 EDI</h3>\n<ol>\n<li>국민건강보험공단 홈페이지에서 회원가입 → 사업장 가입신청을 골라요.</li>\n<li>약관 동의 후 아이디·비밀번호, 사업장관리번호 등 사업장 정보를 입력하면 홈페이지 가입이 끝나요.</li>\n<li>건강보험 EDI에서 공동인증서 등록을 누르고 사업장 회원 아이디·비밀번호를 넣으면 사업장관리번호·단위사업장기호·사업자등록번호가 자동으로 들어가요. 담당자 이름·전화번호를 적고 인증서를 등록해요.</li>\n</ol>\n<p>법인 사업장은 사업장 명의 인증서만 쓸 수 있고, 개인 사업장은 사업자 명의 인증서나 대표자 개인인증서도 등록할 수 있어요. 대표자 개인인증서 중 용도제한용은 안 돼요.</p>\n<h3>국민연금 EDI</h3>\n<p>따로 회원가입이 없어요. 사업장관리번호를 넣고 약관에 동의한 뒤 인증서 암호를 입력하면 바로 써요. 사업장 정보나 인증서를 저장하지 않는 방식이라 접속할 때마다 약관 동의가 필요해요. 법인은 사업장등록번호로 받은 공동인증서, 개인사업장은 사업장등록번호나 대표자 명의 공동인증서를 써요.</p>\n<h3>고용·산재보험 토탈서비스</h3>\n<p>회원가입 없이 사업주(법인)의 공동인증서나 간편인증으로 고용·산재 신고를 할 수 있어요. 4대 공통 서식은 정보연계센터·국민연금 EDI·건강보험 EDI로 내요.</p>\n\n<h2>사업장 인증서는 무엇을 쓰나</h2>\n<p>범용 공동인증서가 없다면 보건복지 전용 공동인증서를 무료로 받을 수 있어요. 국민연금·건강보험·심사평가원 등 보건복지 서비스 기관에서만 쓰는 인증서로, 온라인으로 신청하거나 서류를 챙겨 국민연금공단 또는 국민건강보험공단 지사를 방문해 신청해요. 대표자가 직접 가면 신청서, 사업자등록증 사본, 대표자 신분증 사본이 필요해요. 대리인이 가면 대표자 신분증 대신 인감증명서 원본(6개월 이내 발급, 법인은 법인인감증명서)과 대리인 신분증 사본을 내고, 법인이 신청서에 사용인감을 찍었다면 사용인감계 원본도 내요. 다만 이 인증서는 이름 그대로 보건복지 분야 기관용이라, 고용·산재보험 토탈서비스에서 쓰려면 범용 공동인증서나 간편인증을 준비하는 게 안전해요.</p>\n\n<h2>취득·상실 신고 기한</h2>\n<table>\n<thead><tr><th>보험</th><th>취득·상실 신고 기한</th><th>근거</th></tr></thead>\n<tbody>\n<tr><td>건강보험</td><td>취득·상실일부터 14일 이내</td><td>국민건강보험법 제8조·제10조</td></tr>\n<tr><td>국민연금</td><td>사유 발생일이 속한 달의 다음 달 15일</td><td>국민연금법 시행규칙 제6조</td></tr>\n<tr><td>고용보험</td><td>사유 발생일이 속한 달의 다음 달 15일</td><td>고용보험법 시행령 제7조</td></tr>\n<tr><td>산재보험(근로자 고용 신고)</td><td>고용한 날이 속한 달의 다음 달 15일</td><td>보험료징수법 제16조의10</td></tr>\n</tbody>\n</table>\n<p>고용보험은 근로자가 그 전에 신고해 달라고 요구하면 지체 없이 해야 해요. 산재보험 고용 신고는 한 달 소정근로시간이 60시간 미만인 사람 등 대통령령으로 정한 근로자는 하지 않을 수 있어요. 신고를 하지 않으면 국민연금은 50만 원 이하, 고용보험은 300만 원 이하 과태료 대상이에요.</p>\n\n<h2>EDI로 취득 신고하는 순서</h2>\n<ol>\n<li>4대사회보험 정보연계센터·건강보험 EDI·국민연금 EDI 중 한 곳에 사업장 인증서로 로그인해요.</li>\n<li>4대 공통 신고에서 자격취득 신고서를 골라요. 국민연금 EDI는 공통(동시) 신고 메뉴에 자격취득·자격상실 신고서와 고용보험 이직확인서가 함께 있어요.</li>\n<li>직원 인적 사항, 취득일, 월 보수 등을 넣고 신고할 보험을 선택해 전송해요.</li>\n<li>처리 결과 메뉴에서 접수·처리 여부를 확인해요.</li>\n</ol>\n<p>퇴사자는 같은 메뉴의 자격상실 신고서로 내고, 고용보험 이직확인서가 필요한 경우도 같이 챙겨요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>세무대리인이 대신 신고할 수 있나요?</h3>\n<p>국민연금 EDI에는 업무대행 서비스가 있어요. 업무대행기관 지정 신청과 위탁사업장 등록 신청을 거치면 대행기관이 사업장 업무를 대신 처리해요.</p>\n<h3>인증서를 갱신하면 EDI에 다시 등록해야 하나요?</h3>\n<p>국민연금 EDI는 공동인증서를 재발급받거나 갱신해도 따로 변경·재등록 없이 바로 쓸 수 있어요.</p>\n<h3>지점(단위사업장)마다 건강보험 EDI를 따로 쓸 수 있나요?</h3>\n<p>네, 단위사업장별로 회원가입한 뒤 아이디마다 공동인증서를 등록하면 따로 쓸 수 있어요.</p>\n<h3>EDI 사용 중 막히면 어디에 묻나요?</h3>\n<p>건강보험 EDI는 국민건강보험공단 1577-1000, 고용·산재보험 토탈서비스는 근로복지공단 1588-0075로 물으면 돼요. 국민연금 EDI는 로그인 후 상담예약을 신청하면 원하는 시간에 전용 콜센터에서 전화가 와요.</p>",
+ "tags": [
+  "4대보험",
+  "EDI",
+  "취득신고",
+  "사업장"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a tidy small business office with wooden desks, potted plants and soft morning light through the window, no people",
+   "alt": "아침 햇살이 드는 작은 사무실"
+  }
+ ],
+ "keyword": "4대보험EDI",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "건강보험 직장가입자 자격 취득 신고는 취득한 날부터 14일 이내 (국민건강보험법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험 직장가입자 자격 상실 신고는 잃은 날부터 14일 이내 (국민건강보험법 제10조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법/제10조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험 14일 기한이 4대보험 중 가장 짧음 — 연금·고용·산재는 다음 달 15일 (국민연금법 시행규칙 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법시행규칙/제6조",
+    "https://www.law.go.kr/법령/국민건강보험법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 사업장가입자 취득·상실 신고는 사유 발생일이 속한 달의 다음 달 15일까지 (국민연금법 시행규칙 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법시행규칙/제6조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험 피보험자격 취득·상실 신고는 다음 달 15일까지 (고용보험법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제7조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험은 근로자가 기일 전에 신고를 요구하면 지체 없이 신고 (고용보험법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제7조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "산재보험 근로자 고용 신고는 고용한 날이 속한 달의 다음 달 15일까지 (고용보험 및 산업재해보상보험의 보험료징수 등에 관한 법률 제16조의10)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "산재 고용 신고는 1개월 소정근로시간 60시간 미만 등 대통령령 근로자는 하지 않을 수 있음 (고용보험 및 산업재해보상보험의 보험료징수 등에 관한 법률 제16조의10)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 자격 신고 미이행 사용자 과태료 50만 원 이하 (국민연금법 제131조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법/제131조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험 피보험자격 신고 미이행 과태료 300만 원 이하 (고용보험법 제118조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제118조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사업장 자격 신고 의무 (고용보험법 제15조, 국민연금법 제21조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제15조",
+    "https://www.law.go.kr/법령/국민연금법/제21조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4대보험 EDI 사이트 4곳: 4대사회보험 정보연계센터, 건강보험 EDI, 국민연금 EDI, 고용·산재보험 토탈서비스",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/main/main.do",
+    "https://edi.nhis.or.kr/homeapp/wep/o/ediIntroduce.do",
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19013"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4대 공통 신고는 정보연계센터·건강보험 EDI·국민연금 EDI 중 한 곳에서 한 번에",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/main/main.do",
+    "https://edi.nhis.or.kr/homeapp/wep/o/ediIntroduce.do",
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "4대사회보험 정보연계센터는 세 공단에 따로 하던 자격 신고를 한 기관에서 하도록 2003년부터 운영 중",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20231211/trend20231211_3.pdf",
+    "https://www.4insure.or.kr/pbiz/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "정보연계센터 4insure.or.kr 은 4대 공통 신고·가입내역 확인서",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "정보연계센터 사업장은 회원가입 후 등록한 공동·금융인증서로 로그인해야 신고",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/cert/insertBplcCerfAplyAncView.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "건강보험 EDI edi.nhis.or.kr 은 건강보험 신고·조회, 4대보험 공통업무도 처리",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/ediIntroduce.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI edi.nps.or.kr 은 4대 공통 신고, 납부예외·재개 등 연금 고유 신고, 증명서",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI 로그인은 사업장관리번호 + 공동·금융인증서, 회원가입 없음",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI는 사업장 정보·인증서를 저장하지 않아 접속마다 약관 동의",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI 인증서: 법인은 사업장등록번호 공동인증서, 개인은 사업장등록번호 또는 대표자 명의",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI 이용료 무료, 24시간 신고·신청, 처리 결과 즉시 확인",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "토탈서비스 total.comwel.or.kr 에서 고용·산재 신고·보수총액 신고",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19013"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "토탈서비스는 회원가입 없이 공동인증서 또는 간편인증으로 이용",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19073"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험 EDI 가입: 공단 홈페이지 회원가입 → 사업장 가입신청 → 약관 동의 → 사업장 정보 입력",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/serviceGuide.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험 EDI 인증서 등록 시 아이디·비밀번호 확인하면 사업장관리번호·단위사업장기호·사업자등록번호 자동 입력, 담당자 이름·전화번호 입력",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/certificateReg.do",
+    "https://edi.nhis.or.kr/homeapp/wep/o/serviceGuide.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "건강보험 EDI: 법인 사업장은 사업장 명의 인증서만, 개인 사업장은 사업자 명의 또는 대표자 개인인증서(용도제한용 제외)",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/certificateReg.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보건복지 전용 공동인증서는 무료, 보건복지 서비스 기관에서만 사용, 온라인 또는 국민연금공단·국민건강보험공단 지사 방문 신청",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보건복지 전용 인증서 대표자 신청 서류: 신청서·사업자등록증 사본·대표자 신분증 사본",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대리인 신청: 인감증명서 원본 6개월 이내(법인은 법인인감증명서)·대리인 신분증 사본, 사용인감 사용 시 사용인감계",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "국민연금 EDI 공통(동시) 신고 메뉴에 자격취득·자격상실 신고서와 고용보험 이직확인서",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "취득 신고는 인적 사항·취득일·월 소득 입력 후 전송, 처리 결과 메뉴에서 확인",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI 업무대행 서비스: 업무대행기관 지정 신청, 위탁사업장 등록 신청",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI는 공동인증서 재발급·갱신해도 재등록 없이 이용",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험 EDI는 단위사업장별 회원가입 후 아이디별 공동인증서 등록으로 사용 가능",
+   "urls": [
+    "https://www.nhis.or.kr/_custom/nhis/_common/board/index/728.do?mode=view&articleNo=115472"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "건강보험 1577-1000, 근로복지공단 고용·산재 1588-0075",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금 EDI 상담예약(콜백) 서비스로 전용 콜센터 전화 상담",
+   "urls": [
+    "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민건강보험법 제8조 단서 해당 없음 — 1~4호는 수급권자·피부양자·의료보호대상자의 취득 시기라 사업장 신고 기한(②항 14일)과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민건강보험법 제10조 각 호(상실 시기) 해당 없음 — 글은 ②항 신고 기한 14일만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법/제10조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민건강보험법 제8조 위임 — 국민건강보험법 시행규칙 제4조 직장가입자 자격취득 신고서 제출 확인",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법시행규칙/제4조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보험료징수법 제16조의10 단서(60시간 미만 등) 반영 — 산재 고용 신고 문단, 시행령 제19조의7④: 고용보험 적용 제외 근로자 등 (고용보험 및 산업재해보상보험의 보험료징수 등에 관한 법률 시행령 제19조의7)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률시행령/제19조의7"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보험료징수법 제16조의10 ①항 후단 원천공제 제외·⑧항 문서 신고 단서 해당 없음 — 보수총액·문서 신고는 글에서 다루지 않음",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험법 제15조 단서(⑦ 자영업자 피보험자 신고 안 함) 해당 없음 — 글은 사업주의 근로자 신고만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제15조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금법 제131조 단서(부칙) 해당 없음 — 과태료 50만 원 이하는 ①항 1호 제21조① 신고 미이행",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법/제131조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민연금법 시행규칙 제6조 각 호(취득·상실 신고서) 반영 — 취득·상실 신고 기한 표",
+   "urls": [
+    "https://www.law.go.kr/법령/국민연금법시행규칙/제6조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민건강보험법 제8조 단서1 해당 없음 — 각 호는 수급권자·피부양자·의료보호대상자였던 사람의 자격 취득 시기이고, 글은 사용자의 신고 기한(②항 14일)만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험및산업재해보상보험의보험료징수등에관한법률 제16조의10 단서1 해당 없음 — 보수총액 신고(①항)의 원천공제 예외로, 글은 보수총액 신고 기한을 다루지 않음",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험및산업재해보상보험의보험료징수등에관한법률 제16조의10 단서2 반영 — '취득·상실 신고 기한' 표 아래 문단 '한 달 소정근로시간이 60시간 미만인 사람 등 대통령령으로 정한 근로자는 하지 않을 수 있어요'",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험및산업재해보상보험의보험료징수등에관한법률 제16조의10 단서3 해당 없음 — 근로자 10명 미만 사업의 문서 신고 허용으로, 글은 EDI 전자 신고 방법만 다루며 문서 신고를 막는 문장 없음",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험법 제15조 단서1 해당 없음 — 자영업자 본인 피보험자격 신고 면제로, 글은 사업주의 근로자 신고만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제15조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "국민건강보험법시행규칙 제4조 단서1 해당 없음 — 직장 상실 신고를 내면 지역가입자 신고로 본다는 세대주 쪽 간주 규정, 사용자의 EDI 신고 방법과 무관",
+   "urls": [
+    "https://www.law.go.kr/법령/국민건강보험법시행규칙/제4조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험법 제77조의2 해당 없음 — 예술인 피보험자 특례, 글은 근로자 취득·상실 신고만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제77조의2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용보험법 제77조의7 해당 없음 — 노무제공플랫폼사업자 특례, 글은 근로자 취득·상실 신고만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제77조의7"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국민연금공단 2026년 국민연금 EDI서비스 가이드북",
+   "url": "https://edi.nps.or.kr/cm/main/guide/edi_guide.pdf"
+  },
+  {
+   "name": "국민건강보험공단 건강보험 EDI 공동인증서 등록 안내",
+   "url": "https://edi.nhis.or.kr/homeapp/wep/o/certificateReg.do"
+  },
+  {
+   "name": "4대사회보험 정보연계센터 사업장 인증서 안내",
+   "url": "https://www.4insure.or.kr/pbiz/cert/insertBplcCerfAplyAncView.do"
+  }
+ ]
+}
