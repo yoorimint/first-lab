@@ -108,6 +108,44 @@ def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, f
     return out
 
 
+# 같은 틀 글 (11/7 운영자 '겹치는 글 합치기' 승인): 자동차검사소 연작 5편이 본문 57~83% 같았음 (다른 글끼리는 최대 47%).
+# 공개 직전, 이 글 본문 가운데 먼저 쓴 글(공개 글·번호가 앞선 초안)에 그대로 있는 비율이 TWIN_RATIO 이상이면 보류 →
+# 글쓰기 작업이 공통 내용은 그 글 링크로 줄이고 이 글만의 정보로 다시 쓴다 (먼저 쓴 글은 그대로 공개).
+TWIN_RATIO = 0.5
+_SHINGLE = 6
+
+
+def shingles(html_: str) -> set[str]:
+    text = re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", html_ or ""))
+    return {text[i:i + _SHINGLE] for i in range(len(text) - _SHINGLE + 1)}
+
+
+def twin_of(content: str, others: dict[int, str], ratio: float = TWIN_RATIO) -> tuple[int, float] | None:
+    """이 글 본문이 다른 글에 그대로 있는 비율이 가장 높은 글 (번호, 비율) — ratio 미만이면 None."""
+    mine = shingles(content)
+    if len(mine) < 200:  # 너무 짧은 글은 판단하지 않음
+        return None
+    best = max(((pid, len(mine & shingles(html_)) / len(mine)) for pid, html_ in others.items()), key=lambda x: x[1], default=None)
+    return best if best and best[1] >= ratio else None
+
+
+def _earlier_posts(post_id: int) -> dict[int, str]:
+    rows = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=publish,draft", "--fields=ID,post_content",
+                             "--format=json", "--posts_per_page=-1") or "[]")
+    return {int(r["ID"]): r.get("post_content", "") for r in rows if isinstance(r, dict) and int(r["ID"]) < post_id}
+
+
+def template_twin(post_id: int, content: str, others: dict[int, str] | None = None) -> list[str]:
+    try:
+        twin = twin_of(content, _earlier_posts(post_id) if others is None else others)
+    except Exception:  # noqa: BLE001 — 못 읽으면 이 확인만 건너뜀
+        return []
+    if not twin:
+        return []
+    return [f"같은 틀 글: #{twin[0]} 과 본문 {round(twin[1] * 100)}%가 같음 — 공통 내용(요금·기간·과태료 등)은 그 글 링크로 줄이고"
+            " 이 글만의 정보(위치·찾아가는 길·연락처·설비 등)로 다시 쓰기"]
+
+
 def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
     """공개 전에 다시 확인할 이유 (빈 목록이면 공개해도 됨)."""
     today = today or dt.date.today()
@@ -143,6 +181,7 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
         title = excerpt = content = ""
     out += expiry.passed_rounds([title, excerpt] + expiry.blocks(content), since, today)
     out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(content)))
+    out += template_twin(post_id, content) if content else []
     # 대기열에 들어간 뒤라도 본문 계산기가 독립 검수 전이면 공개하지 않음 (11/5 운영자 '계산기들은 전부 발행처리했네?')
     from . import review_gate
     out += review_gate.unreviewed_calcs(get("post_content"))

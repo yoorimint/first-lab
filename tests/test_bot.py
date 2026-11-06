@@ -464,7 +464,7 @@ class ContinuousTest(unittest.TestCase):
         self.assertIn("'candidates_more'", api)
         self.assertIn("?page=2", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
         self.assertIn("( $page - 1 ) * 40, 40 )", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
-        self.assertIn('(x["gold"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
+        self.assertIn('(x["gold"], x["focus"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
 
     def test_same_minute_previous_post_is_not_new(self):
         # 11/4 22:05: 직전 글 기록과 다음 편 시작이 같은 분 → 직전 글을 새 글로 착각해 두 편이 동시에 돎
@@ -2077,6 +2077,36 @@ class ApproxRoundingTest(unittest.TestCase):
 
     def test_in_gate(self):
         self.assertIn("condition_gate.approx_rounding(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
+class SiteFocusTest(unittest.TestCase):
+    """11/7 운영자 '주제 좁히기·겹치는 글 합치기' 승인."""
+
+    def test_focus_and_off_topic(self):
+        from bot.select_keyword import off_topic, on_focus
+        self.assertTrue(on_focus("실업급여신청서류"))
+        self.assertTrue(on_focus("퇴직금계산기"))
+        self.assertFalse(on_focus("인천공항주차요금"))
+        for kw in ("블루베리보관법", "냉장고정리방법", "캠핑준비물리스트", "김치찌개레시피"):
+            self.assertTrue(off_topic(kw), kw)
+        self.assertFalse(off_topic("실업급여신청"))
+        self.assertIn('(x["gold"], x["focus"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
+
+    def test_template_twin_held_but_first_and_rewritten_pass(self):
+        """검사소 연작: 먼저 쓴 글은 그대로, 같은 틀로 찍은 뒤 글은 보류, 이 글만의 정보로 다시 쓰면 통과."""
+        from bot import freshness
+        common = "".join(f"<p>정기검사 수수료는 승용차 23,000원이고 종합검사는 지역에 따라 달라요 {i}번 안내예요.</p>" for i in range(30))
+        first = "<p>노원검사소는 하계동에 있어요.</p>" + common
+        copy = "<p>성동검사소는 송정동에 있어요.</p>" + common
+        got = freshness.template_twin(20, copy, {10: first})
+        self.assertEqual(len(got), 1)
+        self.assertIn("#10", got[0])
+        rewritten = ("<p>성동검사소는 송정동 동부간선도로 옆에 있어요. 전화 02-000-0000, 화물차 검사 라인이 따로 있어요.</p>"
+                     + "".join(f"<p>성동 검사소 {i}번 출입구는 송정로 쪽이고 주말 대기 줄이 길어요.</p>" for i in range(30))
+                     + "<p>요금·과태료는 정기검사 비용 글을 보세요.</p>")
+        self.assertEqual(freshness.template_twin(20, rewritten, {10: first}), [])
+        self.assertEqual(freshness.template_twin(20, "<p>짧은 글</p>", {10: first}), [])   # 너무 짧으면 판단 안 함
+        self.assertIn("같은 틀 글", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
 
 class RetentionStartTest(unittest.TestCase):
