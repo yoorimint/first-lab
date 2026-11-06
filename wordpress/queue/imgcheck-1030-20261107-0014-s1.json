@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1030,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "firefighter helmets and protective jackets hanging neatly on hooks inside a fire station equipment room",
+   "alt": "소방서 장비실에 걸린 소방 헬멧과 방화복"
+  }
+ ]
+}

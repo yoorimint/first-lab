@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1006,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "rows of parked cars in a wide open-air parking area near an airport runway under a clear sky, an airplane taking off in the distance",
+   "alt": "공항 근처 야외 주차장과 이륙하는 비행기"
+  }
+ ]
+}
