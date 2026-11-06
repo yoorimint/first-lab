@@ -1562,6 +1562,23 @@ class SilentFailureTest(unittest.TestCase):
         self.assertIn("quality_report", (ROOT / "automation" / "tick.py").read_text(encoding="utf-8"))
 
 
+class PatchOpenTagTest(unittest.TestCase):
+    """찾을 문구에 여는 태그(<p>)를 넣으면 서버가 문단을 못 찾아 고친 내용이 안 들어감 (11/6 #1028 patch_problems)."""
+
+    def test_open_tag_rejected_and_server_cannot_apply(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        from bot import fix_posts
+        body = "<p>평일에는 공연이 14:30 한 번뿐이라 시간이 맞아요.</p>"
+        bad = {"type": "missing_condition", "why": "x", "find": "<p>평일에는 공연이", "tag": "p",
+               "replace_paragraph": "11~12월 평일 공연", "prevention": "review_only:x"}
+        post = {"title": "t", "excerpt": "e", "content_html": body}
+        self.assertTrue(any("여는 태그" in e for e in apply_review.check(post, [bad])))
+        self.assertIsNone(fix_posts.patch_content(body, bad))   # 서버는 실제로 못 찾음 — 그래서 미리 막음
+        ok = dict(bad, find="평일에는 공연이")
+        self.assertIn("11~12월", fix_posts.patch_content(body, ok))
+
+
 class QualityLogTest(unittest.TestCase):
     """외부 검수에서 고친 곳 수를 글마다 남김 — 동시 글쓰기 전후 품질 비교 (11/6 운영자 '퀄리티는 유지하거나 더 올리고')."""
 
