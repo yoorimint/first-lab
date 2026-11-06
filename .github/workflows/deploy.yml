@@ -86,8 +86,12 @@ jobs:
             else
               git clone -q https://github.com/yoorimint/first-lab "$REPO"
             fi
-            bash "$REPO/server/setup.sh"
-            bash "$REPO/server/wp-setup.sh"
-            bash "$REPO/server/bot-setup.sh"
-            bash "$REPO/server/bot-check.sh"
+            # 같은 서버의 사주데이 앱보다 낮은 몫으로 (11/6 10:06 배포 때 부하 5.14·사주데이 /healthz 응답 없음 1분)
+            # cgroup v2 에선 Nice 는 서비스 사이에 안 먹음 → CPUWeight·IOWeight(기본 100)를 낮춘 범위에서 실행
+            LOW="nice -n 10"
+            if command -v systemd-run >/dev/null; then LOW="systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20 nice -n 10"; fi
+            $LOW bash "$REPO/server/setup.sh"
+            $LOW bash "$REPO/server/wp-setup.sh"
+            $LOW bash "$REPO/server/bot-setup.sh"
+            $LOW bash "$REPO/server/bot-check.sh"
             echo "${{ needs.gate.outputs.sha }}" > /var/www/first-lab/deployed-version.txt   # 따라잡기(gate)가 비교하는 값

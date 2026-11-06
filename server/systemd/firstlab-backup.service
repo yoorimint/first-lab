@@ -5,3 +5,5 @@ Description=First Lab daily backup
 Type=oneshot
 ExecStart=/opt/first-lab/server/backup.sh
 Nice=15
+CPUWeight=20
+IOWeight=20

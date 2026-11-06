@@ -1922,6 +1922,18 @@ class DeploySpeedTest(unittest.TestCase):
         self.assertEqual(deploy.count("needs.gate.outputs.sha"), 2)
         self.assertIn("needs: [gate, check]", deploy)
 
+    def test_shares_server_politely(self):
+        """같은 서버(2코어)의 사주데이 앱: 11/6 10:06 배포 때 부하 5.14·/healthz 응답 없음 → 우리 일은 CPU·IO 몫을 낮게.
+        cgroup v2 에선 Nice 가 서비스 사이에 안 먹어 CPUWeight·IOWeight(기본 100)로."""
+        for name in ("bot", "discover", "backup"):
+            unit = (ROOT / "server" / "systemd" / f"firstlab-{name}.service").read_text(encoding="utf-8")
+            self.assertIn("CPUWeight=20", unit, name)
+            self.assertIn("IOWeight=20", unit, name)
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        self.assertIn("systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20", wf)
+        for script in ("setup.sh", "wp-setup.sh", "bot-setup.sh", "bot-check.sh"):
+            self.assertIn(f'$LOW bash "$REPO/server/{script}"', wf)
+
     def test_reviewed_list_change_deploys(self):
         """서버가 automation/reviewed.txt 를 읽음 (계산기 공개·검수 관문) → 이 파일만 바뀌어도 배포."""
         wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")

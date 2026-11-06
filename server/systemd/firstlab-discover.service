@@ -8,3 +8,5 @@ WorkingDirectory=/opt/first-lab
 ExecStart=/opt/first-lab-venv/bin/python -m bot.discover
 TimeoutStartSec=3h
 Nice=15
+CPUWeight=20
+IOWeight=20
