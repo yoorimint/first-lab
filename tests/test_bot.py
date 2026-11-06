@@ -1693,6 +1693,11 @@ class FacilityOrdinanceTest(unittest.TestCase):
         self.assertEqual(facility_ordinance("인천시립요양원 입소 조건과 비용", own), [])
         self.assertEqual(facility_ordinance("천안 청수도서관 이용시간", []), [])          # 시립·구립이 제목에 없으면 안 봄
         self.assertEqual(facility_ordinance("구립 도서관 이용시간", [{"claim": "조례 해당 없음 — 구 규칙만 있음", "urls": []}]), [])
+        # 제목엔 없고 요약에만 '시립' (#1156), 여러 시설 공통 조례는 '시설 조례:' 로 밝히면 통과
+        self.assertEqual(len(facility_ordinance("남부대 수영장 이용 안내", [], "광주 남부대학교 시립국제수영장 성인 일일 5,000원")), 1)
+        umbrella = [{"claim": "시설 조례: 광주광역시체육시설관리운영조례 별표 1 27호 남부대시립국제수영장",
+                     "urls": ["https://www.law.go.kr/자치법규/광주광역시체육시설관리운영조례/제17조"]}]
+        self.assertEqual(facility_ordinance("남부대 수영장 이용 안내", umbrella, "남부대학교 시립국제수영장"), [])
 
 
 class UpcomingAmendmentTest(unittest.TestCase):

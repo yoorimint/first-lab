@@ -99,7 +99,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "excerpt_parentheticals": lambda: condition_gate.excerpt_parentheticals(post["excerpt"], post["content_html"]),
               "limited_event_year": lambda: condition_gate.limited_event_year(post["excerpt"], post["content_html"]),
               "deadline_holiday": lambda: condition_gate.deadline_holiday(post["content_html"]),
-              "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review")),
+              "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review"), post["excerpt"]),
               "upcoming_amendments": lambda: condition_gate.upcoming_amendments(post.get("review"), post["content_html"]),
               # 길 화살표('A→B→C 하루 21회') 주장의 숫자를 계산으로 봐서 대조 안 했음 (11/6 #1060) — 이제 대조함
               "is_calc_claim": lambda: [c for c in (str(i.get("claim", "")) for i in post.get("review") or [])
