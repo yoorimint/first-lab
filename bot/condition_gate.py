@@ -596,6 +596,29 @@ def retention_start(body_html: str) -> list[str]:
     return out[:3]
 
 
+# 근거 조문이 '…범위에서 조례로 정하는 거리(기준) 이상'처럼 조례에 맡기는데 제목·요약·첫 문단이 법 하한을 그대로 단정
+# (11/7 #1344 일조권: '10~17m 부분은 5m 이상만 띄우면 돼요' — 실제 거리는 시·군·구 조례, 서울 조례는 아직 높이의 1/2).
+DELEGATED = re.compile(r"범위에서[^.]{0,40}조례로 정하는|조례로 정하는 (?:거리|기준|비율|면적|높이)")
+
+
+def ordinance_delegation(title: str, excerpt: str, body_html: str, review: list[dict] | None,
+                         articles_of=None, changes_of=None, today=None) -> list[str]:
+    import datetime as dt
+    first = re.search(r"<p[^>]*>.*?</p>", body_html or "", re.S)
+    lead = f"{title} {excerpt} {_plain(first.group(0)) if first else ''}"
+    if "조례" in lead:
+        return []
+    articles_of, changes_of = articles_of or law_articles, changes_of or _law_changes
+    today = today or dt.date.today()
+    for base, art in cited_articles(review)[:UPCOMING_MAX_ARTICLES]:
+        texts = [(articles_of(base) or {}).get(art, "")]
+        name = urllib.parse.unquote(base).rsplit("/", 1)[-1]
+        texts += [str(c.get("text", "")) for c in (changes_of(name, art, today) or [])]
+        if any(DELEGATED.search(t) for t in texts):
+            return [f"{name} {art} 는 기준을 '조례로 정하는' 범위로 맡김 — 제목·요약·첫 문단에 '실제 기준은 시·군·구 조례로 정해요'를 적기 (법 기준은 최소·최대 범위)"]
+    return []
+
+
 def upcoming_amendments(review: list[dict] | None, body_html: str, changes_of=None, today=None) -> list[str]:
     import datetime as dt
     today = today or dt.date.today()

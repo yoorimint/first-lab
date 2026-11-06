@@ -1939,6 +1939,24 @@ class RuleProvisoTest(unittest.TestCase):
         self.assertTrue(any("제7조 단서1" in g for g in got), got)
 
 
+class OrdinanceDelegationTest(unittest.TestCase):
+    """11/7 #1344 일조권: 개정 법 제61조 '…범위에서 조례로 정하는 거리 이상' — 제목·요약·첫 문단은 '5m 이상만 띄우면 돼요'."""
+    REVIEW = [{"claim": "10~17m 부분 5m (건축법 제61조)", "verdict": "맞음", "action": "유지", "urls": ["https://www.law.go.kr/법령/건축법"]}]
+    TEXT = "① … 다음 각 호의 구분에 따른 범위에서 해당 지방자치단체의 조례로 정하는 거리 이상을 띄어 건축하여야 한다."
+
+    def run_check(self, lead):
+        import datetime as dt
+        from bot.condition_gate import ordinance_delegation
+        return ordinance_delegation("일조권 사선제한 개정", "", f"<p>{lead}</p>", self.REVIEW,
+                                    articles_of=lambda base: {}, changes_of=lambda n, a, t: [{"text": self.TEXT}], today=dt.date(2026, 11, 7))
+
+    def test_missing_ordinance_flagged(self):
+        self.assertEqual(len(self.run_check("10m 초과 17m 이하 부분은 5m 이상만 띄우면 돼요.")), 1)
+
+    def test_ordinance_mentioned_passes(self):
+        self.assertEqual(self.run_check("법 기준은 5m 이상이고 실제 거리는 조례로 정해요."), [])
+
+
 class HeadlineFromPriceTest(unittest.TestCase):
     """11/7 #1272: 제목 '응시료 75,000원부터' — 본문 첫 문단에 필기 25,000원."""
 

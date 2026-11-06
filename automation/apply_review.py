@@ -106,6 +106,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "ordinary_wage_rule": lambda: condition_gate.ordinary_wage_rule(post["content_html"]),
               "approx_rounding": lambda: condition_gate.approx_rounding(post["content_html"]),
               "retention_start": lambda: condition_gate.retention_start(post["content_html"]),
+              "ordinance_delegation": lambda: condition_gate.ordinance_delegation(post["title"], post["excerpt"], post["content_html"], post.get("review")),
               "stale_forms": lambda: condition_gate.stale_forms(post.get("review")),
               # 길 화살표('A→B→C 하루 21회') 주장의 숫자를 계산으로 봐서 대조 안 했음 (11/6 #1060) — 이제 대조함
               "is_calc_claim": lambda: [c for c in (str(i.get("claim", "")) for i in post.get("review") or [])
