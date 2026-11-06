@@ -186,6 +186,26 @@ def excerpt_qualifiers(excerpt: str, body_html: str) -> list[str]:
     return out[:2]
 
 
+# 요약이 본문의 규칙 문장만 옮기고 바로 뒤 '다만 …' 단서를 뺌 (11/6 #1026 해촉증명서: 요약 '간이지급명세서가 제출됐으면 증빙을 따로 안 붙여도 돼요'
+# ↔ 본문 다음 문장 '다만 명세서에 누락·오류가 있어 공단이 확인하지 못하면 서류가 필요해요'). 같은 꼴(요약에 조건 없이 단정)이 자주 틀린 유형.
+CAVEAT_START = re.compile(r"^(다만|단,|단 |하지만|그러나|예외로)")
+CAVEAT_WORDS = re.compile(r"(다만|단,|제외|경우에만|만 해당|아니면|없으면|못하면)")
+
+
+def excerpt_caveats(excerpt: str, body_html: str) -> list[str]:
+    body = _sentences(body_html)
+    out = []
+    for s in _sentences(excerpt or ""):
+        if CAVEAT_WORDS.search(s):
+            continue
+        stems = _stems(s)
+        for i, b in enumerate(body[:-1]):
+            if len(stems & _stems(b)) >= 4 and CAVEAT_START.search(body[i + 1]) and not CAVEAT_WORDS.search(" ".join(_sentences(excerpt))):
+                out.append(f"요약 '{s[:40]}' 에 본문 바로 뒤 단서가 없음: '{body[i + 1][:50]}' — 요약에도 '다만 …'")
+                break
+    return out[:2]
+
+
 # 다른 법률이 정한 예외 (같은 꼴 2번 → 검사, 11/6): #989 '4명 이하는 공휴일 유급휴일 아님' ↔ 노동절 제정법(5/1 은 규모 무관 유급휴일),
 # #996 '가사 사용인은 근로기준법 미적용' ↔ 가사근로자법 제6조(인증기관 소속 가사근로자는 적용). 같은 법 안의 특례(exception_articles)로는 못 봄
 # → 자주 쓰는 주제마다 알려진 다른 법 예외를 목록으로: 본문이 그 주제를 말하는데 예외 법의 말이 없으면 경고. 새로 찾으면 여기에 더한다.

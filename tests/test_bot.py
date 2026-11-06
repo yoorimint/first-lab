@@ -2881,6 +2881,24 @@ class DottedDateNumberTest(unittest.TestCase):
         self.assertEqual(len(msgs), 1)
 
 
+class ExcerptCaveatTest(unittest.TestCase):
+    """요약이 본문 규칙만 옮기고 바로 뒤 '다만 …' 단서를 뺌 (11/6 #1026 해촉증명서 간이지급명세서)."""
+
+    BODY = ("<p>거래처가 세무서에 <strong>간이지급명세서</strong>를 냈다면 해촉으로 소득이 줄어 조정을 신청할 때 증빙서류를 첨부한 것으로 봐서, "
+            "따로 붙이지 않아도 돼요. 다만 그 명세서에 누락·오류가 있어 공단이 확인하지 못하면 사유를 증명하는 서류가 필요해요.</p>")
+
+    def test_caveat_missing_in_excerpt(self):
+        from bot.condition_gate import excerpt_caveats
+        bad = "2025년 9월부터 간이지급명세서가 제출됐으면 해촉 사유 조정에 증빙을 따로 안 붙여도 돼요."
+        self.assertEqual(len(excerpt_caveats(bad, self.BODY)), 1)
+        self.assertEqual(excerpt_caveats(bad + " 다만 명세서에 누락·오류가 있어 공단이 확인하지 못하면 증명 서류가 필요해요.", self.BODY), [])
+        self.assertEqual(excerpt_caveats("해촉증명서 양식의 칸을 정리했어요.", self.BODY), [])  # 다른 말이면 안 봄
+
+    def test_wired(self):
+        self.assertIn("excerpt_caveats", (ROOT / "bot" / "source_check.py").read_text(encoding="utf-8"))
+        self.assertIn('"excerpt_caveats"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+
 class RelatedPostsTest(unittest.TestCase):
     """글 아래 '함께 보면 좋은 글'은 주제가 겹치는 글만 (11/6 운영자: 자동차보험료 계산 글에 주식 평단가 계산기 — '계산'만 겹침)."""
 
