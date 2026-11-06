@@ -1710,6 +1710,31 @@ class FacilityOrdinanceTest(unittest.TestCase):
         self.assertEqual(facility_ordinance("남부대 수영장 이용 안내", umbrella, "남부대학교 시립국제수영장"), [])
 
 
+class LawAnnexTest(unittest.TestCase):
+    """11/6 #1189·#1199: 과태료·봉급표 숫자가 법령 별표에만 있어 근거 대조가 '페이지에 없음' — 법령 근거면 현행 판 별표 글자도 대조."""
+
+    def test_law_page_includes_annex(self):
+        from unittest import mock
+        from bot import source_check
+        url = "https://www.law.go.kr/법령/공무원보수규정-테스트"
+        with mock.patch.object(source_check, "_fetch", return_value="제5조 봉급"), \
+                mock.patch.object(source_check, "law_annex", return_value="9급 1호봉 2133000"), \
+                mock.patch("bot.condition_gate._cached", side_effect=lambda kind, key, make: make()):
+            self.assertIn("2133000", source_check.fetch(url))
+
+    def test_non_law_url_has_no_annex(self):
+        from bot import source_check
+        self.assertEqual(source_check.law_annex("https://www.moel.go.kr/x"), "")
+
+    def test_annex_text_reads_byl(self):
+        from unittest import mock
+        from bot import law_api
+        xml = "<법령><별표단위><별표내용><![CDATA[■ 공무원보수규정 [별표 13] <개정 2026. 1. 2.> 9급 2,133,000]]></별표내용></별표단위></법령>"
+        import datetime as dt
+        with mock.patch.object(law_api, "fetch", return_value=xml):
+            self.assertIn("2,133,000", law_api.annex_text({"mst": "1", "date": dt.date(2026, 1, 2)}))
+
+
 class StaleFormTest(unittest.TestCase):
     """11/6 #1180: 2020년 판 이직확인서 파일(flSeq=94608429)을 근거로 써 소정근로시간 선택지·이직코드가 2025.7.1 개정 전 내용."""
     URL = "https://www.law.go.kr/LSW/flDownload.do?flSeq=94608429"

@@ -154,10 +154,15 @@ def form_heads(text: str) -> dict[str, dt.date]:
 def form_dates(version: dict) -> dict[str, dt.date]:
     """한 판의 별표·서식 마지막 개정일 — 근거로 쓴 서식 파일이 예전 판인지 대조 (11/6 #1180: 2020년 판 이직확인서를 근거로 써
     선택지·이직코드가 2025.7.1 개정 전 내용). 못 받으면 {}."""
+    return form_heads(annex_text(version))
+
+
+def annex_text(version: dict) -> str:
+    """한 판의 별표·서식 글자 전체 (봉급표·과태료 기준처럼 숫자가 별표에만 있는 경우 — law.go.kr 조문 화면에는 별표가 없음). 못 받으면 ''."""
     xml = fetch("service", "eflaw", MST=version["mst"], efYd=f"{version['date']:%Y%m%d}")
     if not xml:
-        return {}
-    return form_heads(" ".join(el.text or "" for el in ET.fromstring(xml).iter("별표내용")))
+        return ""
+    return " ".join(el.text or "" for el in ET.fromstring(xml).iter("별표내용"))
 
 
 def changed_articles(before: dict, after: dict, limit: int = 15) -> list[str]:

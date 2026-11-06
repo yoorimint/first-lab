@@ -156,12 +156,36 @@ def _raw(url: str) -> tuple[bytes, str | None, str] | None:
         return None
 
 
+def law_annex(url: str) -> str:
+    """'/법령/<이름>' 근거면 그 법령 현행 판 별표 글자 (쉼표 뺌) — 봉급표·과태료 별표 숫자가 조문 화면에 없어 '페이지에 없음'으로
+    나왔음 (11/6 #1189 과태료 115일·#1199 군무원 봉급표 8개). 못 받으면 ''."""
+    plain = urllib.parse.unquote(url)
+    if "law.go.kr/법령/" not in plain:
+        return ""
+    name = plain.split("/법령/")[1].split("/")[0].split("?")[0]
+    from . import law_api
+    from .condition_gate import _cached
+
+    def make() -> dict:
+        try:
+            if not law_api.available():
+                return {}
+            version = law_api.current(law_api.versions(name), dt.date.today())
+            text = law_api.annex_text(version) if version else ""
+        except Exception:  # noqa: BLE001 - 못 받으면 별표 없이 대조 (예전처럼)
+            return {}
+        return {"text": re.sub(r"\s+", " ", text).replace(",", "")} if text else {}
+    return (_cached("annex", name, make) or {}).get("text", "")
+
+
 def fetch(url: str) -> str | None:
     """law.go.kr 본문은 같은 날 다시 받지 않음 (condition_gate._cached) — 근거 대조를 여러 번 돌려도 빠르게.
     정부24 혜택 주소는 화면 글자에 공공서비스 API 상세 원문을 더함 (bot/benefit_detail, 11/6)."""
     if "law.go.kr" in urllib.parse.unquote(url):
         from .condition_gate import _cached
-        return _cached("page", url, lambda: _fetch(url))
+        page = _cached("page", url, lambda: _fetch(url))
+        annex = law_annex(url)
+        return f"{page} {annex}" if page and annex else page
     from .benefit_detail import detail_text, service_ids
     ids = service_ids([url])
     official = (detail_text(ids[0]) or "") if ids else ""
