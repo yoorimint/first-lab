@@ -162,6 +162,30 @@ def calc_coverage(body_html: str, data_dir: Path = CALC_DATA_DIR) -> list[str]:
     return out
 
 
+# 요약 금액 앞의 조건이 본문보다 빠짐 (11/6 #1006: 본문 '금~일요일과 법정공휴일 15,000원' ↔ 요약 '금~일 15,000원' — 평일 공휴일도
+# 13,000원으로 읽힘). 요약의 금액마다 본문 같은 금액 바로 앞(25자)의 날짜·시기 조건 낱말이 요약 쪽 앞(25자)에도 있어야 함.
+WHEN_WORDS = ("공휴일", "성수기", "비수기", "주말", "평일", "명절", "연휴", "야간", "심야")
+
+
+def excerpt_qualifiers(excerpt: str, body_html: str) -> list[str]:
+    ex, body = _plain(excerpt or ""), _plain(body_html or "")
+    out = []
+    for m in re.finditer(r"\d[\d,]*\s?(?:만\s?)?원", ex):
+        before = ex[max(0, m.start() - 25):m.start()]
+        # 요약이 그 금액에 조건을 일부만 붙였을 때만 ('금~일 15,000원' — 본문은 '금~일요일과 법정공휴일'). 조건 없이 쓴 금액은
+        # 다른 검사(lead_thresholds 등) 몫 — 저장소 127편 실측에서 조건 없는 금액까지 보면 4편 중 3편이 오탐
+        if not (re.search(r"[월화수목금토일]\s?[~·-]\s?[월화수목금토일]", before[-12:]) or any(w in before[-12:] for w in WHEN_WORDS)):
+            continue
+        for b in re.finditer(re.escape(m.group(0)), body):
+            if re.match(r"\s*[×x*=]", body[b.end():b.end() + 3]):
+                continue  # 계산 예시 속 금액 ('비수기 일·월 2박 25,000원 × 2') — 요금 조건이 아님 (#998 오탐)
+            missing = [w for w in WHEN_WORDS if w in body[max(0, b.start() - 25):b.start()] and w not in before]
+            if missing:
+                out.append(f"요약 '…{before[-12:]}{m.group(0)}' 에 본문의 조건 '{', '.join(missing)}' 이 빠짐 — 요약에도 넣기")
+                break
+    return out[:2]
+
+
 # 다른 법률이 정한 예외 (같은 꼴 2번 → 검사, 11/6): #989 '4명 이하는 공휴일 유급휴일 아님' ↔ 노동절 제정법(5/1 은 규모 무관 유급휴일),
 # #996 '가사 사용인은 근로기준법 미적용' ↔ 가사근로자법 제6조(인증기관 소속 가사근로자는 적용). 같은 법 안의 특례(exception_articles)로는 못 봄
 # → 자주 쓰는 주제마다 알려진 다른 법 예외를 목록으로: 본문이 그 주제를 말하는데 예외 법의 말이 없으면 경고. 새로 찾으면 여기에 더한다.

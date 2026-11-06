@@ -83,6 +83,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "title_numbers": lambda: len(condition_gate.title_numbers(post["title"])) > 1,
               "calc_coverage": lambda: condition_gate.calc_coverage(post["content_html"]),
               "cross_law_exceptions": lambda: condition_gate.cross_law_exceptions(post["content_html"]),
+              "excerpt_qualifiers": lambda: condition_gate.excerpt_qualifiers(post["excerpt"], post["content_html"]),
               "transition_rules": lambda: condition_gate.transition_rules(post.get("review"), post["content_html"]),
               "excerpt_vs_exclusions": lambda: condition_gate.excerpt_vs_exclusions(post["excerpt"], post["content_html"]),
               "lead_thresholds": lambda: condition_gate.lead_thresholds(post["excerpt"], post["content_html"]),

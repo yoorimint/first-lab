@@ -528,7 +528,9 @@ def main(argv: list[str]) -> None:
         print(f"- [제목 숫자] {len(nums)}개({', '.join(nums)}) — 핵심 숫자 1개만, 나머지는 요약문·본문으로 (제목 형식: 키워드+찾는 말+숫자 1개)")
     if len(data.get("title", "")) > TITLE_WARN:
         print(f"- [제목 길이] {len(data['title'])}자 — {TITLE_WARN}자 안팎으로 (45자 넘으면 서버가 보류): 키워드+찾는 말+핵심 숫자 1개")
-    from .condition_gate import cross_law_exceptions
+    from .condition_gate import cross_law_exceptions, excerpt_qualifiers
+    for x in excerpt_qualifiers(data.get("excerpt", ""), data.get("content_html", "")):
+        print(f"- [요약 조건] {x}")
     for x in cross_law_exceptions(data.get("content_html", "")):
         print(f"- [다른 법 예외] {x}")
     for x in lead_vs_exceptions(data.get("content_html", "")):

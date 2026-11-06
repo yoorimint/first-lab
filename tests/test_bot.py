@@ -3265,6 +3265,18 @@ class LogNoiseTest(unittest.TestCase):
         self.assertGreaterEqual(st.MAX_LOG, 100)
 
 
+class ExcerptQualifierTest(unittest.TestCase):
+    """11/6 #1006: 본문 '금~일요일과 법정공휴일 15,000원' ↔ 요약 '금~일 15,000원' (평일 공휴일도 13,000원으로 읽힘)."""
+
+    def test_partial_condition_in_excerpt(self):
+        from bot.condition_gate import excerpt_qualifiers
+        body = "<p>하루 최대 월~목 13,000원, 금~일요일과 법정공휴일 15,000원이에요.</p>"
+        self.assertEqual(len(excerpt_qualifiers("하루 최대 월~목 13,000원·금~일 15,000원이에요.", body)), 1)
+        self.assertEqual(excerpt_qualifiers("하루 최대 월~목 13,000원·금~일·공휴일 15,000원이에요.", body), [])
+        self.assertEqual(excerpt_qualifiers("24시간 최대 P1·P2 10,000원(금~일·공휴일 15,000원)", "<p>금~일·법정공휴일 10,000원</p>"), [])  # 조건 없이 쓴 금액은 안 봄 (#655)
+        self.assertEqual(excerpt_qualifiers("평일 25,000원", "<p>비수기 일·월 2박 25,000원 × 2 = 50,000원</p>"), [])         # 계산 예시 (#998)
+
+
 class CrossLawTest(unittest.TestCase):
     """다른 법률의 예외 (11/6 #989 노동절법·#996 가사근로자법 — 같은 꼴 2번 → 알려진 예외 목록으로 경고)."""
 
