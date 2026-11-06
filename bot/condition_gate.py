@@ -133,6 +133,11 @@ def lead_vs_body(body_html: str) -> list[str]:
 TITLE_MAX, TITLE_WARN = 45, 35
 
 
+def title_numbers(title: str) -> list[str]:
+    """제목 속 숫자(연도 빼고) — 핵심 1개 권장 (11/6 #973 '3년마다 4시간, 교육비 32,000원' 세 개: 규칙은 바꿨는데 검사는 길이만 봄)."""
+    return [n for n in re.findall(r"\d[\d,.]*", title or "") if not re.fullmatch(r"20\d\d", n)]
+
+
 def title_length(title: str) -> list[str]:
     n = len((title or "").strip())
     return [f"제목 {n}자 — {TITLE_MAX}자 이하로 (검색 결과에서 뒤가 잘림). 키워드+찾는 말+핵심 숫자 1개, 덜 중요한 숫자는 요약문·본문으로"] if n > TITLE_MAX else []

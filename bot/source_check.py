@@ -522,7 +522,10 @@ def main(argv: list[str]) -> None:
     data = json.loads(open(argv[1], encoding="utf-8").read())
     for x in headline_conditions(review, data.get("title", ""), data.get("excerpt", "")):
         print(f"- [제목 조건 확인] {x} → 제목·요약에 조건(최대·이하·기준 등)을 붙이거나 조건 없는 값으로")
-    from .condition_gate import TITLE_WARN, lead_vs_exceptions
+    from .condition_gate import TITLE_WARN, lead_vs_exceptions, title_numbers
+    nums = title_numbers(data.get("title", ""))
+    if len(nums) > 1:
+        print(f"- [제목 숫자] {len(nums)}개({', '.join(nums)}) — 핵심 숫자 1개만, 나머지는 요약문·본문으로 (제목 형식: 키워드+찾는 말+숫자 1개)")
     if len(data.get("title", "")) > TITLE_WARN:
         print(f"- [제목 길이] {len(data['title'])}자 — {TITLE_WARN}자 안팎으로 (45자 넘으면 서버가 보류): 키워드+찾는 말+핵심 숫자 1개")
     for x in lead_vs_exceptions(data.get("content_html", "")):

@@ -3226,6 +3226,12 @@ class TitleSeoTest(unittest.TestCase):
         self.assertIn("title_length(title)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
         self.assertTrue(any("제목 55자" in x for x in review_gate.problems([{"claim": "2027년 1월 21일 65세", "urls": [], "verdict": "맞음", "action": "유지"}], long, "", "")))
 
+    def test_title_numbers_warning(self):
+        from bot.condition_gate import title_numbers
+        self.assertEqual(title_numbers("건설기계조종사 안전교육: 3년마다 4시간, 교육비 32,000원"), ["3", "4", "32,000"])   # #973
+        self.assertEqual(title_numbers("한전 고효율 가전 환급 2026: 복지할인 가구 최대 30만 원"), ["30"])               # 연도는 셈 안 함
+        self.assertIn("[제목 숫자]", (ROOT / "bot" / "source_check.py").read_text(encoding="utf-8"))
+
     def test_writer_rule_and_branding(self):
         self.assertIn("35자 안팎·최대 45자", (ROOT / "bot" / "writer.py").read_text(encoding="utf-8"))
         self.assertIn("the_seo_framework_use_title_branding", (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8"))
