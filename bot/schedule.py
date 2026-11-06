@@ -25,8 +25,18 @@ def plan_times(times: list[str], jitter_minutes: int, today: str) -> list[str]:
         base = datetime.strptime(f"{today} {hhmm}", "%Y-%m-%d %H:%M")
         offset = random.Random(f"{today}-{i}-{hhmm}").randint(-jitter_minutes, jitter_minutes) if jitter_minutes else 0
         day_start = base.replace(hour=0, minute=0)
-        plan.append(min(max(base + timedelta(minutes=offset), day_start), day_start.replace(hour=23, minute=59)).strftime("%H:%M"))
-    return sorted(plan)
+        plan.append(min(max(base + timedelta(minutes=offset), day_start), day_start.replace(hour=23, minute=59)))
+    # 랜덤으로 두 시각이 같은 분이 되면 '했음' 기록이 하나로 합쳐져 한 편이 공개 안 됨 (11/6 검토: 09:00·10:00 ±100분이면 1년에 2일)
+    # → 겹치면 1분씩 뒤로 (자정을 넘으면 앞으로), 줄 수 = 하루 공개 수 그대로
+    out: list[datetime] = []
+    for t in sorted(plan):
+        step = timedelta(minutes=1)
+        while t in out:
+            if step.days == 0 and t.hour == 23 and t.minute == 59:  # 앞으로 가다 자정 직전
+                step = -step   # 자정 직전이면 거꾸로 (한 번만 바꿈 — 무한 반복 없음)
+            t += step
+        out.append(t)
+    return sorted(x.strftime("%H:%M") for x in out)
 
 
 def due_slot(times: list[str], fired: list[str], now: datetime) -> str | None:

@@ -2856,6 +2856,27 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class PlanCountTest(unittest.TestCase):
+    """예약 공개 시각 줄 수 = 오늘 공개 계획 수 = 하루 공개 수 (11/6 운영자 '3개 넣으면 3개, 4개 넣으면 4개')."""
+
+    def test_any_number_of_lines(self):
+        from bot import schedule
+        for n in range(1, 9):
+            times = [f"{8 + i:02d}:00" for i in range(n)]
+            for day in ("2026-11-06", "2026-12-25", "2027-03-01"):
+                self.assertEqual(len(schedule.plan_times(times, 100, day)), n)
+
+    def test_same_minute_kept_apart(self):
+        """랜덤으로 같은 분이 되면 '했음' 기록이 합쳐져 한 편이 빠짐 → 겹치지 않게."""
+        import datetime as dt
+        from bot import schedule
+        for i in range(730):
+            day = (dt.date(2026, 11, 6) + dt.timedelta(i)).isoformat()
+            for times in (["09:00", "10:00"], ["00:00", "00:01", "00:02"], ["23:59", "23:58", "23:30", "23:00"]):
+                plan = schedule.plan_times(times, 100, day)
+                self.assertEqual(len(set(plan)), len(times), (day, times, plan))
+
+
 class PublishPlanVisibleTest(unittest.TestCase):
     """운영자가 바꾼 '예약 공개 시각'이 오늘 계획에 들어갔는지 감시가 볼 수 있게 (11/6 '09:00·18:00 두 줄로 바꿨다')."""
 
