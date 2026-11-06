@@ -1,0 +1,368 @@
+[
+  {
+    "why": "비영업용 2,500cc 2년차: 2,500×200원=50만 원(제127조①1호), 교육세 30% 15만 → 65만 원. 1월 연납 50만×334/365×5% 공제 → 477,120+143,130 (Python 별도 계산·본문 표)",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2026-05-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 500000,
+      "n1": 2,
+      "n2": 2,
+      "half1": 250000,
+      "half2": 250000,
+      "annual": 500000,
+      "edu1": 75000,
+      "edu2": 75000,
+      "total": 650000,
+      "jan_days": 334,
+      "jan_tax": 477120,
+      "jan_edu": 143130,
+      "jan_total": 620250,
+      "jun_tax2": 237500,
+      "jun_edu2": 71250,
+      "jun_total": 633750
+    },
+    "notes_include": [
+      "3년차"
+    ]
+  },
+  {
+    "why": "3년차: 기분세액 25만−25만×5%×1 = 237,500원(제127조①2호), 연 617,500원 (본문 표)",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2025-03-10",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 500000,
+      "n1": 3,
+      "n2": 3,
+      "half1": 237500,
+      "half2": 237500,
+      "annual": 475000,
+      "edu1": 71250,
+      "edu2": 71250,
+      "total": 617500,
+      "jan_days": 334,
+      "jan_tax": 453260,
+      "jan_edu": 135970,
+      "jan_total": 589230,
+      "jun_tax2": 225620,
+      "jun_edu2": 67680,
+      "jun_total": 602050
+    },
+    "boundary": true,
+    "notes_exclude": [
+      "3년차(최초"
+    ]
+  },
+  {
+    "why": "기산일 8월: 1기분 차령 3, 2기분 차령 4 (시행령 제122조②2호) → 237,500+225,000",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2024-08-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 500000,
+      "n1": 3,
+      "n2": 4,
+      "half1": 237500,
+      "half2": 225000,
+      "annual": 462500,
+      "edu1": 71250,
+      "edu2": 67500,
+      "total": 601250,
+      "jan_days": 334,
+      "jan_tax": 441330,
+      "jan_edu": 132390,
+      "jan_total": 573720,
+      "jun_tax2": 213750,
+      "jun_edu2": 64120,
+      "jun_total": 586620
+    }
+  },
+  {
+    "why": "12년차 딱: 50% 경감 125,000원씩 (본문 표)",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2016-02-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 500000,
+      "n1": 12,
+      "n2": 12,
+      "half1": 125000,
+      "half2": 125000,
+      "annual": 250000,
+      "edu1": 37500,
+      "edu2": 37500,
+      "total": 325000,
+      "jan_days": 334,
+      "jan_tax": 238560,
+      "jan_edu": 71560,
+      "jan_total": 310120,
+      "jun_tax2": 118750,
+      "jun_edu2": 35620,
+      "jun_total": 316870
+    },
+    "boundary": true,
+    "notes_include": [
+      "50% 경감이 최대"
+    ]
+  },
+  {
+    "why": "18년차도 12년으로 봄(제127조①2호 후단) → 12년차와 같음",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2010-01-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 500000,
+      "n1": 18,
+      "n2": 18,
+      "half1": 125000,
+      "half2": 125000,
+      "annual": 250000,
+      "edu1": 37500,
+      "edu2": 37500,
+      "total": 325000,
+      "jan_days": 334,
+      "jan_tax": 238560,
+      "jan_edu": 71560,
+      "jan_total": 310120,
+      "jun_tax2": 118750,
+      "jun_edu2": 35620,
+      "jun_total": 316870
+    },
+    "boundary": true
+  },
+  {
+    "why": "1,600cc 이하 cc당 140원: 224,000원",
+    "input": {
+      "kind": "private",
+      "cc": 1600,
+      "first_date": "2026-01-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 224000,
+      "n1": 2,
+      "n2": 2,
+      "half1": 112000,
+      "half2": 112000,
+      "annual": 224000,
+      "edu1": 33600,
+      "edu2": 33600,
+      "total": 291200,
+      "jan_days": 334,
+      "jan_tax": 213750,
+      "jan_edu": 64120,
+      "jan_total": 277870,
+      "jun_tax2": 106400,
+      "jun_edu2": 31920,
+      "jun_total": 283920
+    },
+    "boundary": true
+  },
+  {
+    "why": "1,601cc는 1,600cc 초과 200원: 320,200원",
+    "input": {
+      "kind": "private",
+      "cc": 1601,
+      "first_date": "2026-01-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 320200,
+      "n1": 2,
+      "n2": 2,
+      "half1": 160100,
+      "half2": 160100,
+      "annual": 320200,
+      "edu1": 48030,
+      "edu2": 48030,
+      "total": 416260,
+      "jan_days": 334,
+      "jan_tax": 305540,
+      "jan_edu": 91660,
+      "jan_total": 397200,
+      "jun_tax2": 152090,
+      "jun_edu2": 45620,
+      "jun_total": 405840
+    },
+    "boundary": true
+  },
+  {
+    "why": "영업용 2,500cc 이하 19원: 47,500원, 교육세 없음(제150조 7호)",
+    "input": {
+      "kind": "business",
+      "cc": 2500,
+      "first_date": "2026-01-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 47500,
+      "n1": 2,
+      "n2": 2,
+      "half1": 23750,
+      "half2": 23750,
+      "annual": 47500,
+      "edu1": 0,
+      "edu2": 0,
+      "total": 47500,
+      "jan_days": 334,
+      "jan_tax": 45320,
+      "jan_edu": 0,
+      "jan_total": 45320,
+      "jun_tax2": 22560,
+      "jun_edu2": 0,
+      "jun_total": 46310
+    },
+    "boundary": true,
+    "notes_include": [
+      "지방교육세가 붙지 않아요"
+    ]
+  },
+  {
+    "why": "영업용 2,500cc 초과 24원: 60,024원 → 기분 30,012 → 10원 미만 버림 30,010",
+    "input": {
+      "kind": "business",
+      "cc": 2501,
+      "first_date": "2026-01-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 60024,
+      "n1": 2,
+      "n2": 2,
+      "half1": 30010,
+      "half2": 30010,
+      "annual": 60020,
+      "edu1": 0,
+      "edu2": 0,
+      "total": 60020,
+      "jan_days": 334,
+      "jan_tax": 57270,
+      "jan_edu": 0,
+      "jan_total": 57270,
+      "jun_tax2": 28500,
+      "jun_edu2": 0,
+      "jun_total": 58510
+    },
+    "boundary": true
+  },
+  {
+    "why": "전기차 비영업용 10만 원(제127조①3호), 차령 경감 없음, 교육세 3만",
+    "input": {
+      "kind": "ev_private",
+      "cc": 0,
+      "first_date": "2025-01-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 100000,
+      "n1": 3,
+      "n2": 3,
+      "half1": 50000,
+      "half2": 50000,
+      "annual": 100000,
+      "edu1": 15000,
+      "edu2": 15000,
+      "total": 130000,
+      "jan_days": 334,
+      "jan_tax": 95420,
+      "jan_edu": 28620,
+      "jan_total": 124040,
+      "jun_tax2": 47500,
+      "jun_edu2": 14250,
+      "jun_total": 126750
+    },
+    "notes_include": [
+      "10만 원 이하"
+    ]
+  },
+  {
+    "why": "윤년 2028: 1월 연납 335/366 → 477,110",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2027-03-10",
+      "year": 2028
+    },
+    "expect": {
+      "annual_base": 500000,
+      "n1": 2,
+      "n2": 2,
+      "half1": 250000,
+      "half2": 250000,
+      "annual": 500000,
+      "edu1": 75000,
+      "edu2": 75000,
+      "total": 650000,
+      "jan_days": 335,
+      "jan_tax": 477110,
+      "jan_edu": 143130,
+      "jan_total": 620240,
+      "jun_tax2": 237500,
+      "jun_edu2": 71250,
+      "jun_total": 633750
+    }
+  },
+  {
+    "why": "2,497cc 7년차: 499,400원 → 기분 249,700−249,700×25% = 187,275 → 187,270",
+    "input": {
+      "kind": "private",
+      "cc": 2497,
+      "first_date": "2021-04-01",
+      "year": 2027
+    },
+    "expect": {
+      "annual_base": 499400,
+      "n1": 7,
+      "n2": 7,
+      "half1": 187270,
+      "half2": 187270,
+      "annual": 374540,
+      "edu1": 56180,
+      "edu2": 56180,
+      "total": 486900,
+      "jan_days": 334,
+      "jan_tax": 357400,
+      "jan_edu": 107220,
+      "jan_total": 464620,
+      "jun_tax2": 177900,
+      "jun_edu2": 53370,
+      "jun_total": 474720
+    }
+  },
+  {
+    "why": "등록한 해에는 일할계산이라 안내",
+    "input": {
+      "kind": "private",
+      "cc": 2500,
+      "first_date": "2027-03-01",
+      "year": 2027
+    },
+    "expect_error": true
+  },
+  {
+    "why": "배기량 빈칸",
+    "input": {
+      "kind": "private",
+      "cc": 0,
+      "first_date": "2020-03-01",
+      "year": 2027
+    },
+    "expect_error": true
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "basis_date": "2026-11-06", "yearly_checked": 2027,
+  "laws": ["지방세법", "지방세법 시행령", "지방세기본법"],
+  "sources": [
+    {"name": "국가법령정보센터 지방세법 (제127조 자동차세 세율, 제128조 납기·연납, 제150조·제151조 지방교육세)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국가법령정보센터 지방세법 시행령 (제122조 차령 계산, 제123조 자동차 종류, 제125조⑥ 연납 이자율 5%)", "url": "https://www.law.go.kr/법령/지방세법시행령"},
+    {"name": "국가법령정보센터 지방세기본법 (제59조 끝수 계산 — 국고금관리법 제47조 준용)", "url": "https://www.law.go.kr/법령/지방세기본법"}
+  ],
+  "won10_keys": ["half1", "half2", "annual", "edu1", "edu2", "total", "jan_tax", "jan_edu", "jan_total", "jun_tax2", "jun_edu2", "jun_total"],
+  "kinds": {
+    "private":     {"per_cc": [{"upto": 1000, "won": 80}, {"upto": 1600, "won": 140}, {"upto": null, "won": 200}], "age_relief": true, "edu": true},
+    "business":    {"per_cc": [{"upto": 1600, "won": 18}, {"upto": 2500, "won": 19}, {"upto": null, "won": 24}], "age_relief": false, "edu": false},
+    "ev_private":  {"flat": 100000, "age_relief": false, "edu": true},
+    "ev_business": {"flat": 20000, "age_relief": false, "edu": false}
+  },
+  "age": {"from": 3, "cap": 12, "pct_per_year": 5},
+  "edu_pct": 30,
+  "prepay_pct": 5,
+  "small_annual": 100000
+}

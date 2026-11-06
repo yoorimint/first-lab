@@ -1,0 +1,5 @@
+{"type": "skip", "slot": 2, "keywords": [
+ {"keyword": "핫핑오프라인", "why": "특정 쇼핑몰 브랜드 매장 안내", "brand": "핫핑"},
+ {"keyword": "금호리조트설악", "why": "특정 회사 리조트 상품", "brand": "금호리조트"},
+ {"keyword": "코레일관광개발채용", "why": "특정 회사 채용 공고 (해마다 바뀜)", "brand": "코레일관광개발"}
+], "law_changes": [], "new_benefits": []}
