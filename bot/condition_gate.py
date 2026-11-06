@@ -860,6 +860,29 @@ def lead_minimums(excerpt: str, body_html: str) -> list[str]:
     return list(dict.fromkeys(out))[:2]
 
 
+# 제목·요약의 'N원부터'는 본문 금액 중 가장 낮은 값이어야 (11/7 #1272 BIM 자격증 '응시료 75,000원부터' — 본문 첫 문단에 필기 25,000원)
+FROM_PRICE = re.compile(r"([\d,]{4,})\s*원\s*부터")
+_FEE_WORD = re.compile(r"응시료|수수료|검정료|요금|이용료|입장료|가격|비용|사용료|수강료|필기|실기|1박|성인|어린이|1인")
+_WON = re.compile(r"(?<![\d,])(\d{1,3}(?:,\d{3})+|\d{4,})\s*원")
+
+
+def headline_from_price(title: str, excerpt: str, body_html: str) -> list[str]:
+    out = []
+    for where, text in (("제목", title or ""), ("요약", excerpt or "")):
+        for m in FROM_PRICE.finditer(text):
+            low = int(m.group(1).replace(",", ""))
+            cheaper = sorted({int(w.replace(",", "")) for sent in re.findall(r"[^.?!]+", _plain_keep_commas(body_html))
+                              if _FEE_WORD.search(sent) for w in _WON.findall(sent) if 0 < int(w.replace(",", "")) < low})
+            if cheaper:
+                out.append(f"{where} '{m.group(0)}' 인데 본문 {', '.join(f'{c:,}원' for c in cheaper[:3])} 이 더 낮음 — 가장 낮은 값으로 쓰거나 무엇의 금액인지(예: '필기+실기 합계') 밝히기")
+    return out[:2]
+
+
+def _plain_keep_commas(html_: str) -> str:
+    import html as _html
+    return re.sub(r"\s+", " ", _html.unescape(re.sub(r"<[^>]+>", " ", html_ or "")))
+
+
 # 갈래를 나눠 설명하는 글의 '…만' 단정 (11/5 #784: 5등급제·9등급제 글에서 '융합 선택 과목은 성취도만 적고',
 # '과학탐구실험 … 3단계 성취도만' — 5등급제에만 맞는 말을 갈래 없이 씀, 같은 꼴 2번 → review-only-log 에서 검사로 옮김)
 _VARIANT = re.compile(r"(\d+등급제|[가-힣]+ 융자|[가-힣]+가입자|[가-힣]+제도)")

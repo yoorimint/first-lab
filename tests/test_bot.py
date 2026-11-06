@@ -1906,6 +1906,20 @@ class RuleProvisoTest(unittest.TestCase):
         self.assertTrue(any("제7조 단서1" in g for g in got), got)
 
 
+class HeadlineFromPriceTest(unittest.TestCase):
+    """11/7 #1272: 제목 '응시료 75,000원부터' — 본문 첫 문단에 필기 25,000원."""
+
+    def test_cheaper_in_body_flagged(self):
+        from bot.condition_gate import headline_from_price
+        body = "<p>2급은 필기 25,000원·실기 60,000원이에요.</p>"
+        self.assertEqual(len(headline_from_price("BIM 자격증, 응시료 75,000원부터", "", body)), 1)
+
+    def test_lowest_or_unrelated_passes(self):
+        from bot.condition_gate import headline_from_price
+        self.assertEqual(headline_from_price("응시료 25,000원부터", "", "<p>필기 25,000원·실기 60,000원</p>"), [])
+        self.assertEqual(headline_from_price("숙박 70,000원부터", "", "<p>과태료 20,000원이에요. 1박 70,000원</p>"), [])
+
+
 class SmallWorkplaceItemTest(unittest.TestCase):
     """11/7 #1265: 작은 회사도 된다는 임산부 단축근무 글에 '태아검진 시간 (제74조의2)'을 조건 없이 — 별표 1 밖 조문."""
     BODY = ("<p>근로기준법 제74조는 상시 4명 이하 사업장에도 적용돼요.</p>"
