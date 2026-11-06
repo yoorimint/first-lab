@@ -1735,6 +1735,24 @@ class LawAnnexTest(unittest.TestCase):
             self.assertIn("2,133,000", law_api.annex_text({"mst": "1", "date": dt.date(2026, 1, 2)}))
 
 
+class RetentionStartTest(unittest.TestCase):
+    """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
+
+    def test_missing_start_flagged(self):
+        from bot.condition_gate import retention_start
+        self.assertEqual(len(retention_start("<p>계약서는 사업주가 3년간 보존해야 해요.</p>")), 1)
+        self.assertEqual(len(retention_start("<p>임금대장(3년 보존)이에요.</p>")), 1)
+
+    def test_with_start_passes(self):
+        from bot.condition_gate import retention_start
+        self.assertEqual(retention_start("<p>근로관계가 끝난 날부터 3년간 보존해야 해요.</p>"), [])
+        self.assertEqual(retention_start("<p>확정신고 기한 후 5년간 보존해야 해요.</p>"), [])
+        self.assertEqual(retention_start("<p>전송하면 5년 보존 의무도 없어요.</p>"), [])
+
+    def test_in_gate(self):
+        self.assertIn("condition_gate.retention_start(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
 class StaleFormTest(unittest.TestCase):
     """11/6 #1180: 2020년 판 이직확인서 파일(flSeq=94608429)을 근거로 써 소정근로시간 선택지·이직코드가 2025.7.1 개정 전 내용."""
     URL = "https://www.law.go.kr/LSW/flDownload.do?flSeq=94608429"

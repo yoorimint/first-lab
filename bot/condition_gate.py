@@ -487,6 +487,21 @@ def stale_forms(review: list[dict] | None, cited_of=None, current_of=None) -> li
     return out
 
 
+# 'N년간 보존'은 언제부터 세는지가 핵심 조건 (11/6 #1208 '계약서는 3년간 보존' — 근로기준법 시행령 제22조②: 근로관계가 끝난 날부터).
+RETENTION = re.compile(r"[^.?!。]*\d+\s*년\s*(?:간|동안)?\s*(?:보존|보관)[^.?!。]*")
+RETENTION_START = re.compile(r"부터|후|끝난|지난|기산|없")
+
+
+def retention_start(body_html: str) -> list[str]:
+    out = []
+    blocks = re.sub(r"</(?:p|li|td|th|h\d|tr|caption)>", ". ", body_html or "")  # 표 칸·문단을 문장 경계로
+    for m in RETENTION.finditer(_plain(blocks)):
+        sent = m.group(0).strip()
+        if not RETENTION_START.search(sent):
+            out.append(f"보존 기간을 언제부터 세는지 없음: '{sent[-60:]}' — 근거 법령의 기산일(예: '근로관계가 끝난 날부터 3년')을 같이 쓰기")
+    return out[:3]
+
+
 def upcoming_amendments(review: list[dict] | None, body_html: str, changes_of=None, today=None) -> list[str]:
     import datetime as dt
     today = today or dt.date.today()
