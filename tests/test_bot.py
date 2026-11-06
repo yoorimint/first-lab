@@ -1757,6 +1757,7 @@ class TopicDirectionTest(unittest.TestCase):
         self.assertTrue(same("부동산양도세계산기", "부동산양도소득세계산기"))
         self.assertTrue(same("나의신용점수조회", "내신용점수조회"))
         self.assertTrue(same("실업급여수급조건", "고용보험실업급여조건"))
+        self.assertTrue(same("아르바이트이력서양식", "알바이력서양식"))   # 11/6 #885 뒤 다시 후보로 나옴
         self.assertFalse(same("실업급여조건6개월", "고용보험실업급여조건"))  # 세부 질문은 따로 쓸 수 있음
         self.assertGreater(topic_weight("주식평단가계산기"), topic_weight("실업급여신청"))
         self.assertGreater(topic_weight("실업급여신청"), topic_weight("냉장고정리방법"))
