@@ -542,6 +542,9 @@ def main(argv: list[str]) -> None:
     from .condition_gate import cross_law_exceptions, excerpt_caveats, excerpt_qualifiers, limited_event_year
     for x in limited_event_year(data.get("excerpt", ""), data.get("content_html", "")):
         print(f"- [한시 행사 연도] {x}")
+    from .condition_gate import deadline_holiday
+    for x in deadline_holiday(data.get("content_html", "")):
+        print(f"- [예시 기한 휴일] {x}")
     for x in excerpt_qualifiers(data.get("excerpt", ""), data.get("content_html", "")) + excerpt_caveats(data.get("excerpt", ""), data.get("content_html", "")):
         print(f"- [요약 조건] {x}")
     for x in cross_law_exceptions(data.get("content_html", "")):

@@ -1648,6 +1648,20 @@ class ProvisoChecklistTest(unittest.TestCase):
         self.assertIn("`automation/review-prompt.md` 의 `---` 아래 지시문 그대로", writer)   # 2번: 독립 검수 = 외부 검수 지시
 
 
+class DeadlineHolidayTest(unittest.TestCase):
+    """예시 기한이 토·일·공휴일인데 다음 날로 늦춰짐을 안 씀 (11/6 #1126 증여세 '2월 말일까지' — 2027-02-28 일요일·3/1 삼일절)."""
+
+    def test_example_deadline_on_weekend(self):
+        import datetime as dt
+        from bot.condition_gate import deadline_holiday
+        today = dt.date(2026, 11, 6)
+        bad = "<p>예를 들어 11월 6일에 받았다면 11월 30일부터 3개월, 즉 2월 말일까지예요.</p>"
+        self.assertIn("2027-02-28(일요일)", deadline_holiday(bad, today)[0])
+        ok = "<p>예를 들어 2월 28일이 일요일이고 3월 1일이 공휴일이라 기한은 3월 2일까지로 늦춰져요. 예를 들어 2월 26일까지 내요.</p>"
+        self.assertEqual(deadline_holiday(ok, today), [])          # 늦춰짐을 썼거나 평일(2/26 금)
+        self.assertEqual(deadline_holiday("<p>12월 31일까지 신청해요.</p>", today), [])   # 예시 문장이 아니면 안 봄
+
+
 class FacilityOrdinanceTest(unittest.TestCase):
     """공공시설 글은 그 시설의 설치·운영 조례를 근거로 (11/6 #1106 인천시립요양원: 보도자료만 보고 입소 대상을 좁게 씀)."""
 

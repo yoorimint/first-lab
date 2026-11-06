@@ -43,3 +43,6 @@ date,post,fixes,types
 2026-11-06,1106,4,missing_condition:4
 2026-11-06,1098,0,
 2026-11-06,1110,1,unverified:1
+2026-11-06,1124,1,wrong_fact:1
+2026-11-06,1126,1,missing_condition:1
+2026-11-06,289,1,missing_condition:1

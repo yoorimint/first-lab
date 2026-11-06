@@ -469,6 +469,44 @@ def facility_ordinance(title: str, review: list[dict] | None) -> list[str]:
             "(python3 -m bot.lawtext <조례 이름> 제N조, 주소 https://www.law.go.kr/자치법규/<조례 이름>). 조례가 없으면 검수 기록에 '조례 해당 없음 — 이유'"]
 
 
+# 예시 기한이 토·일·공휴일인데 '다음 날로 늦춰짐'을 안 씀 (11/6 #1126 증여세: '11월 6일에 받으면 2월 말일까지' — 2027-02-28 일요일,
+# 3/1 삼일절 → 국세기본법 제5조로 3월 2일). 공휴일은 근무일 계산기 자료(calculators/data/work-days.json, 2026~2027).
+EXAMPLE_MARK = re.compile(r"(예를 들어|예컨대|예시로|가령)")
+POSTPONE = re.compile(r"(다음 ?날|그다음 ?날|늦춰|연장|미뤄|첫 평일|다음 평일)")
+
+
+def _holidays() -> dict[str, str]:
+    try:
+        return json.loads((CALC_DATA_DIR / "work-days.json").read_text(encoding="utf-8")).get("holidays") or {}
+    except (OSError, ValueError):
+        return {}
+
+
+def deadline_holiday(body_html: str, today=None) -> list[str]:
+    import calendar
+    import datetime as dt
+    today = today or dt.date.today()
+    holidays = _holidays()
+    out = []
+    for s in _sentences(body_html or ""):
+        if not EXAMPLE_MARK.search(s) or POSTPONE.search(s):
+            continue
+        for m in re.finditer(r"(?:(20\d\d)년\s*)?(\d{1,2})월\s*(말일|\d{1,2}일)까지", s):
+            month = int(m.group(2))
+            if not 1 <= month <= 12:
+                continue
+            year = int(m.group(1)) if m.group(1) else (today.year if month >= today.month else today.year + 1)
+            day = calendar.monthrange(year, month)[1] if m.group(3) == "말일" else int(m.group(3)[:-1])
+            try:
+                d = dt.date(year, month, day)
+            except ValueError:
+                continue
+            if d.weekday() >= 5 or f"{d:%Y-%m-%d}" in holidays:
+                why = "토요일" if d.weekday() == 5 else "일요일" if d.weekday() == 6 else holidays.get(f"{d:%Y-%m-%d}", "공휴일")
+                out.append(f"예시 기한 '{m.group(0)}' 이 {d:%Y-%m-%d}({why}) — 기한이 토·일·공휴일이면 다음 날로 늦춰지는지(국세기본법 제5조 등) 쓰기")
+    return out[:3]
+
+
 # 요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762 '…남기면, 12개월 근무 뒤 남은 구직급여의 절반을 받아요' ↔ 본문 '못 받는 경우' 목록)
 EXCLUSION_HEAD = re.compile(r"<h[23][^>]*>([^<?]*(?:못 받|받을 수 없|제외|안 되는|대상이 아닌|지원 안|불가)[^<?]*)</h[23]>")  # 묻는 제목(…나요?) 제외
 PROMISE = re.compile(r"(받아요|받을 수 있어요|지원돼요|돌려받아요|지원받아요)")
