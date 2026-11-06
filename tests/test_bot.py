@@ -3381,6 +3381,47 @@ class OfficialLinksTest(unittest.TestCase):
         self.assertEqual(out.count("hometax.go.kr"), 1)         # 이미 링크가 있는 사이트는 더 안 붙임
         self.assertNotIn('href="https://www.gov.kr"', out)      # 'mygov.kr'·'정부24시간'은 다른 말
 
+    def test_name_with_particle_linked(self):
+        """11/6: '정부24에서'·'홈택스로'처럼 조사가 붙으면 링크가 안 됐음 ('정부24시간'은 계속 다른 말)."""
+        out = self.run_php("<p>정부24에서 신청하거나 홈택스로는 내요. 숲나들e로 예약. 정부24시간 상담</p>")
+        self.assertIn('class="firstlab-official">정부24</a>에서', out)
+        self.assertIn('class="firstlab-official">홈택스</a>로는', out)
+        self.assertIn('href="https://www.foresttrip.go.kr"', out)
+        self.assertIn("정부24시간", out)
+
+    def run_fill(self, html):
+        import os
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("<?php define('ABSPATH', 1); function add_filter() {} function esc_url($s) { return $s; }\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-official-links.php'}';\n"
+                "echo firstlab_official_section_fill(firstlab_official_autolink(getenv('H')));")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            return subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env={**os.environ, "H": html}).stdout
+        finally:
+            os.unlink(f.name)
+
+    def test_section_gets_named_site(self):
+        """11/6 운영자: 사천 휴양림 글 '공식 안내 바로가기'에 본문이 안내하는 숲나들e 가 없었음 — 화면에서 끝 목록에 더함."""
+        html = ('<p>숲나들e로 예약해요.</p><h2 class="wp-block-heading">공식 안내 바로가기</h2>'
+                '<ul class="wp-block-list"><li><a href="https://www.law.go.kr/x">조례</a></li></ul>')
+        out = self.run_fill(html)
+        tail = out[out.index("공식 안내 바로가기"):]
+        self.assertIn('href="https://www.foresttrip.go.kr"', tail)
+        self.assertIn('class="firstlab-official">숲나들e</a>로', out)   # 본문 이름 링크도 그대로
+
+    def test_section_not_duplicated_or_invented(self):
+        listed = ('<p>홈택스에서 신청</p><h2>공식 안내 바로가기</h2><ul><li><a href="https://www.hometax.go.kr/x">홈택스</a></li></ul>')
+        self.assertEqual(self.run_fill(listed).count("hometax.go.kr"), 1)  # 목록에 이미 있으면 더 안 붙임
+        self.assertIn('href="https://www.gov.kr"', self.run_fill("<table><tr><td>등기소</td><td>정부24, 주민센터</td></tr></table>"))  # 표 칸 경계
+        made = self.run_fill("<p>정부24에서 떼요.</p>")
+        self.assertIn("공식 안내 바로가기</h2>", made)
+        self.assertEqual(self.run_fill("<p>관계없는 글</p>"), "<p>관계없는 글</p>")
+
     def test_verified_hosts_from_bot(self):
         """목록 밖 공식 주소도 봇이 열어 본 기록이 있으면 링크 (11/6 운영자 '신뢰할 수 있는 공식 사이트면')."""
         import os

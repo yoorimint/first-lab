@@ -13,6 +13,11 @@
 defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_OFFICIAL_MAX = 3;
+// 이름 뒤: 끝·띄어쓰기·문장부호, 또는 조사(최대 2개) 뒤 끝 — '정부24에서'·'홈택스로는' 은 링크, '정부24시간' 은 다른 말
+// (11/6: 조사가 붙은 이름이 하나도 링크되지 않았음 — '숲나들e로 예약')
+const FIRSTLAB_OFFICIAL_AFTER = '(?=(?:에서|에게|으로|부터|까지|이나|로|에|은|는|이|가|을|를|와|과|의|도|만|나){0,2}(?![\p{L}\p{N}]))';
+const FIRSTLAB_OFFICIAL_SECTION = '공식 안내 바로가기';
+const FIRSTLAB_OFFICIAL_FILL_MAX = 2;
 
 /** [주소, 본문에 적힌 주소(도메인), 이름들] — 공공기관 공식 서비스만 (새로 넣을 때는 공식 주소를 직접 확인하고). */
 function firstlab_official_sites(): array {
@@ -29,6 +34,7 @@ function firstlab_official_sites(): array {
 		array( 'https://www.efine.go.kr', 'efine.go.kr', array( '교통민원24' ) ),
 		array( 'https://www.q-net.or.kr', 'q-net.or.kr', array( '큐넷' ) ),
 		array( 'https://www.iros.go.kr', 'iros.go.kr', array( '인터넷등기소' ) ),
+		array( 'https://www.foresttrip.go.kr', 'foresttrip.go.kr', array( '숲나들e' ) ), // 산림청 자연휴양림 예약 (11/6 #1218 사천 휴양림 글에 링크 없음)
 	);
 }
 
@@ -80,7 +86,7 @@ function firstlab_official_autolink( string $html, array $verified = array() ): 
 			// 주소(www. 있든 없든)를 먼저, 없으면 이름 — 다른 주소의 일부(…gov.kr 가 아닌 'xgov.kr')나 낱말 중간은 빼고
 			$patterns = array_merge(
 				array( '/(?<![\w.\/-])(?:www\.)?' . preg_quote( $host, '/' ) . '(?![\w\/-])/i' ),
-				array_map( static fn( $n ) => '/(?<![\p{L}\p{N}])' . preg_quote( $n, '/' ) . '(?![\p{L}\p{N}])/u', $names )
+				array_map( static fn( $n ) => '/(?<![\p{L}\p{N}])' . preg_quote( $n, '/' ) . FIRSTLAB_OFFICIAL_AFTER . '/u', $names )
 			);
 			foreach ( $patterns as $p ) {
 				if ( preg_match( $p, $part, $m, PREG_OFFSET_CAPTURE ) ) {
@@ -97,6 +103,42 @@ function firstlab_official_autolink( string $html, array $verified = array() ): 
 	return implode( '', $parts );
 }
 
+/** 본문에 이름이 나온 목록 사이트(예약·신청처)가 글 끝 '공식 안내 바로가기'에 없으면 그 목록에 더함 (없으면 목록을 만듦).
+ * 11/6 운영자 '사천휴양림 글 공식안내바로가기에 숲나들이 없는건 일부러?' — 글쓰기 작업이 근거 목록(sources)에 예약처를 빠뜨림. 화면에서만. */
+function firstlab_official_section_fill( string $html ): string {
+	$pos  = strpos( $html, FIRSTLAB_OFFICIAL_SECTION );
+	$h2   = false === $pos ? false : strrpos( substr( $html, 0, $pos ), '<h2' );
+	$body = false === $h2 ? $html : substr( $html, 0, $h2 );
+	$tail = false === $h2 ? '' : substr( $html, $h2 );
+	$text = firstlab_official_text( preg_replace( '#<(h[1-6])\b.*?</\1>#is', ' ', $body ) );
+	$add  = array();
+	foreach ( firstlab_official_sites() as list( $url, $host, $names ) ) {
+		if ( count( $add ) >= FIRSTLAB_OFFICIAL_FILL_MAX || preg_match( '#//(?:www\.)?' . preg_quote( $host, '#' ) . '#i', $tail ) ) {
+			continue;
+		}
+		foreach ( $names as $n ) {
+			if ( preg_match( '/(?<![\p{L}\p{N}])' . preg_quote( $n, '/' ) . FIRSTLAB_OFFICIAL_AFTER . '/u', $text ) ) {
+				$add[] = sprintf( '<li><a href="%s" target="_blank" rel="noopener">%s</a></li>', esc_url( $url ), $n . ' (' . $host . ')' );
+				break;
+			}
+		}
+	}
+	if ( ! $add ) {
+		return $html;
+	}
+	if ( false === $h2 ) {
+		return $html . '<h2 class="wp-block-heading">' . FIRSTLAB_OFFICIAL_SECTION . '</h2><ul class="wp-block-list">' . implode( '', $add ) . '</ul>';
+	}
+	$end = strpos( $tail, '</ul>' );
+	return false === $end ? $html : $body . substr( $tail, 0, $end ) . implode( '', $add ) . substr( $tail, $end );
+}
+
+/** 태그를 빼고 글자만 (wp_strip_all_tags 없이 테스트할 수 있게). */
+function firstlab_official_text( string $html ): string {
+	$html = preg_replace( '#<(script|style)\b.*?</\1>#is', ' ', $html );
+	return trim( preg_replace( '/\s+/u', ' ', preg_replace( '/<[^>]+>/', ' ', $html ) ) ); // 태그 자리는 띄어쓰기 ('</td><td>정부24' 가 앞 칸 글자에 붙지 않게)
+}
+
 add_filter(
 	'the_content',
 	static function ( $content ) {
@@ -104,7 +146,8 @@ add_filter(
 			return $content;
 		}
 		$meta = json_decode( (string) get_post_meta( get_the_ID(), '_firstlab_official_hosts', true ), true );
-		return firstlab_official_autolink( (string) $content, (array) ( $meta['hosts'] ?? array() ) );
+		// 본문 링크 먼저 (끝 목록에 주소가 생기면 본문 이름은 '이미 링크 있음'으로 건너뛰므로), 그다음 끝 목록 채우기
+		return firstlab_official_section_fill( firstlab_official_autolink( (string) $content, (array) ( $meta['hosts'] ?? array() ) ) );
 	},
 	7 // 목차(8)·운영 정보(9)·함께 보면 좋은 글(20) 전 — 본문 글자에만
 );
