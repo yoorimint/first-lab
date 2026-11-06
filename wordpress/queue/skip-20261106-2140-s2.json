@@ -1,0 +1,11 @@
+{"type": "skip", "keywords": [
+ {"keyword": "JLPT접수", "why": "해마다 바뀌는 접수 기간·응시료를 공식 원문(jlpt.or.kr)으로 확인 못 함"},
+ {"keyword": "영월별마로천문대", "why": "공식 사이트(yao.or.kr) 접속 불가로 관람료 확인 못 함"},
+ {"keyword": "페넬로페기저귀", "why": "특정 브랜드 상품", "brand": "페넬로페"},
+ {"keyword": "중학생패딩", "why": "상품 추천"},
+ {"keyword": "궐동미용실", "why": "특정 업체 추천"},
+ {"keyword": "전시회족자봉", "why": "상품 구매·업체 비교"},
+ {"keyword": "거북섬아파트매매", "why": "날마다 바뀌는 시세"},
+ {"keyword": "도담도담매트", "why": "특정 브랜드 상품", "brand": "도담도담"},
+ {"keyword": "산타몬플러스액", "why": "의약품·특정 상품"}
+], "law_changes": [], "new_benefits": [], "slot": 2}
