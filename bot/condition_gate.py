@@ -510,6 +510,46 @@ def stale_forms(review: list[dict] | None, cited_of=None, current_of=None) -> li
     return out
 
 
+# 상시 4명 이하 사업장에 적용되는 근로기준법 조문 (시행령 별표 1). 항 단위로만 적용되는 조문(제19조①·제23조②·제55조①·제65조①③·
+# 제70조②③)은 판단하지 않음. 가지 조문은 '부터 … 까지' 범위 안일 때만 (제74조의2·제76조의2 는 목록 밖).
+_SMALL_RANGES = [(1, 13), (15, 15), (17, 18), (20, 22), (26, 26), (35, 42), (43, 45), (47, 49), (54, 54), (63, 64),
+                 (66, 69), (71, 72), (74, 74), (76, 76), (78, 92), (101, 106), (107, 116)]
+_SMALL_PARTIAL = {19, 23, 55, 65, 70}
+_SMALL_TOPIC = re.compile(r"4\s*명\s*이하|5\s*[인명]\s*미만|규모가 작아도|작은 (?:회사|사업장)")
+_SMALL_OK = re.compile(r"5\s*[인명]\s*이상|4\s*명\s*이하[^.]{0,20}(?:적용되지|적용 안|빠|제외)|별표\s*1")
+_LABOR_REF = re.compile(r"제(\d+)조(?:의(\d+))?")
+_OTHER_LAW = re.compile(r"(?<!근로기준)[가-힣]{2,}법(?:\s*시행령|\s*시행규칙)?\s*제\d+조")
+
+
+def small_workplace_article(n: int, branch: int) -> bool | None:
+    """근로기준법 제n조(의branch)가 상시 4명 이하에 적용되나 (모르면 None)."""
+    if n in _SMALL_PARTIAL:
+        return None
+    for lo, hi in _SMALL_RANGES:
+        if lo <= n <= hi and (not branch or n < hi):
+            return True
+    return False
+
+
+def small_workplace_items(body_html: str) -> list[str]:
+    """작은 사업장도 된다고 하는 근로기준법 글에서, 4명 이하에 적용되지 않는 조문을 조건 없이 안내한 문단
+    (11/7 #1265 임산부 단축근무: '태아검진 시간 … (제74조의2)' — 별표 1 에 없는데 FAQ '회사 규모가 작아도 되나요? 네')."""
+    html_ = body_html or ""
+    if "근로기준법" not in html_ or not _SMALL_TOPIC.search(_plain(html_)):
+        return []
+    out = []
+    for block in re.findall(r"<(?:p|li|td)\b[^>]*>(.*?)</(?:p|li|td)>", html_, re.S):
+        text = _plain(block)
+        if _SMALL_OK.search(text) or _OTHER_LAW.search(text):
+            continue
+        for n, b in _LABOR_REF.findall(text):
+            if small_workplace_article(int(n), int(b or 0)) is False:
+                art = f"제{n}조" + (f"의{b}" if b else "")
+                out.append(f"근로기준법 {art} 는 상시 4명 이하 사업장에 적용되지 않음(시행령 별표 1) — 그 문단에 '상시 5명 이상 사업장' 조건을 적기: '{text.strip()[:50]}'")
+                break
+    return out[:3]
+
+
 # 통상임금: 대법원 2024. 12. 19. 전원합의체(2020다247190)로 '고정성' 요건이 빠졌다 — 재직 조건이 붙거나 한 달을 넘는 주기로 나와도
 # 정기적·일률적이면 통상임금 (11/7 #1232 해고예고수당 '기본급과 매달 정해진 금액으로 나오는 수당이 중심' → 정기상여금이 빠져 적게 계산).
 OLD_WAGE_RULE = re.compile(r"고정성|고정적으로|고정적인|매달 정해진|매월 정해진|매달 나오는|매월 나오는|재직자에게만 주는")

@@ -1906,6 +1906,31 @@ class RuleProvisoTest(unittest.TestCase):
         self.assertTrue(any("제7조 단서1" in g for g in got), got)
 
 
+class SmallWorkplaceItemTest(unittest.TestCase):
+    """11/7 #1265: 작은 회사도 된다는 임산부 단축근무 글에 '태아검진 시간 (제74조의2)'을 조건 없이 — 별표 1 밖 조문."""
+    BODY = ("<p>근로기준법 제74조는 상시 4명 이하 사업장에도 적용돼요.</p>"
+            "<ul><li>태아검진 시간: 청구하면 회사는 허용해야 해요 (제74조의2).</li></ul>")
+
+    def test_excluded_article_flagged(self):
+        from bot.condition_gate import small_workplace_items
+        self.assertEqual(len(small_workplace_items(self.BODY)), 1)
+
+    def test_condition_or_other_law_passes(self):
+        from bot.condition_gate import small_workplace_items
+        ok = self.BODY.replace("태아검진 시간:", "태아검진 시간: 상시 5명 이상 사업장이라면")
+        self.assertEqual(small_workplace_items(ok), [])
+        other = "<p>4명 이하 사업장도 돼요 (근로기준법).</p><li>육아기 단축은 남녀고용평등법 제19조의2 예요.</li>"
+        self.assertEqual(small_workplace_items(other), [])
+
+    def test_article_table(self):
+        from bot.condition_gate import small_workplace_article
+        self.assertTrue(small_workplace_article(74, 0))
+        self.assertFalse(small_workplace_article(74, 2))
+        self.assertTrue(small_workplace_article(43, 2))     # '제43조부터 제45조까지' 안의 가지 조문
+        self.assertFalse(small_workplace_article(60, 0))    # 연차
+        self.assertIsNone(small_workplace_article(23, 0))   # 항 단위 적용 — 판단 안 함
+
+
 class OrdinaryWageRuleTest(unittest.TestCase):
     """11/7 #1232: '통상임금은 … 기본급과 매달 정해진 금액으로 나오는 수당이 중심' — 2024.12.19 전원합의체 뒤 옛 기준."""
 
