@@ -90,7 +90,9 @@ def page_text(raw: bytes, charset: str | None) -> str:
     if text is None:
         text = raw.decode("utf-8", "ignore")
     text = re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", text)
-    text = html.unescape(re.sub(r"<[^>]+>", " ", text))
+    # 그림 설명 글(alt): 기준을 그림으로 올리고 글자는 alt 에만 둔 공식 페이지 (11/7 #1245 도로교통공단 '허용되는 사진 규격' — '못 엶')
+    alts = " ".join(html.unescape(a) for a in re.findall(r"""(?is)<img\b[^>]*\balt=["']([^"']{10,})["']""", text))
+    text = html.unescape(re.sub(r"<[^>]+>", " ", text)) + (" " + alts if alts else "")
     return text.replace(",", "")
 
 

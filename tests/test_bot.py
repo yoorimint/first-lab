@@ -1833,6 +1833,16 @@ class ExpiryTest(unittest.TestCase):
         self.assertEqual(plan.call_count, refresh.RECHECK_PER_DAY - 1)
 
 
+class ImageAltTextTest(unittest.TestCase):
+    """11/7 #1245: 공단 사진 규격 기준이 그림 설명 글(alt)에만 있어 근거 대조가 '못 엶'."""
+
+    def test_alt_text_read(self):
+        from bot.source_check import page_text
+        raw = '<html><body><img src="a.png" alt="파일 크기 500킬로바이트(KB) 이하의 JPG 파일, 413 x 531 픽셀 권장"></body></html>'.encode()
+        self.assertIn("500킬로바이트", page_text(raw, "utf-8"))
+        self.assertNotIn("로고", page_text('<img alt="로고">'.encode(), "utf-8"))  # 짧은 alt 는 뺌
+
+
 class MillionthRateTest(unittest.TestCase):
     """11/6 #1228: 노인장기요양보험법 시행령 '100만분의 9,448'(0.9448%)을 같은 값으로 못 봐 '페이지에 없음'."""
 
