@@ -135,6 +135,31 @@ def all_articles(version: dict) -> dict[str, str]:
     return out
 
 
+# 별표·서식 머리글: '■ 고용보험법 시행규칙[별지 제75호의4서식] <개정 2025. 7. 1.>' (법제처 별표내용·서식 PDF 첫 줄 모두 같은 꼴)
+FORM_HEAD = re.compile(r"■\s*([^\[\n■]+?)\s*\[(별표|별지)\s*([^\]]+?)\]\s*<([^>]*\d{4}[^>]*)>")
+_YMD = re.compile(r"(\d{4})\s*\.\s*(\d{1,2})\s*\.\s*(\d{1,2})")
+
+
+def form_heads(text: str) -> dict[str, dt.date]:
+    """글자 안의 별표·서식 머리글 → {'고용보험법시행규칙|별지75의4': 마지막 개정일}."""
+    out = {}
+    for law, kind, num, dates in FORM_HEAD.findall(text or ""):
+        days = [dt.date(int(y), int(m), int(d)) for y, m, d in _YMD.findall(dates)]
+        if days:
+            key = re.sub(r"\s", "", law) + "|" + kind + re.sub(r"[제호서식\s]", "", num)
+            out[key] = max(days + ([out[key]] if key in out else []))
+    return out
+
+
+def form_dates(version: dict) -> dict[str, dt.date]:
+    """한 판의 별표·서식 마지막 개정일 — 근거로 쓴 서식 파일이 예전 판인지 대조 (11/6 #1180: 2020년 판 이직확인서를 근거로 써
+    선택지·이직코드가 2025.7.1 개정 전 내용). 못 받으면 {}."""
+    xml = fetch("service", "eflaw", MST=version["mst"], efYd=f"{version['date']:%Y%m%d}")
+    if not xml:
+        return {}
+    return form_heads(" ".join(el.text or "" for el in ET.fromstring(xml).iter("별표내용")))
+
+
 def changed_articles(before: dict, after: dict, limit: int = 15) -> list[str]:
     """두 판 사이에 바뀌거나 새로 생긴 조문 (삭제된 조문 포함), 조문 순."""
     keys = sorted(set(before) | set(after), key=lambda k: tuple(int(x) for x in re.findall(r"\d+", k)))

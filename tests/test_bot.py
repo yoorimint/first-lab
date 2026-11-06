@@ -1710,6 +1710,39 @@ class FacilityOrdinanceTest(unittest.TestCase):
         self.assertEqual(facility_ordinance("남부대 수영장 이용 안내", umbrella, "남부대학교 시립국제수영장"), [])
 
 
+class StaleFormTest(unittest.TestCase):
+    """11/6 #1180: 2020년 판 이직확인서 파일(flSeq=94608429)을 근거로 써 소정근로시간 선택지·이직코드가 2025.7.1 개정 전 내용."""
+    URL = "https://www.law.go.kr/LSW/flDownload.do?flSeq=94608429"
+
+    def test_form_head_parsed(self):
+        import datetime as dt
+        from bot.law_api import form_heads
+        got = form_heads("■ 고용보험법 시행규칙[별지 제75호의4서식] <개정 2020. 8. 28.> 피보험자 이직확인서 "
+                         "■ 고용보험법 시행규칙 [별표 2] <개정 2019.1.1, 2024. 7. 1.> "
+                         "■ 고용보험법 시행규칙[별지 제8호서식] [별지 제75호의4서식으로 이동 <2020. 8. 28.>]")
+        self.assertEqual(got, {"고용보험법시행규칙|별지75의4": dt.date(2020, 8, 28), "고용보험법시행규칙|별표2": dt.date(2024, 7, 1)})
+
+    def test_old_form_blocked(self):
+        from bot import condition_gate
+        review = [{"claim": "이직코드 23 (고용보험법 시행규칙 별지 제75호의4서식)", "urls": [self.URL]}]
+        got = condition_gate.stale_forms(review, lambda u: {"고용보험법시행규칙|별지75의4": "2020-08-28"},
+                                         lambda law: {"고용보험법시행규칙|별지75의4": "2025-07-01"})
+        self.assertEqual(len(got), 1)
+        self.assertIn("2025-07-01", got[0])
+
+    def test_current_or_unreadable_passes(self):
+        from bot import condition_gate
+        review = [{"claim": "c", "urls": [self.URL]}]
+        cur = lambda law: {"고용보험법시행규칙|별지75의4": "2025-07-01"}  # noqa: E731
+        self.assertEqual(condition_gate.stale_forms(review, lambda u: {"고용보험법시행규칙|별지75의4": "2025-07-01"}, cur), [])
+        self.assertEqual(condition_gate.stale_forms(review, lambda u: {}, cur), [])
+        self.assertEqual(condition_gate.stale_forms(review, lambda u: {"고용보험법시행규칙|별지75의4": "2020-08-28"}, lambda law: {}), [])
+
+    def test_in_server_gate_and_apply_review(self):
+        self.assertIn("condition_gate.stale_forms(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+        self.assertIn('"stale_forms":', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+
 class UpcomingAmendmentTest(unittest.TestCase):
     """근거 조문이 곧 바뀌는데 지금 규칙만 씀 (11/6 #1102 보험료징수법 제16조의10 — 2027-01-01 단서 변경)."""
 

@@ -442,6 +442,51 @@ def _law_changes(name: str, art: str, today) -> list[dict]:
     return [{"date": dt.date.fromisoformat(c["date"]), "text": c["text"]} for c in data.get("changes", [])]
 
 
+# 법제처 별표·서식 파일(flDownload)을 예전 판으로 근거 삼으면 개정 전 서식 내용을 그대로 옮긴다 (11/6 #1180 이직확인서:
+# 소정근로시간 선택지·이직코드 22·23·연차수당 계산이 2020년 판). 파일 첫 줄 '<개정 날짜>'를 그 법령 현행 판의 같은 서식과 대조.
+# (파일 번호 flSeq 는 내용이 같아도 판마다 달라 번호로는 대조 못 함)
+FORM_FILE = re.compile(r"law\.go\.kr/LSW/flDownload\.do\?flSeq=\d+")
+
+
+def _cited_form(url: str) -> dict:
+    from . import law_api, source_check
+
+    def make() -> dict:
+        heads = law_api.form_heads(source_check._fetch(url) or "")
+        return {k: f"{d:%Y-%m-%d}" for k, d in heads.items()}
+    return _cached("formfile", url, make) or {}
+
+
+def _current_form_dates(law: str) -> dict:
+    import datetime as dt
+    from . import law_api
+
+    def make() -> dict:
+        try:
+            if not law_api.available():
+                return {}
+            version = law_api.current(law_api.versions(law), dt.date.today())
+            return {k: f"{d:%Y-%m-%d}" for k, d in (law_api.form_dates(version) if version else {}).items()}
+        except Exception:  # noqa: BLE001 - 못 읽으면 막지 않음 (저장도 안 함)
+            return {}
+    return _cached("formdates", law, make) or {}
+
+
+def stale_forms(review: list[dict] | None, cited_of=None, current_of=None) -> list[str]:
+    """근거 서식 파일의 개정일이 그 법령 현행 판의 같은 별표·서식보다 이르면 막음. 파일·현행 판을 못 읽으면 막지 않음."""
+    cited_of, current_of = cited_of or _cited_form, current_of or _current_form_dates
+    urls = sorted({u for i in review or [] for u in map(str, i.get("urls") or []) if FORM_FILE.search(u)})
+    out = []
+    for url in urls:
+        for key, day in (cited_of(url) or {}).items():
+            law, form = key.split("|")
+            now = (current_of(law) or {}).get(key)
+            if now and day < now:
+                out.append(f"근거 서식 파일이 예전 판: {law} {form} — 파일은 {day} 개정판, 현행은 {now} 개정판 ({url}). "
+                           f"법제처 그 법령의 '별표·서식' 현행 파일로 내용을 다시 대조하고 근거 주소도 바꾸기")
+    return out
+
+
 def upcoming_amendments(review: list[dict] | None, body_html: str, changes_of=None, today=None) -> list[str]:
     import datetime as dt
     today = today or dt.date.today()
