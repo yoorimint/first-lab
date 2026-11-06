@@ -182,6 +182,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - `mode` 가 `"enhance"`(보강): `bot.refresh.ENHANCE_SYSTEM` 규칙대로. `siblings` 는 이 글에서 함께 답할 검색어다.
   `why` 가 순위 정체·하락이면 상위 글들이 다루는데 이 글에 빠진 하위 질문을 채우는 게 핵심이다.
 - `mode` 가 `"recheck"`(재검증): `bot.factcheck.SYSTEM` 규칙대로 수치·기준만 공식 출처로 다시 확인하고 바뀐 것만 고친다.
+  `why` 가 '확인 기한'이면(bot/expiry.py) 그 이유(예정 문장·해 바뀜·서버가 못 여는 근거)를 먼저 보고, 숫자뿐 아니라 대상·방법·제도 이름까지 공식 자료로 다시 본다. 예정이던 일이 시행됐으면 '예정'을 지금 기준으로 고친다.
 - `mode` 가 `"retitle"`(제목): 순위는 괜찮은데 검색 결과에서 안 눌리는 글이다. 본문은 건드리지 않고 **제목·요약문만** 다시 쓴다.
   `queries`(이 글로 실제 들어온 검색어)를 보고, 검색한 사람이 찾는 답이 이 글에 있다는 게 제목에서 바로 보이게.
   규칙은 `bot.refresh.RETITLE_SYSTEM` (본문에 있는 숫자만, 과장·낚시 금지, 제목 60자·요약문 120자 이내).

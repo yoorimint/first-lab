@@ -1736,6 +1736,68 @@ class LawAnnexTest(unittest.TestCase):
             self.assertIn("2,133,000", law_api.annex_text({"mst": "1", "date": dt.date(2026, 1, 2)}))
 
 
+class ExpiryTest(unittest.TestCase):
+    """11/7 운영자 '근본적인 해결책 — 글들은 대부분 나중에 업데이트가 필요할 거 아냐': 글마다 다시 확인할 날 (bot/expiry.py)."""
+
+    def setUp(self):
+        import datetime as dt
+        self.dt = dt
+        self.day = dt.date(2026, 11, 7)
+
+    def test_base_and_unreadable_cycle(self):
+        from bot.expiry import due_date
+        self.assertEqual(due_date("숫자 없는 안내", self.day)[0], self.day + self.dt.timedelta(days=180))
+        self.assertEqual(due_date("숫자 없는 안내", self.day, unreadable=True)[0], self.day + self.dt.timedelta(days=90))
+
+    def test_new_year_for_this_year_values(self):
+        from bot.expiry import due_date
+        self.assertEqual(due_date("2026년 최저임금은 시급 10,320원이에요.", self.day)[0], self.dt.date(2027, 1, 5))
+
+    def test_announced_change_date(self):
+        """#1226 폐렴: '2027년도 예산안(2026년 9월 발표)에서 … 바꿀 예정' → 2027-01-01 (지난 발표 날짜로 매달 돌지 않음)."""
+        from bot.expiry import due_date
+        text = "질병관리청은 2027년도 예산안(2026년 9월 발표)에서 어르신 백신을 단백결합 백신으로 바꿀 예정이라고 밝혔어요."
+        self.assertEqual(due_date(text, self.day)[0], self.dt.date(2027, 1, 1))
+        self.assertEqual(due_date("2026년 12월 10일부터 휴게시간 규정이 바뀌어요.", self.day)[0], self.dt.date(2026, 12, 10))
+
+    def test_stale_plan_rechecked_monthly(self):
+        """예정 날짜가 지났는데 아직 '예정'이면 30일마다 (바뀐 뒤 고칠 때까지)."""
+        from bot.expiry import due_date
+        got = due_date("2027년부터 단백결합 백신으로 바꿀 예정이에요.", self.dt.date(2027, 1, 3))
+        self.assertEqual(got[0], self.dt.date(2027, 2, 2))
+
+    def test_unreadable_from_record(self):
+        from bot.expiry import unreadable
+        self.assertTrue(unreadable({"counts": {"확인": 5, "못 엶": 8}}))
+        self.assertFalse(unreadable({"counts": {"확인": 9, "못 엶": 1}}))
+        self.assertFalse(unreadable(None))
+
+    def test_due_post_picked_regardless_of_weekly_limit(self):
+        from unittest import mock
+        from bot import refresh
+        post = {"id": 1, "title": "폐렴 예방접종 가격", "url": "u", "date": "2026-05-01", "refreshed": "", "verified": "",
+                "law_changed": "", "has_number": True, "text": "65세 이상 무료", "source_check": ""}
+        conn = mock.MagicMock()
+        real = refresh.datetime
+        with mock.patch.object(refresh, "wp_cli", return_value=json.dumps([post])), \
+                mock.patch.object(refresh, "datetime") as fake:
+            fake.now.return_value = real(2026, 11, 7)
+            fake.strptime = real.strptime
+            got = refresh.pick_targets(conn, 1, fixes_only=True)
+        self.assertEqual(len(got), 1)
+        self.assertEqual(got[0][1], "recheck")
+        self.assertIn("확인 기한", got[0][2])
+
+    def test_chain_stops_at_daily_cap(self):
+        from unittest import mock
+        from bot import refresh
+        state = {}
+        with mock.patch.object(refresh, "plan_direct") as plan:
+            for _ in range(refresh.RECHECK_PER_DAY + 2):
+                refresh._chain_next(state)
+        self.assertEqual(plan.call_count, refresh.RECHECK_PER_DAY - 1)
+
+
 class MillionthRateTest(unittest.TestCase):
     """11/6 #1228: 노인장기요양보험법 시행령 '100만분의 9,448'(0.9448%)을 같은 값으로 못 봐 '페이지에 없음'."""
 

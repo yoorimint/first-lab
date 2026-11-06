@@ -20,7 +20,7 @@ import re
 import urllib.parse
 from datetime import datetime, timedelta
 
-from . import changed, factcheck
+from . import changed, expiry, factcheck
 from .blocks import to_blocks
 from .keyword_db import connect, norm
 from .keyword_filter import subject, subject_intent
@@ -59,6 +59,8 @@ foreach ( get_posts( array( 'post_status' => 'publish', 'numberposts' => 500 ) )
         'law_changed' => (string) get_post_meta( $p->ID, '_firstlab_law_changed', true ),
         'verified' => (string) get_post_meta( $p->ID, '_firstlab_verified_at', true ),
         'has_number' => (bool) preg_match( '/\d/', wp_strip_all_tags( $p->post_content ) ),
+        'text' => mb_substr( wp_strip_all_tags( $p->post_content ), 0, 30000 ),
+        'source_check' => (string) get_post_meta( $p->ID, '_firstlab_source_check', true ),
     );
 }
 echo wp_json_encode( $out );
@@ -119,6 +121,19 @@ def top_queries(conn, page: str, limit: int = 5) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def due_for(post: dict, today) -> tuple | None:
+    """(다시 확인할 날, 이유) — 그날이 지났을 때만. 기록을 못 읽으면 기본 주기로."""
+    try:
+        record = json.loads(post.get("source_check") or "{}")
+    except ValueError:
+        record = {}
+    day, why = expiry.due_date(str(post.get("text", "")), expiry.last_checked(post), expiry.unreadable(record))
+    return (day, why) if day <= today else None
+
+
+RECHECK_PER_DAY = 3   # 기한 지난 글 재검증을 하루 이만큼까지 이어서 (글쓰기 월정액 사용량 — 늘리려면 이 값)
+
+
 def pick_targets(conn, limit: int, fixes_only: bool = False) -> list[tuple[dict, str, str]]:
     """(글, 방식 'retitle'|'enhance'|'recheck', 이유) 목록.
     fixes_only: 근거가 바뀐 글(bot/changed.py 표시)만 — 주당 갱신 한도를 다 써도 틀려진 글은 고친다."""
@@ -136,6 +151,10 @@ def pick_targets(conn, limit: int, fixes_only: bool = False) -> list[tuple[dict,
         law = p.get("law_changed") or ""
         if changed.pending(law, max(p["refreshed"] or "", p.get("verified") or "")):  # 근거가 마지막 확인 뒤에 바뀜
             picks.append((-1, p, "recheck", f"근거 변경: {law}"))
+            continue
+        due = due_for(p, now.date())
+        if due:  # 다시 확인할 날이 지남 (bot/expiry.py) — 틀려졌을 수 있으니 한도와 상관없이, 오래 밀린 글부터
+            picks.append((-0.5 - min((now.date() - due[0]).days, 900) / 1000, p, "recheck", f"확인 기한 {due[0]} 지남 — {due[1]}"))
             continue
         if fixes_only:
             continue
@@ -266,6 +285,21 @@ def plan_direct(state: dict, fixes_only: bool = False) -> list[str]:
     return [f"글 갱신 대상 준비 (매일 글쓰기 세션이 처리): '{post['title']}' - {why}"]
 
 
+def _chain_next(state: dict) -> None:
+    """재검증 하나가 끝나면 그날 RECHECK_PER_DAY 편까지 다음 '고칠 글'(근거 바뀜·확인 기한 지남)을 바로 준비 — 하루 1편이면
+    글이 쌓일수록 기한 지난 글이 영영 밀림 (11/7). 못 고르면 다음 날 정기 선택이 다시 함."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    days = state.get("recheck_day", {})
+    count = days.get(today, 0) + 1
+    state["recheck_day"] = {today: count}
+    if count >= RECHECK_PER_DAY:
+        return
+    try:
+        plan_direct(state, fixes_only=True)
+    except Exception:  # noqa: BLE001 - 다음 날 정기 선택이 다시 함
+        pass
+
+
 def apply_direct(data: dict, state: dict) -> str:
     """글쓰기 세션이 올린 갱신 반영 (본문 / 제목·요약문, 있는 것만).
     그 사이 글이 수정됐거나, 본문이 크게 줄었거나, 새 제목 숫자가 본문에 없으면 반영하지 않는다."""
@@ -292,6 +326,7 @@ def apply_direct(data: dict, state: dict) -> str:
     _count_done(state)
     if target.get("id") == post_id:
         state.pop("refresh_target", None)
+        _chain_next(state)
     if gold:  # 이 글이 그 검색어를 맡음 → 다시 새 글·보강 대상으로 안 뽑힘
         from .keyword_db import set_status
         with connect() as conn:
