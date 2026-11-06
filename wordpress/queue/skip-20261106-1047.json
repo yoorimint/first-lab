@@ -1,0 +1,5 @@
+{"type": "skip", "keywords": [
+ {"keyword": "문수산자연휴양림", "why": "특정 시설 이용 정보"},
+ {"keyword": "호박고구마직거래", "why": "날마다 바뀌는 농산물 가격·특정 판매처 상품"},
+ {"keyword": "쿠잉냉장고", "why": "특정 브랜드 상품", "brand": "쿠잉"}
+], "law_changes": [], "new_benefits": []}
