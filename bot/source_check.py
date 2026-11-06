@@ -307,7 +307,19 @@ def article_text(text: str, article: str) -> str:
 def exceptions_in(article_body: str, limit: int = 4) -> list[str]:
     """조문 안의 예외·단서 문장 (글이 원칙만 쓰고 이걸 빠뜨리는 일이 많음 — 11/5 #491·#512·#535)."""
     parts = re.split(r"(?<=다\.)\s+|(?=\s[②-⑳]\s?)", re.sub(r"<[^>]*>", "", article_body))
-    return [x.strip()[:200] for x in parts if any(m in x for m in EXCEPTION_MARKS)][:limit]
+    out = []
+    for x in parts:
+        if not any(m in x for m in EXCEPTION_MARKS):
+            continue
+        items = re.split(r"\s(?=\d+(?:의\d+)?\.\s)", x)
+        if len(x) > 200 and len(items) > 2:
+            # 호를 나열한 긴 항(과태료 목록 등): 예외가 든 호만 따로 — 앞 200자만 보여 주면 뒤쪽 호의 '(…경우는 제외한다)'가
+            # 잘려 안 보였음 (11/6 #1143 건설근로자법 제26조②7호 '도급인이 직접 내야 하는 경우는 제외')
+            head = re.match(r"\s*([①-⑳])", x)
+            out += [f"{head.group(1) + ' ' if head else ''}{it.strip()}"[:200] for it in items[1:] if any(m in it for m in EXCEPTION_MARKS)]
+        else:
+            out.append(x.strip()[:200])
+    return out[:limit]
 
 
 def claim_article(item: dict, url: str) -> str | None:

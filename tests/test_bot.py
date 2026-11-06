@@ -1637,6 +1637,14 @@ class ProvisoChecklistTest(unittest.TestCase):
         art = "제55조(납부지연가산세) ① 가산세를 부과한다. ④ 제1항을 적용할 때 납세고지서별ㆍ세목별 세액이 45만원 미만인 경우에는 같은 항 제4호의 가산세를 적용하지 아니한다."
         self.assertTrue(any("45만원 미만" in x for x in exceptions_in(art)))
 
+    def test_long_list_shows_the_item_with_exception(self):
+        """호를 나열한 긴 항은 예외가 든 호만 (11/6 #1143 제26조②7호 괄호 '…경우는 제외한다' 가 앞 200자에 잘려 안 보였음)."""
+        from bot.source_check import exceptions_in
+        items = " ".join(f"{i}. 제{i}조를 위반하여 신고를 하지 아니한 자" for i in range(1, 7))
+        art = f"제26조(과태료) ② 다음 각 호의 어느 하나에 해당하는 자에게는 300만원 이하의 과태료를 부과한다. {items} 7. 공제부금을 내지 아니한 자(도급인이 직접 내야 하는 경우는 제외한다)"
+        got = exceptions_in(art)
+        self.assertTrue(any(x.startswith("7.") or "7. 공제부금" in x for x in got), got)
+
     def test_unreadable_law_does_not_block(self):
         from bot.condition_gate import article_provisos
         self.assertEqual(article_provisos(self.review(), articles_of=lambda base: {}), [])
