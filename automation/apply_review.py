@@ -142,6 +142,22 @@ def with_title_fields(post: dict, p: dict) -> dict:
     return p
 
 
+QUALITY_LOG = ROOT / "automation" / "quality-log.csv"   # 외부 검수에서 고친 곳 수 — 품질이 유지·향상되는지 숫자로 (11/6 운영자 '퀄리티는 유지하거나 더 올리고')
+
+
+def record_quality(post_id: int, items: list[dict], path: Path = QUALITY_LOG, today: str | None = None) -> None:
+    """날짜, 글 번호, 고친 곳 수, 유형별 수 (제목·요약 고침은 headline). 같은 글을 다시 고치면 줄이 더 생김 (재검수도 품질 기록)."""
+    import collections
+    import datetime as dt
+    kinds = collections.Counter(str(p.get("type", "")) for p in items)
+    date = today or f"{dt.date.today():%Y-%m-%d}"
+    new = not path.exists()
+    with path.open("a", encoding="utf-8") as f:
+        if new:
+            f.write("date,post,fixes,types\n")
+        f.write(f"{date},{post_id},{len(items)},{' '.join(f'{k}:{v}' for k, v in sorted(kinds.items()))}\n")
+
+
 def current_post(post_id: int, fetch=None) -> dict:
     """서버의 지금 본문으로 검사 (11/6: 예전에 받아 둔 검수 파일로 검사해 제목 길이 검사가 '안 걸림'으로 잘못 나옴 —
     그사이 바뀐 본문이면 찾을 문구·검사 결과가 틀림). 서버를 못 읽으면 받아 둔 파일로."""
@@ -178,6 +194,7 @@ def main(argv: list[str]) -> int:
                     f.write(f"- #{post_id} [{p.get('type')}] {p['prevention'][len('review_only:'):].strip()} — {str(p.get('why', ''))[:80]}\n")
     with REVIEWED.open("a", encoding="utf-8") as f:  # 패치를 저장한 뒤에만
         f.write(f"{post_id} {title}\n")
+    record_quality(post_id, items)
     print(f"글 {post_id}: 패치 {len(items)}개 저장, 검수 완료 기록")
     return 0
 

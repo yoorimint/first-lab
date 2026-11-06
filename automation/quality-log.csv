@@ -1,0 +1,21 @@
+date,post,fixes,types
+2026-11-06,861,0,
+2026-11-06,863,2,missing_condition:2
+2026-11-06,867,0,
+2026-11-06,869,1,missing_condition:1
+2026-11-06,872,3,missing_condition:1 unverified:1 wrong_fact:1
+2026-11-06,874,2,missing_condition:1 unverified:1
+2026-11-06,882,0,
+2026-11-06,885,1,missing_condition:1
+2026-11-06,896,4,missing_condition:2 no_source:1 wrong_fact:1
+2026-11-06,928,7,missing_condition:6 unverified:1
+2026-11-06,940,0,
+2026-11-06,960,5,missing_condition:5
+2026-11-06,973,4,headline:1 missing_condition:3
+2026-11-06,980,1,wrong_fact:1
+2026-11-06,989,3,calc:2 missing_condition:1
+2026-11-06,996,2,missing_condition:2
+2026-11-06,998,1,missing_condition:1
+2026-11-06,1006,2,headline:1 wrong_fact:1
+2026-11-06,1012,0,
+2026-11-06,1015,0,

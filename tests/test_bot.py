@@ -5,6 +5,7 @@ import json
 import re
 import sqlite3
 import sys
+import tempfile
 import unittest
 import urllib.parse
 from pathlib import Path
@@ -1530,6 +1531,26 @@ class ApplyReviewTest(unittest.TestCase):
         self.assertEqual(apply_review.check(post, keep), [])
         fix = [dict(soft[0], type="wrong_fact", replace_paragraph="건강보험 300원이 줄어요.", prevention="review_only:공식 금액이 무엇인지는 코드가 판단 불가")]   # 숫자가 틀렸다고 고치는 유형은 허용
         self.assertEqual(apply_review.check(post, fix), [])
+
+
+class QualityLogTest(unittest.TestCase):
+    """외부 검수에서 고친 곳 수를 글마다 남김 — 동시 글쓰기 전후 품질 비교 (11/6 운영자 '퀄리티는 유지하거나 더 올리고')."""
+
+    def test_records_fix_count_and_types(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "q.csv"
+            apply_review.record_quality(1001, [{"type": "missing_condition"}, {"type": "wrong_fact"},
+                                               {"type": "missing_condition"}], path, today="2026-11-06")
+            apply_review.record_quality(1002, [], path, today="2026-11-07")
+            lines = path.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(lines[0], "date,post,fixes,types")
+        self.assertEqual(lines[1], "2026-11-06,1001,3,missing_condition:2 wrong_fact:1")
+        self.assertEqual(lines[2], "2026-11-07,1002,0,")
+
+    def test_apply_review_writes_it(self):
+        self.assertIn("record_quality(post_id, items)", (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
 
 
 class PreventionRequiredTest(unittest.TestCase):
