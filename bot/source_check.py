@@ -100,6 +100,46 @@ _ATTACH = re.compile(r"""href=["']([^"']*(?:fileDown|FileDown|download|Download|
 MAX_ATTACH = 3
 
 
+_HWP_SKIP16 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23}  # 16바이트 확장 제어 문자
+
+
+def hwp5_text(raw: bytes) -> str:
+    """HWP 5.0 본문(BodyText/Section*)의 문단 글자(PARA_TEXT, 태그 67). olefile 없거나 못 읽으면 ''."""
+    import io
+    import struct
+    import zlib
+    try:
+        import olefile
+        ole = olefile.OleFileIO(io.BytesIO(raw))
+        compressed = ole.openstream("FileHeader").read()[36] & 1
+        sections = sorted((e for e in ole.listdir() if e[0] == "BodyText"), key=lambda e: int(re.sub(r"\D", "", e[1]) or 0))
+        out = []
+        for sec in sections:
+            data = ole.openstream(sec).read()
+            data = zlib.decompress(data, -15) if compressed else data
+            i = 0
+            while i + 4 <= len(data):
+                head = struct.unpack_from("<I", data, i)[0]
+                tag, size, i = head & 0x3FF, (head >> 20) & 0xFFF, i + 4
+                if size == 0xFFF:
+                    size, i = struct.unpack_from("<I", data, i)[0], i + 4
+                if tag == 67:
+                    chunk, j, chars = data[i:i + size], 0, []
+                    while j + 2 <= len(chunk):
+                        c = struct.unpack_from("<H", chunk, j)[0]
+                        if c in _HWP_SKIP16:
+                            chars.append(" ")
+                            j += 16
+                            continue
+                        chars.append("\n" if c in (10, 13) else (chr(c) if c >= 32 else ""))
+                        j += 2
+                    out.append("".join(chars))
+                i += size
+        return "\n".join(out)
+    except Exception:  # noqa: BLE001 - olefile 없음·깨진 파일 → 예전처럼 ''
+        return ""
+
+
 def doc_text(raw: bytes) -> str:
     """PDF(pdftotext)·hwpx(zip 안 XML) 바이트 → 글자 (쉼표 뺌). 못 읽으면 ''."""
     import io
@@ -109,6 +149,8 @@ def doc_text(raw: bytes) -> str:
         if raw[:4] == b"%PDF":
             out = subprocess.run(["pdftotext", "-layout", "-", "-"], input=raw, capture_output=True, timeout=60)
             text = out.stdout.decode("utf-8", "ignore")
+        elif raw[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":  # HWP 5.0 (OLE) — 법제처 고시 첨부 (11/6 #1210)
+            text = hwp5_text(raw)
         elif raw[:2] == b"PK":
             with zipfile.ZipFile(io.BytesIO(raw)) as z:
                 parts = [z.read(n).decode("utf-8", "ignore") for n in z.namelist() if re.match(r"Contents/section\d+\.xml$", n)]

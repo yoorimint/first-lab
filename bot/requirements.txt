@@ -5,3 +5,4 @@ openai>=1
 google-auth>=2
 requests>=2  # 서치콘솔 API 인증
 pillow>=10  # 대표 이미지(제목 카드) 생성
+olefile>=0.46  # 근거 대조: 법제처 고시 첨부 HWP 5.0 글자 읽기 (11/6 #1210 대지급금 상한액 표)

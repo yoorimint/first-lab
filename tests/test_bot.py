@@ -5,6 +5,7 @@ import json
 import re
 import sqlite3
 import sys
+import importlib.util
 import tempfile
 import unittest
 import urllib.parse
@@ -1733,6 +1734,25 @@ class LawAnnexTest(unittest.TestCase):
         import datetime as dt
         with mock.patch.object(law_api, "fetch", return_value=xml):
             self.assertIn("2,133,000", law_api.annex_text({"mst": "1", "date": dt.date(2026, 1, 2)}))
+
+
+class Hwp5TextTest(unittest.TestCase):
+    """11/6 #1210: 대지급금 상한액 고시 첨부가 HWP 5.0 이라 근거 대조가 빈 글자 → 맞는 '310만 원'이 '페이지에 없음'.
+    파일: 법제처 고시 첨부 원본 (flSeq=108704833, 공공 문서)."""
+
+    @unittest.skipUnless(importlib.util.find_spec("olefile"), "olefile 없음")
+    def test_reads_hwp5_attachment(self):
+        from bot.source_check import doc_text
+        text = doc_text((ROOT / "tests" / "fixtures" / "daejigeupgeum-gosi.hwp").read_bytes())
+        self.assertIn("출산전후휴가기간 중 급여", text)
+        self.assertIn("310", text)
+
+    def test_broken_hwp_is_empty(self):
+        from bot.source_check import doc_text
+        self.assertEqual(doc_text(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1" + b"broken"), "")
+
+    def test_olefile_in_server_requirements(self):
+        self.assertIn("olefile", (ROOT / "bot" / "requirements.txt").read_text(encoding="utf-8"))
 
 
 class RetentionStartTest(unittest.TestCase):
