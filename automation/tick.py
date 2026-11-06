@@ -54,6 +54,15 @@ def failure_reason(run: dict) -> str:
     return f" — {bad['name']} 작업 실패"
 
 
+def plan_line(plan: dict, done: dict) -> str:
+    """오늘 공개 계획 {날짜: [시각]}·완료 {날짜: [시각]} → '08:31 ✅ · 18:12 ⏳' (예약 발행이 아니면 '없음')."""
+    if not plan:
+        return "없음 (예약 발행 아님)"
+    day = max(plan)
+    fired = set((done or {}).get(day) or [])
+    return " · ".join(f"{t} {'✅' if t in fired else '⏳'}" for t in plan[day])
+
+
 def main() -> int:
     problems = []
     now = datetime.now(ZoneInfo("Asia/Seoul")).replace(tzinfo=None)
@@ -88,6 +97,8 @@ def main() -> int:
         problems.append(f"패치 미반영 {len(m['patch_problems'])}건: {m['patch_problems'][0][:80]}")
     held = m.get("held_drafts") or []
     print(f"보류 {len(held)}편" + (f": {[(x['post_id'], x['reason'][:40]) for x in held]}" if held else "") + f" · 쉬는 글 {len(m.get('gave_up') or [])}편")
+    pp = m.get("publish_plan") or {}
+    print("공개 계획: " + plan_line(pp.get("plan") or {}, pp.get("done") or {}))
     stats = m.get("server_stats") or {}
     if stats:  # 서버 상태 오늘 (bot/server_stats.py — 서버를 올릴지 판단용)
         from bot.server_stats import summary  # noqa: E402

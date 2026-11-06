@@ -2856,6 +2856,21 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class PublishPlanVisibleTest(unittest.TestCase):
+    """운영자가 바꾼 '예약 공개 시각'이 오늘 계획에 들어갔는지 감시가 볼 수 있게 (11/6 '09:00·18:00 두 줄로 바꿨다')."""
+
+    def test_tick_shows_plan(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import tick
+        line = tick.plan_line({"2026-11-06": ["08:31", "18:12"]}, {"2026-11-06": ["08:31"]})
+        self.assertEqual(line, "08:31 ✅ · 18:12 ⏳")
+        self.assertIn("없음", tick.plan_line({}, {}))
+
+    def test_maintenance_exposes_plan(self):
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("'publish_plan'", php)
+
+
 class TickDeployTest(unittest.TestCase):
     def test_only_latest_finished_deploy_counts(self):
         sys.path.insert(0, str(ROOT / "automation"))
