@@ -464,7 +464,7 @@ class ContinuousTest(unittest.TestCase):
         self.assertIn("'candidates_more'", api)
         self.assertIn("?page=2", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
         self.assertIn("( $page - 1 ) * 40, 40 )", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
-        self.assertIn('(x["gold"], x["focus"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
+        self.assertIn('x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))   # 황금 안에서 정보 검색 먼저
 
     def test_same_minute_previous_post_is_not_new(self):
         # 11/4 22:05: 직전 글 기록과 다음 편 시작이 같은 분 → 직전 글을 새 글로 착각해 두 편이 동시에 돎
@@ -2088,19 +2088,36 @@ class SiteFocusTest(unittest.TestCase):
         self.assertTrue(on_focus("퇴직금계산기"))
         self.assertFalse(on_focus("인천공항주차요금"))
         for kw in ("블루베리보관법", "냉장고정리방법", "캠핑준비물리스트", "김치찌개레시피"):
-            self.assertTrue(off_topic(kw), kw)
+            self.assertTrue(off_topic(kw), kw)   # 후순위 표시 (빼지는 않음)
         self.assertFalse(off_topic("실업급여신청"))
-        self.assertIn('(x["gold"], x["focus"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
 
-    def test_seed_words_focus_first_no_off_topic(self):
+    def test_seed_words_focus_first_others_later(self):
+        """중심 주제 씨앗 먼저, 빼지 않고 뒤에 (11/7 운영자 '빼지 말고 후순위 — 황금 키워드 나올 수도')."""
         from bot.seed_words import FOCUS_SEEDS, SEED_WORDS
-        from bot.select_keyword import off_topic, on_focus
-        self.assertEqual(SEED_WORDS[:len(FOCUS_SEEDS)], list(FOCUS_SEEDS))   # 중심 주제 씨앗을 먼저 수집
-        self.assertFalse([w for w in SEED_WORDS if off_topic(w)])
+        from bot.select_keyword import on_focus
+        self.assertEqual(SEED_WORDS[:len(FOCUS_SEEDS)], list(FOCUS_SEEDS))
         for w in ("레시피", "에어프라이어", "스킨케어", "오사카", "캠핑장"):
-            self.assertNotIn(w, SEED_WORDS)
-        self.assertTrue(on_focus("청년도약계좌조건"))   # 씨앗 목록으로도 중심 주제 판단
+            self.assertGreater(SEED_WORDS.index(w), len(FOCUS_SEEDS))
+        self.assertTrue(on_focus("청년도약계좌조건"))
         self.assertTrue(on_focus("경정청구기간"))
+        src = (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8")
+        self.assertIn('(x["gold"], x["focus"], not x["later"], x["info"], x["score"])', src)
+        self.assertNotIn("off_topic(r[\"norm\"]) or", src)   # 후보에서 빼지 않음
+
+    def test_focus_snowball_grows_seeds(self):
+        """창고의 중심 주제 키워드가 다음 수집 출발 단어로 — 쉰 지 14일 안 된 것·중심 주제 아닌 것·검색 적은 것은 뺌."""
+        import sqlite3
+        from bot import discover
+        from bot.keyword_db import SCHEMA
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.executescript(SCHEMA)
+        rows = [("실업급여조건", 9000), ("육아휴직급여신청", 4000), ("캠핑장예약", 8000), ("경정청구방법", 100), ("연말정산환급", 7000)]
+        for kw, total in rows:
+            conn.execute("INSERT INTO keywords(keyword, norm, total, first_seen, last_checked) VALUES (?,?,?,?,?)", (kw, kw, total, "2026-11-01", "2026-11-07"))
+        conn.execute("INSERT INTO seeds(word, used_date) VALUES ('연말정산환급', '2026-11-01')")   # 6일 전에 씀 → 아직 쉼
+        self.assertEqual(discover.focus_snowball(conn, "2026-11-07", 10), ["실업급여조건", "육아휴직급여신청"])
+        self.assertEqual(discover.focus_snowball(conn, "2026-11-20", 10), ["실업급여조건", "연말정산환급", "육아휴직급여신청"])
 
     def test_template_twin_held_but_first_and_rewritten_pass(self):
         """검사소 연작: 먼저 쓴 글은 그대로, 같은 틀로 찍은 뒤 글은 보류, 이 글만의 정보로 다시 쓰면 통과."""

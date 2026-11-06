@@ -41,7 +41,7 @@ TOPIC_BONUS = (
 TOPIC_PENALTY = ((("준비물", "리스트", "정리방법", "청소", "인테리어", "여행"), -1.0),)
 
 # 사이트 중심 주제 (11/7 운영자 '주제 좁히기' 승인): 공식 근거 검수·계산기가 가장 가치 있는 일·세금·4대보험·지원금.
-# 황금 키워드 다음 순서로 먼저 쓰고(정렬 키), 공식 근거로 차별화할 게 없는 생활 요령은 글감에서 뺀다.
+# 황금 키워드 다음 순서로 먼저 쓰고(정렬 키), 공식 근거로 차별화할 게 없는 생활 요령은 맨 뒤로 (11/7 운영자 '빼지 말고 후순위').
 FOCUS = ("실업급여", "고용보험", "건강보험", "국민연금", "4대보험", "사대보험", "근로", "최저임금", "연차", "주휴", "퇴직",
          "해고", "육아휴직", "출산", "휴가", "수당", "급여", "연봉", "월급", "세금", "소득세", "양도세", "증여세", "상속세",
          "부가세", "종부세", "취득세", "재산세", "자동차세", "연말정산", "환급", "공제", "지원금", "바우처", "장려금", "보조금",
@@ -128,7 +128,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
 
     result = []
     for r in rows:
-        if not is_allowed(r["keyword"], settings.blocked_words) or off_topic(r["norm"]) or overlaps_used(r["norm"]):
+        if not is_allowed(r["keyword"], settings.blocked_words) or overlaps_used(r["norm"]):
             continue
         if r["last_checked"] != latest and naver_hub.intent(r["keyword"]) == "skip":
             continue  # 황금으로 들어온 옛 키워드 중 사이트 찾아가기·네이버가 바로 답함·브랜드는 제외
@@ -160,11 +160,12 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     # 운영자 지시(11/5): 황금 키워드 찾은 것은 점수 높은 것부터 먼저 쓴다 → 황금·좋음 무리를 맨 앞에, 그 안에서 점수순
     # 황금 무리 안에서는 정보 검색(intent info)을 먼저 — 판단 애매(unknown)한 황금은 대부분 호텔·상품·행사라 글쓰기 세션이 다 빼서
     # 새 글 없이 끝난 실행이 세 번 연속 (11/6). 황금 먼저 규칙은 그대로.
-    # 11/7: 황금 다음은 사이트 중심 주제(FOCUS) 먼저
+    # 11/7: 황금 안에서도 사이트 중심 주제(FOCUS) 먼저, 생활 요령(OFF_TOPIC)은 맨 뒤
     for c in result:
         c["info"] = naver_hub.intent(c["keyword"]) == "info"
         c["focus"] = on_focus(norm(c["keyword"]))
-    result.sort(key=lambda x: (x["gold"], x["focus"], x["info"], x["score"]), reverse=True)
+        c["later"] = off_topic(norm(c["keyword"]))
+    result.sort(key=lambda x: (x["gold"], x["focus"], not x["later"], x["info"], x["score"]), reverse=True)
     picked, per_head = [], {}
     for c in result:
         key = c["head"] or c["keyword"]

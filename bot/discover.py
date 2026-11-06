@@ -20,7 +20,7 @@ from pathlib import Path
 from .keyword_db import connect, norm, summary, upsert
 from .keyword_filter import MODIFIERS
 from .naver_ads import ads_client
-from .seed_words import SEED_WORDS
+from .seed_words import FOCUS_SEEDS, SEED_WORDS
 from .seeds import google_trends_kr
 
 BATCH = 5              # API 1회당 출발 키워드 수 (API 최대값)
@@ -52,6 +52,24 @@ def _modifier_heads(conn, today: str, limit_heads: int) -> list[str]:
     rows = sorted(rows, key=lambda r: (r["docs"] is not None and r["total"] >= r["docs"] * GOOD_INDEX, topic_weight(r["norm"]), r["total"]),
                   reverse=True)
     return [r["keyword"] for r in rows[:limit_heads]]
+
+
+# 중심 주제 씨앗 늘리기 (11/7 운영자 '중심 주제 단어가 200여 개밖에 안 되나? 몇천 개는 되지 않나?'):
+# 창고에 모인 중심 주제 키워드(검색 많은 순)를 다음 수집의 출발 단어로 — 날마다 SNOWBALL_CALLS×5 개, 같은 단어는 REST_DAYS 뒤 다시.
+SNOWBALL_CALLS = 40
+SNOWBALL_MIN = 300      # 이 검색량 이상인 키워드만 출발 단어로
+SNOWBALL_REST_DAYS = 14
+
+
+def focus_snowball(conn, today: str, limit: int) -> list[str]:
+    from .select_keyword import on_focus
+    cutoff = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=SNOWBALL_REST_DAYS)).strftime("%Y-%m-%d")
+    rows = conn.execute(
+        "SELECT k.keyword, k.norm FROM keywords k LEFT JOIN seeds s ON s.word = k.keyword"
+        " WHERE k.status NOT IN ('rejected','excluded') AND k.total >= ? AND (s.used_date IS NULL OR s.used_date <= ?)"
+        " ORDER BY k.total DESC", (SNOWBALL_MIN, cutoff)).fetchall()
+    out = [r["keyword"] for r in rows if on_focus(r["norm"]) and r["keyword"] not in SEED_WORDS]
+    return list(dict.fromkeys(out))[:limit]
 
 
 def secrets_expiring(today=None, days: int = 30) -> list[str]:
@@ -104,12 +122,14 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
         # 1) 출발 단어 전부: 급상승어 + 우선 주제 + 씨앗
         trends = google_trends_kr()
         stats["trends"] = len(trends)
-        words = list(dict.fromkeys(trends + (extra_seeds or []) + SEED_WORDS))
+        snowball = focus_snowball(conn, today, SNOWBALL_CALLS * BATCH)
+        stats["snowball"] = len(snowball)
+        words = list(dict.fromkeys(trends + (extra_seeds or []) + list(FOCUS_SEEDS) + snowball + SEED_WORDS))
         for i in range(0, len(words), BATCH):
             if stats["calls"] >= calls or not run_batch(conn, words[i:i + BATCH]):
                 break
         conn.executemany("INSERT OR REPLACE INTO seeds (word, used_date) VALUES (?,?)",
-                         [(w, today) for w in words if w in SEED_WORDS])
+                         [(w, today) for w in words if w in SEED_WORDS or w in snowball])
         conn.commit()
         print(f"[수집] 출발 단어 {len(words)}개 (급상승 {len(trends)}): {stats}", flush=True)
 
