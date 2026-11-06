@@ -510,6 +510,20 @@ def stale_forms(review: list[dict] | None, cited_of=None, current_of=None) -> li
     return out
 
 
+# 통상임금: 대법원 2024. 12. 19. 전원합의체(2020다247190)로 '고정성' 요건이 빠졌다 — 재직 조건이 붙거나 한 달을 넘는 주기로 나와도
+# 정기적·일률적이면 통상임금 (11/7 #1232 해고예고수당 '기본급과 매달 정해진 금액으로 나오는 수당이 중심' → 정기상여금이 빠져 적게 계산).
+OLD_WAGE_RULE = re.compile(r"고정성|고정적으로|고정적인|매달 정해진|매월 정해진|매달 나오는|매월 나오는|재직자에게만 주는")
+
+
+def ordinary_wage_rule(body_html: str) -> list[str]:
+    out = []
+    for sent in re.findall(r"[^.?!。]+", _plain(body_html or "")):
+        if "통상임금" in sent and OLD_WAGE_RULE.search(sent):
+            out.append(f"통상임금을 옛 기준(고정성·매달 지급)으로 설명: '{sent.strip()[:60]}' — 2024.12.19 대법원 전원합의체 뒤에는 "
+                       "재직 조건이 붙거나 한 달 넘는 주기라도 정기적·일률적이면 통상임금 (대법원 2018다296472 등)")
+    return out[:2]
+
+
 # '약 N만원'은 같은 글의 정확한 금액을 반올림한 값이어야 (11/6 #1212: 표 합계 34,428,900원을 '약 3,442만원'으로 버림 — 반올림 3,443만원).
 APPROX_MAN = re.compile(r"약\s*([\d,]+)\s*만\s*원")
 EXACT_WON = re.compile(r"(?<![\d,.])(\d{1,3}(?:,\d{3}){2,}|\d{7,})\s*원")

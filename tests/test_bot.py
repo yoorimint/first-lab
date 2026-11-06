@@ -1850,6 +1850,23 @@ class RuleProvisoTest(unittest.TestCase):
         self.assertTrue(any("제7조 단서1" in g for g in got), got)
 
 
+class OrdinaryWageRuleTest(unittest.TestCase):
+    """11/7 #1232: '통상임금은 … 기본급과 매달 정해진 금액으로 나오는 수당이 중심' — 2024.12.19 전원합의체 뒤 옛 기준."""
+
+    def test_old_rule_flagged(self):
+        from bot.condition_gate import ordinary_wage_rule
+        self.assertEqual(len(ordinary_wage_rule("<p>통상임금은 기본급과 매달 정해진 금액으로 나오는 수당이 중심이에요.</p>")), 1)
+        self.assertEqual(len(ordinary_wage_rule("<p>통상임금은 정기성·일률성·고정성을 갖춰야 해요.</p>")), 1)
+
+    def test_current_rule_passes(self):
+        from bot.condition_gate import ordinary_wage_rule
+        self.assertEqual(ordinary_wage_rule("<p>통상임금은 정기적·일률적으로 주기로 정한 임금이고, 재직 조건이 붙어도 빠지지 않아요.</p>"), [])
+        self.assertEqual(ordinary_wage_rule("<p>월급은 매달 정해진 날에 받아요.</p>"), [])
+
+    def test_in_gate(self):
+        self.assertIn("condition_gate.ordinary_wage_rule(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
 class ApproxRoundingTest(unittest.TestCase):
     """11/6 #1212: 표 합계 34,428,900원을 첫 문단에 '약 3,442만원' (반올림 3,443만원)."""
 
