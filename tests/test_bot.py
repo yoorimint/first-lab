@@ -653,7 +653,7 @@ class MiscTest(unittest.TestCase):
 
     def test_related_box_prefers_same_subject(self):
         php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php").read_text(encoding="utf-8")
-        self.assertIn("similar_text", php)   # 같은 주제 글끼리 먼저 연결 (주휴수당 뜻 ↔ 계산)
+        self.assertIn("firstlab_related_pick", php)   # 같은 주제 글끼리 먼저 연결 (주휴수당 뜻 ↔ 계산) — 동작은 RelatedPostsTest
 
     def test_popular_page_sums_clicks_per_page(self):
         rows = [{"page": "a", "clicks": 3}, {"page": "b", "clicks": 4}, {"page": "a", "clicks": 3}]
@@ -2879,6 +2879,44 @@ class DottedDateNumberTest(unittest.TestCase):
                                      record=lambda pid, review: done.append(pid) or "숫자 주장 1개 중 확인 1")
         self.assertEqual(done, [1023])
         self.assertEqual(len(msgs), 1)
+
+
+class RelatedPostsTest(unittest.TestCase):
+    """글 아래 '함께 보면 좋은 글'은 주제가 겹치는 글만 (11/6 운영자: 자동차보험료 계산 글에 주식 평단가 계산기 — '계산'만 겹침)."""
+
+    def run_php(self, body):
+        import os
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("<?php define('ABSPATH', 1); function add_filter() {}\nrequire getenv('P');\n" + body)
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            return subprocess.run(["php", f.name], capture_output=True, text=True, check=True,
+                                  env={**os.environ, "P": str(ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php")}).stdout
+        finally:
+            os.unlink(f.name)
+
+    def test_topic_overlap_only(self):
+        out = self.run_php("""
+$t = '자동차보험료 계산 방법: 평균 68만 원과 연령·차종별 차이';
+echo json_encode(firstlab_related_pick($t, [
+  ['id' => 583, 'title' => '주식 평단가 계산기: 물타기·목표 수량·코스피 매도세 0.20%', 'same_cat' => true],
+  ['id' => 7, 'title' => '자동차 명의이전 방법과 비용', 'same_cat' => false],
+  ['id' => 8, 'title' => '자동차보험 할증 기준: 사고 1건이면 얼마나 오르나', 'same_cat' => false],
+]));
+echo "\n", json_encode(firstlab_related_pick('주식 평단가 계산기', [['id' => 34, 'title' => '자동차보험료 계산 방법', 'same_cat' => true]]));
+""").split()
+        self.assertEqual(json.loads(out[0]), [8, 7])  # 같은 분류라도 '계산'만 겹치는 주식 글은 안 붙음, 주제 많이 겹치는 순
+        self.assertEqual(json.loads(out[1]), [])      # 관련 글이 없으면 칸을 안 보임
+
+    def test_same_topic_other_purpose_first(self):
+        out = self.run_php("""echo json_encode(firstlab_related_pick('주휴수당 뜻', [
+  ['id' => 2, 'title' => '연차수당 계산', 'same_cat' => true],
+  ['id' => 1, 'title' => '주휴수당 계산 방법', 'same_cat' => false]]));""")
+        self.assertEqual(json.loads(out), [1, 2])  # 주휴수당 뜻 ↔ 계산 (11/5 운영자)
 
 
 class SlotSplitTest(unittest.TestCase):
