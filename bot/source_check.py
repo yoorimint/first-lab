@@ -348,6 +348,38 @@ def law_exceptions(review: list[dict] | None, fetcher=fetch) -> list[dict]:
     return out
 
 
+# 법 조문이 내용을 하위 규정에 맡기는 말 — 그 하위 규정(시행령·시행규칙·고시)을 안 읽고 쓰면 기간·범위가 빠짐
+# (11/6 #885 채용서류 반환 청구 기간은 시행령 제4조에만, #896 전기자전거 안전기준 적용 범위 '이륜자전거'는 고시에만 — 같은 꼴 2번 → 검사)
+_DELEGATE = re.compile(r"[^.]*?(?:대통령령|총리령|[가-힣]{1,8}부령|[가-힣]{2,8}장관이 정하여 고시|[가-힣]{2,8}장관이 고시)[^.]*?\.")
+LOWER_RULE_MARKS = ("시행령", "시행규칙", "/행정규칙/", "admrul", "flDownload")
+
+
+def delegations(review: list[dict] | None, fetcher=fetch, limit: int = 3) -> list[dict]:
+    """근거 법 조문이 하위 규정에 맡긴 문장 중, 글의 근거에 그 법의 시행령·시행규칙·고시가 하나도 없는 것."""
+    urls = [urllib.parse.unquote(str(u)) for item in review or [] if _ok(item) for u in item.get("urls", [])]
+    out, cache, done = [], {}, set()
+    for item in review or []:
+        if not _ok(item):
+            continue
+        for url in item.get("urls", []):
+            art, base = claim_article(item, str(url)), law_page(str(url))
+            if not art or "/법령/" not in base or (base, art) in done:
+                continue
+            done.add((base, art))
+            name = base.rsplit("/", 1)[-1]
+            if re.search(r"시행령|시행규칙$", name):
+                continue                      # 이미 하위 규정
+            if any(name in u and any(m in u for m in ("시행령", "시행규칙")) for u in urls) or any("/행정규칙/" in u for u in urls):
+                continue                      # 하위 규정도 근거로 읽음
+            if base not in cache:
+                cache[base] = fetcher(base)
+            body = article_text(cache[base] or "", art)
+            found = [re.sub(r"\s+", " ", m.group(0)).strip()[:200] for m in _DELEGATE.finditer(body)][:limit]
+            if found:
+                out.append({"law": name, "article": art, "sentences": found})
+    return out
+
+
 CONDITION_WORDS = ("이하", "이상", "초과", "미만", "경우", "한해", "한정", "때만", "기준", "가정")
 QUALIFIERS = ("최대", "최소", "이하", "이상", "초과", "미만", "까지", "부터", "기준", "약", "예시", "최고", "최저")
 
@@ -443,6 +475,11 @@ def main(argv: list[str]) -> None:
             print(f"  [경우 나열: {law['law']} {law['article']}] 이 조문이 나열한 경우를 글이 모두 다루는지(일부만 쓰면 '등'·'다음 중 하나'로) 확인:")
             for x in law["cases"]:
                 print(f"    · {x}")
+    for d in delegations(review):
+        print(f"- [위임 확인: {d['law']} {d['article']}] 이 조문이 하위 규정에 맡긴 내용(기간·금액·범위)을 그 시행령·시행규칙·고시에서 읽었는지 — "
+              "python3 -m bot.lawtext <법령명>시행령 <제N조> 로 확인하고 그 주소도 근거에 단다:")
+        for x in d["sentences"]:
+            print(f"    · {x}")
     data = json.loads(open(argv[1], encoding="utf-8").read())
     for x in headline_conditions(review, data.get("title", ""), data.get("excerpt", "")):
         print(f"- [제목 조건 확인] {x} → 제목·요약에 조건(최대·이하·기준 등)을 붙이거나 조건 없는 값으로")

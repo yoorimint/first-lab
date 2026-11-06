@@ -1269,6 +1269,21 @@ class BenefitDetailTest(unittest.TestCase):
         self.assertEqual(calls[0], ("serviceDetail", {"cond[서비스ID::EQ]": "WII000001600"}))
         self.assertIsNone(bd.detail_text("X", fetch=lambda path, **kw: {"data": []}))
 
+    def test_delegated_rule_must_be_read(self):
+        """11/6 #885(시행령에만 있는 반환 청구 기간)·#896(고시에만 있는 적용 범위) — 같은 꼴 2번 → 위임 확인 검사."""
+        from bot import source_check as sc
+        law = "https://www.law.go.kr/법령/채용절차의공정화에관한법률"
+        text = "제11조(채용서류의 반환 등) ① 반환하여야 한다. ④ 구인자는 대통령령으로 정한 반환의 청구기간이 지난 경우 파기하여야 한다. 제12조(비용) 부담한다."
+        ok = {"verdict": "맞음", "action": "유지"}
+        review = [{"claim": "반환 청구 (채용절차법 제11조)", "urls": [law + "/제11조"], **ok}]
+        got = sc.delegations(review, fetcher=lambda u: text)
+        self.assertEqual([(d["law"], d["article"]) for d in got], [("채용절차의공정화에관한법률", "제11조")])
+        self.assertIn("대통령령으로 정한 반환의 청구기간", got[0]["sentences"][0])
+        read = review + [{"claim": "14~180일", "urls": ["https://www.law.go.kr/법령/채용절차의공정화에관한법률시행령/제4조"], **ok}]
+        self.assertEqual(sc.delegations(read, fetcher=lambda u: text), [])                 # 시행령도 읽었으면 조용
+        self.assertEqual(sc.delegations([{"claim": "제12조", "urls": [law + "/제12조"], **ok}], fetcher=lambda u: text), [])
+        self.assertIn("위임 확인", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
     def test_unit_numbers_compared(self):
         """두 자리 수 + 단위(14일·24세·60시간·15회)도 대조 (11/6 'API 다 써서' 3번, #872 '14일 연장'). 날짜·한 자리·단위 없는 수는 뺌."""
         from bot.source_check import key_numbers
