@@ -1,0 +1,422 @@
+{
+ "title": "종합소득세 중간예납: 11월 30일까지, 작년 세액의 절반",
+ "excerpt": "종합소득세 중간예납은 작년 종합소득세의 2분의 1을 11월 30일까지 내요. 50만 원 미만은 걷지 않고, 1천만 원을 넘으면 2027년 2월 1일까지 나눠 낼 수 있어요.",
+ "content_html": "<p>종합소득세 중간예납은 작년 종합소득세(중간예납기준액)의 절반을 올해 11월에 미리 내는 세금이에요. 세무서가 11월 1일~15일 사이에 고지서를 보내고, 2026년 납부기한은 <strong>11월 30일(월)</strong>이에요. 절반을 계산한 금액이 50만 원 미만이면 걷지 않고, 1천만 원을 넘으면 일부를 2027년 2월 1일까지 나눠 낼 수 있어요.</p>\n\n<h2>중간예납 대상과 제외되는 사람</h2>\n<p>원칙은 종합소득이 있는 거주자, 주로 작년에 사업소득으로 종합소득세를 낸 개인사업자예요. 아래에 해당하면 고지 대상이 아니에요.</p>\n<table>\n<thead><tr><th>제외 대상</th><th>내용</th></tr></thead>\n<tbody>\n<tr><td>신규 사업자</td><td>2026년 중 새로 사업을 시작한 사람</td></tr>\n<tr><td>휴·폐업자</td><td>2026년 6월 30일 이전 휴·폐업자 등</td></tr>\n<tr><td>사업소득이 없는 사람</td><td>이자·배당·근로·연금·기타소득만 있는 사람</td></tr>\n<tr><td>일부 사업소득만 있는 사람</td><td>사무지원 서비스업, 자영예술가, 모집수당 등</td></tr>\n<tr><td>소액</td><td>중간예납세액 50만 원 미만</td></tr>\n</tbody>\n</table>\n<p>이 밖에 납세조합이 매월 원천징수해 낸 조합원, 분리과세 주택임대소득만 있는 사람 등도 제외돼요. 그래서 회사에서 연말정산만 하는 직장인은 중간예납 고지서를 받지 않아요.</p>\n\n<h2>중간예납세액 계산법</h2>\n<p>계산식은 <strong>중간예납기준액 × 2분의 1</strong>이고, 1천 원 미만은 버려요. 부동산매매업자는 상반기 토지·건물 매매차익 예정신고로 낸 세액을 빼요. 중간예납기준액은 작년 귀속 소득세로 낸 금액을 모은 값이에요.</p>\n<ol>\n<li>작년 11월에 낸 중간예납세액</li>\n<li>올해 5월(성실신고확인대상자는 6월) 확정신고 때 낸 세액</li>\n<li>추가로 낸 세액(가산세 포함)과 기한 후 신고로 낸 세액</li>\n<li>위 합계에서 돌려받은 환급세액을 뺌</li>\n</ol>\n<p>예를 들어 기준액이 600만 원이면 중간예납세액은 300만 원이에요. 기준액이 999,998원이면 절반 499,999원에서 1천 원 미만을 버린 499,000원이 50만 원 미만이라 고지되지 않아요.</p>\n<p>[firstlab_calc id=\"interim-income-tax\"]</p>\n\n<h2>분납 기준: 1천만 원 넘으면 나눠 내기</h2>\n<p>중간예납세액이 1천만 원을 넘을 때만 나눠 낼 수 있어요. 나눠 낸 부분은 2027년 1월 초에 고지서가 다시 오고, 납부기한은 2027년 2월 1일(월)이에요.</p>\n<table>\n<thead><tr><th>중간예납세액</th><th>나눠 낼 수 있는 금액</th><th>예시</th></tr></thead>\n<tbody>\n<tr><td>1천만 원 이하</td><td>분납 없음</td><td>300만 원 → 11월에 전액</td></tr>\n<tr><td>1천만 원 초과 ~ 2천만 원 이하</td><td>1천만 원을 넘는 금액</td><td>1,500만 원 → 11월 1,000만 원, 2월 500만 원</td></tr>\n<tr><td>2천만 원 초과</td><td>세액의 50% 이하</td><td>5,000만 원 → 11월 2,500만 원, 2월 2,500만 원</td></tr>\n</tbody>\n</table>\n\n<h2>올해 매출이 줄었으면: 중간예납추계액 신고</h2>\n<p>고지 금액은 작년 실적 기준이라 올해 장사가 안 됐으면 부담이 커요. 2026년 상반기(1월 1일~6월 30일) 소득으로 계산한 세액(중간예납추계액)이 중간예납기준액의 30%에 못 미치면, 11월 1일부터 30일까지 추계액을 신고하고 그 금액만 낼 수 있어요. 신고하면 고지된 세액은 없던 것이 돼요.</p>\n<ul>\n<li>추계액 계산: 상반기 종합소득금액을 2배로 해 이월결손금·종합소득공제를 빼고 기본세율(6~45%)을 곱한 뒤 2로 나누고, 6월 30일까지의 공제·감면세액과 원천징수세액 등을 빼요.</li>\n<li>추계액이 50만 원 미만이면 낼 세금은 없지만, 신고서를 내야 고지세액이 취소돼요.</li>\n<li>작년에 낸 세금이 없어 기준액이 없는 복식부기의무자는 상반기 사업소득이 있으면 추계액을 반드시 신고·납부해야 해요.</li>\n<li>추계액으로 낸 세액도 1천만 원을 넘으면 분납할 수 있어요.</li>\n</ul>\n\n<h2>납부 방법</h2>\n<ul>\n<li>홈택스·손택스 전자납부: 홈택스에서는 계좌이체, 신용카드, 간편결제 중에서 골라요.</li>\n<li>고지서에 적힌 가상계좌나 국세계좌로 이체</li>\n<li>금융기관 창구에서 고지서로 직접 납부</li>\n</ul>\n\n<h2>자주 묻는 질문</h2>\n<h3>중간예납으로 낸 돈은 내년에 어떻게 되나요?</h3>\n<p>2027년 5월(성실신고확인대상자는 6월) 확정신고 때 낼 세금에서 이미 낸 중간예납세액을 빼고 내요. 더 냈으면 돌려받아요. 같은 세금을 두 번 내는 게 아니에요.</p>\n<h3>프리랜서 3.3%도 중간예납을 내나요?</h3>\n<p>사업소득이 있으면 대상이 될 수 있지만, 자영예술가·모집수당처럼 원천징수되는 일부 사업소득만 있는 사람은 제외돼요. 고지서가 왔는지 홈택스에서 먼저 보는 게 좋아요.</p>\n<h3>고지서 금액보다 적게 내도 되나요?</h3>\n<p>추계액 신고를 해야 줄일 수 있어요. 신고 없이 일부만 내면 1천만 원 초과로 분납할 수 있는 부분만 내년 1월에 다시 고지되고, 나머지는 기한을 넘긴 세금이 돼요.</p>",
+ "tags": [
+  "종합소득세 중간예납",
+  "중간예납 분납",
+  "중간예납 추계액 신고"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a small neighborhood bakery counter at dusk in Seoul with warm lights and fresh bread on wooden shelves, no people",
+   "alt": "저녁 무렵 따뜻한 조명이 켜진 동네 빵집 진열대"
+  }
+ ],
+ "keyword": "종합소득세중간예납",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "종합소득세 중간예납은 작년 세액의 절반을 11월 30일까지 냄 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "중간예납세액 50만 원 미만은 걷지 않음 (소득세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간예납세액 1천만 원을 넘으면 2027년 2월 1일까지 나눠 낼 수 있음 (소득세법 제77조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "작년 종합소득세(중간예납기준액)의 절반을 11월에 미리 냄 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세무서가 11월 1일~15일 사이에 고지서를 보냄 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "2026년 납부기한은 11월 30일(월)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대상은 종합소득이 있는 거주자 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "이 밖에 납세조합이 매월 원천징수해 낸 조합원, 분리과세 주택임대소득만 있는 사람 등도 제외 (소득세법 시행령 제123조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "2026년 중 새로 사업을 시작한 사람은 제외 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 6월 30일 이전 휴·폐업자 등은 제외",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "이자·배당·근로·연금·기타소득만 있는 사람은 제외 (소득세법 시행령 제123조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사무지원 서비스업, 자영예술가, 모집수당 등 일부 사업소득만 있는 사람은 제외 (소득세법 시행규칙 제64조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행규칙",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연말정산만 하는 직장인은 중간예납 고지서를 받지 않음 (소득세법 시행령 제123조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산식은 중간예납기준액 × 2분의 1, 1천 원 미만 버림 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "부동산매매업자는 상반기 토지·건물 매매차익 예정신고로 낸 세액을 뺌 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "기준액에 작년 11월 중간예납세액이 들어감 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "올해 5월(성실신고확인대상자는 6월) 확정신고 때 낸 세액이 들어감 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "추가로 낸 세액(가산세 포함)과 기한 후 신고 세액이 들어감 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "합계에서 환급세액을 뺌 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준액 600만 원이면 중간예납세액 300만 원 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준액 999,998원 → 499,999원 → 499,000원, 50만 원 미만이라 고지 안 됨 (소득세법 제86조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중간예납세액이 1천만 원을 넘을 때만 분납 (소득세법 제77조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "분납분은 2027년 1월 초 고지서가 다시 옴 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "분납 납부기한 2027년 2월 1일(월)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1천만 원 이하는 분납 없음, 300만 원은 11월에 전액 (소득세법 제77조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1천만 원 초과~2천만 원 이하는 1천만 원을 넘는 금액, 1,500만 원 → 11월 1,000만 원·2월 500만 원 (소득세법 시행령 제140조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2천만 원 초과는 세액의 50% 이하, 5,000만 원 → 2,500만 원·2,500만 원 (소득세법 시행령 제140조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고지 금액은 작년 실적 기준 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상반기 추계액이 기준액의 30%에 못 미치면 추계액 신고 가능 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추계액 신고 기간 11월 1일부터 30일까지, 그 금액만 냄 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추계액을 신고하면 고지 세액은 없던 것이 됨 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추계액 계산: 상반기 소득 2배에서 이월결손금·종합소득공제를 빼고 기본세율(6~45%)을 곱해 2로 나누고 공제·감면세액·원천징수세액 등을 뺌 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추계액 50만 원 미만이면 낼 세금은 없지만 신고서를 내야 고지세액 취소",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "기준액이 없는 복식부기의무자는 상반기 사업소득이 있으면 추계액을 반드시 신고·납부 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추계액으로 낸 세액도 1천만 원을 넘으면 분납 가능 (소득세법 제77조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "홈택스·손택스 전자납부 가능",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "홈택스에서는 계좌이체, 신용카드, 간편결제 중에서 고름",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=238910"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "고지서에 적힌 가상계좌나 국세계좌로 이체",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융기관 창구에서 고지서로 직접 납부",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 5월(성실신고확인대상자는 6월) 확정신고 때 이미 낸 중간예납세액을 빼고 냄, 더 냈으면 돌려받음 (소득세법 제76조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "자영예술가·모집수당 등 일부 사업소득만 있으면 제외 (소득세법 시행규칙 제64조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행규칙",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "추계액 신고를 해야 고지 금액보다 줄일 수 있음 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "일부만 내면 분납 가능 부분만 내년 1월에 다시 고지되고 나머지는 기한을 넘긴 세금 (소득세법 제65조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기: 기준액 넣으면 중간예납세액과 나눠 낼 수 있는 금액이 나옴 (소득세법 제65조·제77조·제86조, 소득세법 시행령 제140조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국세청 중간예납세액의 계산 및 납부방법",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+  },
+  {
+   "name": "국세청 소득세 중간예납 대상자 안내",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2236&cntntsId=7673"
+  },
+  {
+   "name": "국세청 소득세 중간예납추계액 신고 안내",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2238&cntntsId=7675"
+  }
+ ]
+}

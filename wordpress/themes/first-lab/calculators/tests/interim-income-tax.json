@@ -1,0 +1,199 @@
+[
+  {
+    "why": "중간예납기준액 999,998원 → 2분의 1 499,999원 → 1천원 미만 버림 499,000원, 50만 원 미만이라 0원 (제65조①·제86조4호)",
+    "input": {
+      "base": 999998
+    },
+    "expect": {
+      "half": 499000,
+      "interim_tax": 0,
+      "exempt": true,
+      "installment": 0,
+      "pay_by_nov": 0
+    },
+    "boundary": true,
+    "notes_include": [
+      "걷지 않아요"
+    ],
+    "notes_exclude": [
+      "추계액"
+    ]
+  },
+  {
+    "why": "기준액 1,000,000원 → 500,000원: '50만원 미만'이 아니라 걷음 (제86조4호 경계)",
+    "input": {
+      "base": 1000000
+    },
+    "expect": {
+      "half": 500000,
+      "interim_tax": 500000,
+      "exempt": false,
+      "installment": 0,
+      "pay_by_nov": 500000
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준액 1,001,999원 → 500,999.5 → 500,000원 (1천원 미만 버림)",
+    "input": {
+      "base": 1001999
+    },
+    "expect": {
+      "half": 500000,
+      "interim_tax": 500000,
+      "exempt": false,
+      "installment": 0,
+      "pay_by_nov": 500000
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준액 600만 원 → 300만 원, 1천만 원 이하라 분납 없음 (본문 예시)",
+    "input": {
+      "base": 6000000
+    },
+    "expect": {
+      "half": 3000000,
+      "interim_tax": 3000000,
+      "exempt": false,
+      "installment": 0,
+      "pay_by_nov": 3000000
+    }
+  },
+  {
+    "why": "기준액 2,000만 원 → 1,000만 원: '1천만원을 초과'가 아니라 분납 없음 (제77조 경계)",
+    "input": {
+      "base": 20000000
+    },
+    "expect": {
+      "half": 10000000,
+      "interim_tax": 10000000,
+      "exempt": false,
+      "installment": 0,
+      "pay_by_nov": 10000000
+    },
+    "boundary": true,
+    "notes_include": [
+      "나눠 내지 못하고"
+    ]
+  },
+  {
+    "why": "기준액 20,002,000원 → 10,001,000원: 1천만 원 넘는 1,000원 분납 (시행령 제140조1호)",
+    "input": {
+      "base": 20002000
+    },
+    "expect": {
+      "half": 10001000,
+      "interim_tax": 10001000,
+      "exempt": false,
+      "installment": 1000,
+      "pay_by_nov": 10000000
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준액 3,000만 원 → 1,500만 원: 1천만 원 넘는 500만 원 분납, 11월 1,000만 원 (본문 예시)",
+    "input": {
+      "base": 30000000
+    },
+    "expect": {
+      "half": 15000000,
+      "interim_tax": 15000000,
+      "exempt": false,
+      "installment": 5000000,
+      "pay_by_nov": 10000000
+    },
+    "notes_include": [
+      "1천만 원을 넘는 금액"
+    ]
+  },
+  {
+    "why": "기준액 4,000만 원 → 2,000만 원: 2천만 원 이하라 1,000만 원 분납 (시행령 제140조1호 경계)",
+    "input": {
+      "base": 40000000
+    },
+    "expect": {
+      "half": 20000000,
+      "interim_tax": 20000000,
+      "exempt": false,
+      "installment": 10000000,
+      "pay_by_nov": 10000000
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준액 40,002,000원 → 20,001,000원: 2천만 원 초과라 50% 10,000,500원 분납 (시행령 제140조2호)",
+    "input": {
+      "base": 40002000
+    },
+    "expect": {
+      "half": 20001000,
+      "interim_tax": 20001000,
+      "exempt": false,
+      "installment": 10000500,
+      "pay_by_nov": 10000500
+    },
+    "boundary": true,
+    "notes_include": [
+      "50% 이하"
+    ]
+  },
+  {
+    "why": "기준액 1억 원 → 5,000만 원: 50% 2,500만 원 분납 (본문 예시)",
+    "input": {
+      "base": 100000000
+    },
+    "expect": {
+      "half": 50000000,
+      "interim_tax": 50000000,
+      "exempt": false,
+      "installment": 25000000,
+      "pay_by_nov": 25000000
+    }
+  },
+  {
+    "why": "기준액 0원 → 0원",
+    "input": {
+      "base": 0
+    },
+    "expect": {
+      "half": 0,
+      "interim_tax": 0,
+      "exempt": true,
+      "installment": 0,
+      "pay_by_nov": 0
+    }
+  },
+  {
+    "why": "잘못된 입력 '' → 안내",
+    "expect_error": true,
+    "input": {
+      "base": ""
+    },
+    "expect": {}
+  },
+  {
+    "why": "잘못된 입력 '-1' → 안내",
+    "expect_error": true,
+    "input": {
+      "base": "-1"
+    },
+    "expect": {}
+  },
+  {
+    "why": "잘못된 입력 '1.5' → 안내",
+    "expect_error": true,
+    "input": {
+      "base": "1.5"
+    },
+    "expect": {}
+  },
+  {
+    "why": "잘못된 입력 '2000000000000' → 안내",
+    "expect_error": true,
+    "input": {
+      "base": "2000000000000"
+    },
+    "expect": {}
+  }
+]
