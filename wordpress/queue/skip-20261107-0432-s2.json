@@ -1,0 +1,5 @@
+{"type": "skip", "keywords": [
+ {"keyword": "천왕이펜하우스", "why": "특정 아파트 단지(분양·시세 정보)", "brand": "이펜하우스"},
+ {"keyword": "핀에어비즈니스", "why": "특정 항공사 좌석 상품", "brand": "핀에어"},
+ {"keyword": "전주신시가지이자카야", "why": "음식점 추천 주제"}
+], "law_changes": [], "new_benefits": [], "slot": 2}
