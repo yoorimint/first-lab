@@ -1,0 +1,180 @@
+[
+ {
+  "why": "법 제61조①1호: 높이 10m 이하 부분 1.5m 이상 — 딱 10m (개정 후 신청)",
+  "input": {
+   "mode": "height",
+   "value": 10,
+   "apply": "2026-11-12"
+  },
+  "expect": {
+   "rule": "new",
+   "distance": 1.5
+  },
+  "boundary": true
+ },
+ {
+  "why": "법 제61조①2호: 10m 초과 17m 이하 5m 이상 — 10.01m 이면 5m",
+  "input": {
+   "mode": "height",
+   "value": 10.01,
+   "apply": "2026-11-12"
+  },
+  "expect": {
+   "rule": "new",
+   "distance": 5
+  },
+  "boundary": true
+ },
+ {
+  "why": "법 제61조①2호: 딱 17m 도 5m (17m 이하)",
+  "input": {
+   "mode": "height",
+   "value": 17,
+   "apply": "2026-12-01"
+  },
+  "expect": {
+   "distance": 5
+  },
+  "boundary": true
+ },
+ {
+  "why": "법 제61조①3호: 17m 초과는 높이의 2분의 1 — 17.01m → 8.505m",
+  "input": {
+   "mode": "height",
+   "value": 17.01,
+   "apply": "2026-12-01"
+  },
+  "expect": {
+   "distance": 8.505
+  },
+  "boundary": true
+ },
+ {
+  "why": "본문 예시: 15m 부분, 개정 후 5m (종전 시행령 제86조①2호 15÷2 = 7.5m)",
+  "input": {
+   "mode": "height",
+   "value": 15,
+   "apply": "2026-11-20"
+  },
+  "expect": {
+   "rule": "new",
+   "distance": 5
+  },
+  "notes_include": [
+   "개정으로 이 높이에서는 2.5m 덜 띄워도 돼요."
+  ]
+ },
+ {
+  "why": "부칙 제4조: 시행일(11.12) 전날 신청이면 종전 기준 15÷2 = 7.5m",
+  "input": {
+   "mode": "height",
+   "value": 15,
+   "apply": "2026-11-11"
+  },
+  "expect": {
+   "rule": "old",
+   "distance": 7.5
+  },
+  "boundary": true,
+  "notes_include": [
+   "2026년 11월 12일 전에 허가를 신청했거나 건축신고를 했다면 종전 기준(10m 초과 부분은 높이의 2분의 1)이에요."
+  ]
+ },
+ {
+  "why": "20m 부분은 개정 전후 모두 10m (20÷2)",
+  "input": {
+   "mode": "height",
+   "value": 20,
+   "apply": "2026-11-20"
+  },
+  "expect": {
+   "distance": 10
+  },
+  "notes_exclude": [
+   "개정으로 이 높이에서는"
+  ]
+ },
+ {
+  "why": "거리 → 높이: 경계선에서 5m 자리, 개정 후 17m 까지 (2호 5m 이상이면 17m 이하 부분 가능), 종전은 5×2 = 10m",
+  "input": {
+   "mode": "distance",
+   "value": 5,
+   "apply": "2026-11-20"
+  },
+  "expect": {
+   "max_height": 17
+  },
+  "boundary": true
+ },
+ {
+  "why": "거리 → 높이: 4.99m 자리는 10m 까지 (5m 미만이라 10m 초과 부분 불가)",
+  "input": {
+   "mode": "distance",
+   "value": 4.99,
+   "apply": "2026-11-20"
+  },
+  "expect": {
+   "max_height": 10
+  },
+  "boundary": true
+ },
+ {
+  "why": "거리 → 높이: 10m 자리는 10×2 = 20m (3호)",
+  "input": {
+   "mode": "distance",
+   "value": 10,
+   "apply": "2026-11-20"
+  },
+  "expect": {
+   "max_height": 20
+  }
+ },
+ {
+  "why": "거리 → 높이: 1.49m 자리는 1.5m 미만이라 건축 불가 (0)",
+  "input": {
+   "mode": "distance",
+   "value": 1.49,
+   "apply": "2026-11-20"
+  },
+  "expect": {
+   "max_height": 0
+  },
+  "boundary": true
+ },
+ {
+  "why": "거리 → 높이: 종전 기준 5m 자리 = max(10, 5×2) = 10m",
+  "input": {
+   "mode": "distance",
+   "value": 5,
+   "apply": "2026-11-01"
+  },
+  "expect": {
+   "rule": "old",
+   "max_height": 10
+  }
+ },
+ {
+  "why": "높이 0 은 안내 문장",
+  "input": {
+   "mode": "height",
+   "value": 0,
+   "apply": "2026-11-20"
+  },
+  "expect_error": true
+ },
+ {
+  "why": "종전 기준 신청(2025-01-01)이면 '개정으로 덜 띄워도' 안내가 없어야 함 (15m → 7.5m)",
+  "input": {
+   "mode": "height",
+   "value": 15,
+   "apply": "2025-01-01"
+  },
+  "expect": {
+   "rule": "old",
+   "distance": 7.5
+  },
+  "notes_exclude": [
+   "개정으로 이 높이에서는"
+  ]
+ }
+]

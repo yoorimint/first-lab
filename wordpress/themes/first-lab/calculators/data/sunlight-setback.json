@@ -1,0 +1,29 @@
+{
+ "basis_date": "2026-11-07",
+ "yearly": false,
+ "sources": [
+  {
+   "name": "건축법 제61조제1항 (법률 제21880호, 2026.11.12 시행)·부칙 제4조 적용례",
+   "url": "https://www.law.go.kr/법령/건축법"
+  },
+  {
+   "name": "건축법 시행령 제86조제1항 (종전 기준: 10m 이하 1.5m, 10m 초과 높이의 2분의 1)",
+   "url": "https://www.law.go.kr/법령/건축법시행령"
+  }
+ ],
+ "new_rule_from": "2026-11-12",
+ "new_rule": {
+  "low_height": 10,
+  "low_distance": 1.5,
+  "mid_height": 17,
+  "mid_distance": 5,
+  "high_ratio": 0.5
+ },
+ "old_rule": {
+  "low_height": 10,
+  "low_distance": 1.5,
+  "mid_height": null,
+  "mid_distance": null,
+  "high_ratio": 0.5
+ }
+}
