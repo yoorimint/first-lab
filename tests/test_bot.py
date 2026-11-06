@@ -1709,6 +1709,29 @@ class UpcomingAmendmentTest(unittest.TestCase):
         self.assertIn("upcoming_amendments", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
 
+class JsonListMergeTest(unittest.TestCase):
+    """패치 목록(JSON)을 감시 세션·글쓰기 작업이 동시에 더해도 충돌 없이 합침 (11/6 patches.json 충돌로 push 실패)."""
+
+    def test_git_merge_with_driver(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as d:
+            run = lambda *a: subprocess.run(["git", "-C", d, *a], capture_output=True, text=True, check=True)  # noqa: E731
+            run("init", "-q", "-b", "main"); run("config", "user.email", "t@t"); run("config", "user.name", "t")
+            run("config", "merge.jsonlist.driver", f"python3 {ROOT / 'automation' / 'merge_json_list.py'} %O %A %B")
+            (Path(d) / ".gitattributes").write_text((ROOT / ".gitattributes").read_text(encoding="utf-8"), encoding="utf-8")
+            (Path(d) / "wordpress").mkdir()
+            f = Path(d) / "wordpress" / "patches.json"
+            f.write_text('[\n {"post": 1}\n]\n', encoding="utf-8"); run("add", "-A"); run("commit", "-qm", "base")
+            run("checkout", "-qb", "other"); f.write_text('[\n {"post": 1},\n {"post": 3}\n]\n', encoding="utf-8"); run("commit", "-qam", "o")
+            run("checkout", "-q", "main"); f.write_text('[\n {"post": 1},\n {"post": 2}\n]\n', encoding="utf-8"); run("commit", "-qam", "m")
+            run("merge", "-q", "--no-edit", "other")
+            self.assertEqual([x["post"] for x in json.loads(f.read_text(encoding="utf-8"))], [1, 2, 3])
+
+    def test_wired(self):
+        self.assertIn("merge.jsonlist.driver", (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8"))
+        self.assertIn("merge.jsonlist.driver", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
+
 class DomesticWorkerLawTest(unittest.TestCase):
     """'가사근로자는 근로기준법 제17조가 적용되지 않아요'만 쓰고 가사근로자법 제14조(서면 교부)·제26조(벌금)를 뺌 (11/6 #1036)."""
 

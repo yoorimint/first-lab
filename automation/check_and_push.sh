@@ -5,6 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 msg="${1:?커밋 메시지}"
+# 패치 목록(JSON)은 양쪽 항목 합치기로 병합 (.gitattributes merge=jsonlist, 11/6 감시 세션·글쓰기 작업 동시 추가 충돌)
+git config merge.jsonlist.driver "python3 automation/merge_json_list.py %O %A %B"
 id ci >/dev/null 2>&1 || useradd -M ci
 run_tests() {
   runuser -u ci -- env HOME=/tmp python3 -B -m unittest discover -s tests >/tmp/check_and_push.log 2>&1 \
@@ -17,7 +19,7 @@ git diff --cached --quiet && { echo "바뀐 것 없음"; exit 0; }
 git commit -q -m "$msg"
 pushed=""
 for wait in 2 4 8 16; do
-  git fetch -q origin main && git rebase -q origin/main && run_tests && git push -q origin HEAD:main && { pushed=1; break; }
+  git fetch -q origin main && { git rebase -q origin/main || { git rebase --abort 2>/dev/null; false; }; } && run_tests && git push -q origin HEAD:main && { pushed=1; break; }
   sleep "$wait"
 done
 # 네 번 다 실패하면 성공처럼 끝내지 않음 (11/6 GitHub 'commit_refs_rules' 거부가 4번 반복됐는데 커밋 줄을 찍고 끝나 올라간 줄 앎)
