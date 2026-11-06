@@ -2856,6 +2856,15 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class DeployTimeoutTest(unittest.TestCase):
+    """배포 작업이 GitHub 쪽에서 '진행 중'으로 멈추면 다음 배포가 모두 대기 (11/6 05:43~) → 작업마다 시간 제한."""
+
+    def test_each_job_has_timeout(self):
+        text = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        self.assertEqual(text.count("runs-on: ubuntu-latest"), text.count("timeout-minutes:"))
+        self.assertIn("timeout-minutes: 40", text)
+
+
 class DottedDateNumberTest(unittest.TestCase):
     """주장 속 날짜 '2027.1.1' 이 대조 숫자로 뽑혀 분수 표기 변환에서 float 오류 → 그 글 근거 대조 전체 실패 (11/6 #1023)."""
 
