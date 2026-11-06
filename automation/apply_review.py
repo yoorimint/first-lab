@@ -85,6 +85,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "cross_law_exceptions": lambda: condition_gate.cross_law_exceptions(post["content_html"]),
               "excerpt_qualifiers": lambda: condition_gate.excerpt_qualifiers(post["excerpt"], post["content_html"]),
               "excerpt_caveats": lambda: condition_gate.excerpt_caveats(post["excerpt"], post["content_html"]),
+              "excerpt_parentheticals": lambda: condition_gate.excerpt_parentheticals(post["excerpt"], post["content_html"]),
               "limited_event_year": lambda: condition_gate.limited_event_year(post["excerpt"], post["content_html"]),
               "deadline_holiday": lambda: condition_gate.deadline_holiday(post["content_html"]),
               "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review")),

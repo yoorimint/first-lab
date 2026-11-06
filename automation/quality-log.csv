@@ -48,3 +48,5 @@ date,post,fixes,types
 2026-11-06,289,1,missing_condition:1
 2026-11-06,849,1,missing_condition:1
 2026-11-06,746,2,unverified:2
+2026-11-06,1132,2,wrong_fact:2
+2026-11-06,1134,1,missing_condition:1

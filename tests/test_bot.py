@@ -1648,6 +1648,18 @@ class ProvisoChecklistTest(unittest.TestCase):
         self.assertIn("`automation/review-prompt.md` 의 `---` 아래 지시문 그대로", writer)   # 2번: 독립 검수 = 외부 검수 지시
 
 
+class ExcerptParentheticalTest(unittest.TestCase):
+    """요약이 본문 괄호 속 제외 조건을 뺌 (11/6 #1134 '사망했을 때(유족연금이 나오면 제외)' ↔ 요약 '사망')."""
+
+    def test_parenthetical_condition(self):
+        from bot.condition_gate import excerpt_parentheticals
+        body = "<p>가입자가 사망했을 때(유족연금이 나오면 제외), 국외로 이주했을 때 받아요.</p>"
+        self.assertEqual(len(excerpt_parentheticals("10년 미만, 사망, 국외 이주 때만 받아요.", body)), 1)
+        self.assertEqual(excerpt_parentheticals("사망(유족연금이 나오지 않을 때), 국외 이주 때만 받아요.", body), [])
+        self.assertEqual(excerpt_parentheticals("국외 이주 때 받아요.", body), [])
+        self.assertIn('"excerpt_parentheticals"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+
 class DeadlineHolidayTest(unittest.TestCase):
     """예시 기한이 토·일·공휴일인데 다음 날로 늦춰짐을 안 씀 (11/6 #1126 증여세 '2월 말일까지' — 2027-02-28 일요일·3/1 삼일절)."""
 

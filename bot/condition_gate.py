@@ -221,6 +221,21 @@ def limited_event_year(excerpt: str, body_html: str) -> list[str]:
     return out[:3]
 
 
+# 요약이 본문 괄호 속 제외 조건을 뺌 (11/6 #1134 국민연금 반환일시금: 본문 '사망했을 때(유족연금이 나오면 제외)' ↔ 요약 '사망').
+PAREN_QUAL = re.compile(r"([가-힣]{2,8})(?:했을 때|할 때|일 때|인 때|된 때|한 때)?\(([^()]{2,40}?(?:제외|빼고|없을 때|아닐 때|만 해당|않을 때|안 나올 때|나오면))\)")
+
+
+def excerpt_parentheticals(excerpt: str, body_html: str) -> list[str]:
+    ex, body = _plain(excerpt or ""), _plain(body_html or "")
+    out = []
+    for m in PAREN_QUAL.finditer(body):
+        word, qual = m.group(1), m.group(2)
+        key = next((w for w in re.findall(r"[가-힣]{2,}", qual) if w not in ("제외", "경우", "해당")), "")
+        if word in ex and key and key not in ex:
+            out.append(f"요약의 '{word}' 에 본문 조건 '({qual})' 이 빠짐 — 요약에도 넣기")
+    return list(dict.fromkeys(out))[:2]
+
+
 # 다른 법률이 정한 예외 (같은 꼴 2번 → 검사, 11/6): #989 '4명 이하는 공휴일 유급휴일 아님' ↔ 노동절 제정법(5/1 은 규모 무관 유급휴일),
 # #996 '가사 사용인은 근로기준법 미적용' ↔ 가사근로자법 제6조(인증기관 소속 가사근로자는 적용). 같은 법 안의 특례(exception_articles)로는 못 봄
 # → 자주 쓰는 주제마다 알려진 다른 법 예외를 목록으로: 본문이 그 주제를 말하는데 예외 법의 말이 없으면 경고. 새로 찾으면 여기에 더한다.
