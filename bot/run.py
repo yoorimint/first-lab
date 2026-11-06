@@ -310,7 +310,7 @@ def refresh_dashboard(state: dict, settings: BotSettings) -> None:
         state["candidates"] = ranked_candidates(conn, settings, limit=CANDIDATES_POOL)
     try:  # 대기 글이 많으면 새 글 대신 외부 검수할 글 (bot/review_queue.py)
         from .review_queue import target
-        state["review_target"] = target()
+        state["review_target"] = target(ahead=len(settings.schedule_times) if settings.post_status == "schedule" else 1)
     except Exception:  # noqa: BLE001 - 못 구하면 새 글 쓰기로
         state["review_target"] = None
 

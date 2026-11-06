@@ -164,6 +164,19 @@ def _record_topic_done(data: dict) -> None:
     save_state(state)
 
 
+def mark_prepublished(post_id: int, filename: str) -> None:
+    """재검수한 날 = 파일 이름의 날짜(reviewdone-<번호>-<YYYYMMDD…>), 못 읽으면 오늘. 근거 확인한 날도 그날로 (bot/freshness)."""
+    import re
+    from .review_queue import PREPUBLISH_META
+    m = re.match(r"reviewdone-\d+-(20\d\d)-?(\d\d)-?(\d\d)", filename)
+    try:
+        day = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date() if m else datetime.now().date()
+    except ValueError:
+        day = datetime.now().date()
+    wp_cli("post", "meta", "update", str(post_id), PREPUBLISH_META, f"{day:%Y-%m-%d}")
+    freshness.mark_verified(post_id, day)
+
+
 def skip_keywords(data: dict) -> str:
     """글쓰기 세션이 건너뛴 후보를 '부적합'으로 기록 (월정액 방식의 후보 안전 검사 대신)."""
     items = [i for i in data.get("keywords", []) if str(i.get("keyword", "")).strip()]
@@ -224,6 +237,9 @@ def main() -> None:
             elif data.get("type") == "review_done":  # 글쓰기 작업이 새 글 대신 대기 글을 외부 검수함 (bot/review_queue.py)
                 label = "대기 글 검수(직접)"
                 msg = f"글 {int(data['post_id'])} '{str(data.get('title', ''))[:40]}' 고친 곳 {int(data.get('patches', 0))}개"
+                if data.get("prepublish"):  # 공개 직전 재검수 — 공개가 이 글을 먼저 내보냄 (bot/review_queue.PREPUBLISH_META)
+                    label = "공개 전 재검수(직접)"
+                    mark_prepublished(int(data["post_id"]), path.name)
                 if int((state.get("review_target") or {}).get("post_id", 0) or 0) == int(data["post_id"]):
                     state["review_target"] = None  # 바로 다음 실행이 같은 글을 또 검수하지 않게 (11/5 #690 두 번 검수 — 대상은 1분 봇이 새로 고름)
             elif data.get("type") == "run_done":  # 보류 수정·계산기만 한 실행도 '끝남'으로 (bot/run.DONE_MARKS)

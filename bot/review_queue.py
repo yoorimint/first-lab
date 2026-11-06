@@ -46,8 +46,72 @@ def pick(ready: list[dict], reviewed: set[int], today: str = "") -> dict | None:
     return {**todo[0], "ready": len(ready), "unreviewed": len(todo)} if todo else None
 
 
-def target(today: str | None = None) -> dict | None:
+# ── 공개 직전 재검수 (11/6 운영자 '공개 전에 한 번 더 — 그렇게 만들어라') ──
+# 대기 글은 쓴 지 몇 주 뒤에 공개된다. 공개 직전 확인(bot/freshness.py)은 코드라 숫자 없는 변화(신청 방법·대상 조건)와
+# 해 바뀜(페이지가 2026·2027 값을 같이 보여 줌)을 못 잡는다 → 공개 순서상 다음 글을 글쓰기 작업이 외부 검수와 같은 절차로 다시 본다.
+# 공개(bot/schedule.publish_next)는 재검수를 마친 글을 먼저 내보내고, 재검수된 글이 없으면 예전처럼 코드 확인만으로 공개 (공개가 멈추지 않게).
+PREPUBLISH_META = "_firstlab_prepublish_at"   # 재검수한 날 (bot/publish_queue 가 review_done(prepublish) 받으면 기록)
+PREPUBLISH_FRESH_DAYS = 3                     # 이 기간 안에 재검수했으면 다시 안 함 (넘으면 공개 전에 또)
+
+_PREPUBLISH_PHP = r"""
+$out = array();
+foreach ( array( IDS ) as $id ) {
+    if ( $id ) { $out[ $id ] = (string) get_post_meta( $id, '_firstlab_prepublish_at', true ); }
+}
+echo wp_json_encode( $out );
+"""
+
+
+def fresh(date: str, today: str) -> bool:
+    """재검수가 아직 유효한가 (오늘 포함 PREPUBLISH_FRESH_DAYS 일 안)."""
+    import datetime as dt
+    try:
+        return 0 <= (dt.date.fromisoformat(today) - dt.date.fromisoformat(str(date)[:10])).days <= PREPUBLISH_FRESH_DAYS
+    except ValueError:
+        return False
+
+
+def prepublish_dates(ids: list[int], wp=None) -> dict[int, str]:
+    """초안 번호 → 재검수한 날 ('' = 안 함). 한 번의 조회로."""
+    if not ids:
+        return {}
+    if wp is None:
+        from .settings import wp_cli as wp
+    code = _PREPUBLISH_PHP.replace("IDS", ",".join(str(int(i)) for i in ids))  # 정수만 (runuser 는 환경 변수를 안 넘길 수 있음)
+    try:
+        got = json.loads(wp("eval", code) or "{}")
+    except Exception:  # noqa: BLE001 — 못 읽으면 재검수 안 한 것으로
+        return {}
+    return {int(k): str(v) for k, v in (got.items() if isinstance(got, dict) else [])}
+
+
+def prepublish_pick(order: list[int], dates: dict[int, str], titles: dict[int, str], today: str, ahead: int) -> dict | None:
+    """공개 순서 앞 ahead 편(= 하루 공개 수) 중 재검수가 유효하지 않은 첫 글."""
+    for pid in order[:max(ahead, 1)]:
+        if not fresh(dates.get(pid, ""), today):
+            return {"post_id": pid, "title": titles.get(pid, ""), "kind": "prepublish"}
+    return None
+
+
+def prefer_prepublished(order: list[int], dates: dict[int, str], today: str) -> list[int]:
+    """공개 순서에서 재검수가 유효한 글을 앞으로 (나머지 순서는 그대로)."""
+    return sorted(order, key=lambda pid: not fresh(dates.get(pid, ""), today))
+
+
+def target(today: str | None = None, ahead: int = 1, now=None) -> dict | None:
+    """글쓰기 작업의 대기 글 검수 대상: 공개 직전 재검수가 먼저, 없으면 외부 검수 안 된 대기 글 (12/5 뒤·감시가 밀렸을 때)."""
     import datetime as dt
     from .settings import wp_cli
+    today = today or f"{dt.date.today():%Y-%m-%d}"
     ready = json.loads(wp_cli("eval", _READY_PHP) or "[]")
-    return pick(ready, reviewed_ids(), today or f"{dt.date.today():%Y-%m-%d}")
+    try:
+        from . import schedule
+        ids = [int(r["post_id"]) for r in ready]
+        from zoneinfo import ZoneInfo
+        order = schedule.publish_order(ids, now or dt.datetime.now(ZoneInfo("Asia/Seoul")))
+        got = prepublish_pick(order, prepublish_dates(order[:max(ahead, 1)]), {int(r["post_id"]): r["title"] for r in ready}, today, ahead)
+        if got:
+            return {**got, "ready": len(ready)}
+    except Exception:  # noqa: BLE001 — 순서를 못 구하면 예전 대상만
+        pass
+    return pick(ready, reviewed_ids(), today)

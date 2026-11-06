@@ -2881,6 +2881,62 @@ class DottedDateNumberTest(unittest.TestCase):
         self.assertEqual(len(msgs), 1)
 
 
+class PrepublishReviewTest(unittest.TestCase):
+    """공개 직전 재검수 (11/6 운영자 '공개 전에 한 번 더 — 그렇게 만들어라'): 공개 순서상 다음 글을 글쓰기 작업이 다시 검수,
+    공개는 재검수 마친 글 먼저, 없으면 예전처럼 (공개가 멈추지 않게), 며칠 지나면 다시 (평생 한 번이 아니게)."""
+
+    def test_pick_next_in_publish_order(self):
+        from bot import review_queue as rq
+        order, titles = [30, 10, 20], {30: "가", 10: "나", 20: "다"}
+        got = rq.prepublish_pick(order, {}, titles, "2026-11-06", ahead=2)
+        self.assertEqual((got["post_id"], got["kind"]), (30, "prepublish"))
+        got = rq.prepublish_pick(order, {30: "2026-11-06"}, titles, "2026-11-06", ahead=2)
+        self.assertEqual(got["post_id"], 10)
+        self.assertIsNone(rq.prepublish_pick(order, {30: "2026-11-06", 10: "2026-11-05"}, titles, "2026-11-06", ahead=2))
+        # 하루 공개 수(ahead) 밖의 글은 아직 안 함
+        self.assertIsNone(rq.prepublish_pick(order, {30: "2026-11-06"}, titles, "2026-11-06", ahead=1))
+
+    def test_review_expires(self):
+        from bot import review_queue as rq
+        self.assertTrue(rq.fresh("2026-11-03", "2026-11-06"))
+        self.assertFalse(rq.fresh("2026-11-02", "2026-11-06"))
+        self.assertFalse(rq.fresh("", "2026-11-06"))
+        got = rq.prepublish_pick([30], {30: "2026-10-20"}, {}, "2026-11-06", ahead=1)
+        self.assertEqual(got["post_id"], 30)  # 오래전 재검수 → 다시
+
+    def test_publish_prefers_reviewed_but_never_stalls(self):
+        from bot import review_queue as rq
+        self.assertEqual(rq.prefer_prepublished([30, 10, 20], {20: "2026-11-06"}, "2026-11-06"), [20, 30, 10])
+        self.assertEqual(rq.prefer_prepublished([30, 10, 20], {}, "2026-11-06"), [30, 10, 20])  # 재검수 없으면 그대로 공개
+
+    def test_dates_read_in_one_call(self):
+        from bot import review_queue as rq
+        calls = []
+        got = rq.prepublish_dates([5, 6], wp=lambda *a: calls.append(a) or '{"5": "2026-11-06", "6": ""}')
+        self.assertEqual(got, {5: "2026-11-06", 6: ""})
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(rq.prepublish_dates([5], wp=lambda *a: (_ for _ in ()).throw(RuntimeError())), {})
+
+    def test_done_file_marks_post(self):
+        from unittest import mock
+        from bot import publish_queue
+        calls = []
+        with mock.patch.object(publish_queue, "wp_cli", lambda *a: calls.append(a) or ""), \
+                mock.patch.object(publish_queue.freshness, "mark_verified", lambda pid, when=None: calls.append(("verified", pid, str(when)))):
+            publish_queue.mark_prepublished(2015, "reviewdone-2015-20261106-1430.json")
+            publish_queue.mark_prepublished(7, "reviewdone-7-2026-11-07-0910.json")
+        self.assertIn(("post", "meta", "update", "2015", "_firstlab_prepublish_at", "2026-11-06"), calls)
+        self.assertIn(("verified", 2015, "2026-11-06"), calls)
+        self.assertIn(("post", "meta", "update", "7", "_firstlab_prepublish_at", "2026-11-07"), calls)
+
+    def test_wired_in(self):
+        sched = (ROOT / "bot" / "schedule.py").read_text(encoding="utf-8")
+        self.assertIn("prefer_prepublished", sched)
+        self.assertIn("mark_prepublished", (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
+        self.assertIn("target(ahead=", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
+        self.assertIn('"prepublish": true', (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
+
 class PlanCountTest(unittest.TestCase):
     """예약 공개 시각 줄 수 = 오늘 공개 계획 수 = 하루 공개 수 (11/6 운영자 '3개 넣으면 3개, 4개 넣으면 4개')."""
 

@@ -36,14 +36,15 @@ curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/
 - **배포가 막혔으면 그것부터**: 응답의 `deploy_alert` 가 있으면 GitHub 검사와 같게 root 가 아닌 사용자로 `useradd -M ci 2>/dev/null; runuser -u ci -- env HOME=/tmp python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` 를 돌려 (root 로는 권한 문제가 안 보임) 실패한 검사를 고쳐(대개 지난 실행이 올린 파일) 커밋·main 에 올리고, 그 뒤에 아래를 한다. 못 고치면 보고 첫 줄에 "배포 막힘: <실패한 검사>". 검사가 모두 통과하면 GitHub 쪽 문제(결제·한도 등)라 고칠 것이 없다 — 보고 첫 줄 "배포 막힘: GitHub 쪽(검사 통과)" 만 쓰고 바로 다음 일.
 - **고친 내용이 안 들어간 글**: 응답의 `patch_problems` 가 있으면 첫 항목의 글(글 번호)을 `python3 automation/unreviewed.py <번호>` 로 받아, 그 문구를 고친 본문으로 6단계 갱신 파일(`refresh`, `base_modified` 는 응답 대신 받은 글의 값)을 올린다.
 - **대기 글 검수** (`review_target` 이 있고 실행 순서상 차례일 때 — 새 글은 안 씀):
-  0. 그 글 번호가 저장소 `automation/reviewed.txt` 에 이미 있으면 앞 실행이 끝낸 것 — 검수하지 말고 다음 무거운 일로
+  0. 그 글 번호가 저장소 `automation/reviewed.txt` 에 이미 있으면 앞 실행이 끝낸 것 — 검수하지 말고 다음 무거운 일로.
+     **단 `review_target.kind` 가 `"prepublish"`(공개 직전 재검수)면 reviewed.txt 에 있어도 검수한다** — 곧 공개될 글을 오늘 공식 자료로 다시 본다 (쓴 뒤 바뀐 금액·요율·신청 방법, 해가 바뀐 값). 같은 글의 `reviewdone-<post_id>-<오늘 날짜>…` 파일이 이미 저장소에 있으면 앞 실행이 끝낸 것
   1. `python3 automation/unreviewed.py <post_id>` 로 본문 받기 (`/tmp/firstlab-review/post-<id>.json`)
   2. `automation/review-prompt.md` 의 `---` 아래 지시문에 그 파일 경로와 오늘 날짜를 넣어 하위 에이전트 1개에게 검수 (모델 지정 안 함)
   3. 검수자가 '틀림'이라 한 곳은 근거 원문을 **내가 직접 열어** 확인한 뒤에만 고친다. 못 열면 '○○에서 확인하세요'로 완화. 공식 페이지에서 확인된 숫자는 지우지 않는다 (도구가 막음)
   4. 패치 목록 JSON: `[{"type": <automation/error_types.json 의 유형 하나>, "why": "근거 한 줄", "find": "본문에 딱 한 번 있는 문구", "replace_paragraph": "그 문단(p·li·tr) 안쪽 전체", "tag": "p|li|tr", "prevention": "check:<검사 이름> 또는 review_only:<코드로 못 막는 이유>"}]` (제목은 `{"type", "why", "set_title", "prevention"}`)
      - prevention 필수 (재발 방지 없이 고치지 않는다): 이 오류를 다음부터 잡는 검사 이름(`bot/condition_gate.py`·`review_gate.py` 의 함수) — 기존 검사가 못 잡았으면 검사를 고치고 이 글을 테스트 사례로 넣은 뒤 그 이름. 사실 자체가 틀린 것(wrong_fact·outdated·missing_condition)만 review_only 가능 — apply_review 가 검사함
   5. `python3 automation/apply_review.py <post_id> "<제목>" <패치.json>` (고칠 곳이 없으면 패치 파일 없이) — 오류가 나오면 그 문구대로 패치를 고쳐 다시
-  6. `wordpress/queue/reviewdone-<post_id>-<날짜시각>.json` = `{"type": "review_done", "post_id": <id>, "title": "<제목>", "patches": <고친 곳 수>}`
+  6. `wordpress/queue/reviewdone-<post_id>-<YYYYMMDD-HHMM>.json` = `{"type": "review_done", "post_id": <id>, "title": "<제목>", "patches": <고친 곳 수>}` (공개 직전 재검수면 `"prepublish": true` 도 — 서버가 그 글을 먼저 공개)
   7. 커밋에 `wordpress/queue wordpress/patches.json automation/reviewed.txt automation/common-errors.md automation/review-only-log.md` (검사를 고쳤으면 `bot/ tests/` 도) 를 **모두** 넣는다 (빠지면 같은 글을 매번 다시 검수함)
 - `candidates` 는 점수순 후보다. 위에서부터 보고 아래에 해당하면 건너뛴다:
   - 날마다 값이 바뀌는 시세·가격(예: 오늘의 금 시세, 농산물 가격) — 글이 금방 틀린 정보가 됨

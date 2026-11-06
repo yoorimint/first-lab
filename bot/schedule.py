@@ -123,6 +123,10 @@ def publish_next(now_kst: datetime) -> str | None:
     if not ids:
         return None
     ordered = publish_order(ids, now_kst, photo_tiebreak=True)
+    # 공개 직전 재검수(bot/review_queue)를 마친 글을 먼저 — 없으면 순서 그대로 (공개가 멈추지 않게)
+    from . import review_queue
+    today = f"{now_kst:%Y-%m-%d}"
+    ordered = review_queue.prefer_prepublished(ordered, review_queue.prepublish_dates(ordered, wp_cli), today)
     held = []
     post_id = None
     for candidate in ordered[:MAX_FRESH_CHECKS]:
