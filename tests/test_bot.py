@@ -1242,6 +1242,56 @@ echo firstlab_calc_rates(getenv('FL_DATA'));
         self.assertEqual(self.rates("/data/vat.json"), raw)
 
 
+class BenefitDetailTest(unittest.TestCase):
+    """정부24 혜택 원문(공공서비스 API 상세)으로 혜택 글 대조 (11/6 운영자 '가진 API 다 써서 더 정확하게' 1번).
+    #872: 문의처 번호가 원문(성평등가족부 02-2100-6313)과 달랐는데 근거 대조는 화면만 봤음."""
+
+    DETAIL = {"서비스명": "위기청소년 특별 지원", "문의처": "성평등가족부/02-2100-6313", "지원내용": "생활지원 월 65만원 이하",
+              "공무원확인구비서류": "해당없음", "온라인신청사이트URL": None}
+
+    def test_service_ids_from_gov24_urls(self):
+        from bot import benefit_detail as bd
+        urls = ["https://www.gov.kr/portal/rcvfvrSvc/dtlEx/WII000001600", "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/WII000001600?x=1",
+                "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/627000000759", "https://x.go.kr/a?svcId=ABC1234567", "https://www.law.go.kr/법령/a"]
+        self.assertEqual(bd.service_ids(urls), ["WII000001600", "627000000759", "ABC1234567"])
+
+    def test_text_has_fields_and_age(self):
+        from bot import benefit_detail as bd
+        calls = []
+
+        def fetch(path, **kw):
+            calls.append((path, kw))
+            return {"data": [self.DETAIL if path == "serviceDetail" else {"JA0110": 9, "JA0111": 24, "JA0101": "Y"}]}
+        text = bd.detail_text("WII000001600", fetch=fetch)
+        self.assertIn("문의처: 성평등가족부/02-2100-6313", text)
+        self.assertIn("대상 나이: 9세~24세", text)
+        self.assertNotIn("해당없음", text)                        # 비어 있는 항목은 뺌
+        self.assertEqual(calls[0], ("serviceDetail", {"cond[서비스ID::EQ]": "WII000001600"}))
+        self.assertIsNone(bd.detail_text("X", fetch=lambda path, **kw: {"data": []}))
+
+    def test_source_check_compares_with_official_text(self):
+        from bot import benefit_detail, source_check
+        with mock.patch.object(benefit_detail, "detail_text", return_value="문의처: 02-2100-6313 지원금액 월 65만원"), \
+             mock.patch.object(source_check, "_fetch", return_value=None):      # 화면은 못 읽어도
+            text = source_check.fetch("https://www.gov.kr/portal/rcvfvrSvc/dtlEx/WII000001600")
+        self.assertIn("02-2100-6313", text)
+        review = [{"claim": "문의는 02-2100-6313", "urls": ["https://www.gov.kr/portal/rcvfvrSvc/dtlEx/WII000001600"], "verdict": "맞음", "action": "유지"},
+                  {"claim": "문의는 031-8008-2591", "urls": ["https://www.gov.kr/portal/rcvfvrSvc/dtlEx/WII000001600"], "verdict": "맞음", "action": "유지"}]
+        result = source_check.check(review, fetcher=lambda u: text)
+        self.assertEqual(result["counts"]["확인"], 1)
+        self.assertEqual(result["counts"]["페이지에 없음"], 1)              # #872 경기도 번호
+
+    def test_reviewer_gets_official_text(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import unreviewed
+        post = {"content_html": '<a href="https://www.gov.kr/portal/rcvfvrSvc/dtlEx/WII000001600">정부24</a>',
+                "source_check": {"found": [{"urls": ["https://www.gov.kr/portal/rcvfvrSvc/dtlEx/627000000759"]}]}}
+        got = unreviewed.benefit_details(post, detail_text=lambda sid: f"원문 {sid}" if sid != "627000000759" else None)
+        self.assertEqual(got, {"WII000001600": "원문 WII000001600"})
+        self.assertIn("benefit_detail", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
+        self.assertIn("python3 -m bot.benefit_detail", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
+
 class CalcHomeTest(unittest.TestCase):
     """계산기 대표 글 (11/6 운영자): 계산기를 넣은 공개 글이 있으면 단독 페이지는 그 글로 301·목록 링크도 그 글·사이트맵에서 뺌.
     공개 글이 없으면 단독 페이지가 그대로 (계산기가 사라지지 않게)."""

@@ -137,11 +137,18 @@ def _raw(url: str) -> tuple[bytes, str | None, str] | None:
 
 
 def fetch(url: str) -> str | None:
-    """law.go.kr 본문은 같은 날 다시 받지 않음 (condition_gate._cached) — 근거 대조를 여러 번 돌려도 빠르게."""
+    """law.go.kr 본문은 같은 날 다시 받지 않음 (condition_gate._cached) — 근거 대조를 여러 번 돌려도 빠르게.
+    정부24 혜택 주소는 화면 글자에 공공서비스 API 상세 원문을 더함 (bot/benefit_detail, 11/6)."""
     if "law.go.kr" in urllib.parse.unquote(url):
         from .condition_gate import _cached
         return _cached("page", url, lambda: _fetch(url))
-    return _fetch(url)
+    from .benefit_detail import detail_text, service_ids
+    ids = service_ids([url])
+    official = (detail_text(ids[0]) or "") if ids else ""
+    page = _fetch(url)
+    if official:
+        return f"{page or ''} {official.replace(',', '')}".strip()
+    return page
 
 
 def _fetch(url: str) -> str | None:

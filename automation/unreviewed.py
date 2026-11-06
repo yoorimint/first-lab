@@ -20,6 +20,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))  # bot 모듈 (정부24 혜택 원문)
 REVIEWED = ROOT / "automation" / "reviewed.txt"
 BASE = "https://first-lab.kr/wp-json/firstlab/v1"
 OUT_DIR = Path(tempfile.gettempdir()) / "firstlab-review"  # 검수자에게 줄 본문 (저장소 밖)
@@ -71,12 +72,25 @@ def cited_urls(post: dict) -> list[str]:
     return list(dict.fromkeys(str(u) for u in urls))
 
 
+def benefit_details(post: dict, detail_text=None) -> dict[str, str]:
+    """글이 근거로 단 정부24 혜택의 공식 원문 (공공서비스 API, bot/benefit_detail) — 검수자가 화면 대신 원본을 인용 (11/6)."""
+    from bot.benefit_detail import detail_text as _detail, service_ids
+    links = re.findall(r'href="([^"]+)"', post.get("content_html", ""))
+    out = {}
+    for sid in service_ids(cited_urls(post) + links):
+        text = (detail_text or _detail)(sid)
+        if text:
+            out[sid] = text
+    return out
+
+
 def save_body(post_id: int) -> Path:
     """서버의 지금 본문을 JSON 파일로 (title, excerpt, content_html, cited_urls)."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     path = OUT_DIR / f"post-{post_id}.json"
     post = _get(f"/post/{post_id}")
     post["cited_urls"] = cited_urls(post)
+    post["benefit_detail"] = benefit_details(post)
     path.write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
     return path
 
