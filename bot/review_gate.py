@@ -146,6 +146,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.lead_thresholds(excerpt, body_html)
     out += condition_gate.title_qualifier(title, body_html)
     out += condition_gate.title_length(title)
+    out += condition_gate.calc_coverage(body_html)
     out += condition_gate.lead_minimums(excerpt, body_html)
     out += condition_gate.variant_only(body_html)
     out += condition_gate.law_absence(body_html)

@@ -143,6 +143,25 @@ def title_length(title: str) -> list[str]:
     return [f"제목 {n}자 — {TITLE_MAX}자 이하로 (검색 결과에서 뒤가 잘림). 키워드+찾는 말+핵심 숫자 1개, 덜 중요한 숫자는 요약문·본문으로"] if n > TITLE_MAX else []
 
 
+# 계산기 데이터가 다루는 기간 (11/6 #989 근무일수: 공휴일 목록이 2026~2027년뿐인데 글은 '대체공휴일까지 반영해 바로 세어 줘요' —
+# 다른 해 날짜를 넣으면 공휴일이 빠진 값). data 에 holiday_from·holiday_to 가 있으면 본문에 그 기간('2026~2027년')이 있어야 함.
+CALC_DATA_DIR = Path(__file__).resolve().parent.parent / "wordpress" / "themes" / "first-lab" / "calculators" / "data"
+
+
+def calc_coverage(body_html: str, data_dir: Path = CALC_DATA_DIR) -> list[str]:
+    out = []
+    for calc_id in dict.fromkeys(re.findall(r'\[firstlab_calc id="([a-z0-9-]+)"', body_html or "")):
+        try:
+            data = json.loads((data_dir / f"{calc_id}.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        start, end = str(data.get("holiday_from", ""))[:4], str(data.get("holiday_to", ""))[:4]
+        # '2026·2027년 월별 표' 같은 제목은 기간 안내가 아님 → '2026~2027년 … 공휴일' 처럼 범위와 공휴일을 같이
+        if start and end and not re.search(rf"{start}\s*[~∼-]\s*{end}년[^.]{{0,25}}공휴일", _plain(body_html)):
+            out.append(f"계산기 {calc_id} 의 공휴일 목록은 {start}~{end}년뿐 — 본문에 '{start}~{end}년 공휴일만 반영'처럼 기간을 밝히기")
+    return out
+
+
 # 첫 문단이 규칙을 그냥 말하는데(긍정 단정) 예외는 아래(FAQ 등)에만 — 11/5 #821·#828, 11/6 #928 '과태료 5회분' ↔ FAQ '전세사기피해주택은
 # 과태료 부과 안 함'. 같은 꼴 3번 → 검사. 저장소 글 120편 실측 6편 걸림(맞는 것 1~2) → 공개를 막지 않고 글쓰기 사전 점검 경고로만.
 EXCEPT_WORDS = re.compile(r"(제외|그러하지 아니|부과하지 않|적용하지 않|지지 않)")

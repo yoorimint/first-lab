@@ -3261,6 +3261,22 @@ class LogNoiseTest(unittest.TestCase):
         self.assertGreaterEqual(st.MAX_LOG, 100)
 
 
+class CalcCoverageTest(unittest.TestCase):
+    """11/6 #989 근무일수 계산기: 공휴일 목록이 2026~2027년뿐인데 글은 '대체공휴일까지 반영해 바로 세어 줘요' → 본문에 기간을 밝혀야 통과."""
+
+    def test_holiday_range_must_be_stated(self):
+        import tempfile
+        from bot.condition_gate import calc_coverage
+        d = Path(tempfile.mkdtemp())
+        (d / "work-days.json").write_text(json.dumps({"holiday_from": "2026-01-01", "holiday_to": "2027-12-31"}), encoding="utf-8")
+        body = '<p>2026·2027년 월별 근무일수</p><p>[firstlab_calc id="work-days"]</p><p>계산기는 관공서 공휴일만 빼요.</p>'
+        self.assertEqual(len(calc_coverage(body, d)), 1)                      # 표 제목 '2026·2027년'은 기간 안내가 아님
+        fixed = body.replace("관공서 공휴일만", "2026~2027년 관공서 공휴일·대체공휴일만")
+        self.assertEqual(calc_coverage(fixed, d), [])
+        self.assertEqual(calc_coverage('<p>[firstlab_calc id="vat"]</p>', d), [])   # 기간 없는 계산기는 상관없음
+        self.assertIn("calc_coverage(body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
 class RegateTest(unittest.TestCase):
     """11/6 #980: 검사 쪽 오탐(공식 주소 목록 누락)으로 보류·포기된 글 — 배포 때 지금 코드로 다시 검사해 통과하면 바로 공개 대기열로."""
 
