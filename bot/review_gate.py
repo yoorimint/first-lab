@@ -152,6 +152,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.law_absence(body_html)
     out += condition_gate.excerpt_apply_date(excerpt, body_html)
     out += condition_gate.exception_articles(review, law_fetcher)
+    out += condition_gate.article_provisos(review, law_fetcher)
     out += condition_gate.transition_rules(review, body_html)
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:

@@ -1581,6 +1581,40 @@ class AppendOnlyMergeTest(unittest.TestCase):
             self.assertEqual(sorted(f.read_text(encoding="utf-8").split("\n")[:3]), ["1 a", "2 b", "calc:x"])
 
 
+class ProvisoChecklistTest(unittest.TestCase):
+    """근거 조문의 단서·예외 확인표 (11/6 운영자 '품질 1개 미만 — 1,2번 만들어라'): 외부 검수가 고친 곳의 74%가 빠진 조건·예외."""
+
+    ART = {"제41조의2": "제41조의2(소득월액의 조정 등) ① 가입자는 조정을 신청할 수 있다. "
+                        "⑧ 제1항에도 불구하고 간이지급명세서가 제출된 경우에는 증명서류를 첨부한 것으로 본다. "
+                        "다만, 공단이 누락ㆍ오류 등으로 확인할 수 없는 경우에는 그러하지 아니하다."}
+    URL = "https://www.law.go.kr/법령/국민건강보험법시행령/제41조의2"
+
+    def review(self, *extra):
+        return [{"claim": "간이지급명세서가 제출되면 증빙 첨부로 봐요 (국민건강보험법시행령 제41조의2)",
+                 "verdict": "맞음", "action": "유지", "urls": [self.URL]}, *extra]
+
+    def test_each_proviso_needs_a_record(self):
+        from bot.condition_gate import article_provisos
+        got = article_provisos(self.review(), articles_of=lambda base: self.ART)
+        self.assertEqual(len(got), 2)                       # ⑧ '에도 불구하고', 다만 단서
+        self.assertIn("단서2", got[1])
+        done = [{"claim": "제41조의2 단서1 반영 — 둘째 문단", "verdict": "맞음", "action": "유지", "urls": [self.URL]},
+                {"claim": "제41조의2 단서2 반영 — 요약과 둘째 문단 '다만 누락·오류'", "verdict": "맞음", "action": "유지", "urls": [self.URL]}]
+        self.assertEqual(article_provisos(self.review(*done), articles_of=lambda base: self.ART), [])
+        half = [done[0], {"claim": "제41조의2 단서2", "verdict": "맞음", "action": "유지", "urls": [self.URL]}]
+        self.assertEqual(len(article_provisos(self.review(*half), articles_of=lambda base: self.ART)), 1)  # 반영/해당 없음 말이 있어야
+
+    def test_unreadable_law_does_not_block(self):
+        from bot.condition_gate import article_provisos
+        self.assertEqual(article_provisos(self.review(), articles_of=lambda base: {}), [])
+
+    def test_wired(self):
+        self.assertIn("article_provisos", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+        writer = (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8")
+        self.assertIn("python3 -m bot.provisos", writer)
+        self.assertIn("`automation/review-prompt.md` 의 `---` 아래 지시문 그대로", writer)   # 2번: 독립 검수 = 외부 검수 지시
+
+
 class DomesticWorkerLawTest(unittest.TestCase):
     """'가사근로자는 근로기준법 제17조가 적용되지 않아요'만 쓰고 가사근로자법 제14조(서면 교부)·제26조(벌금)를 뺌 (11/6 #1036)."""
 

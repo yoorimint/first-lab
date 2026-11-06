@@ -351,6 +351,59 @@ def exception_articles(review: list[dict] | None, articles_of=None) -> list[str]
     return out
 
 
+# 근거 조문 안의 단서·예외 문장 확인표 (11/6 운영자 '품질 1개 미만으로 — 1번 만들어라'): 외부 검수가 고친 곳의 74%가 '빠진 조건·예외'이고
+# 대부분 글이 근거로 단 조문의 '다만 …'·'…은 제외한다'·'…에도 불구하고'였다 (#1026 시행령 제41조의2⑧ 단서, #1051 등).
+# → 근거 조문마다 단서를 번호로 뽑아(bot.provisos 가 같은 번호로 보여 줌) 검수 기록에 '<조문> 단서N 반영/해당 없음 — 이유' 가 있어야 통과.
+PROVISO_LIMIT = 6          # 조문 하나에서 확인할 단서 수 (앞에서부터)
+PROVISO_MAX_MSGS = 8
+PROVISO_DONE = re.compile(r"(반영|해당 ?없음|무관)")
+
+
+def cited_articles(review: list[dict] | None) -> list[tuple[str, str]]:
+    """검수 기록이 근거로 단 (법령 본문 주소, 조문) — 맞음·유지 주장만, '해당 없음' 확인 항목은 뺌."""
+    from . import source_check
+    from .review_gate import _ok
+    out = []
+    for item in review or []:
+        if not _ok(item) or PROVISO_DONE.search(str(item.get("claim", ""))) and "단서" in str(item.get("claim", "")):
+            continue
+        if "해당 없음" in str(item.get("claim", "")):
+            continue
+        for url in item.get("urls", []):
+            if "law.go.kr" in str(url):
+                art = source_check.claim_article(item, str(url))
+                key = (source_check.law_page(str(url)), art)
+                if art and key not in out:
+                    out.append(key)
+    return out
+
+
+def provisos_of(review: list[dict] | None, articles_of=None) -> list[tuple[str, str, int, str]]:
+    """[(법령 이름, 조문, 번호, 단서 문장)] — 번호는 1부터 (글쓰기 세션 python3 -m bot.provisos 와 같은 번호)."""
+    from .source_check import exceptions_in
+    articles_of = articles_of or law_articles
+    cache, out = {}, []
+    for base, art in cited_articles(review):
+        if base not in cache:
+            cache[base] = articles_of(base) or {}
+        name = urllib.parse.unquote(base).rsplit("/", 1)[-1]
+        for k, x in enumerate(exceptions_in(cache[base].get(art, ""), limit=PROVISO_LIMIT), 1):
+            out.append((name, art, k, x))
+    return out
+
+
+def article_provisos(review: list[dict] | None, articles_of=None) -> list[str]:
+    """확인 안 한 단서 (검수 기록에 '<조문> 단서N' + 반영/해당 없음 이 없는 것). 조문을 못 읽으면 막지 않음."""
+    claims = [str(i.get("claim", "")) for i in review or []]
+    out = []
+    for name, art, k, x in provisos_of(review, articles_of):
+        key = re.compile(rf"{re.escape(art)}(?![의\d])\s*단서\s*{k}(?!\d)")
+        if not any(key.search(c) and PROVISO_DONE.search(c) for c in claims):
+            out.append(f"{name[:20]} {art} 단서{k} 확인 안 함: '{x[:60]}' — 글에 반영하고 검수 기록에 '{art} 단서{k} 반영 — 어디', "
+                       f"관계없으면 '{art} 단서{k} 해당 없음 — 이유' (python3 -m bot.provisos 글.json)")
+    return out[:PROVISO_MAX_MSGS]
+
+
 # 요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762 '…남기면, 12개월 근무 뒤 남은 구직급여의 절반을 받아요' ↔ 본문 '못 받는 경우' 목록)
 EXCLUSION_HEAD = re.compile(r"<h[23][^>]*>([^<?]*(?:못 받|받을 수 없|제외|안 되는|대상이 아닌|지원 안|불가)[^<?]*)</h[23]>")  # 묻는 제목(…나요?) 제외
 PROMISE = re.compile(r"(받아요|받을 수 있어요|지원돼요|돌려받아요|지원받아요)")
