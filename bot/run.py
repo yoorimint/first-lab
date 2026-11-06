@@ -382,6 +382,16 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001 - 사진 실패가 글 작성·공개를 막지 않게
             add_log(state, False, f"사진 채우기 실패: {str(e)[:150]}")
 
+    # 근거 기록 없는 공개 대기 글 다시 대조 (bot/hold.missing_evidence) — 10분마다 1편. 배포 때 10편씩 하던 것을 옮김
+    # (11/6: 공식 페이지를 여는 일이라 배포 '서버 적용'이 7분 넘게 걸리고, 그동안 다음 배포·글쓰기 끝 처리가 밀림)
+    if now.minute % 10 == 7:
+        try:
+            from . import hold
+            for msg in hold.missing_evidence(*hold.ready_without_record(), limit=1):
+                add_log(state, True, f"근거 기록 채우기: {msg}")
+        except Exception as e:  # noqa: BLE001
+            add_log(state, False, f"근거 기록 채우기 실패: {str(e)[:150]}")
+
     # 매일 점검: 공개 대기 글 재검수·기록 점검 (Claude 예약 작업을 점검 모드로 실행, automation/maintenance.md)
     if settings.write_mode == "direct" and settings.maint_times:
         fired = state.get("maint_fired", {}).get(today, [])

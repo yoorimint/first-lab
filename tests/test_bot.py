@@ -2880,6 +2880,11 @@ class DottedDateNumberTest(unittest.TestCase):
         self.assertEqual(done, [1023])
         self.assertEqual(len(msgs), 1)
 
+    def test_refill_not_in_deploy(self):
+        """배포 '서버 적용'에서 공식 페이지를 열면 배포가 7분 넘게 걸림 (11/6) → 봇 10분 주기로."""
+        self.assertNotIn("missing_evidence(", (ROOT / "bot" / "hold.py").read_text(encoding="utf-8").split("def main")[1])
+        self.assertIn("hold.missing_evidence(*hold.ready_without_record(), limit=1)", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
+
 
 class ExcerptCaveatTest(unittest.TestCase):
     """요약이 본문 규칙만 옮기고 바로 뒤 '다만 …' 단서를 뺌 (11/6 #1026 해촉증명서 간이지급명세서)."""

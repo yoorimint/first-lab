@@ -145,7 +145,7 @@ MAX_REFILL = 10  # 한 번 배포에 다시 대조할 글 수 (공식 페이지�
 
 def missing_evidence(ready: list[dict], recorded: set[int], review_of=latest_review, record=None, limit: int = MAX_REFILL) -> list[str]:
     """공개 대기 글 중 근거 대조 기록이 없는 글을 저장소 검수 기록으로 다시 대조해 채움 (11/6 #1023: 대조 코드 오류로
-    기록이 안 남음 → 공개 직전 '쓸 때 확인된 숫자가 아직 페이지에 있는지' 확인이 빠짐). 배포마다 돌아 고친 코드로 다시."""
+    기록이 안 남음 → 공개 직전 '쓸 때 확인된 숫자가 아직 페이지에 있는지' 확인이 빠짐). 봇이 10분마다 1편씩 고친 코드로 다시."""
     record = record or (lambda pid, review: source_check.record(pid, review, lambda p, k, v: wp_cli("post", "meta", "update", p, k, v)))
     out = []
     for r in ready:
@@ -170,11 +170,7 @@ def ready_without_record() -> tuple[list[dict], set[int]]:
 
 def main() -> None:
     from .state import add_log, load_state, save_state
-    msgs = regate(held_drafts())
-    try:
-        msgs += missing_evidence(*ready_without_record())
-    except Exception as e:  # noqa: BLE001 - 기록 채우기 실패가 배포를 막지 않게
-        msgs.append(f"근거 기록 채우기 실패: {str(e)[:80]}")
+    msgs = regate(held_drafts())  # 근거 기록 채우기는 배포 때가 아니라 봇 10분마다 1편 (bot/run.py — 배포가 길어져 밀림, 11/6)
     if msgs:
         state = load_state()
         for m in msgs:
