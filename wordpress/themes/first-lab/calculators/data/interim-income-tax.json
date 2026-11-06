@@ -1,4 +1,5 @@
 {
+  "law_checked": ["소득세법|2027-01-01"],
   "basis_date": "2026-11-06", "yearly": false,
   "max_input": 1000000000000,
   "won10_keys": ["half", "interim_tax", "installment", "pay_by_nov"],
