@@ -2496,6 +2496,17 @@ class ConditionGateTest(unittest.TestCase):
         self.assertEqual(g.headline_scope("설날 2월 17일", "", "<p>2026년 설날은 2월 17일, 음력 1월 1일이에요.</p>"), [])  # 날짜 자체는 비교 안 함
         self.assertEqual(g.headline_scope("연차 15일", "", "<p>1년 80% 출근하면 15일이에요.</p>"), [])     # 조건 없는 값
 
+    def test_alternative_in_other_article(self):
+        """11/6 #960: 부동산등기규칙 제60조의2 '제60조에 따라 인감증명을 제출하여야 하는 자는 … 대신 … 본인서명사실확인서' —
+        글이 '인감증명이 필요해요'만 세 곳에 씀. '제N조에 따라 … 대신' 조문도 특례로 확인하게."""
+        from bot import condition_gate as g
+        law = {"제60조": "제60조(인감증명의 제출) ① 다음 각 호의 인감증명을 제출하여야 한다.",
+               "제60조의2": "제60조의2(본인서명사실확인서 또는 전자본인서명확인서 발급증의 제출) 제60조에 따라 인감증명을 제출하여야 하는 자는 "
+                           "인감증명을 제출하는 대신 신청서 등에 서명을 하고 본인서명사실확인서를 제출할 수 있다.",
+               "제61조": "제61조(인감증명 등의 유효기간) 제60조에 따른 인감증명은 발행일부터 3개월 이내의 것이어야 한다."}
+        self.assertEqual(g.related_exceptions(law, "제60조"),
+                         [("제60조의2", "본인서명사실확인서 또는 전자본인서명확인서 발급증의 제출")])   # 제61조('에 따른')는 아님
+
     def test_exception_in_other_article(self):
         from bot import condition_gate as g
         law = {"제53조": "제53조(증여재산 공제) 거주자가 증여를 받은 경우에는 다음 각 호의 금액을 공제한다.",

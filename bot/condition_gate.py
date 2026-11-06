@@ -170,7 +170,10 @@ def related_exceptions(articles: dict[str, str], article: str) -> list[tuple[str
     for num, text in (articles or {}).items():
         if num == article:
             continue
-        if re.search(rf"{re.escape(article)}(?![의\d])[^.]{{0,40}}?{EXCEPTION_REF}", text or ""):
+        if (re.search(rf"{re.escape(article)}(?![의\d])[^.]{{0,40}}?{EXCEPTION_REF}", text or "")
+                # '제N조에 따라 …하여야 하는 자는 … 대신 …할 수 있다' — 다른 방법을 허용하는 조문 (11/6 #960 부동산등기규칙 제60조의2:
+                # 인감증명 대신 본인서명사실확인서, 글이 '인감증명이 필요해요'만 세 곳에 씀)
+                or re.search(rf"{re.escape(article)}(?![의\d])에 따라[^.]{{0,40}}?대신", text or "")):
             head = re.match(rf"{re.escape(num)}\(([^)]{{1,40}})\)", text or "")
             out.append((num, head.group(1) if head else ""))
     return out[:6]
