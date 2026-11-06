@@ -404,6 +404,52 @@ def article_provisos(review: list[dict] | None, articles_of=None) -> list[str]:
     return out[:PROVISO_MAX_MSGS]
 
 
+# 근거 조문이 곧(UPCOMING_DAYS 안) 바뀌는데 글이 지금 규칙만 씀 (11/6 #1102 4대보험 EDI: 보험료징수법 제16조의10 단서가 2027-01-01 부터
+# '월 60시간 미만' → '고용보험법상 소득기준 미만'으로 바뀜 — 공개가 몇 주 뒤라 공개 직후 틀린 글이 됨). 법제처 API 시행 예정 판으로 확인.
+UPCOMING_DAYS = 180
+UPCOMING_MAX_ARTICLES = 8
+
+
+def _law_changes(name: str, art: str, today) -> list[dict]:
+    """[{date, text}] — 같은 날 다시 받지 않음 (법제처 API 를 조문마다 여러 번 부름; '바뀌는 판 없음'도 저장)."""
+    import datetime as dt
+    from . import law_api
+    if not law_api.available():
+        return []
+
+    def make() -> dict:
+        try:
+            got = law_api.upcoming_changes(name, art, today)
+        except Exception:  # noqa: BLE001 - 못 읽으면 막지 않음 (저장도 안 함)
+            return {}
+        return {"changes": [{"date": f"{c['date']:%Y-%m-%d}", "text": str(c.get("text", ""))[:300]} for c in got]}
+    data = _cached("upcoming", f"{name}|{art}", make) or {}
+    return [{"date": dt.date.fromisoformat(c["date"]), "text": c["text"]} for c in data.get("changes", [])]
+
+
+def upcoming_amendments(review: list[dict] | None, body_html: str, changes_of=None, today=None) -> list[str]:
+    import datetime as dt
+    today = today or dt.date.today()
+    changes_of = changes_of or _law_changes
+    text = _plain(body_html or "")
+    claims = [str(i.get("claim", "")) for i in review or []]
+    out = []
+    for base, art in cited_articles(review)[:UPCOMING_MAX_ARTICLES]:
+        name = urllib.parse.unquote(base).rsplit("/", 1)[-1]
+        for ch in changes_of(name, art, today) or []:
+            day = ch.get("date")
+            if not day or not (today < day <= today + dt.timedelta(days=UPCOMING_DAYS)):
+                continue
+            said = (f"{day.year}년 {day.month}월" in text or f"{day.year}.{day.month}.{day.day}" in text
+                    or f"{day.year}. {day.month}. {day.day}" in text)
+            noted = any(re.search(rf"{re.escape(art)}(?![의\d])[^.]{{0,20}}시행 ?예정", c) and PROVISO_DONE.search(c) for c in claims)
+            if not (said or noted):
+                out.append(f"{name[:20]} {art} 이 {day:%Y-%m-%d} 부터 바뀜 — 본문에 '{day.year}년 {day.month}월부터 …로 바뀌어요'를 쓰거나 "
+                           f"검수 기록에 '{art} 시행 예정 해당 없음 — 이유' (python3 -m bot.lawtext {name} {art} 의 [시행 예정 개정])")
+            break
+    return out
+
+
 # 요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762 '…남기면, 12개월 근무 뒤 남은 구직급여의 절반을 받아요' ↔ 본문 '못 받는 경우' 목록)
 EXCLUSION_HEAD = re.compile(r"<h[23][^>]*>([^<?]*(?:못 받|받을 수 없|제외|안 되는|대상이 아닌|지원 안|불가)[^<?]*)</h[23]>")  # 묻는 제목(…나요?) 제외
 PROMISE = re.compile(r"(받아요|받을 수 있어요|지원돼요|돌려받아요|지원받아요)")

@@ -1648,6 +1648,28 @@ class ProvisoChecklistTest(unittest.TestCase):
         self.assertIn("`automation/review-prompt.md` 의 `---` 아래 지시문 그대로", writer)   # 2번: 독립 검수 = 외부 검수 지시
 
 
+class UpcomingAmendmentTest(unittest.TestCase):
+    """근거 조문이 곧 바뀌는데 지금 규칙만 씀 (11/6 #1102 보험료징수법 제16조의10 — 2027-01-01 단서 변경)."""
+
+    REVIEW = [{"claim": "월 60시간 미만은 신고 안 해도 돼요 (고용보험및산업재해보상보험의보험료징수등에관한법률 제16조의10)",
+               "verdict": "맞음", "action": "유지", "urls": ["https://www.law.go.kr/법령/고용보험및산업재해보상보험의보험료징수등에관한법률/제16조의10"]}]
+
+    def test_soon_change_must_be_mentioned(self):
+        import datetime as dt
+        from bot.condition_gate import upcoming_amendments
+        today = dt.date(2026, 11, 6)
+        soon = lambda name, art, t: [{"date": dt.date(2027, 1, 1), "text": "소득기준 미만"}]  # noqa: E731
+        self.assertEqual(len(upcoming_amendments(self.REVIEW, "<p>월 60시간 미만은 신고 안 해도 돼요.</p>", soon, today)), 1)
+        self.assertEqual(upcoming_amendments(self.REVIEW, "<p>2027년 1월부터는 소득기준 미만으로 바뀌어요.</p>", soon, today), [])
+        noted = self.REVIEW + [{"claim": "제16조의10 시행 예정 해당 없음 — 이 글은 2026년 신고만", "verdict": "맞음", "action": "유지", "urls": []}]
+        self.assertEqual(upcoming_amendments(noted, "<p>x</p>", soon, today), [])
+        far = lambda name, art, t: [{"date": dt.date(2028, 1, 1), "text": "x"}]  # noqa: E731
+        self.assertEqual(upcoming_amendments(self.REVIEW, "<p>x</p>", far, today), [])   # 6개월 넘게 남은 개정은 공개 직전 재검수 몫
+
+    def test_wired(self):
+        self.assertIn("upcoming_amendments", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
 class DomesticWorkerLawTest(unittest.TestCase):
     """'가사근로자는 근로기준법 제17조가 적용되지 않아요'만 쓰고 가사근로자법 제14조(서면 교부)·제26조(벌금)를 뺌 (11/6 #1036)."""
 
