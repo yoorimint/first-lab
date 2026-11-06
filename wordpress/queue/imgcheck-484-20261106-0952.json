@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 484,
+ "replace": [
+  {
+   "old": "ai-5f52d4267c",
+   "prompt": "A calm, bright clinic waiting area in autumn with empty chairs and soft window light, no people, no text, no signs, no screens",
+   "alt": "햇살이 드는 조용한 병원 대기 공간",
+   "why": "주사기 눈금에 엉터리 글자·숫자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
