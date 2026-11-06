@@ -1768,6 +1768,19 @@ class PatchOpenTagTest(unittest.TestCase):
         self.assertIn("11~12월", fix_posts.patch_content(body, ok))
 
 
+class UnverifiedPlainFragmentTest(unittest.TestCase):
+    """확인 못 한 문구(숫자 없음)를 완화할 때, 같은 문단에 확인된 숫자가 있어도 숫자를 그대로 두면 review_only 허용 (11/6 #1150)."""
+
+    def test_numbers_kept(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review as a
+        el = "<p>HRD-Net에서 접수할 수 있어요. 교육비는 300,000원이에요.</p>"
+        self.assertTrue(a._numbers_kept({"find": "HRD-Net에서 접수할 수 있어요",
+                                         "replace_paragraph": "접수 방법은 공고에서 확인해요. 교육비는 300,000원이에요."}, el))
+        self.assertFalse(a._numbers_kept({"find": "HRD-Net에서 접수할 수 있어요", "replace_paragraph": "접수 방법은 공고에서 확인해요."}, el))
+        self.assertFalse(a._numbers_kept({"find": "교육비는 300,000원이에요", "replace_paragraph": "교육비는 공고에서 확인"}, el))
+
+
 class QualityLogTest(unittest.TestCase):
     """외부 검수에서 고친 곳 수를 글마다 남김 — 동시 글쓰기 전후 품질 비교 (11/6 운영자 '퀄리티는 유지하거나 더 올리고')."""
 

@@ -55,6 +55,16 @@ def _has_claim_number(text: str) -> bool:
     return bool(key_numbers(_plain(text)))
 
 
+def _numbers_kept(p: dict, element: str) -> bool:
+    """확인 못 한 문구(find) 자체엔 숫자가 없고, 문단의 숫자는 고친 문구에 그대로 남음 — 숫자가 아니라 숫자 없는 안내(접수처·절차)를
+    완화한 것이라 근거 대조(숫자 검사)로는 못 막음 (11/6 #1150: 확인된 '65개'와 같은 문단의 'HRD-Net 접수'를 완화하는데 막힘)."""
+    from bot.source_check import key_numbers
+    if _has_claim_number(p.get("find", "")):
+        return False
+    after = set(key_numbers(_plain(p.get("replace_paragraph", ""))))
+    return set(key_numbers(_plain(element))) <= after
+
+
 PREVENTION_LOG = ROOT / "automation" / "review-only-log.md"
 CHECK_MODULES = ("condition_gate.py", "review_gate.py", "source_check.py", "writer.py", "freshness.py")  # 글을 막거나 표시하는 검사가 있는 곳
 
@@ -63,7 +73,8 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
     """재발 방지 표시가 없거나 거짓이면 이유."""
     prev = str(p.get("prevention", "")).strip()
     if prev.startswith("review_only:"):
-        if p.get("type") in PLAIN_REVIEW_ONLY and not _has_claim_number(element_around(post["content_html"], p.get("find", ""), p.get("tag", "p"))):
+        element = element_around(post["content_html"], p.get("find", ""), p.get("tag", "p"))
+        if p.get("type") in PLAIN_REVIEW_ONLY and (not _has_claim_number(element) or _numbers_kept(p, element)):
             # 근거 대조(bot/source_check)는 숫자만 페이지와 맞춰 봄 — 숫자 없는 단정(11/6 #874 '공항버스 제외')은 코드로 못 봄
             return None if len(prev) >= len("review_only:") + 10 else "review_only 이유가 너무 짧음 (왜 코드로 못 막는지)"
         if not TYPES.get(p.get("type"), {}).get("review_only"):
