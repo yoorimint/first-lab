@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 405,
+ "replace": [
+  {
+   "old": "ai-8c94ea35a6",
+   "prompt": "an open suitcase on a white hotel bed with neatly folded clothes, a knit sweater and sunglasses, soft morning sunlight, no labels or text",
+   "alt": "아침 햇살 속 호텔 침대 위에 펼친 여행 가방과 옷가지",
+   "why": "가방 안 작은 통에 엉터리 글자 라벨이 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
