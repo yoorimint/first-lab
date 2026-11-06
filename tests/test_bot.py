@@ -1562,6 +1562,17 @@ class SilentFailureTest(unittest.TestCase):
         self.assertIn("quality_report", (ROOT / "automation" / "tick.py").read_text(encoding="utf-8"))
 
 
+class DomesticWorkerLawTest(unittest.TestCase):
+    """'가사근로자는 근로기준법 제17조가 적용되지 않아요'만 쓰고 가사근로자법 제14조(서면 교부)·제26조(벌금)를 뺌 (11/6 #1036)."""
+
+    def test_replacement_law_needed(self):
+        from bot.condition_gate import cross_law_exceptions
+        bad = "<p>인증기관과 계약한 가사근로자는 가사 사용인으로 보지 않지만, 근로기준법 제17조는 적용되지 않아요.</p>"
+        self.assertTrue(any("가사근로자법 제14조" in x for x in cross_law_exceptions(bad)))
+        good = bad.replace("</p>", " 대신 가사근로자법 제14조에 따라 서면을 교부해야 해요.</p>")
+        self.assertEqual(cross_law_exceptions(good), [])
+
+
 class PatchOpenTagTest(unittest.TestCase):
     """찾을 문구에 여는 태그(<p>)를 넣으면 서버가 문단을 못 찾아 고친 내용이 안 들어감 (11/6 #1028 patch_problems)."""
 
