@@ -1065,6 +1065,8 @@ class SourceCheckTest(unittest.TestCase):
         self.assertFalse(sc.has_number("1천분의 50", "0.5"))
         self.assertTrue(sc.has_number("총급여액 7천만원 이하", "7000"))  # 7,000만 원
         self.assertTrue(sc.has_number("총급여액이 3천300만원 이하인 경우", "3300"))  # 11/5 #553
+        self.assertTrue(sc.has_number("인터넷 www.15990903.or.kr 예약", "15990903"))   # 11/7 #1462 주소 속 숫자
+        self.assertFalse(sc.has_number("요율 3.5%", "5"))                                 # 소수점 뒤는 아님
         self.assertTrue(sc.has_number("1억5천만원 이하", "15000"))
         self.assertFalse(sc.has_number("3천만원", "3300"))
         self.assertEqual(sc.readable_url("https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=1"),

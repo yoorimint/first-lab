@@ -315,7 +315,8 @@ def _man_forms(number: str) -> list[str]:
 
 def has_number(text: str, number: str) -> bool:
     # 시각(10:30)의 시·분은 그 숫자가 아님 (11/6 #1060: 확인된 '외국인 10명'의 10 이 버스 시각 10:30 에 맞아 지움으로 잘못 셈)
-    patterns = [rf"(?<![\d.:]){re.escape(number)}(?!\d|:\d)"] + _fraction_forms(number) + _korean_forms(number) + _man_forms(number)
+    # 소수점 뒤(3.5 의 5)는 아님, 주소 속 숫자(www.15990903.or.kr)는 그 숫자 (11/7 #1462 '페이지에 없음' 오탐)
+    patterns = [rf"(?<![\d:])(?<!\d\.){re.escape(number)}(?!\d|:\d)"] + _fraction_forms(number) + _korean_forms(number) + _man_forms(number)
     return any(re.search(p, text) for p in patterns)
 
 
