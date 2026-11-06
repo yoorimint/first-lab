@@ -69,3 +69,4 @@ date,post,fixes,types
 2026-11-06,1165,1,missing_condition:1
 2026-11-06,1210,2,missing_condition:2
 2026-11-06,1212,3,calc:1 missing_condition:1 wrong_fact:1
+2026-11-06,1218,2,missing_condition:1 unverified:1

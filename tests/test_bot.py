@@ -1755,6 +1755,29 @@ class Hwp5TextTest(unittest.TestCase):
         self.assertIn("olefile", (ROOT / "bot" / "requirements.txt").read_text(encoding="utf-8"))
 
 
+class RuleProvisoTest(unittest.TestCase):
+    """11/6 #1218: 조례 제7조② 단서('긴급상황 시 다르게 적용')를 뺌 — 단서 확인표가 법령(/법령/)만 보고 조례·고시는 빈 조문이었음."""
+    TEXT = ("제6조(예약) ① 숲나들e로 예약한다. 다만 예약시스템을 쓸 수 없으면 전화로 예약할 수 있다. "
+            "제7조(이용료의 반환 등) ② 5일 이내에 반환한다. 다만 긴급상황 발생 시 다르게 적용할 수 있다. "
+            "부 칙 이 조례는 공포한 날부터 시행한다. [별표 1] 이용료")
+
+    def test_rule_split_into_articles(self):
+        from bot.condition_gate import rule_articles
+        arts = rule_articles(self.TEXT)
+        self.assertEqual(list(arts), ["제6조", "제7조"])
+        self.assertIn("긴급상황", arts["제7조"])
+        self.assertNotIn("별표", arts["제7조"])
+
+    def test_ordinance_proviso_required(self):
+        from unittest import mock
+        from bot import condition_gate
+        review = [{"claim": "환불은 5일 안에 (사천시 자연휴양림 관리 및 운영에 관한 조례 제7조)", "verdict": "맞음", "action": "유지",
+                   "urls": ["https://www.law.go.kr/자치법규/사천시자연휴양림관리및운영에관한조례"]}]
+        with mock.patch("bot.law_rules.rule_text", return_value=self.TEXT):
+            got = condition_gate.article_provisos(review, condition_gate._law_articles)
+        self.assertTrue(any("제7조 단서1" in g for g in got), got)
+
+
 class ApproxRoundingTest(unittest.TestCase):
     """11/6 #1212: 표 합계 34,428,900원을 첫 문단에 '약 3,442만원' (반올림 3,443만원)."""
 

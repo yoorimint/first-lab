@@ -323,10 +323,33 @@ def law_articles(base_url: str) -> dict[str, str]:
     return _cached("articles", base_url, lambda: _law_articles(base_url))
 
 
+RULE_ARTICLE = re.compile(r"(?<![\w「])(제\d+조(?:의\d+)?)\s?\((?=[^)]{1,40}\))")
+RULE_TAIL = re.compile(r"\s(?:부\s?칙|\[별표|■|\[별지)")
+
+
+def rule_articles(text: str) -> dict[str, str]:
+    """조례·고시 원문 글자 → {조문: 글자}. 조문 제목 '제7조(이용료의 반환)' 위치로 자르고, 마지막 조문은 부칙·별표 앞에서 끊음."""
+    marks = list(RULE_ARTICLE.finditer(text or ""))
+    out = {}
+    for k, m in enumerate(marks):
+        end = marks[k + 1].start() if k + 1 < len(marks) else len(text)
+        chunk = text[m.start():end]
+        tail = RULE_TAIL.search(chunk)
+        out.setdefault(m.group(1), (chunk[:tail.start()] if tail else chunk).strip())
+    return out
+
+
 def _law_articles(base_url: str) -> dict[str, str]:
     """'https://www.law.go.kr/법령/<이름>' → 현행 판 본문 조문 {번호: 글자} (법제처 API, 부칙 없음). 못 받으면 {}."""
     import datetime as dt
     from . import law_api
+    from .law_rules import rule_of, rule_text
+    rule = rule_of(base_url)
+    if rule:  # 조례·고시도 조문 단서를 확인 (11/6 #1218 사천시 휴양림 조례 제7조② 단서 '긴급상황 시 다르게 적용' 누락)
+        try:
+            return rule_articles(rule_text(*rule) or "")
+        except Exception:  # noqa: BLE001 - 못 받으면 막지 않음
+            return {}
     name = urllib.parse.unquote(base_url).split("/법령/")[-1].split("/")[0] if "/법령/" in urllib.parse.unquote(base_url) else ""
     if not name or not law_api.available():
         return {}
