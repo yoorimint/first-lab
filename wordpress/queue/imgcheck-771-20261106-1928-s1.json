@@ -1,0 +1,1 @@
+{"type": "image_check", "post_id": 771, "replace": [{"old": "ai-321a30ae2c", "prompt": "A quiet residential street lined with golden ginkgo trees in autumn, soft morning light, no signs, no vehicles with visible plates, photorealistic", "alt": "노란 은행나무가 늘어선 조용한 가을 주택가 길", "why": "도로 표지판에 엉터리 글자('JO')가 보임"}], "remove": [], "add": [], "slot": 1}
