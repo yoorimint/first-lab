@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 996,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "A tired worker in a plain jacket walking home along a quiet tree-lined street at night under warm streetlights, soft cinematic lighting",
+   "alt": "야간 근무를 마치고 밤길을 걷는 직장인"
+  }
+ ]
+}
