@@ -2856,6 +2856,31 @@ class LeadVsBodyTest(unittest.TestCase):
         self.assertEqual(g.lead_vs_body("<p>이 카드는 연회비가 없어요.</p><p>해외 결제는 수수료가 있어요.</p>"), [])
 
 
+class DottedDateNumberTest(unittest.TestCase):
+    """주장 속 날짜 '2027.1.1' 이 대조 숫자로 뽑혀 분수 표기 변환에서 float 오류 → 그 글 근거 대조 전체 실패 (11/6 #1023)."""
+
+    def test_dotted_date_does_not_crash(self):
+        from bot import source_check
+        claim = "소득세법 제84조 2027.1.1 개정은 가상자산 호 신설로 번호만 바뀌고 기타소득금액 건별 5만 원 이하 비과세는 그대로"
+        self.assertIn("2027.1.1", source_check.key_numbers(claim))
+        self.assertTrue(source_check.has_number("부칙 2027.1.1 시행", "2027.1.1"))
+        self.assertFalse(source_check.has_number("다른 글자", "2027.1.1"))
+        review = [{"claim": claim, "verdict": "맞음", "action": "유지", "urls": ["https://www.law.go.kr/법령/소득세법/제84조"]}]
+        got = source_check.check(review, fetcher=lambda u: claim + " " + "가" * 300)
+        self.assertEqual(got["counts"][source_check.FOUND], 1)
+
+    def test_missing_records_refilled_on_deploy(self):
+        """기록이 안 남은 대기 글은 배포마다(bot.hold) 저장소 검수 기록으로 다시 대조 — 고친 코드로 스스로 채워짐."""
+        from bot import hold
+        done = []
+        msgs = hold.missing_evidence([{"post_id": 1023, "keyword": "프리랜서3.3%계산기"}, {"post_id": 1019, "keyword": "x"},
+                                      {"post_id": 9, "keyword": "검수 기록 없음"}], {1019},
+                                     review_of=lambda pid, kw: [{"claim": "c"}] if pid != 9 else None,
+                                     record=lambda pid, review: done.append(pid) or "숫자 주장 1개 중 확인 1")
+        self.assertEqual(done, [1023])
+        self.assertEqual(len(msgs), 1)
+
+
 class PlanCountTest(unittest.TestCase):
     """예약 공개 시각 줄 수 = 오늘 공개 계획 수 = 하루 공개 수 (11/6 운영자 '3개 넣으면 3개, 4개 넣으면 4개')."""
 

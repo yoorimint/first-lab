@@ -140,9 +140,41 @@ def held_drafts() -> list[dict]:
              "excerpt": r["post_excerpt"], "content": _html(r["post_content"])} for r in rows]
 
 
+MAX_REFILL = 10  # 한 번 배포에 다시 대조할 글 수 (공식 페이지를 여는 일이라 — 남은 글은 다음 배포에)
+
+
+def missing_evidence(ready: list[dict], recorded: set[int], review_of=latest_review, record=None, limit: int = MAX_REFILL) -> list[str]:
+    """공개 대기 글 중 근거 대조 기록이 없는 글을 저장소 검수 기록으로 다시 대조해 채움 (11/6 #1023: 대조 코드 오류로
+    기록이 안 남음 → 공개 직전 '쓸 때 확인된 숫자가 아직 페이지에 있는지' 확인이 빠짐). 배포마다 돌아 고친 코드로 다시."""
+    record = record or (lambda pid, review: source_check.record(pid, review, lambda p, k, v: wp_cli("post", "meta", "update", p, k, v)))
+    out = []
+    for r in ready:
+        pid = int(r["post_id"])
+        if pid in recorded:
+            continue
+        review = review_of(pid, r.get("keyword", ""))
+        if review and len(out) < limit:
+            out.append(f"글 {pid} 근거 대조 다시: {record(pid, review)}"[:150])
+    return out
+
+
+def ready_without_record() -> tuple[list[dict], set[int]]:
+    import urllib.parse
+    ready = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--meta_key={schedule.QUEUE_META}",
+                              f"--meta_value={schedule.READY}", "--fields=ID,post_name", "--format=json", "--posts_per_page=-1") or "[]")
+    have = wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--meta_key={source_check.META}",
+                  "--field=ID", "--posts_per_page=-1")
+    return ([{"post_id": r["ID"], "keyword": urllib.parse.unquote(r.get("post_name", ""))} for r in ready],
+            {int(x) for x in have.split()})
+
+
 def main() -> None:
     from .state import add_log, load_state, save_state
     msgs = regate(held_drafts())
+    try:
+        msgs += missing_evidence(*ready_without_record())
+    except Exception as e:  # noqa: BLE001 - 기록 채우기 실패가 배포를 막지 않게
+        msgs.append(f"근거 기록 채우기 실패: {str(e)[:80]}")
     if msgs:
         state = load_state()
         for m in msgs:

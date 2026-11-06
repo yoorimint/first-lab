@@ -198,6 +198,8 @@ def _fetch(url: str) -> str | None:
 
 def _fraction_forms(number: str) -> list[str]:
     """퍼센트 값의 법령식 표기: 0.5 → '1천분의 5', 20 → '100분의 20' (분자가 정수일 때만)."""
+    if not re.fullmatch(r"\d+(?:\.\d+)?", number):
+        return []  # 날짜 '2027.1.1' 같은 것 — float 변환 실패로 근거 대조 전체가 멈췄음 (11/6 #1023 프리랜서 3.3%)
     forms = []
     for denom, scale in (("100", 1), ("1천", 10), ("1000", 10), ("1만", 100), ("10000", 100), ("10만", 1000), ("100000", 1000)):
         value = float(number) * scale
