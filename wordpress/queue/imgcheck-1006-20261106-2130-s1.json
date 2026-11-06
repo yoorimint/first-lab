@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1006,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a quiet open-air parking area beside an airport runway at sunset with a few parked cars and distant hills",
+   "alt": "해 질 녘 활주로 옆 공항 야외 주차장"
+  }
+ ]
+}

@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1030,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a coiled red fire hose hanging on a wall inside a clean, brightly lit fire station garage",
+   "alt": "소방서 차고 벽에 걸린 빨간 소방 호스"
+  }
+ ]
+}
