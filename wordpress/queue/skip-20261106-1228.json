@@ -1,0 +1,9 @@
+{"type": "skip", "keywords": [
+ {"keyword": "김오곤흑염소", "why": "특정 브랜드 건강식품 상품", "brand": "김오곤"},
+ {"keyword": "영통베이비하우스", "why": "특정 업체 상품·추천", "brand": "영통베이비하우스"},
+ {"keyword": "세라믹텀블러", "why": "상품 비교·추천 (공식 기준 없는 상품 글)"},
+ {"keyword": "서영대학교파주캠퍼스", "why": "특정 학교 기관 소개·홍보성, 공식 기준 정보 글 아님", "brand": "서영대학교"},
+ {"keyword": "일취월장독서실", "why": "특정 업체(독서실) 상품·추천", "brand": "일취월장"},
+ {"keyword": "디월트송풍기", "why": "특정 브랜드 상품 비교·추천", "brand": "디월트"},
+ {"keyword": "KLARWIND냉장고", "why": "특정 브랜드 상품 비교·추천", "brand": "KLARWIND"}
+], "law_changes": [], "new_benefits": []}
