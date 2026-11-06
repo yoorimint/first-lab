@@ -36,7 +36,14 @@ UNREADABLE = "근거 못 읽음"  # 숫자 없는 주장(메뉴·절차 등)인�
 MAX_ALL_URLS = 40
 MIN_KOREAN = 400       # 한글이 이보다 적으면 본문 없는 껍데기 페이지(화면을 스크립트로 채움) → 못 엶
 # (11/5 실측: 심평원 껍데기 0자, 에너지바우처 신청 안내 1,394자 — 1,500 이던 기준이 짧은 실제 페이지를 '못 읽음'으로 잘못 셈)
-CALC_MARKS = ("이면", "=", "×", "계산", "합계", "→", "예시")  # 계산 결과 주장 표시
+CALC_MARKS = ("이면", "=", "×", "계산", "합계", "예시")  # 계산 결과 주장 표시
+# '→' 는 숫자→숫자일 때만 계산 (3,000원 → 2,700원). 길·절차 화살표('대구→고령→해인사행 하루 21회')까지 계산으로 봐서
+# 그 주장의 숫자를 대조하지 않았음 (11/6 #1060 대장경테마파크 버스 횟수 — 외부 검수가 확인불가)
+CALC_ARROW = re.compile(r"\d[^→]{0,12}→\s*(?:약\s*)?\d")
+
+
+def is_calc_claim(claim: str) -> bool:
+    return any(m in claim for m in CALC_MARKS) or bool(CALC_ARROW.search(claim))
 MAX_NUMBERS = 3        # 숫자가 이보다 많은 주장은 계산 과정 나열로 보고 대조하지 않음 (예: 사례별 세액 목록)
 
 
@@ -46,7 +53,7 @@ def key_numbers(claim: str) -> list[str]:
     # 법령은 '100분의 20' 으로 쓰지만 has_number 의 분수 표기가 함께 찾음. 비율은 계산 결과가 아니라 규칙 값이라
     # '3명 이상이면 20%' 처럼 계산 표시('이면')가 있어도 대조한다.
     pct = {m for m in re.findall(r"(\d+(?:\.\d+)?)\s*(?:%|퍼센트)", claim)}
-    if any(m in claim for m in CALC_MARKS):
+    if is_calc_claim(claim):
         if any(m in claim for m in ("=", "×", "재계산", "예시")):
             return []  # 계산식의 비율은 예시 가정값(예금 금리 2.5% 등)이라 근거 페이지에 없음 — 표본 20개 중 2개 오탐
         return sorted(pct) if len(pct) <= MAX_NUMBERS else []
@@ -238,7 +245,8 @@ def _man_forms(number: str) -> list[str]:
 
 
 def has_number(text: str, number: str) -> bool:
-    patterns = [rf"(?<![\d.]){re.escape(number)}(?!\d)"] + _fraction_forms(number) + _korean_forms(number) + _man_forms(number)
+    # 시각(10:30)의 시·분은 그 숫자가 아님 (11/6 #1060: 확인된 '외국인 10명'의 10 이 버스 시각 10:30 에 맞아 지움으로 잘못 셈)
+    patterns = [rf"(?<![\d.:]){re.escape(number)}(?!\d|:\d)"] + _fraction_forms(number) + _korean_forms(number) + _man_forms(number)
     return any(re.search(p, text) for p in patterns)
 
 

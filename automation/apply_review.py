@@ -75,7 +75,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
         code = "".join((ROOT / "bot" / f).read_text(encoding="utf-8") for f in CHECK_MODULES)
         if not re.fullmatch(r"\w+", name) or not re.search(rf"\b(def|class) {name}\b", code):
             return f"check:{name} 를 저장소 코드·테스트에서 못 찾음 — 검사를 먼저 만들기"
-        from bot import condition_gate
+        from bot import condition_gate, source_check
         fn = {"headline_scope": lambda: condition_gate.headline_scope(post["title"], post["excerpt"], post["content_html"]),
               "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"]),
               "lead_vs_exceptions": lambda: condition_gate.lead_vs_exceptions(post["content_html"]),
@@ -86,6 +86,9 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "excerpt_qualifiers": lambda: condition_gate.excerpt_qualifiers(post["excerpt"], post["content_html"]),
               "excerpt_caveats": lambda: condition_gate.excerpt_caveats(post["excerpt"], post["content_html"]),
               "limited_event_year": lambda: condition_gate.limited_event_year(post["excerpt"], post["content_html"]),
+              # 길 화살표('A→B→C 하루 21회') 주장의 숫자를 계산으로 봐서 대조 안 했음 (11/6 #1060) — 이제 대조함
+              "is_calc_claim": lambda: [c for c in (str(i.get("claim", "")) for i in post.get("review") or [])
+                                              if "→" in c and source_check.key_numbers(c) and not source_check.is_calc_claim(c)],
               "transition_rules": lambda: condition_gate.transition_rules(post.get("review"), post["content_html"]),
               "excerpt_vs_exclusions": lambda: condition_gate.excerpt_vs_exclusions(post["excerpt"], post["content_html"]),
               "lead_thresholds": lambda: condition_gate.lead_thresholds(post["excerpt"], post["content_html"]),
@@ -162,6 +165,24 @@ def record_quality(post_id: int, items: list[dict], path: Path = QUALITY_LOG, to
         f.write(f"{date},{post_id},{len(items)},{' '.join(f'{k}:{v}' for k, v in sorted(kinds.items()))}\n")
 
 
+def with_review(post: dict, queue_dir: Path | None = None) -> dict:
+    """검수 기록(review)을 붙임 — 서버 본문에는 없어서 review 를 보는 검사(transition_rules·is_calc_claim)가 늘 '안 걸림'이었음
+    (11/6 #1060). 보류 수정 파일(fixhold-<번호>-*) → 같은 제목의 처음 글 파일 순."""
+    if post.get("review"):
+        return post
+    queue_dir = queue_dir or ROOT / "wordpress" / "queue"
+    pid = str(post.get("post_id", ""))
+    paths = sorted(queue_dir.glob(f"fixhold-{pid}-*.json"), reverse=True) + sorted(queue_dir.glob("*.json"))
+    for path in paths:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(data, dict) and data.get("review") and (path.name.startswith("fixhold-") or data.get("title") == post.get("title")):
+            return {**post, "review": data["review"]}
+    return post
+
+
 def current_post(post_id: int, fetch=None) -> dict:
     """서버의 지금 본문으로 검사 (11/6: 예전에 받아 둔 검수 파일로 검사해 제목 길이 검사가 '안 걸림'으로 잘못 나옴 —
     그사이 바뀐 본문이면 찾을 문구·검사 결과가 틀림). 서버를 못 읽으면 받아 둔 파일로."""
@@ -181,7 +202,7 @@ def main(argv: list[str]) -> int:
         return 2
     post_id, title = int(argv[1]), argv[2]
     items = json.loads(Path(argv[3]).read_text(encoding="utf-8")) if len(argv) > 3 else []
-    post = current_post(post_id)
+    post = with_review(current_post(post_id))
     errors = check(post, items)
     if errors:
         print("반영 안 함 (아무것도 바꾸지 않음):\n  " + "\n  ".join(errors))

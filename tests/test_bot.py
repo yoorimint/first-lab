@@ -1581,6 +1581,33 @@ class AppendOnlyMergeTest(unittest.TestCase):
             self.assertEqual(sorted(f.read_text(encoding="utf-8").split("\n")[:3]), ["1 a", "2 b", "calc:x"])
 
 
+class RouteArrowTest(unittest.TestCase):
+    """#1060 대장경테마파크 (11/6): 길 화살표 주장('대구→고령→해인사행 하루 21회')을 계산으로 봐서 숫자 대조를 안 했고,
+    검수 반영 도구가 검수 기록을 안 붙여 review 를 보는 검사가 늘 '안 걸림', 시각 10:30 을 확인된 숫자 10 으로 셈."""
+
+    def test_route_arrow_is_not_calc(self):
+        from bot.source_check import is_calc_claim, key_numbers
+        self.assertEqual(key_numbers("대구 서부시외버스터미널→고령→해인사행 하루 21회(40분 간격)"), ["21"])
+        self.assertTrue(is_calc_claim("월 300만 원 → 270만 원"))
+        self.assertEqual(key_numbers("1,000원→900원"), [])
+
+    def test_time_is_not_the_number(self):
+        from bot.source_check import has_number
+        self.assertFalse(has_number("하루 3회 (06:40, 10:30, 15:30)", "10"))
+        self.assertTrue(has_number("외국인 10명 이상", "10"))
+
+    def test_apply_review_attaches_review(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        with tempfile.TemporaryDirectory() as d:
+            q = Path(d)
+            (q / "x.json").write_text(json.dumps({"title": "글 제목", "review": [{"claim": "c"}]}, ensure_ascii=False), encoding="utf-8")
+            got = apply_review.with_review({"post_id": 7, "title": "글 제목"}, q)
+            self.assertEqual(got["review"], [{"claim": "c"}])
+            (q / "fixhold-7-1.json").write_text(json.dumps({"review": [{"claim": "고친 뒤"}]}, ensure_ascii=False), encoding="utf-8")
+            self.assertEqual(apply_review.with_review({"post_id": 7, "title": "글 제목"}, q)["review"], [{"claim": "고친 뒤"}])
+
+
 class ProvisoChecklistTest(unittest.TestCase):
     """근거 조문의 단서·예외 확인표 (11/6 운영자 '품질 1개 미만 — 1,2번 만들어라'): 외부 검수가 고친 곳의 74%가 빠진 조건·예외."""
 
