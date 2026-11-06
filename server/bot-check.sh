@@ -17,7 +17,7 @@ echo -e "\n==> 공공 API 점검 (키 값은 출력 안 함)"
 # 법제처 API 는 신청 때 등록한 서버 주소에서만 됨 — 이 서버가 밖으로 나갈 때 쓰는 주소 (등록값과 같아야 함)
 # 서버 주소는 공개 배포 기록(공개 저장소)에 남기지 않음 (11/5 검토)
 API_OUT=$(mktemp)
-(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python - <<'PY' 2>&1 | tail -4) > "$API_OUT"
+(cd "$REPO_DIR" && /opt/first-lab-venv/bin/python - <<'PY' 2>&1 | tail -5) > "$API_OUT"
 from bot import law_api, benefit_api
 body = law_api.fetch("service", "law", ID="001761") or ""
 print("법령 API:", "정상" if body else "실패 (신청 승인·등록한 서버 주소 확인)")
@@ -34,6 +34,15 @@ else:
         print(f"네이버 API HUB: {'정상 (연말정산 블로그 문서 ' + format(got['docs'], ',') + '개)' if got else '실패'}")
     except Exception as e:  # noqa: BLE001
         print(f"네이버 API HUB: 실패 ({type(e).__name__}: {str(e)[:120]})")
+from bot import search_console  # 연결 여부가 기록에 안 보였음 (11/6 운영자 'API 다 써서' 5번)
+if not search_console.available():
+    print("서치콘솔: 미연동 (서비스 계정 키 파일 없음)")
+else:
+    try:
+        rows = search_console.fetch(days=7)
+        print(f"서치콘솔: 정상 (최근 7일 검색어·페이지 {len(rows)}줄, 클릭 {sum(r['clicks'] for r in rows)}·노출 {sum(r['impressions'] for r in rows)})")
+    except Exception as e:  # noqa: BLE001
+        print(f"서치콘솔: 실패 ({type(e).__name__}: {str(e)[:120]})")
 PY
 (cd "$REPO_DIR" && /opt/first-lab-venv/bin/python -m bot.bok_api 2>&1 | tail -1) >> "$API_OUT" || true
 cat "$API_OUT"

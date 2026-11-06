@@ -3118,6 +3118,36 @@ class BokApiTest(unittest.TestCase):
             self.assertIsNone(bok_api.base_rate(dt.date(2026, 11, 5)))   # 키 없으면 영향 없음
 
 
+class BokNamedTest(unittest.TestCase):
+    """예금·적금 금리, 원/달러 환율, 소비자물가 (11/6 운영자 'API 다 써서' 4번) — 항목 코드는 서버가 이름으로 찾음."""
+
+    def test_named_values_found_by_name_with_cpi_yoy(self):
+        import datetime as dt
+        from bot import bok_api
+        listing = {"121Y002": [("BEABAA21", "정기예금", "M"), ("BEABAA22", "정기적금", "M")],
+                   "731Y001": [("0000001", "원/미국달러(매매기준율)", "D")], "901Y009": [("0", "총지수", "M")]}
+        data = {"BEABAA21": [("202609", 2.8)], "BEABAA22": [("202609", 3.1)], "0000001": [("20261105", 1385.5)],
+                "0": [("202510", 116.0), ("202610", 118.4)]}
+        got, missing = bok_api.named_values(dt.date(2026, 11, 6), fetch_series=lambda stat, code, *a: data[code],
+                                            listing=lambda stat: listing[stat])
+        self.assertEqual(missing, [])
+        self.assertEqual(got["deposit"]["value"], 2.8)
+        self.assertEqual(got["cpi"]["yoy"], 2.1)
+        self.assertEqual(bok_api.describe(got["usd"]), "원/달러 환율 1385.5(20261105)")
+        self.assertEqual(bok_api.describe(got["cpi"]), "소비자물가지수 118.4(202610, 전년 대비 2.1%)")
+        got, missing = bok_api.named_values(dt.date(2026, 11, 6), fetch_series=lambda *a: [], listing=lambda stat: [])
+        self.assertEqual((got, len(missing)), ({}, 4))                       # 못 찾으면 빠지고 기록에 '못 찾음'
+
+
+class DeployCheckReportTest(unittest.TestCase):
+    def test_deploy_check_shows_search_console_and_new_rates(self):
+        """배포 점검 기록(/maintenance)에 서치콘솔 연결 여부·한도 안 넘는 줄 수 (11/6 'API 다 써서' 5번: 연결 여부가 안 보였음)."""
+        sh = (ROOT / "server" / "bot-check.sh").read_text(encoding="utf-8")
+        self.assertIn("서치콘솔: 미연동", sh)
+        self.assertIn("tail -5", sh)                       # 법령·혜택·네이버·서치콘솔 네 줄 + 여유
+        self.assertIn("named_values", (ROOT / "bot" / "bok_api.py").read_text(encoding="utf-8"))
+
+
 class RatesTest(unittest.TestCase):
     """한국은행 금리: 매일 저장, 기준금리가 바뀌면 '기준금리'가 든 공개 글·초안에 재검증 표시."""
 
