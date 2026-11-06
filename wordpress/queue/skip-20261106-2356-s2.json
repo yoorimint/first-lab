@@ -1,0 +1,12 @@
+{
+ "type": "skip",
+ "keywords": [
+  {"keyword": "캠핑온풍기", "why": "상품 추천·비교"},
+  {"keyword": "송파헬로우시티", "why": "특정 아파트 단지(시세·매물 정보)"},
+  {"keyword": "남산어퍼하우스", "why": "특정 회사 주거·분양 상품"},
+  {"keyword": "덕천미용실", "why": "지역 업체 추천"}
+ ],
+ "law_changes": [],
+ "new_benefits": [],
+ "slot": 2
+}
