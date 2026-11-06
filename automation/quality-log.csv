@@ -33,3 +33,5 @@ date,post,fixes,types
 2026-11-06,1053,0,
 2026-11-06,1060,15,missing_condition:2 outdated:1 unverified:9 wrong_fact:3
 2026-11-06,1056,0,
+2026-11-06,1062,2,missing_condition:1 wrong_fact:1
+2026-11-06,1064,1,missing_condition:1
