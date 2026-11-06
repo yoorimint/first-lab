@@ -30,7 +30,8 @@ MAX_ATTACH = 3   # 고시 본문은 첨부(PDF)에만 있는 경우가 많음 (1
 
 
 def _norm(name: str) -> str:
-    return re.sub(r"\s+", "", name or "")
+    """띄어쓰기·가운뎃점 무시 ('관리· 운영 조례' = '관리운영조례', 11/7 #998)."""
+    return re.sub(r"[\s·ㆍ・]+", "", name or "")
 
 
 def rule_of(url: str) -> tuple[str, str] | None:
@@ -48,7 +49,9 @@ def versions(kind: str, name: str, fetch=None) -> list[dict]:
     """이름이 같은 판들 [{'seq', 'name', 'start'(시행일), 'issued'(발령·공포일), 'current'}] (시행일 순)."""
     fetch = fetch or law_api.fetch
     target, item, name_tag, seq_tag, _, issued_tag = KINDS[kind]
-    xml = fetch("search", target, query=name, display="100")
+    # 법제처 검색은 검색어에 '·' 가 있으면 0건 (11/7 #998 '동해시 망상오토캠핑리조트 관리· 운영 조례') → 점 앞까지로 찾고 이름은 _norm 으로 비교
+    query = re.split(r"[·ㆍ・]", name)[0].strip() or name
+    xml = fetch("search", target, query=query, display="100")
     if not xml:
         return []
     try:

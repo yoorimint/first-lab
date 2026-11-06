@@ -1848,6 +1848,23 @@ class ExpiryTest(unittest.TestCase):
         self.assertEqual(plan.call_count, refresh.RECHECK_PER_DAY - 1)
 
 
+class MiddleDotRuleNameTest(unittest.TestCase):
+    """11/7 #998: 이름에 '·' 가 있는 조례('동해시 망상오토캠핑리조트 관리· 운영 조례')를 법제처 검색이 0건으로 돌려줘 못 읽음."""
+
+    def test_query_without_dot_and_name_matches(self):
+        from bot import law_rules
+        asked = []
+        xml = ("<LawSearch><law><자치법규명>동해시 망상오토캠핑리조트 관리· 운영 조례</자치법규명><자치법규일련번호>2129089</자치법규일련번호>"
+               "<시행일자>20260512</시행일자><공포일자>20260512</공포일자></law></LawSearch>")
+
+        def fake(kind, target, **kw):
+            asked.append(kw.get("query"))
+            return xml
+        got = law_rules.versions("자치법규", "동해시망상오토캠핑리조트관리·운영조례", fetch=fake)
+        self.assertNotIn("·", asked[0])
+        self.assertEqual([v["seq"] for v in got], ["2129089"])
+
+
 class OrdinanceAnnexTest(unittest.TestCase):
     """11/7 #1288: 자치법규 별표는 본문이 비고 '<별표첨부파일명>' 의 hwp 로만 있어 조례 요금표(S사이트 50,000원·1박 추가 30,000원)를 못 읽음."""
 
