@@ -1,0 +1,14 @@
+{
+  "basis_date": "2026-11-06", "yearly_checked": 2026,
+  "sources": [
+    {"name": "한국공항공사 대구국제공항 주차요금 안내 (요금 체계·차량 구분·할인)", "url": "https://www.airport.co.kr/daegu/cms/frCon/index.do?MENU_ID=170&CONTENTS_NO=2"},
+    {"name": "한국공항공사 대구국제공항 주차장 안내 (정산 방법)", "url": "https://www.airport.co.kr/daegu/cms/frCon/index.do?MENU_ID=170"}
+  ],
+  "base_minutes": 30,
+  "max_days": 60,
+  "fees": {
+    "small": {"base_fee": 800, "unit_minutes": 15, "unit_fee": 400, "daily_max_weekday": 13000, "daily_max_weekend": 15000},
+    "large": {"base_fee": 1100, "unit_minutes": 10, "unit_fee": 400, "daily_max_weekday": 14000, "daily_max_weekend": 14000}
+  },
+  "discount_rates": {"none": 0, "half": 0.5, "low3": 0.2}
+}

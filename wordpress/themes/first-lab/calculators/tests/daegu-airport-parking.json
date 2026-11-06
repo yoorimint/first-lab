@@ -1,0 +1,386 @@
+[
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 월 10:00~11:00 소형 1시간 = 기본 800 + 15분 400 × 2 = 1,600원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "11:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 1600
+  },
+  "notes_include": [
+   "20분 안에 출차"
+  ],
+  "notes_exclude": [
+   "대형은 요일과 관계없이"
+  ]
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 월 10:00~12:00 소형 2시간 = 3,200원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "12:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 3200
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 월 08:00~수 20:00 소형 = 13,000 × 3 = 39,000원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "08:00",
+   "out_date": "2026-11-11",
+   "out_time": "20:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 39000
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 목 07:00~일 22:00 소형 = 13,000 + 15,000 × 3 = 58,000원 (구간 시작 요일 기준)",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-12",
+   "in_time": "07:00",
+   "out_date": "2026-11-15",
+   "out_time": "22:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 58000
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 목 07:00~일 22:00 경차(50%) = 29,000원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-12",
+   "in_time": "07:00",
+   "out_date": "2026-11-15",
+   "out_time": "22:00",
+   "discount": "half"
+  },
+  "expect": {
+   "fee": 29000,
+   "fee_before_discount": 58000
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 목 10:00~금 12:00 = 목 구간 13,000 + 금 구간 2시간 3,200 = 16,200원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-12",
+   "in_time": "10:00",
+   "out_date": "2026-11-13",
+   "out_time": "12:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 16200
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 일 10:00~월 12:00 = 일 구간 15,000 + 월 구간 2시간 3,200 = 18,200원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-15",
+   "in_time": "10:00",
+   "out_date": "2026-11-16",
+   "out_time": "12:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 18200
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 저공해 3종(20%) 1시간 1,600 → 1,280원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "11:00",
+   "discount": "low3"
+  },
+  "expect": {
+   "fee": 1280
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 대형 1시간 = 기본 1,100 + 10분 400 × 3 = 2,300원",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "11:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 2300
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 대형 월 24시간 = 14,000원",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-10",
+   "out_time": "10:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 14000
+  },
+  "notes_include": [
+   "대형은 요일과 관계없이"
+  ]
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 대형 금 24시간 = 14,000원 (요일 구분 없음)",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-13",
+   "in_time": "10:00",
+   "out_date": "2026-11-14",
+   "out_time": "10:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 14000
+  }
+ },
+ {
+  "why": "공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과: 대형 월 10:00~화 11:00 = 14,000 + 둘째 구간 1시간 400 × 6 = 16,400원 (둘째 구간엔 기본요금 없음)",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-10",
+   "out_time": "11:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 16400
+  }
+ },
+ {
+  "why": "기준선 (기본 30분): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 소형 10:00~10:30 = 800원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "10:30",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 800
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (기본 30분 바로 위): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 소형 10:00~10:31·10:44 = 1,200원 (10:35 사례)",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "10:35",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 1200
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (기본 30분): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 대형 10:00~10:30 = 1,100원",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "10:30",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 1100
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (기본 30분 바로 위): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 대형 10:00~10:31·10:40 = 1,500원",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "10:40",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 1500
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (1일 최대 바로 아래): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 월 10:00~18:00 소형 = 800 + 400 × 30 = 12,800원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "18:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 12800
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (1일 최대): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 월 10:00~18:15 소형 = 13,000원 (공식 표 '8시간 초과 24시간까지 13,000원')",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "18:15",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 13000
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (금 1일 최대 바로 아래): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 금 10:00~19:15 = 14,800원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-13",
+   "in_time": "10:00",
+   "out_date": "2026-11-13",
+   "out_time": "19:15",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 14800
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (금 1일 최대): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 금 10:00~19:30 = 15,000원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-13",
+   "in_time": "10:00",
+   "out_date": "2026-11-13",
+   "out_time": "19:30",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 15000
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (대형 1일 최대 바로 아래): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 대형 10:00~15:30 = 1,100 + 400 × 30 = 13,100원",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "15:30",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 13100
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (대형 1일 최대): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 대형 10:00~16:00 = 14,000원",
+  "input": {
+   "size": "large",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "16:00",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 14000
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (둘째 구간 10분): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 월 10:00~화 10:10 = 13,000 + 400 = 13,400원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-10",
+   "out_time": "10:10",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 13400
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 (둘째 구간 45분): 공사 예상 주차요금 조회(getParkingPrice.do, 대구 A1104) 결과 월 10:00~화 10:45 = 13,000 + 400 × 3 = 14,200원",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-10",
+   "out_time": "10:45",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 14200
+  },
+  "boundary": true
+ },
+ {
+  "why": "공식 안내에 무료 회차 시간이 없어 짧은 주차도 기본요금으로 보수적으로 표시 (공사 조회 화면은 10분 0원)",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "10:10",
+   "discount": "none"
+  },
+  "expect": {
+   "fee": 800
+  }
+ },
+ {
+  "why": "출차가 입차보다 앞이면 안내 문장",
+  "input": {
+   "size": "small",
+   "in_date": "2026-11-09",
+   "in_time": "10:00",
+   "out_date": "2026-11-09",
+   "out_time": "09:00",
+   "discount": "none"
+  },
+  "expect_error": true
+ }
+]
