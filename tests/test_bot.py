@@ -2881,6 +2881,34 @@ class DottedDateNumberTest(unittest.TestCase):
         self.assertEqual(len(msgs), 1)
 
 
+class SlotSplitTest(unittest.TestCase):
+    """동시 글쓰기 후보 나누기는 키워드로 (11/6: 순번으로 나눴더니 목록이 갱신되며 순번이 밀려 두 칸이 같은 키워드를 씀)."""
+
+    def test_same_keyword_same_slot_after_shift(self):
+        import os
+        import shutil
+        import subprocess
+        import zlib
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        func = src[src.index("function firstlab_api_slot_of"):src.index("function firstlab_api_held_drafts")]
+        words = ["프리랜서3.3%계산기", "주휴수당뜻", "세후급여계산기", "전세자금대출계산기", "퇴직소득세계산기", "김해공항국제선주차장"]
+        code = "<?php\n" + func + "foreach (json_decode(getenv('W'), true) as $w) echo firstlab_api_slot_of($w), \"\\n\";"
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            out = subprocess.run(["php", f.name], capture_output=True, text=True, check=True,
+                                 env={**os.environ, "W": json.dumps(words + [" 프리랜서 3.3% 계산기 "])}).stdout.split()
+        finally:
+            os.unlink(f.name)
+        slots = [int(x) for x in out]
+        self.assertEqual(slots[:-1], [zlib.crc32(w.encode()) % 2 + 1 for w in words])  # 순서와 무관하게 키워드로만
+        self.assertEqual(slots[-1], slots[0])  # 띄어쓰기만 다르면 같은 칸
+        self.assertEqual(set(slots), {1, 2})
+        self.assertNotIn("$i % 2", src)  # 순번 나누기로 되돌리지 않게
+
+
 class PrepublishReviewTest(unittest.TestCase):
     """공개 직전 재검수 (11/6 운영자 '공개 전에 한 번 더 — 그렇게 만들어라'): 공개 순서상 다음 글을 글쓰기 작업이 다시 검수,
     공개는 재검수 마친 글 먼저, 없으면 예전처럼 (공개가 멈추지 않게), 며칠 지나면 다시 (평생 한 번이 아니게)."""

@@ -25,11 +25,11 @@ add_action(
 					// 후보 쪽: 40개를 다 건너뛰면 글쓰기 작업이 ?page=2, 3 으로 다음 40개 (11/6 '새 글 없음' 안전장치, bot/run.CANDIDATES_POOL)
 					$page     = $request ? max( 1, min( 3, (int) $request->get_param( 'page' ) ) ) : 1;
 					$pool     = array_values( (array) ( $state['candidates'] ?? array() ) );
-					// 글쓰기 동시 실행 (11/6 운영자 '둘 다 해 봐', bot/run.WRITERS): ?slot=N 이면 후보를 번갈아 나눠 줌 — 두 실행이 같은 키워드를
+					// 글쓰기 동시 실행 (11/6 운영자 '둘 다 해 봐', bot/run.WRITERS): ?slot=N 이면 후보를 키워드로 나눠 줌 — 두 실행이 같은 키워드를
 					// 고르지 않게. 2번부터는 새 글만 (보류 수정·갱신·사진 검사·법령·새 혜택·계산기는 1번 실행 몫 — 같은 일을 겹쳐 하지 않게)
 					$slot     = $request ? max( 0, min( 2, (int) $request->get_param( 'slot' ) ) ) : 0;
 					if ( $slot ) {
-						$pool = array_values( array_filter( $pool, static fn( $i ) => $i % 2 === $slot - 1, ARRAY_FILTER_USE_KEY ) );
+						$pool = array_values( array_filter( $pool, static fn( $c ) => firstlab_api_slot_of( (string) ( $c['keyword'] ?? '' ) ) === $slot ) );
 					}
 					$side = $slot < 2; // 1번(또는 혼자 도는) 실행만 곁일
 					// 전체 글 (30편으로 자르면 오래된 글과 같은 주제를 또 씀 — 11/5 대부업 대출 조회 중복)
@@ -148,6 +148,14 @@ function firstlab_api_hold_tries( int $post_id ): array {
 function firstlab_api_hold_resting( int $post_id ): bool {
 	list( $tries, $last ) = firstlab_api_hold_tries( $post_id );
 	return $tries >= 3 && $last && strtotime( $last . ' +30 days' ) > time();
+}
+
+/**
+ * 후보 키워드가 맡겨지는 글쓰기 칸 (1 또는 2). 키워드 글자로 정해 후보 순서가 바뀌어도 늘 같은 칸.
+ * 11/6: 순번(짝·홀)으로 나눴더니 2번 칸이 받은 뒤 후보 목록이 갱신돼 순번이 한 칸 밀림 → 1번 칸도 같은 키워드(프리랜서3.3%계산기)를 받아 한 실행을 버림.
+ */
+function firstlab_api_slot_of( string $keyword ): int {
+	return ( crc32( (string) preg_replace( '/\s+/u', '', $keyword ) ) % 2 ) + 1;
 }
 
 function firstlab_api_held_drafts(): array {
