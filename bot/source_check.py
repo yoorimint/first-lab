@@ -380,6 +380,41 @@ def delegations(review: list[dict] | None, fetcher=fetch, limit: int = 3) -> lis
     return out
 
 
+def _addenda_text(name: str) -> str:
+    """법령 현행 판의 부칙 글자 (법제처 API, 같은 날 다시 안 받음). 못 받으면 ''."""
+    import datetime as _dt
+    from . import law_api
+    from .condition_gate import _cached
+
+    def make() -> str:
+        cur = law_api.current(law_api.versions(name), _dt.date.today())
+        xml = law_api.fetch("service", "law", MST=str(cur["mst"])) if cur else ""
+        parts = re.findall(r"<부칙내용>(.*?)</부칙내용>", xml or "", re.S)
+        return re.sub(r"<!\[CDATA\[|\]\]>|<[^>]+>|\s+", " ", " ".join(parts))
+    return _cached("addenda", name, make) or ""
+
+
+def addendum_transitions(review: list[dict] | None, addenda_of=None, limit: int = 3) -> list[dict]:
+    """근거 조문을 부칙이 '제N조…의 개정규정에도 불구하고' 대상자별로 달리 정한 경과조치 (예전 면허·계약 등).
+    11/6 #973 건설기계 안전교육: 2019.10.18 전 면허는 발급일에 따라 2020~2022년 — 글은 '취득일부터 3년'만, #928 건축법 부칙 제5조도 같은 꼴."""
+    addenda_of = addenda_of or _addenda_text
+    out, done = [], set()
+    for item in review or []:
+        if not _ok(item):
+            continue
+        for url in item.get("urls", []):
+            art, base = claim_article(item, str(url)), law_page(str(url))
+            if not art or "/법령/" not in base or (base, art) in done:
+                continue
+            done.add((base, art))
+            text = addenda_of(base.rsplit("/", 1)[-1])
+            found = [re.sub(r"\s+", " ", m.group(0)).strip()[:220] for m in
+                     re.finditer(rf"[^.]*{re.escape(art)}(?![의\d])(?:제\d+항)?[^.]{{0,20}}개정규정에도 불구하고[^.]*\.", text)][:limit]
+            if found:
+                out.append({"law": base.rsplit("/", 1)[-1], "article": art, "sentences": found})
+    return out
+
+
 CONDITION_WORDS = ("이하", "이상", "초과", "미만", "경우", "한해", "한정", "때만", "기준", "가정")
 QUALIFIERS = ("최대", "최소", "이하", "이상", "초과", "미만", "까지", "부터", "기준", "약", "예시", "최고", "최저")
 
@@ -475,6 +510,10 @@ def main(argv: list[str]) -> None:
             print(f"  [경우 나열: {law['law']} {law['article']}] 이 조문이 나열한 경우를 글이 모두 다루는지(일부만 쓰면 '등'·'다음 중 하나'로) 확인:")
             for x in law["cases"]:
                 print(f"    · {x}")
+    for d in addendum_transitions(review):
+        print(f"- [부칙 경과조치: {d['law']} {d['article']}] 이 조문을 예전 대상자(시행 전 면허·계약 등)에게는 달리 적용하는 부칙 — 해당 독자가 있으면 글에 넣는다:")
+        for x in d["sentences"]:
+            print(f"    · {x}")
     for d in delegations(review):
         print(f"- [위임 확인: {d['law']} {d['article']}] 이 조문이 하위 규정에 맡긴 내용(기간·금액·범위)을 그 시행령·시행규칙·고시에서 읽었는지 — "
               "python3 -m bot.lawtext <법령명>시행령 <제N조> 로 확인하고 그 주소도 근거에 단다:")

@@ -1299,6 +1299,19 @@ class BenefitDetailTest(unittest.TestCase):
         self.assertEqual(sc.delegations([{"claim": "제12조", "urls": [law + "/제12조"], **ok}], fetcher=lambda u: text), [])
         self.assertIn("위임 확인", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
+    def test_addendum_transition_shown(self):
+        """11/6 #973(시행규칙 부칙 제2조: 2019.10.18 전 면허는 2020~2022년)·#928(건축법 부칙 제5조) — 부칙 경과조치가 2번 빠짐 → 경고."""
+        from bot import source_check as sc
+        addenda = ("제1조(시행일) 이 규칙은 공포한 날부터 시행한다. 제2조(경과조치) 이 규칙 시행 전에 면허증을 발급 받은 자는 "
+                   "제83조제3항의 개정규정에도 불구하고 다음 각 호의 구분에 따라 안전교육등을 받아야 한다. 제3조(다른 경과조치) 제84조는 종전에 따른다.")
+        review = [{"claim": "3년마다 (시행규칙 제83조)", "urls": ["https://www.law.go.kr/법령/건설기계관리법시행규칙/제83조"],
+                   "verdict": "맞음", "action": "유지"}]
+        got = sc.addendum_transitions(review, addenda_of=lambda name: addenda)
+        self.assertEqual([(g["law"], g["article"]) for g in got], [("건설기계관리법시행규칙", "제83조")])
+        self.assertIn("제83조제3항의 개정규정에도 불구하고", got[0]["sentences"][0])
+        other = [{"claim": "제84조", "urls": ["https://www.law.go.kr/법령/건설기계관리법시행규칙/제84조"], "verdict": "맞음", "action": "유지"}]
+        self.assertEqual(sc.addendum_transitions(other, addenda_of=lambda name: addenda), [])   # '개정규정에도 불구하고'가 아님
+
     def test_unit_numbers_compared(self):
         """두 자리 수 + 단위(14일·24세·60시간·15회)도 대조 (11/6 'API 다 써서' 3번, #872 '14일 연장'). 날짜·한 자리·단위 없는 수는 뺌."""
         from bot.source_check import key_numbers
