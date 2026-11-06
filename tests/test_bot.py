@@ -403,13 +403,13 @@ class HoldFixTest(unittest.TestCase):
 
 
 class ContinuousTest(unittest.TestCase):
-    def run_step(self, state, minute, on=True, fire_ok=True):
+    def run_step(self, state, minute, on=True, fire_ok=True, writers=1):
         from datetime import datetime
         from zoneinfo import ZoneInfo
         from bot import run
         now = datetime(2026, 11, 5, 10, minute, tzinfo=ZoneInfo("Asia/Seoul"))
         settings = BotSettings.from_option({}, {})
-        with mock.patch.object(run, "continuous_on", return_value=on), \
+        with mock.patch.object(run, "WRITERS", writers), mock.patch.object(run, "continuous_on", return_value=on), \
                 mock.patch.object(run, "set_continuous") as stop, \
                 mock.patch.object(run, "fire_routine", return_value=fire_ok) as fire, \
                 mock.patch.object(run, "save_state"):
@@ -426,6 +426,24 @@ class ContinuousTest(unittest.TestCase):
         fire, _ = self.run_step(state, 26)  # 올라옴 → 다음 편
         self.assertEqual(fire.call_count, 1)
         self.assertEqual(state["continuous"]["count"], 1)
+
+    def test_two_writers_tracked_per_slot(self):
+        """11/6 운영자 '둘 다 해 봐': 글쓰기 2개 동시 — 칸마다 'slot-N' 으로 시작, 끝 표시 '[N번]' 으로 칸별로 다음 편."""
+        from bot import run
+        self.assertEqual(run.WRITERS, 2)
+        state = {"log": []}
+        fire, _ = self.run_step(state, 0, writers=2)
+        self.assertEqual([c.args[3] for c in fire.call_args_list], ["slot-1", "slot-2"])     # 두 칸 모두 시작
+        state["log"].insert(0, {"time": "2026-11-05 10:15", "ok": True, "msg": "글쓰기 실행 끝(직접): [2번] 새 글 x"})
+        fire, _ = self.run_step(state, 16, writers=2)
+        self.assertEqual([c.args[3] for c in fire.call_args_list], ["slot-2"])               # 끝난 2번 칸만 다음 편
+        state["log"].insert(0, {"time": "2026-11-05 10:20", "ok": True, "msg": "글쓰기 실행 끝(직접): 보류 수정"})  # 칸 표시 없음 = 1번
+        fire, _ = self.run_step(state, 21, writers=2)
+        self.assertEqual([c.args[3] for c in fire.call_args_list], ["slot-1"])
+        old = {"log": [{"time": "2026-11-05 09:50", "ok": True, "msg": "글쓰기 실행 끝(직접): 예전"}],
+               "continuous": {"fired_at": "2026-11-05 10:00", "fails": 0, "count": 5, "seen": "2026-11-05 09:40 직접 작성 글: x"}}
+        fire, _ = self.run_step(old, 5, writers=2)                                          # 배포 직후: 1번은 아직 쓰는 중
+        self.assertEqual([c.args[3] for c in fire.call_args_list], ["slot-2"])
 
     def test_waits_for_fresh_candidates(self):
         """11/6 09:45: 끝 표시와 같은 배포의 후보 제외가 후보 목록에 반영되기 전에 다음 편이 시작돼 옛 후보(방금 뺀 것)를 받음."""

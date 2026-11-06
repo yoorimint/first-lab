@@ -228,7 +228,8 @@ def main() -> None:
                     state["review_target"] = None  # 바로 다음 실행이 같은 글을 또 검수하지 않게 (11/5 #690 두 번 검수 — 대상은 1분 봇이 새로 고름)
             elif data.get("type") == "run_done":  # 보류 수정·계산기만 한 실행도 '끝남'으로 (bot/run.DONE_MARKS)
                 label = "글쓰기 실행 끝(직접)"
-                msg = str(data.get("summary", ""))[:200] or "-"
+                slot = f"[{int(data['slot'])}번] " if str(data.get("slot", "")).isdigit() else ""  # 동시 실행 칸 (bot/run.WRITERS)
+                msg = slot + (str(data.get("summary", ""))[:200] or "-")
             elif data.get("type") == "evidence":
                 label = "근거 기록"
                 msg = save_evidence(data)

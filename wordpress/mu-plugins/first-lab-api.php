@@ -24,7 +24,14 @@ add_action(
 					$recent   = array();
 					// 후보 쪽: 40개를 다 건너뛰면 글쓰기 작업이 ?page=2, 3 으로 다음 40개 (11/6 '새 글 없음' 안전장치, bot/run.CANDIDATES_POOL)
 					$page     = $request ? max( 1, min( 3, (int) $request->get_param( 'page' ) ) ) : 1;
-					$pool     = (array) ( $state['candidates'] ?? array() );
+					$pool     = array_values( (array) ( $state['candidates'] ?? array() ) );
+					// 글쓰기 동시 실행 (11/6 운영자 '둘 다 해 봐', bot/run.WRITERS): ?slot=N 이면 후보를 번갈아 나눠 줌 — 두 실행이 같은 키워드를
+					// 고르지 않게. 2번부터는 새 글만 (보류 수정·갱신·사진 검사·법령·새 혜택·계산기는 1번 실행 몫 — 같은 일을 겹쳐 하지 않게)
+					$slot     = $request ? max( 0, min( 2, (int) $request->get_param( 'slot' ) ) ) : 0;
+					if ( $slot ) {
+						$pool = array_values( array_filter( $pool, static fn( $i ) => $i % 2 === $slot - 1, ARRAY_FILTER_USE_KEY ) );
+					}
+					$side = $slot < 2; // 1번(또는 혼자 도는) 실행만 곁일
 					// 전체 글 (30편으로 자르면 오래된 글과 같은 주제를 또 씀 — 11/5 대부업 대출 조회 중복)
 						foreach ( get_posts( array( 'numberposts' => -1, 'post_status' => array( 'publish', 'future', 'draft' ) ) ) as $p ) {
 						$recent[] = array(
@@ -36,27 +43,28 @@ add_action(
 					}
 					return array(
 						'write_mode'    => (string) ( $settings['write_mode'] ?? 'direct' ),
-						'refresh_target' => firstlab_api_refresh_target( $state ),
-						'held_drafts'    => firstlab_api_held_drafts(),
-						'image_checks'   => firstlab_api_image_checks(), // 사진 검사할 글 (daily-writer.md 5-2)
+						'refresh_target' => $side ? firstlab_api_refresh_target( $state ) : null,
+						'held_drafts'    => $side ? firstlab_api_held_drafts() : array(),
+						'image_checks'   => $side ? firstlab_api_image_checks() : array(), // 사진 검사할 글 (daily-writer.md 5-2)
 						'candidates'    => array_slice( $pool, ( $page - 1 ) * 40, 40 ), // bot/run.CANDIDATES (11/6 20→40)
 						'candidates_page' => $page,
+						'slot'            => $slot,
 						'candidates_more' => count( $pool ) > $page * 40, // 다음 쪽(?page=N+1)이 있음
 						// 앞으로 시행될 근거 법령 개정 (bot/law_watch.py) — 아직 글을 안 쓴 것만 (daily-writer.md 1단계)
-						'law_changes'   => firstlab_api_law_changes( $state ),
+						'law_changes'   => $side ? firstlab_api_law_changes( $state ) : array(),
 						// 새로 생긴 전국·광역 혜택 (bot/benefit_watch.py) — 검색량이 생기기 전에 먼저 쓰는 글감, 이미 쓴 것은 뺌
-						'new_benefits'  => array_values( array_filter( (array) ( $state['new_benefits'] ?? array() ),
+						'new_benefits'  => ! $side ? array() : array_values( array_filter( (array) ( $state['new_benefits'] ?? array() ),
 							static fn( $b ) => ! in_array( $b['key'] ?? '', (array) ( $state['new_benefits_done'] ?? array() ), true ) ) ),
 						// 최신 금리 (한국은행 ECOS, bot/bok_api.py) — 대출·이자 글의 금리 예시는 이 값 기준 (daily-writer.md)
 						'rates'         => $state['rates'] ?? null,
 						// 다음 해 요율·금액 확인이 안 된 계산기 (bot/calc_watch.py, 11/15~) — daily-writer.md 4-2
-						'calc_yearly'   => (array) ( $state['calc_yearly'] ?? array() ),
+						'calc_yearly'   => $side ? (array) ( $state['calc_yearly'] ?? array() ) : array(),
 						// 공개 대기 글이 많으면 새 글 대신 외부 검수할 대기 글 (bot/review_queue.py, daily-writer.md 0단계)
-						'review_target' => $state['review_target'] ?? null,
+						'review_target' => $side ? ( $state['review_target'] ?? null ) : null,
 						// 배포가 막힘(대개 검사 실패) — 글쓰기 작업이 먼저 고침 (bot/deploy_watch.py)
-						'deploy_alert'  => $state['deploy_alert'] ?? null,
+						'deploy_alert'  => $side ? ( $state['deploy_alert'] ?? null ) : null,
 						// 고친 내용이 서버 글에 안 들어간 패치 (bot/patch_check.py) — 글쓰기 작업이 갱신 파일로 고침
-						'patch_problems' => (array) ( $state['patch_problems'] ?? array() ),
+						'patch_problems' => $side ? (array) ( $state['patch_problems'] ?? array() ) : array(),
 						'recent_posts'  => $recent,
 						'persona'       => (string) ( $settings['persona'] ?? '' ),
 						'target_length' => (int) ( $settings['target_length'] ?? 3000 ),

@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -229,35 +230,73 @@ def post_arrived_since(state: dict, since: str, seen: str | None = None) -> bool
                for e in state.get("log", []))
 
 
+WRITERS = 2  # 글쓰기 동시 실행 수 (11/6 운영자 '둘 다 해 봐' — 시험). 실행마다 'slot-N' 을 보내 /next?slot=N 으로 후보를 나눠 받고,
+             # 2번 실행은 새 글만 (곁일은 1번). 사용량 한도로 실패가 이어지면 아래 자동 정지가 둘 다 멈춤.
+SLOT_TAG = re.compile(r"\[(\d)번\]")
+
+
+def slot_key(slot: int) -> str:
+    return "continuous" if slot == 1 else f"continuous_{slot}"   # 1번은 예전 키 그대로 (상태 호환)
+
+
+def slot_done_log(state: dict, slot: int) -> str:
+    """그 실행 칸의 가장 최근 '실행 끝' 기록 — 끝 표시(done 파일)에 slot 이 적혀 '[N번]' 이 붙음. 칸 표시가 없으면 1번."""
+    for e in state.get("log", []):  # 최신이 앞
+        msg = str(e.get("msg", ""))
+        if not (e.get("ok") and "글쓰기 실행 끝(직접):" in msg):
+            continue
+        tag = SLOT_TAG.search(msg[:40])
+        if (int(tag.group(1)) if tag else 1) == slot:
+            return f"{e.get('time', '')} {msg}"
+    return ""
+
+
 def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
-    """연속 작성 (설정 페이지 시작·정지): 한 편이 올라오면 바로 다음 편을 실행. 한 번에 한 편씩만.
-    한 편이 60분 안에 안 올라오면 실패로 세고, 3번 연속 실패하면 스스로 멈춘다 (사용량 한도·후보 소진 대비)."""
+    """연속 작성 (설정 페이지 시작·정지): 칸(WRITERS 개)마다 한 편이 끝나면 바로 다음 편을 실행.
+    한 편이 CONTINUOUS_TIMEOUT_MIN 안에 안 끝나면 실패로 세고, 한 칸이라도 3번 연속 실패하면 스스로 멈춘다 (사용량 한도·후보 소진 대비)."""
     if settings.write_mode != "direct" or not continuous_on():
-        state.pop("continuous", None)
+        for slot in range(1, WRITERS + 1):
+            state.pop(slot_key(slot), None)
         return
     if state.get("dashboard_at") == "":
         # 방금 올라온 결과(후보 제외·새 글)로 후보 목록을 새로 만들기 전 — 이번 분에 시작하면 옛 후보를 받음
         # (11/6 09:45 실행: '후보 20개는 직전 실행이 제외한 것' → 새 글 없이 끝남). 아래 refresh_dashboard 뒤 다음 분에 시작.
         return
-    c = state.get("continuous") or {}
+    for slot in range(1, WRITERS + 1):
+        if not _slot_step(state, settings, now, slot):
+            return
+
+
+def _slot_step(state: dict, settings: BotSettings, now: datetime, slot: int) -> bool:
+    """한 칸 진행. 연속 작성을 멈췄으면 False."""
+    key = slot_key(slot)
+    c = state.get(key) or {}
     stamp = now.strftime("%Y-%m-%d %H:%M")
     fails, count = c.get("fails", 0), c.get("count", 0)
+    done_of = (lambda: slot_done_log(state, slot)) if WRITERS > 1 else (lambda: latest_post_log(state))
     if c.get("fired_at"):
-        arrived = post_arrived_since(state, c["fired_at"], c.get("seen"))
+        seen = c.get("seen")
+        done = done_of()
+        # 끝 기록이 시작 뒤 것이어야 '끝남' — 배포 직후 예전 방식으로 기록된 실행(seen 이 다른 종류)을 끝난 것으로 착각해 겹쳐 돌리지 않게
+        arrived = (bool(done) and done != seen and done[:16] >= c["fired_at"]) if (WRITERS > 1 or seen is not None) \
+            else post_arrived_since(state, c["fired_at"], seen)
         started = datetime.strptime(c["fired_at"], "%Y-%m-%d %H:%M").replace(tzinfo=now.tzinfo)
         if not arrived and now - started < timedelta(minutes=CONTINUOUS_TIMEOUT_MIN):
-            return  # 쓰는 중
+            return True  # 쓰는 중
         fails, count = (0, count + 1) if arrived else (fails + 1, count)
     if fails >= CONTINUOUS_MAX_FAILS:
         set_continuous(False)
-        state.pop("continuous", None)
-        add_log(state, False, f"연속 작성 자동 정지: {fails}번 연속으로 글이 안 올라옴 (사용량 한도·후보 소진·오류 확인 필요)")
-        return
-    seen = latest_post_log(state)
-    state["continuous"] = {"fired_at": stamp, "fails": fails, "count": count, "seen": seen}
+        for s_ in range(1, WRITERS + 1):
+            state.pop(slot_key(s_), None)
+        add_log(state, False, f"연속 작성 자동 정지: {slot}번 실행이 {fails}번 연속으로 끝나지 않음 (사용량 한도·후보 소진·오류 확인 필요)")
+        return False
+    seen = done_of()
+    state[key] = {"fired_at": stamp, "fails": fails, "count": count, "seen": seen}
     save_state(state)  # 실행 전에 저장 — 중간에 죽어도 다음 분에 또 실행하지 않게 (11/5 검토)
-    ok = fire_routine(state, settings, f"연속 작성 {count + 1}번째")
-    state["continuous"] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count, "seen": seen}
+    label = f"연속 작성 {count + 1}번째" + (f" ({slot}번 칸)" if WRITERS > 1 else "")
+    ok = fire_routine(state, settings, label, f"slot-{slot}" if WRITERS > 1 else "")
+    state[key] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count, "seen": seen}
+    return True
 
 
 CANDIDATES = 40  # 글쓰기 세션에 주는 후보 수 — 20개면 업체·상품을 빼고 나면 남는 게 없어 새 글 없이 끝나는 실행이 생김 (11/6 세 번 연속)
