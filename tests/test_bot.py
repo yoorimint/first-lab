@@ -3248,6 +3248,19 @@ class TitleSeoTest(unittest.TestCase):
         self.assertEqual(apply_review.current_post(1, fetch=lambda pid: d)["title"], "지금 제목")
 
 
+class LogNoiseTest(unittest.TestCase):
+    """11/6: 배포마다 같은 '황금 키워드 집계'·'문제 0개'가 쌓여 30줄 기록에서 새벽 수집 기록이 밀려남 → 하루 한 번만, 기록 100줄."""
+
+    def test_same_message_once_a_day(self):
+        from bot import state as st
+        s = {"log": []}
+        self.assertTrue(st.add_log_once_a_day(s, True, "황금 키워드 집계: 같음"))
+        self.assertFalse(st.add_log_once_a_day(s, True, "황금 키워드 집계: 같음"))
+        self.assertTrue(st.add_log_once_a_day(s, True, "황금 키워드 집계: 바뀜"))
+        self.assertEqual(len(s["log"]), 2)
+        self.assertGreaterEqual(st.MAX_LOG, 100)
+
+
 class RegateTest(unittest.TestCase):
     """11/6 #980: 검사 쪽 오탐(공식 주소 목록 누락)으로 보류·포기된 글 — 배포 때 지금 코드로 다시 검사해 통과하면 바로 공개 대기열로."""
 

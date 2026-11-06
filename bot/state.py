@@ -22,7 +22,7 @@ STATE_OPTION = "firstlab_bot_state"
 REQUEST_OPTION = "firstlab_bot_request"
 EXCLUDE_OPTION = "firstlab_bot_excluded"  # 관리자가 '제외' 누른 키워드 목록 (봇이 반영 후 지움)
 DICT_KEYS = ("plan", "done", "refresh", "spend", "direct_fired", "publish_fired", "continuous", "maint_fired", "law_changes", "rates")  # 날짜·주차를 키로 쓰는 값 (빈 값이면 PHP 가 [] 로 바꿈)
-MAX_LOG = 30
+MAX_LOG = 100  # 11/6: 30줄이면 배포가 잦은 날 새벽 수집 기록이 오전에 밀려나 '언제 돌았나'를 못 봄
 MERGE_LISTS = ("used_keywords", "law_changes_done", "new_benefits_done")  # 저장 때 다른 실행의 값과 합칠 목록
 STATE_LOCK = "/run/firstlab-state.lock"  # 봇(1분)·배포(글 올리기)·키워드 수집이 상태를 동시에 저장할 때 순서 맞춤
 MAX_USED = 2000
@@ -123,6 +123,15 @@ def spent_today(state: dict) -> float:
 
 def add_log(state: dict, ok: bool, msg: str) -> None:
     state["log"].insert(0, {"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "ok": ok, "msg": msg})
+
+
+def add_log_once_a_day(state: dict, ok: bool, msg: str) -> bool:
+    """오늘 같은 내용이 이미 기록돼 있으면 안 남김 (배포마다 똑같은 집계·'문제 0개'가 쌓여 중요한 기록을 밀어냄, 11/6). 남겼으면 True."""
+    today = datetime.now().strftime("%Y-%m-%d")
+    if any(str(e.get("time", "")).startswith(today) and e.get("msg") == msg for e in state.get("log", [])):
+        return False
+    add_log(state, ok, msg)
+    return True
 
 
 def pop_manual_request() -> bool:

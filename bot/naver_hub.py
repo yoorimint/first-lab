@@ -574,9 +574,9 @@ def main(argv: list[str]) -> int:
         from .keyword_db import connect
         with connect() as conn:
             msg = "황금 키워드 집계: " + golden_report(conn, top_n=10)
-        from .state import add_log, load_state, save_state
+        from .state import add_log_once_a_day, load_state, save_state
         state = load_state()
-        add_log(state, True, msg)
+        add_log_once_a_day(state, True, msg)   # 배포마다 같은 집계가 쌓이지 않게
         save_state(state)
         print(msg, flush=True)
         return 0

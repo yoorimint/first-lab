@@ -35,7 +35,11 @@ def run() -> str:
     state = load_state()
     state["patch_problems"] = found[:20]
     msg = f"고친 내용 서버 반영 확인: 패치 {len(patches)}개 중 문제 {len(found)}개" + (f" — {found[0][:80]}" if found else "")
-    add_log(state, not found, msg)
+    if found:
+        add_log(state, False, msg)
+    else:  # 문제 없으면 하루 한 번만 (배포마다 '문제 0개'가 쌓여 다른 기록을 밀어냄, 11/6) — 패치 수는 빼고 비교
+        from .state import add_log_once_a_day
+        add_log_once_a_day(state, True, "고친 내용 서버 반영 확인: 문제 0개")
     save_state(state)
     return msg
 
