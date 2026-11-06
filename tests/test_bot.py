@@ -721,6 +721,8 @@ class OfficialHostTest(unittest.TestCase):
         self.assertTrue(is_official("https://www.q-net.or.kr/crf005.do"))
         self.assertFalse(is_official("https://blog.naver.com/x"))
         self.assertFalse(is_official("https://notkorcham.net/x"))  # 이름만 비슷한 주소는 아님
+        self.assertTrue(is_official("https://en-ter.co.kr/support/info/info01/info.do"))  # 한전 에너지마켓플레이스 (11/6 #980)
+        self.assertFalse(is_official("https://fake-en-ter.co.kr/x"))
         # 외국 정부 (11/5 #567 ESTA 오탐)
         for u in ("https://esta.cbp.dhs.gov/faq", "https://www.ecfr.gov/x", "https://www.gov.uk/visa", "https://www.mofa.go.jp/a",
                   "https://www.immi.gov.au/a", "https://travel.state.gov/a", "https://france-visas.gouv.fr/a", "https://travel.gc.ca/a",
