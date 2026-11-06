@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 896,
+ "replace": [
+  {
+   "old": "ai-e87c7fdb16",
+   "prompt": "an adult electric tricycle with two rear wheels and a front basket parked on a riverside bike path lined with autumn trees",
+   "alt": "가을 강변 자전거길에 세워 둔 세발 전기자전거",
+   "why": "사진 속 자전거가 뒷바퀴 1개인 두발 자전거라 글 주제(세발 전기자전거)와 맞지 않음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
