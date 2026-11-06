@@ -75,7 +75,9 @@ def _docs_text(xml: str, raw_of=None) -> str:
     from . import source_check
     raw_of = raw_of or source_check._raw
     texts = []
-    for link in re.findall(r"<첨부파일링크>\s*([^<\s]+)", xml)[:MAX_ATTACH]:
+    # 자치법규 별표는 본문이 비고 첨부 hwp 로만 있음 — '<별표첨부파일명>' 칸 (11/7 #1288 고성군 당항포관광지 조례 요금표를 못 읽음)
+    links = re.findall(r"<첨부파일링크>\s*([^<\s]+)", xml) + re.findall(r"<별표첨부파일명>\s*(?:<!\[CDATA\[)?\s*(https?://[^<\]\s]+)", xml)
+    for link in links[:MAX_ATTACH]:
         got = raw_of(html.unescape(link).replace("http://", "https://"))
         texts.append(source_check.doc_text(got[0]) if got else "")
     return " ".join(t for t in texts if t)

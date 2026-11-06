@@ -1844,6 +1844,18 @@ class ExpiryTest(unittest.TestCase):
         self.assertEqual(plan.call_count, refresh.RECHECK_PER_DAY - 1)
 
 
+class OrdinanceAnnexTest(unittest.TestCase):
+    """11/7 #1288: 자치법규 별표는 본문이 비고 '<별표첨부파일명>' 의 hwp 로만 있어 조례 요금표(S사이트 50,000원·1박 추가 30,000원)를 못 읽음."""
+
+    def test_annex_attachment_read(self):
+        from bot import law_rules
+        xml = ("<별표단위><별표첨부파일구분><![CDATA[hwp]]></별표첨부파일구분><별표첨부파일명><![CDATA[http://www.law.go.kr/flDownload.do?"
+               "gubun=ELIS&flSeq=137245517&flNm=%EB%B3%84%ED%91%9C+1]]></별표첨부파일명><별표내용><![CDATA[]]></별표내용></별표단위>")
+        seen = []
+        law_rules._docs_text(xml, raw_of=lambda url: seen.append(url) or None)
+        self.assertEqual(seen, ["https://www.law.go.kr/flDownload.do?gubun=ELIS&flSeq=137245517&flNm=%EB%B3%84%ED%91%9C+1"])
+
+
 class ImageAltTextTest(unittest.TestCase):
     """11/7 #1245: 공단 사진 규격 기준이 그림 설명 글(alt)에만 있어 근거 대조가 '못 엶'."""
 

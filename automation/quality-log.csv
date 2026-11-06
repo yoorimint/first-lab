@@ -82,3 +82,4 @@ date,post,fixes,types
 2026-11-06,1270,4,missing_condition:1 unverified:3
 2026-11-06,1272,6,headline:2 missing_condition:1 outdated:1 wrong_fact:2
 2026-11-06,1278,7,missing_condition:6 wrong_fact:1
+2026-11-06,1288,20,missing_condition:5 outdated:4 unverified:10 wrong_fact:1
