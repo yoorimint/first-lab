@@ -139,7 +139,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += _regional_only(review, f"{title} {excerpt}")
     out += _small_workplace(review, f"{title} {excerpt}")
     # 조건 누락 (11/5 운영자 '막을 대책 세워서 어떻게든 해야지') — bot/condition_gate.py
-    from . import condition_gate
+    from . import condition_gate, expiry
     out += condition_gate.headline_scope(title, excerpt, body_html)
     out += condition_gate.lead_vs_body(body_html)
     out += condition_gate.excerpt_vs_exclusions(excerpt, body_html)
@@ -163,6 +163,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.ordinary_wage_rule(body_html)
     out += condition_gate.small_workplace_items(body_html)
     out += condition_gate.headline_from_price(title, excerpt, body_html)
+    out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(body_html)))
     out += condition_gate.stale_forms(review, None if law_fetcher is None else (lambda *a: []))
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:

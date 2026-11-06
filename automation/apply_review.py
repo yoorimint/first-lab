@@ -66,7 +66,7 @@ def _numbers_kept(p: dict, element: str) -> bool:
 
 
 PREVENTION_LOG = ROOT / "automation" / "review-only-log.md"
-CHECK_MODULES = ("condition_gate.py", "review_gate.py", "source_check.py", "writer.py", "freshness.py")  # 글을 막거나 표시하는 검사가 있는 곳
+CHECK_MODULES = ("condition_gate.py", "review_gate.py", "source_check.py", "writer.py", "freshness.py", "expiry.py")  # 글을 막거나 표시하는 검사가 있는 곳
 
 
 def _prevention_problem(post: dict, p: dict) -> str | None:
@@ -86,7 +86,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
         code = "".join((ROOT / "bot" / f).read_text(encoding="utf-8") for f in CHECK_MODULES)
         if not re.fullmatch(r"\w+", name) or not re.search(rf"\b(def|class) {name}\b", code):
             return f"check:{name} 를 저장소 코드·테스트에서 못 찾음 — 검사를 먼저 만들기"
-        from bot import condition_gate, source_check
+        from bot import condition_gate, expiry, source_check
         fn = {"headline_scope": lambda: condition_gate.headline_scope(post["title"], post["excerpt"], post["content_html"]),
               "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"]),
               "lead_vs_exceptions": lambda: condition_gate.lead_vs_exceptions(post["content_html"]),
@@ -101,6 +101,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "deadline_holiday": lambda: condition_gate.deadline_holiday(post["content_html"]),
               "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review"), post["excerpt"], post["content_html"]),
               "upcoming_amendments": lambda: condition_gate.upcoming_amendments(post.get("review"), post["content_html"]),
+              "round_headline": lambda: expiry.round_headline(post["title"], post["excerpt"], " ".join(expiry.blocks(post["content_html"]))),
               "headline_from_price": lambda: condition_gate.headline_from_price(post["title"], post["excerpt"], post["content_html"]),
               "small_workplace_items": lambda: condition_gate.small_workplace_items(post["content_html"]),
               "ordinary_wage_rule": lambda: condition_gate.ordinary_wage_rule(post["content_html"]),

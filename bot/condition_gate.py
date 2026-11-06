@@ -593,7 +593,25 @@ def retention_start(body_html: str) -> list[str]:
         sent = m.group(0).strip()
         if not RETENTION_START.search(sent):
             out.append(f"보존 기간을 언제부터 세는지 없음: '{sent[-60:]}' — 근거 법령의 기산일(예: '근로관계가 끝난 날부터 3년')을 같이 쓰기")
+    out += _retention_table(body_html)
     return out[:3]
+
+
+def _retention_table(body_html: str) -> list[str]:
+    """머리칸이 '보관·보존'인 표 열의 'N년' 칸 (11/7 #1428: '보관 기준' 열에 '임금채권 시효 3년' — 문장에 '보관' 말이 없어 위 검사가 못 봄)."""
+    out = []
+    for table in re.findall(r"<table\b.*?</table>", body_html or "", re.S | re.I):
+        rows = [[_plain(c) for c in re.findall(r"<t[hd]\b[^>]*>(.*?)</t[hd]>", r, re.S | re.I)]
+                for r in re.findall(r"<tr\b.*?</tr>", table, re.S | re.I)]
+        if not rows:
+            continue
+        cols = [i for i, head in enumerate(rows[0]) if re.search(r"보관|보존", head)]
+        for row in rows[1:]:
+            for i in cols:
+                cell = row[i] if i < len(row) else ""
+                if re.search(r"\d+\s*년", cell) and not RETENTION_START.search(cell):
+                    out.append(f"보관 기간 칸을 언제부터 세는지 없음: '{row[0][:20]} — {cell[:40]}' — 기산일(예: '받을 수 있는 때부터 3년')과 법정 의무인지 권고인지 쓰기")
+    return out
 
 
 # 근거 조문이 '…범위에서 조례로 정하는 거리(기준) 이상'처럼 조례에 맡기는데 제목·요약·첫 문단이 법 하한을 그대로 단정

@@ -1822,6 +1822,53 @@ class ExpiryTest(unittest.TestCase):
         self.assertFalse(unreadable({"counts": {"확인": 9, "못 엶": 1}}))
         self.assertFalse(unreadable(None))
 
+    def test_yearless_date_counts(self):
+        """#1423 '11월 19일 접수'처럼 연도 없는 날짜도 다시 확인할 날이 됨 (예전엔 'O년 O월'만 읽어 놓침)."""
+        from bot.expiry import due_date
+        self.assertEqual(due_date("12월 시험은 11월 19일 오후 2시부터 선착순 접수예요.", self.day)[0], self.dt.date(2026, 11, 19))
+        # 11월에 쓴 '1월 9일' 은 다음 해
+        self.assertEqual(due_date("다음 접수는 1월 9일부터예요.", self.day)[0], self.dt.date(2027, 1, 9))
+
+    def test_draft_round_passed_before_publish(self):
+        """11/7 운영자 '시간 제한 있는 글은 나중에 올리면 기한이 지나지 않아?': 쓸 땐 앞날이던 접수가 대기 중 지나면 보류."""
+        from bot.expiry import passed_rounds
+        written = self.dt.date(2026, 11, 6)
+        texts = ["12월 시험은 11월 19일(목) 오후 2시 선착순 접수"]
+        self.assertEqual(passed_rounds(texts, written, self.dt.date(2026, 11, 18)), [])
+        self.assertIn("2026-11-19", passed_rounds(texts, written, self.dt.date(2026, 11, 20))[0])
+        # 기간은 끝날까지 유효, 이미 지난 일로 쓴 문장·해마다 같은 날·규칙 변경('이후')은 아님
+        self.assertEqual(passed_rounds(["11월 2일~30일 접수"], written, self.dt.date(2026, 11, 20)), [])
+        self.assertTrue(passed_rounds(["11월 2일~30일 접수"], self.dt.date(2026, 11, 1), self.dt.date(2026, 12, 1)))
+        for text in ("2차 신청은 11월 10일 마감됐어요", "매년 11월 30일까지 신청해요", "11월 12일 이후 건축허가 신청분부터 적용"):
+            self.assertEqual(passed_rounds([text], written, self.dt.date(2026, 12, 1)), [], text)
+
+    def test_round_headline_for_repeating_schedule(self):
+        """11/7 운영자 '시험일정이 아니라 계속 유효한 걸로 적어야': 되풀이 일정인데 제목·요약이 이번 회차에 묶이면 관문에서 막음."""
+        from bot import review_gate
+        from bot.expiry import blocks, round_headline
+        body = "<p>소방안전관리자 2급 시험은 매달 열려요.</p><table><tr><td>월별 공고</td></tr></table>"
+        got = round_headline("소방안전관리자 2급 시험일정: 12월 시험은 11월 19일 접수", "", " ".join(blocks(body)))
+        self.assertEqual(len(got), 1)
+        self.assertIn("늘 맞는 규칙", got[0])
+        self.assertEqual(round_headline("소방안전관리자 2급 시험일정: 매달 시행, 전달 중순 오후 2시 접수", "", " ".join(blocks(body))), [])
+        self.assertEqual(round_headline("아동수당: 2027년 1월 21일 이후 출생아는 신청 없이", "", "매월 10만 원"), [])   # 규칙 변경
+        self.assertEqual(round_headline("한정 행사 11월 30일까지 접수", "", "올해만 열리는 행사"), [])          # 한 번뿐인 행사는 공개 전 확인이 막음
+        self.assertTrue(any("이번 회차" in p for p in review_gate.problems([{"claim": "c"}], "12월 시험은 11월 19일 접수", "", body)))
+
+    def test_queued_draft_with_passed_round_held(self):
+        from bot import freshness
+
+        def wp(*a):
+            if a[:2] == ("post", "get"):
+                return {"--field=post_title": "소방안전관리자 2급 시험일정", "--field=post_excerpt": "",
+                        "--field=post_content": "<p>12월 시험은 11월 19일 오후 2시 선착순 접수예요.</p>",
+                        "--field=post_date": "2026-11-06", "--field=post_name": "x"}.get(a[3], "")
+            return ""
+        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a, **k: []), \
+                mock.patch.object(freshness, "_review_from_queue", return_value=[{"claim": "c"}]):
+            self.assertFalse(any("지난 일정" in g for g in freshness.check_post(1, self.dt.date(2026, 11, 18))))
+            self.assertTrue(any("지난 일정" in g for g in freshness.check_post(1, self.dt.date(2026, 11, 20))))
+
     def test_due_post_picked_regardless_of_weekly_limit(self):
         from unittest import mock
         from bot import refresh
@@ -2045,6 +2092,15 @@ class RetentionStartTest(unittest.TestCase):
         self.assertEqual(retention_start("<p>근로관계가 끝난 날부터 3년간 보존해야 해요.</p>"), [])
         self.assertEqual(retention_start("<p>확정신고 기한 후 5년간 보존해야 해요.</p>"), [])
         self.assertEqual(retention_start("<p>전송하면 5년 보존 의무도 없어요.</p>"), [])
+
+    def test_retention_table_column(self):
+        """11/7 #1428: '보관 기준' 열에 '임금채권 시효 3년' — 문장에 '보관' 말이 없어도 표 머리칸으로 봄."""
+        from bot.condition_gate import retention_start
+        table = ("<table><tr><th>서류</th><th>보관 기준</th></tr>"
+                 "<tr><td>근로계약서</td><td>{}</td></tr></table>")
+        self.assertEqual(len(retention_start(table.format("임금채권 시효 3년"))), 1)
+        self.assertEqual(retention_start(table.format("임금을 받을 수 있는 때부터 3년(시효에 맞춘 권고)")), [])
+        self.assertEqual(retention_start("<table><tr><th>서류</th><th>금액</th></tr><tr><td>a</td><td>3년 약정</td></tr></table>"), [])
 
     def test_in_gate(self):
         self.assertIn("condition_gate.retention_start(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))

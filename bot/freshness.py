@@ -15,7 +15,7 @@ import re
 import urllib.parse
 from pathlib import Path
 
-from . import changed, source_check
+from . import changed, expiry, source_check
 from .review_gate import _ok
 from .settings import wp_cli
 
@@ -136,6 +136,13 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
         mark = ""
     if changed.pending(mark, f"{since:%Y-%m-%d}") and mark[:10] <= f"{today:%Y-%m-%d}":
         out.append(f"쓴 뒤 근거 변경: {mark[:150]}")
+    # 쓸 때 앞날이던 접수·마감이 대기 중에 지났거나, 되풀이 일정인데 제목이 이번 회차에 묶인 글 (11/7 운영자 '시간 제한 있는 글')
+    try:
+        title, excerpt, content = get("post_title"), get("post_excerpt"), get("post_content")
+    except Exception:  # noqa: BLE001 — 못 읽으면 이 확인만 건너뜀
+        title = excerpt = content = ""
+    out += expiry.passed_rounds([title, excerpt] + expiry.blocks(content), since, today)
+    out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(content)))
     # 대기열에 들어간 뒤라도 본문 계산기가 독립 검수 전이면 공개하지 않음 (11/5 운영자 '계산기들은 전부 발행처리했네?')
     from . import review_gate
     out += review_gate.unreviewed_calcs(get("post_content"))
