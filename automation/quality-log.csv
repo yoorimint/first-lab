@@ -100,3 +100,5 @@ date,post,fixes,types
 2026-11-06,1405,3,unverified:3
 2026-11-06,1403,2,missing_condition:2
 2026-11-06,1408,4,missing_condition:4
+2026-11-06,1419,1,wrong_fact:1
+2026-11-06,1421,1,wrong_fact:1
