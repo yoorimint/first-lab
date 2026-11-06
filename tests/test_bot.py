@@ -3265,6 +3265,21 @@ class LogNoiseTest(unittest.TestCase):
         self.assertGreaterEqual(st.MAX_LOG, 100)
 
 
+class CrossLawTest(unittest.TestCase):
+    """다른 법률의 예외 (11/6 #989 노동절법·#996 가사근로자법 — 같은 꼴 2번 → 알려진 예외 목록으로 경고)."""
+
+    def test_known_cross_law_exceptions(self):
+        from bot.condition_gate import cross_law_exceptions
+        b989 = "<p>상시 4명 이하 사업장에는 이 조항이 적용되지 않아, 공휴일은 근로계약에서 정한 경우에만 쉬어요.</p>"
+        b996 = "<li>동거하는 친족만 쓰는 사업장·가사 사용인: 근로기준법 자체가 적용되지 않아요.</li>"
+        self.assertEqual(len(cross_law_exceptions(b989)), 1)
+        self.assertEqual(len(cross_law_exceptions(b996)), 1)
+        self.assertEqual(cross_law_exceptions(b989 + "<p>단, 노동절(5월 1일)은 규모와 상관없이 유급휴일이에요.</p>"), [])
+        self.assertEqual(cross_law_exceptions(b996 + "<p>가사근로자는 근로기준법이 적용돼요.</p>"), [])
+        self.assertEqual(cross_law_exceptions("<p>연장근로 가산은 50%예요.</p>"), [])
+        self.assertIn('"cross_law_exceptions"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+
 class CalcCoverageTest(unittest.TestCase):
     """11/6 #989 근무일수 계산기: 공휴일 목록이 2026~2027년뿐인데 글은 '대체공휴일까지 반영해 바로 세어 줘요' → 본문에 기간을 밝혀야 통과."""
 
