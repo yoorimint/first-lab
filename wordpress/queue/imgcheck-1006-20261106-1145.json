@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1006,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "rows of parked cars in a wide open-air airport parking lot under a clear blue sky with an airplane flying overhead",
+   "alt": "비행기가 지나가는 공항 야외 주차장"
+  }
+ ]
+}

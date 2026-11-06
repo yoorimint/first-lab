@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1030,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a red fire truck parked in front of a modern fire station garage at dusk with its doors open",
+   "alt": "해 질 녘 소방서 차고 앞의 빨간 소방차"
+  }
+ ]
+}
