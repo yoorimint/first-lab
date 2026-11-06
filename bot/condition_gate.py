@@ -624,18 +624,25 @@ def upcoming_amendments(review: list[dict] | None, body_html: str, changes_of=No
 PUBLIC_FACILITY = re.compile(r"(시립|구립|군립|도립|공립)\s?[가-힣]{0,12}(요양원|요양시설|도서관|체육관|수영장|복지관|어린이집|박물관|미술관|캠핑장|휴양림|공원|병원|문화센터|청소년수련관)")
 
 
-def facility_ordinance(title: str, review: list[dict] | None, excerpt: str = "") -> list[str]:
+# 이름에 '군립·시립'이 없는 지자체 운영 시설 (11/7 #1288 당항포 오토캠핑장 '고성군', #1297 함허동천 야영장 '강화군시설관리공단':
+# 군청 안내 페이지의 옛 요금을 그대로 옮김 — 조례 별표가 2026.1.1 개정) → 본문이 지자체·공단 운영이라고 하면 조례 확인
+LOCAL_FACILITY = re.compile(r"(캠핑장|야영장|휴양림|수영장|체육관|도서관|관광지)")
+LOCAL_RUNNER = re.compile(r"[가-힣]{1,6}(?:시|군|구)\s?(?:시설관리공단|시설공단|관광재단|문화재단)|[가-힣]{1,6}(?:시|군|구)(?:청|가|이|에서)\s?(?:직접\s?)?운영")
+
+
+def facility_ordinance(title: str, review: list[dict] | None, excerpt: str = "", body_html: str = "") -> list[str]:
     # 제목에 '시립'이 없어도 요약에 있으면 (11/6 #1156 '남부대 수영장' — 요약 '남부대학교 시립국제수영장', 조례는 50% 감면인데 글은 30%)
     m = PUBLIC_FACILITY.search(title or "") or PUBLIC_FACILITY.search(excerpt or "")
-    if not m:
+    local = None if m else (LOCAL_FACILITY.search(title or "") and LOCAL_RUNNER.search(_plain(body_html or "")))
+    if not m and not local:
         return []
-    facility = re.sub(r"\s+", "", m.group(0))   # '시립요양원' — 다른 시설의 조례(계양구 치매전담형 …)로는 안 됨
+    facility = re.sub(r"\s+", "", m.group(0)) if m else ""   # '시립요양원' — 다른 시설의 조례(계양구 치매전담형 …)로는 안 됨
     names = [re.sub(r"\s+", "", n) for i in review or [] for u in i.get("urls", [])
              for n in re.findall(r"/자치법규/([^/?#]+)", urllib.parse.unquote(str(u)))]
     claims = " ".join(str(i.get("claim", "")) for i in review or [])
     # 여러 시설을 함께 정하는 조례(광주광역시 체육시설 관리운영 조례 별표 1 '27. 남부대시립국제수영장')는 이름에 시설명이 없음
     # → 검수 기록에 '시설 조례: <조례 이름> …' 으로 그 조례가 이 시설을 정한다고 밝히면 통과
-    if any(facility in n for n in names) or "조례 해당 없음" in claims or (names and "시설 조례" in claims):
+    if (any(facility in n for n in names) if facility else names) or "조례 해당 없음" in claims or (names and "시설 조례" in claims):
         return []
     return ["공공시설 글인데 그 시설의 설치·운영 조례를 근거로 안 씀 — 입소·이용 대상·요금은 조례가 정함 "
             "(python3 -m bot.lawtext <조례 이름> 제N조, 주소 https://www.law.go.kr/자치법규/<조례 이름>). 여러 시설 공통 조례면 검수 기록에 '시설 조례: <조례 이름> 별표 …', 조례가 없으면 '조례 해당 없음 — 이유'"]

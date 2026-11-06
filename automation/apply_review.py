@@ -99,7 +99,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "excerpt_parentheticals": lambda: condition_gate.excerpt_parentheticals(post["excerpt"], post["content_html"]),
               "limited_event_year": lambda: condition_gate.limited_event_year(post["excerpt"], post["content_html"]),
               "deadline_holiday": lambda: condition_gate.deadline_holiday(post["content_html"]),
-              "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review"), post["excerpt"]),
+              "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review"), post["excerpt"], post["content_html"]),
               "upcoming_amendments": lambda: condition_gate.upcoming_amendments(post.get("review"), post["content_html"]),
               "headline_from_price": lambda: condition_gate.headline_from_price(post["title"], post["excerpt"], post["content_html"]),
               "small_workplace_items": lambda: condition_gate.small_workplace_items(post["content_html"]),

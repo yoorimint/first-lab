@@ -153,7 +153,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.excerpt_apply_date(excerpt, body_html)
     out += condition_gate.exception_articles(review, law_fetcher)
     out += condition_gate.article_provisos(review, law_fetcher)
-    out += condition_gate.facility_ordinance(title, review, excerpt)
+    out += condition_gate.facility_ordinance(title, review, excerpt, body_html)
     out += condition_gate.upcoming_amendments(review, body_html, None if law_fetcher is None else (lambda *a: []))
     out += condition_gate.transition_rules(review, body_html)
     out += condition_gate.retention_start(body_html)

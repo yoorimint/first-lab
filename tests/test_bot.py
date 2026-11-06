@@ -1749,6 +1749,10 @@ class FacilityOrdinanceTest(unittest.TestCase):
         self.assertEqual(len(facility_ordinance("인천시립요양원 입소 조건과 비용", other)), 1)
         self.assertEqual(facility_ordinance("인천시립요양원 입소 조건과 비용", own), [])
         self.assertEqual(facility_ordinance("천안 청수도서관 이용시간", []), [])          # 시립·구립이 제목에 없으면 안 봄
+        # 11/7 #1297 함허동천: 이름에 군립이 없어도 본문이 지자체·공단 운영이면 조례 확인 (군청 안내 페이지가 옛 요금)
+        self.assertEqual(len(facility_ordinance("함허동천 캠핑장 요금", [], "", "<p>강화군시설관리공단이 운영하는 야영장이에요.</p>")), 1)
+        self.assertEqual(facility_ordinance("함허동천 캠핑장 요금", [{"claim": "요금", "urls": ["https://www.law.go.kr/자치법규/강화군함허동천야영장관리및운영조례"]}],
+                                            "", "<p>강화군시설관리공단이 운영해요.</p>"), [])
         self.assertEqual(facility_ordinance("구립 도서관 이용시간", [{"claim": "조례 해당 없음 — 구 규칙만 있음", "urls": []}]), [])
         # 제목엔 없고 요약에만 '시립' (#1156), 여러 시설 공통 조례는 '시설 조례:' 로 밝히면 통과
         self.assertEqual(len(facility_ordinance("남부대 수영장 이용 안내", [], "광주 남부대학교 시립국제수영장 성인 일일 5,000원")), 1)
