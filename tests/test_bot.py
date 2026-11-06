@@ -3068,6 +3068,22 @@ class LimitedEventYearTest(unittest.TestCase):
         self.assertIn('"limited_event_year"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
 
 
+class PhpNameClashTest(unittest.TestCase):
+    """워드프레스가 한 번에 읽는 PHP(mu-plugins·테마)에 같은 이름의 함수·상수가 두 번 있으면 사이트 전체가 치명적 오류 (500).
+    11/6 17:5x: 새 공식 사이트 링크 플러그인의 firstlab_official_links 가 구조화 데이터 플러그인의 같은 이름과 겹쳐 글·API 전부 500."""
+
+    def test_no_duplicate_names(self):
+        import collections
+        files = list((ROOT / "wordpress" / "mu-plugins").glob("*.php")) + list((ROOT / "wordpress" / "themes").rglob("*.php"))
+        funcs, consts = collections.Counter(), collections.Counter()
+        for f in files:
+            text = f.read_text(encoding="utf-8")
+            funcs.update(set(re.findall(r"^\s*function\s+([A-Za-z_]\w*)\s*\(", text, re.M)))
+            consts.update(set(re.findall(r"^\s*const\s+([A-Z_][A-Z0-9_]*)\s*=", text, re.M)))
+        self.assertEqual([n for n, c in funcs.items() if c > 1], [])
+        self.assertEqual([n for n, c in consts.items() if c > 1], [])
+
+
 class OfficialLinksTest(unittest.TestCase):
     """본문에 글자로만 적힌 공식 사이트를 화면에서 링크로 (11/6 운영자 '공식사이트 링크 만들어라' — 자동차세 납부 조회 글)."""
 
@@ -3079,7 +3095,7 @@ class OfficialLinksTest(unittest.TestCase):
             self.skipTest("php 없음")
         code = ("<?php define('ABSPATH', 1); function add_filter() {} function esc_url($s) { return $s; }\n"
                 f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-official-links.php'}';\n"
-                "echo firstlab_official_links(getenv('H'));")
+                "echo firstlab_official_autolink(getenv('H'));")
         with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
             f.write(code)
         try:

@@ -31,7 +31,7 @@ function firstlab_official_sites(): array {
 }
 
 /** 본문 HTML → 공식 사이트 이름·주소 첫 곳을 링크로 (글자 부분만, 링크·제목·코드 안은 그대로). */
-function firstlab_official_links( string $html ): string {
+function firstlab_official_autolink( string $html ): string {
 	$parts = preg_split( '/(<[^>]+>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE );
 	$skip  = 0; // <a>·<h1~6>·<code>·<script>·<style> 안
 	$done  = 0;
@@ -87,7 +87,7 @@ add_filter(
 		if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
-		return firstlab_official_links( (string) $content );
+		return firstlab_official_autolink( (string) $content );
 	},
 	7 // 목차(8)·운영 정보(9)·함께 보면 좋은 글(20) 전 — 본문 글자에만
 );
