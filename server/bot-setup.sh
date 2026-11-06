@@ -150,6 +150,9 @@ fi
 
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.pending_images) || echo "사진 없는 글 표시 실패 (봇 동작에는 영향 없음)"
 
+log "보류 글 다시 검사 (검사 코드가 바뀌었으면 지금 코드로 통과하는 보류·쉬는 글을 바로 공개 대기열로 — bot/hold.py)"
+(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.hold) || echo "보류 다시 검사 실패 (봇 동작에는 영향 없음)"
+
 log "systemd 타이머 (1분마다 실행)"
 install -m 644 "$REPO_DIR"/server/systemd/firstlab-{bot,discover,backup}.{service,timer} /etc/systemd/system/
 systemctl daemon-reload

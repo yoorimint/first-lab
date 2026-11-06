@@ -3248,6 +3248,26 @@ class TitleSeoTest(unittest.TestCase):
         self.assertEqual(apply_review.current_post(1, fetch=lambda pid: d)["title"], "지금 제목")
 
 
+class RegateTest(unittest.TestCase):
+    """11/6 #980: 검사 쪽 오탐(공식 주소 목록 누락)으로 보류·포기된 글 — 배포 때 지금 코드로 다시 검사해 통과하면 바로 공개 대기열로."""
+
+    def test_released_when_current_code_passes(self):
+        import tempfile
+        from bot import hold
+        d = Path(tempfile.mkdtemp())
+        (d / "hanjeon.json").write_text(json.dumps({"keyword": "한전고효율가전환급", "review": [{"claim": "a"}]}), encoding="utf-8")
+        (d / "fixhold-980-20261106-1129.json").write_text(json.dumps({"type": "fix_hold", "post_id": 980, "give_up": True}), encoding="utf-8")
+        self.assertEqual(hold.latest_review(980, "한전고효율가전환급", d), [{"claim": "a"}])   # 포기 파일엔 review 없음 → 처음 글 파일
+        released = []
+        held = [{"post_id": 980, "keyword": "한전고효율가전환급", "title": "t"}, {"post_id": 981, "keyword": "x", "title": "u"}]
+        msgs = hold.regate(held, review_of=lambda pid, kw: [{"claim": "a"}] if pid in (980, 981) else None,
+                           problems=lambda review, t, e, c: [] if t == "t" else ["아직 막힘"],
+                           release=lambda pid, review: released.append(pid))
+        self.assertEqual(released, [980])
+        self.assertEqual(len(msgs), 1)
+        self.assertIn("bot.hold", (ROOT / "server" / "bot-setup.sh").read_text(encoding="utf-8"))
+
+
 class LeadExceptionTest(unittest.TestCase):
     """첫 문단이 규칙을 그냥 말하고 예외는 아래에만 (11/5 #821·#828, 11/6 #928 — 같은 꼴 3번 → 검사, 글쓰기 사전 점검 경고)."""
 

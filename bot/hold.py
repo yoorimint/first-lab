@@ -11,6 +11,9 @@ MAX_TRIES 번 넘게 막힌 글·포기한 글은 목록에서 빼고(다른 보
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from . import freshness, review_gate, schedule, source_check
 from .blocks import to_blocks
 from .refresh import _html
@@ -76,3 +79,78 @@ def apply_fix(data: dict) -> str:
     # 새 검수 기록으로 근거 대조도 다시 저장 (공개 직전 확인·법령 감시·공개 글 다시 보기가 이 근거를 봄)
     source_check.record(post_id, data.get("review"), lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
     return f"'{title}' 재검사 통과 → 공개 대기열 ({str(data.get('changes', ''))[:80]})"
+
+
+# 배포 때 보류 글 다시 검사 (11/6 #980: 근거 en-ter.co.kr(한전 운영)이 공식 주소 목록에 없어 보류 → 글쓰기 작업이 포기 → 감시 세션이
+# 목록을 고쳤지만 30일 쉬는 글이 됨). 검사 코드가 바뀌면(배포) 보류·쉬는 글을 지금 코드로 다시 검사해 통과하면 바로 공개 대기열로.
+QUEUE_DIR = Path(__file__).resolve().parent.parent / "wordpress" / "queue"
+
+
+def latest_review(post_id: int, keyword: str, queue_dir: Path = QUEUE_DIR) -> list | None:
+    """그 글의 가장 최근 검수 기록: 보류 수정 파일(fixhold-<번호>-*) 중 review 가 있는 마지막 것, 없으면 처음 올린 글 파일(같은 키워드)."""
+    for path in sorted(queue_dir.glob(f"fixhold-{post_id}-*.json"), reverse=True):
+        try:
+            review = json.loads(path.read_text(encoding="utf-8")).get("review")
+        except (OSError, ValueError):
+            continue
+        if review:
+            return review
+    for path in queue_dir.glob("*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(data, dict) and str(data.get("keyword", "")).strip() == keyword and data.get("review"):
+            return data["review"]
+    return None
+
+
+def regate(held: list[dict], review_of=latest_review, problems=None, release=None) -> list[str]:
+    """held: [{'post_id', 'keyword', 'title', 'excerpt', 'content'}]. 지금 코드로 통과하면 release(post_id, review)."""
+    problems = problems or review_gate.problems
+    release = release or _release
+    out = []
+    for h in held:
+        review = review_of(int(h["post_id"]), h.get("keyword", ""))
+        if not review:
+            continue
+        if not problems(review, h.get("title", ""), h.get("excerpt", ""), h.get("content", "")):
+            release(int(h["post_id"]), review)
+            out.append(f"글 {h['post_id']} '{str(h.get('title', ''))[:30]}' 지금 검사로 통과 → 보류 해제·공개 대기열")
+    return out
+
+
+def _release(post_id: int, review: list) -> None:
+    wp_cli("post", "meta", "delete", str(post_id), review_gate.HOLD_META)
+    try:
+        wp_cli("post", "meta", "delete", str(post_id), TRIES_META)
+    except Exception:  # noqa: BLE001
+        pass
+    schedule.mark_ready(post_id)
+    source_check.record(post_id, review, lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
+
+
+def held_drafts() -> list[dict]:
+    """보류·쉬는 초안 (주소 = 키워드, publisher.existing_post_id 와 같은 규칙)."""
+    import urllib.parse
+    rows = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--meta_key={review_gate.HOLD_META}",
+                             "--fields=ID,post_name,post_title,post_excerpt,post_content", "--format=json",
+                             "--posts_per_page=-1") or "[]")
+    return [{"post_id": r["ID"], "keyword": urllib.parse.unquote(r.get("post_name", "")), "title": r["post_title"],
+             "excerpt": r["post_excerpt"], "content": _html(r["post_content"])} for r in rows]
+
+
+def main() -> None:
+    from .state import add_log, load_state, save_state
+    msgs = regate(held_drafts())
+    if msgs:
+        state = load_state()
+        for m in msgs:
+            add_log(state, True, f"보류 다시 검사: {m}")
+        save_state(state)
+    print("\n".join(msgs) or "보류 다시 검사: 풀린 글 없음")
+
+
+if __name__ == "__main__":
+    main()
+
