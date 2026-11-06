@@ -1,12 +1,30 @@
 {
-  "law_checked": ["소득세법|2027-01-01"],
-  "basis_date": "2026-11-06", "yearly": false,
+  "law_checked": [
+    "소득세법|2027-01-01",
+    "소득세법 시행령|2027-01-01"
+  ],
+  "basis_date": "2026-11-06",
+  "yearly": false,
   "max_input": 1000000000000,
-  "won10_keys": ["half", "interim_tax", "installment", "pay_by_nov"],
+  "won10_keys": [
+    "half",
+    "interim_tax",
+    "installment",
+    "pay_by_nov"
+  ],
   "sources": [
-    {"name": "국가법령정보센터 소득세법 (제65조 중간예납, 제77조 분할납부, 제86조 소액 부징수)", "url": "https://www.law.go.kr/법령/소득세법"},
-    {"name": "국가법령정보센터 소득세법 시행령 (제123조 제외 소득, 제140조 분납 금액)", "url": "https://www.law.go.kr/법령/소득세법시행령"},
-    {"name": "국세청 중간예납세액의 계산 및 납부방법", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"}
+    {
+      "name": "국가법령정보센터 소득세법 (제65조 중간예납, 제77조 분할납부, 제86조 소액 부징수)",
+      "url": "https://www.law.go.kr/법령/소득세법"
+    },
+    {
+      "name": "국가법령정보센터 소득세법 시행령 (제123조 제외 소득, 제140조 분납 금액)",
+      "url": "https://www.law.go.kr/법령/소득세법시행령"
+    },
+    {
+      "name": "국세청 중간예납세액의 계산 및 납부방법",
+      "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=2237&cntntsId=7674"
+    }
   ],
   "unit": 1000,
   "min_collect": 500000,
