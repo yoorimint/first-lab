@@ -1533,6 +1533,35 @@ class ApplyReviewTest(unittest.TestCase):
         self.assertEqual(apply_review.check(post, fix), [])
 
 
+class SilentFailureTest(unittest.TestCase):
+    """성공 기록 속 일부 실패도 ❌ (11/6 #1023 '근거 대조 실패(기록만)' 이 성공으로 남아 매일 점검이 못 봄) + 품질 한 줄 보고."""
+
+    def test_partial_failure_marked(self):
+        from bot.state import add_log
+        state = {"log": []}
+        add_log(state, True, "직접 작성 글: [공개 대기] 'x' (근거 대조 실패(기록만): could not convert)")
+        add_log(state, True, "서버 상태: 사주데이 응답 최대 1076ms·실패 0/41")
+        add_log(state, True, "예약 공개 19:20: 'x' 공개 (IndexNow 알림 실패 429)")
+        add_log(state, True, "글 401 근거 대조 다시: 숫자 주장 15개 중 확인 10")
+        self.assertEqual([e["ok"] for e in state["log"]], [True, False, True, False])
+
+    def test_quality_line(self):
+        import datetime as dt
+        sys.path.insert(0, str(ROOT / "automation"))
+        import quality_report as q
+        today = dt.date(2026, 11, 13)
+        rows = [{"date": "2026-11-06", "fixes": "9"}, {"date": "2026-11-07", "fixes": "1"}, {"date": "2026-11-12", "fixes": "0"}]
+        n, avg, line = q.summary(rows, today)
+        self.assertEqual((n, avg), (2, 0.5))   # 7일 전(11/6)은 뺌
+        self.assertNotIn("⚠", line)
+        self.assertIn("⚠", q.summary(rows + [{"date": "2026-11-13", "fixes": "5"}], today)[2])
+        self.assertIn("기록 없음", q.summary([], today)[2])   # 검수가 멈춘 것도 알림
+
+    def test_wired(self):
+        self.assertIn("quality_report.py", (ROOT / "automation" / "maintenance.md").read_text(encoding="utf-8"))
+        self.assertIn("quality_report", (ROOT / "automation" / "tick.py").read_text(encoding="utf-8"))
+
+
 class QualityLogTest(unittest.TestCase):
     """외부 검수에서 고친 곳 수를 글마다 남김 — 동시 글쓰기 전후 품질 비교 (11/6 운영자 '퀄리티는 유지하거나 더 올리고')."""
 

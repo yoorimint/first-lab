@@ -107,6 +107,13 @@ def main() -> int:
     reviews = [l for l in m["log"] if "대기 글 검수(직접)" in str(l.get("msg", ""))][:3]
     for l in reviews:
         print(f"  검수(글쓰기 작업): {l['time']} {str(l['msg'])[:100]}")
+    try:  # 품질 한 줄 (automation/quality_report.py — 매일 점검 보고와 같은 숫자)
+        import csv
+        from quality_report import LOG, summary
+        with LOG.open(encoding="utf-8") as f:
+            print(summary(list(csv.DictReader(f)), now.date())[2])
+    except Exception as e:  # noqa: BLE001
+        print(f"품질: 못 읽음 ({e})")
     print("문제: " + ("; ".join(problems) if problems else "없음"))
     return 1 if problems else 0
 

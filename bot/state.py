@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import fcntl
 import json
+import re
 import subprocess
 from contextlib import contextmanager
 from datetime import datetime
@@ -121,7 +122,14 @@ def spent_today(state: dict) -> float:
     return spend.get(datetime.now().strftime("%Y-%m-%d"), 0.0)
 
 
+# 성공 기록 안에 섞인 일부 실패 ('근거 대조 실패(기록만)', 'IndexNow 알림 실패' 등)도 ❌ 로 — 매일 점검(automation/maintenance.md)은 ❌ 만 봄.
+# 11/6 #1023: 근거 대조가 오류로 멈췄는데 '성공'으로 남아 아무도 몰랐음. '실패 0/41'(서버 상태 집계)처럼 0건은 성공.
+PARTIAL_FAIL = re.compile(r"실패(?!\s*0(?![\d.]))")
+
+
 def add_log(state: dict, ok: bool, msg: str) -> None:
+    if ok and PARTIAL_FAIL.search(str(msg)):
+        ok = False
     state["log"].insert(0, {"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "ok": ok, "msg": msg})
 
 
