@@ -483,6 +483,9 @@ def main(argv: list[str]) -> None:
     data = json.loads(open(argv[1], encoding="utf-8").read())
     for x in headline_conditions(review, data.get("title", ""), data.get("excerpt", "")):
         print(f"- [제목 조건 확인] {x} → 제목·요약에 조건(최대·이하·기준 등)을 붙이거나 조건 없는 값으로")
+    from .condition_gate import lead_vs_exceptions
+    for x in lead_vs_exceptions(data.get("content_html", "")):
+        print(f"- [첫 문단 예외 확인] {x}")
     for x in absolute_sentences(data.get("content_html", "")):
         print(f"- [단정 문장] {x} → 예외(제외 대상·조건·상한·하한)를 원문에서 확인")
     # 서버 관문과 똑같은 검사 (review_gate.problems 가 조건 누락 관문까지 부름) — 여기서 고치면 보류되지 않음 (11/5 검토: 일부만 보던 것)

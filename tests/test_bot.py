@@ -3191,6 +3191,25 @@ class DeployCheckReportTest(unittest.TestCase):
         self.assertIn("named_values", (ROOT / "bot" / "bok_api.py").read_text(encoding="utf-8"))
 
 
+class LeadExceptionTest(unittest.TestCase):
+    """첫 문단이 규칙을 그냥 말하고 예외는 아래에만 (11/5 #821·#828, 11/6 #928 — 같은 꼴 3번 → 검사, 글쓰기 사전 점검 경고)."""
+
+    def test_flags_rule_without_exception_in_lead(self):
+        from bot.condition_gate import lead_vs_exceptions
+        body = ("<p>대신 과태료로 이행강제금 5회분을 내는데, 5회 미만으로 부과받았고 추가 위반이 없으면 이미 낸 이행강제금을 빼요.</p>"
+                "<h2>FAQ</h2><p>전세사기피해자가 전세사기피해주택을 매수한 경우에는 이행강제금 5회분 과태료를 부과하지 않고, 추가 부설주차장 설치 의무도 지지 않아요.</p>")  # #928 실제 문장
+        self.assertEqual(len(lead_vs_exceptions(body)), 1)
+        fixed = body.replace("내는데,", "내요(전세사기피해주택은 제외).")
+        self.assertEqual(lead_vs_exceptions(fixed), [])
+        table = ("<p>품목분류 사전심사를 신청하면 신청받은 날부터 30일 안에 처리 기간이 끝나요.</p>"
+                 "<p>처리 기간 신청받은 날부터 30일 (보정·분석·위원회 심의 기간 등 제외)</p>")
+        self.assertEqual(lead_vs_exceptions(table), [])               # 괄호 속 '제외'는 예외 문장이 아님
+
+    def test_writer_sees_it_and_apply_review_can_name_it(self):
+        self.assertIn("lead_vs_exceptions", (ROOT / "bot" / "source_check.py").read_text(encoding="utf-8"))
+        self.assertIn('"lead_vs_exceptions"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+
 class ServerStatsTest(unittest.TestCase):
     """서버 상태 기록 (11/6 운영자 '기록 만들어라'): 같은 서버(2코어)의 사주데이가 배포 때 응답 없음 → 올릴지 숫자로."""
 

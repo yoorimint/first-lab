@@ -128,6 +128,29 @@ def lead_vs_body(body_html: str) -> list[str]:
     return out[:2]
 
 
+# 첫 문단이 규칙을 그냥 말하는데(긍정 단정) 예외는 아래(FAQ 등)에만 — 11/5 #821·#828, 11/6 #928 '과태료 5회분' ↔ FAQ '전세사기피해주택은
+# 과태료 부과 안 함'. 같은 꼴 3번 → 검사. 저장소 글 120편 실측 6편 걸림(맞는 것 1~2) → 공개를 막지 않고 글쓰기 사전 점검 경고로만.
+EXCEPT_WORDS = re.compile(r"(제외|그러하지 아니|부과하지 않|적용하지 않|지지 않)")
+
+
+def lead_vs_exceptions(body_html: str) -> list[str]:
+    first = re.search(r"<p[^>]*>(.*?)</p>", body_html or "", re.S)
+    if not first:
+        return []
+    rest = _sentences(body_html[first.end():])
+    out = []
+    for s in _sentences(first.group(0)):
+        if EXCEPT_WORDS.search(s):
+            continue
+        stems = _stems(s)
+        for e in rest:
+            bare = re.sub(r"\([^)]*\)", "", e)  # '(보정 기간 등 제외)' 같은 괄호 속 제외는 뺌
+            if EXCEPT_WORDS.search(bare) and len(stems & _stems(e)) >= 4:
+                out.append(f"첫 문단 '{s[:50]}' 에 아래의 예외가 없음: '{e[:60]}' — 첫 문단에도 '(○○은 제외)'로")
+                break
+    return out[:2]
+
+
 EXCEPTION_REF = r"(?:에도 불구하고|와 별개로|과 별개로)"
 
 

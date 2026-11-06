@@ -78,6 +78,8 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
         from bot import condition_gate
         fn = {"headline_scope": lambda: condition_gate.headline_scope(post["title"], post["excerpt"], post["content_html"]),
               "lead_vs_body": lambda: condition_gate.lead_vs_body(post["content_html"]),
+              "lead_vs_exceptions": lambda: condition_gate.lead_vs_exceptions(post["content_html"]),
+              "transition_rules": lambda: condition_gate.transition_rules(post.get("review"), post["content_html"]),
               "excerpt_vs_exclusions": lambda: condition_gate.excerpt_vs_exclusions(post["excerpt"], post["content_html"]),
               "lead_thresholds": lambda: condition_gate.lead_thresholds(post["excerpt"], post["content_html"]),
               "title_qualifier": lambda: condition_gate.title_qualifier(post["title"], post["content_html"]),
