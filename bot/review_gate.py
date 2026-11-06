@@ -157,6 +157,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.upcoming_amendments(review, body_html, None if law_fetcher is None else (lambda *a: []))
     out += condition_gate.transition_rules(review, body_html)
     out += condition_gate.retention_start(body_html)
+    out += condition_gate.approx_rounding(body_html)
     out += condition_gate.stale_forms(review, None if law_fetcher is None else (lambda *a: []))
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:

@@ -1755,6 +1755,22 @@ class Hwp5TextTest(unittest.TestCase):
         self.assertIn("olefile", (ROOT / "bot" / "requirements.txt").read_text(encoding="utf-8"))
 
 
+class ApproxRoundingTest(unittest.TestCase):
+    """11/6 #1212: 표 합계 34,428,900원을 첫 문단에 '약 3,442만원' (반올림 3,443만원)."""
+
+    def test_truncated_flagged(self):
+        from bot.condition_gate import approx_rounding
+        self.assertEqual(len(approx_rounding("<p>연간 약 3,442만원이에요.</p><td>34,428,900원</td>")), 1)
+
+    def test_rounded_passes(self):
+        from bot.condition_gate import approx_rounding
+        self.assertEqual(approx_rounding("<p>연간 약 3,443만원이에요.</p><td>34,428,900원</td>"), [])
+        self.assertEqual(approx_rounding("<p>약 3,442만원</p><td>34,421,000원</td>"), [])
+
+    def test_in_gate(self):
+        self.assertIn("condition_gate.approx_rounding(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

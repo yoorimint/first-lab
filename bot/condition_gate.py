@@ -487,6 +487,23 @@ def stale_forms(review: list[dict] | None, cited_of=None, current_of=None) -> li
     return out
 
 
+# '약 N만원'은 같은 글의 정확한 금액을 반올림한 값이어야 (11/6 #1212: 표 합계 34,428,900원을 '약 3,442만원'으로 버림 — 반올림 3,443만원).
+APPROX_MAN = re.compile(r"약\s*([\d,]+)\s*만\s*원")
+EXACT_WON = re.compile(r"(?<![\d,.])(\d{1,3}(?:,\d{3}){2,}|\d{7,})\s*원")
+
+
+def approx_rounding(body_html: str) -> list[str]:
+    text = re.sub(r"<[^>]+>", " ", body_html or "")  # 쉼표를 남겨야 금액을 읽음 (_plain 은 쉼표를 뺌)
+    exact = {int(x.replace(",", "")) for x in EXACT_WON.findall(text)}
+    out = []
+    for raw in sorted(set(APPROX_MAN.findall(text))):
+        n = int(raw.replace(",", ""))
+        for x in sorted(exact):
+            if x // 10000 == n and x % 10000 >= 5000:
+                out.append(f"'약 {raw}만원' 은 본문 금액 {x:,}원을 버린 값 — 반올림하면 약 {n + 1:,}만원")
+    return out[:3]
+
+
 # 'N년간 보존'은 언제부터 세는지가 핵심 조건 (11/6 #1208 '계약서는 3년간 보존' — 근로기준법 시행령 제22조②: 근로관계가 끝난 날부터).
 RETENTION = re.compile(r"[^.?!。]*\d+\s*년\s*(?:간|동안)?\s*(?:보존|보관)[^.?!。]*")
 RETENTION_START = re.compile(r"부터|후|끝난|지난|기산|없")
