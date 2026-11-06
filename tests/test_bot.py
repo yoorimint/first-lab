@@ -2942,6 +2942,18 @@ class ExcerptCaveatTest(unittest.TestCase):
         self.assertIn('"excerpt_caveats"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
 
 
+class LimitedEventYearTest(unittest.TestCase):
+    """올해만 하는 무료·할인 행사를 연도 없이 써서 해마다 그런 것처럼 읽힘 (11/6 #1028 태권도원 모노레일 '연말까지 무료')."""
+
+    def test_event_needs_year(self):
+        from bot.condition_gate import limited_event_year
+        self.assertEqual(len(limited_event_year("모노레일 4,000원(11·12월 주말 무료)", "<p>11월·12월 주말에는 모노레일도 무료로 탈 수 있어요.</p>")), 2)
+        self.assertEqual(limited_event_year("모노레일 4,000원(2026년 11·12월 주말 무료)",
+                                            "<p>올해(2026년)는 11월·12월 주말에 모노레일도 무료로 탈 수 있어요.</p>"), [])
+        self.assertEqual(limited_event_year("", "<p>인천수목원은 입장 무료, 동절기 11월~2월 10:00~17:00이에요.</p>"), [])  # 해마다 같은 철 규칙
+        self.assertIn('"limited_event_year"', (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+
 class RelatedPostsTest(unittest.TestCase):
     """글 아래 '함께 보면 좋은 글'은 주제가 겹치는 글만 (11/6 운영자: 자동차보험료 계산 글에 주식 평단가 계산기 — '계산'만 겹침)."""
 

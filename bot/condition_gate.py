@@ -206,6 +206,21 @@ def excerpt_caveats(excerpt: str, body_html: str) -> list[str]:
     return out[:2]
 
 
+# 올해만 하는 행사(무료·할인)를 연도 없이 '11월·12월 주말 무료'로 써서 해마다 그런 것처럼 읽힘 (11/6 #1028 태권도원 모노레일:
+# 2026-11-06 보도자료 '연말까지 무료'). 공개가 몇 주~몇 달 뒤라 다음 해에도 남음 → 연도를 붙이게. 매년 같은 철 규칙(동절기 등)은 뺌.
+LIMITED_EVENT = re.compile(r"(\d{1,2}월?\s*[·,~과와]\s*\d{1,2}월|연말까지|올해 말까지)[^.]{0,40}(무료|할인|이벤트|행사)"
+                           r"|(무료|할인|이벤트|행사)[^.]{0,40}(\d{1,2}월?\s*[·,~과와]\s*\d{1,2}월|연말까지|올해 말까지)")
+EVERY_YEAR = re.compile(r"(동절기|하절기|매년|해마다|성수기|비수기|20\d\d|올해)")
+
+
+def limited_event_year(excerpt: str, body_html: str) -> list[str]:
+    out = []
+    for s in _sentences(excerpt or "") + _sentences(body_html or ""):
+        if LIMITED_EVENT.search(s) and not EVERY_YEAR.search(s):
+            out.append(f"'{s[:50]}' — 올해만 하는 행사면 '2026년 …'처럼 연도를 (해마다 같은 규칙이면 그대로)")
+    return out[:3]
+
+
 # 다른 법률이 정한 예외 (같은 꼴 2번 → 검사, 11/6): #989 '4명 이하는 공휴일 유급휴일 아님' ↔ 노동절 제정법(5/1 은 규모 무관 유급휴일),
 # #996 '가사 사용인은 근로기준법 미적용' ↔ 가사근로자법 제6조(인증기관 소속 가사근로자는 적용). 같은 법 안의 특례(exception_articles)로는 못 봄
 # → 자주 쓰는 주제마다 알려진 다른 법 예외를 목록으로: 본문이 그 주제를 말하는데 예외 법의 말이 없으면 경고. 새로 찾으면 여기에 더한다.
