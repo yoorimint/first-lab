@@ -450,6 +450,25 @@ def upcoming_amendments(review: list[dict] | None, body_html: str, changes_of=No
     return out
 
 
+# 시립·구립 등 공공시설 글은 그 시설의 '설치 및 운영 조례'가 입소·이용 대상과 요금을 정한다 (11/6 #1106 인천시립요양원: 보도자료만 보고
+# 입소 대상을 '장기요양 수급자'로만 씀 — 조례 제5조①은 65세 이상 생계·의료급여 수급자, 시장 인정자도 대상). 근거에 그 조례가 있어야.
+PUBLIC_FACILITY = re.compile(r"(시립|구립|군립|도립|공립)\s?[가-힣]{0,12}(요양원|요양시설|도서관|체육관|수영장|복지관|어린이집|박물관|미술관|캠핑장|휴양림|공원|병원|문화센터|청소년수련관)")
+
+
+def facility_ordinance(title: str, review: list[dict] | None) -> list[str]:
+    m = PUBLIC_FACILITY.search(title or "")
+    if not m:
+        return []
+    facility = re.sub(r"\s+", "", m.group(0))   # '시립요양원' — 다른 시설의 조례(계양구 치매전담형 …)로는 안 됨
+    names = [re.sub(r"\s+", "", n) for i in review or [] for u in i.get("urls", [])
+             for n in re.findall(r"/자치법규/([^/?#]+)", urllib.parse.unquote(str(u)))]
+    claims = " ".join(str(i.get("claim", "")) for i in review or [])
+    if any(facility in n for n in names) or "조례 해당 없음" in claims:
+        return []
+    return ["공공시설 글인데 그 시설의 설치·운영 조례를 근거로 안 씀 — 입소·이용 대상·요금은 조례가 정함 "
+            "(python3 -m bot.lawtext <조례 이름> 제N조, 주소 https://www.law.go.kr/자치법규/<조례 이름>). 조례가 없으면 검수 기록에 '조례 해당 없음 — 이유'"]
+
+
 # 요약 '받아요' ↔ 본문 '못 받는 경우' (11/5 #762 '…남기면, 12개월 근무 뒤 남은 구직급여의 절반을 받아요' ↔ 본문 '못 받는 경우' 목록)
 EXCLUSION_HEAD = re.compile(r"<h[23][^>]*>([^<?]*(?:못 받|받을 수 없|제외|안 되는|대상이 아닌|지원 안|불가)[^<?]*)</h[23]>")  # 묻는 제목(…나요?) 제외
 PROMISE = re.compile(r"(받아요|받을 수 있어요|지원돼요|돌려받아요|지원받아요)")

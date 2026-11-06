@@ -1648,6 +1648,19 @@ class ProvisoChecklistTest(unittest.TestCase):
         self.assertIn("`automation/review-prompt.md` 의 `---` 아래 지시문 그대로", writer)   # 2번: 독립 검수 = 외부 검수 지시
 
 
+class FacilityOrdinanceTest(unittest.TestCase):
+    """공공시설 글은 그 시설의 설치·운영 조례를 근거로 (11/6 #1106 인천시립요양원: 보도자료만 보고 입소 대상을 좁게 씀)."""
+
+    def test_needs_own_ordinance(self):
+        from bot.condition_gate import facility_ordinance
+        other = [{"claim": "c", "urls": ["https://www.law.go.kr/자치법규/인천광역시계양구치매전담형노인요양시설설치및운영조례"]}]
+        own = [{"claim": "c", "urls": ["https://www.law.go.kr/자치법규/인천광역시립요양원설치및운영에관한조례/제5조"]}]
+        self.assertEqual(len(facility_ordinance("인천시립요양원 입소 조건과 비용", other)), 1)
+        self.assertEqual(facility_ordinance("인천시립요양원 입소 조건과 비용", own), [])
+        self.assertEqual(facility_ordinance("천안 청수도서관 이용시간", []), [])          # 시립·구립이 제목에 없으면 안 봄
+        self.assertEqual(facility_ordinance("구립 도서관 이용시간", [{"claim": "조례 해당 없음 — 구 규칙만 있음", "urls": []}]), [])
+
+
 class UpcomingAmendmentTest(unittest.TestCase):
     """근거 조문이 곧 바뀌는데 지금 규칙만 씀 (11/6 #1102 보험료징수법 제16조의10 — 2027-01-01 단서 변경)."""
 
