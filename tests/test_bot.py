@@ -2852,6 +2852,12 @@ class CheckAndPushTest(unittest.TestCase):
         code = "\n".join(l for l in sh.splitlines() if not l.lstrip().startswith("#"))
         self.assertNotIn("| tail -1 &&", code)
 
+    def test_writer_retries_github_side_push_errors(self):
+        """11/6 08:25 글쓰기 실행 94번: GitHub 'commit_refs_rules' 일시 거부(약 5분)에 바로 멈춰 다 쓴 글이 안 올라감 → 몇 분에 걸쳐 다시."""
+        doc = (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8")
+        self.assertIn("30초·1분·2분·4분 쉬고 다시", doc)
+        self.assertIn("fatal error", doc)
+
     def test_push_failures_are_not_hidden(self):
         """11/6: 네 번 실패한 main push 를 성공처럼 끝냄 · 브랜치 '-f' push 가 권한에 막히고 '|| true' 가 숨김."""
         sh = (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8")

@@ -151,7 +151,7 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - push 가 다른 실행과 겹쳐 거절되면(non-fast-forward) `git pull --rebase origin main` 후 한 번 더 push 한다.
   `patches.json`·`reviewed.txt` 가 충돌하면 양쪽 내용을 모두 남기고(둘 다 끝에 덧붙인 줄) `python3 automation/common_errors.py` 를 다시 돌린 뒤 이어서 rebase.
 - 배포 결과는 기다리지 않는다 (서버가 배포 밀림을 감지해 다음 실행의 `deploy_alert` 로 알려 줌).
-- push 가 권한 문제로 실패하면 다른 방법을 찾지 말고 "push 실패"로 보고하고 끝낸다.
+- push 가 GitHub 쪽 오류(`fatal error`, `remote rejected`, 5xx·연결 끊김)로 실패하면 30초·1분·2분·4분 쉬고 다시 (11/6 08:25 'commit_refs_rules' 거부가 5분쯤 이어져 다 쓴 글이 사라짐). 그래도 안 되거나 권한 문제(403·permission)면 다른 방법을 찾지 말고 "push 실패"로 보고하고 끝낸다.
 
 ## 5-1. 검수 보류 초안 고치기 (있을 때만, 실행 1번에 1개)
 1단계 응답의 `held_drafts` 가 비어 있지 않으면 첫 번째 글을 고친다. `reason` 이 서버 관문에서 막힌 이유다.
