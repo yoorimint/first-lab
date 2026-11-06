@@ -878,6 +878,31 @@ class ImageCheckTest(unittest.TestCase):
         wait = next(c for c in calls if c[:3] == ("post", "meta", "update") and c[4] == photo.PENDING_META)
         self.assertIn('"replace": "ai-aaaaaaaaaa"', wait[5])  # 사진 채우기가 이 사진을 바꿈
 
+    def test_quota_does_not_count_as_failed_round(self):
+        """11/7 #1042·#1030·#1006: 한도 소진 2번을 '2번 실패'로 세어 '사진을 2번 못 넣음 → 제목 카드' 로 영영 포기."""
+        from bot import image_check, images, photo
+        calls = []
+
+        def fake_cli(*args):
+            calls.append(args)
+            if args[:3] == ("post", "meta", "get"):
+                return {image_check.ROUND_META: "1"}.get(args[4], "")
+            return ""
+        with mock.patch.object(image_check, "wp_cli", side_effect=fake_cli), \
+             mock.patch.object(photo, "wp_cli", side_effect=fake_cli), \
+             mock.patch.object(image_check, "load_settings", return_value=mock.Mock(cf_account_id="a", cf_api_token="t")), \
+             mock.patch.object(photo, "make", side_effect=images.QuotaExceeded("한도")):
+            image_check.apply_check({"type": "image_check", "post_id": 1042, "add": [{"prompt": "a parking garage", "alt": "주차장"}]})
+        rounds = [c[5] for c in calls if c[:3] == ("post", "meta", "update") and c[4] == image_check.ROUND_META]
+        self.assertEqual(rounds[-1], "1")   # 되돌림 (올리지 않음)
+
+    def test_no_give_up_while_quota_blocked(self):
+        from bot import images
+        with mock.patch.object(images, "quota_blocked", return_value=True):
+            msg, calls, made, card = self.run_check({"replace": [], "remove": [], "add": []}, current="", rounds="2")
+        self.assertFalse(any("_firstlab_img_checked" in c for c in calls))
+        self.assertIn("한도 소진", msg)
+
     def test_no_photo_is_never_marked_checked(self):
         _, calls, made, _ = self.run_check({"replace": [], "remove": []}, current="")
         self.assertEqual(made, [])
