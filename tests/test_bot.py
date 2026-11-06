@@ -903,6 +903,16 @@ class ImageCheckTest(unittest.TestCase):
         self.assertFalse(any("_firstlab_img_checked" in c for c in calls))
         self.assertIn("한도 소진", msg)
 
+    def test_text_prone_word_removed_instead_of_dropping_scene(self):
+        """11/7 #1042 공항 주차장: 장면 4개가 다 'airport' 때문에 버려져 사진을 영영 못 넣음 → 그 말만 빼고 씀."""
+        from bot import images, photo
+        self.assertEqual(images.safe_scene("a quiet covered airport parking deck with neatly parked cars"),
+                         "a quiet covered parking deck with neatly parked cars")
+        self.assertEqual(images.safe_scene("a printed contract"), "")
+        add = [{"prompt": "firefighter helmets hanging on hooks inside a fire station equipment room", "alt": "소방 헬멧"}]
+        msg, calls, made, card = self.run_check({"add": add}, current="")
+        self.assertEqual(made[0]["prompt"], "firefighter helmets hanging on hooks inside a fire equipment room")
+
     def test_no_photo_is_never_marked_checked(self):
         _, calls, made, _ = self.run_check({"replace": [], "remove": []}, current="")
         self.assertEqual(made, [])

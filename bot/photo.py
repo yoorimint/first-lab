@@ -35,6 +35,10 @@ def first_scene(prompts: list[str], alts: list[str]) -> dict | None:
     for n, prompt in enumerate(prompts):
         if prompt and not images.text_prone(prompt):
             return {"prompt": prompt, "alt": alts[n] if n < len(alts) else ""}
+    for n, prompt in enumerate(prompts):  # 다 걸리면 걸린 말만 빼서 (장면을 통째로 버리면 사진을 영영 못 넣음 — 11/7 #1042)
+        safe = images.safe_scene(prompt or "")
+        if safe:
+            return {"prompt": safe, "alt": alts[n] if n < len(alts) else ""}
     return None
 
 

@@ -43,7 +43,11 @@ def apply_check(data: dict) -> str:
             if rounds >= MAX_ROUND:
                 remove = True  # 여러 번 바꿔도 계속 나쁨 → 뺌
             elif images.text_prone(r.get("prompt", "")):
-                retry = True
+                safe = images.safe_scene(r.get("prompt", ""))  # 걸린 말만 빼서 쓸 수 있으면 그대로 (11/7)
+                if safe:
+                    new_scene = {**r, "prompt": safe}
+                else:
+                    retry = True
             else:
                 new_scene = r
     if retry and not new_scene and not remove:

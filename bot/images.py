@@ -119,6 +119,24 @@ def text_prone(prompt: str) -> str:
     return m.group(0) if m else ""
 
 
+DROPPABLE = re.compile(r"airports?|terminals?|stations?|storefronts?", re.IGNORECASE)  # 장소를 꾸미는 말 — 빼도 장면이 남음
+
+
+def safe_scene(prompt: str) -> str:
+    """글자 생기기 쉬운 말을 빼서 쓸 수 있는 장면으로 (11/7 #1042 공항 주차장 글: 'airport parking deck' 장면 4개가 다 버려져
+    사진을 영영 못 넣음 → 'parking deck' 으로). 빼고 나서도 4낱말 이상이고 깨끗할 때만, 아니면 ''."""
+    for _ in range(4):
+        word = text_prone(prompt)
+        if not word:
+            dangling = re.search(r"\b(a|an|the)\s+(on|in|at|with|of|and|near)\b", prompt, re.IGNORECASE)
+            return prompt if len(prompt.split()) >= 4 and not dangling else ""
+        if not DROPPABLE.fullmatch(word):  # 서류·계약서처럼 장면의 주인공인 말은 빼면 장면이 망가짐 → 다른 장면을 받음
+            return ""
+        prompt = re.sub(rf"\s*\b{re.escape(word)}\b", "", prompt, count=1, flags=re.IGNORECASE)
+        prompt = re.sub(r"\s{2,}", " ", prompt).strip(" ,")
+    return ""
+
+
 class QuotaExceeded(RuntimeError):
     """Cloudflare 하루 무료 한도 소진 (매일 00:00 UTC = 오전 9시 초기화). 못 만든 사진은 pending_images 가 나중에 채움."""
 
