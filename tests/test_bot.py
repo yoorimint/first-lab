@@ -1631,6 +1631,12 @@ class ProvisoChecklistTest(unittest.TestCase):
         half = [done[0], {"claim": "제41조의2 단서2", "verdict": "맞음", "action": "유지", "urls": [self.URL]}]
         self.assertEqual(len(article_provisos(self.review(*half), articles_of=lambda base: self.ART)), 1)  # 반영/해당 없음 말이 있어야
 
+    def test_not_applied_clause_is_a_proviso(self):
+        """'…이면 제4호의 가산세를 적용하지 아니한다' 도 단서 (11/6 #1093 지방세기본법 제55조④ 45만 원 기준을 고지서 합계로 씀)."""
+        from bot.source_check import exceptions_in
+        art = "제55조(납부지연가산세) ① 가산세를 부과한다. ④ 제1항을 적용할 때 납세고지서별ㆍ세목별 세액이 45만원 미만인 경우에는 같은 항 제4호의 가산세를 적용하지 아니한다."
+        self.assertTrue(any("45만원 미만" in x for x in exceptions_in(art)))
+
     def test_unreadable_law_does_not_block(self):
         from bot.condition_gate import article_provisos
         self.assertEqual(article_provisos(self.review(), articles_of=lambda base: {}), [])
