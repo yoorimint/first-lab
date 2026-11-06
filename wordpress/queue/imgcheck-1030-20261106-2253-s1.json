@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1030,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "firefighters' helmets and turnout gear hanging neatly on hooks inside a fire station locker area",
+   "alt": "소방서 안 고리에 걸린 소방관 헬멧과 방화복"
+  }
+ ]
+}

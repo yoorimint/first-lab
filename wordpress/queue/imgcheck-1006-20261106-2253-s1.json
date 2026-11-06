@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 1006,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a wide multi-level airport parking garage at dawn with soft light and an airplane tail visible beyond the railing",
+   "alt": "새벽빛이 드는 공항 주차 건물"
+  }
+ ]
+}
