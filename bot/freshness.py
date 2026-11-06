@@ -56,7 +56,26 @@ def _review_from_queue(keyword: str) -> list[dict]:
     return []
 
 
-def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, fetcher=source_check.fetch) -> list[str]:
+# 제목·요약의 임시 상태 (11/6 #1012 '지금은 구제역 휴원 중'): 다시 열면 글이 틀려짐 → 그 말이 근거 공식 페이지에서 사라지면 다시 확인
+TEMP_STATUS = ("휴원", "휴관", "휴장", "운영 중단", "운영중단", "임시 폐쇄", "임시폐쇄", "통제 중", "통제중", "접수 중단", "판매 중단")
+
+
+def status_gone(headline: str, record: dict, review: list[dict], page) -> list[str]:
+    words = [w for w in TEMP_STATUS if w in (headline or "")]
+    if not words:
+        return []
+    urls = list(dict.fromkeys([u for item in record.get("found", []) for u in item.get("urls", [])]
+                              + [str(u) for item in review if _ok(item) for u in item.get("urls", [])
+                                 if source_check.is_official(str(u))]))[:8]
+    texts = [t for t in (page(u) for u in urls) if t]
+    if not texts:
+        return []  # 지금 못 열면 판단하지 않음
+    gone = [w for w in words if not any(w.replace(" ", "") in t.replace(" ", "") for t in texts)]
+    return [f"제목·요약의 임시 상태 '{w}' 가 근거 공식 페이지에서 사라짐 — 다시 열었는지 확인해 고치기" for w in gone]
+
+
+def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, fetcher=source_check.fetch,
+             headline: str = "") -> list[str]:
     out, cache = [], {}
 
     def page(url: str) -> str | None:
@@ -85,6 +104,7 @@ def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, f
         gone = [n for n in item.get("numbers", []) if not any(source_check.has_number(t, n) for t in texts)]
         if gone:
             out.append(f"'{item['claim'][:30]}' 숫자 {', '.join(gone)} 가 공식 페이지에서 사라짐")
+    out += status_gone(headline, record, review, page)
     return out
 
 
@@ -102,7 +122,11 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
     except Exception:  # noqa: BLE001
         record = {}
     review = [] if record.get("laws") else _review_from_queue(urllib.parse.unquote(get("post_name")))
-    out = problems(record, review, since, today)
+    try:  # 임시 상태(휴원 등) 확인용 — 못 읽어도 다른 확인은 그대로
+        headline = f"{get('post_title')} {get('post_excerpt')}"
+    except Exception:  # noqa: BLE001
+        headline = ""
+    out = problems(record, review, since, today, headline=headline)
     if not record.get("found") and not record.get("laws") and not review:
         # 근거 기록이 하나도 없는 글은 바뀌어도 알 길이 없음 → 공개 전에 근거부터 (11/5 운영자 '예전 봇 글도 근거 기록 만들어라')
         out.append("근거 기록 없음 (어느 공식 출처로 확인했는지 남기기)")

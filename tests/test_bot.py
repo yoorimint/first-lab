@@ -2329,7 +2329,7 @@ class ChangedMarkTest(unittest.TestCase):
                 return {freshness.VERIFIED_META: "2026-11-01", changed.META: "2026-11-05 혜택 내용 변경(정부24): 구직급여",
                         source_check.META: json.dumps({"found": [{"claim": "c", "numbers": ["1"], "urls": ["u"]}]})}.get(a[4], "")
             return "x"
-        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a: []):
+        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a, **k: []):
             self.assertEqual(freshness.check_post(1, dt.date(2026, 11, 6)), ["쓴 뒤 근거 변경: 2026-11-05 혜택 내용 변경(정부24): 구직급여"])
             self.assertEqual(freshness.check_post(1, dt.date(2026, 11, 4)), [])   # 아직 안 온 날짜 표시는 무시
 
@@ -2956,7 +2956,7 @@ class CalcReviewGateTest(unittest.TestCase):
             if a[:2] == ("post", "get") and a[3] == "--field=post_content":
                 return '<p>[firstlab_calc id="not-reviewed-yet"]</p>'
             return "" if a[:3] == ("post", "meta", "get") else "2026-11-01"
-        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a: []), \
+        with mock.patch.object(freshness, "wp_cli", side_effect=wp), mock.patch.object(freshness, "problems", side_effect=lambda *a, **k: []), \
                 mock.patch.object(freshness, "_review_from_queue", return_value=[{"claim": "c"}]):
             got = freshness.check_post(1, dt.date(2026, 11, 6))
         self.assertTrue(any("not-reviewed-yet" in g for g in got), got)
@@ -3263,6 +3263,24 @@ class LogNoiseTest(unittest.TestCase):
         self.assertTrue(st.add_log_once_a_day(s, True, "황금 키워드 집계: 바뀜"))
         self.assertEqual(len(s["log"]), 2)
         self.assertGreaterEqual(st.MAX_LOG, 100)
+
+
+class TempStatusTest(unittest.TestCase):
+    """11/6 #1012 '지금은 구제역 휴원 중' — 다시 열면 글이 틀려짐 → 근거 공식 페이지에서 그 상태 말이 사라지면 공개 전·공개 뒤 다시 확인."""
+
+    def test_flag_when_status_word_gone(self):
+        import datetime as dt
+        from bot import freshness
+        record = {"found": [{"claim": "31종", "numbers": [], "urls": ["https://www.incheon.go.kr/park/park010214"]}]}
+        closed = lambda url: "※구제역 발생 방지를 위해 휴원중(2026년 9월 21일 ~ 구제역 발생 종료 시) 31종"   # noqa: E731
+        reopened = lambda url: "관람시간 10:00~17:00 31종"                                          # noqa: E731
+        head = "인천대공원 동물원: 무료 입장·31종, 지금은 구제역 휴원 중"
+        d = dt.date(2026, 11, 6)
+        self.assertEqual(freshness.problems(record, [], d, d, closed, headline=head), [])
+        got = freshness.problems(record, [], d, d, reopened, headline=head)
+        self.assertTrue(any("'휴원'" in x for x in got))
+        self.assertEqual(freshness.problems(record, [], d, d, reopened, headline="인천대공원 동물원 무료 입장"), [])   # 상태 말 없는 제목
+        self.assertEqual(freshness.problems(record, [], d, d, lambda u: None, headline=head), [])                     # 못 열면 판단 안 함
 
 
 class ExcerptQualifierTest(unittest.TestCase):

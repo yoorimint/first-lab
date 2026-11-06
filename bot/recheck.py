@@ -44,7 +44,8 @@ def check_one(pid: str, post: dict, today: dt.date, wp, fetcher) -> list[str]:
     except json.JSONDecodeError:
         record = {}
     review = [] if record.get("laws") else freshness._review_from_queue(urllib.parse.unquote(post.get("name", "")))
-    return freshness.problems(record, review, dt.date.fromisoformat(since), today, fetcher)
+    return freshness.problems(record, review, dt.date.fromisoformat(since), today, fetcher,
+                              headline=f"{post.get('title', '')} {post.get('excerpt', '')}")
 
 
 def run(today: dt.date | None = None, bulk=None, wp=None, fetcher=None) -> str:
