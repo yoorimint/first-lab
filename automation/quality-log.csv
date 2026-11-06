@@ -109,3 +109,4 @@ date,post,fixes,types
 2026-11-06,1428,6,missing_condition:6
 2026-11-06,1431,0,
 2026-11-06,1433,2,missing_condition:2
+2026-11-06,1445,3,missing_condition:2 wrong_fact:1
