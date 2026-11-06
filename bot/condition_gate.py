@@ -614,7 +614,10 @@ def ordinance_delegation(title: str, excerpt: str, body_html: str, review: list[
         texts = [(articles_of(base) or {}).get(art, "")]
         name = urllib.parse.unquote(base).rsplit("/", 1)[-1]
         texts += [str(c.get("text", "")) for c in (changes_of(name, art, today) or [])]
-        if any(DELEGATED.search(t) for t in texts):
+        windows = [t[max(0, m.start() - 300):m.end() + 300] for t in texts for m in DELEGATED.finditer(t)]
+        # 첫 문단이 그 위임 범위의 숫자를 직접 말할 때만 (11/7 대기 글 검사: 양성화 글은 이행강제금 '5회분'만 말해 오탐)
+        nums = {n for w in windows for n in re.findall(r"\d+(?:\.\d+)?", w) if len(n) >= 2 or "." in n}
+        if nums & set(re.findall(r"\d+(?:\.\d+)?", lead)):
             return [f"{name} {art} 는 기준을 '조례로 정하는' 범위로 맡김 — 제목·요약·첫 문단에 '실제 기준은 시·군·구 조례로 정해요'를 적기 (법 기준은 최소·최대 범위)"]
     return []
 

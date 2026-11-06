@@ -1942,7 +1942,8 @@ class RuleProvisoTest(unittest.TestCase):
 class OrdinanceDelegationTest(unittest.TestCase):
     """11/7 #1344 일조권: 개정 법 제61조 '…범위에서 조례로 정하는 거리 이상' — 제목·요약·첫 문단은 '5m 이상만 띄우면 돼요'."""
     REVIEW = [{"claim": "10~17m 부분 5m (건축법 제61조)", "verdict": "맞음", "action": "유지", "urls": ["https://www.law.go.kr/법령/건축법"]}]
-    TEXT = "① … 다음 각 호의 구분에 따른 범위에서 해당 지방자치단체의 조례로 정하는 거리 이상을 띄어 건축하여야 한다."
+    TEXT = ("① … 다음 각 호의 구분에 따른 범위에서 해당 지방자치단체의 조례로 정하는 거리 이상을 띄어 건축하여야 한다. "
+            "1. 높이 10미터 이하인 부분: 1.5미터 이상 2. 높이 10미터 초과 17미터 이하인 부분: 5미터 이상")
 
     def run_check(self, lead):
         import datetime as dt
@@ -1952,6 +1953,8 @@ class OrdinanceDelegationTest(unittest.TestCase):
 
     def test_missing_ordinance_flagged(self):
         self.assertEqual(len(self.run_check("10m 초과 17m 이하 부분은 5m 이상만 띄우면 돼요.")), 1)
+        # 첫 문단이 위임 범위의 숫자를 말하지 않으면 막지 않음 (양성화 글 '이행강제금 5회분' 오탐)
+        self.assertEqual(self.run_check("과태료는 이행강제금 5회분이에요."), [])
 
     def test_ordinance_mentioned_passes(self):
         self.assertEqual(self.run_check("법 기준은 5m 이상이고 실제 거리는 조례로 정해요."), [])
