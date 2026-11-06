@@ -261,6 +261,7 @@ function firstlab_api_maintenance(): array {
 			array_filter( get_posts( array( 'post_status' => 'draft', 'meta_key' => '_firstlab_hold_tries', 'numberposts' => -1 ) ), static fn( $p ) => firstlab_api_hold_resting( $p->ID ) )
 		) ),
 		'rates'       => $state['rates'] ?? null, // 한국은행 최신 금리
+		'server_stats' => $state['server_stats'] ?? null, // 서버 부하·메모리·사주데이 응답 (bot/server_stats.py, 서버 올릴지 판단용)
 		'calc_yearly' => $state['calc_yearly'] ?? null,
 		'deploy_alert' => $state['deploy_alert'] ?? null,
 		'patch_problems' => $state['patch_problems'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)

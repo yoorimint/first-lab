@@ -324,6 +324,15 @@ def main() -> None:
     else:
         state["plan"], state["done"] = {}, {}
 
+    # 서버 상태 기록 (bot/server_stats.py) — 서버를 올릴지 숫자로 정하려고 (11/6 운영자). 사주데이 응답은 5분마다
+    try:
+        from . import server_stats
+        report = server_stats.record(state, now, check_saju=now.minute % 5 == 0)
+        if report:
+            add_log(state, True, report)
+    except Exception:  # noqa: BLE001 - 기록 실패가 봇을 멈추지 않게
+        pass
+
     # 한도 소진으로 못 만든 대표 사진 채우기 (5분마다, 한도 초기화 후 공개 대기열 글부터)
     if now.minute % 5 == 0:
         try:

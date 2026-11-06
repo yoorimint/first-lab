@@ -12,7 +12,10 @@ import subprocess
 import sys
 import urllib.request
 from datetime import datetime, timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # bot 모듈 (서버 상태 요약)
 
 SITE = "https://first-lab.kr"
 
@@ -85,6 +88,11 @@ def main() -> int:
         problems.append(f"패치 미반영 {len(m['patch_problems'])}건: {m['patch_problems'][0][:80]}")
     held = m.get("held_drafts") or []
     print(f"보류 {len(held)}편" + (f": {[(x['post_id'], x['reason'][:40]) for x in held]}" if held else "") + f" · 쉬는 글 {len(m.get('gave_up') or [])}편")
+    stats = m.get("server_stats") or {}
+    if stats:  # 서버 상태 오늘 (bot/server_stats.py — 서버를 올릴지 판단용)
+        from bot.server_stats import summary  # noqa: E402
+        day = max(stats)
+        print("  " + summary(day, stats[day]))
     reviews = [l for l in m["log"] if "대기 글 검수(직접)" in str(l.get("msg", ""))][:3]
     for l in reviews:
         print(f"  검수(글쓰기 작업): {l['time']} {str(l['msg'])[:100]}")

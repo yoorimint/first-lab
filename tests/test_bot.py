@@ -3191,6 +3191,50 @@ class DeployCheckReportTest(unittest.TestCase):
         self.assertIn("named_values", (ROOT / "bot" / "bok_api.py").read_text(encoding="utf-8"))
 
 
+class ServerStatsTest(unittest.TestCase):
+    """서버 상태 기록 (11/6 운영자 '기록 만들어라'): 같은 서버(2코어)의 사주데이가 배포 때 응답 없음 → 올릴지 숫자로."""
+
+    def reader(self, load, saju=120):
+        return {"load": lambda: load, "cores": lambda: 2, "saju": lambda: saju,
+                "mem": lambda: {"total": 3900, "available": 900, "swap_used": 50}}
+
+    def test_daily_aggregate_and_report_once(self):
+        from datetime import datetime
+        from bot import server_stats as ss
+        state = {}
+        self.assertIsNone(ss.record(state, datetime(2026, 11, 6, 10, 5), True, self.reader(5.14, None)))
+        ss.record(state, datetime(2026, 11, 6, 10, 6), False, self.reader(0.8))
+        day = state["server_stats"]["2026-11-06"]
+        self.assertEqual((day["samples"], day["load_max"], day["load_max_at"]), (2, 5.14, "2026-11-06 10:05"))
+        self.assertEqual((day["high_minutes"], day["high_at"]), (1, ["10:05"]))      # 코어당 1.5 넘음
+        self.assertEqual((day["saju_checks"], day["saju_fail"], day["saju_fail_at"]), (1, 1, ["10:05"]))
+        self.assertEqual(day["mem_avail_min"], 900)
+        report = ss.record(state, datetime(2026, 11, 7, 0, 1), True, self.reader(0.5))
+        self.assertIn("서버 상태(2026-11-06)", report)
+        self.assertIn("높은 부하 1분(10:05)", report)
+        self.assertIn("실패 1/1(10:05)", report)
+        self.assertIsNone(ss.record(state, datetime(2026, 11, 7, 0, 2), False, self.reader(0.5)))   # 하루 한 번만
+
+    def test_keeps_two_weeks(self):
+        from datetime import datetime, timedelta
+        from bot import server_stats as ss
+        state, start = {}, datetime(2026, 11, 1, 12, 0)
+        for i in range(20):
+            ss.record(state, start + timedelta(days=i), False, self.reader(0.5))
+        self.assertLessEqual(len(state["server_stats"]), ss.KEEP_DAYS + 1)
+
+    def test_proc_readers(self):
+        import tempfile
+        from bot import server_stats as ss
+        with tempfile.NamedTemporaryFile("w", delete=False) as f:
+            f.write("MemTotal: 4000000 kB\nMemAvailable: 1024000 kB\nSwapTotal: 2048000 kB\nSwapFree: 1024000 kB\n")
+        self.assertEqual(ss.read_mem(f.name), {"total": 3906, "available": 1000, "swap_used": 1000})
+        with tempfile.NamedTemporaryFile("w", delete=False) as f:
+            f.write("5.14 3.21 1.02 2/300 1234\n")
+        self.assertEqual(ss.read_load(f.name), 5.14)
+        self.assertIn("server_stats", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+
+
 class RatesTest(unittest.TestCase):
     """한국은행 금리: 매일 저장, 기준금리가 바뀌면 '기준금리'가 든 공개 글·초안에 재검증 표시."""
 
