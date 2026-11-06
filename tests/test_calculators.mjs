@@ -39,6 +39,17 @@ const sitePaths = new Set([
 ].map((slug) => `/${String(slug).trim()}/`));
 let checked = 0;
 
+// 버림 보정 자체 (11/6 #1019): 오차만 메우고 진짜 끝수는 올리지 않아야 함
+for (const [n, want, why] of [
+  [(3800000 / 209) * 11 * 1.5, 300000, '소수 오차 299,999.99… → 300,000 (11/5)'],
+  [999999999999 / 2 / 1000, 499999999, '큰 금액 끝수 .9995 는 버림 (11/6 중간예납 1조 원 근처)'],
+  [1e12 / 1000 - 0.001, 999999999, '1조 원 규모 끝수 .999'],
+  [0.1 + 0.2, 0, '작은 값'],
+]) {
+  if (util.floor(n) !== want) fail('util.floor', `${why}: ${n} → ${util.floor(n)} (기대 ${want})`);
+  if (util.trunc(-n) !== -want) fail('util.trunc', `${why} (음수): ${-n} → ${util.trunc(-n)} (기대 ${-want})`);
+}
+
 for (const id of ids) {
   load(path.join(DIR, 'defs', `${id}.js`));
   const def = defs[id];

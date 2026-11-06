@@ -24,15 +24,18 @@
 
   class InputError extends Error {}
 
+  const FLOOR_REL = 1e-15;
   const util = {
     InputError,
     /** 숫자 칸 자판: 소수를 넣는 칸(step 이 소수·'any')은 'decimal'. 'numeric' 은 iOS 자판에 소수점이 없어 9,333.33·0.015 를 못 넣음 (11/5) */
     inputMode: (input) => (input.step !== undefined && !Number.isInteger(Number(input.step)) ? 'decimal' : 'numeric'),
     /** 버림 (컴퓨터 소수 오차 보정): 3,800,000 ÷ 209 × 11 × 1.5 = 299,999.99… 를 그냥 버리면 1원이 빠짐 (11/5 주휴·연장수당 계산기).
-     *  계산기는 Math.floor/Math.trunc 대신 이것을 쓴다 — 검사기가 막음 (tests/test_calculators.mjs). */
-    floor: (n) => Math.floor(n + Math.abs(n) * 1e-12 + 1e-9),
+     *  계산기는 Math.floor/Math.trunc 대신 이것을 쓴다 — 검사기가 막음 (tests/test_calculators.mjs).
+     *  보정 폭은 몇 번 계산한 오차(값의 1e-15배 + 1e-9)만큼 — 11/6 #1019: 1e-12배였을 때 999,999,999,999 ÷ 2,000 = 499,999,999.9995 를
+     *  500,000,000 으로 올려 1천 원이 틀림 (값이 크면 보정이 진짜 끝수보다 커짐). */
+    floor: (n) => Math.floor(n + Math.abs(n) * FLOOR_REL + 1e-9),
     /** 0 쪽으로 버림 (환급 등 음수), 같은 오차 보정 */
-    trunc: (n) => (n < 0 ? -Math.floor(-n + Math.abs(n) * 1e-12 + 1e-9) : Math.floor(n + Math.abs(n) * 1e-12 + 1e-9)),
+    trunc: (n) => (n < 0 ? -Math.floor(-n + Math.abs(n) * FLOOR_REL + 1e-9) : Math.floor(n + Math.abs(n) * FLOOR_REL + 1e-9)),
     /** 금액 → "23,000원" */
     won: (n) => Math.round(n).toLocaleString('ko-KR') + '원',
     /** 'YYYY-MM-DD' → 그날 0시(UTC) 밀리초. 형식이 틀리거나 없는 날짜면 null */
