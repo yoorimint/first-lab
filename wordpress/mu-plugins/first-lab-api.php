@@ -18,10 +18,13 @@ add_action(
 			array(
 				'methods'             => 'GET',
 				'permission_callback' => 'firstlab_api_allowed',
-				'callback'            => static function () {
+				'callback'            => static function ( $request = null ) {
 					$state    = (array) get_option( 'firstlab_bot_state', array() );
 					$settings = (array) get_option( 'firstlab_bot', array() );
 					$recent   = array();
+					// 후보 쪽: 40개를 다 건너뛰면 글쓰기 작업이 ?page=2, 3 으로 다음 40개 (11/6 '새 글 없음' 안전장치, bot/run.CANDIDATES_POOL)
+					$page     = $request ? max( 1, min( 3, (int) $request->get_param( 'page' ) ) ) : 1;
+					$pool     = (array) ( $state['candidates'] ?? array() );
 					// 전체 글 (30편으로 자르면 오래된 글과 같은 주제를 또 씀 — 11/5 대부업 대출 조회 중복)
 						foreach ( get_posts( array( 'numberposts' => -1, 'post_status' => array( 'publish', 'future', 'draft' ) ) ) as $p ) {
 						$recent[] = array(
@@ -36,7 +39,9 @@ add_action(
 						'refresh_target' => firstlab_api_refresh_target( $state ),
 						'held_drafts'    => firstlab_api_held_drafts(),
 						'image_checks'   => firstlab_api_image_checks(), // 사진 검사할 글 (daily-writer.md 5-2)
-						'candidates'    => array_slice( (array) ( $state['candidates'] ?? array() ), 0, 40 ), // bot/run.CANDIDATES (11/6 20→40)
+						'candidates'    => array_slice( $pool, ( $page - 1 ) * 40, 40 ), // bot/run.CANDIDATES (11/6 20→40)
+						'candidates_page' => $page,
+						'candidates_more' => count( $pool ) > $page * 40, // 다음 쪽(?page=N+1)이 있음
 						// 앞으로 시행될 근거 법령 개정 (bot/law_watch.py) — 아직 글을 안 쓴 것만 (daily-writer.md 1단계)
 						'law_changes'   => firstlab_api_law_changes( $state ),
 						// 새로 생긴 전국·광역 혜택 (bot/benefit_watch.py) — 검색량이 생기기 전에 먼저 쓰는 글감, 이미 쓴 것은 뺌

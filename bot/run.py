@@ -261,13 +261,14 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
 
 
 CANDIDATES = 40  # 글쓰기 세션에 주는 후보 수 — 20개면 업체·상품을 빼고 나면 남는 게 없어 새 글 없이 끝나는 실행이 생김 (11/6 세 번 연속)
+CANDIDATES_POOL = CANDIDATES * 3  # 서버가 준비해 두는 후보 — 한 쪽(40개)을 다 건너뛰면 /next?page=2·3 으로 다음 쪽 (11/6 운영자 '만들어라')
 
 
 def refresh_dashboard(state: dict, settings: BotSettings) -> None:
     """설정 페이지에 보여줄 창고 현황과 다음 후보 (안전 검사 전 포함)."""
     with connect() as conn:
         state["keywords"] = summary(conn)
-        state["candidates"] = ranked_candidates(conn, settings, limit=CANDIDATES)
+        state["candidates"] = ranked_candidates(conn, settings, limit=CANDIDATES_POOL)
     try:  # 대기 글이 많으면 새 글 대신 외부 검수할 글 (bot/review_queue.py)
         from .review_queue import target
         state["review_target"] = target()

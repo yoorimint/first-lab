@@ -439,7 +439,11 @@ class ContinuousTest(unittest.TestCase):
     def test_more_candidates_info_first_within_gold(self):
         from bot import run
         self.assertEqual(run.CANDIDATES, 40)
-        self.assertIn("0, 40 )", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        self.assertEqual(run.CANDIDATES_POOL, 120)                                       # 다음 쪽(?page=2·3)용
+        api = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("'candidates_more'", api)
+        self.assertIn("?page=2", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+        self.assertIn("( $page - 1 ) * 40, 40 )", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
         self.assertIn('(x["gold"], x["info"], x["score"])', (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8"))
 
     def test_same_minute_previous_post_is_not_new(self):
