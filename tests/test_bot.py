@@ -1269,6 +1269,14 @@ class BenefitDetailTest(unittest.TestCase):
         self.assertEqual(calls[0], ("serviceDetail", {"cond[서비스ID::EQ]": "WII000001600"}))
         self.assertIsNone(bd.detail_text("X", fetch=lambda path, **kw: {"data": []}))
 
+    def test_unit_numbers_compared(self):
+        """두 자리 수 + 단위(14일·24세·60시간·15회)도 대조 (11/6 'API 다 써서' 3번, #872 '14일 연장'). 날짜·한 자리·단위 없는 수는 뺌."""
+        from bot.source_check import key_numbers
+        self.assertEqual(key_numbers("조사가 더 필요하면 14일 연장"), ["14"])
+        self.assertEqual(key_numbers("만 9~24세, 월 15회 이상"), ["15", "24"])
+        for claim in ("계좌 개설 11월 16일(월)~27일(금)", "가입 심사 10월 19일~11월 13일", "2026년 10월 31일 시행", "5일 이내", "12억 이하"):
+            self.assertEqual(key_numbers(claim), [], claim)
+
     def test_source_check_compares_with_official_text(self):
         from bot import benefit_detail, source_check
         with mock.patch.object(benefit_detail, "detail_text", return_value="문의처: 02-2100-6313 지원금액 월 65만원"), \

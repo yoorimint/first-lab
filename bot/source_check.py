@@ -6,7 +6,8 @@
 지금은 공개를 막지 않는다(큐넷처럼 자주 안 열리는 공식 사이트 때문에 오탐이 생길 수 있음).
 결과는 글 메타(META)와 봇 기록에 남기고, 감시 세션이 외부 검수 결과와 며칠 비교한 뒤 보류에 쓸지 정한다.
 
-대조하는 숫자: 금액·건수처럼 세 자리 이상이거나 소수점이 있는 수 (5일·12억의 '5'·'12' 같은 짧은 수는 어디에나 있어 제외).
+대조하는 숫자: 금액·건수처럼 세 자리 이상이거나 소수점이 있는 수, 비율, 두 자리 수 + 단위(14일·39세·24개월 — 날짜 빼고).
+한 자리 수(5일)·단위 없는 두 자리 수(12억의 '12')는 어디에나 있어 제외.
 계산 결과 주장('~이면 ~원', '=')은 출처에 없는 값이라 대조하지 않는다 (재계산은 외부 검수가 함).
 법령은 비율을 '1천분의 5'(=0.5%)·'100분의 20' 처럼 쓰므로 그 표기도 같은 값으로 본다.
 """
@@ -49,8 +50,20 @@ def key_numbers(claim: str) -> list[str]:
         if any(m in claim for m in ("=", "×", "재계산", "예시")):
             return []  # 계산식의 비율은 예시 가정값(예금 금리 2.5% 등)이라 근거 페이지에 없음 — 표본 20개 중 2개 오탐
         return sorted(pct) if len(pct) <= MAX_NUMBERS else []
-    nums = sorted({n for n in _numbers(claim) if "." in n or len(n.lstrip("0")) >= 3} | pct)
+    nums = sorted({n for n in _numbers(claim) if "." in n or len(n.lstrip("0")) >= 3} | pct | unit_numbers(claim))
     return nums if len(nums) <= MAX_NUMBERS else []
+
+
+# 두 자리 수 + 단위(14일·15회·39세·24개월·60시간) — 기간·나이·횟수 조건이 글의 핵심인데 세 자리 미만이라 대조 안 됐음 (11/6 운영자
+# 'API 다 써서' 3번, #872 '14일 연장'). 날짜(11월 27일)는 페이지 표기(11.27.)가 달라 뺌. 저장소 글 40편 실측: 확인 193 · 없음 15(날짜·계산 예시 대부분).
+_UNIT = re.compile(r"(?<![\d.,])(\d{2})\s*(?=일|개월|년|세|회|시간|명|주)")
+
+
+_DATE_BEFORE = re.compile(r"\d\s*월\s*$|\d\s*월\s*\d{1,2}\s*일\S{0,4}\s*~\s*$")   # '11월 27일', '11월 16일(월)~27일'
+
+
+def unit_numbers(claim: str) -> set[str]:
+    return {m.group(1) for m in _UNIT.finditer(claim) if not _DATE_BEFORE.search(claim[:m.start()])}
 
 
 def readable_url(url: str) -> str:
