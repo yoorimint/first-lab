@@ -344,3 +344,4 @@ calc:foreign-stock-tax
 1766 종합소득세 기한후신고: 한 달 안이면 무신고가산세 50% 감면
 calc:industrial-accident-insurance
 calc:senior-continued-employment
+1561 연차수당 계산법: 월 통상임금 209시간 기준 공식과 예시
