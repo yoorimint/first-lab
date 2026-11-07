@@ -2081,6 +2081,40 @@ class ApproxRoundingTest(unittest.TestCase):
         self.assertIn("condition_gate.approx_rounding(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
 
+class CheckedLineTest(unittest.TestCase):
+    """11/7 운영자 '확인 방식 한 줄 — 하자, AI 사용은 빼고' (first-lab-author-box.php)."""
+
+    def run_php(self, record, dates):
+        import os
+        import shutil
+        import subprocess
+        import tempfile
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("<?php define('ABSPATH', 1); function add_filter() {} function wp_parse_url($u, $c) { return parse_url($u, $c); }\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-author-box.php'}';\n"
+                "echo firstlab_checked_line(json_decode(getenv('R'), true), json_decode(getenv('D'), true));")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        env = {**os.environ, "R": json.dumps(record), "D": json.dumps(dates)}
+        return subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env=env).stdout
+
+    def test_line_from_record(self):
+        rec = {"laws": [["https://www.law.go.kr/법령/근로기준법", "제55조"]],
+               "found": [{"urls": ["https://www.moel.go.kr/a"]}, {"urls": ["https://museum.gunsan.go.kr/b", "https://www.law.go.kr/x"]}]}
+        self.assertEqual(self.run_php(rec, ["2026-11-01", "", "2026-11-07 08:19:21"]),
+                         "이 글은 법제처 법령 원문과 고용노동부·공공기관 공식 페이지로 확인했어요 · 마지막 확인 2026년 11월 7일")
+        self.assertEqual(self.run_php({"laws": [["https://www.law.go.kr/법령/소득세법", "제12조"]]}, ["2026-11-03"]),
+                         "이 글은 법제처 법령 원문으로 확인했어요 · 마지막 확인 2026년 11월 3일")
+        self.assertEqual(self.run_php({"found": [{"urls": ["https://www.nhis.or.kr/a"]}]}, []), "이 글은 국민건강보험공단 공식 페이지로 확인했어요")
+        self.assertEqual(self.run_php({}, ["2026-11-07"]), "")                                      # 기록 없으면 줄 없음
+        self.assertEqual(self.run_php({"found": [{"urls": ["https://blog.naver.com/x"]}]}, []), "")   # 공식 출처 아님
+
+    def test_no_ai_wording(self):
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-author-box.php").read_text(encoding="utf-8")
+        self.assertNotIn("AI", src.split("*/", 1)[1])   # 운영자: AI 사용 문구는 빼기
+
+
 class SiteFocusTest(unittest.TestCase):
     """11/7 운영자 '주제 좁히기·겹치는 글 합치기' 승인."""
 
