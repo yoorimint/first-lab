@@ -169,3 +169,5 @@ date,post,fixes,types
 2026-11-07,1802,2,missing_condition:2
 2026-11-07,1808,1,missing_condition:1
 2026-11-07,1805,0,
+2026-11-07,1815,1,wrong_fact:1
+2026-11-07,1821,3,missing_condition:2 wrong_fact:1
