@@ -1,0 +1,223 @@
+[
+ {
+  "why": "월 250만 원 ÷ 209시간(고용노동부 주40시간 기준) × 8시간 = 1일 95,693원, 5일 = 2,500,000×8×5÷209 = 478,468원 (Python 분수 계산)",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 5,
+   "employees": 5
+  },
+  "expect": {
+   "daily": 95693,
+   "pay": 478468,
+   "covered": true
+  }
+ },
+ {
+  "why": "월 300만 원, 10일 = 3,000,000×80÷209 = 1,148,325원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 3000000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 10,
+   "employees": 5
+  },
+  "expect": {
+   "daily": 114832,
+   "pay": 1148325
+  }
+ },
+ {
+  "why": "시급 10,320원(2026 최저임금) × 8시간 = 82,560원 × 11일 = 908,160원",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 10320,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 11,
+   "employees": 5
+  },
+  "expect": {
+   "daily": 82560,
+   "pay": 908160
+  }
+ },
+ {
+  "why": "반차 0.5일 = 2,500,000×8×0.5÷209 = 47,846원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 0.5,
+   "employees": 5
+  },
+  "expect": {
+   "daily": 95693,
+   "pay": 47846
+  }
+ },
+ {
+  "why": "단시간 주 20시간(일 4시간): (20+4)×365÷7÷12≈104.29시간, 150만 원×4×7÷104.29 = 402,723원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 1500000,
+   "base_hours": 104.29,
+   "day_hours": 4,
+   "days": 7,
+   "employees": 5
+  },
+  "expect": {
+   "daily": 57531,
+   "pay": 402723
+  }
+ },
+ {
+  "why": "기준선: 상시 4명(근로기준법 시행령 별표 1 — 제60조 미적용) → 0원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 5,
+   "employees": 4
+  },
+  "expect": {
+   "pay": 0,
+   "covered": false
+  },
+  "boundary": true,
+  "notes_include": [
+   "4명 이하 사업장"
+  ]
+ },
+ {
+  "why": "기준선: 상시 5명 딱 → 적용, 478,468원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 5,
+   "employees": 5
+  },
+  "expect": {
+   "pay": 478468,
+   "covered": true
+  },
+  "boundary": true,
+  "notes_exclude": [
+   "4명 이하 사업장"
+  ]
+ },
+ {
+  "why": "기준선: 0일 → 0원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 0,
+   "employees": 5
+  },
+  "expect": {
+   "pay": 0
+  },
+  "boundary": true
+ },
+ {
+  "why": "일수 빈칸은 0원이 아니라 안내",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": "",
+   "employees": 5
+  },
+  "expect": {},
+  "expect_error": true
+ },
+ {
+  "why": "0.3일 같은 0.5 단위가 아닌 값은 안내",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2500000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 0.3,
+   "employees": 5
+  },
+  "expect": {},
+  "expect_error": true
+ },
+ {
+  "why": "통상임금 0원은 안내",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 0,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 5,
+   "employees": 5
+  },
+  "expect": {},
+  "expect_error": true
+ },
+ {
+  "why": "2026.12.31: 시급 10,500원은 2026 최저임금 10,320원 이상 → 최저임금 안내 없음",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 10500,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 1,
+   "employees": 5
+  },
+  "expect": {
+   "pay": 84000
+  },
+  "today": "2026-12-31",
+  "boundary": true,
+  "notes_exclude": [
+   "최저임금(시급"
+  ]
+ },
+ {
+  "why": "2027.1.1부터 최저임금 10,700원(고시) → 10,500원은 미달 안내",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 10500,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 1,
+   "employees": 5
+  },
+  "expect": {
+   "pay": 84000
+  },
+  "today": "2027-01-01",
+  "boundary": true,
+  "notes_include": [
+   "2027년 최저임금(시급 10,700원)"
+  ]
+ },
+ {
+  "why": "1,081,000원÷209×8 = 41,377.99…→41,377원 (화면 시급 5,172.25×8=41,378 로 계산하면 1원 틀림 — 시행령 제6조 식대로 한 번에 계산), 1일 = 41,377원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 1081000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 1,
+   "employees": 5
+  },
+  "expect": {
+   "daily": 41377,
+   "pay": 41377
+  }
+ }
+]

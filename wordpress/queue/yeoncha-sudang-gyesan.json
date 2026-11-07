@@ -1,0 +1,514 @@
+{
+ "title": "연차수당 계산법: 월 통상임금 209시간 기준 공식과 예시",
+ "excerpt": "연차수당은 월 통상임금 ÷ 209시간 × 8시간 × 쓰지 못한 연차 일수예요. 월 250만 원·5일이면 478,468원. 다만 5인 이상 사업장, 4주 평균 주 15시간 이상 근로자만 해당해요.",
+ "content_html": "<p>연차수당은 <strong>1일 통상임금 × 쓰지 못한 연차 일수</strong>예요. 월급제라면 월 통상임금을 209시간(주 40시간 기준)으로 나눠 통상시급을 구하고, 여기에 하루 소정근로시간 8시간을 곱하면 1일 통상임금이 나와요. 월 통상임금 250만 원에 쓰지 못한 연차가 5일이면 478,468원이에요. 다만 상시 근로자 5명 이상 사업장에서, 4주 평균 1주 소정근로시간이 15시간 이상인 근로자에게만 법정 연차와 연차수당이 있어요.</p>\n<h2>연차수당 계산 공식 3단계</h2>\n<ol>\n<li><strong>통상시급 구하기</strong>: 월 통상임금 ÷ 월 통상임금 산정 기준시간. 주 40시간이면 (40시간 + 주휴 8시간) × 365 ÷ 7 ÷ 12 ≈ 209시간이에요. 시급제는 시급 그대로예요.</li>\n<li><strong>1일 통상임금 구하기</strong>: 통상시급 × 1일 소정근로시간(보통 8시간).</li>\n<li><strong>연차수당</strong>: 1일 통상임금 × 쓰지 못한 연차 일수.</li>\n</ol>\n<p>단시간근로자는 기준시간이 달라요. 주 20시간·하루 4시간이면 (20 + 4) × 365 ÷ 7 ÷ 12 ≈ 104.29시간으로 나누고 4시간을 곱해요.</p>\n<p>[firstlab_calc id=\"annual-leave-pay\"]</p>\n<h2>월급별 연차수당 계산 예시</h2>\n<p>주 40시간·하루 8시간 근무, 통상임금으로 주는 회사를 가정했어요. 수당은 중간에 끝수를 버리지 않고 한 번에 계산한 뒤 원 미만을 버렸어요.</p>\n<table>\n<thead><tr><th>통상임금</th><th>1일 통상임금</th><th>안 쓴 연차</th><th>연차수당</th></tr></thead>\n<tbody>\n<tr><td>월 250만 원</td><td>95,693원</td><td>5일</td><td>478,468원</td></tr>\n<tr><td>월 300만 원</td><td>114,832원</td><td>10일</td><td>1,148,325원</td></tr>\n<tr><td>시급 10,320원</td><td>82,560원</td><td>11일</td><td>908,160원</td></tr>\n</tbody>\n</table>\n<p>시급 10,320원은 2026년 최저임금이에요. 2027년 1월 1일부터는 최저임금이 시급 10,700원이라 1일 통상임금도 85,600원 이상이 돼요.</p>\n<h3>통상임금에 넣는 돈</h3>\n<p>통상임금은 정기적이고 일률적으로 소정근로에 대해 주기로 정한 임금이에요. 기본급에 직책수당·자격수당처럼 매달 고정으로 주는 수당을 더하고, 연장·야간·휴일근로수당은 넣지 않아요. 2024년 12월 19일 대법원 전원합의체 판결을 반영한 고용노동부 개정 통상임금 노사지도 지침(2025년 2월 6일)에 따라, 정기성·일률성을 갖췄다면 지급일에 재직해야 준다는 조건이 붙은 정기상여금도 통상임금에 들어갈 수 있어요. 정기상여금이 있는 회사라면 수당이 생각보다 커질 수 있어요.</p>\n<p>취업규칙·단체협약에서 연차수당을 평균임금으로 주기로 정했다면 평균임금으로 계산해요. 정한 것이 없으면 통상임금으로 주고, 휴가를 쓸 수 있던 마지막 달의 통상임금이 기준이에요.</p>\n<h2>연차수당은 언제 받나요</h2>\n<ul>\n<li><strong>다니는 중</strong>: 연차는 생긴 날부터 1년(입사 1년 미만 때 생긴 연차는 입사 1년이 끝날 때까지) 안에 안 쓰면 없어지고, 그다음 날 수당을 청구할 권리가 생겨요. 단체협약·취업규칙에 정한 날이 없으면 사용 기간이 끝난 뒤 처음 돌아오는 정기 월급날에 받아요.</li>\n<li><strong>퇴사할 때</strong>: 아직 쓰지 못한 연차는 퇴직일부터 14일 이내에 수당으로 받아요. 특별한 사정이 있으면 회사와 합의해 날짜를 늦출 수 있어요.</li>\n<li><strong>청구 기한</strong>: 연차수당도 임금이라 3년 동안 청구하지 않으면 시효로 없어져요.</li>\n</ul>\n<p>퇴직 전전년도에 생긴 연차 중 퇴직 전년도에 쓰지 못해 받은 연차수당은 그 금액의 3/12이 퇴직금 계산의 평균임금에 더해져요. 고용노동부 퇴직금 계산기에도 연차수당 칸이 따로 있어요.</p>\n<h2>퇴사할 때 수당 받는 일수</h2>\n<p>퇴사할 때는 생겼지만 아직 쓰지 않은 연차 전부가 대상이에요. 입사 1년 미만이면 1개월 개근할 때마다 1일씩, 최대 11일이 생겨요. 1년 동안 80% 이상 출근하면 그다음 해에 15일이 생기고, 3년 이상 다니면 2년마다 1일씩 늘어 최대 25일이에요.</p>\n<p>15일은 1년의 근로를 마친 다음 날 생겨요. 그래서 딱 1년만 일하고 그만두면 15일은 생기지 않고 최대 11일분만 받아요. 1년을 채운 다음 날까지 근로관계가 이어지면 15일이 더 생겨 최대 26일분이 돼요. 내 연차 개수는 연차 개수 계산기로 먼저 세어 보는 게 편해요.</p>\n<p>회사가 회계연도(1월 1일~12월 31일) 기준으로 연차를 주더라도, 퇴사할 때 입사일 기준으로 다시 센 일수보다 적게 받았다면 그 차이만큼 수당으로 정산받아요.</p>\n<h2>연차수당을 못 받는 경우</h2>\n<ul>\n<li><strong>상시 근로자 4명 이하 사업장</strong>: 근로기준법의 연차 규정이 적용되지 않아요. 동거하는 친족만 쓰는 사업장과 가사 사용인도 근로기준법이 적용되지 않아요. 인증받은 가사서비스 제공기관과 근로계약을 맺은 가사근로자는 가사근로자법에 따로 정한 기준을 확인해요.</li>\n<li><strong>4주 평균 1주 소정근로시간 15시간 미만</strong>: 연차 자체가 생기지 않아요.</li>\n<li><strong>회사가 법에 정한 사용 촉진을 한 경우</strong>: 연차 사용 기간이 끝나기 6개월 전을 기준으로 10일 이내에 회사가 남은 일수를 알리고 사용 시기를 정해 달라고 서면으로 촉구하고, 근로자가 10일 안에 시기를 알리지 않아 끝나기 2개월 전까지 회사가 사용 시기를 정해 서면으로 통보했는데도 쓰지 않았다면 수당을 줄 의무가 없어요. 입사 1년 미만 때 생긴 연차는 1년이 끝나기 3개월 전과 1개월 전을 기준으로 따로 정해져 있어요.</li>\n</ul>\n<p>회사 사정(사용자의 귀책사유)으로 연차를 쓰지 못했다면 1년이 지나도 연차가 없어지지 않아요.</p>\n<h2>2027년 6월 10일부터 바뀌는 점</h2>\n<p>개정 근로기준법이 2027년 6월 10일부터 시행돼요. 대통령령으로 정하는 시간 단위·일수 범위 안에서 연차를 나눠 청구하면 회사가 줘야 해요(사업 운영에 막대한 지장이 있으면 회사가 시기를 바꿀 수 있는 것은 지금과 같아요). 연차를 청구하거나 썼다는 이유로 해고하거나 불리하게 대우하면 안 돼요. 수당 계산 공식(1일 통상임금 × 일수)은 그대로예요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>회사가 수당 대신 연차를 다음 해로 넘기자고 하면요?</h3>\n<p>근로자가 동의하면 다음 해로 이월해 쓸 수 있지만, 회사가 근로자 뜻에 반해 강제할 수는 없어요. 이월하기로 한 기간이 지나도록 못 썼다면 그때 수당을 청구할 수 있어요.</p>\n<h3>반차만 남았으면 수당은 어떻게 계산하나요?</h3>\n<p>0.5일로 계산해요. 월 250만 원이면 2,500,000 × 8 × 0.5 ÷ 209 = 47,846원이에요.</p>\n<h3>연차수당을 안 주면 어디에 물어보나요?</h3>\n<p>고용노동부 고객상담센터(국번 없이 1350)에서 상담받을 수 있고, 회사가 끝내 주지 않으면 노동포털에서 온라인으로, 또는 사업장 소재지 관할 고용노동관서(지방고용노동청·지청)에 임금체불로 진정할 수 있어요.</p>",
+ "tags": [
+  "연차수당",
+  "미사용 연차수당",
+  "통상임금",
+  "연차 계산"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a peaceful autumn park path with a wooden bench and falling yellow leaves in soft afternoon light, no people",
+   "alt": "가을 햇살이 비치는 공원 산책길과 나무 벤치"
+  }
+ ],
+ "keyword": "연차수당계산",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 연차수당 계산법: 월 통상임금 209시간 기준 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 월 통상임금 ÷ 209시간 × 8시간 × 쓰지 못한 연차 일수 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 월 250만 원·5일이면 478,468원 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 다만 5인 이상 사업장, 4주 평균 주 15시간 이상 근로자만 해당 (근로기준법 제11조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상시 근로자 4명 이하 사업장은 연차 규정 미적용 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4주 평균 1주 소정근로시간 15시간 미만이면 연차 없음 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주 40시간이면 (40+8)×365÷7÷12 ≈ 209시간 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "시급제는 시급 그대로 통상시급 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1일 통상임금 = 통상시급 × 1일 소정근로시간 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "단시간 주 20시간·하루 4시간: (20+4)×365÷7÷12 ≈ 104.29시간 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 월 250만 원 1일 95,693원, 5일 478,468원 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 월 300만 원 1일 114,832원, 10일 1,148,325원 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "표: 시급 10,320원 1일 82,560원, 11일 908,160원 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 최저임금 시급 10,320원",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 1월 1일부터 최저임금 10,700원, 1일 통상임금 85,600원 이상",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "통상임금은 정기적·일률적으로 소정근로에 대해 주기로 정한 임금 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연장·야간·휴일근로수당은 통상임금에 넣지 않음 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202504150559014040080"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2024년 12월 19일 대법원 전원합의체 판결 반영 개정 통상임금 노사지도 지침 2025년 2월 6일",
+   "urls": [
+    "https://www.moel.go.kr/news/notice/noticeView.do?bbs_seq=20250200285",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202504150559014040080"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "정기성·일률성을 갖추면 재직 조건 붙은 정기상여금도 통상임금 가능",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202504150559014040080",
+    "https://www.moel.go.kr/news/notice/noticeView.do?bbs_seq=20250200285"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "취업규칙 등에서 평균임금으로 정하면 평균임금, 정한 것이 없으면 통상임금 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "휴가를 쓸 수 있던 마지막 달의 통상임금 기준",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연차는 생긴 날부터 1년, 1년 미만 때 연차는 입사 1년이 끝날 때까지 안 쓰면 소멸 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소멸 다음 날 수당 청구권 발생",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "정한 날이 없으면 사용 기간이 끝난 뒤 첫 정기 월급날 지급",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직일부터 14일 이내 지급, 특별한 사정이 있으면 합의로 연장 (근로기준법 제36조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "임금채권 3년 시효 (근로기준법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직 전전년도 발생·전년도 미사용 연차수당의 3/12을 평균임금에 더함",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201707140941334611000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용노동부 퇴직금 계산기에 연차수당 칸",
+   "urls": [
+    "https://www.moel.go.kr/retirementpayCal.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴사할 때는 생겼지만 쓰지 않은 연차 전부가 대상",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 미만은 1개월 개근마다 1일, 최대 11일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 80% 이상 출근하면 15일, 3년 이상 2년마다 1일 가산 최대 25일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "15일은 1년 근로를 마친 다음 날 생김",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "딱 1년 일하고 그만두면 최대 11일, 다음 날까지 근로관계면 최대 26일",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "회계연도 기준이라도 퇴사 때 입사일 기준보다 적으면 차이를 수당으로 정산",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202306071525097031000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "동거 친족만 쓰는 사업장·가사 사용인은 근로기준법 미적용, 인증기관 가사근로자는 가사근로자법 기준 확인 (근로기준법 제11조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.law.go.kr/법령/가사근로자의고용개선등에관한법률"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사용 촉진: 6개월 전 기준 10일 이내 서면 촉구, 10일 안 통보 없으면 2개월 전까지 서면 통보 시 보상 의무 없음 (근로기준법 제61조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 미만 연차 촉진은 3개월 전·1개월 전 기준 (근로기준법 제61조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사용자 귀책사유로 못 쓴 연차는 소멸하지 않음 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "개정 근로기준법 2027년 6월 10일 시행 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 6월 10일부터 시간 단위·일수 범위 안에서 나눠 청구하면 회사가 줘야 하고, 사업 운영에 막대한 지장이 있으면 시기 변경 가능 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "연차 청구·사용을 이유로 해고·불리한 처우 금지 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수당 계산 공식(통상임금 또는 평균임금)은 개정 후에도 그대로 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로자가 동의하면 이월 가능, 강제 불가, 이월 기간 지나면 수당 청구 가능",
+   "urls": [
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "반차 0.5일: 2,500,000×8×0.5÷209 = 47,846원 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용노동부 고객상담센터 1350",
+   "urls": [
+    "https://labor.moel.go.kr/minwonSysInfo/wagesolway.do",
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "노동포털 온라인 또는 사업장 소재지 관할 고용노동관서에 임금체불 진정",
+   "urls": [
+    "https://labor.moel.go.kr/minwonSysInfo/wagesolway.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "근로기준법 제36조 단서1 반영 — '언제 받나요' 퇴사할 때 항목: 특별한 사정이 있으면 합의해 날짜를 늦출 수 있음",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제36조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제11조 단서1 반영 — '못 받는 경우' 첫 항목: 동거 친족만 쓰는 사업장·가사 사용인 미적용",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제11조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제18조 단서1 반영 — 첫 문단·요약과 '못 받는 경우' 둘째 항목: 4주 평균 1주 15시간 미만 연차 없음",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제60조 단서1 반영 — '2027년 6월 10일부터 바뀌는 점': 사업 운영에 막대한 지장이 있으면 시기 변경",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제60조 단서2 반영 — '못 받는 경우' 아래 문단: 회사 귀책사유면 연차가 없어지지 않음",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제61조 단서1 반영 — '못 받는 경우' 셋째 항목: 1년 미만 연차는 제1항 촉진에서 빼고 따로 정함",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제61조 단서2 반영 — '못 받는 경우' 셋째 항목: 10일 안 통보 없으면 끝나기 2개월 전까지 서면 통보",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제61조 단서3 반영 — '못 받는 경우' 셋째 항목: 1년 미만 연차 촉진은 따로 정해져 있음",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제61조 단서4 반영 — '못 받는 경우' 셋째 항목: 1년 미만 연차는 3개월 전·1개월 전 기준으로 따로 정해져 있음",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 제61조 단서5 반영 — '못 받는 경우' 셋째 항목: 1년 미만 연차 촉진 통보 기한은 '따로 정해져 있음'으로 안내",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 시행령 제6조 경우 나열 반영 — 월급제(209시간)·시급제·단시간 기준시간을 다루고, 일급·주급·도급 등은 계산기 시급 입력으로 환산 (해당 없음 아님: 글은 대표 경우만 '월급제라면'으로 한정)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 근로기준법 (제60조 연차 유급휴가·제61조 사용 촉진)",
+   "url": "https://www.law.go.kr/법령/근로기준법"
+  },
+  {
+   "name": "고용노동부 1350 상담 미사용 연차수당 발생·지급 시기·통상임금 기준",
+   "url": "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+  },
+  {
+   "name": "고용노동부 보도자료 연차유급휴가 행정해석 변경",
+   "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+{
+  "basis_date": "2026-11-07", "yearly_checked": 2027, "law_checked": [],
+  "sources": [
+    {"name": "근로기준법 제11조·제18조·제60조·제61조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
+    {"name": "근로기준법 시행령 제6조(통상임금)·제7조·별표 1 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법시행령"},
+    {"name": "고용노동부 빠른인터넷상담 연차수당 통상임금 209시간 기준", "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=201711281212106211000"},
+    {"name": "고용노동부 1350 상담 미사용 연차수당 발생·지급 시기·통상임금 기준 (근로개선정책과-4218)", "url": "https://1350.moel.go.kr/rtmview.do?id=1000244622"}
+  ],
+  "min_employees": 5,
+  "max_base_hours": 300,
+  "max_day_hours": 8,
+  "max_days": 100,
+  "min_wage": 10320,
+  "min_wage_year": 2026,
+  "scheduled": [{"from": "2027-01-01", "values": {"min_wage": 10700, "min_wage_year": 2027}, "source": {"name": "고용노동부 2027년 적용 최저임금 시간급 10,700원 고시", "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"}}]
+}
