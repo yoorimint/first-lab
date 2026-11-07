@@ -1,0 +1,209 @@
+[
+  {
+    "why": "이익 합계가 기본공제 250만 원과 같음 → 과세표준 0원 (소득세법 제103조 연 250만 원)",
+    "input": {
+      "sale": 12500000,
+      "acquire": 10000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 2500000,
+      "deduction": 2500000,
+      "base": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0
+    },
+    "boundary": true,
+    "notes_include": [
+      "기본공제 250만 원 안이라"
+    ]
+  },
+  {
+    "why": "250만 1원: 과세표준 1원 × 20% = 0.2원 → 10원 미만 버림 0원",
+    "input": {
+      "sale": 12500001,
+      "acquire": 10000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 2500001,
+      "deduction": 2500000,
+      "base": 1,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0
+    },
+    "boundary": true
+  },
+  {
+    "why": "250만 50원: 과세표준 50원 → 소득세 10원, 지방 2% 1원 → 0원",
+    "input": {
+      "sale": 12500050,
+      "acquire": 10000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 2500050,
+      "deduction": 2500000,
+      "base": 50,
+      "income_tax": 10,
+      "local_tax": 0,
+      "total": 10
+    },
+    "boundary": true
+  },
+  {
+    "why": "본문 예시: 이익 900만 - 손실 200만 = 700만 → 과세표준 450만 × 20% = 90만 + 지방 2% 9만 = 99만 원",
+    "input": {
+      "sale": 31000000,
+      "acquire": 24000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 7000000,
+      "deduction": 2500000,
+      "base": 4500000,
+      "income_tax": 900000,
+      "local_tax": 90000,
+      "total": 990000
+    }
+  },
+  {
+    "why": "수수료 3만 원 포함: 3,000만 - 2,000만 - 3만 = 997만 → 747만 × 20% = 149만 4천 + 14만 9,400",
+    "input": {
+      "sale": 30000000,
+      "acquire": 20000000,
+      "expense": 30000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 9970000,
+      "deduction": 2500000,
+      "base": 7470000,
+      "income_tax": 1494000,
+      "local_tax": 149400,
+      "total": 1643400
+    }
+  },
+  {
+    "why": "손실이 더 큼: 1,000만 - 1,200만 → 세금 0원",
+    "input": {
+      "sale": 10000000,
+      "acquire": 12000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": -2000000,
+      "deduction": 0,
+      "base": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0
+    },
+    "boundary": true,
+    "notes_include": [
+      "손실은 같은 해에"
+    ]
+  },
+  {
+    "why": "끝수: 이익 3,333,333원 → 과세표준 833,333 × 20% = 166,666.6 → 166,660원, 지방 16,666.66 → 16,660원",
+    "input": {
+      "sale": 13333333,
+      "acquire": 10000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 3333333,
+      "deduction": 2500000,
+      "base": 833333,
+      "income_tax": 166660,
+      "local_tax": 16660,
+      "total": 183320
+    }
+  },
+  {
+    "why": "국내 과세주식에서 공제 100만 원 이미 씀 → 남은 150만 원만 공제: 700만 → 550만 × 20% = 110만 + 11만",
+    "input": {
+      "sale": 17000000,
+      "acquire": 10000000,
+      "used": 1000000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 7000000,
+      "deduction": 1500000,
+      "base": 5500000,
+      "income_tax": 1100000,
+      "local_tax": 110000,
+      "total": 1210000
+    }
+  },
+  {
+    "why": "국내에서 250만 원 다 씀 → 공제 0원: 이익 100만 원 전부 과세 20만 + 2만",
+    "input": {
+      "sale": 11000000,
+      "acquire": 10000000,
+      "used": 2500000,
+      "kind": "general"
+    },
+    "expect": {
+      "income": 1000000,
+      "deduction": 0,
+      "base": 1000000,
+      "income_tax": 200000,
+      "local_tax": 20000,
+      "total": 220000
+    },
+    "boundary": true
+  },
+  {
+    "why": "중소기업 주식 10%·지방 1%: 이익 700만 → 450만 × 10% = 45만 + 4만 5천",
+    "input": {
+      "sale": 17000000,
+      "acquire": 10000000,
+      "kind": "sme"
+    },
+    "expect": {
+      "income": 7000000,
+      "deduction": 2500000,
+      "base": 4500000,
+      "income_tax": 450000,
+      "local_tax": 45000,
+      "total": 495000
+    }
+  },
+  {
+    "why": "판 금액 0 → 안내",
+    "input": {
+      "sale": "0",
+      "kind": "general"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "소수 금액 → 안내",
+    "input": {
+      "sale": "1.5",
+      "kind": "general"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "음수 산 금액 → 안내",
+    "input": {
+      "sale": 1000000,
+      "acquire": "-1",
+      "kind": "general"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "너무 큰 금액 → 안내",
+    "input": {
+      "sale": 200000000000,
+      "kind": "general"
+    },
+    "expect_error": true
+  }
+]

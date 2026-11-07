@@ -1,0 +1,14 @@
+{
+  "basis_date": "2026-11-07", "yearly": false, "law_checked": ["소득세법|2027-01-01"],
+  "max_input": 100000000000,
+  "won10_keys": ["income_tax", "local_tax", "total"],
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제94조①3호다목 해외주식, 제102조 구분 계산, 제103조 기본공제 250만 원, 제104조①12호 세율, 제110조 확정신고)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국가법령정보센터 지방세법 (제103조의3 양도소득 개인지방소득세 세율)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국세청 주식등 양도소득세 과세대상 (국내·국외주식 손익통산·기본공제 합산)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=8800"},
+    {"name": "국가법령정보센터 국고금관리법 (제47조 10원 미만 끝수)", "url": "https://www.law.go.kr/법령/국고금관리법"}
+  ],
+  "basic_deduction": 2500000,
+  "rate_pct": 20, "rate_sme_pct": 10,
+  "local_permille": 20, "local_sme_permille": 10
+}
