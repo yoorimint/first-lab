@@ -2282,6 +2282,17 @@ class DeletedArticleTransitionTest(unittest.TestCase):
         self.assertIn("개인연금저축", got[0])
 
 
+class NoticeYearLabelTest(unittest.TestCase):
+    """11/7 #1678: 2026년 공고 값(연간 7천만 원)을 제목·요약이 연도 없이 — 한 회차 규칙을 일반 규칙처럼 (하루 세 번째)."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import notice_year_label
+        body = "<p>2026년 공고 기준이에요.</p><p>2026년 소상공인 정책자금 융자계획에 따라요.</p>"
+        self.assertEqual(len(notice_year_label("정책자금: 연간 7천만 원", "기준금리+0.6%p", body)), 1)
+        self.assertEqual(notice_year_label("정책자금: 연간 7천만 원(2026년 공고)", "", body), [])
+        self.assertEqual(notice_year_label("엑셀 자격증 22,000원", "", "<p>2027년 9월 1일부터 채용 공고 가점이 바뀌어요.</p>"), [])
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

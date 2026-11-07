@@ -1030,3 +1030,16 @@ def labor_day_exception(body_html: str) -> list[str]:
         if _NO_HOLIDAY_PAY.search(text) and re.search(r"없|더하지 않|안 받|받지 않", text) and not re.search(r"노동절|근로자의 ?날", text):
             out.append(f"무급휴무일과 겹친 공휴일 규칙에 노동절 예외가 없음: '{text[:50]}' — 노동절(5월 1일)은 무급휴무일과 겹쳐도 시급제·일급제 유급휴일수당")
     return out[:2]
+
+
+# 해마다 새 공고로 바뀌는 사업(정책자금·채용·시험)의 금액을 제목·요약이 연도 없이 씀 — 한 회차 규칙을 일반 규칙처럼
+# (11/7 #1423 소방안전관리자·#1504 장애인고용공단 채용·#1678 소상공인 정책자금 — 하루 세 번 → 검사로)
+_NOTICE = re.compile(r"(20\d\d)년[^.。<]{0,40}(공고|융자계획|사업계획|시행계획)")
+_HEAD_AMOUNT = re.compile(r"\d[\d,.]*\s*(만\s*원|억|천만\s*원|원|%)")
+
+
+def notice_year_label(title: str, excerpt: str, body_html: str) -> list[str]:
+    body = _plain(body_html or "")
+    if len(_NOTICE.findall(body)) >= 2 and _HEAD_AMOUNT.search(title or "") and not re.search(r"20\d\d", f"{title} {excerpt}"):
+        return ["본문은 'O년 공고' 기준인데 제목·요약의 금액에 연도가 없음 — 해마다 공고로 바뀌는 값이면 제목이나 요약에 'O년 공고 기준'을 넣기"]
+    return []
