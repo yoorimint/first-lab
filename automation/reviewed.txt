@@ -299,3 +299,4 @@ calc:sunlight-setback
 calc:unused-leave-pay
 calc:annual-leave-pay
 calc:work-hours
+1559 미사용 연차수당 계산: 하루 통상임금 × 남은 일수, 예시 672,000원
