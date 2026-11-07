@@ -305,3 +305,4 @@ calc:savings-interest
 1576 근무시간 계산기: 휴게 빼고 하루 8시간 넘으면 연장근로
 calc:part-time-pay
 calc:acquisition-tax
+calc:cheongyak-score

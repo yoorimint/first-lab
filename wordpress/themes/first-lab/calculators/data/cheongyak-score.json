@@ -1,0 +1,19 @@
+{
+  "basis_date": "2026-11-07", "yearly": false,
+  "sources": [
+    {"name": "국가법령정보센터 주택공급에 관한 규칙 별표 1 (가점제 적용기준·가점 산정기준)·제10조제6항(미성년 가입기간)·제28조(가점제 비율·동점 처리)", "url": "https://www.law.go.kr/법령/주택공급에관한규칙"},
+    {"name": "청약홈 청약가점 계산기 (0점 기준·배우자 통장 50% 합산)", "url": "https://www.applyhome.co.kr/ap/apg/selectAddpntCalculatorView.do"}
+  ],
+  "age_start": 30,
+  "adult_age": 19,
+  "nohouse_base": 2,
+  "nohouse_step": 2,
+  "nohouse_max": 32,
+  "dependent_base": 5,
+  "dependent_step": 5,
+  "dependent_max": 35,
+  "account_max": 17,
+  "spouse_max": 3,
+  "minor_pre2024_max_years": 2,
+  "minor_max_years": 5
+}

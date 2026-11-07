@@ -1,0 +1,331 @@
+[
+  {
+    "why": "35세 기혼(31세 혼인)·무주택·부양 3명·통장 10년 5개월: 30세 생일부터 5년 6개월 12점 + 20점 + 12점 = 44점 (별표 1 표, 본문 예시)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "2022-06-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 3,
+      "spouse_account": "",
+      "birth": "1991-05-01",
+      "account": "2016-06-01"
+    },
+    "expect": {
+      "nohouse": 12,
+      "dependents": 20,
+      "own_account": 12,
+      "account": 12,
+      "total": 44
+    }
+  },
+  {
+    "why": "무주택 정확히 15년(30세 생일 2011-11-07) → 32점 상한 (15년 이상)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1981-11-07",
+      "account": "2016-06-01"
+    },
+    "expect": {
+      "nohouse": 32,
+      "nohouse_months": 180
+    },
+    "boundary": true
+  },
+  {
+    "why": "무주택 하루 모자란 15년(공고일 2026-11-06) → 14년 구간 30점",
+    "input": {
+      "announce": "2026-11-06",
+      "married": "no",
+      "marriage": "",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1981-11-07",
+      "account": "2016-06-01"
+    },
+    "expect": {
+      "nohouse": 30
+    },
+    "boundary": true
+  },
+  {
+    "why": "만 28세 미혼 → 무주택기간 0점 (청약홈: 만30세 미만 미혼 0점), 부양 0명 5점, 통장 6년 10개월 8점",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1998-01-01",
+      "account": "2020-01-01"
+    },
+    "expect": {
+      "nohouse": 0,
+      "dependents": 5,
+      "account": 8,
+      "total": 13
+    },
+    "notes_include": [
+      "만 30세 미만 미혼이면 무주택기간이 아직 시작되지 않아 0점이에요. 30세 전에 혼인신고를 하면 그날부터 셉니다."
+    ]
+  },
+  {
+    "why": "30세 전 혼인(2024-03-01): 혼인신고일부터 2년 8개월 → 6점 (별표 1 제1호가목3)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "2024-03-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 1,
+      "spouse_account": "",
+      "birth": "1998-01-01",
+      "account": "2020-01-01"
+    },
+    "expect": {
+      "nohouse": 6,
+      "dependents": 10
+    }
+  },
+  {
+    "why": "본문 예시 3: 1998-01-01생, 2024-03-01 혼인 → 2년 8개월 6점, 배우자 1명 10점, 본인 6년 10개월 8점 + 배우자 4년 3점 = 11점, 총 27점",
+    "input": {
+      "announce": "2026-11-07",
+      "birth": "1998-01-01",
+      "married": "yes",
+      "marriage": "2024-03-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 1,
+      "account": "2020-01-01",
+      "spouse_account": "2022-11-07"
+    },
+    "expect": {
+      "nohouse": 6,
+      "dependents": 10,
+      "own_account": 8,
+      "spouse": 3,
+      "account": 11,
+      "total": 27
+    }
+  },
+  {
+    "why": "본인 5년(7점)+배우자 4년(50%=2년 → 3점 상한) = 10점 (청약홈 배우자 합산)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "2020-01-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "2022-11-07",
+      "birth": "1990-01-01",
+      "account": "2021-11-07"
+    },
+    "expect": {
+      "own_account": 7,
+      "spouse": 3,
+      "account": 10
+    }
+  },
+  {
+    "why": "배우자 정확히 2년(50%=1년) → 3점",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "2020-01-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "2024-11-07",
+      "birth": "1990-01-01",
+      "account": "2021-11-07"
+    },
+    "expect": {
+      "spouse": 3
+    },
+    "boundary": true
+  },
+  {
+    "why": "배우자 1년 11개월(50% 1년 미만) → 2점",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "2020-01-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "2024-11-08",
+      "birth": "1990-01-01",
+      "account": "2021-11-07"
+    },
+    "expect": {
+      "spouse": 2
+    },
+    "boundary": true
+  },
+  {
+    "why": "본인 14년(16점)+배우자 3점 → 합계 17점 한도",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "2015-01-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "2015-01-01",
+      "birth": "1985-01-01",
+      "account": "2012-11-07"
+    },
+    "expect": {
+      "own_account": 16,
+      "spouse": 3,
+      "account": 17
+    },
+    "boundary": true
+  },
+  {
+    "why": "통장 5개월 30일(6개월 하루 전) → 1점 (6개월 미만)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1990-01-01",
+      "account": "2026-05-08"
+    },
+    "expect": {
+      "own_account": 1
+    },
+    "boundary": true
+  },
+  {
+    "why": "통장 정확히 6개월 → 2점 (6개월 이상~1년 미만)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1990-01-01",
+      "account": "2026-05-07"
+    },
+    "expect": {
+      "own_account": 2
+    },
+    "boundary": true
+  },
+  {
+    "why": "10세(2010-01-01) 가입: 성년 전 9년 중 2023년 이전 부분 2년만 인정 + 성년 뒤 7년 10개월 = 9년 10개월 → 11점 (제10조제6항)",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "2000-01-01",
+      "account": "2010-01-01"
+    },
+    "expect": {
+      "own_account": 11
+    },
+    "notes_include": [
+      "미성년자 때 가입한 기간은 2023년 12월 31일 이전 부분은 2년까지, 2024년 이후 부분과 합쳐 5년까지만 인정해서 줄여 계산했어요."
+    ]
+  },
+  {
+    "why": "세대원 주택 소유 → 무주택 0점, 가점제 제외 안내",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "now",
+      "nohouse_since": "",
+      "dependents": 2,
+      "spouse_account": "",
+      "birth": "1980-01-01",
+      "account": "2010-01-01"
+    },
+    "expect": {
+      "nohouse": 0,
+      "dependents": 15,
+      "account": 17,
+      "total": 32
+    },
+    "notes_include": [
+      "지금 세대원 중 주택을 가진 사람이 있으면 무주택기간은 0점이고, 투기과열지구·청약과열지역 등에서는 1주택 세대도 가점제 대상에서 빠져 추첨제로만 신청해요. 소형·저가주택 1채만 있거나 60세 이상 부모님 집이라 무주택으로 보는 경우라면 '세대원 모두 주택을 가진 적 없음' 또는 '예전에 있었고 지금은 세대원 모두 무주택'을 골라 다시 계산해요."
+    ]
+  },
+  {
+    "why": "예전 주택 처분(2023-02-01) → 최근 무주택이 된 날부터 3년 9개월 8점",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "past",
+      "nohouse_since": "2023-02-01",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1980-01-01",
+      "account": "2010-01-01"
+    },
+    "expect": {
+      "nohouse": 8,
+      "nohouse_months": 45
+    }
+  },
+  {
+    "why": "부양가족 6명 35점, 7명도 35점 상한 / 84점 만점",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "yes",
+      "marriage": "1998-01-01",
+      "house": "never",
+      "nohouse_since": "",
+      "dependents": 7,
+      "spouse_account": "",
+      "birth": "1970-01-01",
+      "account": "2005-01-01"
+    },
+    "expect": {
+      "nohouse": 32,
+      "dependents": 35,
+      "account": 17,
+      "total": 84
+    },
+    "boundary": true
+  },
+  {
+    "why": "예전에 주택이 있었다고 했는데 무주택이 된 날이 없음 → 안내",
+    "input": {
+      "announce": "2026-11-07",
+      "married": "no",
+      "marriage": "",
+      "house": "past",
+      "nohouse_since": "",
+      "dependents": 0,
+      "spouse_account": "",
+      "birth": "1980-01-01",
+      "account": "2010-01-01"
+    },
+    "expect_error": true
+  }
+]
