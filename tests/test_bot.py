@@ -2261,6 +2261,15 @@ class LaborDayExceptionTest(unittest.TestCase):
         self.assertEqual(labor_day_exception(good), [])
 
 
+class OtherIncomeTaxScopeTest(unittest.TestCase):
+    """11/7 #1630: '그 밖의 기타소득' 선택지에 복권(200만 원 비과세)을 넣으면 33만 원이 나옴 — 계산 대상 밖을 선택지·안내로 막음."""
+
+    def test_option_scope(self):
+        src = (ROOT / "wordpress" / "themes" / "first-lab" / "calculators" / "defs" / "other-income-tax.js").read_text(encoding="utf-8")
+        self.assertNotIn("그 밖의 기타소득", src)
+        self.assertIn("복권·연금계좌 연금외수령", src)
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

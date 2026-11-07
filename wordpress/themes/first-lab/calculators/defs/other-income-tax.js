@@ -13,9 +13,9 @@
         options: [
           ['p60', '강연료·원고료·인세·자문료 등 일시적 용역 (필요경비 60%)'],
           ['p80', '공익법인 시상 상금·여러 명이 순위를 겨루는 대회 상금·주택입주 지체상금 (필요경비 80%)'],
-          ['p0', '사례금·그 밖의 기타소득 (정해진 필요경비 없음)'],
+          ['p0', '사례금·물품·장소 일시 대여료·위약금 등 (정해진 필요경비 없음)'],
         ],
-        help: '계속·반복해서 하는 일의 대가는 기타소득이 아니라 사업소득(3.3%)이라 이 계산과 달라요.',
+        help: '계속·반복해서 하는 일의 대가는 기타소득이 아니라 사업소득(3.3%)이라 이 계산과 달라요. 복권·연금계좌 연금외수령·소기업소상공인 공제부금 해지일시금·서화·골동품·종교인소득은 세율이나 비과세 기준이 달라 이 계산기로 계산하지 않아요.',
       },
       { name: 'amount', label: '받기로 한 금액 (원, 세전)', type: 'number', min: 0, step: 1, help: '1건(한 번 지급) 기준이에요.' },
       { name: 'actual', label: '실제로 쓴 필요경비 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '증빙이 있고 정해진 비율보다 클 때만 결과가 달라져요.' },
@@ -53,7 +53,7 @@
       const values = { expense, income, income_tax: incomeTax, local_tax: localTax, total, net, exempt };
       const fmt = (n) => (Number.isInteger(n) ? u.won(n) : `${n.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}원`);
       const rows = [['받기로 한 금액 (세전)', u.won(amount)]];
-      rows.push([usedActual ? '필요경비 (실제 쓴 금액)' : `필요경비 (받은 금액의 ${pct}%)`, fmt(expense)]);
+      rows.push([usedActual ? (actual100 > amount * 100 ? '필요경비 (실제 쓴 금액, 받은 금액까지만)' : '필요경비 (실제 쓴 금액)') : (pct === 0 ? '필요경비 (정해진 비율 없음)' : `필요경비 (받은 금액의 ${pct}%)`), fmt(expense)]);
       rows.push(['기타소득금액 (금액 - 필요경비)', fmt(income)]);
       const notes = [];
       if (exempt) {
