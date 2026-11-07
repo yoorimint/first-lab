@@ -1,0 +1,365 @@
+{
+ "title": "월차 발생 기준: 입사 첫해 한 달 개근마다 하루씩, 최대 11일",
+ "excerpt": "월차는 입사 1년 미만 근로자가 1개월 개근하면 다음 날 1일씩, 최대 11일 생겨요. 1년 다음 날에도 재직하면 15일이 더해져 최대 26일이에요. 다만 상시 5명 이상·주 15시간 이상 근로자 기준이에요.",
+ "content_html": "<p>흔히 월차라고 부르는 휴가는 근로기준법 제60조 제2항의 유급휴가예요. <strong>입사한 지 1년이 안 된 근로자가 1개월을 개근하면, 그 1개월을 마친 다음 날 1일</strong>이 생기고 첫 1년 동안 최대 11일까지 쌓여요. 입사 1년을 채운 다음 날에도 일하고 있으면 15일이 더 생겨, 그때까지 생긴 연차는 최대 26일이에요. 다만 상시 5명 이상 사업장에서 4주 평균 주 15시간 이상 일하는 근로자 기준이라, 상시 4명 이하 사업장과 주 15시간 미만 근로자는 제외예요.</p>\n<h2>월차 발생 기준 한눈에 보기</h2>\n<table><thead><tr><th>항목</th><th>기준</th></tr></thead><tbody>\n<tr><td>대상</td><td>계속 근로 1년 미만 근로자, 1년간 출근율 80% 미만 근로자</td></tr>\n<tr><td>발생 조건</td><td>1개월 개근</td></tr>\n<tr><td>발생 시점</td><td>그 1개월의 근로를 마친 다음 날</td></tr>\n<tr><td>최대 일수</td><td>첫 1년 11일</td></tr>\n<tr><td>사용 기한</td><td>입사 후 최초 1년의 근로가 끝날 때까지</td></tr>\n<tr><td>적용 제외</td><td>상시 4명 이하 사업장, 4주 평균 주 15시간 미만 근로자</td></tr>\n</tbody></table>\n<h2>발생 날짜 계산 예시: 3월 2일 입사</h2>\n<p>2026년 3월 2일에 입사해 매달 개근했다고 가정하면, 첫 1개월(3월 2일~4월 1일)을 마친 다음 날인 4월 2일에 첫 월차 1일이 생겨요. 이후 매달 2일마다 1일씩 늘어나요.</p>\n<table><thead><tr><th>회차</th><th>발생일</th><th>누적</th></tr></thead><tbody>\n<tr><td>1번째</td><td>2026년 4월 2일</td><td>1일</td></tr>\n<tr><td>2번째</td><td>2026년 5월 2일</td><td>2일</td></tr>\n<tr><td>6번째</td><td>2026년 9월 2일</td><td>6일</td></tr>\n<tr><td>11번째</td><td>2027년 2월 2일</td><td>11일</td></tr>\n</tbody></table>\n<p>상시 5명 이상 사업장에서 입사 1년을 채운 다음 날인 2027년 3월 2일에도 계속 일하고 있고 그 1년간 80% 이상 출근했다면, 이때부터는 제60조 제1항의 연차 15일이 따로 생겨요. 입사일과 오늘 날짜를 넣으면 지금까지 생긴 일수와 다음 발생일을 바로 볼 수 있어요.</p>\n<p>[firstlab_calc id=\"annual-leave\"]</p>\n<h2>개근으로 보는 것과 결근이 되는 것</h2>\n<p>개근은 일하기로 정한 소정근로일에 결근하지 않는 것을 말해요. 결근은 소정근로일에 근로자가 임의로 일하지 않은 날이라, 결근이 있는 달에는 그 달 몫의 월차가 생기지 않아요.</p>\n<ul>\n<li><strong>지각·조퇴·외출</strong>: 고용노동부 해석상 이 시간을 모아 결근으로 처리해 연차 산정에 불리하게 하는 것은 허용되지 않아요. 다만 단체협약·취업규칙에 '질병·부상 외 사유의 지각·조퇴·외출은 누계 8시간을 연차 1일로 계산한다'는 규정이 있으면, 받을 연차에서 빼는 노사 간 특약으로 볼 수 있다는 해석도 있어요.</li>\n<li><strong>출근으로 보는 기간</strong>(제60조 제6항, 상시 5명 이상 사업장): 업무상 부상·질병으로 쉰 기간, 임신 중 출산전후휴가 등으로 쉰 기간, 육아휴직 기간, 육아기 근로시간 단축으로 줄어든 시간, 임신기 근로시간 단축으로 줄어든 시간</li>\n</ul>\n<h2>월차가 생기지 않는 경우</h2>\n<ul>\n<li><strong>상시 4명 이하 사업장</strong>: 연차유급휴가 규정이 적용되지 않아요. 다만 고용노동부 해석상 노사가 이 규정을 적용하기로 약정했다면 회사는 그 약정을 따라야 해요.</li>\n<li><strong>4주 평균 주 15시간 미만 근로자</strong>: 근로기준법 제18조 제3항에 따라 연차 규정이 적용되지 않아요. 주 15시간은 <a href=\"https://first-lab.kr/주휴수당뜻/\">주휴수당</a>과 같은 기준이에요.</li>\n<li><strong>개근한 1개월을 마친 다음 날 이미 퇴사한 경우</strong>: 그 달 몫은 생기지 않아요. 그래서 1년 기간제로 일하고 계약이 끝나면 월차는 최대 11일이에요.</li>\n</ul>\n<h2>1년이 넘어도 월차가 생기는 경우</h2>\n<p>상시 5명 이상 사업장이라면 입사 1년이 지났더라도 직전 1년간 출근율이 80%에 못 미쳐 15일 연차를 받지 못했다면, 그다음 1년에는 1개월 개근할 때마다 1일씩 받아요. 같은 제60조 제2항이 '1년간 80퍼센트 미만 출근한 근로자'도 대상으로 정하고 있기 때문이에요.</p>\n<h2>사용 기한과 퇴직할 때 남은 월차</h2>\n<p>1년 미만 근로자의 월차는 입사 후 최초 1년의 근로가 끝날 때까지 쓰지 않으면 소멸해요. 회사 사정(사용자 귀책사유)으로 못 쓴 경우는 예외예요.</p>\n<p>상시 5명 이상 사업장에서 회사가 사용 촉진 절차를 모두 밟았는데도 쓰지 않았다면 남은 휴가를 수당으로 보상할 의무가 없어요. 1년 미만 근로자에 대한 촉진은 두 단계예요(제61조 제2항). ① 최초 1년이 끝나기 3개월 전을 기준으로 10일 이내에 남은 일수를 알리고 사용 시기를 정해 달라고 서면으로 촉구해요(촉구 뒤에 생긴 휴가는 1개월 전을 기준으로 5일 이내). ② 근로자가 10일 안에 사용 시기를 알리지 않으면, 회사가 최초 1년이 끝나기 1개월 전까지(①의 뒤 촉구분은 10일 전까지) 사용 시기를 정해 서면으로 알려야 해요.</p>\n<p>퇴직하면서 쓰지 못한 월차가 남아 있으면 연차 미사용 수당을 청구할 수 있어요. 1일 임금을 10만 원으로 가정하고 3일이 남았다면 3일 × 10만 원 = 30만 원이에요. 어떤 임금을 기준으로 계산할지는 취업규칙이나 근로계약서에 정해져 있어요. 퇴직 후 금품은 원칙적으로 14일 이내에 지급해야 해요(제36조).</p>\n<h2>2027년 6월 10일부터 바뀌는 점</h2>\n<ul>\n<li>근로자가 연차(월차 포함)를 대통령령으로 정하는 시간 단위·일수 범위에서 나눠 청구하면 회사는 이를 줘야 해요.</li>\n<li>연차를 청구하거나 썼다는 이유로 해고하거나 불리하게 대우하는 것이 금지돼요.</li>\n</ul>\n<h2>자주 묻는 질문</h2>\n<h3>1년 계약직이면 연차는 모두 며칠인가요?</h3>\n<p>고용노동부 해석으로 1년 기간제 근로자는 최대 11일이에요. 1년을 마친 다음 날(366일째)에도 근로관계가 있어야 15일이 더 생겨요. 366일을 일하고 퇴직하면 최대 26일분의 미사용 수당을 청구할 수 있어요.</p>\n<h3>한 달 결근하면 다음 달 월차도 없어지나요?</h3>\n<p>결근이 있는 달 몫만 생기지 않아요. 그다음 1개월을 다시 개근하면 그 달 몫 1일은 생겨요.</p>\n<h3>5명 미만 회사인데 근로계약서에 연차가 적혀 있어요.</h3>\n<p>법상 의무는 아니지만, 고용노동부 해석상 노사가 연차 규정을 적용하기로 약정했다면 회사는 그 약정에 따라야 해요. 근로계약서·취업규칙에 적힌 쓰는 방법과 수당 내용을 함께 확인해 두세요.</p>\n<h3>월차 수당은 퇴직 후 언제까지 청구할 수 있나요?</h3>\n<p>연차수당 같은 임금채권의 소멸시효는 3년이에요(제49조). 받지 못했다면 고용노동부 1350 상담센터로 문의할 수 있어요.</p>",
+ "tags": [
+  "월차 발생 기준",
+  "1년 미만 연차",
+  "연차유급휴가"
+ ],
+ "category": "생활정보",
+ "images": [
+  {
+   "prompt": "a calm modern office desk by a window with a coffee mug and a small potted plant, soft afternoon light, empty chair",
+   "alt": "창가의 조용한 사무실 책상과 커피잔"
+  }
+ ],
+ "keyword": "월차발생기준",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "월차는 입사 1년 미만 근로자가 1개월 개근 시 1일 유급휴가 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년간 80% 미만 출근한 근로자도 1개월 개근 시 1일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1개월 개근 연차는 그 1개월을 마친 다음 날 발생, 1개월 개근하면 다음 날 1일씩",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "첫 1년 동안 최대 11일, 1년 기간제 근로자는 최대 11일",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 다음 날 재직 시 15일 더해 최대 26일",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상시 5명 이상 사업장에 적용 (근로기준법 제11조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제11조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상시 4명 이하 사업장은 연차유급휴가 규정 미적용 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.easylaw.go.kr/CSP/CnpClsMainBtr.laf?popMenu=ov&csmSeq=2855&ccfNo=2&cciNo=2&cnpClsNo=3",
+    "https://www.law.go.kr/법령/근로기준법시행령/제7조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4주 평균 주 15시간 미만 근로자는 연차 미적용, 주휴수당과 같은 기준 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사용 기한: 최초 1년의 근로가 끝날 때까지 안 쓰면 소멸 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "사용자 귀책사유로 못 쓴 경우는 소멸 예외 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 3월 2일 입사 시 첫 월차 2026년 4월 2일, 5월 2일 2일, 9월 2일 6일, 2027년 2월 2일 11일",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052",
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 3월 2일 1년간 80% 이상 출근 시 15일 연차 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기에 입사일과 오늘 날짜를 넣으면 생긴 일수와 다음 발생일",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "개근은 소정근로일에 결근하지 않는 것",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202507220211040630300"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "결근은 소정근로일에 근로자가 임의로 일하지 않은 날, 결근한 달 몫은 안 생김",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202507220211040630300"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "출근으로 보는 기간 5가지: 업무상 부상·질병, 출산전후휴가 등, 육아휴직, 육아기·임신기 근로시간 단축 시간 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "개근한 1개월을 마친 다음 날 퇴사했으면 그 달 몫 없음",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 기간제 계약 종료 시 월차 최대 11일",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1년 지나도 출근율 80% 미만이면 1개월 개근 시 1일 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직 시 안 쓴 월차는 미사용 수당 청구, 기준 임금은 취업규칙 등 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조",
+    "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1일 임금 10만 원 가정, 3일 × 10만 원 = 30만 원",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴직 후 금품은 원칙적으로 14일 이내 지급 (근로기준법 제36조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제36조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 6월 10일부터 시간 단위·일수 범위 분할 청구 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 6월 10일부터 연차 청구·사용 이유로 불리한 처우 금지 (근로기준법 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "366일째 근로관계가 있어야 15일, 366일 근무 후 퇴직 시 최대 26일분 수당",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "임금채권 소멸시효 3년 (근로기준법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "지각·조퇴 누계 결근 취급 불가, 단 취업규칙 '누계 8시간 연차 1일' 특약 해석",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202407311108107910308"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "1년 미만 촉진 두 단계: 3개월 전 기준 10일 이내 서면 촉구(뒤 발생분 1개월 전 5일 이내), 1개월 전까지 시기 지정 통보(뒤 촉구분 10일 전) (근로기준법 제61조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "4명 이하 사업장도 노사가 적용 약정하면 회사는 따라야 함, 고용노동부 해석 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/cgmExpcInfoP.do?cgmExpcDatSeq=18554&mode=2&ofiClsCd=350101"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "FAQ: 5명 미만 법상 의무 아님, 약정 시 따라야 함 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/cgmExpcInfoP.do?cgmExpcDatSeq=18554&mode=2&ofiClsCd=350101",
+    "https://www.easylaw.go.kr/CSP/CnpClsMainBtr.laf?popMenu=ov&csmSeq=2855&ccfNo=2&cciNo=2&cnpClsNo=3"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "근로기준법 제60조 단서1 해당 없음 — 사용 시기 변경권은 이 글 주제(발생 기준·기한) 밖",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제60조 단서2 반영 — '사용 기한과 퇴직할 때' 첫 문단 '회사 사정(사용자 귀책사유)으로 못 쓴 경우는 예외'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제60조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제11조 단서1 해당 없음 — 동거 친족만 쓰는 사업장·가사 사용인이 아닌 일반 사업장 근로자 대상 글",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제11조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제18조 단서1 반영 — '월차가 생기지 않는 경우' 4주 평균 주 15시간 미만 항목",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제36조 단서1 반영 — '원칙적으로 14일 이내'로 합의 연장 여지를 남김",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제36조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제61조 단서1 해당 없음 — 1년 이상 근로자 촉진(제1항)은 1년 미만 월차를 제외함, 글은 제2항만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제61조 단서2 해당 없음 — 제1항 각 호(6개월 전 촉구)는 1년 이상 연차용",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제61조 단서3 반영 — '촉진 절차를 모두 밟았는데도 쓰지 않았다면 보상 의무 없음'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제61조 단서4 반영 — ① 3개월 전 기준 10일 이내 촉구, 뒤 생긴 휴가 1개월 전 기준 5일 이내",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제61조 단서5 반영 — ② 1개월 전까지 시기 지정 통보, 뒤 촉구분 10일 전까지",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제61조"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "고용노동부 연차유급휴가 행정해석 변경 보도자료",
+   "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=13052"
+  },
+  {
+   "name": "찾기쉬운 생활법령정보 연차유급휴가",
+   "url": "https://www.easylaw.go.kr/CSP/CnpClsMainBtr.laf?popMenu=ov&csmSeq=2855&ccfNo=2&cciNo=2&cnpClsNo=3"
+  },
+  {
+   "name": "국가법령정보센터 근로기준법",
+   "url": "https://www.law.go.kr/법령/근로기준법"
+  }
+ ]
+}
