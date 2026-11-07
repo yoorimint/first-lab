@@ -130,3 +130,5 @@ date,post,fixes,types
 2026-11-07,1610,3,missing_condition:2 unverified:1
 2026-11-07,1633,2,missing_condition:1 wrong_fact:1
 2026-11-07,1630,4,missing_condition:3 wrong_fact:1
+2026-11-07,1643,3,missing_condition:2 unverified:1
+2026-11-07,1645,3,missing_condition:2 unverified:1
