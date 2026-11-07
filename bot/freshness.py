@@ -146,6 +146,27 @@ def template_twin(post_id: int, content: str, others: dict[int, str] | None = No
             " 이 글만의 정보(위치·찾아가는 길·연락처·설비 등)로 다시 쓰기"]
 
 
+def same_topic(post_id: int, slug: str, others: dict[int, str] | None = None) -> list[str]:
+    """먼저 쓴 글(번호가 앞선 공개 글·초안) 중 검색 목적까지 같은 주제 (11/7 #1559 '미사용 연차수당 계산'·#1561 '연차수당 계산'을
+    두 칸이 동시에 씀) → 나중 글은 보류. 글쓰기 작업은 고치지 않고 포기(give_up) — 먼저 쓴 글 하나만 공개."""
+    from .keyword_db import norm
+    from .select_keyword import topic_key
+    if others is None:
+        try:
+            rows = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=publish,draft", "--fields=ID,post_name",
+                                     "--format=json", "--posts_per_page=-1") or "[]")
+        except Exception:  # noqa: BLE001 — 못 읽으면 이 확인만 건너뜀
+            return []
+        others = {int(r["ID"]): urllib.parse.unquote(str(r.get("post_name", ""))) for r in rows if isinstance(r, dict)}
+    mine = topic_key(norm(slug))
+    if not mine[0]:
+        return []
+    for pid, other in sorted(others.items()):
+        if pid < post_id and other and topic_key(norm(other)) == mine:
+            return [f"같은 주제 글: #{pid}({other}) 이 먼저 있음 — 고치지 말고 포기(give_up), 먼저 쓴 글만 공개"]
+    return []
+
+
 def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
     """공개 전에 다시 확인할 이유 (빈 목록이면 공개해도 됨)."""
     today = today or dt.date.today()
@@ -182,6 +203,7 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
     out += expiry.passed_rounds([title, excerpt] + expiry.blocks(content), since, today)
     out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(content)))
     out += template_twin(post_id, content) if content else []
+    out += same_topic(post_id, urllib.parse.unquote(get("post_name")))
     # 대기열에 들어간 뒤라도 본문 계산기가 독립 검수 전이면 공개하지 않음 (11/5 운영자 '계산기들은 전부 발행처리했네?')
     from . import review_gate
     out += review_gate.unreviewed_calcs(get("post_content"))

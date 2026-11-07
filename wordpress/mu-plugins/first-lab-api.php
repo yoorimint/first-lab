@@ -29,7 +29,8 @@ add_action(
 					// 고르지 않게. 2번부터는 새 글만 (보류 수정·갱신·사진 검사·법령·새 혜택·계산기는 1번 실행 몫 — 같은 일을 겹쳐 하지 않게)
 					$slot     = $request ? max( 0, min( 2, (int) $request->get_param( 'slot' ) ) ) : 0;
 					if ( $slot ) {
-						$pool = array_values( array_filter( $pool, static fn( $c ) => firstlab_api_slot_of( (string) ( $c['keyword'] ?? '' ) ) === $slot ) );
+						// 같은 주제(bot/select_keyword.topic_key)는 같은 칸으로 — 11/7 두 칸이 '연차수당 계산'·'미사용 연차수당 계산'을 동시에 씀
+						$pool = array_values( array_filter( $pool, static fn( $c ) => firstlab_api_slot_of( (string) ( $c['topic'] ?? $c['keyword'] ?? '' ) ) === $slot ) );
 					}
 					$side = $slot < 2; // 1번(또는 혼자 도는) 실행만 곁일
 					// 전체 글 (30편으로 자르면 오래된 글과 같은 주제를 또 씀 — 11/5 대부업 대출 조회 중복)

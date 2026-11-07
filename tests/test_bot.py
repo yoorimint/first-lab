@@ -2208,6 +2208,20 @@ class SiteFocusTest(unittest.TestCase):
         self.assertEqual(discover.focus_snowball(conn, "2026-11-07", 10), ["실업급여조건", "육아휴직급여신청"])
         self.assertEqual(discover.focus_snowball(conn, "2026-11-20", 10), ["실업급여조건", "연말정산환급", "육아휴직급여신청"])
 
+    def test_same_topic_with_qualifier(self):
+        """11/7 #1559·#1561: '미사용 연차수당 계산'과 '연차수당 계산'을 두 칸이 동시에 씀 — 같은 주제로 보고 같은 칸·나중 글 보류."""
+        from bot import freshness
+        from bot.select_keyword import topic_key
+        self.assertEqual(topic_key("미사용연차수당계산"), topic_key("연차수당계산"))
+        self.assertNotEqual(topic_key("연차수당계산"), topic_key("연차발생기준"))
+        self.assertEqual(topic_key("내일배움카드신청")[0], "내일배움카드")   # '내' 로 시작해도 안 뗌
+        got = freshness.same_topic(1561, "연차수당계산", {1559: "미사용연차수당계산", 1561: "연차수당계산"})
+        self.assertIn("#1559", got[0])
+        self.assertEqual(freshness.same_topic(1559, "미사용연차수당계산", {1559: "미사용연차수당계산", 1561: "연차수당계산"}), [])  # 먼저 쓴 글은 그대로
+        api = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("$c['topic'] ?? $c['keyword']", api)
+        self.assertIn("같은 주제 글", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
     def test_template_twin_held_but_first_and_rewritten_pass(self):
         """검사소 연작: 먼저 쓴 글은 그대로, 같은 틀로 찍은 뒤 글은 보류, 이 글만의 정보로 다시 쓰면 통과."""
         from bot import freshness

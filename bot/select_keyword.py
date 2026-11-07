@@ -69,6 +69,19 @@ def tier(label: str, n: str) -> int:
     return 2 if label == "좋음" else 3
 
 
+# 같은 주제를 꾸미기만 하는 앞말 (11/7: '미사용연차수당계산'·'연차수당계산'을 두 글쓰기 칸이 동시에 따로 씀)
+QUALIFIERS = ("미사용", "남은", "잔여")
+
+
+def topic_key(n: str) -> tuple[str, str]:
+    """(주제, 검색 목적) — 표기 통일·꾸밈 앞말을 뗀 것. 같으면 같은 글로 답할 키워드 (쓸 때 겹침 막기·두 칸 나누기·공개 직전 중복)."""
+    subj, intent = subject_intent(unify(n))
+    for q in QUALIFIERS:
+        if subj.startswith(q) and len(subj) - len(q) >= 2:
+            subj = subj[len(q):]
+    return subj, intent
+
+
 def unify(n: str) -> str:
     """비교용 표기 통일 ('나의신용점수조회' → '내신용점수조회')."""
     for a, b in SYNONYMS:
@@ -120,7 +133,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
     used_unified = {_core(unify(u)) for u in used}
     # 이미 쓴 글의 (주제, 검색 목적) → 둘 다 같은 키워드만 새 글 대신 그 글 보강(refresh.py). 목적이 다르면 새 글
     # (11/5 운영자: 주휴수당 뜻 ↔ 주휴수당 계산은 검색 의도가 다름)
-    used_subjects = {subject_intent(u) for u in used}
+    used_subjects = {subject_intent(u) for u in used} | {topic_key(u) for u in used}
     head_difficulty = _head_difficulty(conn, volumes)
     month = dt.date.today().month
 
@@ -129,7 +142,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
         막음: 퇴직금계산 ↔ 퇴직금계산방법, 자동차정기검사비용 ↔ 자동차정기검사가격(주제·목적이 같음),
               다이어트식단 ↔ 다이어트식단표(2글자 이내 차이)
         허용: 퇴직금계산 → 퇴직금계산1년미만, 주휴수당계산 → 주휴수당뜻(목적이 다름)"""
-        if _core(n) in used_cores or subject_intent(n) in used_subjects:
+        if _core(n) in used_cores or subject_intent(n) in used_subjects or topic_key(n) in used_subjects:
             return True
         if any((u in n or n in u) and abs(len(n) - len(u)) <= 2 for u in used):
             return True
@@ -166,6 +179,7 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
                        "gsc": {"opportunity": "서치콘솔 기회", "good_head": "잘 되는 주제",
                                "bad_head": "안 되는 주제"}.get(gsc or "", ""),
                        "naver": naver_hub.describe(sig, r["total"], r["keyword"]),  # 글쓰기 세션이 보는 근거 (황금 점수·성수기·블로그 글 수)
+                       "topic": "".join(topic_key(r["norm"])),  # 두 글쓰기 칸 나누기 기준 (같은 주제는 같은 칸 — first-lab-api.php)
                        "gold": naver_hub.is_gold(sig, r["total"], r["keyword"]),
                        "tier": tier(naver_hub.gold_label(sig, r["total"]) if naver_hub.is_info(r["keyword"]) else "", r["norm"])})
     # 운영자 지시(11/5): 황금 키워드 찾은 것은 점수 높은 것부터 먼저 쓴다 → 황금·좋음 무리를 맨 앞에, 그 안에서 점수순
