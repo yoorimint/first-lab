@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 973,
+ "replace": [
+  {
+   "old": "ai-c39615cccf",
+   "prompt": "a plain unbranded yellow excavator parked on a quiet construction site at sunrise, seen from a distance",
+   "alt": "이른 아침 공사 현장에 세워 둔 노란 굴착기",
+   "why": "특정 브랜드 로고(CAT)가 여러 곳에 보이고 붐이 두 개로 일그러짐"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

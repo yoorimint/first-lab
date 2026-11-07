@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1228,
+ "replace": [
+  {
+   "old": "ai-bcfd5f9c49",
+   "prompt": "a bright empty office desk by a sunny window with a white coffee mug and a small potted plant, no papers, no devices",
+   "alt": "햇살 드는 창가 사무실 책상 위 커피잔과 화분",
+   "why": "오른쪽 검은 판에 엉터리 글자(GATTEN)와 글자 있는 종이·계산기 화면"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
