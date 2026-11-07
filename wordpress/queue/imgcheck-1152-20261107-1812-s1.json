@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1152,
+ "replace": [
+  {
+   "old": "ai-e735b1ba7c",
+   "prompt": "a calm memorial park on a gentle autumn hillside with winding paths, stone steps and colorful maple trees under an overcast sky",
+   "alt": "단풍이 든 언덕에 산책로가 이어진 조용한 추모공원",
+   "why": "오른쪽 위 안내판에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
