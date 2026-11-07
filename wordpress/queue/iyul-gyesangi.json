@@ -1,0 +1,417 @@
+{
+ "title": "이율 계산기: 예금·적금 세후 이자, 15.4% 떼는 계산법",
+ "excerpt": "예금 이자는 원금×연 이율×기간, 적금은 월 납입액×연 이율÷12×n(n+1)/2로 계산하고 이자의 15.4%를 떼요. 1,000만 원을 연 3.39%로 1년 맡기면 세후 이자 286,800원이에요.",
+ "content_html": "<p>이율 계산은 <strong>예금이면 원금 × 연 이율 × 기간(년)</strong>, <strong>적금이면 월 납입액 × 연 이율 ÷ 12 × n(n+1)/2</strong>(n = 개월 수)로 세전 이자를 구하고, 일반과세 상품은 여기서 <strong>15.4%</strong>(이자소득세 14% + 지방소득세 1.4%)를 떼요. 예를 들어 1,000만 원을 연 3.39% 단리 정기예금에 1년 맡기면 세전 이자 339,000원, 세금 52,200원을 떼고 <strong>세후 이자 286,800원</strong>을 받아요. 아래 계산기에 내 금액과 이율을 넣으면 세후 이자와 만기 수령액이 바로 나와요.</p>\n\n<h2>예금·적금 이자 계산기</h2>\n<p>[firstlab_calc id=\"savings-interest\"]</p>\n\n<h2>이율 계산 공식 3가지</h2>\n<table><thead><tr><th>방식</th><th>세전 이자 공식</th><th>특징</th></tr></thead><tbody><tr><td>예금 단리</td><td>원금 × 연 이율 ÷ 12 × 개월 수</td><td>원금에만 이자</td></tr><tr><td>적금 단리</td><td>월 납입액 × 연 이율 ÷ 12 × n(n+1)/2</td><td>회차마다 이자 기간이 다름</td></tr><tr><td>예금 월복리</td><td>원금 × ((1 + 연 이율 ÷ 12)<sup>n</sup> − 1)</td><td>이자에도 이자 (적금 월복리는 회차별로 따로 계산해 더해요)</td></tr></tbody></table>\n<p>상품 설명서에 적힌 금리는 1년 기준인 연 이율이에요. 한 달 이율은 연 이율을 12로 나눈 값이라, 연 3.39%면 한 달에 약 0.2825%예요.</p>\n\n<h2>같은 이율로 계산한 예시</h2>\n<p>예시 금리는 한국은행 경제통계시스템(ecos.bok.or.kr)의 '예금은행 수신금리(신규취급액 기준)'에 나온 2026년 9월 평균인 정기예금 연 3.39%, 정기적금 연 3.15%를 썼어요. 기간은 모두 12개월, 일반과세 기준이에요.</p>\n<table><thead><tr><th>조건</th><th>세전 이자</th><th>세금</th><th>세후 이자</th></tr></thead><tbody><tr><td>예금 1,000만 원·연 3.39%·단리</td><td>339,000원</td><td>52,200원</td><td>286,800원</td></tr><tr><td>예금 1,000만 원·연 3.39%·월복리</td><td>344,317원</td><td>53,020원</td><td>291,297원</td></tr><tr><td>적금 월 50만 원·연 3.15%·단리</td><td>102,375원</td><td>15,760원</td><td>86,615원</td></tr></tbody></table>\n<p>적금은 12개월 동안 원금 600만 원을 넣었는데 이자는 102,375원이에요. 첫 달에 넣은 돈은 12개월, 마지막 달에 넣은 돈은 1개월만 이자가 붙기 때문이에요. 12개월 적금의 이자는 같은 돈을 처음부터 예금에 맡겼을 때의 13/24(약 54%)라서, 적금 연 이율이 예금보다 높아 보여도 이자 총액은 생각보다 적어요.</p>\n\n<h2>세금 15.4% 떼는 순서</h2>\n<ol><li>세전 이자에 14%를 곱해 이자소득세를 구하고 10원 미만은 버려요.</li><li>그 이자소득세의 10%가 지방소득세예요. 여기서도 10원 미만은 버려요.</li><li>세전 이자에서 두 세금을 빼면 세후 이자예요.</li></ol>\n<p>예금 예시라면 339,000원 × 14% = 47,460원, 47,460원 × 10% = 4,746원 → 4,740원이라 세금은 52,200원이에요. 세금은 은행이 이자를 줄 때 미리 떼고 주기 때문에 따로 낼 일은 대부분 없어요. 다만 한 해 이자·배당소득이 2,000만 원을 넘으면 넘는 부분은 다음 해 5월 종합소득세 신고 때 다른 소득과 합쳐 다시 계산해요.</p>\n\n<h2>가입 전에 같이 볼 것</h2>\n<ul><li><strong>예금자보호 한도</strong>: 2025년 9월 1일부터 원금과 이자를 합쳐 금융기관별로 1인당 1억 원까지 보호돼요. 1억 원을 꽉 채워 맡기면 이자는 한도를 넘을 수 있어요.</li><li><strong>보호되지 않는 상품</strong>: 펀드 같은 금융투자상품, 실적배당형 상품, 증권사 CMA처럼 운용 실적에 따라 받는 돈이 달라지는 상품은 예금자보호 대상이 아니에요.</li><li><strong>금리 비교</strong>: 은행·저축은행 예금과 적금 금리는 금융감독원 금융상품한눈에(finlife.fss.or.kr)에서 한 번에 비교할 수 있어요.</li></ul>\n\n<h2>자주 묻는 질문</h2>\n<h3>우대금리는 계산기에 어떻게 넣나요?</h3>\n<p>기본금리에 받을 수 있는 우대금리를 더한 값을 연 이율 칸에 넣으면 돼요. 우대 조건을 못 채우면 기본금리로 다시 계산해 보는 게 안전해요.</p>\n<h3>중간에 해지하면 이자가 어떻게 되나요?</h3>\n<p>약정한 이율이 아니라 상품마다 정한 중도해지 이율이 적용돼서 이자가 크게 줄어요. 해지 전에 상품 설명서의 중도해지 이율을 먼저 보세요.</p>\n<h3>단리와 월복리 차이는 큰가요?</h3>\n<p>1,000만 원을 연 3.39%로 1년 맡기면 세전 이자가 339,000원과 344,317원으로 5,317원 차이예요. 금리가 같다면 기간이 길수록 차이가 커져요.</p>\n<h3>비과세 상품이면 얼마를 받나요?</h3>\n<p>계산기 세금 칸에서 비과세를 고르면 세전 이자를 그대로 받는 금액이 나와요. 예금 예시라면 339,000원 전부예요.</p>",
+ "tags": [
+  "이율 계산기",
+  "예금 이자 계산",
+  "적금 이자 계산",
+  "세후 이자"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a glass jar filled with coins on a sunny wooden windowsill next to a small green plant",
+   "alt": "햇살 드는 창가에 놓인 동전 저금병과 작은 화분"
+  }
+ ],
+ "keyword": "이율계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 예금·적금 세후 이자, 이자에서 15.4% 떼는 계산법 (소득세법 제129조, 지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 이자의 15.4%를 떼요 — 이자소득세 14% (소득세법 제129조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 15.4% 중 지방소득세 1.4%는 소득세의 10% (지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "[요약] 1,000만 원을 연 3.39%로 1년 맡기면 세후 이자 286,800원 (소득세법 제129조, 지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예금 이자 = 원금 × 연 이율 × 기간(년), 적금 = 월 납입액 × 연 이율 ÷ 12 × n(n+1)/2 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세전 이자 339,000원, 세금 52,200원 (소득세법 제129조, 지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예금 단리 공식 원금 × 연 이율 ÷ 12 × 개월 수 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "적금 단리: 회차마다 이자 기간이 다름 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예금 월복리 원금 × ((1 + 연 이율 ÷ 12)^n − 1), 적금 월복리는 회차별로 계산해 더함 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "한 달 이율 = 연 이율 ÷ 12, 연 3.39%면 약 0.2825% (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 9월 예금은행 수신금리(신규취급액 기준) 정기예금 연 3.39%, 정기적금 연 3.15% — 한국은행 ECOS 121Y002",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y002/M/202609/202609/BEABAA211",
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y002/M/202609/202609/BEABAA212"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "예금 1,000만 원 3.39% 단리 세전 339,000원·세금 52,200원·세후 286,800원 (소득세법 제129조, 지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예금 1,000만 원 3.39% 월복리 344,317원·53,020원·291,297원 (소득세법 제129조, 지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "적금 월 50만 원 3.15% 단리 102,375원·15,760원·86,615원 (소득세법 제129조, 지방세법 제103조의13)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/지방세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "적금 12개월 원금 600만 원, 이자 102,375원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "첫 달 넣은 돈 12개월, 마지막 달 1개월만 이자 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "12개월 적금 이자는 같은 돈을 처음부터 예금에 맡긴 것의 13/24(약 54%) (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "세전 이자에 14%를 곱해 이자소득세, 10원 미만 버림 (소득세법 제129조, 국고금관리법 제47조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법",
+    "https://www.law.go.kr/법령/국고금관리법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "지방소득세는 이자소득세의 10%, 10원 미만 버림 (지방세법 제103조의13, 국고금관리법 제47조)",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법",
+    "https://www.law.go.kr/법령/국고금관리법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "339,000원 × 14% = 47,460원, 47,460원 × 10% = 4,746원 → 4,740원, 세금 52,200원 (국고금관리법 제47조)",
+   "urls": [
+    "https://www.law.go.kr/법령/국고금관리법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "은행이 이자를 줄 때 미리 떼므로 따로 낼 일은 대부분 없음 — 2천만 원 이하 원천징수 이자는 종합과세 합산 안 함 (소득세법 제14조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "한 해 이자·배당소득이 2,000만 원을 넘으면 넘는 부분은 다음 해 5월 종합소득세 신고 때 다른 소득과 합쳐 계산 (소득세법 제14조, 소득세법 제70조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "예금자보호: 2025년 9월 1일부터 원금과 이자를 합쳐 금융기관별 1인당 1억 원",
+   "urls": [
+    "https://www.kdic.or.kr/sp/dpstrprot/ProtSystProtLmts/selectScrn.do",
+    "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/news/promotion/1308414_1118.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1억 원을 꽉 채워 맡기면 이자는 한도를 넘을 수 있음 (원금+이자 1억 원 초과분 보호 안 됨)",
+   "urls": [
+    "https://www.kdic.or.kr/sp/dpstrprot/ProtSystProtLmts/selectScrn.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "펀드 등 금융투자상품, 실적배당형 상품, 증권사 CMA는 예금자보호 대상 아님",
+   "urls": [
+    "https://www.kdic.or.kr/sp/dpstrprot/ProtSystFaq/selectScrn.do",
+    "https://www.bokjiro.go.kr/ssis-tbu/cms/pc/news/promotion/1308414_1118.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융감독원 금융상품한눈에(finlife.fss.or.kr)에서 은행·저축은행 예금·적금 금리 비교",
+   "urls": [
+    "https://finlife.fss.or.kr/finlife/svings/fdrmDpst/list.do?menuNo=700002"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "우대금리는 기본금리에 더해 연 이율 칸에 입력, 조건 못 채우면 기본금리로 다시 계산",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중도해지하면 약정 이율이 아니라 상품별 중도해지 이율이 적용돼 이자가 줄어듦",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "단리 339,000원과 월복리 344,317원 차이 5,317원 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금리가 같으면 기간이 길수록 단리·복리 차이가 커짐 (재계산)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비과세 상품이면 세전 이자 339,000원 전부 받음 (재계산, 계산기 비과세 선택)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기에 금액과 이율을 넣으면 세후 이자와 만기 수령액이 나옴 (계산기 결과 항목 재확인)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상품 설명서 금리는 1년 기준 연 이율 (계산기 입력 연 이율)",
+   "urls": [
+    "https://fine.fss.or.kr/main/prc/dp/sub/dp014.jsp?menuNo=900259"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제129조 단서1 해당 없음 — 비영업대금의 이익(개인 간 대여 이자) 25%·온투업 14% 규정으로, 이 글은 은행 예금·적금 이자(라목 그 밖의 이자소득 14%)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제129조"
+   ]
+  },
+  {
+   "claim": "소득세법 제129조 단서2 해당 없음 — 사업소득(외국인 직업운동가) 규정",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제129조"
+   ]
+  },
+  {
+   "claim": "소득세법 제129조 단서3 해당 없음 — 근로소득·일용근로자 규정",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제129조"
+   ]
+  },
+  {
+   "claim": "소득세법 제129조 단서4 해당 없음 — 연금소득·기타소득 규정",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제129조"
+   ]
+  },
+  {
+   "claim": "소득세법 제129조 단서5 해당 없음 — 기타소득 세율 규정",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제129조"
+   ]
+  },
+  {
+   "claim": "소득세법 제129조 단서6 해당 없음 — 법원 보증금·경락대금 이자 14%와 실지명의 미확인 소득 45% 규정으로, 실명 확인된 일반 은행 예금·적금 이자는 제1항 14%",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제129조"
+   ]
+  },
+  {
+   "claim": "지방세법 제103조의13 단서1 해당 없음 — 특별징수의무자(은행)의 반기별 납부 기한 규정으로 예금자가 받는 세후 이자와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법/제103조의13"
+   ]
+  },
+  {
+   "claim": "지방세법 제103조의13 단서2 해당 없음 — 소득세법 원천징수 규정 준용 조항으로 세율(소득세의 10%)은 그대로",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법/제103조의13"
+   ]
+  },
+  {
+   "claim": "국고금관리법 제47조 단서1 해당 없음 — 대통령령으로 정하는 끝수 계산 예외로, 이자소득세·지방소득세 10원 미만 버림 계산과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/국고금관리법/제47조"
+   ]
+  },
+  {
+   "claim": "국고금관리법 제47조 단서2 해당 없음 — 한국산업은행 등 공공기관 예외로 글과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/국고금관리법/제47조"
+   ]
+  },
+  {
+   "claim": "소득세법 제14조 단서1 반영 — 본문 세금 15.4% 떼는 순서 문단: 이자·배당소득 2,000만 원 이하 원천징수분은 따로 낼 일 없고, 넘는 부분은 종합소득세 신고 때 합쳐 계산",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제14조"
+   ]
+  },
+  {
+   "claim": "소득세법 제14조 단서2 해당 없음 — 분리과세 기타소득 규정",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제14조"
+   ]
+  },
+  {
+   "claim": "지방세법 제103조의16 해당 없음 — 퇴직소득 지방소득세 특별징수 환급 규정으로 예금·적금 이자와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/지방세법/제103조의16"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 소득세법 (이자소득 원천징수세율 14%, 종합과세 기준 2,000만 원)",
+   "url": "https://www.law.go.kr/법령/소득세법"
+  },
+  {
+   "name": "국가법령정보센터 지방세법 (개인지방소득세 특별징수 소득세의 10%)",
+   "url": "https://www.law.go.kr/법령/지방세법"
+  },
+  {
+   "name": "예금보험공사 예금자보호 한도 안내 (1인당 1억 원)",
+   "url": "https://www.kdic.or.kr/sp/dpstrprot/ProtSystProtLmts/selectScrn.do"
+  }
+ ]
+}

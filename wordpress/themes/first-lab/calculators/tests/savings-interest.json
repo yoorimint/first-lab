@@ -1,0 +1,283 @@
+[
+  {
+    "why": "정기예금 1,000만 원·연 3.39%(한국은행 2026년 9월 예금은행 정기예금 평균)·12개월 단리: 이자 = 1,000만×3.39% = 339,000원, 소득세 14% 47,460원, 지방소득세 4,746→4,740원 (본문 표와 같아야 함)",
+    "input": {
+      "product": "deposit",
+      "amount": "10000000",
+      "rate": "3.39",
+      "months": "12",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 10000000,
+      "interest": 339000,
+      "income_tax": 47460,
+      "local_tax": 4740,
+      "tax": 52200,
+      "net": 286800,
+      "maturity": 10286800
+    },
+    "notes_exclude": [
+      "적금은 나중에 넣은 돈일수록",
+      "월복리는"
+    ]
+  },
+  {
+    "why": "정기적금 월 50만 원·연 3.15%·12개월 단리: 50만×3.15%/12×78 = 102,375원, 소득세 14,332.5→14,330원, 지방 1,433→1,430원 (본문 표)",
+    "input": {
+      "product": "installment",
+      "amount": "500000",
+      "rate": "3.15",
+      "months": "12",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 6000000,
+      "interest": 102375,
+      "income_tax": 14330,
+      "local_tax": 1430,
+      "tax": 15760,
+      "net": 86615,
+      "maturity": 6086615
+    },
+    "notes_include": [
+      "적금은 나중에 넣은 돈일수록"
+    ]
+  },
+  {
+    "why": "예금 월복리: 1,000만×((1+0.0339/12)^12−1) = 344,317.x원 → 344,317원 (Fraction 으로 따로 계산, 본문 표)",
+    "input": {
+      "product": "deposit",
+      "amount": "10000000",
+      "rate": "3.39",
+      "months": "12",
+      "compound": "monthly",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 10000000,
+      "interest": 344317,
+      "income_tax": 48200,
+      "local_tax": 4820,
+      "tax": 53020,
+      "net": 291297,
+      "maturity": 10291297
+    }
+  },
+  {
+    "why": "적금 월복리: 회차별 50만×((1+i)^k−1), k=1..12 합 (Fraction 으로 따로 계산)",
+    "input": {
+      "product": "installment",
+      "amount": "500000",
+      "rate": "3.15",
+      "months": "12",
+      "compound": "monthly",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 6000000,
+      "interest": 103366,
+      "income_tax": 14470,
+      "local_tax": 1440,
+      "tax": 15910,
+      "net": 87456,
+      "maturity": 6087456
+    }
+  },
+  {
+    "why": "월 30만 원·연 4%·12개월 적금: 30만×4%/12×78 = 78,000원 딱 떨어짐 (소수 오차로 77,999원이 되면 안 됨), 세금 10,920+1,090원",
+    "input": {
+      "product": "installment",
+      "amount": "300000",
+      "rate": "4",
+      "months": "12",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 3600000,
+      "interest": 78000,
+      "income_tax": 10920,
+      "local_tax": 1090,
+      "tax": 12010,
+      "net": 65990,
+      "maturity": 3665990
+    },
+    "boundary": true
+  },
+  {
+    "why": "금리 0%: 이자·세금 0원, 만기 = 원금",
+    "input": {
+      "product": "deposit",
+      "amount": "10000000",
+      "rate": "0",
+      "months": "12",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 10000000,
+      "interest": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "tax": 0,
+      "net": 0,
+      "maturity": 10000000
+    },
+    "boundary": true
+  },
+  {
+    "why": "1개월·이자 833원: 소득세 116.62원 → 10원 미만 버려 110원, 지방소득세 11원 → 10원 (소액 부징수는 이자소득 제외 — 소득세법 제86조1호)",
+    "input": {
+      "product": "deposit",
+      "amount": "1000000",
+      "rate": "1",
+      "months": "1",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 1000000,
+      "interest": 833,
+      "income_tax": 110,
+      "local_tax": 10,
+      "tax": 120,
+      "net": 713,
+      "maturity": 1000713
+    },
+    "boundary": true
+  },
+  {
+    "why": "원금 100만 원·연 12%·10개월 단리 = 이자 100,000원 딱 떨어짐: 소득세 14,000원·지방소득세 1,400원 (합계 15.4% = 15,400원)",
+    "input": {
+      "product": "deposit",
+      "amount": "1000000",
+      "rate": "12",
+      "months": "10",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 1000000,
+      "interest": 100000,
+      "income_tax": 14000,
+      "local_tax": 1400,
+      "tax": 15400,
+      "net": 84600,
+      "maturity": 1084600
+    },
+    "boundary": true
+  },
+  {
+    "why": "비과세 상품: 세금 0원, 세후 이자 = 세전 이자 339,000원",
+    "input": {
+      "product": "deposit",
+      "amount": "10000000",
+      "rate": "3.39",
+      "months": "12",
+      "compound": "simple",
+      "tax": "none"
+    },
+    "expect": {
+      "principal": 10000000,
+      "interest": 339000,
+      "income_tax": 0,
+      "local_tax": 0,
+      "tax": 0,
+      "net": 339000,
+      "maturity": 10339000
+    },
+    "notes_exclude": [
+      "2,000만 원을 넘으면"
+    ]
+  },
+  {
+    "why": "기간 0개월은 안내 문장",
+    "input": {
+      "product": "deposit",
+      "amount": "1000000",
+      "rate": "3",
+      "months": "0",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "월 300만 원·연 6%·2개월 적금 월복리: 300만×0.005 + 300만×(1.005²−1) = 15,000 + 30,075 = 45,075원 딱 떨어짐 (소수 계산은 45,074원으로 1원 빠졌음 — 11/7 독립 검수)",
+    "input": {
+      "product": "installment",
+      "amount": "3000000",
+      "rate": "6",
+      "months": "2",
+      "compound": "monthly",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 6000000,
+      "interest": 45075,
+      "income_tax": 6310,
+      "local_tax": 630,
+      "tax": 6940,
+      "net": 38135,
+      "maturity": 6038135
+    },
+    "boundary": true
+  },
+  {
+    "why": "월 1,000만 원·연 6%·1개월 적금 월복리 = 이자 50,000원 딱, 세금 7,000+700원 (소수 계산은 49,999원)",
+    "input": {
+      "product": "installment",
+      "amount": "10000000",
+      "rate": "6",
+      "months": "1",
+      "compound": "monthly",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 10000000,
+      "interest": 50000,
+      "income_tax": 7000,
+      "local_tax": 700,
+      "tax": 7700,
+      "net": 42300,
+      "maturity": 10042300
+    },
+    "boundary": true
+  },
+  {
+    "why": "월 1,000만 원·연 12%·3개월 적금 월복리: 100,000 + 201,000 + 303,010 = 604,010원 (소수 계산은 604,009원)",
+    "input": {
+      "product": "installment",
+      "amount": "10000000",
+      "rate": "12",
+      "months": "3",
+      "compound": "monthly",
+      "tax": "normal"
+    },
+    "expect": {
+      "principal": 30000000,
+      "interest": 604010,
+      "income_tax": 84560,
+      "local_tax": 8450,
+      "tax": 93010,
+      "net": 511000,
+      "maturity": 30511000
+    },
+    "boundary": true
+  },
+  {
+    "why": "이율 소수 셋째 자리는 안내 문장",
+    "input": {
+      "product": "deposit",
+      "amount": "1000000",
+      "rate": "3.395",
+      "months": "12",
+      "compound": "simple",
+      "tax": "normal"
+    },
+    "expect_error": true
+  }
+]
