@@ -69,8 +69,9 @@
       let r = progressive(base, d.brackets, add);
       if (hold < 1) r = bigger(r, flat(base, sr.under1));
       else if (hold < 2) r = bigger(r, flat(base, sr.under2));
-      const tax = r.tax;
-      const local = FirstLabCalc.util.floor(tax / d.local_ratio_div);
+      // 낼 세액은 10원 미만 버림 (양도소득세 국고금관리법 제47조①, 지방소득세 지방회계법 제55조)
+      const tax = FirstLabCalc.util.floor10(r.tax);
+      const local = FirstLabCalc.util.floor10(FirstLabCalc.util.floor(r.tax / d.local_ratio_div));
 
       if (status === 'one') notes.push('12억 원을 넘는 1세대 1주택이라 양도차익 중 (양도가액 − 12억 원) ÷ 양도가액 비율만 과세했어요.');
       if (status === 'one' && live < d.lthd_one_house.min_live && hold >= 3) notes.push('거주기간이 2년 미만이라 장기보유특별공제는 1년에 2%(최대 30%) 표로 계산했어요.');

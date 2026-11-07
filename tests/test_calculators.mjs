@@ -33,7 +33,7 @@ const ids = fs.readdirSync(path.join(DIR, 'defs')).filter((f) => f.endsWith('.js
 // 우리 사이트 글·페이지 주소 (/%postname%/ — 글 주소 = 키워드, publish_queue.py)
 const QUEUE = path.join(ROOT, 'wordpress/queue');
 // 10원 끝수 처리를 아직 확인 못 한 세금 계산기 (11/7 발견) — 이 날짜까지 확인해 won10_keys 또는 won10 이유를 넣기
-const WON10_PENDING = { until: '2026-11-14', ids: ['capital-gains-tax', 'income-tax'] };
+const WON10_PENDING = { until: '2026-11-14', ids: [] }; // 11/7 모두 확인함 — 새로 생기면 여기 넣고 기한 안에 확인
 const PAGES = path.join(ROOT, 'wordpress/pages');
 const sitePaths = new Set([
   ...fs.readdirSync(QUEUE).filter((f) => f.endsWith('.json')).map((f) => readJson(path.join(QUEUE, f)).keyword).filter(Boolean),

@@ -34,9 +34,10 @@
       const base = Math.max(0, income - deduction);
       const { tax, rate } = baseTax(base, d.brackets);
       const determined = Math.max(0, tax - credit);
-      const due = determined - prepaid;
+      // 낼·돌려받을 세액은 10원 미만 버림 (국고금관리법 제47조①, 지방소득세는 지방회계법 제55조)
+      const due = FirstLabCalc.util.floor10(determined - prepaid);
       const local = FirstLabCalc.util.floor(determined / d.local_ratio_div);
-      const localDue = local - FirstLabCalc.util.floor(prepaid / d.local_ratio_div);
+      const localDue = FirstLabCalc.util.floor10(local - FirstLabCalc.util.floor(prepaid / d.local_ratio_div));
 
       const rows = [
         ['소득공제 합계', u.won(deduction)],
