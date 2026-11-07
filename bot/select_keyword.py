@@ -59,6 +59,16 @@ def off_topic(n: str) -> bool:
     return any(w in n for w in OFF_TOPIC)
 
 
+def tier(label: str, n: str) -> int:
+    """쓸 순서·공개 순서의 무리 (작을수록 먼저, 11/7 운영자 '주제도 아니고 황금도 아닌 글은 밀려도 된다'):
+    0 황금 → 1 중심 주제 → 2 좋음 → 3 나머지. label: 황금지수 등급(naver_hub.gold_label), n: 키워드(norm)."""
+    if label == "황금":
+        return 0
+    if on_focus(n):
+        return 1
+    return 2 if label == "좋음" else 3
+
+
 def unify(n: str) -> str:
     """비교용 표기 통일 ('나의신용점수조회' → '내신용점수조회')."""
     for a, b in SYNONYMS:
@@ -156,16 +166,17 @@ def ranked_candidates(conn, settings: BotSettings, limit: int = 50) -> list[dict
                        "gsc": {"opportunity": "서치콘솔 기회", "good_head": "잘 되는 주제",
                                "bad_head": "안 되는 주제"}.get(gsc or "", ""),
                        "naver": naver_hub.describe(sig, r["total"], r["keyword"]),  # 글쓰기 세션이 보는 근거 (황금 점수·성수기·블로그 글 수)
-                       "gold": naver_hub.is_gold(sig, r["total"], r["keyword"])})
+                       "gold": naver_hub.is_gold(sig, r["total"], r["keyword"]),
+                       "tier": tier(naver_hub.gold_label(sig, r["total"]) if naver_hub.is_info(r["keyword"]) else "", r["norm"])})
     # 운영자 지시(11/5): 황금 키워드 찾은 것은 점수 높은 것부터 먼저 쓴다 → 황금·좋음 무리를 맨 앞에, 그 안에서 점수순
     # 황금 무리 안에서는 정보 검색(intent info)을 먼저 — 판단 애매(unknown)한 황금은 대부분 호텔·상품·행사라 글쓰기 세션이 다 빼서
     # 새 글 없이 끝난 실행이 세 번 연속 (11/6). 황금 먼저 규칙은 그대로.
-    # 11/7: 황금 안에서도 사이트 중심 주제(FOCUS) 먼저, 생활 요령(OFF_TOPIC)은 맨 뒤
+    # 11/7: 황금 → 중심 주제(FOCUS) → 좋음 → 나머지, 같은 무리 안에서 생활 요령(OFF_TOPIC)은 뒤
     for c in result:
         c["info"] = naver_hub.intent(c["keyword"]) == "info"
         c["focus"] = on_focus(norm(c["keyword"]))
         c["later"] = off_topic(norm(c["keyword"]))
-    result.sort(key=lambda x: (x["gold"], x["focus"], not x["later"], x["info"], x["score"]), reverse=True)
+    result.sort(key=lambda x: (-x["tier"], not x["later"], x["info"], x["score"]), reverse=True)
     picked, per_head = [], {}
     for c in result:
         key = c["head"] or c["keyword"]

@@ -345,11 +345,11 @@ def is_gold(sig: dict | None, total: int, keyword: str = "") -> bool:
     return gold_label(sig, total) in ("황금", "좋음") and is_info(keyword)
 
 
-def publish_priority(keywords: dict[int, str], month: int, conn=None) -> dict[int, float]:
-    """초안 번호 → 공개 우선 점수 (황금 점수×2 + 성수기). 키워드 창고·신호가 없으면 빈 값 (공개 순서는 예전대로)."""
+def _signals_of(keywords: dict[int, str], conn=None) -> tuple[dict, dict] | None:
+    """키워드들의 (네이버 신호, 검색량). 키워드 창고가 없거나 못 읽으면 None."""
     from .keyword_db import DB_PATH, connect
     if not keywords or (conn is None and not DB_PATH.exists()):
-        return {}
+        return None
 
     def read(c) -> tuple[dict, dict]:
         return load(c), {r["norm"]: r["total"] for r in c.execute(
@@ -357,13 +357,29 @@ def publish_priority(keywords: dict[int, str], month: int, conn=None) -> dict[in
             [norm(k) for k in keywords.values()])}
     try:
         if conn is not None:
-            sigs, totals = read(conn)
-        else:
-            with connect() as c:
-                sigs, totals = read(c)
+            return read(conn)
+        with connect() as c:
+            return read(c)
     except Exception:  # noqa: BLE001 — 순서 정하기용이라 실패해도 공개는 계속
+        return None
+
+
+def publish_priority(keywords: dict[int, str], month: int, conn=None) -> dict[int, float]:
+    """초안 번호 → 공개 우선 점수 (황금 점수×2 + 성수기). 키워드 창고·신호가 없으면 빈 값 (공개 순서는 예전대로)."""
+    got = _signals_of(keywords, conn)
+    if not got:
         return {}
+    sigs, totals = got
     return {pid: signal_score(sigs.get(norm(k)), totals.get(norm(k), 0), month, k) for pid, k in keywords.items()}
+
+
+def publish_labels(keywords: dict[int, str], conn=None) -> dict[int, str]:
+    """초안 번호 → 황금지수 등급('황금'·'좋음'·…, 정보 검색이 아니면 ''). 못 읽으면 빈 값."""
+    got = _signals_of(keywords, conn)
+    if not got:
+        return {}
+    sigs, totals = got
+    return {pid: (gold_label(sigs.get(norm(k)), totals.get(norm(k), 0)) if is_info(k) else "") for pid, k in keywords.items()}
 
 
 def load(conn) -> dict[str, dict]:

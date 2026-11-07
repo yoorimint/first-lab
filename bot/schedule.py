@@ -97,6 +97,7 @@ MAX_FRESH_CHECKS = 3  # 한 번에 공개 직전 확인을 하는 초안 수 (�
 HOLD_META = "_firstlab_hold"  # bot/review_gate.HOLD_META 와 같음 (순환 import 피함)
 
 
+MAX_WAIT_ANY = timedelta(days=90)  # 주제·황금이 아닌 글도 이만큼 기다리면 중심 주제 무리와 같이
 MAX_WAIT = timedelta(days=21)  # 이만큼 기다린 글은 황금 점수와 상관없이 먼저 (계속 밀리지 않게)
 # 11/6: 예전엔 '대기열 뒤 21편을 뺀 나머지'로 셈 — 하루 30편씩 쌓이자 하루도 안 된 글까지 '오래된 글'이 돼 황금 점수가 거의 안 쓰임
 
@@ -110,10 +111,18 @@ def publish_order(ids: list[int], now_kst: datetime, photo_tiebreak: bool = Fals
     gold = naver_hub.publish_priority({i: texts[i].split(" ")[0] for i in ids}, now_kst.month)
     rank = {i: seasons.rank(texts[i], now_kst.date()) for i in ids}
     from .review_queue import reviewed_ids
+    from .keyword_db import norm
+    from .select_keyword import tier
     reviewed = reviewed_ids()
     cutoff = now_kst.replace(tzinfo=None) - MAX_WAIT
     old = {i for i in ids if info.get(i, {}).get("date") and info[i]["date"] <= cutoff}
-    return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i],
+    # 11/7 운영자 '주제도 아니고 황금도 아닌 글은 밀려도 된다': 황금 → 중심 주제 → 좋음 → 나머지 무리 순 (같은 무리 안에서 예전 순서).
+    # 아주 오래 기다린 글(MAX_WAIT_ANY)은 중심 주제 무리로 올려 영영 안 나가는 일은 없게.
+    labels = naver_hub.publish_labels({i: texts[i].split(" ")[0] for i in ids})
+    very_old = now_kst.replace(tzinfo=None) - MAX_WAIT_ANY
+    level = {i: tier(labels.get(i, ""), norm(texts[i].split(" ")[0])) for i in ids}
+    level = {i: min(t, 1) if info.get(i, {}).get("date") and info[i]["date"] <= very_old else t for i, t in level.items()}
+    return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, level[i], i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i],
                                       _has_pending_images(i) if photo_tiebreak else False))
 
 

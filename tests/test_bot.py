@@ -2190,7 +2190,7 @@ class SiteFocusTest(unittest.TestCase):
         self.assertTrue(on_focus("청년도약계좌조건"))
         self.assertTrue(on_focus("경정청구기간"))
         src = (ROOT / "bot" / "select_keyword.py").read_text(encoding="utf-8")
-        self.assertIn('(x["gold"], x["focus"], not x["later"], x["info"], x["score"])', src)
+        self.assertIn('(-x["tier"], not x["later"], x["info"], x["score"])', src)
         self.assertNotIn("off_topic(r[\"norm\"]) or", src)   # 후보에서 빼지 않음
 
     def test_focus_snowball_grows_seeds(self):
@@ -2572,6 +2572,28 @@ class GoldFirstTest(unittest.TestCase):
         self.assertEqual(self._publish_pick(recent, {129: 9.0}), 129)                       # 모두 하루 안 된 글 → 황금 점수 높은 글
         old = [{"ID": 50, "post_name": "o", "post_title": "t", "post_date": "2026-10-10 10:00:00"}]
         self.assertEqual(self._publish_pick(old + recent, {129: 9.0}), 50)                  # 21일 넘게 기다린 글은 먼저
+
+    def test_publish_tiers_gold_focus_good_rest(self):
+        """11/7 운영자 '주제도 아니고 황금도 아닌 글은 밀려도 된다': 황금 → 중심 주제 → 좋음 → 나머지 (21일 넘은 글도 무리 안에서만 먼저)."""
+        from bot import naver_hub
+        rows = [{"ID": 10, "post_name": "마라도여객선", "post_title": "t", "post_date": "2026-10-01 10:00:00"},   # 좋음, 36일 기다림
+                {"ID": 11, "post_name": "수습기간해고", "post_title": "t", "post_date": "2026-11-05 10:00:00"},   # 중심 주제
+                {"ID": 12, "post_name": "캠핑장예약", "post_title": "t", "post_date": "2026-11-05 10:00:00"}]
+        labels = {10: "좋음", 11: "", 12: ""}
+        with mock.patch.object(naver_hub, "publish_labels", return_value=labels):
+            self.assertEqual(self._publish_pick(rows, {10: 9.0}), 11)
+        labels[12] = "황금"
+        with mock.patch.object(naver_hub, "publish_labels", return_value=labels):
+            self.assertEqual(self._publish_pick(rows, {10: 9.0}), 12)
+        rows[0]["post_date"] = "2026-07-01 10:00:00"   # 90일 넘게 기다린 글은 중심 주제 무리로 (영영 밀리지 않게)
+        labels[12] = ""
+        with mock.patch.object(naver_hub, "publish_labels", return_value=labels):
+            self.assertEqual(self._publish_pick(rows, {10: 9.0}), 10)
+
+    def test_writing_tier(self):
+        from bot.select_keyword import tier
+        self.assertEqual([tier("황금", "캠핑장예약"), tier("", "수습기간해고"), tier("좋음", "마라도여객선"), tier("", "캠핑장예약")], [0, 1, 2, 3])
+        self.assertEqual(tier("좋음", "퇴직연금중도인출"), 1)
 
     def test_gold_first_even_if_photo_pending(self):
         """11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진 줘야지' — 공개는 황금 점수 순, 사진 대기는 같은 점수일 때만 뒤로."""
