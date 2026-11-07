@@ -164,6 +164,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.small_workplace_items(body_html)
     out += condition_gate.headline_from_price(title, excerpt, body_html)
     out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(body_html)))
+    out += condition_gate.holiday_attendance(excerpt, body_html)
     out += condition_gate.stale_forms(review, None if law_fetcher is None else (lambda *a: []))
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:

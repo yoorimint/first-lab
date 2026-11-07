@@ -101,6 +101,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "deadline_holiday": lambda: condition_gate.deadline_holiday(post["content_html"]),
               "facility_ordinance": lambda: condition_gate.facility_ordinance(post["title"], post.get("review"), post["excerpt"], post["content_html"]),
               "upcoming_amendments": lambda: condition_gate.upcoming_amendments(post.get("review"), post["content_html"]),
+              "holiday_attendance": lambda: condition_gate.holiday_attendance(post["excerpt"], post["content_html"]),
               "round_headline": lambda: expiry.round_headline(post["title"], post["excerpt"], " ".join(expiry.blocks(post["content_html"]))),
               "headline_from_price": lambda: condition_gate.headline_from_price(post["title"], post["excerpt"], post["content_html"]),
               "small_workplace_items": lambda: condition_gate.small_workplace_items(post["content_html"]),

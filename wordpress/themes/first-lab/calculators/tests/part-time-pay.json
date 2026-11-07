@@ -267,5 +267,12 @@
    "12시간까지"
   ],
   "boundary": true
- }
+ },
+  {
+    "why": "14.995시간 → 0.01 단위 15시간으로 맞춘 뒤 판정: 급여 15×10,320=154,800, 주휴 3시간 30,960 (11/7 외부 검수: 예전엔 급여 15시간분인데 주휴 0)",
+    "input": {"wage": 10320, "hours": 14.995, "extra": 0, "night": 0, "size": "five"},
+    "expect": {"holiday_hours": 3, "base_pay": 154800, "holiday_pay": 30960},
+    "notes_include": ["통상근로자가 주 5일·40시간"],
+    "boundary": true
+  }
 ]

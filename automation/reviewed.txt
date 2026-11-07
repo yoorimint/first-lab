@@ -306,3 +306,4 @@ calc:savings-interest
 calc:part-time-pay
 calc:acquisition-tax
 calc:cheongyak-score
+1601 알바 급여 계산기: 시급×시간+주휴수당, 주 15시간 기준

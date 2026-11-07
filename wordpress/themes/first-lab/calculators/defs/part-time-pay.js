@@ -29,9 +29,11 @@
       const blank = (x) => String(x ?? '').trim() === '';
       if (!(wage > 0) || !Number.isInteger(wage)) throw new u.InputError('시급을 1원 단위로 넣어 주세요.');
       if (blank(v.hours)) throw new u.InputError('1주 소정근로시간을 넣어 주세요.');
-      const hours = Number(v.hours);
-      const extra = blank(v.extra) ? 0 : Number(v.extra);
-      const night = blank(v.night) ? 0 : Number(v.night);
+      // 0.01시간 단위로 먼저 맞춤 — 금액(100배 정수)과 15시간 판정이 같은 값을 보게 (11/7 외부 검수: 14.995 → 급여 15시간분인데 주휴 0)
+      const r2 = (x) => Math.round(x * 100) / 100;
+      const hours = r2(Number(v.hours));
+      const extra = blank(v.extra) ? 0 : r2(Number(v.extra));
+      const night = blank(v.night) ? 0 : r2(Number(v.night));
       if (!(hours >= 0) || hours > d.full_week_hours) throw new u.InputError(`1주 소정근로시간은 0~${d.full_week_hours}시간으로 넣어 주세요 (법정 근로시간이 1주 ${d.full_week_hours}시간이에요).`);
       if (!(extra >= 0) || extra > d.max_extra_hours) throw new u.InputError(`더 일한 시간은 0~${d.max_extra_hours}시간으로 넣어 주세요.`);
       if (!(night >= 0) || night > hours + extra) throw new u.InputError('야간에 일한 시간은 소정근로시간과 더 일한 시간을 합친 것보다 클 수 없어요.');
@@ -61,6 +63,7 @@
       if (!big && (extra > 0 || night > 0)) notes.push('상시 4명 이하 사업장은 근로기준법의 연장·야간 50% 가산이 적용되지 않아 1배로 계산했어요. 계약서·취업규칙에 가산을 정했으면 그대로 받아요.');
       if (wage < d.min_wage) notes.push(`${d.min_wage_year}년 최저임금(시급 ${u.won(d.min_wage)})보다 낮은 시급이에요.`);
       notes.push('소정근로일을 모두 나온 주 기준이에요. 결근한 주는 그 주 주휴수당이 빠져요.');
+      notes.push('주휴시간은 같은 일을 하는 통상근로자가 주 5일·40시간 일하는 사업장 기준(주 시간 ÷ 40 × 8)이에요 (근로기준법 시행령 별표 2).');
       notes.push('한 달 평균은 한 주 급여 × 365 ÷ 7 ÷ 12로 계산했고, 원 미만은 버렸어요. 실제 달 급여는 그달에 든 근무일 수에 따라 달라져요.');
       notes.push('4대보험·세금을 떼기 전 금액이에요.');
       return {

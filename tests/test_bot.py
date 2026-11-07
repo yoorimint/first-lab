@@ -2239,6 +2239,17 @@ class SiteFocusTest(unittest.TestCase):
         self.assertIn("같은 틀 글", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
 
 
+class HolidayAttendanceTest(unittest.TestCase):
+    """11/7 #1601: 요약·첫 문단 '주 15시간 이상이면 주휴수당' — 본문엔 있는 '개근' 요건이 빠짐 (시행령 제30조①)."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import holiday_attendance
+        body = "<p>알바 급여는 1주 15시간 이상이면 주휴수당을 더해요.</p><p>그 주 소정근로일을 개근해야 해요.</p>"
+        self.assertEqual(len(holiday_attendance("주 15시간 이상이면 주휴수당을 더해요.", body)), 1)
+        self.assertEqual(holiday_attendance("주 15시간 이상 일하고 그 주 소정근로일을 다 나오면 주휴수당을 더해요.", body), [])
+        self.assertEqual(holiday_attendance("시급 계산법", "<p>시급 계산</p>"), [])
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

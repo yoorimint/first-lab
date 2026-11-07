@@ -1002,3 +1002,17 @@ def excerpt_apply_date(excerpt: str, body_html: str) -> list[str]:
 
 
 _NOW = re.compile(r"지금도|현재도|이미|현행")
+
+
+# 주휴수당 요건 '개근' (근로기준법 시행령 제30조①) — 본문엔 있는데 요약·첫 문단이 '주 15시간 이상이면 주휴'로만 씀
+# (11/7 #1601 알바 급여, #1419 주휴수당 뜻 등 같은 꼴 반복 → 검사로)
+_ATTEND = re.compile(r"개근|다 나오|모두 나오|빠짐없이 나오|결근 없이|다 나온|모두 나온")
+
+
+def holiday_attendance(excerpt: str, body_html: str) -> list[str]:
+    first = re.search(r"<p[^>]*>.*?</p>", body_html or "", re.S)
+    lead = _plain(excerpt or "") + " " + (_plain(first.group(0)) if first else "")
+    body = _plain(body_html or "")
+    if "주휴" in lead and re.search(r"15\s*시간", lead) and _ATTEND.search(body) and not _ATTEND.search(lead):
+        return ["요약·첫 문단이 주휴수당 요건을 '주 15시간 이상'만 적음 — 본문처럼 '그 주 소정근로일 개근'도 넣기 (시행령 제30조①)"]
+    return []
