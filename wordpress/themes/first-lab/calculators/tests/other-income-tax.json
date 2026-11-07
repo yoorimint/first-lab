@@ -1,0 +1,310 @@
+[
+  {
+    "why": "국세청 예시: 강연료 125,000원 → 필요경비 60% 75,000원, 기타소득금액 50,000원은 과세최저한이라 0원 (국세청 기타소득 원천징수 방법)",
+    "input": {
+      "kind": "p60",
+      "amount": 125000
+    },
+    "expect": {
+      "expense": 75000.0,
+      "income": 50000.0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0,
+      "net": 125000,
+      "exempt": true
+    },
+    "boundary": true,
+    "notes_include": [
+      "5만 원 이하면"
+    ]
+  },
+  {
+    "why": "125,001원: 기타소득금액 50,000.4원 > 5만 원 → 20% 10,000.08 → 10,000원, 지방 1,000원 (제84조 '5만원 이하'만 비과세)",
+    "input": {
+      "kind": "p60",
+      "amount": 125001
+    },
+    "expect": {
+      "expense": 75000.6,
+      "income": 50000.4,
+      "income_tax": 10000,
+      "local_tax": 1000,
+      "total": 11000,
+      "net": 114001,
+      "exempt": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "강연료 100만 원: 필요경비 60만, 기타소득금액 40만 × 20% = 8만 + 지방 8,000 = 88,000원(8.8%) (국세청 '지급액 × 8.8%')",
+    "input": {
+      "kind": "p60",
+      "amount": 1000000
+    },
+    "expect": {
+      "expense": 600000.0,
+      "income": 400000.0,
+      "income_tax": 80000,
+      "local_tax": 8000,
+      "total": 88000,
+      "net": 912000,
+      "exempt": false
+    },
+    "notes_exclude": [
+      "실제 쓴 필요경비가"
+    ]
+  },
+  {
+    "why": "원고료 300만 원: 기타소득금액 120만 → 소득세 24만 + 지방 2.4만 = 264,000원 (본문 표)",
+    "input": {
+      "kind": "p60",
+      "amount": 3000000
+    },
+    "expect": {
+      "expense": 1800000.0,
+      "income": 1200000.0,
+      "income_tax": 240000,
+      "local_tax": 24000,
+      "total": 264000,
+      "net": 2736000,
+      "exempt": false
+    }
+  },
+  {
+    "why": "750만 원: 기타소득금액 300만 원 → 소득세 60만 + 지방 6만 = 66만 원 (분리과세 선택 한도 경계, 본문 표)",
+    "input": {
+      "kind": "p60",
+      "amount": 7500000
+    },
+    "expect": {
+      "expense": 4500000.0,
+      "income": 3000000.0,
+      "income_tax": 600000,
+      "local_tax": 60000,
+      "total": 660000,
+      "net": 6840000,
+      "exempt": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "대회 상금 100만 원(80%): 기타소득금액 20만 → 4만 + 4,000 = 44,000원 (시행령 제87조1호가목)",
+    "input": {
+      "kind": "p80",
+      "amount": 1000000
+    },
+    "expect": {
+      "expense": 800000.0,
+      "income": 200000.0,
+      "income_tax": 40000,
+      "local_tax": 4000,
+      "total": 44000,
+      "net": 956000,
+      "exempt": false
+    }
+  },
+  {
+    "why": "80% 경계: 250,000원 → 기타소득금액 5만 원 → 비과세",
+    "input": {
+      "kind": "p80",
+      "amount": 250000
+    },
+    "expect": {
+      "expense": 200000.0,
+      "income": 50000.0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0,
+      "net": 250000,
+      "exempt": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "80% 경계: 250,005원 → 기타소득금액 50,001원 → 소득세 10,000.2 → 10,000원",
+    "input": {
+      "kind": "p80",
+      "amount": 250005
+    },
+    "expect": {
+      "expense": 200004.0,
+      "income": 50001.0,
+      "income_tax": 10000,
+      "local_tax": 1000,
+      "total": 11000,
+      "net": 239005,
+      "exempt": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "사례금 30만 원(필요경비 없음): 30만 × 20% = 6만 + 6,000 = 66,000원(22%) (본문 표)",
+    "input": {
+      "kind": "p0",
+      "amount": 300000
+    },
+    "expect": {
+      "expense": 0.0,
+      "income": 300000.0,
+      "income_tax": 60000,
+      "local_tax": 6000,
+      "total": 66000,
+      "net": 234000,
+      "exempt": false
+    }
+  },
+  {
+    "why": "사례금 5만 원: 기타소득금액 5만 원 이하 → 0원",
+    "input": {
+      "kind": "p0",
+      "amount": 50000
+    },
+    "expect": {
+      "expense": 0.0,
+      "income": 50000.0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0,
+      "net": 50000,
+      "exempt": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "사례금 50,001원: 소득세 10,000.2 → 10,000원, 지방 1,000원",
+    "input": {
+      "kind": "p0",
+      "amount": 50001
+    },
+    "expect": {
+      "expense": 0.0,
+      "income": 50001.0,
+      "income_tax": 10000,
+      "local_tax": 1000,
+      "total": 11000,
+      "net": 39001,
+      "exempt": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "실제 경비가 더 큼: 강연료 100만·실제 경비 70만 → 기타소득금액 30만 → 6만 + 6,000 = 66,000원 (시행령 제87조1의2 단서)",
+    "input": {
+      "kind": "p60",
+      "amount": 1000000,
+      "actual": 700000
+    },
+    "expect": {
+      "expense": 700000.0,
+      "income": 300000.0,
+      "income_tax": 60000,
+      "local_tax": 6000,
+      "total": 66000,
+      "net": 934000,
+      "exempt": false
+    },
+    "notes_include": [
+      "실제 쓴 필요경비가"
+    ]
+  },
+  {
+    "why": "실제 경비가 60%보다 작으면 60%: 100만·실제 50만 → 88,000원",
+    "input": {
+      "kind": "p60",
+      "amount": 1000000,
+      "actual": 500000
+    },
+    "expect": {
+      "expense": 600000.0,
+      "income": 400000.0,
+      "income_tax": 80000,
+      "local_tax": 8000,
+      "total": 88000,
+      "net": 912000,
+      "exempt": false
+    }
+  },
+  {
+    "why": "실제 경비가 받은 금액보다 커도 기타소득금액은 0원",
+    "input": {
+      "kind": "p0",
+      "amount": 100000,
+      "actual": 200000
+    },
+    "expect": {
+      "expense": 100000.0,
+      "income": 0.0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0,
+      "net": 100000,
+      "exempt": true
+    }
+  },
+  {
+    "why": "끝수: 1,234,567원 → 기타소득금액 493,826.8 → 소득세 98,765.36 → 98,760원, 지방 9,876 → 9,870원",
+    "input": {
+      "kind": "p60",
+      "amount": 1234567
+    },
+    "expect": {
+      "expense": 740740.2,
+      "income": 493826.8,
+      "income_tax": 98760,
+      "local_tax": 9870,
+      "total": 108630,
+      "net": 1125937,
+      "exempt": false
+    }
+  },
+  {
+    "why": "잘못된 금액 '0' → 안내",
+    "input": {
+      "kind": "p60",
+      "amount": "0"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 금액 '-1' → 안내",
+    "input": {
+      "kind": "p60",
+      "amount": "-1"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 금액 '1.5' → 안내",
+    "input": {
+      "kind": "p60",
+      "amount": "1.5"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 금액 '' → 안내",
+    "input": {
+      "kind": "p60",
+      "amount": ""
+    },
+    "expect_error": true
+  },
+  {
+    "why": "잘못된 실제 경비 '-5' → 안내",
+    "input": {
+      "kind": "p60",
+      "amount": 1000000,
+      "actual": "-5"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "너무 큰 금액 → 안내",
+    "input": {
+      "kind": "p60",
+      "amount": 200000000000
+    },
+    "expect_error": true
+  }
+]

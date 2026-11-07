@@ -1,0 +1,17 @@
+{
+  "basis_date": "2026-11-07", "yearly": false, "law_checked": ["소득세법|2027-01-01"],
+  "max_input": 100000000000,
+  "won10_keys": ["income_tax", "local_tax", "total"],
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제21조 기타소득, 제37조 필요경비, 제84조 과세최저한, 제129조 원천징수세율, 제14조 분리과세)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국가법령정보센터 소득세법 시행령 (제87조 필요경비 60%·80%)", "url": "https://www.law.go.kr/법령/소득세법시행령"},
+    {"name": "국가법령정보센터 지방세법 (제103조의13 개인지방소득세 특별징수 10%)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국가법령정보센터 국고금관리법 (제47조 10원 미만 끝수)", "url": "https://www.law.go.kr/법령/국고금관리법"},
+    {"name": "국세청 기타소득 원천징수 방법", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=6457&cntntsId=7893"}
+  ],
+  "expense_pct": {"p60": 60, "p80": 80, "p0": 0},
+  "exempt_max": 50000,
+  "rate_pct": 20,
+  "local_pct": 10,
+  "separate_max": 3000000
+}
