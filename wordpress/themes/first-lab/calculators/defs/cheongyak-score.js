@@ -43,7 +43,7 @@
         options: [['never', '세대원 모두 주택을 가진 적 없음'], ['past', '예전에 있었고 지금은 세대원 모두 무주택'], ['now', '지금 세대원 중 주택 소유자가 있음 (소형·저가주택 1채, 60세 이상 부모님 집 등 무주택으로 보는 경우 제외)']],
       },
       { name: 'nohouse_since', label: '마지막으로 무주택이 된 날 (예전에 주택이 있었을 때)', type: 'date', default: '' },
-      { name: 'dependents', label: '부양가족 수 (본인 제외)', type: 'number', min: 0, step: 1, default: 0, help: '같은 등본의 배우자, 미혼 자녀, 본인(배우자와 등본이 따로면 배우자)이 세대주일 때 3년 이상 같은 등본에 있는 부모·조부모 등. 주택을 가진 부모님은 두 분 모두 빠져요(소형·저가주택 등 무주택으로 보는 집이면 인정, 60세 이상 예외는 적용 안 됨).' },
+      { name: 'dependents', label: '부양가족 수 (본인 제외)', type: 'number', min: 0, step: 1, default: 0, help: '같은 등본의 배우자, 미혼 자녀(만 30세 이상은 최근 1년 이상 같은 등본), 본인(배우자와 등본이 따로면 배우자)이 세대주일 때 3년 이상 같은 등본에 있는 부모·조부모 등. 주택을 가진 부모님은 두 분 모두 빠져요(소형·저가주택 등 무주택으로 보는 집이면 인정, 60세 이상 예외는 적용 안 됨).' },
       { name: 'account', label: '본인 청약통장 최초 가입일', type: 'date', default: '2016-06-01' },
       { name: 'spouse_account', label: '배우자 청약통장 최초 가입일 (없으면 비움)', type: 'date', default: '' },
     ],
@@ -99,9 +99,10 @@
       if (account < adultDay) {
         const minorEnd = Math.min(adultDay, announce);
         const cut = Date.UTC(2024, 0, 1);
-        const pre = Math.min(u.daysBetween(Date.UTC(2024 - d.minor_pre2024_max_years, 0, 1), cut), Math.max(0, u.daysBetween(account, Math.min(minorEnd, cut))));
+        const preEnd = Math.min(minorEnd, cut);
+        const pre = Math.max(0, u.daysBetween(Math.max(account, plusMonths(preEnd, -12 * d.minor_pre2024_max_years)), preEnd));
         const post = Math.max(0, u.daysBetween(Math.max(account, cut), minorEnd));
-        const credit = Math.min(pre + post, u.daysBetween(plusMonths(adultDay, -12 * d.minor_max_years), adultDay));
+        const credit = Math.min(pre + post, u.daysBetween(plusMonths(minorEnd, -12 * d.minor_max_years), minorEnd));
         if (credit < u.daysBetween(account, minorEnd)) minorNote = true;
         effStart = u.addDays(Math.max(account, minorEnd), -credit);
       }
@@ -117,6 +118,7 @@
         if (!married) throw new u.InputError('배우자 통장 점수는 기혼일 때만 더해요. 혼인 여부를 확인해 주세요.');
         spouseMonths = fullMonths(sp, announce);
         spousePts = Math.min(d.spouse_max, spouseMonths < 12 ? 1 : spouseMonths < 24 ? 2 : 3);
+        notes.push('노부모 부양 특별공급에서는 배우자 통장 점수를 더하지 않아요 (주택공급에 관한 규칙 별표 1 비고 2).');
       }
       const accPts = Math.min(d.account_max, ownPts + spousePts);
       const total = nohousePts + depPts + accPts;

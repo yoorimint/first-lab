@@ -327,5 +327,8 @@
       "account": "2010-01-01"
     },
     "expect_error": true
-  }
+  },
+  {"why": "미성년 2년 한도는 달력 2년(윤일 포함): 1990-01-01생·1998-01-01 가입 → 인정 시작 2007-01-01, 공고 2015-01-01이면 8년 → 10점 (11/7 외부 검수: 예전엔 730일 고정이라 9점)", "input": {"birth": "1990-01-01", "married": "no", "marriage": "", "house": "never", "nohouse_since": "", "dependents": 0, "account": "1998-01-01", "spouse_account": "", "announce": "2015-01-01"}, "expect": {"own_account": 10}, "boundary": true},
+  {"why": "같은 입력 공고 2014-12-31 → 7년 → 9점", "input": {"birth": "1990-01-01", "married": "no", "marriage": "", "house": "never", "nohouse_since": "", "dependents": 0, "account": "1998-01-01", "spouse_account": "", "announce": "2014-12-31"}, "expect": {"own_account": 9}, "boundary": true},
+  {"why": "배우자 통장 넣으면 노부모 부양 특별공급 제외 안내 (별표1 비고 2)", "input": {"announce": "2026-11-07", "birth": "1998-01-01", "married": "yes", "marriage": "2024-03-01", "house": "never", "nohouse_since": "", "dependents": 1, "account": "2020-01-01", "spouse_account": "2022-11-07"}, "expect": {"nohouse": 6, "dependents": 10, "own_account": 8, "spouse": 3, "account": 11, "total": 27}, "notes_include": ["노부모 부양 특별공급"]}
 ]
