@@ -1,0 +1,84 @@
+{
+  "basis_date": "2026-11-07",
+  "yearly_checked": 2026,
+  "yearly_recheck": "2027-01-05",
+  "yearly_pending": "2027년분 1세대 1주택 공정시장가액비율 (지방세법 시행령 제109조 — 2026년분 43·44·45%는 그해 한정, 해마다 5~6월 개정) / 1세대 1주택 특례세율(제111조의2) 유효기간: 법률 제17769호 부칙 제2조로 2026년분까지 — 연장 법 개정(보통 12월 말 공포) 확인, 연장 없으면 2027년분은 표준세율",
+  "sources": [
+    {
+      "name": "국가법령정보센터 지방세법 (제110조 과세표준·상한, 제111조 주택 세율, 제111조의2 1세대 1주택 특례세율, 제112조 도시지역분, 제115조 납기, 제118조 분할납부, 제151조 지방교육세)",
+      "url": "https://www.law.go.kr/법령/지방세법"
+    },
+    {
+      "name": "국가법령정보센터 지방세법 시행령 (제109조 공정시장가액비율 60%·2026년 1세대 1주택 43~45%, 제109조의2 과세표준상한율 5%)",
+      "url": "https://www.law.go.kr/법령/지방세법시행령"
+    },
+    {
+      "name": "국가법령정보센터 지방세법 부칙 (법률 제17769호 제2조 1세대 1주택 재산세 세율 특례의 유효기간 6년)",
+      "url": "https://www.law.go.kr/법령/지방세법"
+    }
+  ],
+  "ratio_one_year": 2026,
+  "ratio_one": [
+    {
+      "upto": 300000000,
+      "pct": 43
+    },
+    {
+      "upto": 600000000,
+      "pct": 44
+    },
+    {
+      "upto": null,
+      "pct": 45
+    }
+  ],
+  "ratio_other_pct": 60,
+  "special_max_price": 900000000,
+  "brackets_standard": [
+    {
+      "upto": 60000000,
+      "permille": 1
+    },
+    {
+      "upto": 150000000,
+      "permille": 1.5
+    },
+    {
+      "upto": 300000000,
+      "permille": 2.5
+    },
+    {
+      "upto": null,
+      "permille": 4
+    }
+  ],
+  "brackets_special": [
+    {
+      "upto": 60000000,
+      "permille": 0.5
+    },
+    {
+      "upto": 150000000,
+      "permille": 1
+    },
+    {
+      "upto": 300000000,
+      "permille": 2
+    },
+    {
+      "upto": null,
+      "permille": 3.5
+    }
+  ],
+  "cap_pct": 5,
+  "edu_pct": 20,
+  "urban_permille": 1.4,
+  "installment_over": 2500000,
+  "won10_keys": [
+    "tax",
+    "edu",
+    "urban",
+    "total"
+  ],
+  "special_last_year": 2026
+}
