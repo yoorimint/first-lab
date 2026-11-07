@@ -41,12 +41,15 @@
       if (status === 'one' && hold < 2) throw new u.InputError('1세대 1주택 비과세는 2년 이상 보유해야 해요. 2년 미만이면 "일반"으로 계산해요.');
 
       const gain = Math.max(0, sale - acquire - expense);
+      // 공동명의: 12억 판정은 집 전체 값(시행령 제156조①), 세금은 사람별(기본공제 각각 250만 원, 제103조①) — 11/7 #1862 검수:
+      // 자기 지분(7.5억)만 넣으면 비과세로 잘못 나옴
+      const JOINT = '이 계산은 한 사람이 집 전체를 가진 경우예요. 공동명의면 12억 원 판정은 집 전체 값으로 하고, 세금은 지분별로 따로 계산해요(기본공제도 사람마다 250만 원).';
       const notes = [];
       if (status === 'one' && sale <= d.high_price) {
         return {
           values: { gain, taxable_gain: 0, lthd_pct: 0, lthd: 0, income: 0, base: 0, rate: 0, tax: 0, local: 0, total: 0, exempt: true },
           rows: [['양도차익', u.won(gain)], ['결과', '양도가액 12억 원 이하 1세대 1주택이라 비과세 (낼 세금 0원)']],
-          notes: ['비과세여도 조정대상지역에서 취득한 집은 2년 이상 거주해야 하는 등 요건이 있어요. 요건은 홈택스 모의계산이나 세무서에서 한 번 더 확인해요.'],
+          notes: ['비과세여도 조정대상지역에서 취득한 집은 2년 이상 거주해야 하는 등 요건이 있어요. 요건은 홈택스 모의계산이나 세무서에서 한 번 더 확인해요.', JOINT],
         };
       }
 
@@ -73,6 +76,7 @@
       const tax = FirstLabCalc.util.floor10(r.tax);
       const local = FirstLabCalc.util.floor10(FirstLabCalc.util.floor(r.tax / d.local_ratio_div));
 
+      notes.push(JOINT);
       if (status === 'one') notes.push('12억 원을 넘는 1세대 1주택이라 양도차익 중 (양도가액 − 12억 원) ÷ 양도가액 비율만 과세했어요.');
       if (status === 'one' && live < d.lthd_one_house.min_live && hold >= 3) notes.push('거주기간이 2년 미만이라 장기보유특별공제는 1년에 2%(최대 30%) 표로 계산했어요.');
       if (status === 'one' && live < d.lthd_one_house.min_live) notes.push('취득할 때 조정대상지역이었던 주택은 2년 이상 거주해야 비과세가 돼요(소득세법 시행령 제154조). 거주 요건을 못 채웠다면 양도차익 전체가 과세될 수 있어요.');

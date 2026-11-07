@@ -493,5 +493,6 @@
       "base": 3997500000,
       "tax": 2532435000
     }
-  }
+  },
+  {"why": "공동명의 안내 (11/7 #1862 검수: 지분 7.5억만 넣으면 비과세로 잘못 나옴 → 12억 판정은 집 전체 값이라고 안내)", "input": {"asset": "house", "status": "one", "expense": 0, "live": 5, "sale": 750000000, "acquire": 500000000, "hold": 5}, "expect": {"exempt": true}, "notes_include": ["공동명의면 12억 원 판정은 집 전체 값"]}
 ]
