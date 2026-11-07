@@ -2319,6 +2319,15 @@ class ReviewRatesTest(unittest.TestCase):
         self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
 
 
+class LawAbsenceTableTest(unittest.TestCase):
+    """11/7 #1901 표 칸 '법률 근거 없음' — 다른 법률 전체는 확인 안 한 부정 단정."""
+
+    def test_table_cell(self):
+        from bot.condition_gate import law_absence
+        self.assertEqual(len(law_absence("<table><tr><td>재직 경찰 검사</td><td>법률 근거 없음</td></tr></table>")), 1)
+        self.assertEqual(law_absence("<table><tr><td>재직 경찰 검사</td><td>경찰공무원법에 조항 없음</td></tr></table>"), [])
+
+
 class AverageWageFloorTest(unittest.TestCase):
     """11/7 #1858: 평균임금 = 3개월 임금 ÷ 총일수만 쓰고 통상임금 보장(근로기준법 제2조②) 누락."""
 
