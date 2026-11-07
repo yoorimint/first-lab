@@ -6,6 +6,8 @@
  *   data/<id>.json  요율·금액, 기준일(basis_date), 출처(sources)  ← 해마다 바뀌는 값은 여기만 고친다
  *                   "scheduled": [{"from": "2027-01-01", "values": {키: 새 값}, "source": {"name", "url"}}]
  *                   = 이미 확정된 다음 값. 그날부터 화면이 자동으로 새 값을 쓴다 (util.dataOn) — 감시 세션 없이 연초를 넘기려고 (11/5)
+ *                   "history": [{"until": "2025-12-31", "values": {키: 옛 값}, "source": {...}}]
+ *                   = 그날까지 쓰던 옛 값. 사건 날짜(퇴사일 등)가 옛날이면 그때 값으로 계산 (11/7 #1699: 2025년 이직자에 2026년 상한)
  *                   "yearly_checked": 2027 = 연초에 바뀌는 값을 그 해 것으로 확인함 (해마다 안 바뀌는 계산기는 "yearly": false)
  *   tests/<id>.json 검증 사례 (공식 예시·법령 문구 기준)  → node tests/test_calculators.mjs 로 배포 전 검사
  * 본문에는 독립된 줄에 [firstlab_calc id="<id>"] (mu-plugins/first-lab-calculators.php 가 아래 div 로 바꿈)
@@ -62,7 +64,14 @@
         if (s.from > out.basis_date) out.basis_date = s.from;
         if (s.source) out.sources.unshift(s.source);
       }
+      // 옛 값: until 이 늦은 것부터 덮어써서, 그날을 포함하는 가장 이른(가까운) 시기 값이 남게 함
+      const past = (data.history || []).filter((h) => iso <= h.until).sort((a, b) => (a.until < b.until ? 1 : -1));
+      for (const h of past) {
+        Object.assign(out, h.values);
+        if (h.source) out.sources.unshift(h.source);
+      }
       delete out.scheduled;
+      delete out.history;
       Object.defineProperty(out, 'raw', { value: data, enumerable: false }); // 사건 날짜(퇴사일 등)로 다시 고를 때 (dataOn(d.raw, 날짜))
       return out;
     },

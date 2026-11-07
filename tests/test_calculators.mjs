@@ -89,6 +89,16 @@ for (const id of ids) {
       if (page.includes(oldText) && !page.includes(newText)) fail(id, `${where}: 페이지에 옛 값 '${oldText}' 만 있음 — '${newText}'(${sch.from}부터)도 적기`);
     }
   }
+  for (const [n, h] of (data.history || []).entries()) {
+    const where = `data.history[${n}]`;
+    if (!util.parseDate(h.until) || h.until >= data.basis_date) fail(id, `${where}.until 이 기준일 앞의 날짜(YYYY-MM-DD)가 아님`);
+    for (const key of Object.keys(h.values || {})) if (!(key in data)) fail(id, `${where}.values.${key}: data 에 없는 키 (오타면 옛 값이 안 쓰임)`);
+    if (!Object.keys(h.values || {}).length) fail(id, `${where}.values 가 비어 있음`);
+    if (!h.source || !h.source.name || !/^https:\/\//.test(h.source.url || '')) fail(id, `${where}.source 에 이름과 https 주소가 필요함`);
+    if (!(cases || []).some((c) => Object.values(c.input || {}).some((x) => typeof x === 'string' && util.parseDate(x) && x <= h.until))) {
+      fail(id, `${where}: ${h.until} 이전 날짜를 넣은 사례가 없음 (옛 값이 실제로 쓰이는지 확인)`);
+    }
+  }
   if (!Array.isArray(cases) || cases.length < MIN_CASES) fail(id, `검증 사례가 ${MIN_CASES}개 이상 필요함`);
   else if (cases.filter((c) => c.boundary === true).length < MIN_BOUNDARY) {
     fail(id, `기준선 사례("boundary": true)가 ${MIN_BOUNDARY}개 이상 필요함 — 공제액·합격 점수·면세점·세율 구간·상한/하한에 딱 맞는 값과 바로 아래/위 값을, 계산기 말고 법령대로 손으로 계산해 넣기`);

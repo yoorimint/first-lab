@@ -179,5 +179,10 @@
       "daily": 68480
     },
     "boundary": true
-  }
+  },
+  {"why": "2025.12.31 이직(시행령 부칙 제4조 종전 규정): 하한 10,030×8×0.8=64,192 > 97,826×0.6=58,695 → 64,192 × 150일", "today": "2026-11-07", "input": {"wage_3m": 9000000, "days_3m": 92, "hours": 8, "age50": "under50", "period": "1", "quit_date": "2025-12-31"}, "expect": {"min_daily": 64192, "calc_daily": 58695, "daily": 64192, "total": 9628800}, "boundary": true},
+  {"why": "2025.12.31 이직 고임금: 종전 상한 110,000×0.6=66,000 (2026년 상한 68,100 아님) × 270일", "today": "2026-11-07", "input": {"wage_3m": 15000000, "days_3m": 92, "hours": 8, "age50": "over50", "period": "4", "quit_date": "2025-12-31"}, "expect": {"calc_daily": 66000, "daily": 66000, "total": 17820000}, "boundary": true},
+  {"why": "2026.1.1 이직부터 새 상한 113,500×0.6=68,100", "today": "2026-11-07", "input": {"wage_3m": 15000000, "days_3m": 92, "hours": 8, "age50": "over50", "period": "4", "quit_date": "2026-01-01"}, "expect": {"calc_daily": 68100, "min_daily": 66048, "daily": 68100}, "boundary": true},
+  {"why": "주 15시간·주휴 3시간 → (15+3)÷48×8=3시간 (시행규칙 제91조의2①2): 하한 10,320×3×0.8=24,768", "input": {"wage_3m": 1000000, "days_3m": 92, "hours": 3, "age50": "under50", "period": "0"}, "expect": {"min_daily": 24768, "daily": 24768}},
+  {"why": "2025년 전 이직은 그때 상한·최저임금 값이 없어 계산 안 함", "input": {"wage_3m": 9000000, "days_3m": 92, "hours": 8, "age50": "under50", "period": "1", "quit_date": "2024-12-31"}, "expect_error": true}
 ]
