@@ -2250,6 +2250,17 @@ class HolidayAttendanceTest(unittest.TestCase):
         self.assertEqual(holiday_attendance("시급 계산법", "<p>시급 계산</p>"), [])
 
 
+class LaborDayExceptionTest(unittest.TestCase):
+    """11/7 #1607: '무급휴무일과 겹친 공휴일은 유급휴일수당 없음' — 노동절은 예외 (노동절 제정에 관한 법률, 고용노동부 상담)."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import labor_day_exception
+        bad = "<p>무급휴무일과 공휴일이 겹치면 따로 정한 게 없는 한 유급휴일수당은 없어요.</p>"
+        self.assertEqual(len(labor_day_exception(bad)), 1)
+        good = "<p>무급휴무일과 공휴일이 겹치면 유급휴일수당은 없어요. 노동절(5월 1일)은 예외예요.</p>"
+        self.assertEqual(labor_day_exception(good), [])
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

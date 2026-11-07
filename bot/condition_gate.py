@@ -1016,3 +1016,17 @@ def holiday_attendance(excerpt: str, body_html: str) -> list[str]:
     if "주휴" in lead and re.search(r"15\s*시간", lead) and _ATTEND.search(body) and not _ATTEND.search(lead):
         return ["요약·첫 문단이 주휴수당 요건을 '주 15시간 이상'만 적음 — 본문처럼 '그 주 소정근로일 개근'도 넣기 (시행령 제30조①)"]
     return []
+
+
+# 무급휴무일과 겹친 공휴일엔 유급휴일수당 없음 — 노동절(5월 1일)은 법률로 날짜를 정한 유급휴일이라 예외 (11/7 #1607,
+# 고용노동부 상담 '휴무일과 근로자의 날이 중복되는 경우라면 … 유급휴일수당 및 휴일근로가산임금을 지급'; 2027.5.1 토요일)
+_NO_HOLIDAY_PAY = re.compile(r"무급\s*휴무일[^.]{0,40}공휴일|공휴일[^.]{0,40}무급\s*휴무일")
+
+
+def labor_day_exception(body_html: str) -> list[str]:
+    out = []
+    for block in re.findall(r"<(p|li)[^>]*>(.*?)</\1>", body_html or "", re.S):
+        text = _plain(block[1])
+        if _NO_HOLIDAY_PAY.search(text) and re.search(r"없|더하지 않|안 받|받지 않", text) and not re.search(r"노동절|근로자의 ?날", text):
+            out.append(f"무급휴무일과 겹친 공휴일 규칙에 노동절 예외가 없음: '{text[:50]}' — 노동절(5월 1일)은 무급휴무일과 겹쳐도 시급제·일급제 유급휴일수당")
+    return out[:2]
