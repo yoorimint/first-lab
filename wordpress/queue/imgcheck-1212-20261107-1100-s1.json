@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "slot": 1,
+ "post_id": 1212,
+ "replace": [
+  {
+   "old": "ai-6f6d21bfc3",
+   "prompt": "a red fire truck parked inside a clean fire station garage with plain red helmets on a bench, soft daylight, no lettering",
+   "alt": "소방서 차고에 서 있는 빨간 소방차와 헬멧",
+   "why": "헬멧 가리개에 'FIRET'·'FIRREI' 같은 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

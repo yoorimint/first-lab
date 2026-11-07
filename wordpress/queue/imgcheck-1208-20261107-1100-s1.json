@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "slot": 1,
+ "post_id": 1208,
+ "replace": [
+  {
+   "old": "ai-a22fc419a6",
+   "prompt": "two people shaking hands across a clean wooden table in a bright small shop, seen from the side at chest height, no faces visible",
+   "alt": "밝은 가게 안 나무 탁자 위에서 악수하는 두 사람의 손",
+   "why": "왼쪽 위 간판에 엉터리 글자가 보이고 빵집 대체 텍스트와 장면(주방)이 다름"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
