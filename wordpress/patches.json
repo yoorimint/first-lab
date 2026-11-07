@@ -6467,5 +6467,23 @@
     "find": "기업마당 2026년 소상공인 정책자금 융자사업 변경 공고",
     "replace_paragraph": "<a href=\"https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000124909\" target=\"_blank\" rel=\"noopener\">기업마당 2026년 소상공인 정책자금 융자사업 4차 변경 공고(2026년 7월 29일)</a>",
     "prevention": "review_only:링크 공고 차수 표시 — 공고문 대조로만"
+  },
+  {
+    "post": 1680,
+    "type": "missing_condition",
+    "tag": "p",
+    "why": "근로자퇴직급여 보장법 제19조②(DC형: 제17조①④⑤ 준용, 법제처 원문)·시행령 제9조2호 — 담보대출 상환 예외는 DB·DC 모두",
+    "find": "회사가 퇴직연금(DB형)에 가입했어도 IRP로 받는 원칙은 같고,",
+    "replace_paragraph": "아래 경우가 아니면 IRP 계좌로 받는 게 원칙이에요. 회사가 퇴직연금(DB형·DC형)에 가입했어도 IRP로 받는 원칙은 같고, 담보대출 상환 예외가 하나 더 있어요.",
+    "prevention": "review_only:준용 조문으로 넓어지는 범위 누락 — 조문 대조로만"
+  },
+  {
+    "post": 1680,
+    "type": "missing_condition",
+    "tag": "tr",
+    "why": "근로자퇴직급여 보장법 제19조②(DC형: 제17조①④⑤ 준용, 법제처 원문)·시행령 제9조2호 — 담보대출 상환 예외는 DB·DC 모두",
+    "find": "<td>담보대출 상환 (DB형)</td>",
+    "replace_paragraph": "<td>담보대출 상환 (퇴직연금 DB·DC형)</td><td>퇴직연금을 담보로 받은 대출을 갚을 때 (갚을 금액까지만)</td>",
+    "prevention": "review_only:준용 조문으로 넓어지는 범위 누락 — 조문 대조로만"
   }
 ]
