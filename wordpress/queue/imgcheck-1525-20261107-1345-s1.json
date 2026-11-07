@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1525,
+ "replace": [
+  {
+   "old": "ai-37e1dd7918",
+   "prompt": "an early morning construction site with steel beams, a plain unmarked excavator and safety cones under soft light",
+   "alt": "이른 아침 철골과 굴착기가 있는 조용한 건설 현장",
+   "why": "굴착기에 엉터리 로고 글자(CORAT)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

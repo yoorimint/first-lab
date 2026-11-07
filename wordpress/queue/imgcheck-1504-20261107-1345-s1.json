@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1504,
+ "replace": [
+  {
+   "old": "ai-4091baa2be",
+   "prompt": "a bright accessible office lobby with a gentle wheelchair ramp, wide glass doors, potted plants and soft daylight, no signs",
+   "alt": "경사로와 넓은 유리문이 있는 밝은 사무실 로비",
+   "why": "비상구 표시에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
