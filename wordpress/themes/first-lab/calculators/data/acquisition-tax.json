@@ -1,0 +1,15 @@
+{
+  "basis_date": "2026-11-07", "yearly_checked": 2026,
+  "sources": [
+    {"name": "국가법령정보센터 지방세법 (제11조 주택 세율, 제13조의2 다주택 중과, 제151조 지방교육세, 제20조 신고·납부)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국가법령정보센터 지방세법 시행령 (제28조의2 중과 제외 주택, 제28조의4 주택 수, 제28조의5 일시적 2주택)", "url": "https://www.law.go.kr/법령/지방세법시행령"},
+    {"name": "국가법령정보센터 농어촌특별세법 (제4조 비과세, 제5조 세율)", "url": "https://www.law.go.kr/법령/농어촌특별세법"},
+    {"name": "국가법령정보센터 지방세특례제한법 (제36조의3 생애최초 주택 구입 감면)", "url": "https://www.law.go.kr/법령/지방세특례제한법"}
+  ],
+  "won10_keys": ["tax", "edu", "rural", "total"],
+  "general": {"low_max": 600000000, "low_rate": 0.01, "high_min": 900000000, "high_rate": 0.03, "edu_share": 0.1, "rural_rate": 0.002},
+  "heavy8": {"rate": 0.08, "edu_rate": 0.004, "rural_rate": 0.006},
+  "heavy12": {"rate": 0.12, "edu_rate": 0.004, "rural_rate": 0.01},
+  "exempt_low": {"capital": "1억 원", "other": "2억 원"},
+  "first_home": {"max_price": 1200000000, "relief": "200만 원", "relief_small": "300만 원"}
+}

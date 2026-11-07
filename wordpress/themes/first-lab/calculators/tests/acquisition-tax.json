@@ -1,0 +1,240 @@
+[
+  {
+    "why": "1주택 5억 85㎡ 이하: 제11조①8호가 1% = 500만 원, 지방교육세 1%×50%×20% = 0.1% 50만 원, 농특세 비과세(제4조 11호)",
+    "input": {
+      "price": 500000000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 10000,
+      "tax": 5000000,
+      "edu": 500000,
+      "rural": 0,
+      "total": 5500000
+    },
+    "notes_include": [
+      "생애최초"
+    ]
+  },
+  {
+    "why": "1주택 딱 6억(경계): 6억 이하 1% → 600만 원 + 교육세 60만 원",
+    "input": {
+      "price": 600000000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 10000,
+      "tax": 6000000,
+      "edu": 600000,
+      "rural": 0,
+      "total": 6600000
+    },
+    "boundary": true
+  },
+  {
+    "why": "1주택 6억 1만 원(경계 바로 위): 세율 (6.0001억×2/3억−3)/100 = 0.0100006… → 넷째자리 0.0100 = 1.00%",
+    "input": {
+      "price": 600010000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 10000,
+      "tax": 6000100,
+      "edu": 600010,
+      "rural": 0,
+      "total": 6600110
+    },
+    "boundary": true
+  },
+  {
+    "why": "1주택 600,750,000원(반올림 경계): (2×6.0075억−9억)/3억 = 0.0100500 → 넷째자리 반올림 0.0101 = 1.01%",
+    "input": {
+      "price": 600750000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 10100,
+      "tax": 6067570,
+      "edu": 606750,
+      "rural": 0,
+      "total": 6674320
+    },
+    "boundary": true
+  },
+  {
+    "why": "1주택 7억 85㎡ 초과: 세율 0.016666… → 0.0167(1.67%), 교육세 1.67%×50%×20%, 농특세 0.2%(농특세법 제5조①6호 2%×10%)",
+    "input": {
+      "price": 700000000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "large"
+    },
+    "expect": {
+      "rate4": 16700,
+      "tax": 11690000,
+      "edu": 1169000,
+      "rural": 1400000,
+      "total": 14259000
+    }
+  },
+  {
+    "why": "1주택 딱 9억(경계): 계산식 9×2/3−3 = 3% → 2,700만 원",
+    "input": {
+      "price": 900000000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 30000,
+      "tax": 27000000,
+      "edu": 2700000,
+      "rural": 0,
+      "total": 29700000
+    },
+    "boundary": true
+  },
+  {
+    "why": "1주택 9억 1만 원(경계 바로 위): 9억 초과 3%",
+    "input": {
+      "price": 900010000,
+      "homes": "1",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 30000,
+      "tax": 27000300,
+      "edu": 2700030,
+      "rural": 0,
+      "total": 29700330
+    },
+    "boundary": true
+  },
+  {
+    "why": "조정대상지역 2주택 8억, 일시적 아님: 제13조의2①2호 4%+2%×200% = 8%, 교육세 (4%−2%)×20% = 0.4%",
+    "input": {
+      "price": 800000000,
+      "homes": "2",
+      "adjusted": "yes",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 80000,
+      "tax": 64000000,
+      "edu": 3200000,
+      "rural": 0,
+      "total": 67200000
+    },
+    "notes_include": [
+      "중과하지 않아요"
+    ]
+  },
+  {
+    "why": "조정대상지역 2주택 8억, 일시적 2주택: 시행령 제28조의5 → 일반 세율 0.023333… → 2.33%",
+    "input": {
+      "price": 800000000,
+      "homes": "2",
+      "adjusted": "yes",
+      "temporary": "yes",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 23300,
+      "tax": 18640000,
+      "edu": 1864000,
+      "rural": 0,
+      "total": 20504000
+    },
+    "notes_include": [
+      "차액을 추징해요"
+    ]
+  },
+  {
+    "why": "비조정 2주택 5억: 중과 아님 1%",
+    "input": {
+      "price": 500000000,
+      "homes": "2",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 10000,
+      "tax": 5000000,
+      "edu": 500000,
+      "rural": 0,
+      "total": 5500000
+    }
+  },
+  {
+    "why": "비조정 3주택 5억 85㎡ 초과: 8%, 농특세 (2%+4%)×10% = 0.6%",
+    "input": {
+      "price": 500000000,
+      "homes": "3",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "large"
+    },
+    "expect": {
+      "rate4": 80000,
+      "tax": 40000000,
+      "edu": 2000000,
+      "rural": 3000000,
+      "total": 45000000
+    }
+  },
+  {
+    "why": "조정 3주택 10억 85㎡ 초과: 제13조의2①3호 4%+2%×400% = 12%, 교육세 0.4%, 농특세 (2%+8%)×10% = 1%",
+    "input": {
+      "price": 1000000000,
+      "homes": "3",
+      "adjusted": "yes",
+      "temporary": "no",
+      "area": "large"
+    },
+    "expect": {
+      "rate4": 120000,
+      "tax": 120000000,
+      "edu": 4000000,
+      "rural": 10000000,
+      "total": 134000000
+    },
+    "notes_exclude": [
+      "생애최초"
+    ]
+  },
+  {
+    "why": "비조정 4주택 3억: 12%",
+    "input": {
+      "price": 300000000,
+      "homes": "4",
+      "adjusted": "no",
+      "temporary": "no",
+      "area": "small"
+    },
+    "expect": {
+      "rate4": 120000,
+      "tax": 36000000,
+      "edu": 1200000,
+      "rural": 0,
+      "total": 37200000
+    }
+  }
+]
