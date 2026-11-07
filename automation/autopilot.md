@@ -52,3 +52,4 @@
 - 월 1회 중복 점검(같은 질문에 답하는 글 쌍 → 합치고 301) — 글이 수백 편을 넘을 때부터, 12/5 전에 틀만.
 - 근거 조문에 시행 예정 개정(law_api.upcoming_changes, 근거 대조 '[시행 예정 개정]')이 있는데 글에 그 날짜가 없으면 관문으로 막기 (11/5 #842 직권신청 2027.1.21 개정 누락) — 오탐 시험 뒤.
 
+- [ ] (11/7, 기한 11/14 — tests/test_calculators.mjs WON10_PENDING) 세금 계산기 6개(capital-gains-tax·car-transfer·income-tax·property-holding-tax·pension-tax-credit·vat)의 낼 세액 10원 미만 끝수 처리 확인 → won10_keys 또는 won10 이유. 지방세(취득세·지방소득세)는 근거 법령 따로 확인. regional-health-insurance(지역 건강보험료)도 1원 단위 — 공단 끝수 처리 근거 확인 뒤 같이.
