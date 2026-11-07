@@ -227,5 +227,9 @@
    "extra_ltc": 0,
    "my_total": 122841
   }
- }
+ },
+ {"why": "하한 경계: 280,667×3.595%=10,089.98 → 10,080 (하한과 같음) (11/7 외부 검수: 281,000원은 진짜 경계가 아님)", "input": {"pay": 280667, "interest": 0, "income_full": 0, "income_half": 0}, "expect": {"health": 10080}, "boundary": true},
+ {"why": "처음으로 하한 위: 280,668×3.595%=10,090.01 → 10,090 (11/7 외부 검수: 281,000원은 진짜 경계가 아님)", "input": {"pay": 280668, "interest": 0, "income_full": 0, "income_half": 0}, "expect": {"health": 10090}, "boundary": true},
+ {"why": "상한 바로 아래: 127,725,730×3.595% → 4,591,730 (11/7 외부 검수: 281,000원은 진짜 경계가 아님)", "input": {"pay": 127725730, "interest": 0, "income_full": 0, "income_half": 0}, "expect": {"health": 4591730}, "boundary": true},
+ {"why": "상한: 127,725,731원부터 본인 4,591,740원 (11/7 외부 검수: 281,000원은 진짜 경계가 아님)", "input": {"pay": 127725731, "interest": 0, "income_full": 0, "income_half": 0}, "expect": {"health": 4591740}, "boundary": true}
 ]

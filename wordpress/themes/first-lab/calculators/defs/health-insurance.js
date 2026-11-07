@@ -57,9 +57,9 @@
         rows.push(['추가 장기요양보험료', u.won(extraLtc)]);
         rows.push(['내가 내는 한 달 합계', u.won(myTotal)]);
       }
-      const notes = ['건강보험료는 10원 미만, 장기요양보험료는 원 미만을 버렸어요. 급여명세서와 끝자리가 몇십 원 다를 수 있어요.'];
+      const notes = ['건강보험료는 10원 미만, 장기요양보험료는 원 미만을 버렸어요. 급여명세서와 끝자리가 몇 원 다를 수 있어요.', '휴직자·섬 지역 등 보험료 경감, 사립학교 교원의 부담 비율(본인 50%·학교 30%·국가 20%)은 반영하지 않았어요.'];
       if (health === d.health_employee_max) notes.push(`본인 몫 건강보험료는 한 달 ${u.won(d.health_employee_max)}을 넘지 않아요.`);
-      if (health === d.health_employee_min) notes.push(`본인 몫 건강보험료는 최저 ${u.won(d.health_employee_min)}이에요.`);
+      if (health === d.health_employee_min) notes.push(`본인 몫 건강보험료는 하한 ${u.won(d.health_employee_min)}으로 매겨요 (경감 대상이면 이보다 적을 수 있어요).`);
       if (interest > 0 && interestCounted === 0) notes.push('이자·배당소득이 1년 1,000만 원 이하라 계산에서 뺐어요.');
       if (otherTotal > 0 && otherTotal <= d.other_income_deduction) notes.push('월급 외 소득이 1년 2,000만 원 이하라 추가 보험료가 없어요.');
       if (extra > 0) notes.push('추가 보험료는 회사와 나누지 않고 본인이 전부 내요. 1~10월은 전전년도, 11~12월은 전년도 소득 자료로 매겨요 (연금소득은 1~10월도 전년도 자료).');
