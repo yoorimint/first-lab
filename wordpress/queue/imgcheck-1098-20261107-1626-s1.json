@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1098,
+ "replace": [
+  {
+   "old": "ai-da9e40fc4d",
+   "prompt": "side view of a white hatchback car standing on steel test rollers in a bright, clean vehicle inspection bay, soft daylight, no badges or emblems visible",
+   "alt": "밝은 검사장 롤러 위에 선 흰색 해치백 옆모습",
+   "why": "앞면에 로고처럼 보이는 엉터리 엠블럼이 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
