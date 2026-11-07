@@ -99,7 +99,8 @@
       const giftLimit = base > 0 && taxable > d.limit_gift_over ? FirstLabCalc.util.floor((tax * Math.min(giftBase, base)) / base) : 0;
       const giftCredit = Math.min(num(v.gift_tax_paid), giftLimit);
       const credit = v.on_time !== 'yes' ? 0 : FirstLabCalc.util.floor(((tax - giftCredit) * d.filing_credit_pct) / 100);
-      const pay = tax - giftCredit - credit;
+      // 낼 세액은 10원 미만 버림 (국고금관리법 제47조①, 11/7 #1754 검수: 1원 단위로 보여 줌)
+      const pay = FirstLabCalc.util.floor((tax - giftCredit - credit) / 10) * 10;
 
       const rows = [
         ['장례비 공제', u.won(funeral)],

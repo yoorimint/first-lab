@@ -32,6 +32,8 @@ const ids = fs.readdirSync(path.join(DIR, 'defs')).filter((f) => f.endsWith('.js
 
 // 우리 사이트 글·페이지 주소 (/%postname%/ — 글 주소 = 키워드, publish_queue.py)
 const QUEUE = path.join(ROOT, 'wordpress/queue');
+// 10원 끝수 처리를 아직 확인 못 한 세금 계산기 (11/7 발견) — 이 날짜까지 확인해 won10_keys 또는 won10 이유를 넣기
+const WON10_PENDING = { until: '2026-11-14', ids: ['capital-gains-tax', 'car-transfer', 'income-tax', 'property-holding-tax', 'pension-tax-credit', 'vat'] };
 const PAGES = path.join(ROOT, 'wordpress/pages');
 const sitePaths = new Set([
   ...fs.readdirSync(QUEUE).filter((f) => f.endsWith('.json')).map((f) => readJson(path.join(QUEUE, f)).keyword).filter(Boolean),
@@ -87,6 +89,13 @@ for (const id of ids) {
     const page = fs.existsSync(pageFile) ? fs.readFileSync(pageFile, 'utf8') : '';
     for (const [oldText, newText] of sch.texts || []) {
       if (page.includes(oldText) && !page.includes(newText)) fail(id, `${where}: 페이지에 옛 값 '${oldText}' 만 있음 — '${newText}'(${sch.from}부터)도 적기`);
+    }
+  }
+  // 세금 계산기는 낼 세액의 10원 미만 끝수 처리를 밝혀야 함 (11/7 #1754 상속세: won10_keys 가 없어 1원 단위로 보여 줌)
+  // won10_keys(버리는 값) 또는 "won10": "<10원 버림을 안 하는 이유>" 중 하나. 아직 확인 못 한 계산기는 WON10_PENDING (기한 지나면 실패)
+  if (/-tax$/.test(id) && !(data.won10_keys || []).length && typeof data.won10 !== 'string') {
+    if (!(WON10_PENDING.ids.includes(id) && new Date().toISOString().slice(0, 10) <= WON10_PENDING.until)) {
+      fail(id, 'data 에 "won10_keys": [낼 세액 키] 또는 "won10": "<끝수 처리 안 하는 이유>" 가 필요함 (국고금관리법 제47조①)');
     }
   }
   for (const [n, h] of (data.history || []).entries()) {
