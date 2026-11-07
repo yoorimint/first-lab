@@ -119,3 +119,4 @@ date,post,fixes,types
 2026-11-07,1481,3,missing_condition:2 unverified:1
 2026-11-07,1483,6,missing_condition:1 wrong_fact:5
 2026-11-07,1495,0,
+2026-11-07,1504,9,missing_condition:8 wrong_fact:1
