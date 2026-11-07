@@ -2110,6 +2110,35 @@ class CheckedLineTest(unittest.TestCase):
         self.assertEqual(self.run_php({}, ["2026-11-07"]), "")                                      # 기록 없으면 줄 없음
         self.assertEqual(self.run_php({"found": [{"urls": ["https://blog.naver.com/x"]}]}, []), "")   # 공식 출처 아님
 
+    def test_reviewed_sites_included(self):
+        """11/7 운영자 '고용노동부도 확인됐으면 같이 넣어주면 되는 거 아냐?': 검수에서 맞음으로 확인한 공식 사이트도 표시."""
+        from bot import source_check
+        review = [{"claim": "a", "verdict": "맞음", "action": "유지", "urls": ["https://1350.moel.go.kr/x", "https://www.law.go.kr/법령/근로기준법/제55조"]},
+                  {"claim": "b", "verdict": "틀림", "action": "삭제", "urls": ["https://www.nts.go.kr/y"]},
+                  {"claim": "c", "verdict": "맞음", "action": "유지", "urls": ["https://blog.naver.com/z"]}]
+        self.assertEqual(source_check.reviewed_hosts(review), ["1350.moel.go.kr"])   # 틀림·비공식·법령(따로 laws)은 뺌
+        rec = {"laws": [["https://www.law.go.kr/법령/근로기준법", "제55조"]], "reviewed": ["1350.moel.go.kr"]}
+        self.assertEqual(self.run_php(rec, ["2026-11-07"]),
+                         "이 글은 법제처 법령 원문과 고용노동부 공식 페이지로 확인했어요 · 마지막 확인 2026년 11월 7일")
+
+    def test_backfill_old_records_once(self):
+        from bot import source_check
+        meta = {"5": json.dumps({"laws": [], "found": []})}
+
+        def wp(*a):
+            if a[0] == "eval":
+                return json.dumps([{"id": 5, "slug": "주휴수당뜻"}] if "reviewed" not in meta["5"] else [])
+            if a[:3] == ("post", "meta", "get"):
+                return meta[a[3]]
+            if a[:3] == ("post", "meta", "update"):
+                meta[a[3]] = a[5]
+            return ""
+        review = [{"claim": "a", "verdict": "맞음", "action": "유지", "urls": ["https://www.moel.go.kr/x"]}]
+        msg = source_check.backfill_reviewed(wp=wp, review_of=lambda slug: review if slug == "주휴수당뜻" else [])
+        self.assertIn("5(1)", msg)
+        self.assertEqual(json.loads(meta["5"])["reviewed"], ["moel.go.kr"])
+        self.assertIsNone(source_check.backfill_reviewed(wp=wp, review_of=lambda s: review))   # 다 채우면 할 일 없음
+
     def test_no_ai_wording(self):
         src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-author-box.php").read_text(encoding="utf-8")
         self.assertNotIn("AI", src.split("*/", 1)[1])   # 운영자: AI 사용 문구는 빼기

@@ -4,7 +4,7 @@
  * Description: 글 본문 끝에 운영 방식·마지막 업데이트 날짜·오류 제보 안내를 표시 (누가·어떻게 쓴 글인지 밝혀 신뢰도 보강).
  *
  * 11/7 운영자 '확인 방식 한 줄 — 하자, AI 사용은 빼고': 서버 근거 대조 기록(_firstlab_source_check, bot/source_check.py)에서
- * 실제로 확인한 근거(법령·기관 페이지)와 마지막 확인일(검수 통과·갱신·공개 중 가장 늦은 날)로
+ * 검수에서 확인한 근거(법령 laws·기관 사이트 reviewed)와 서버가 숫자를 확인한 페이지(found), 그리고 마지막 확인일(검수 통과·갱신·공개 중 가장 늦은 날)로
  * "이 글은 법제처 법령 원문과 고용노동부 공식 페이지로 확인했어요 · 마지막 확인 2026년 11월 7일" 을 붙인다. 기록이 없으면 이 줄은 없음.
  */
 
@@ -45,6 +45,9 @@ function firstlab_checked_line( array $record, array $dates ): string {
 	$urls = array();
 	foreach ( (array) ( $record['laws'] ?? array() ) as $law ) {
 		$urls[] = (string) ( is_array( $law ) ? ( $law[0] ?? '' ) : $law );
+	}
+	foreach ( (array) ( $record['reviewed'] ?? array() ) as $host ) { // 검수에서 확인한 공식 사이트 (bot/source_check.reviewed_hosts)
+		$urls[] = 'https://' . (string) $host;
 	}
 	foreach ( (array) ( $record['found'] ?? array() ) as $item ) {
 		foreach ( (array) ( $item['urls'] ?? array() ) as $u ) {

@@ -348,7 +348,53 @@ def check(review: list[dict] | None, fetcher=fetch) -> dict:
     laws = sorted({(law_page(str(u)), art) for item in review or [] if _ok(item) for u in item.get("urls", [])
                    for art in [claim_article(item, str(u))] if art})
     # found·laws: 공개 직전 확인(bot/freshness.py)이 '쓸 때 확인된 숫자가 아직 페이지에 있는지·근거 조문이 그 뒤 바뀌었는지' 다시 본다
-    return {"counts": counts, "claims": [c for c in claims if c["status"] != FOUND], "found": found, "laws": [list(x) for x in laws]}
+    return {"counts": counts, "claims": [c for c in claims if c["status"] != FOUND], "found": found, "laws": [list(x) for x in laws],
+            "reviewed": reviewed_hosts(review)}
+
+
+def reviewed_hosts(review: list[dict] | None) -> list[str]:
+    """검수에서 '맞음'으로 확인한 주장의 공식 근거 사이트 (법령 제외, www. 뺀 주소) — 글 끝 '이 글은 … 로 확인했어요' 줄
+    (wordpress/mu-plugins/first-lab-author-box.php, 11/7 운영자 '고용노동부도 확인됐으면 같이 넣어주면 되는 거 아냐?')."""
+    out = []
+    for item in review or []:
+        if not _ok(item):
+            continue
+        for u in item.get("urls", []):
+            host = (urllib.parse.urlparse(str(u).strip()).hostname or "").lower()
+            host = host[4:] if host.startswith("www.") else host
+            if host and "law.go.kr" not in host and is_official(str(u)) and host not in out:
+                out.append(host)
+    return out
+
+
+_NO_REVIEWED_PHP = r"""
+$out = array();
+$ids = get_posts( array( 'post_type' => 'post', 'post_status' => array( 'publish', 'draft' ), 'numberposts' => -1, 'fields' => 'ids',
+  'meta_key' => '_firstlab_source_check' ) );
+foreach ( $ids as $id ) {
+  $r = json_decode( (string) get_post_meta( $id, '_firstlab_source_check', true ), true );
+  if ( is_array( $r ) && ! array_key_exists( 'reviewed', $r ) ) { $out[] = array( 'id' => $id, 'slug' => urldecode( get_post_field( 'post_name', $id ) ) ); }
+  if ( count( $out ) >= BATCH ) { break; }
+}
+echo wp_json_encode( $out );
+"""
+
+
+def backfill_reviewed(batch: int = 10, wp=None, review_of=None) -> str | None:
+    """예전 근거 대조 기록에 'reviewed'(검수로 확인한 공식 사이트)가 없으면 저장소 큐 파일의 검수 기록으로 채운다.
+    없는 글이 없어지면 아무것도 안 함 (기록이 없어도 빈 목록을 넣어 같은 글을 다시 안 봄)."""
+    if wp is None:
+        from .settings import wp_cli as wp
+    if review_of is None:
+        from .freshness import _review_from_queue as review_of
+    todo = json.loads(wp("eval", _NO_REVIEWED_PHP.replace("BATCH", str(int(batch)))) or "[]")
+    done = []
+    for row in todo if isinstance(todo, list) else []:
+        record = json.loads(wp("post", "meta", "get", str(row["id"]), META) or "{}")
+        record["reviewed"] = reviewed_hosts(review_of(str(row.get("slug", ""))))
+        wp("post", "meta", "update", str(row["id"]), META, json.dumps(record, ensure_ascii=False))
+        done.append(f"{row['id']}({len(record['reviewed'])})")
+    return f"검수 확인 사이트 채움: {', '.join(done)}" if done else None
 
 
 RECENT_DAYS = 365  # 이 기간 안에 개정·시행된 조문은 안내 페이지가 아직 옛 내용일 수 있음 (11/5 #512 납부지연 가산세 2026.7.1 개정)
