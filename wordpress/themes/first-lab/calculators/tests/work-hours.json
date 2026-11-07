@@ -345,5 +345,16 @@
     "notes_include": [
       "18세 미만은 밤 10시~아침 6시"
     ]
+  },
+  {
+    "why": "22시→7시(밤 밖은 6~7시 60분뿐)인데 휴게 120분·밤 휴게 0분 — 밤 밖에서 120분을 쉴 수 없음 → 입력 오류 (11/7 외부 검수)",
+    "input": {"start_h": 22, "start_m": 0, "end_h": 7, "end_m": 0, "break_min": 120, "night_break_min": 0, "days": 5, "size": "five", "age": "adult"},
+    "expect_error": true
+  },
+  {
+    "why": "9시~19시 주 7일: 휴일 근로는 가산수당에서 휴일근로로 따로 — 안내 문장 (제56조②), 1주 12시간 한도에는 포함 (제2조 '1주'는 휴일 포함 7일)",
+    "input": {"start_h": 9, "start_m": 0, "end_h": 19, "end_m": 0, "break_min": 60, "night_break_min": 0, "days": 7, "size": "five", "age": "adult"},
+    "expect": {"work_hours": 9, "week_hours": 63},
+    "notes_include": ["휴일을 뺀 일수로", "1주 12시간 한도에는 들어가요"]
   }
 ]

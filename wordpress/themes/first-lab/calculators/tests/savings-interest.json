@@ -189,6 +189,9 @@
       "net": 339000,
       "maturity": 10339000
     },
+    "notes_include": [
+      "조합 예탁금"
+    ],
     "notes_exclude": [
       "2,000만 원을 넘으면"
     ]

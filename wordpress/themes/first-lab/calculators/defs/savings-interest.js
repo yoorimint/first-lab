@@ -74,6 +74,7 @@
       if (product === 'installment') notes.push('적금은 나중에 넣은 돈일수록 이자가 붙는 기간이 짧아서, 같은 이율의 예금(전액을 처음부터 맡김)보다 이자가 적어요.');
       if (compound === 'monthly') notes.push('월복리는 매달 생긴 이자를 원금에 더해 다음 달 이자를 계산한 값이에요. 상품마다 복리 주기가 다를 수 있어요.');
       if (v.tax !== 'none') notes.push('이자·배당소득이 한 해 2,000만 원을 넘으면 넘는 부분은 다음 해 5월 종합소득세 신고 때 다른 소득과 합쳐 계산해요.');
+      if (v.tax === 'none') notes.push('농협·수협·신협·새마을금고 같은 조합 예탁금은 비과세로 안내돼도 농어촌특별세가 붙거나, 2026년부터 가입한 예탁금은 조합원·소득 기준에 따라 5%(2027년 가입분부터 9%)를 뗄 수 있어요(조세특례제한법 제89조의3). 가입한 곳에서 적용 세율을 확인하세요.');
       return { values: { principal, interest, income_tax: incomeTax, local_tax: localTax, tax, net, maturity: principal + net }, rows, notes };
     },
   });
