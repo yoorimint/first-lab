@@ -405,14 +405,14 @@ class HoldFixTest(unittest.TestCase):
 
 
 class ContinuousTest(unittest.TestCase):
-    def run_step(self, state, minute, on=True, fire_ok=True, writers=1):
+    def run_step(self, state, minute, on=True, fire_ok=True, writers=1, writer2=True):
         from datetime import datetime
         from zoneinfo import ZoneInfo
         from bot import run
         now = datetime(2026, 11, 5, 10, minute, tzinfo=ZoneInfo("Asia/Seoul"))
         settings = BotSettings.from_option({}, {})
         with mock.patch.object(run, "WRITERS", writers), mock.patch.object(run, "continuous_on", return_value=on), \
-                mock.patch.object(run, "set_continuous") as stop, \
+                mock.patch.object(run, "writer2_on", return_value=writer2), mock.patch.object(run, "set_continuous") as stop, \
                 mock.patch.object(run, "fire_routine", return_value=fire_ok) as fire, \
                 mock.patch.object(run, "save_state"):
             run.continuous_step(state, settings, now)
@@ -446,6 +446,17 @@ class ContinuousTest(unittest.TestCase):
                "continuous": {"fired_at": "2026-11-05 10:00", "fails": 0, "count": 5, "seen": "2026-11-05 09:40 직접 작성 글: x"}}
         fire, _ = self.run_step(old, 5, writers=2)                                          # 배포 직후: 1번은 아직 쓰는 중
         self.assertEqual([c.args[3] for c in fire.call_args_list], ["slot-2"])
+
+    def test_writer2_off_runs_slot1_only(self):
+        """11/7 운영자 '설정에 2번 작성자 온오프 버튼': 끄면 1번 칸만 시작, 2번 칸 기록은 지움."""
+        state = {"log": [], "continuous_2": {"fired_at": "2026-11-05 09:50", "fails": 0, "count": 3, "seen": ""}}
+        fire, _ = self.run_step(state, 0, writers=2, writer2=False)
+        self.assertEqual([c.args[3] for c in fire.call_args_list], ["slot-1"])
+        self.assertNotIn("continuous_2", state)
+        api = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("firstlab_writer2", api)            # 1번 칸이 후보 전부를 받음
+        page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
+        self.assertIn("firstlab_bot_writer2", page)       # 설정 페이지 버튼
 
     def test_waits_for_fresh_candidates(self):
         """11/6 09:45: 끝 표시와 같은 배포의 후보 제외가 후보 목록에 반영되기 전에 다음 편이 시작돼 옛 후보(방금 뺀 것)를 받음."""

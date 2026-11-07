@@ -176,3 +176,13 @@ def continuous_on() -> bool:
 
 def set_continuous(on: bool) -> None:
     wp_cli("option", "update", CONTINUOUS_OPTION, "1" if on else "0")
+
+
+WRITER2_OPTION = "firstlab_writer2"  # 설정 페이지 '2번 작성자' 켜짐(1)·꺼짐(0) — 11/7 운영자. 값이 없으면 켜짐(예전처럼 둘)
+
+
+def writer2_on() -> bool:
+    try:
+        return wp_cli("option", "get", WRITER2_OPTION).strip() != "0"
+    except (subprocess.CalledProcessError, OSError):
+        return True

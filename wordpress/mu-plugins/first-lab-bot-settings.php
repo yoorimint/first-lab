@@ -221,6 +221,22 @@ add_action(
 	}
 );
 
+const FIRSTLAB_BOT_WRITER2 = 'firstlab_writer2'; // 2번 작성자 켜짐(1, 기본)/꺼짐(0) — 서버 봇이 1분마다 확인 (bot/run.py continuous_step)
+
+// '2번 작성자 켜기·끄기' (11/7 운영자) → 값만 바꿈. 끄면 2번이 쓰던 한 편은 마치고 다음부터 1번만 씀
+add_action(
+	'admin_post_firstlab_bot_writer2',
+	static function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( '권한이 없습니다.' );
+		}
+		check_admin_referer( 'firstlab_bot_writer2' );
+		update_option( FIRSTLAB_BOT_WRITER2, empty( $_POST['on'] ) ? '0' : '1', false );
+		wp_safe_redirect( admin_url( 'options-general.php?page=firstlab-bot' ) );
+		exit;
+	}
+);
+
 /** 예약 발행 공개 대기 초안 수 (bot/schedule.py 와 같은 메타). */
 function firstlab_bot_ready_count(): int {
 	return count(
@@ -372,6 +388,19 @@ function firstlab_bot_render_status(): void {
 			}
 			?>
 		</span>
+	</form>
+	<?php $writer2 = '0' !== (string) get_option( FIRSTLAB_BOT_WRITER2, '1' ); ?>
+	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:8px">
+		<input type="hidden" name="action" value="firstlab_bot_writer2">
+		<?php wp_nonce_field( 'firstlab_bot_writer2' ); ?>
+		<strong>2번 작성자:</strong>
+		<?php if ( $writer2 ) : ?>
+			<?php submit_button( '끄기', 'secondary', 'off', false ); ?>
+			<span class="description">켜짐 — 두 편을 동시에 씀 (구독 사용량 2배). 끄면 2번이 쓰던 한 편까지 마치고 1번만 씀.</span>
+		<?php else : ?>
+			<?php submit_button( '켜기', 'primary', 'on', false ); ?>
+			<span class="description">꺼짐 — 1번 작성자만 한 편씩 씀 (후보 전부를 1번이 받음).</span>
+		<?php endif; ?>
 	</form>
 	<p>예약 발행 공개 대기 초안: <strong><?php echo (int) firstlab_bot_ready_count(); ?>편</strong> (발행 방식이 '예약 발행'일 때 공개 시각마다 오래된 것부터 1편씩 공개)</p>
 	<?php

@@ -28,7 +28,9 @@ add_action(
 					// 글쓰기 동시 실행 (11/6 운영자 '둘 다 해 봐', bot/run.WRITERS): ?slot=N 이면 후보를 키워드로 나눠 줌 — 두 실행이 같은 키워드를
 					// 고르지 않게. 2번부터는 새 글만 (보류 수정·갱신·사진 검사·법령·새 혜택·계산기는 1번 실행 몫 — 같은 일을 겹쳐 하지 않게)
 					$slot     = $request ? max( 0, min( 2, (int) $request->get_param( 'slot' ) ) ) : 0;
-					if ( $slot ) {
+					// 설정 '2번 작성자' 꺼짐(11/7 운영자) → 1번 칸이 후보 전부를 받음 (반만 받으면 나머지 주제는 아무도 안 씀)
+					$solo = 1 === $slot && '0' === (string) get_option( 'firstlab_writer2', '1' );
+					if ( $slot && ! $solo ) {
 						// 같은 주제(bot/select_keyword.topic_key)는 같은 칸으로 — 11/7 두 칸이 '연차수당 계산'·'미사용 연차수당 계산'을 동시에 씀
 						$pool = array_values( array_filter( $pool, static fn( $c ) => firstlab_api_slot_of( (string) ( $c['topic'] ?? $c['keyword'] ?? '' ) ) === $slot ) );
 					}

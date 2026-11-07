@@ -29,7 +29,7 @@ from .publisher import STATUS_LABEL, publish
 from .select_keyword import check_top_competition, pick_keyword, ranked_candidates, review_top
 from .settings import BotSettings, load_settings, wp_cli
 from .state import (add_log, add_spend, continuous_on, load_state, pop_excluded, pop_manual_request, save_state,
-                    set_continuous, spent_today)
+                    set_continuous, spent_today, writer2_on)
 from .writer import align_with_body, write_article
 
 KST = ZoneInfo("Asia/Seoul")
@@ -262,7 +262,11 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
         # 방금 올라온 결과(후보 제외·새 글)로 후보 목록을 새로 만들기 전 — 이번 분에 시작하면 옛 후보를 받음
         # (11/6 09:45 실행: '후보 20개는 직전 실행이 제외한 것' → 새 글 없이 끝남). 아래 refresh_dashboard 뒤 다음 분에 시작.
         return
-    for slot in range(1, WRITERS + 1):
+    # 설정 페이지 '2번 작성자' 끄면 1번 칸만 (11/7 운영자). 2번이 쓰던 한 편은 그대로 마치고, 칸 기록만 지움
+    active = WRITERS if writer2_on() else 1
+    for slot in range(active + 1, WRITERS + 1):
+        state.pop(slot_key(slot), None)
+    for slot in range(1, active + 1):
         if not _slot_step(state, settings, now, slot):
             return
 
