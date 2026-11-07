@@ -2270,6 +2270,18 @@ class OtherIncomeTaxScopeTest(unittest.TestCase):
         self.assertIn("복권·연금계좌 연금외수령", src)
 
 
+class DeletedArticleTransitionTest(unittest.TestCase):
+    """11/7 #1673: 삭제된 조문(조특법 제86조)은 부칙 경과조치로 아직 적용될 수 있음 — lawtext 가 함께 보여 줌."""
+
+    def test_transition_found(self):
+        from bot.lawtext import deleted_transitions
+        raw = ("<![CDATA[제40조(개인연금저축에 대한 경과조치) 2013년 1월 1일 전에 종전의 제86조에 따라 가입한 개인연금저축은 "
+               "제86조 및 제89조의2의 개정규정에도 불구하고 종전의 규정을 적용한다.]]><![CDATA[제41조(연금저축) 종전의 제86조의2 …]]>")
+        got = deleted_transitions(raw, "제86조")
+        self.assertEqual(len(got), 1)
+        self.assertIn("개인연금저축", got[0])
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

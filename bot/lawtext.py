@@ -43,9 +43,20 @@ def from_api(name: str, arts: list[str], today: dt.date) -> bool:
             continue
         for x in exceptions_in(got["text"]):
             print(f"  [예외·단서] {x}")
+        if re.search(r"삭제\s*<", got["text"]) and len(got["text"]) < 200:
+            for t in deleted_transitions(law_api.fetch("service", "law", MST=now["mst"]) or "", art):
+                print(f"  [부칙 경과조치] {t}")
         for ch in law_api.upcoming_changes(name, art, today, vers):
             print(f"  [시행 예정 개정] {ch['date']:%Y-%m-%d}부터 바뀜 → {ch['text'][:300]}")
     return True
+
+
+def deleted_transitions(raw: str, art: str) -> list[str]:
+    """삭제된 조문을 계속 적용하는 부칙 경과조치 ('종전의 제86조에 따라 가입한 … 종전의 규정을 적용한다').
+    11/7 #1673: 조특법 제86조(개인연금저축)가 '삭제'로만 보여 2000년 이전 가입분이 지금도 소득공제인 걸 놓침."""
+    chunks = re.split(r"<!\[CDATA\[|\]\]>", raw or "")
+    pat = re.compile(rf"종전의\s*(?:「[^」]*」\s*)?{re.escape(art)}(?![의\d])")
+    return [re.sub(r"\s+", " ", c).strip()[:300] for c in chunks if pat.search(c) and re.search(r"경과조치|적용례|종전의 규정", c)][:5]
 
 
 def _rule_body(name: str) -> str | None:

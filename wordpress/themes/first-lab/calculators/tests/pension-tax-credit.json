@@ -126,5 +126,6 @@
       "total": 203703,
       "over": 0
     }
-  }
+  },
+  {"why": "안내: 2000년 이전 개인연금저축 소득공제 별도·ISA 두 해 나눠 옮기면 차감 (11/7 외부 검수, 조특법 부칙 제40조·소득세법 제59조의3④)", "input": {"income_type": "wage", "income": 55000000, "savings": 6000000}, "expect": {"rate_pct": 15, "eligible": 6000000, "income_tax_credit": 900000, "local_credit": 90000, "total": 990000, "over": 0}, "notes_include": ["개인연금저축은 지금도 소득공제", "앞 해 적용분"]}
 ]
