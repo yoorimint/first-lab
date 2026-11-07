@@ -55,7 +55,7 @@
         notes.push('공급가액은 원 미만을 반올림했어요. 영수증마다 끝자리 처리 방식이 달라 1원 차이가 날 수 있어요.');
       } else if (v.mode === 'general') {
         const sales = FirstLabCalc.util.floor(amount * d.rate);
-        const pay = sales - purchase;
+        const pay = FirstLabCalc.util.floor10(sales - purchase); // 낼·돌려받을 세액 10원 미만 버림 (국고금관리법 제47조①)
         values = { sales_tax: sales, purchase_tax: purchase, pay };
         rows = [['매출세액 (공급가액 × 10%)', u.won(sales)], ['매입세액', u.won(purchase)]];
         rows.push(pay >= 0 ? ['낼 세액', u.won(pay)] : ['돌려받을 세액 (환급)', u.won(-pay)]);
@@ -66,7 +66,7 @@
         const gross = FirstLabCalc.util.floor((amount * Math.round(ratio * 100) * Math.round(d.rate * 100)) / 10000);
         const credit = FirstLabCalc.util.floor(purchase * d.simple.purchase_credit_rate);
         const exempt = amount < d.simple.exempt_below;
-        const pay = exempt ? 0 : Math.max(0, gross - credit);
+        const pay = exempt ? 0 : FirstLabCalc.util.floor10(Math.max(0, gross - credit));
         values = { gross, credit, pay, exempt };
         rows = [
           ['1년 매출 (공급대가)', u.won(amount)],

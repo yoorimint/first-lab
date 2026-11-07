@@ -56,7 +56,7 @@
       const surcharge = FirstLabCalc.util.floor((tax * surchargePct) / 100);
       const credit = v.on_time === 'no' ? 0 : FirstLabCalc.util.floor(((tax + surcharge) * d.filing_credit_pct) / 100);
       // 낼 세액은 10원 미만 버림 (국고금관리법 제47조①)
-      const pay = FirstLabCalc.util.floor((tax + surcharge - credit) / 10) * 10;
+      const pay = FirstLabCalc.util.floor10(tax + surcharge - credit);
 
       const rows = [
         ['증여재산공제', u.won(basic)],

@@ -174,5 +174,7 @@
       "exempt": false
     },
     "boundary": true
-  }
+  },
+  {"why": "낼 세액 10원 미만 버림(국고금관리법 제47조①): 매출 1,234,567원 × 10% = 123,456원 - 매입 1,000원 = 122,456 → 122,450원", "input": {"mode": "general", "amount": 1234567, "purchase": 1000, "industry": "retail"}, "expect": {"sales_tax": 123456, "pay": 122450}},
+  {"why": "환급도 10원 미만 버림: 123,456 - 200,003 = -76,547 → -76,540원", "input": {"mode": "general", "amount": 1234567, "purchase": 200003, "industry": "retail"}, "expect": {"pay": -76540}}
 ]
