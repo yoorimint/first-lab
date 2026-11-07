@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1495,
+ "replace": [
+  {
+   "old": "ai-6e14b61db3",
+   "prompt": "A young office worker sitting alone at a plain wooden desk by a large window in an empty modern office in the afternoon, seen from behind, soft light, photorealistic",
+   "alt": "오후 사무실 창가 책상에 혼자 앉아 있는 직장인의 뒷모습",
+   "why": "왼쪽 창가에 'A' 글자 모양 장식물이 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

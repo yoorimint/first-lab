@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1464,
+ "replace": [
+  {
+   "old": "ai-416c6f9319",
+   "prompt": "A young father gently cradling a sleeping newborn baby against his chest in a bright, softly lit bedroom, warm natural light, photorealistic",
+   "alt": "햇살 드는 방에서 갓난아기를 품에 안은 아빠",
+   "why": "아빠 손가락과 아기 팔이 엉켜 일그러져 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
