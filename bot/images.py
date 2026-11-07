@@ -144,12 +144,26 @@ class QuotaExceeded(RuntimeError):
 QUOTA_FILE = Path("/var/lib/first-lab/bot/cf-quota-until")  # 한도 소진 시 초기화 시각(UTC ISO)을 적어 둠 → 그때까지 호출 안 함
 
 
-def _block_until_reset() -> None:
-    from datetime import datetime, timedelta, timezone
+# 초기화 직후 몇 시간 안에 받은 '한도 소진'은 아직 안 풀린 것일 수 있음 → 하루를 통째로 막지 않고 RETRY_MINUTES 뒤 다시
+# (11/7 09:00 초기화 직후 한 번 거절되자 다음 날 9시까지 막혀 대표 사진 채우기가 하루 멈춤 — 9시 뒤 '사진 채우기' 기록 0)
+RESET_GRACE_HOURS = 3
+RETRY_MINUTES = 30
 
-    reset = (datetime.now(timezone.utc) + timedelta(days=1)).replace(hour=0, minute=0, second=5, microsecond=0)
+
+def _next_try(blocked_at):
+    """한도 소진을 받은 시각(UTC) → 다시 시도할 시각."""
+    from datetime import timedelta
+
+    if blocked_at.hour < RESET_GRACE_HOURS:
+        return blocked_at + timedelta(minutes=RETRY_MINUTES)
+    return (blocked_at + timedelta(days=1)).replace(hour=0, minute=0, second=5, microsecond=0)
+
+
+def _block_until_reset() -> None:
+    from datetime import datetime, timezone
+
     try:
-        QUOTA_FILE.write_text(reset.isoformat())
+        QUOTA_FILE.write_text(_next_try(datetime.now(timezone.utc)).isoformat())
     except OSError:
         pass
 
@@ -158,9 +172,12 @@ def quota_blocked() -> bool:
     from datetime import datetime, timezone
 
     try:
-        return datetime.now(timezone.utc) < datetime.fromisoformat(QUOTA_FILE.read_text().strip())
+        until = datetime.fromisoformat(QUOTA_FILE.read_text().strip())
+        written = datetime.fromtimestamp(QUOTA_FILE.stat().st_mtime, timezone.utc)
     except (OSError, ValueError):
         return False
+    until = min(until, _next_try(written))  # 예전 방식으로 하루를 막아 둔 기록도 같은 기준으로 (지금 막힌 것 풀기)
+    return datetime.now(timezone.utc) < until
 
 
 def cloudflare_image(account_id: str, api_token: str, prompt: str) -> Path:

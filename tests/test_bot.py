@@ -2081,6 +2081,30 @@ class ApproxRoundingTest(unittest.TestCase):
         self.assertIn("condition_gate.approx_rounding(", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
 
+class QuotaResetTest(unittest.TestCase):
+    """11/7: 9시 초기화 직후 한 번 '한도 소진'을 받자 다음 날까지 막혀 사진 채우기가 하루 멈춤."""
+
+    def test_next_try(self):
+        from datetime import datetime, timezone
+        from bot.images import _next_try
+        t = lambda h, m=0: datetime(2026, 11, 7, h, m, tzinfo=timezone.utc)  # noqa: E731
+        self.assertEqual(_next_try(t(0, 1)), t(0, 31))                                   # 초기화 직후 → 30분 뒤 다시
+        self.assertEqual(_next_try(t(5)), datetime(2026, 11, 8, 0, 0, 5, tzinfo=timezone.utc))  # 진짜 소진 → 다음 초기화
+
+    def test_old_full_day_block_is_lifted(self):
+        import os
+        import tempfile
+        from datetime import datetime, timezone
+        from bot import images
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d, "q")
+            f.write_text("2026-11-08T00:00:05+00:00")                    # 예전 방식: 하루 통째로
+            written = datetime(2026, 11, 7, 0, 0, 10, tzinfo=timezone.utc).timestamp()
+            os.utime(f, (written, written))
+            with mock.patch.object(images, "QUOTA_FILE", f):
+                self.assertFalse(images.quota_blocked())                    # 00:00:10 에 썼으면 00:30:10 뒤엔 풀림 (지금은 그 뒤)
+
+
 class CheckedLineTest(unittest.TestCase):
     """11/7 운영자 '확인 방식 한 줄 — 하자, AI 사용은 빼고' (first-lab-author-box.php)."""
 

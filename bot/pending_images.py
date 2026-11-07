@@ -56,6 +56,7 @@ def fill(cloudflare: tuple[str, str], max_posts: int = 2) -> list[str]:
         try:
             out.append(fill_post(post_id, cloudflare))
         except images.QuotaExceeded:
+            out.append("사진 한도 소진 — 다음 시도는 서버가 정한 시각에 (images.quota_blocked)")
             break
         except Exception as e:  # noqa: BLE001 - 한 글의 실패(안전 필터·5xx)가 다른 글을 영영 막지 않게 (11/5 검토)
             tries = _bump_fail(post_id)
