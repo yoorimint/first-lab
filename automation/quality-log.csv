@@ -113,3 +113,5 @@ date,post,fixes,types
 2026-11-06,1450,5,missing_condition:3 outdated:1 wrong_fact:1
 2026-11-06,1455,3,missing_condition:1 unverified:2
 2026-11-06,1462,0,
+2026-11-07,1464,3,wrong_fact:3
+2026-11-07,1466,5,unverified:5
