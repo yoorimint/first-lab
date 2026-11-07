@@ -33,7 +33,7 @@ const ids = fs.readdirSync(path.join(DIR, 'defs')).filter((f) => f.endsWith('.js
 // 우리 사이트 글·페이지 주소 (/%postname%/ — 글 주소 = 키워드, publish_queue.py)
 const QUEUE = path.join(ROOT, 'wordpress/queue');
 // 10원 끝수 처리를 아직 확인 못 한 세금 계산기 (11/7 발견) — 이 날짜까지 확인해 won10_keys 또는 won10 이유를 넣기
-const WON10_PENDING = { until: '2026-11-14', ids: ['capital-gains-tax', 'income-tax', 'property-holding-tax'] };
+const WON10_PENDING = { until: '2026-11-14', ids: ['capital-gains-tax', 'income-tax'] };
 const PAGES = path.join(ROOT, 'wordpress/pages');
 const sitePaths = new Set([
   ...fs.readdirSync(QUEUE).filter((f) => f.endsWith('.json')).map((f) => readJson(path.join(QUEUE, f)).keyword).filter(Boolean),
@@ -50,6 +50,11 @@ for (const [n, want, why] of [
 ]) {
   if (util.floor(n) !== want) fail('util.floor', `${why}: ${n} → ${util.floor(n)} (기대 ${want})`);
   if (util.trunc(-n) !== -want) fail('util.trunc', `${why} (음수): ${-n} → ${util.trunc(-n)} (기대 ${-want})`);
+}
+
+// 10원 미만 끝수 버림 (국고금관리법 제47조①): 환급(음수)도 크기 기준, 소수 오차는 올림 없이
+for (const [n, want] of [[122456, 122450], [-76547, -76540], [864197.0000001, 864190], [69999.9, 69990], [69999.99999999, 70000], [5, 0]]) {
+  if (util.floor10(n) !== want) fail('util.floor10', `${n} → ${util.floor10(n)} (기대 ${want})`);
 }
 
 for (const id of ids) {

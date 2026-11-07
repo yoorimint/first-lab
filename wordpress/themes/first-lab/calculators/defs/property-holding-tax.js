@@ -54,8 +54,9 @@
       let creditPct = 0;
       if (kind === 'one') creditPct = Math.min(d.credit_max_pct, pick(d.age_credit, age) + pick(d.hold_credit, years));
       const credit = FirstLabCalc.util.floor((calcTax * creditPct) / 100);
-      const jongbu = calcTax - credit;
-      const rural = FirstLabCalc.util.floor((jongbu * d.rural_pct) / 100);
+      // 낼 종부세·농특세는 10원 미만 버림 (국고금관리법 제47조①)
+      const jongbu = FirstLabCalc.util.floor10(calcTax - credit);
+      const rural = FirstLabCalc.util.floor10((jongbu * d.rural_pct) / 100);
       const total = jongbu + rural;
 
       const rows = [
