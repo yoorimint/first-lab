@@ -1,0 +1,130 @@
+[
+  {
+    "why": "총급여 5,500만 원(기준선 딱): 15% 적용, 연금저축 600만 × 15% = 90만 + 지방 9만 = 99만 원 (소득세법 제59조의3 '5천500만원 이하')",
+    "input": {
+      "income_type": "wage",
+      "income": 55000000,
+      "savings": 6000000
+    },
+    "expect": {
+      "rate_pct": 15,
+      "eligible": 6000000,
+      "income_tax_credit": 900000,
+      "local_credit": 90000,
+      "total": 990000,
+      "over": 0
+    },
+    "boundary": true,
+    "notes_include": [
+      "공제 한도까지 3,000,000원"
+    ]
+  },
+  {
+    "why": "총급여 5,500만 1원: 12% → 600만 × 12% = 72만 + 7.2만 = 792,000원",
+    "input": {
+      "income_type": "wage",
+      "income": 55000001,
+      "savings": 6000000
+    },
+    "expect": {
+      "rate_pct": 12,
+      "eligible": 6000000,
+      "income_tax_credit": 720000,
+      "local_credit": 72000,
+      "total": 792000,
+      "over": 0
+    },
+    "boundary": true
+  },
+  {
+    "why": "연금저축 600만 1원: 600만 원만 인정 (제59조의3 단서 '600만원을 초과하는 경우 그 초과하는 금액은 없는 것')",
+    "input": {
+      "income_type": "wage",
+      "income": 40000000,
+      "savings": 6000001
+    },
+    "expect": {
+      "rate_pct": 15,
+      "eligible": 6000000,
+      "income_tax_credit": 900000,
+      "local_credit": 90000,
+      "total": 990000,
+      "over": 1
+    },
+    "boundary": true,
+    "notes_include": [
+      "600만 원까지만"
+    ]
+  },
+  {
+    "why": "총급여 7,000만·연금저축 600만+IRP 300만 = 900만 × 12% = 108만 + 10.8만 = 1,188,000원 (본문 표)",
+    "input": {
+      "income_type": "wage",
+      "income": 70000000,
+      "savings": 6000000,
+      "retire": 3000000
+    },
+    "expect": {
+      "rate_pct": 12,
+      "eligible": 9000000,
+      "income_tax_credit": 1080000,
+      "local_credit": 108000,
+      "total": 1188000,
+      "over": 0
+    }
+  },
+  {
+    "why": "종합소득금액 4,500만(다른 소득 있음, 기준선): 15%, 연금저축 800만+IRP 200만 → 600+200=800만 × 15% = 120만 + 12만",
+    "input": {
+      "income_type": "other",
+      "income": 45000000,
+      "savings": 8000000,
+      "retire": 2000000
+    },
+    "expect": {
+      "rate_pct": 15,
+      "eligible": 8000000,
+      "income_tax_credit": 1200000,
+      "local_credit": 120000,
+      "total": 1320000,
+      "over": 2000000
+    },
+    "boundary": true,
+    "notes_include": [
+      "600만 원까지만"
+    ]
+  },
+  {
+    "why": "다른 소득 있음·종합소득금액 4,500만 1원: 12%, IRP만 1,000만 → 900만 × 12% = 108만",
+    "input": {
+      "income_type": "other",
+      "income": 45000001,
+      "retire": 10000000
+    },
+    "expect": {
+      "rate_pct": 12,
+      "eligible": 9000000,
+      "income_tax_credit": 1080000,
+      "local_credit": 108000,
+      "total": 1188000,
+      "over": 1000000
+    },
+    "boundary": true
+  },
+  {
+    "why": "연금저축 1,234,567원·총급여 3,000만: 15% = 185,185.05 → 185,185원(원 미만 버림), 지방 18,518원",
+    "input": {
+      "income_type": "wage",
+      "income": 30000000,
+      "savings": 1234567
+    },
+    "expect": {
+      "rate_pct": 15,
+      "eligible": 1234567,
+      "income_tax_credit": 185185,
+      "local_credit": 18518,
+      "total": 203703,
+      "over": 0
+    }
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "basis_date": "2026-11-07", "yearly": false,
+  "max_input": 100000000000,
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제59조의3 연금계좌세액공제, 제61조② 산출세액 초과분)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국세청 연금계좌 세액공제 안내", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7875"},
+    {"name": "금융감독원 연금저축 세액공제 (지방소득세 포함 16.5%·13.2%)", "url": "https://fss.or.kr/fss/main/contents.do?menuNo=201007"}
+  ],
+  "income_limit_wage": 55000000,
+  "income_limit_other": 45000000,
+  "rate_high_pct": 15,
+  "rate_low_pct": 12,
+  "local_pct": 10,
+  "savings_cap": 6000000,
+  "total_cap": 9000000
+}
