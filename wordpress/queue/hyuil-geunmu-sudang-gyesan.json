@@ -1,0 +1,425 @@
+{
+ "title": "휴일근무수당 계산: 5명 이상 사업장은 통상시급 1.5배",
+ "excerpt": "상시 5명 이상 사업장의 휴일근무수당은 통상시급 × 시간 × 1.5배(8시간 초과분 2배)예요. 월급 300만 원이 공휴일 8시간 일하면 172,248원, 시급제 2.5배까지 정리했어요.",
+ "content_html": "<p>휴일근무수당은 상시 5명 이상 사업장이라면 <strong>통상시급 × 휴일에 일한 시간 × 1.5배</strong>(8시간까지)로 계산하고, 8시간을 넘긴 시간은 <strong>2배</strong>로 계산해요. 월급 300만 원(통상임금)인 직장인이 공휴일에 8시간 일했다면 300만 원 ÷ 209시간 = 14,354.07원이 통상시급이고, 휴일근무수당은 <strong>172,248원</strong>이에요. 아래 계산기에 내 통상임금, '휴일근로 하루 시간', '휴일근로한 날 수'를 넣고, 평일 연장근로가 없다면 '연장근로 시간' 칸을 0으로 바꾸면 '휴일근로수당' 줄에 바로 나와요.</p>\n\n<p>[firstlab_calc id=\"overtime-pay\"]</p>\n\n<h2>휴일근로 가산율</h2>\n<table>\n<thead><tr><th>구분</th><th>가산</th><th>받는 금액</th></tr></thead>\n<tbody>\n<tr><td>휴일근로 8시간 이내</td><td>통상임금의 50%</td><td>통상시급 × 1.5배</td></tr>\n<tr><td>휴일근로 8시간 초과분</td><td>통상임금의 100%</td><td>통상시급 × 2배</td></tr>\n<tr><td>휴일 밤 10시~아침 6시</td><td>야간 50% 추가</td><td>휴일 가산에 0.5배 더함</td></tr>\n</tbody>\n</table>\n<p>휴일에 일한 시간은 연장근로 가산과 겹쳐 받지 않고 휴일근로 가산율만 적용해요. 다만 1주는 휴일을 포함한 7일이라, 휴일에 일한 시간까지 합쳐 1주 40시간(하루 8시간)을 넘는 근로는 원칙적으로 1주 12시간까지만 할 수 있어요(1주 최대 52시간).</p>\n\n<h2>어떤 날이 휴일인가요</h2>\n<ul>\n<li><strong>주휴일</strong>: 1주 소정근로일을 개근하면 주는 유급휴일(보통 일요일)이에요. 자세한 기준은 <a href=\"https://first-lab.kr/주휴수당뜻/\">주휴수당 뜻 정리</a>에 있어요.</li>\n<li><strong>관공서 공휴일·대체공휴일</strong>: 설날·추석 연휴, 국경일, 어린이날, 크리스마스 등이에요. 상시 5명 이상 사업장은 2022년 1월 1일부터 유급휴일로 보장해야 해요.</li>\n<li><strong>노동절(5월 1일)</strong>: 법률로 정한 유급휴일이라 사업장 규모와 관계없이 쉬는 날이에요.</li>\n<li><strong>약정휴일</strong>: 창립기념일처럼 취업규칙·단체협약으로 휴일로 정한 날이에요.</li>\n</ul>\n<p>주 5일 근무에서 일하지 않는 토요일은 따로 정하지 않았다면 휴일이 아니라 <strong>무급휴무일</strong>로 봐요. 토요일에 일하면 휴일근로가 아니라, 그 주 근로시간이 40시간을 넘은 만큼 연장근로로 1.5배를 받아요.</p>\n\n<h2>월급제와 시급제는 받는 총액이 달라요</h2>\n<p>월급제는 유급휴일 임금이 이미 월급에 들어 있어요. 그래서 유급휴일에 일하면 월급과 별도로 휴일근로 임금(8시간까지 1.5배)을 더 받아요. 시급제·일급제는 일하지 않아도 받는 유급휴일수당(100%)이 따로 있어서, 원래 일하는 날과 겹친 공휴일에 일하면 유급휴일수당 100% + 휴일근로 임금 100% + 가산 50%를 받아요. 흔히 말하는 2.5배가 이 경우예요.</p>\n<p>위 계산기는 휴일에 일한 시간의 임금(1.5배·2배)을 계산해요. 시급제이고 그 공휴일이 원래 일하는 날(소정근로일)과 겹쳤다면 여기에 하루치 유급휴일수당을 더하면 돼요. 무급휴무일과 겹친 공휴일이라면 따로 정한 게 없는 한 더하지 않아요.</p>\n\n<h2>상황별 계산 예시</h2>\n<table>\n<thead><tr><th>상황</th><th>계산</th><th>금액</th></tr></thead>\n<tbody>\n<tr><td>월급 300만 원, 공휴일 8시간</td><td>14,354.07원 × 8시간 × 1.5</td><td>172,248원</td></tr>\n<tr><td>월급 300만 원, 공휴일 10시간</td><td>172,248원 + 14,354.07원 × 2시간 × 2</td><td>229,664원</td></tr>\n<tr><td>시급 12,000원, 근무일과 겹친 공휴일 8시간</td><td>96,000원(유급휴일수당) + 144,000원(8시간 × 1.5)</td><td>240,000원</td></tr>\n<tr><td>시급 12,000원, 무급휴무일과 겹친 공휴일 8시간</td><td>12,000원 × 8시간 × 1.5</td><td>144,000원</td></tr>\n</tbody>\n</table>\n<p>무급휴무일과 공휴일이 겹치면 따로 정한 게 없는 한 유급휴일수당은 없고, 일한 시간에 대한 임금과 가산분만 받아요. 금액은 원 미만을 버렸어요.</p>\n\n<h2>수당이 없는 경우: 휴일대체·5명 미만</h2>\n<p>회사가 근로자대표와 서면으로 합의하고 바꿀 날을 미리(24시간 전) 특정해 알려 공휴일 대신 다른 근로일을 유급휴일로 정하면(휴일대체), 원래 공휴일은 근로일이 되어 휴일근로 가산이 붙지 않아요. 다만 노동절(5월 1일)은 날짜가 법률로 정해진 유급휴일이라 다른 날로 대체할 수 없어요. 근로자대표와 서면 합의로 수당 대신 휴가를 주는 보상휴가제도 있는데, 이때는 가산분까지 반영한 시간만큼 휴가를 받는지 확인하세요.</p>\n<p>상시 4명 이하 사업장은 휴일근로 가산(50%·100%)과 공휴일 유급휴일 규정이 적용되지 않아요. 휴일에 일한 시간의 임금(1배)은 받고, 근로계약서·취업규칙에 가산을 정했다면 그 기준을 따라요. 노동절은 4명 이하 사업장도 유급휴일이에요. 4주 평균 1주 소정근로시간이 15시간 미만인 근로자는 주휴일·공휴일 유급휴일 규정이 적용되지 않아요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>일요일에 출근했는데 평일에 쉬었으면 수당이 없나요?</h3>\n<p>공휴일은 근로자대표와 서면 합의로, 일요일(주휴일)은 단체협약·취업규칙 규정이나 근로자 동의로 미리(24시간 전) 쉴 날을 정해 알려 줬다면 휴일대체라 가산이 없어요. 이런 절차 없이 일요일에 일하고 나중에 하루 쉬게 한 경우는 휴일근로가 될 수 있으니 취업규칙의 휴일 규정을 먼저 보세요.</p>\n<h3>못 받은 휴일근무수당은 언제까지 청구하나요?</h3>\n<p>임금채권은 3년 동안 행사하지 않으면 시효로 사라져요. 회사에 먼저 요청하고, 해결이 안 되면 고용노동부(국번 없이 1350)에 상담할 수 있어요.</p>\n<h3>경비원·농업 근로자도 휴일근무수당을 받나요?</h3>\n<p>농림·축산·수산 사업 근로자, 고용노동부장관 승인을 받은 감시·단속적 근로자 등은 휴일 규정이 적용되지 않아 휴일 가산이 없을 수 있어요. 상시 5명 이상 사업장이라면 야간 가산(밤 10시~아침 6시 50%)은 이 경우에도 적용돼요.</p>\n",
+ "tags": [
+  "휴일근무수당",
+  "휴일근로수당",
+  "공휴일수당",
+  "통상시급"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "an office worker walking through a quiet empty office floor on a sunny holiday morning, soft daylight through large windows",
+   "alt": "휴일 아침 텅 빈 사무실을 걸어가는 직장인"
+  }
+ ],
+ "keyword": "휴일근무수당계산",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "상시 5명 이상 사업장 휴일근로 8시간까지 1.5배, 넘으면 2배 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.law.go.kr/flDownload.do?flSeq=43334647"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로기준법 가산 규정은 상시 5명 이상 사업장에 적용 (근로기준법 제11조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.law.go.kr/flDownload.do?flSeq=43334647"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "월급 300만 원 ÷ 209시간 = 14,354.07원, 공휴일 8시간이면 172,248원 (근로기준법 시행령 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=18144"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "시급제가 근무일과 겹친 공휴일에 일하면 2.5배 (근로기준법 제56조)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기에 통상임금·휴일근로 하루 시간·날 수를 넣고 연장근로 0이면 휴일근로수당 줄에 계산 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "휴일근로 8시간 이내 통상임금의 50% 가산, 통상시급 × 1.5배 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "휴일근로 8시간 초과분 통상임금의 100% 가산, 통상시급 × 2배 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "휴일 밤 10시~아침 6시는 야간 50% 추가 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202409030939141060445"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "휴일근로는 연장근로 가산과 겹쳐 받지 않고 휴일근로 가산율만 적용 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202409030939141060445"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "1주는 휴일을 포함한 7일 (근로기준법 제2조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "휴일근로 포함 1주 40시간·하루 8시간 넘는 근로는 원칙적으로 1주 12시간까지, 1주 최대 52시간 (근로기준법 제53조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "주휴일은 1주 소정근로일을 개근하면 주는 유급휴일 (근로기준법 시행령 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "관공서 공휴일·대체공휴일: 설날·추석 연휴, 국경일, 어린이날, 크리스마스 등 (근로기준법 시행령 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관공서의공휴일에관한규정",
+    "https://www.law.go.kr/법령/근로기준법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상시 5명 이상 사업장은 2022년 1월 1일부터 공휴일·대체공휴일 유급휴일 보장 (근로기준법 제55조)",
+   "urls": [
+    "https://www.moel.go.kr/policy/policydata/view.do?bbs_seq=20211200972",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202209221332378081000",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "노동절(5월 1일)은 법률로 정한 유급휴일, 사업장 규모와 관계없음 (근로기준법 제55조)",
+   "urls": [
+    "https://www.law.go.kr/법령/노동절제정에관한법률",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19254"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "약정휴일은 취업규칙·단체협약 등으로 휴일로 정한 날",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202203081624264651000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주 5일 근무에서 쉬는 토요일은 따로 정하지 않았다면 무급휴무일",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202203081624264651000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "토요일 근무는 그 주 40시간을 넘은 만큼 연장근로 1.5배 (근로기준법 제56조)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202203081624264651000",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202409030939141060445",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "월급제는 유급휴일 임금이 월급에 포함, 유급휴일에 일하면 별도로 1.5배 추가",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202104071524535591000"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "시급제·일급제는 근무일과 겹친 공휴일에 일하면 유급휴일수당 100% + 휴일근로 100% + 가산 50%",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기는 휴일에 일한 시간의 임금(1.5배·2배)을 계산, 소정근로일과 겹친 공휴일이면 시급제는 하루치 유급휴일수당을 더하고 무급휴무일이면 더하지 않음",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "월급 300만 원, 공휴일 10시간 = 172,248원 + 57,416원 = 229,664원 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "시급 12,000원, 근무일과 겹친 공휴일 8시간 = 96,000원 + 144,000원 = 240,000원",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "시급 12,000원, 무급휴무일과 겹친 공휴일 8시간 = 144,000원",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "무급휴무일과 공휴일이 겹치면 따로 정한 게 없는 한 유급휴일수당 없음",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202209221332378081000",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로자대표 서면 합의·24시간 전 특정 고지로 공휴일을 다른 근로일로 대체하면 휴일근로 가산 없음 (근로기준법 제55조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202206031119181381000",
+    "https://www.moel.go.kr/policy/policydata/view.do?bbs_seq=20211200972"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "노동절(5월 1일)은 다른 날로 대체할 수 없음 (근로기준법 제55조)",
+   "urls": [
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19254",
+    "https://www.law.go.kr/법령/노동절제정에관한법률"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "근로자대표와 서면 합의로 수당 대신 휴가(보상휴가제) (근로기준법 제57조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "상시 4명 이하 사업장은 휴일근로 가산과 공휴일 유급휴일 규정 미적용 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.law.go.kr/flDownload.do?flSeq=43334647"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4명 이하 사업장도 휴일에 일한 시간의 임금(1배)은 받고, 계약서·취업규칙에 가산을 정했다면 그 기준 (근로기준법 시행령 제7조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령",
+    "https://www.law.go.kr/flDownload.do?flSeq=43334647"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "노동절은 4명 이하 사업장도 유급휴일 (근로기준법 제55조)",
+   "urls": [
+    "https://www.law.go.kr/법령/노동절제정에관한법률",
+    "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19254"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "4주 평균 1주 소정근로시간 15시간 미만이면 주휴일·공휴일 유급휴일 미적용 (근로기준법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "공휴일은 근로자대표 서면 합의, 주휴일은 단체협약·취업규칙 규정이나 근로자 동의로 24시간 전 고지하면 휴일대체 (근로기준법 제55조)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202206031119181381000",
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "임금채권은 3년간 행사하지 않으면 시효로 소멸 (근로기준법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용노동부 상담 국번 없이 1350",
+   "urls": [
+    "https://www.moel.go.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "농림·축산·수산 사업, 승인받은 감시·단속적 근로자 등은 휴일 규정 미적용 (근로기준법 제63조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제63조 근로자도 상시 5명 이상 사업장이면 야간 가산 50% 적용 (근로기준법 제56조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법",
+    "https://www.law.go.kr/flDownload.do?flSeq=43334647"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "근로기준법 제56조 단서1 반영 — '휴일근로 가산율' 표·'연장근로 가산과 겹쳐 받지 않고 휴일근로 가산율만' 문장",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제56조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제11조 단서1 해당 없음 — 동거 친족만 쓰는 사업장·가사 사용인은 이 글이 다루는 5명 이상·4명 이하 사업장 일반 근로자 계산과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제11조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제53조 단서1 해당 없음 — 특별연장근로 사후 승인 절차는 휴일수당 계산과 무관 (글은 '원칙적으로 1주 12시간'으로 씀)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제53조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제53조 단서2 해당 없음 — 30명 미만 8시간 추가 연장(제3항)을 글에서 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제53조"
+   ]
+  },
+  {
+   "claim": "근로기준법시행령 제30조 단서1 반영 — '관공서 공휴일·대체공휴일' 항목 (민간은 일요일 제외 공휴일·대체공휴일)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법시행령/제30조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제55조 단서1 반영 — '수당이 없는 경우: 휴일대체' 문단 (근로자대표 서면 합의, 노동절은 대체 불가)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제55조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제18조 단서1 반영 — '4주 평균 1주 소정근로시간이 15시간 미만인 근로자는 주휴일·공휴일 유급휴일 규정 미적용' 문장",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제18조"
+   ]
+  },
+  {
+   "claim": "근로기준법 제63조 단서1 반영 — 자주 묻는 질문 '경비원·농업 근로자' 답변",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제63조"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 근로기준법 (제55조 휴일·제56조 휴일근로 가산)",
+   "url": "https://www.law.go.kr/법령/근로기준법"
+  },
+  {
+   "name": "고용노동부 관공서 공휴일·대체공휴일 유급휴일 확대 적용 안내",
+   "url": "https://www.moel.go.kr/policy/policydata/view.do?bbs_seq=20211200972"
+  },
+  {
+   "name": "고용노동부 빠른인터넷상담 (공휴일 근로 시 유급휴일수당·가산수당)",
+   "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202412301013562290603"
+  }
+ ]
+}
