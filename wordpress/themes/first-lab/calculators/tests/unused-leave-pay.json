@@ -1,0 +1,298 @@
+[
+ {
+  "why": "월 2,508,000원 ÷ 209 = 시급 12,000원 × 8시간 = 96,000원 × 7일 = 672,000원 (Python Fraction 별도 계산)",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 7,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "hourly": 12000,
+   "day_wage": 96000,
+   "pay": 672000
+  }
+ },
+ {
+  "why": "월 3,000,000원 ÷ 209 × 8 = 114,832.53…원 × 10일 = 1,148,325.35…원 → 원 미만 버림 1,148,325원 / 화면 일급 114,832원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 3000000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 10,
+   "employees": 30,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "day_wage": 114832,
+   "pay": 1148325
+  }
+ },
+ {
+  "why": "시급 10,320원(2026 최저임금) × 8시간 = 82,560원 × 5일 = 412,800원",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 10320,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 5,
+   "employees": 10,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "day_wage": 82560,
+   "pay": 412800
+  }
+ },
+ {
+  "why": "366일 근무 후 퇴직 최대 26일분(고용노동부 2022.12 해석 변경): 96,000 × 26 = 2,496,000원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 26,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 2496000
+  }
+ },
+ {
+  "why": "기준선: 상시 5명 딱(제11조 5명 이상 적용) → 지급",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 7,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 672000
+  },
+  "notes_exclude": [
+   "4명 이하 사업장은"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "기준선: 상시 4명(시행령 제7조 별표 1, 제60조 미적용) → 0원 + 안내",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 7,
+   "employees": 4,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 0,
+   "full": 672000
+  },
+  "notes_include": [
+   "4명 이하 사업장은"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "사용 촉진 완료(제61조) → 보상 의무 없음 0원, 촉진 빠졌을 때 금액 안내",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 7,
+   "employees": 5,
+   "promoted": "yes",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 0,
+   "full": 672000
+  },
+  "notes_include": [
+   "보상 의무가 없어요"
+  ]
+ },
+ {
+  "why": "반일 0.5일: 96,000 × 0.5 = 48,000원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 0.5,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 48000
+  },
+  "boundary": true
+ },
+ {
+  "why": "단시간 1일 4시간·시급 12,000원 → 48,000원 × 3일 = 144,000원",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 12000,
+   "base_hours": 209,
+   "day_hours": 4,
+   "days": 3,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 20
+  },
+  "expect": {
+   "day_wage": 48000,
+   "pay": 144000
+  }
+ },
+ {
+  "why": "1일 9시간으로 넣어도 법정 8시간까지: 12,000 × 8 × 2 = 192,000원",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 12000,
+   "base_hours": 209,
+   "day_hours": 9,
+   "days": 2,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 192000
+  },
+  "notes_include": [
+   "하루 8시간까지로"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "0일 → 0원",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 0,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect": {
+   "pay": 0
+  }
+ },
+ {
+  "why": "일수 빈칸은 안내 문장",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": "",
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect_error": true
+ },
+ {
+  "why": "0.3일은 안내 문장",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 0.3,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect_error": true
+ },
+ {
+  "why": "기준선: 1주 15시간 딱(제18조③ 15시간 미만만 제외) → 지급 12,000×3×2=72,000원",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 12000,
+   "base_hours": 209,
+   "day_hours": 3,
+   "days": 2,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 15
+  },
+  "expect": {
+   "pay": 72000
+  },
+  "notes_exclude": [
+   "15시간 미만인 근로자는"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "기준선: 1주 14.5시간 → 제18조③ 연차 미적용 0원 + 안내",
+  "input": {
+   "pay_type": "hourly",
+   "amount": 12000,
+   "base_hours": 209,
+   "day_hours": 3,
+   "days": 2,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 14.5
+  },
+  "expect": {
+   "pay": 0,
+   "full": 72000
+  },
+  "notes_include": [
+   "15시간 미만인 근로자는"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "1주 소정근로시간 빈칸은 안내 문장",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 8,
+   "days": 7,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": ""
+  },
+  "expect_error": true
+ },
+ {
+  "why": "1일 0.25시간은 안내 문장(입력 최소 0.5)",
+  "input": {
+   "pay_type": "monthly",
+   "amount": 2508000,
+   "base_hours": 209,
+   "day_hours": 0.25,
+   "days": 7,
+   "employees": 5,
+   "promoted": "no",
+   "week_hours": 40
+  },
+  "expect_error": true
+ }
+]

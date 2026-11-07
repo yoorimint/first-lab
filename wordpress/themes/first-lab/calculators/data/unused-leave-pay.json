@@ -1,0 +1,34 @@
+{
+  "basis_date": "2026-11-07",
+  "yearly": false,
+  "law_checked": [
+    "근로기준법|2026-12-08",
+    "근로기준법|2026-12-10",
+    "근로기준법|2027-01-01",
+    "근로기준법|2027-06-10"
+  ],
+  "sources": [
+    {
+      "name": "근로기준법 제11조·제18조·제60조·제61조 (국가법령정보센터)",
+      "url": "https://www.law.go.kr/법령/근로기준법"
+    },
+    {
+      "name": "근로기준법 시행령 제6조(통상임금)·제7조·별표 1 (국가법령정보센터)",
+      "url": "https://www.law.go.kr/법령/근로기준법시행령"
+    },
+    {
+      "name": "고용노동부 1350 상담 연차유급휴가 미사용수당 지급액·지급 시기",
+      "url": "https://1350.moel.go.kr/rtmview.do?id=1000244622"
+    },
+    {
+      "name": "고용노동부 빠른인터넷상담 월급 ÷ 209시간 통상시급 환산",
+      "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202503201006518980945"
+    }
+  ],
+  "min_employees": 5,
+  "legal_day_hours": 8,
+  "max_day_hours": 24,
+  "max_days": 400,
+  "min_week_hours": 15,
+  "max_week_hours": 68
+}
