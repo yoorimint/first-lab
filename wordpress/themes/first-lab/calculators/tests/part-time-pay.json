@@ -1,0 +1,271 @@
+[
+ {
+  "why": "주 20시간·2026 최저임금 10,320원: 20×10,320=206,400 + 주휴 4시간(20÷40×8)×10,320=41,280 = 247,680, ×365÷84 = 1,076,228.57 → 1,076,228 (Python 분수 계산)",
+  "input": {
+   "wage": 10320,
+   "hours": 20,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_hours": 4,
+   "base_pay": 206400,
+   "holiday_pay": 41280,
+   "weekly": 247680,
+   "monthly": 1076228
+  }
+ },
+ {
+  "why": "기준선: 주 15시간 딱(근로기준법 제18조③ 15시간 미만만 제외) → 주휴 3시간 30,960원, 한 주 185,760원",
+  "input": {
+   "wage": 10320,
+   "hours": 15,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_hours": 3,
+   "holiday_pay": 30960,
+   "weekly": 185760,
+   "monthly": 807171
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 주 14.5시간 → 주휴 없음, 149,640원",
+  "input": {
+   "wage": 10320,
+   "hours": 14.5,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_hours": 0,
+   "holiday_pay": 0,
+   "weekly": 149640,
+   "monthly": 650221
+  },
+  "notes_include": [
+   "주휴수당이 없어요"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "주 40시간: 주휴 8시간 82,560원(고용노동부 주휴수당 예시와 같음), 한 주 495,360원",
+  "input": {
+   "wage": 10320,
+   "hours": 40,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_hours": 8,
+   "holiday_pay": 82560,
+   "weekly": 495360,
+   "monthly": 2152457
+  },
+  "boundary": true
+ },
+ {
+  "why": "5명 이상, 주 20시간 + 초과 4시간: 4×10,320×1.5 = 61,920 (기간제법 제6조③), 합계 309,600",
+  "input": {
+   "wage": 10320,
+   "hours": 20,
+   "extra": 4,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "extra_pay": 61920,
+   "weekly": 309600,
+   "monthly": 1345285
+  }
+ },
+ {
+  "why": "4명 이하, 같은 조건: 가산 없이 4×10,320 = 41,280, 합계 288,960",
+  "input": {
+   "wage": 10320,
+   "hours": 20,
+   "extra": 4,
+   "night": 0,
+   "size": "small"
+  },
+  "expect": {
+   "extra_pay": 41280,
+   "weekly": 288960,
+   "monthly": 1255600
+  },
+  "notes_include": [
+   "4명 이하"
+  ]
+ },
+ {
+  "why": "5명 이상, 주 25시간 중 야간 10시간: 야간 가산 10×10,320×0.5 = 51,600 (근로기준법 제56조③), 258,000+51,600+51,600 = 361,200",
+  "input": {
+   "wage": 10320,
+   "hours": 25,
+   "extra": 0,
+   "night": 10,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_hours": 5,
+   "night_pay": 51600,
+   "weekly": 361200,
+   "monthly": 1569500
+  }
+ },
+ {
+  "why": "4명 이하 야간: 가산 0원, 309,600",
+  "input": {
+   "wage": 10320,
+   "hours": 25,
+   "extra": 0,
+   "night": 10,
+   "size": "small"
+  },
+  "expect": {
+   "night_pay": 0,
+   "weekly": 309600
+  }
+ },
+ {
+  "why": "2027년 최저임금 10,700원(고용노동부 고시), 주 20시간: 214,000 + 42,800 = 256,800, 한 달 1,115,857",
+  "input": {
+   "wage": 10700,
+   "hours": 20,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_pay": 42800,
+   "weekly": 256800,
+   "monthly": 1115857
+  }
+ },
+ {
+  "why": "주 22.5시간: 주휴 4.5시간 46,440원, 합계 278,640",
+  "input": {
+   "wage": 10320,
+   "hours": 22.5,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "holiday_hours": 4.5,
+   "holiday_pay": 46440,
+   "weekly": 278640,
+   "monthly": 1210757
+  }
+ },
+ {
+  "why": "2026.12.31: 시급 10,500원은 2026 최저임금 10,320원 이상 → 미달 안내 없음",
+  "today": "2026-12-31",
+  "input": {
+   "wage": 10500,
+   "hours": 20,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "weekly": 252000
+  },
+  "notes_exclude": [
+   "최저임금"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "2027.1.1부터 최저임금 10,700원(고시) → 10,500원은 미달 안내, 20×10,500+4×10,500=252,000",
+  "today": "2027-01-01",
+  "input": {
+   "wage": 10500,
+   "hours": 20,
+   "extra": 0,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "weekly": 252000
+  },
+  "notes_include": [
+   "2027년 최저임금"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "4명 이하는 기간제법 제6조 미적용(제3조·시행령 별표 1) → 초과 13시간이어도 12시간 한도 안내 없음, 13×10,320=134,160",
+  "input": {
+   "wage": 10320,
+   "hours": 20,
+   "extra": 13,
+   "night": 0,
+   "size": "small"
+  },
+  "expect": {
+   "extra_pay": 134160
+  },
+  "notes_exclude": [
+   "12시간까지"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "5명 이상 단시간 초과 13시간 → 12시간 한도 안내(기간제법 제6조①)",
+  "input": {
+   "wage": 10320,
+   "hours": 20,
+   "extra": 13,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "extra_pay": 201240
+  },
+  "notes_include": [
+   "단시간근로자는"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "5명 이상 주 40시간 + 연장 13시간 → 1주 12시간 한도 안내(근로기준법 제53조①)",
+  "input": {
+   "wage": 10320,
+   "hours": 40,
+   "extra": 13,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "extra_pay": 201240
+  },
+  "notes_include": [
+   "연장근로는"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "5명 이상 주 40시간 + 연장 12시간 딱 → 안내 없음",
+  "input": {
+   "wage": 10320,
+   "hours": 40,
+   "extra": 12,
+   "night": 0,
+   "size": "five"
+  },
+  "expect": {
+   "extra_pay": 185760
+  },
+  "notes_exclude": [
+   "12시간까지"
+  ],
+  "boundary": true
+ }
+]

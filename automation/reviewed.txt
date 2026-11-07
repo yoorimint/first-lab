@@ -303,3 +303,4 @@ calc:work-hours
 calc:savings-interest
 1579 이율 계산기: 예금·적금 세후 이자, 15.4% 떼는 계산법
 1576 근무시간 계산기: 휴게 빼고 하루 8시간 넘으면 연장근로
+calc:part-time-pay

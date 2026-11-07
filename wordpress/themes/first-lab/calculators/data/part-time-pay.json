@@ -1,0 +1,19 @@
+{
+  "basis_date": "2026-11-07", "yearly_checked": 2027,
+  "sources": [
+    {"name": "근로기준법 제11조·제18조·제55조·제56조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법"},
+    {"name": "근로기준법 시행령 제7조·별표 1 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/근로기준법시행령"},
+    {"name": "기간제 및 단시간근로자 보호 등에 관한 법률 제3조·제6조 (국가법령정보센터)", "url": "https://www.law.go.kr/법령/기간제및단시간근로자보호등에관한법률"},
+    {"name": "고용노동부 2026년 적용 최저임금 시간급 10,320원 고시", "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=18144"}
+  ],
+  "min_weekly_hours": 15,
+  "full_week_hours": 40,
+  "full_day_hours": 8,
+  "max_extra_hours": 28,
+  "part_time_extra_limit": 12,
+  "extra_rate_per_100": 150,
+  "night_add_per_100": 50,
+  "min_wage": 10320,
+  "min_wage_year": 2026,
+  "scheduled": [{"from": "2027-01-01", "texts": [["10,320원", "10,700원"]], "values": {"min_wage": 10700, "min_wage_year": 2027}, "source": {"name": "고용노동부 2027년 적용 최저임금 시간급 10,700원 고시", "url": "https://www.moel.go.kr/news/enews/report/enewsView.do?news_seq=19744"}}]
+}
