@@ -174,3 +174,4 @@ date,post,fixes,types
 2026-11-07,254,4,wrong_fact:4
 2026-11-07,1831,2,missing_condition:2
 2026-11-07,1837,1,missing_condition:1
+2026-11-07,1841,3,missing_condition:2 wrong_fact:1
