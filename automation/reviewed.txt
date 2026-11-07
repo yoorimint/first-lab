@@ -298,3 +298,4 @@ calc:sunlight-setback
 1525 일용직 근로계약서 양식: 고용노동부 무료 hwp, 칸별 작성법·3년 보관
 calc:unused-leave-pay
 calc:annual-leave-pay
+calc:work-hours

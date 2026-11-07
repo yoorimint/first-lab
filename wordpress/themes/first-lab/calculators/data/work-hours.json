@@ -1,0 +1,33 @@
+{
+  "basis_date": "2026-11-07",
+  "yearly": false,
+  "law_checked": [
+    "근로기준법|2026-12-10"
+  ],
+  "sources": [
+    {
+      "name": "근로기준법 제50조·제53조·제54조·제56조·제69조·제70조 (국가법령정보센터)",
+      "url": "https://www.law.go.kr/법령/근로기준법"
+    },
+    {
+      "name": "근로기준법 시행령 제7조·별표 1 상시 4명 이하 사업장 적용 규정 (국가법령정보센터)",
+      "url": "https://www.law.go.kr/법령/근로기준법시행령"
+    },
+    {
+      "name": "대법원 2023. 12. 7. 선고 2020도15393 판결 (1주 연장 한도 판단·연장근로 중 휴게)",
+      "url": "https://www.scourt.go.kr/sjudge/1702889952221_175912.pdf"
+    }
+  ],
+  "day_hours": 8,
+  "week_hours": 40,
+  "week_overtime": 12,
+  "minor_day_hours": 7,
+  "minor_week_hours": 35,
+  "minor_day_overtime": 1,
+  "minor_week_overtime": 5,
+  "break_4h_hours": 4,
+  "break_4h_min": 30,
+  "break_8h_hours": 8,
+  "break_8h_min": 60,
+  "weekly_15_hours": 15
+}

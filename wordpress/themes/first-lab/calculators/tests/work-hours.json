@@ -1,0 +1,349 @@
+[
+  {
+    "why": "9시~18시, 휴게 60분: 9시간 − 1시간 = 8시간 (제50조② 휴게시간 제외), 8시간이면 휴게 1시간 이상(제54조①), 주 5일 40시간 = 연장 0",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 18,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "span_hours": 9,
+      "work_hours": 8,
+      "night_hours": 0,
+      "required_break_min": 60,
+      "break_short": false,
+      "day_over_hours": 0,
+      "week_hours": 40,
+      "week_over_hours": 0,
+      "over_limit": false
+    },
+    "boundary": true,
+    "notes_exclude": [
+      "8시간을 넘겨 4시간을 연장근로"
+    ]
+  },
+  {
+    "why": "9시~19시, 휴게 60분, 주 5일: 하루 9시간 → 8시간 넘은 1시간 × 5일 = 연장 5시간, 주 45시간",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 19,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 9,
+      "day_over_hours": 1,
+      "week_hours": 45,
+      "week_over_hours": 5,
+      "over_limit": false
+    },
+    "notes_include": [
+      "8시간을 넘겨 4시간을 연장근로"
+    ]
+  },
+  {
+    "why": "야간 22시~다음 날 7시, 휴게 60분(밤 중): 9시간 − 1 = 8시간, 밤 22~6시 8시간 − 휴게 1시간 = 야간 7시간 (제56조③)",
+    "input": {
+      "start_h": 22,
+      "start_m": 0,
+      "end_h": 7,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 60,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "span_hours": 9,
+      "work_hours": 8,
+      "night_hours": 7,
+      "day_over_hours": 0
+    }
+  },
+  {
+    "why": "기준선: 9시~13시 휴게 없음 = 근로 4시간 → 휴게 30분 이상 필요(제54조①)",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 13,
+      "end_m": 0,
+      "break_min": 0,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 4,
+      "required_break_min": 30,
+      "break_short": true
+    },
+    "boundary": true,
+    "notes_include": [
+      "2026년 12월 10일부터는 근로시간이 4시간인 날"
+    ]
+  },
+  {
+    "why": "기준선: 9시~12시 59분 휴게 없음 = 3시간 59분(4시간 미만) → 법정 휴게 의무 없음",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 12,
+      "end_m": 59,
+      "break_min": 0,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 3.98,
+      "required_break_min": 0,
+      "break_short": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 9시~20시 24분, 휴게 60분, 주 5일 → 하루 10.4시간, 주 52시간 − 40 = 12시간 (제53조① 한도 딱, 대법원 2020도15393 방식)",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 20,
+      "end_m": 24,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 10.4,
+      "week_over_hours": 12,
+      "over_limit": false,
+      "limit_over_hours": 12
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 9시~20시 25분, 주 5일 → 주 52시간 5분 − 40 = 12시간 5분 → 12시간 초과",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 20,
+      "end_m": 25,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "week_over_hours": 12.08,
+      "over_limit": true,
+      "limit_over_hours": 12.08
+    },
+    "boundary": true
+  },
+  {
+    "why": "주 6일 × 8시간 = 48시간 → 하루 초과 0 + 주 40시간 넘은 8시간 = 연장 8시간 (제50조①)",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 18,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 6,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "week_hours": 48,
+      "week_over_hours": 8
+    }
+  },
+  {
+    "why": "주 6일 × 9시간: 하루 초과 6시간 + (8×6 − 40) 8시간 = 14시간 → 12시간 초과",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 19,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 6,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "week_hours": 54,
+      "week_over_hours": 14,
+      "over_limit": true,
+      "limit_over_hours": 14
+    }
+  },
+  {
+    "why": "15세 이상 18세 미만: 9시~17시 휴게 60분 = 7시간 → 1일 7시간 이내(제69조), 주 35시간 = 연장 0",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 17,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "minor"
+    },
+    "expect": {
+      "work_hours": 7,
+      "day_over_hours": 0,
+      "week_hours": 35,
+      "week_over_hours": 0
+    }
+  },
+  {
+    "why": "4명 이하 사업장: 주 6일 × 9시간이어도 연장 한도 판정 안 함 (시행령 별표 1), 휴게 규정은 적용",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 19,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 6,
+      "size": "small",
+      "age": "adult"
+    },
+    "expect": {
+      "week_over_hours": 14,
+      "over_limit": false
+    },
+    "notes_include": [
+      "휴게시간 규정은 적용돼요"
+    ]
+  },
+  {
+    "why": "주 3일 × 하루 4시간 30분(9시~14시, 휴게 30분) = 주 13.5시간 → 15시간 미만 안내 (제18조③)",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 14,
+      "end_m": 0,
+      "break_min": 30,
+      "night_break_min": 0,
+      "days": 3,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 4.5,
+      "required_break_min": 30,
+      "week_hours": 13.5
+    },
+    "notes_include": [
+      "15시간 미만"
+    ]
+  },
+  {
+    "why": "대법원 2020도15393: 8시~21시 휴게 60분 주 4일 → 하루 12시간, 가산 대상 연장 4×4=16시간이지만 한도 판단은 주 48 − 40 = 8시간 → 한도 안. 실근로 12시간 → 휴게 60 + 30 = 90분 이상",
+    "input": {
+      "start_h": 8,
+      "start_m": 0,
+      "end_h": 21,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 4,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 12,
+      "week_over_hours": 16,
+      "limit_over_hours": 8,
+      "over_limit": false,
+      "required_break_min": 90,
+      "break_short": true
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선: 8시~20시 59분 휴게 60분 → 실근로 11시간 59분(8시간 + 4시간 미만) → 휴게 60분 이상",
+    "input": {
+      "start_h": 8,
+      "start_m": 0,
+      "end_h": 20,
+      "end_m": 59,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 5,
+      "size": "five",
+      "age": "adult"
+    },
+    "expect": {
+      "work_hours": 11.98,
+      "required_break_min": 60,
+      "break_short": false
+    },
+    "boundary": true
+  },
+  {
+    "why": "18세 미만 + 4명 이하: 제69조는 별표 1로 4명 이하에도 적용 → 9시~19시 주 6일 = 54 − 35 = 19시간 > 5시간 한도",
+    "input": {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 19,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 0,
+      "days": 6,
+      "size": "small",
+      "age": "minor"
+    },
+    "expect": {
+      "work_hours": 9,
+      "day_over_hours": 2,
+      "limit_over_hours": 19,
+      "over_limit": true
+    },
+    "notes_include": [
+      "4명 이하 사업장에도 적용돼요"
+    ],
+    "notes_exclude": [
+      "1일 8시간·1주 40시간, 연장 1주 12시간 한도"
+    ]
+  },
+  {
+    "why": "18세 미만 야간: 22시~7시 → 제70조② 야간근로 금지(동의+인가 예외) 안내",
+    "input": {
+      "start_h": 22,
+      "start_m": 0,
+      "end_h": 7,
+      "end_m": 0,
+      "break_min": 60,
+      "night_break_min": 60,
+      "days": 5,
+      "size": "five",
+      "age": "minor"
+    },
+    "expect": {
+      "night_hours": 7
+    },
+    "notes_include": [
+      "18세 미만은 밤 10시~아침 6시"
+    ]
+  }
+]
