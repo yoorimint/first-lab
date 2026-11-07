@@ -1,0 +1,74 @@
+{
+ "basis_date": "2026-11-07",
+ "yearly_checked": 2026,
+ "law_checked": [
+  "국민건강보험법|2026-11-27",
+  "국민건강보험법|2026-12-24",
+  "국민건강보험법|2027-01-01",
+  "국민건강보험법 시행령|2026-12-24",
+  "국민건강보험법 시행령|2027-01-01",
+  "노인장기요양보험법|2026-11-27"
+ ],
+ "laws": [
+  "국민건강보험법",
+  "노인장기요양보험법"
+ ],
+ "sources": [
+  {
+   "name": "국민건강보험법 제69조④(보수월액보험료·보수 외 소득월액보험료)·제71조①·제76조(50%씩 부담)",
+   "url": "https://www.law.go.kr/법령/국민건강보험법"
+  },
+  {
+   "name": "국민건강보험법 시행령 제44조① (보험료율 1만분의 719)·제41조④ (연간 2천만 원)·제32조 (상한·하한)",
+   "url": "https://www.law.go.kr/법령/국민건강보험법시행령"
+  },
+  {
+   "name": "국민건강보험법 시행규칙 제44조 (이자·배당 1천만 원 이하 제외, 근로·연금 50%)",
+   "url": "https://www.law.go.kr/법령/국민건강보험법시행규칙"
+  },
+  {
+   "name": "노인장기요양보험법 제9조① (건강보험료율 대비 장기요양보험료율 비율, 소수점 이하 다섯째자리 반올림)",
+   "url": "https://www.law.go.kr/법령/노인장기요양보험법"
+  },
+  {
+   "name": "보건복지부고시 월별 건강보험료액의 상한과 하한 (2026년 1월 1일 시행)",
+   "url": "https://www.nhis.or.kr/lm/lmxsrv/law/lawFullContent.do?SEQ=39"
+  },
+  {
+   "name": "국민건강보험공단 2026년 달라지는 건강·장기요양제도 (보험료율 7.19%·장기요양 0.9448%)",
+   "url": "https://www.nhis.or.kr/renewal_popup/poster/20260204_poster_longdesc_1.html"
+  },
+  {
+   "name": "정책브리핑 제15차 건강보험정책심의위원회 결과 (2027년 보험료율 7.19% 유지)",
+   "url": "https://www.korea.kr/policy/civilView.do?newsId=156780681"
+  }
+ ],
+ "health_rate_per_10000": 719,
+ "ltc_rate_per_1000000": 9448,
+ "health_employee_min": 10080,
+ "health_employee_max": 4591740,
+ "other_income_deduction": 20000000,
+ "other_income_premium_max": 4591740,
+ "interest_exclude_max": 10000000,
+ "half_rate_income": 0.5,
+ "yearly_recheck": "2026-12-15",
+ "yearly_pending": "2027년 보험료 상한·하한 고시(12월)·장기요양 0.9994% 시행령 공포 확인",
+ "scheduled": [
+  {
+   "from": "2027-01-01",
+   "texts": [
+    [
+     "13.14%",
+     "13.90%"
+    ]
+   ],
+   "values": {
+    "ltc_rate_per_1000000": 9994
+   },
+   "source": {
+    "name": "보건복지부 2027년 장기요양보험료율 소득 대비 0.9994% (건강보험료 대비 13.90%) 장기요양위원회 의결 (2026.10.30)",
+    "url": "https://www.mohw.go.kr/board.es?mid=a10503010100&bid=0027&act=view&list_no=1492396"
+   }
+  }
+ ]
+}

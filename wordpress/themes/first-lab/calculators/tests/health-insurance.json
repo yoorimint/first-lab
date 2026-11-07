@@ -1,0 +1,231 @@
+[
+ {
+  "why": "월 300만: 300만×7.19%÷2=107,850 / 장기요양 107,850×0.1314(제9조① 비율 0.9448/7.19 반올림)=14,171 (본문 예시)",
+  "input": {
+   "pay": 3000000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14171,
+   "employee": 122021,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 122021
+  }
+ },
+ {
+  "why": "월 280만: 실수령액 계산기 사례와 같은 값 100,660·13,226",
+  "input": {
+   "pay": 2800000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 100660,
+   "ltc": 13226,
+   "employee": 113886,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 113886
+  }
+ },
+ {
+  "why": "근로자 몫 하한 10,080원(고시 하한 20,160원의 절반): 28만×3.595%=10,066→10,060 < 10,080",
+  "input": {
+   "pay": 280000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 10080,
+   "ltc": 1324,
+   "employee": 11404,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 11404
+  },
+  "boundary": true
+ },
+ {
+  "why": "하한 바로 위: 28만 1천×3.595%=10,101.95→10,100",
+  "input": {
+   "pay": 281000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 10100,
+   "ltc": 1327,
+   "employee": 11427,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 11427
+  },
+  "boundary": true
+ },
+ {
+  "why": "근로자 몫 상한 4,591,740원(고시 상한 9,183,480원의 절반) 바로 아래: 1억 2,772만 5천×3.595%=4,591,713.75→4,591,710",
+  "input": {
+   "pay": 127725000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 4591710,
+   "ltc": 603350,
+   "employee": 5195060,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 5195060
+  },
+  "boundary": true
+ },
+ {
+  "why": "상한 넘음: 1억 2,800만→4,591,740 고정",
+  "input": {
+   "pay": 128000000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 4591740,
+   "ltc": 603354,
+   "employee": 5195094,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 5195094
+  },
+  "boundary": true
+ },
+ {
+  "why": "사업소득 3,000만+이자 500만(1천만 이하 제외): (3,000만−2,000만)÷12=833,333×7.19%=59,916→59,910 (본문 예시)",
+  "input": {
+   "pay": 3000000,
+   "interest": 5000000,
+   "income_full": 30000000,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14171,
+   "employee": 122021,
+   "extra_month": 833333,
+   "extra": 59910,
+   "extra_ltc": 7872,
+   "my_total": 189803
+  },
+  "notes_include": [
+   "1,000만 원 이하라 계산에서 뺐어요"
+  ]
+ },
+ {
+  "why": "보수 외 소득 딱 2,000만 원: 초과가 아니라 추가 보험료 없음",
+  "input": {
+   "pay": 3000000,
+   "interest": 0,
+   "income_full": 20000000,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14171,
+   "employee": 122021,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 122021
+  },
+  "boundary": true,
+  "notes_include": [
+   "2,000만 원 이하라 추가 보험료가 없어요"
+  ]
+ },
+ {
+  "why": "2,012만 원: 월 1만 원 초과×7.19%=719→710",
+  "input": {
+   "pay": 3000000,
+   "interest": 0,
+   "income_full": 20120000,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14171,
+   "employee": 122021,
+   "extra_month": 10000,
+   "extra": 710,
+   "extra_ltc": 93,
+   "my_total": 122824
+  },
+  "boundary": true
+ },
+ {
+  "why": "연금 4,000만 원(50% 평가): (4,000만−2,000만)÷12×50%=833,333",
+  "input": {
+   "pay": 3000000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 40000000
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14171,
+   "employee": 122021,
+   "extra_month": 833333,
+   "extra": 59910,
+   "extra_ltc": 7872,
+   "my_total": 189803
+  }
+ },
+ {
+  "why": "이자 1,200만(1천만 초과라 전액)+사업 1,000만: (2,200만−2,000만)÷12=166,666×7.19%=11,983→11,980",
+  "input": {
+   "pay": 3000000,
+   "interest": 12000000,
+   "income_full": 10000000,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14171,
+   "employee": 122021,
+   "extra_month": 166666,
+   "extra": 11980,
+   "extra_ltc": 1574,
+   "my_total": 135575
+  }
+ },
+ {
+  "why": "2027년 장기요양 0.9994/7.19=0.1390: 107,850×0.1390=14,991",
+  "today": "2027-01-01",
+  "input": {
+   "pay": 3000000,
+   "interest": 0,
+   "income_full": 0,
+   "income_half": 0
+  },
+  "expect": {
+   "health": 107850,
+   "ltc": 14991,
+   "employee": 122841,
+   "extra_month": 0,
+   "extra": 0,
+   "extra_ltc": 0,
+   "my_total": 122841
+  }
+ }
+]
