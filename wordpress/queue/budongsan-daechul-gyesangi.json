@@ -1,0 +1,351 @@
+{
+ "title": "부동산 대출 계산기: 월 1,588,535원 예시와 DSR 한도",
+ "excerpt": "부동산 대출 3억 원을 연 4.88%, 30년 원리금균등으로 빌리면 월 1,588,535원이에요. 상환 방식 3가지 비교와 LTV·DSR 한도 계산까지 정리했어요.",
+ "content_html": "<p>부동산 대출 계산은 두 가지를 따로 봐야 해요. 매달 얼마를 갚는지(상환액), 그리고 얼마까지 빌릴 수 있는지(한도)예요. 3억 원을 연 4.88%, 30년 원리금균등으로 빌리면 매달 1,588,535원을 갚고, 이자는 모두 271,872,696원이에요. 연 4.88%는 한국은행이 집계한 2026년 9월 예금은행 주택담보대출 평균 금리(신규취급액 기준)예요.</p>\n<h2>부동산 대출 계산기로 월 상환액 계산하기</h2>\n<p>대출 원금, 연 금리, 기간(개월), 상환 방식을 넣으면 월 납입금과 이자 총액이 나와요. 30년이면 360개월로 넣어요.</p>\n<p>[firstlab_calc id=\"loan-repayment\"]</p>\n<p>결과는 금리가 기간 내내 같다고 보고 낸 값이에요. 실제 청구액은 납입일과 금융사의 원 단위 처리에 따라 조금 달라질 수 있어요.</p>\n<h2>상환 방식 3가지 비교: 3억 원·연 4.88%·30년</h2>\n<table><thead><tr><th>상환 방식</th><th>월 상환액</th><th>이자 총액</th></tr></thead><tbody>\n<tr><td>원리금균등</td><td>매달 1,588,535원</td><td>271,872,696원</td></tr>\n<tr><td>원금균등</td><td>첫 달 2,053,333원 → 마지막 달 836,722원</td><td>220,210,000원</td></tr>\n<tr><td>만기일시</td><td>매달 이자 1,220,000원, 마지막 달 원금 3억 원</td><td>439,200,000원</td></tr>\n</tbody></table>\n<ul>\n<li><strong>원리금균등</strong>: 매달 갚는 원금과 이자의 합계가 같아요. 생활비 계획을 세우기 쉬워요.</li>\n<li><strong>원금균등</strong>: 매달 같은 원금을 갚고, 이자는 남은 잔액에 붙어요. 처음 부담이 크지만 이자 총액은 가장 적어요.</li>\n<li><strong>만기일시</strong>: 이자만 내다가 마지막에 원금을 한 번에 갚아요. 이자 총액이 가장 커요.</li>\n</ul>\n<p>한국주택금융공사는 이 밖에 월 상환액이 점점 늘어나는 체증식 분할상환도 안내하고 있어요.</p>\n<h2>기간을 늘리면 월 부담과 이자는 어떻게 바뀌나</h2>\n<p>같은 3억 원, 연 4.88%, 원리금균등 기준으로 기간만 바꿔 계산했어요.</p>\n<table><thead><tr><th>기간</th><th>월 상환액</th><th>이자 총액</th></tr></thead><tbody>\n<tr><td>20년</td><td>1,960,034원</td><td>170,408,199원</td></tr>\n<tr><td>30년</td><td>1,588,535원</td><td>271,872,696원</td></tr>\n<tr><td>40년</td><td>1,422,828원</td><td>382,957,636원</td></tr>\n</tbody></table>\n<p>30년에서 40년으로 늘리면 월 상환액은 165,707원 줄지만 이자는 111,084,940원 늘어요.</p>\n<h2>대출 한도 계산: LTV·DSR·주택가격별 상한 중 가장 작은 값</h2>\n<ul>\n<li><strong>LTV</strong>: 집값에 비해 빌릴 수 있는 비율이에요. 금융위원회 2025년 10월 15일 대책으로 규제지역 무주택자(처분조건부 1주택자 포함) 주택담보대출 LTV는 40%예요. 비규제지역은 70%예요. 생애최초 주택구입자와 다주택자는 기준이 따로 있으니 은행에서 확인해요.</li>\n<li><strong>주택가격별 상한</strong>: 수도권·규제지역에서 집을 사려고 받는 주택담보대출 한도예요. 시가 15억 원 이하 6억 원, 15억 원 초과~25억 원 이하 4억 원, 25억 원 초과 2억 원까지예요 (2025년 10월 16일 시행). 다만 중도금대출은 이 상한을 받지 않고, 이주비대출은 주택가격과 관계없이 최대 6억 원이에요.</li>\n<li><strong>DSR</strong>: 가계대출의 1년 원리금을 연소득으로 나눈 비율이에요. 중도금·이주비대출, 전세자금대출, 서민금융상품 등 일부 대출은 계산에서 빠져요. 총대출액이 1억 원을 넘으면 은행권은 40%, 제2금융권은 50% 안에서만 빌릴 수 있어요.</li>\n</ul>\n<h3>DSR 한도 계산 예시: 연소득 6,000만 원</h3>\n<p>다른 대출이 없고 은행권 DSR 40%라면, 1년에 갚을 수 있는 원리금은 2,400만 원(월 200만 원)이에요. 30년 원리금균등으로 바꾸면 연 4.88%일 때 약 3억 7,771만 원까지예요.</p>\n<p>DSR은 변동금리 대출 등에 스트레스 금리를 더한 계산용 금리로 따져요. 수도권·규제지역 주택담보대출은 이 가산 금리의 하한이 3%예요. 변동형이면 3%를 다 더한 연 7.88%로 계산해 한도가 약 2억 7,570만 원으로 줄어요. 혼합형·주기형도 고정 기간(금리변동주기)이 만기의 30% 미만이면 3%를 다 더해요. 30% 이상이면 기간이 길수록 일부만 더하고, 70% 이상이면 더하지 않아요. 스트레스 금리는 실제로 내는 이자가 아니라 한도 계산에만 쓰여요.</p>\n<h3>세 기준을 합친 예시</h3>\n<p>규제지역의 8억 원 아파트를 무주택자가 산다고 해 볼게요. LTV 40%면 3억 2,000만 원, 주택가격별 상한은 6억 원이에요. 변동금리라 스트레스 금리 3%를 다 더하면 DSR 한도는 약 2억 7,570만 원이고, 이 값이 가장 작아 한도가 돼요. 스트레스 금리를 더하지 않는 장기 고정금리라면 DSR 한도가 약 3억 7,771만 원이라 LTV 3억 2,000만 원이 한도예요. 금리 유형·만기·신용점수에 따라 실제 한도는 달라지니 은행 상담 때 함께 확인해요.</p>\n<h2>중도상환수수료도 계산에 넣기</h2>\n<p>금융소비자보호법상 중도상환수수료는 대출계약이 성립한 날부터 3년 이내에 갚을 때만 받을 수 있어요. 다른 법령이 허용하는 경우 등 예외도 있어요. 2025년 1월 13일 이후 새로 맺은 계약부터는 실제로 드는 비용 범위 안에서만 수수료를 매겨요. 새마을금고·농협·수협 같은 상호금융은 금융소비자보호법 대상이 아니니 해당 기관에서 확인해요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>원리금균등과 원금균등 중 무엇이 유리한가요?</h3>\n<p>이자 총액만 보면 원금균등이 적어요. 다만 첫 달 부담이 크니, 상환 방식별 DSR 한도는 은행에서 비교해 봐요.</p>\n<h3>변동금리면 계산 결과가 맞지 않나요?</h3>\n<p>금리가 바뀌면 그때부터 월 상환액이 달라져요. 금리를 1%포인트 높여 한 번 더 계산해 두면 부담을 미리 볼 수 있어요.</p>\n<h3>보증료·인지세도 계산기 결과에 들어가나요?</h3>\n<p>들어가지 않아요. 계산기는 원금과 이자만 계산해요.</p>",
+ "tags": [
+  "부동산대출계산기",
+  "주택담보대출",
+  "DSR",
+  "원리금균등"
+ ],
+ "category": "부동산·이사",
+ "images": [
+  {
+   "prompt": "a calm apartment living room with large windows and afternoon sunlight, a small potted plant on a wooden table",
+   "alt": "오후 햇살이 드는 아파트 거실"
+  }
+ ],
+ "keyword": "부동산대출계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "연 4.88% = 한국은행 2026년 9월 예금은행 주택담보대출 평균 금리(신규취급액 기준), ECOS 121Y006",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202609/202609/BECBLA0302"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3억 원·연 4.88%·30년 원리금균등 월 1,588,535원",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202609/202609/BECBLA0302",
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "3억 원·연 4.88%·30년 원리금균등 이자 총액 271,872,696원",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202609/202609/BECBLA0302",
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등 첫 달 2,053,333원 → 마지막 달 836,722원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등 이자 총액 220,210,000원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만기일시 매달 이자 1,220,000원, 마지막 달 원금 3억 원, 이자 총액 439,200,000원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원리금균등: 매달 갚는 원금과 이자의 합계가 같음",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "원금균등: 매달 같은 원금, 이자는 남은 잔액에 따라 계산, 이자 총액 가장 적음",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "만기일시: 이자만 내다가 마지막에 원금, 이자 총액 가장 큼",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "한국주택금융공사는 체증식 분할상환(월 상환액 증가)도 안내",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "20년 월 1,960,034원·이자 170,408,199원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "40년 월 1,422,828원·이자 382,957,636원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "30년→40년 월 상환액 165,707원 감소, 이자 111,084,940원 증가",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기는 원금·연 금리·기간(개월)·상환 방식을 넣으면 월 납입금·이자 총액이 나오고, 30년은 360개월로 넣음",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "결과는 금리가 기간 내내 같다고 본 값, 실제 청구액은 원 단위 처리에 따라 조금 다를 수 있음",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융위원회 2025년 10월 15일 대책: 규제지역 무주택자(처분조건부 1주택자 포함) 주택담보대출 LTV 40%, 비규제지역 70%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "생애최초 주택구입자와 다주택자는 LTV 기준이 따로 있음 — 은행 확인 안내",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "수도권·규제지역 주택구입목적 주담대 시가 15억 원 이하 6억 원, 15억 원 초과~25억 원 이하 4억 원, 25억 원 초과 2억 원 (2025년 10월 16일 시행)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "중도금대출은 주택가격별 상한 미적용, 이주비대출은 주택가격과 관계없이 최대 6억 원",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=85432&fileTy=ATTACH&fileNo=4"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "DSR = 가계대출의 1년 원리금 ÷ 연소득, 중도금·이주비대출·전세자금대출·서민금융상품 등은 계산에서 제외",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "총대출액 1억 원 초과 시 은행권 DSR 40%, 제2금융권 50%",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연소득 6,000만 원 × 40% = 연 2,400만 원(월 200만 원), 연 4.88%·30년 원리금균등이면 약 3억 7,771만 원",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750",
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202609/202609/BECBLA0302"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "스트레스 금리는 변동금리 대출 등에 더하는 DSR 계산용 금리, 수도권·규제지역 주담대 하한 3%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "변동형이면 3%를 다 더한 연 7.88%로 계산해 한도 약 2억 7,570만 원",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "혼합형·주기형도 고정 기간이 만기의 30% 미만이면 3% 전부, 30% 이상이면 기간이 길수록 일부만, 70% 이상이면 미적용",
+   "urls": [
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "스트레스 금리는 실제 이자가 아니라 한도 계산에만 쓰임 (실제 대출금리에는 미부과)",
+   "urls": [
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "8억 원 아파트 LTV 40% = 3억 2,000만 원, 15억 원 이하라 상한 6억 원",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "변동금리면 DSR 약 2억 7,570만 원이 가장 작아 한도, 장기 고정금리면 DSR 약 3억 7,771만 원이라 LTV 3억 2,000만 원이 한도",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "중도상환수수료는 대출계약 성립일부터 3년 이내 상환 때만 부과 가능, 다른 법령 허용 등 예외 (금융소비자보호에관한법률 제20조)",
+   "urls": [
+    "https://www.law.go.kr/법령/금융소비자보호에관한법률/제20조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2025년 1월 13일 이후 새로 맺은 계약부터 실비용 범위 안에서만 중도상환수수료 부과",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/83833"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "새마을금고·농협·수협 등 상호금융은 금융소비자보호법 적용 대상이 아님",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/83833"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "원금균등은 이자 총액이 적지만 첫 달 부담이 큼 — 상환 방식별 DSR 한도는 은행 비교 안내",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "변동금리면 금리가 바뀌면 월 상환액이 달라짐",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "계산기는 원금과 이자만 계산, 보증료·인지세는 결과에 안 들어감",
+   "urls": [
+    "https://fine.fss.or.kr/fine/fnctip/lonCalc/view.do?menuNo=900019"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융소비자보호에관한법률 제20조 단서1 반영 — 중도상환수수료 문단: 3년 이내 상환·다른 법령 허용 등 예외를 '예외도 있어요'로 반영 (가목 상환방식 강요 금지는 계산과 관계없음)",
+   "urls": [
+    "https://www.law.go.kr/법령/금융소비자보호에관한법률/제20조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융소비자보호에관한법률 제20조 단서2 해당 없음 — 제3자 연대보증·연계제휴서비스 내용으로 대출 상환 계산과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/금융소비자보호에관한법률/제20조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "부동산 대출 계산기 제목 예시 월 1,588,535원 = 3억 원·연 4.88%·30년 원리금균등",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202609/202609/BECBLA0302"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "금융위원회 주택시장 안정화 대책 관련 대출수요 관리 방안",
+   "url": "https://www.fsc.go.kr/no010101/85432"
+  },
+  {
+   "name": "한국주택금융공사 월별 상환원리금 안내",
+   "url": "https://www.hf.go.kr/ko/sub01/sub01_06_03.do"
+  },
+  {
+   "name": "금융위원회 중도상환수수료 개편방안 시행",
+   "url": "https://www.fsc.go.kr/no010101/83833"
+  }
+ ]
+}
