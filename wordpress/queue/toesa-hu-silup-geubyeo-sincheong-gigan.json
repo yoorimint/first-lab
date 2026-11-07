@@ -1,0 +1,578 @@
+{
+ "title": "퇴사 후 실업급여 신청기간: 이직 다음 날부터 12개월, 늦으면 날수 손해",
+ "excerpt": "퇴사 후 실업급여는 원칙적으로 이직일 다음 날부터 12개월 안에 받아요. 대기기간 7일과 소정급여일수 120~270일이 이 안에 들어가야 해 늦으면 날수가 줄 수 있고, 질병·출산 등은 신고해 늘릴 수 있어요.",
+ "content_html": "<p>퇴사 후 실업급여(구직급여)는 <strong>이직일 다음 날부터 12개월 안</strong>에만 받을 수 있어요. 이 12개월을 수급기간이라고 하고, 기간이 끝나면 받을 날(소정급여일수)이 남아 있어도 나머지는 받지 못해요. 그래서 신청 자체는 퇴사 6개월 뒤에도 할 수 있지만, 늦게 신청할수록 받는 날수가 줄어들 수 있어요. 질병·부상, 임신·출산·육아 같은 사유로 일을 할 수 없으면 수급기간 안에 신고해 기간을 늘릴 수 있어요(최대 4년).</p>\n\n<h2>수급기간 12개월은 언제부터 세나요</h2>\n<p>고용보험에서 이직일은 회사를 그만둔 날이고, 피보험자격은 이직한 날의 다음 날 잃어요. 수급기간은 이 이직일의 다음 날부터 12개월이에요. 예를 들어 2026년 6월 30일에 퇴사했다면 수급기간은 2026년 7월 1일부터 2027년 6월 30일까지예요.</p>\n<p>이 12개월 안에 다음 두 기간이 모두 들어가야 해요.</p>\n<ul>\n<li><strong>대기기간 7일</strong>: 고용센터에 실업을 신고한 날부터 7일은 구직급여가 나오지 않아요. 최종 이직 당시 건설일용근로자였다면 대기기간 없이 신고일부터 계산해요.</li>\n<li><strong>소정급여일수</strong>: 대기기간이 끝난 다음 날부터 세는, 실제로 받을 수 있는 날수예요.</li>\n</ul>\n\n<h2>소정급여일수: 나이와 가입기간별 120~270일</h2>\n<table>\n<thead><tr><th>이직일 현재 나이</th><th>1년 미만</th><th>1~3년</th><th>3~5년</th><th>5~10년</th><th>10년 이상</th></tr></thead>\n<tbody>\n<tr><td>50세 미만</td><td>120일</td><td>150일</td><td>180일</td><td>210일</td><td>240일</td></tr>\n<tr><td>50세 이상·장애인</td><td>120일</td><td>180일</td><td>210일</td><td>240일</td><td>270일</td></tr>\n</tbody>\n</table>\n<p>가입기간은 이직한 회사의 고용보험 가입기간이 기준이고, 전 직장에서 자격을 잃은 날부터 3년 안에 지금 회사에 들어왔다면 전 직장 기간도 합쳐요. 다만 전 직장 기간으로 이미 구직급여를 받았다면 그 기간은 빼요.</p>\n\n<h2>늦게 신청하면 얼마나 줄어드나: 계산 예시</h2>\n<p>2026년 6월 30일 퇴사, 50세 미만, 가입기간 3~5년(180일)인 경우로 계산해 볼게요. 수급기간 끝은 2027년 6월 30일이에요.</p>\n<table>\n<thead><tr><th>실업 신고일</th><th>지급 시작일</th><th>받는 날수</th><th>못 받는 날수</th></tr></thead>\n<tbody>\n<tr><td>2026년 12월 26일</td><td>2027년 1월 2일</td><td>180일</td><td>0일</td></tr>\n<tr><td>2027년 1월 4일</td><td>2027년 1월 11일</td><td>171일</td><td>9일</td></tr>\n</tbody>\n</table>\n<p>신고일부터 7일이 대기기간이라, 180일을 다 받으려면 신고일을 포함해 수급기간 끝날까지 187일(대기 7일+180일)이 남아 있어야 해요. 같은 퇴사일이라면 소정급여일수별로 다 받을 수 있는 마지막 신고일은 이렇게 달라져요.</p>\n<ul>\n<li>120일: 2027년 2월 24일</li>\n<li>150일: 2027년 1월 25일</li>\n<li>180일: 2026년 12월 26일</li>\n<li>210일: 2026년 11월 26일</li>\n<li>240일: 2026년 10월 27일</li>\n<li>270일: 2026년 9월 27일</li>\n</ul>\n<p>이 날짜는 신고일 기준의 이론상 마지막 날이에요. 구직 신청·수급자격 인정 신청을 준비하는 시간과 실업인정을 받지 못한 날이 생길 수 있으니 퇴사 직후에 바로 신청하는 게 안전해요.</p>\n\n<h2>신청은 어디서, 어떤 순서로</h2>\n<ol>\n<li>고용24(work24.go.kr)에서 구직 신청을 해요.</li>\n<li>거주지 관할 고용센터에 실업을 신고하고 수급자격 인정을 신청해요. 실업 신고에는 구직 신청과 수급자격 인정 신청이 함께 들어가요.</li>\n<li>인정되면 고용센터가 정한 실업인정일(신고일부터 1주~4주 범위)에 재취업 활동을 신고하고, 그 기간의 구직급여를 받아요.</li>\n</ol>\n<p>회사가 이직확인서를 내지 않아 신청이 미뤄질 것 같으면, 근로자가 직접 이전 회사에 이직확인서 발급을 요청할 수 있고 요청받은 회사는 발급해야 해요.</p>\n\n<h2>수급기간을 늘릴 수 있는 경우</h2>\n<p>12개월 안에 아래 사유로 취업할 수 없게 되면, 그 사실을 수급기간 안에 신청지 관할 고용센터에 신고해 취업할 수 없는 기간만큼 수급기간을 늘릴 수 있어요. 늘린 기간을 합쳐 4년을 넘을 수는 없어요.</p>\n<ul>\n<li>임신·출산·육아</li>\n<li>본인의 질병이나 부상(상병급여를 받은 질병·부상은 제외)</li>\n<li>배우자, 본인·배우자의 직계존속·직계비속의 질병이나 부상</li>\n<li>배우자의 국외발령 등으로 함께 살려고 거처를 옮긴 경우</li>\n<li>병역법에 따른 의무복무</li>\n<li>범죄혐의로 인한 구속이나 형의 집행(형법이나 직무 관련 법률 위반으로 금고 이상의 형을 받고 해고돼 수급자격이 없는 사람은 제외)</li>\n<li>재난 및 안전관리 기본법에 따른 심각 경보 발령</li>\n</ul>\n<p>천재지변, 병역의무 이행 같은 부득이한 사유가 있으면 그 사유가 없어진 날부터 30일 안에 신고서를 내도 돼요. 산재보험 요양급여를 받는 경우나, 3개월 이상 요양이 필요해 이직했고 주치의 소견과 사업주 의견으로 확인된 경우에는 최초 요양일에 신고한 것으로 봐요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>퇴사하고 바로 쉬다가 나중에 신청해도 되나요?</h3>\n<p>12개월 안이면 신청은 할 수 있어요. 다만 구직급여는 일할 의사와 능력이 있는데도 취업하지 못한 상태여야 하는 등 수급 요건을 갖춰야 받을 수 있고, 실업인정일마다 재취업 노력을 신고해야 해요.</p>\n<h3>12개월이 지나면 남은 날은 어떻게 되나요?</h3>\n<p>수급기간이 끝나면 소정급여일수가 남아 있어도 나머지 구직급여는 받을 수 없어요.</p>\n<h3>투잡을 하다 두 곳 모두 그만뒀어요. 대기기간이 같은가요?</h3>\n<p>둘 이상의 고용보험 자격을 잃었다면 그중 하나를 골라 수급자격을 신청해요. 가장 나중에 잃은 자격이 아닌 것을 골랐다면 마지막 이직 사유가 수급자격 제한 사유가 아니어야 하는데, 마지막 이직이 소득 감소에 따른 이직으로 인정돼 신청한 경우에는 대기기간이 7일이 아니라 신고일부터 4주 범위에서 대통령령으로 정한 기간이에요.</p>\n",
+ "tags": [
+  "실업급여",
+  "구직급여",
+  "수급기간",
+  "퇴사"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm young office worker walking out of a modern office building at sunset carrying a small box, seen from behind",
+   "alt": "퇴사 후 상자를 들고 회사 건물을 나서는 직장인 뒷모습"
+  }
+ ],
+ "keyword": "퇴사후실업급여신청기간",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "수급기간은 이직일 다음 날부터 12개월, 원칙적으로 이 12개월 안에 받아요 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "12개월이 끝나면 소정급여일수가 남아 있어도 나머지는 받지 못해요 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "퇴사 6개월 뒤에도 12개월 안이면 신청할 수 있음 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "임신·출산·육아, 질병·부상 등으로 취업할 수 없으면 수급기간 안에 신고해 연장, 최대 4년 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "피보험자격은 이직한 날의 다음 날 상실 (고용보험법 제14조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제14조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 6월 30일 퇴사 시 수급기간 2026년 7월 1일~2027년 6월 30일 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "대기기간 7일: 실업 신고일부터 7일은 구직급여 미지급 (고용보험법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제49조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "최종 이직 당시 건설일용근로자는 대기기간 없이 신고일부터 계산 (고용보험법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제49조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소정급여일수는 대기기간이 끝난 다음 날부터 셈 (고용보험법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소정급여일수 120~270일, 50세 미만 120·150·180·210·240일 (고용보험법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제50조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "50세 이상·장애인 120·180·210·240·270일 (고용보험법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제50조",
+    "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "가입기간은 이직 당시 사업 기준, 전 직장 상실 뒤 3년 안 재취득이면 합산 (고용보험법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "전 직장 기간으로 이미 구직급여를 받았으면 그 기간은 뺌 (고용보험법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 12월 26일 신고: 2027년 1월 2일 지급 시작, 180일, 못 받는 날 0일 (고용보험법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 1월 4일 신고: 2027년 1월 11일 지급 시작, 171일, 못 받는 날 9일 (고용보험법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "180일을 다 받으려면 187일(대기 7일+180일)이 남아 있어야 함 (고용보험법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "마지막 신고일: 120일 2027년 2월 24일, 150일 2027년 1월 25일, 180일 2026년 12월 26일 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "마지막 신고일: 210일 2026년 11월 26일, 240일 2026년 10월 27일, 270일 2026년 9월 27일 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고용24(work24.go.kr)에서 구직 신청 (고용보험법 시행령 제61조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제61조",
+    "https://www.moel.go.kr/faq/faqView.do?seqRepeat=219"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "거주지 관할 고용센터에 수급자격 인정 신청 (고용보험법 시행령 제61조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제61조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "실업 신고에는 구직 신청과 수급자격 인정 신청이 포함 (고용보험법 제42조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제42조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "실업인정일은 신고일부터 1주~4주 범위, 재취업 노력 신고 (고용보험법 제44조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제44조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "근로자가 이직확인서 발급을 요청할 수 있고 요청받은 사업주는 발급해야 함 (고용보험법 제42조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제42조",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288723&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연장 신고는 수급기간 안에 신청지 관할 고용센터에 (고용보험법 시행령 제71조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제71조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "본인 질병·부상(상병급여 받은 것 제외), 배우자·직계존비속 질병·부상 (고용보험법 시행령 제70조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제70조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "배우자 국외발령 등 거소 이전, 병역법 의무복무 (고용보험법 시행령 제70조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제70조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "천재지변·병역의무 등 부득이한 사유는 사유가 없어진 날부터 30일 안에 신고 (고용보험법 시행령 제71조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제71조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "산재 요양급여, 3개월 이상 요양 이직(주치의 소견·사업주 의견 확인)은 최초 요양일에 신고한 것으로 봄 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "일할 의사와 능력이 있는데도 취업하지 못한 상태여야 함 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "둘 이상 자격 상실 시 하나 선택, 가장 나중 자격이 아니면 마지막 이직 사유가 제한 사유가 아니어야 함 (고용보험법 제43조의2)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제43조의2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득 감소 이직 인정 시 대기기간은 신고일부터 4주 범위에서 대통령령으로 정한 기간 (고용보험법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "요약: 원칙적으로 12개월, 질병·출산 등은 신고해 늘릴 수 있음 (고용보험법 제48조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "범죄혐의 구속·형 집행(제58조1호가목 수급자격 없는 사람 제외), 재난 심각 경보 발령 (고용보험법 시행령 제70조)",
+   "urls": [
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행령/제70조",
+    "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288723&efYd=20260918&chrClsCd=010202&ancYnChk=0",
+    "https://www.law.go.kr/법령/고용보험법시행규칙/제92조의2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "고용보험법 제48조 단서1 반영 — '수급기간을 늘릴 수 있는 경우' 단락(최대 4년, 수급기간 안 신고)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제48조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제49조 단서1 반영 — '수급기간 12개월은 언제부터' 목록 대기기간 7일",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제49조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제49조 단서2 반영 — 대기기간 항목에 건설일용근로자 예외",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제49조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제49조 단서3 반영 — FAQ '투잡' 답에 소득 감소 이직 시 4주 범위 대기기간",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제49조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제50조 단서1 반영 — 소정급여일수 표 아래 '이직한 회사의 고용보험 가입기간이 기준'(적용 제외 기간은 가입기간이 아님)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제50조 단서2 해당 없음 — 자영업자 폐업 기준, 이 글은 퇴사한 근로자 대상",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제50조 단서3 반영 — 표 아래 전 직장 3년 안 재취득 시 합산",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제50조 단서4 반영 — 표 아래 '전 직장 기간으로 이미 구직급여를 받았다면 그 기간은 빼요'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제50조 단서5 해당 없음 — 자영업자 재취득 합산 단서, 이 글은 근로자 대상",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제50조 단서6 해당 없음 — 취득 신고 누락자의 피보험기간 소급 계산, 신청기간 계산과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제50조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제42조 단서1 해당 없음 — 재난 시 고용정보시스템 신고 특례, 본문은 일반 신청 순서만 안내",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제42조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제44조 단서1 해당 없음 — 훈련생 등 실업인정 방법 특례, 본문은 원칙 주기(1~4주)만",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제44조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제44조 단서2 해당 없음 — 출석 못 한 경우 증명서 실업인정, 본문은 원칙만 안내하고 '출석만 가능' 단정 없음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제44조"
+   ]
+  },
+  {
+   "claim": "고용보험법시행령 제71조 단서1 반영 — 연장 단락 '수급기간 안에 신청지 관할 고용센터에 신고'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제71조"
+   ]
+  },
+  {
+   "claim": "고용보험법시행령 제71조 단서2 반영 — 연장 단락 천재지변·병역 사유 소멸 후 30일",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제71조"
+   ]
+  },
+  {
+   "claim": "고용보험법시행령 제71조 단서3 반영 — 연장 단락 산재 요양급여는 최초 요양일에 신고한 것으로 봄",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제71조"
+   ]
+  },
+  {
+   "claim": "고용보험법시행령 제70조 단서1 반영 — 연장 사유 목록 범죄혐의 항목 제외 괄호",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제70조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제40조 단서1 해당 없음 — 일용근로자 전용 수급 요건(5·6호), 이 글은 수급 요건이 아닌 신청기간 글",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제40조 단서2 반영 — FAQ '근로 의사와 능력이 있는데도 취업하지 못한 상태'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제43조의2 단서1 반영 — FAQ '투잡' 답에 소득 감소 이직 인정",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제43조의2"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 반영 — 연장 사유 목록 '본인의 질병이나 부상(상병급여를 받은 질병·부상은 제외)', 상병급여 자체는 신청기간 글 범위 밖",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제58조 해당 없음 — 이 글은 신청 기한·수급기간 글이고 이직 사유별 수급자격 제한은 다루지 않음(FAQ는 '등 수급 요건'으로 표현)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제58조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제40조 부칙 경과조치(일용근로자 수급요건) 해당 없음 — 일용근로자 수급 요건은 이 글에서 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 단서1 해당 없음 — 실업 신고 뒤 질병·부상·출산으로 실업인정을 못 받을 때의 상병급여, 이 글은 신고 전 수급기간 연기만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 단서2 해당 없음 — 지급정지 기간 상병급여 제외, 상병급여 내용은 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 단서3 해당 없음 — 상병급여 받은 사람의 구직급여 간주 규정, 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 단서4 해당 없음 — 출산 상병급여 지급 예외, 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 단서5 해당 없음 — 휴업보상 등을 받는 경우 상병급여 제외, 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  },
+  {
+   "claim": "고용보험법 제63조 단서6 해당 없음 — 상병급여 지급 준용 규정, 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제63조"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 고용보험법 (수급기간·대기기간·소정급여일수)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284449&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+  },
+  {
+   "name": "국가법령정보센터 고용보험법 시행령 (수급기간 연기 사유·신청)",
+   "url": "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=288717&efYd=20260918&chrClsCd=010202&ancYnChk=0"
+  },
+  {
+   "name": "찾기 쉬운 생활법령 구직급여 수급일수",
+   "url": "https://www.easylaw.go.kr/CSP/CnpClsMain.laf?csmSeq=722&ccfNo=2&cciNo=3&cnpClsNo=1"
+  }
+ ]
+}
