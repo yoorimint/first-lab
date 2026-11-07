@@ -1,0 +1,298 @@
+[
+  {
+    "why": "월 300만 원 3개월 900만 원÷92=97,826 → ×70%=68,478 (66,048 초과라 기본) × 30일 = 2,054,340",
+    "input": {
+      "wage_3m": 9000000,
+      "days_3m": 92,
+      "off_days": 30,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 97826,
+      "base": 97826,
+      "d70": 68478,
+      "daily": 68478,
+      "total": 2054340
+    }
+  },
+  {
+    "why": "평균 100,000 (9,200,000÷92) → 70,000 × 10일",
+    "input": {
+      "wage_3m": 9200000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 100000,
+      "daily": 70000,
+      "total": 700000
+    }
+  },
+  {
+    "why": "평균 300,000 > 최고 보상기준 268,299 → 268,299×0.7=187,809.3 → 187,809 × 5일",
+    "input": {
+      "wage_3m": 27600000,
+      "days_3m": 92,
+      "off_days": 5,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 300000,
+      "base": 268299,
+      "d70": 187809,
+      "daily": 187809,
+      "total": 939045
+    },
+    "boundary": true
+  },
+  {
+    "why": "평균 268,299 딱 최고 보상기준 → 187,809",
+    "input": {
+      "wage_3m": 24683508,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 268299,
+      "base": 268299,
+      "daily": 187809,
+      "total": 751236
+    },
+    "boundary": true
+  },
+  {
+    "why": "평균 60,000 → 70% 42,000 ≤ 66,048 → 90% 54,000 < 최저임금액 82,560 → 82,560 (제54조②)",
+    "input": {
+      "wage_3m": 5520000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 60000,
+      "daily": 82560,
+      "total": 825600
+    },
+    "notes_include": [
+      "최저임금액을 하루 휴업급여로"
+    ]
+  },
+  {
+    "why": "평균 73,386 → 90% 66,047.4 → 66,047 ≤ 66,048 → 본문 → 최저임금액 82,560 (경계 아래)",
+    "input": {
+      "wage_3m": 6751512,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 73386,
+      "daily": 82560
+    },
+    "boundary": true
+  },
+  {
+    "why": "평균 73,388 → 90% 66,049.2 > 66,048 → 단서 66,048 (경계 위)",
+    "input": {
+      "wage_3m": 6751696,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 73388,
+      "daily": 66048,
+      "total": 264192
+    },
+    "boundary": true,
+    "notes_include": [
+      "최저 보상기준 금액의 80%를 넘어"
+    ]
+  },
+  {
+    "why": "평균임금 73,387 (6,751,604÷92) → 90% 66,048.3 > 66,048 → 단서 66,048 (제54조① 단서는 버리기 전 금액으로 비교, 독립 검수 11/7)",
+    "input": {
+      "wage_3m": 6751604,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 73387,
+      "daily": 66048,
+      "total": 264192
+    },
+    "boundary": true
+  },
+  {
+    "why": "평균 94,354 → 70% 66,047.8 ≤ 66,048 → 90% 84,918 > 66,048 → 66,048",
+    "input": {
+      "wage_3m": 8680568,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 94354,
+      "daily": 66048
+    },
+    "boundary": true
+  },
+  {
+    "why": "평균 94,355 → 70% 66,048.5 > 66,048 → 기본 66,048",
+    "input": {
+      "wage_3m": 8680660,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "avg_wage": 94355,
+      "d70": 66048,
+      "daily": 66048
+    },
+    "boundary": true
+  },
+  {
+    "why": "쉰 기간 3일 → 지급 안 됨 (제52조 단서)",
+    "input": {
+      "wage_3m": 9200000,
+      "days_3m": 92,
+      "off_days": 3,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 70000,
+      "total": 0
+    },
+    "boundary": true,
+    "notes_include": [
+      "3일 이내면 산재 휴업급여는 나오지 않아요"
+    ]
+  },
+  {
+    "why": "쉰 기간 4일 → 기간 전체 70,000×4",
+    "input": {
+      "wage_3m": 9200000,
+      "days_3m": 92,
+      "off_days": 4,
+      "age": "under61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 70000,
+      "total": 280000
+    },
+    "boundary": true
+  },
+  {
+    "why": "61세 평균 100,000: 70,000×66/70=66,000 ≥ 제3호 66,048×86/90=63,112 → 66,000",
+    "input": {
+      "wage_3m": 9200000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "61",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 66000,
+      "total": 660000
+    },
+    "notes_include": [
+      "61세부터는"
+    ]
+  },
+  {
+    "why": "65세 평균 100,000: 70,000×50/70=50,000 < 제3호 66,048×70/90=51,370.67 → 51,370 (별표 1 제1호 단서)",
+    "input": {
+      "wage_3m": 9200000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "65",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 51370
+    },
+    "boundary": true
+  },
+  {
+    "why": "65세 평균 150,000: 105,000×50/70=75,000",
+    "input": {
+      "wage_3m": 13800000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "65",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 75000
+    }
+  },
+  {
+    "why": "63세 평균 60,000: 최저임금액 82,560×78/90=71,552 (제2호)",
+    "input": {
+      "wage_3m": 5520000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "63",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 71552
+    }
+  },
+  {
+    "why": "62세 평균 80,000: 단서 구간 → 제3호 66,048×82/90=60,177.07 → 60,177",
+    "input": {
+      "wage_3m": 7360000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "62",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 60177
+    }
+  },
+  {
+    "why": "64세 평균 120,000: 84,000×54/70=64,800 ≥ 제3호 66,048×74/90=54,306 → 64,800",
+    "input": {
+      "wage_3m": 11040000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "64",
+      "late_injury": "no"
+    },
+    "expect": {
+      "daily": 64800
+    }
+  },
+  {
+    "why": "65세라도 61세 이후 일하다 다쳐 요양 2년 이내면 감액 없음 (시행령 제51조) → 70,000",
+    "input": {
+      "wage_3m": 9200000,
+      "days_3m": 92,
+      "off_days": 10,
+      "age": "65",
+      "late_injury": "yes"
+    },
+    "expect": {
+      "daily": 70000,
+      "total": 700000
+    }
+  }
+]
