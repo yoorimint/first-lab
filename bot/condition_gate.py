@@ -1116,3 +1116,15 @@ def readability(body_html: str, limit: int = 5) -> list[str]:
     for tag, inner in re.findall(r"<(li|p)(?:\s[^>]*)?>((?:(?!</?(?:li|p|ul|ol)\b).)*)</\1>", body_html or "", flags=re.S):
         out += readability_element(tag, inner)
     return [f"읽기: {x}" for x in out[:limit]]
+
+
+# 평균임금 = 3개월 임금 ÷ 총일수만 쓰고 '통상임금보다 적으면 통상임금' (근로기준법 제2조②)을 빠뜨림 (11/7 #1858 프리랜서 퇴직금)
+AVG_WAGE_DEF = re.compile(r"평균임금[^.?!]{0,40}(?:3개월|석 달)[^.?!]{0,80}(?:나눈|나눠|나누)")
+
+
+def average_wage_floor(body_html: str) -> list[str]:
+    text = _plain(body_html or "")
+    m = AVG_WAGE_DEF.search(text)
+    if m and "통상임금" not in text:
+        return [f"평균임금 계산을 설명했는데 '통상임금보다 적으면 통상임금으로'(근로기준법 제2조②)가 없음: {m.group(0)[:50]}"]
+    return []

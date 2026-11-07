@@ -105,6 +105,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "unresolved_delegation": lambda: condition_gate.unresolved_delegation(post["content_html"]),
               "county_scope": lambda: condition_gate.county_scope(post["content_html"]),
               "readability": lambda: condition_gate.readability(post["content_html"]),
+              "average_wage_floor": lambda: condition_gate.average_wage_floor(post["content_html"]),
               "labor_day_exception": lambda: condition_gate.labor_day_exception(post["content_html"]),
               "holiday_attendance": lambda: condition_gate.holiday_attendance(post["excerpt"], post["content_html"]),
               "round_headline": lambda: expiry.round_headline(post["title"], post["excerpt"], " ".join(expiry.blocks(post["content_html"]))),

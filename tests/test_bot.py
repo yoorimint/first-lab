@@ -2319,6 +2319,17 @@ class ReviewRatesTest(unittest.TestCase):
         self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
 
 
+class AverageWageFloorTest(unittest.TestCase):
+    """11/7 #1858: 평균임금 = 3개월 임금 ÷ 총일수만 쓰고 통상임금 보장(근로기준법 제2조②) 누락."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import average_wage_floor
+        body = "<p>1일 평균임금은 퇴직일 이전 3개월 동안 받은 임금 총액을 그 기간의 총일수로 나눈 금액이에요.</p>"
+        self.assertEqual(len(average_wage_floor(body)), 1)
+        self.assertEqual(average_wage_floor(body + "<p>이 금액이 1일 통상임금보다 적으면 통상임금으로 계산해요.</p>"), [])
+        self.assertEqual(average_wage_floor("<p>연차수당은 통상임금으로 계산해요.</p>"), [])
+
+
 class ReadabilityTest(unittest.TestCase):
     """11/7 운영자 '글 가독성은 체크 안 하나': 목록 항목 200자·문단 300자·문장 100자, 법 조문 괄호 1개까지."""
 
