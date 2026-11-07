@@ -343,3 +343,4 @@ calc:foreign-stock-tax
 1761 고용보험 상실코드 9가지: 코드별 뜻과 실업급여 영향
 1766 종합소득세 기한후신고: 한 달 안이면 무신고가산세 50% 감면
 calc:industrial-accident-insurance
+calc:senior-continued-employment

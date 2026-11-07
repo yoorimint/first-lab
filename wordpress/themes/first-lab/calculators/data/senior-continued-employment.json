@@ -1,0 +1,18 @@
+{
+  "basis_date": "2026-11-07", "yearly_checked": 2026,
+  "sources": [
+    {"name": "국가법령정보센터 고령자 고용안정지원금 지급 규정 (제4조 지원요건, 제5조 지원수준·한도, 제6조 대상 근로자, 제12조 신청)", "url": "https://www.law.go.kr/행정규칙/고령자고용안정지원금지급규정"},
+    {"name": "국가법령정보센터 고용보험법 시행령 제28조의4 (고령자 계속고용장려금)", "url": "https://www.law.go.kr/법령/고용보험법시행령"},
+    {"name": "정부24 고령자 계속고용장려금 (고용노동부)", "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/999000000009"}
+  ],
+  "regions": {
+    "capital": {"label": "서울·인천·경기", "monthly": 300000},
+    "non_capital": {"label": "비수도권", "monthly": 400000}
+  },
+  "cap_rate_pct": 30,
+  "cap_max": 30,
+  "small_threshold": 10,
+  "small_cap": 3,
+  "max_months": 36,
+  "max_insured": 1000000
+}

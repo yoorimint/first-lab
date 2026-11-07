@@ -1,0 +1,182 @@
+[
+ {
+  "why": "경기 사업장, 매월 말 20·20·20명(평균 20)·대상 8명: 한도 20×30%=6명(제5조③), 6명×월 30만 원×3개월=540만 원(제5조①)",
+  "input": {
+   "region": "capital",
+   "m1": 20,
+   "m2": 20,
+   "m3": 20,
+   "workers": 8
+  },
+  "expect": {
+   "cap": 6,
+   "paid": 6,
+   "monthly": 300000,
+   "quarterly": 5400000,
+   "per_worker_total": 10800000,
+   "small": false
+  },
+  "notes_include": [
+   "한도인 6명까지만"
+  ]
+ },
+ {
+  "why": "비수도권 같은 조건: 6명×월 40만 원×3개월=720만 원(제5조②), 3년 최대 1,440만 원(제7조)",
+  "input": {
+   "region": "non_capital",
+   "m1": 20,
+   "m2": 20,
+   "m3": 20,
+   "workers": 8
+  },
+  "expect": {
+   "cap": 6,
+   "paid": 6,
+   "monthly": 400000,
+   "quarterly": 7200000,
+   "per_worker_total": 14400000
+  }
+ },
+ {
+  "why": "매월 말 10·10·9명(평균 9.67, 10명 미만): 30%면 2명이지만 제5조③ 단서로 한도 3명 → 3×30만×3=270만 원",
+  "input": {
+   "region": "capital",
+   "m1": 10,
+   "m2": 10,
+   "m3": 9,
+   "workers": 4
+  },
+  "expect": {
+   "cap": 3,
+   "paid": 3,
+   "quarterly": 2700000,
+   "small": true
+  },
+  "boundary": true,
+  "notes_include": [
+   "10명 미만이면"
+  ]
+ },
+ {
+  "why": "매월 말 10·10·10명(평균 딱 10명): 10명 미만 특례 아님, 10×30%=3명",
+  "input": {
+   "region": "capital",
+   "m1": 10,
+   "m2": 10,
+   "m3": 10,
+   "workers": 4
+  },
+  "expect": {
+   "cap": 3,
+   "paid": 3,
+   "small": false
+  },
+  "boundary": true,
+  "notes_exclude": [
+   "10명 미만이면"
+  ]
+ },
+ {
+  "why": "매월 말 13·13·13명(평균 13): 3.9 → 소수점 이하 버림 3명",
+  "input": {
+   "region": "capital",
+   "m1": 13,
+   "m2": 13,
+   "m3": 13,
+   "workers": 5
+  },
+  "expect": {
+   "cap": 3,
+   "paid": 3
+  },
+  "boundary": true
+ },
+ {
+  "why": "매월 말 13·13·14명(평균 13.333…): 30%=4.0 → 4명 (평균을 13.33으로 반올림하면 3명으로 틀리던 경우, 11/7 검수), 4×30만×3=360만 원",
+  "input": {
+   "region": "capital",
+   "m1": 13,
+   "m2": 13,
+   "m3": 14,
+   "workers": 5
+  },
+  "expect": {
+   "sum": 40,
+   "cap": 4,
+   "paid": 4,
+   "quarterly": 3600000
+  },
+  "boundary": true
+ },
+ {
+  "why": "매월 말 100·100·100명(30%=30명 딱): 한도 30명",
+  "input": {
+   "region": "capital",
+   "m1": 100,
+   "m2": 100,
+   "m3": 100,
+   "workers": 40
+  },
+  "expect": {
+   "cap": 30,
+   "paid": 30,
+   "quarterly": 27000000
+  },
+  "boundary": true
+ },
+ {
+  "why": "매월 말 200·200·200명·대상 40명: 30%는 60명이지만 최대 30명(제5조③) → 30×30만×3=2,700만 원",
+  "input": {
+   "region": "capital",
+   "m1": 200,
+   "m2": 200,
+   "m3": 200,
+   "workers": 40
+  },
+  "expect": {
+   "cap": 30,
+   "paid": 30,
+   "quarterly": 27000000
+  }
+ },
+ {
+  "why": "대상이 한도보다 적음: 평균 50명(한도 15명), 2명 → 2×40만×3=240만 원",
+  "input": {
+   "region": "non_capital",
+   "m1": 50,
+   "m2": 50,
+   "m3": 50,
+   "workers": 2
+  },
+  "expect": {
+   "cap": 15,
+   "paid": 2,
+   "quarterly": 2400000
+  },
+  "notes_exclude": [
+   "한도인"
+  ]
+ },
+ {
+  "why": "대상 0명은 계산 안 함",
+  "input": {
+   "region": "capital",
+   "m1": 20,
+   "m2": 20,
+   "m3": 20,
+   "workers": 0
+  },
+  "expect_error": true
+ },
+ {
+  "why": "첫째 달 빈칸: 0명으로 계산하지 않고 안내",
+  "input": {
+   "region": "capital",
+   "m1": "",
+   "m2": 20,
+   "m3": 20,
+   "workers": 4
+  },
+  "expect_error": true
+ }
+]
