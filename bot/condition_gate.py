@@ -1058,3 +1058,16 @@ def unresolved_delegation(body_html: str) -> list[str]:
             out.append(f"'{_DELEGATED.search(s).group(0)}' 를 그대로 옮김 — 시행령·시행규칙 조문을 열어 실제 값(예: 2주)으로 쓰기"
                        f" (아직 정해지지 않았으면 그렇다고 쓰기): {s.strip()[:60]}")
     return out
+
+
+# 중과 제외 '수도권·광역시·세종 밖' 3억 원 이하 주택: 밖으로 보는 읍·면은 광역시만이 아니라 지방자치법 제3조③④의
+# 읍·면 전체(수도권·세종 포함) — 글이 '광역시 군·읍·면'으로 좁혀 씀 (11/7 #1734·#1759, 소득세법 시행령 제167조의3①1호)
+_COUNTY_NARROW = re.compile(r"광역시(?:에 속한|에 소속된|의)?\s*군(?:과|·|,)\s*읍·?면")
+
+
+def county_scope(body_html: str) -> list[str]:
+    for s in re.split(r"(?<=[.?!])\s+|\n+", _plain(body_html or "")):
+        if "3억" in s and _COUNTY_NARROW.search(s):
+            return ["'광역시 군·읍·면'으로 좁혀 씀 — 수도권·광역시·세종 밖으로 보는 곳은 광역시의 군과 지방자치법 제3조③④의"
+                    f" 읍·면 전체(수도권·세종의 읍·면 포함) (소득세법 시행령 제167조의3①1호): {s.strip()[:60]}"]
+    return []

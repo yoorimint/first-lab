@@ -2308,6 +2308,17 @@ class ReviewRatesTest(unittest.TestCase):
         self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
 
 
+class CountyScopeTest(unittest.TestCase):
+    """11/7 #1734·#1759: 중과 제외 3억 원 이하 주택 지역을 '광역시 군·읍·면'으로 좁혀 씀."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import county_scope
+        self.assertEqual(len(county_scope("<p>수도권·광역시 밖(광역시 군·읍·면 포함)에 있는 기준시가 3억 원 이하 주택은 빠져요.</p>")), 1)
+        self.assertEqual(len(county_scope("<p>세종 밖(광역시에 속한 군과 읍·면 지역도 포함)의 기준시가 3억 원 이하 주택</p>")), 1)
+        self.assertEqual(county_scope("<p>밖(광역시의 군 지역과 수도권·광역시·세종의 읍·면 지역도 포함)의 기준시가 3억 원 이하 주택</p>"), [])
+        self.assertEqual(county_scope("<p>광역시 군·읍·면 지역 농어촌주택 특례</p>"), [])
+
+
 class UnresolvedDelegationTest(unittest.TestCase):
     """11/7 #1705 '신고일부터 4주 범위에서 대통령령으로 정한 기간' — 시행령 제71조의2는 '2주'."""
 
