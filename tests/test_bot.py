@@ -2293,6 +2293,19 @@ class NoticeYearLabelTest(unittest.TestCase):
         self.assertEqual(notice_year_label("엑셀 자격증 22,000원", "", "<p>2027년 9월 1일부터 채용 공고 가점이 바뀌어요.</p>"), [])
 
 
+class UnresolvedDelegationTest(unittest.TestCase):
+    """11/7 #1705 '신고일부터 4주 범위에서 대통령령으로 정한 기간' — 시행령 제71조의2는 '2주'."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import unresolved_delegation
+        self.assertEqual(len(unresolved_delegation("<p>대기기간이 7일이 아니라 신고일부터 4주 범위에서 대통령령으로 정한 기간이에요.</p>")), 1)
+        self.assertEqual(len(unresolved_delegation("<p>승진은 대통령령으로 정한 비율에 따라 해요.</p>")), 1)
+        self.assertEqual(unresolved_delegation("<p>대기기간은 신고일부터 2주예요.</p>"), [])
+        self.assertEqual(unresolved_delegation("<p>2027년 6월 10일부터 대통령령으로 정하는 기간 안에 신고해요.</p>"), [])
+        self.assertEqual(unresolved_delegation("<p>시행규칙으로 정하는 기간은 아직 나오지 않았어요.</p>"), [])
+        self.assertEqual(unresolved_delegation("<p>대통령령으로 정하는 시간 단위·일수 범위에서 나눠 써요.</p>"), [])
+
+
 class RetentionStartTest(unittest.TestCase):
     """11/6 #1208 '계약서는 사업주가 3년간 보존' — 시행령 제22조②: 근로관계가 끝난 날부터 3년."""
 

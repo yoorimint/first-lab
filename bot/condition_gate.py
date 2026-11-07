@@ -1043,3 +1043,18 @@ def notice_year_label(title: str, excerpt: str, body_html: str) -> list[str]:
     if len(_NOTICE.findall(body)) >= 2 and _HEAD_AMOUNT.search(title or "") and not re.search(r"20\d\d", f"{title} {excerpt}"):
         return ["본문은 'O년 공고' 기준인데 제목·요약의 금액에 연도가 없음 — 해마다 공고로 바뀌는 값이면 제목이나 요약에 'O년 공고 기준'을 넣기"]
     return []
+
+
+# 법이 하위 법령에 맡긴 값을 글이 그대로 옮김 — 시행령까지 읽으면 숫자가 있음 (11/7 #1705 '신고일부터 4주 범위에서
+# 대통령령으로 정한 기간' → 시행령 제71조의2 '2주'). 아직 하위 법령이 없는 개정 예정 내용은 그렇다고 쓰면 통과.
+_DELEGATED = re.compile(r"(?:대통령령|시행령|시행규칙|총리령|[가-힣]+부령)(?:으로|에서) 정(?:한|하는|해진)\s*(?:기간|비율|일수|기한|한도)")
+_DELEGATED_OK = re.compile(r"아직|정해지지|나오지 않|미정|입법예고|\d+월 \d+일부터")
+
+
+def unresolved_delegation(body_html: str) -> list[str]:
+    out = []
+    for s in re.split(r"(?<=[.?!])\s+|\n+", _plain(body_html or "")):
+        if _DELEGATED.search(s) and not _DELEGATED_OK.search(s):
+            out.append(f"'{_DELEGATED.search(s).group(0)}' 를 그대로 옮김 — 시행령·시행규칙 조문을 열어 실제 값(예: 2주)으로 쓰기"
+                       f" (아직 정해지지 않았으면 그렇다고 쓰기): {s.strip()[:60]}")
+    return out
