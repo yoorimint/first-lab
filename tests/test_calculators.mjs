@@ -98,7 +98,7 @@ for (const id of ids) {
   }
   // 세금 계산기는 낼 세액의 10원 미만 끝수 처리를 밝혀야 함 (11/7 #1754 상속세: won10_keys 가 없어 1원 단위로 보여 줌)
   // won10_keys(버리는 값) 또는 "won10": "<10원 버림을 안 하는 이유>" 중 하나. 아직 확인 못 한 계산기는 WON10_PENDING (기한 지나면 실패)
-  if (/-tax$/.test(id) && !(data.won10_keys || []).length && typeof data.won10 !== 'string') {
+  if (/-tax$|insurance/.test(id) && !(data.won10_keys || []).length && typeof data.won10 !== 'string') {
     if (!(WON10_PENDING.ids.includes(id) && new Date().toISOString().slice(0, 10) <= WON10_PENDING.until)) {
       fail(id, 'data 에 "won10_keys": [낼 세액 키] 또는 "won10": "<끝수 처리 안 하는 이유>" 가 필요함 (국고금관리법 제47조①)');
     }

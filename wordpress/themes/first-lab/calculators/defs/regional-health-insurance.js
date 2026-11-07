@@ -42,7 +42,8 @@
       const sum = incomePremium + propertyPremium;
       const capped = sum > d.monthly_max;
       // 상한·하한은 소득+재산 합계에 적용 (국민건강보험법 제69조⑤⑥, 시행령 제32조 2호 나목) — 11/5 외부 검수: 하한을 소득 보험료에만 적용했던 오류
-      const health = Math.min(Math.max(sum, d.monthly_min), d.monthly_max);
+      // 10원 미만 버림 (국민건강보험법 제107조 '보험료등 … 국고금관리법 제47조에 따른 끝수는 계산하지 아니한다', 11/7)
+      const health = FirstLabCalc.util.floor10(Math.min(Math.max(sum, d.monthly_min), d.monthly_max));
       // 장기요양: 건강보험료 × (장기요양보험료율 ÷ 건강보험료율, 소수점 이하 다섯째자리에서 반올림) — 노인장기요양보험법 제9조①
       // (2026.5.26 개정, 부칙 제3조: 2026년 11월분 보험료부터. 실수령액 계산기와 같은 식)
       const ltcRatio = Math.round((d.ltc_rate_per_1000000 * 100) / d.rate_per_10000); // 1만분의 단위 (0.9448/7.19 → 1314)
@@ -59,7 +60,7 @@
         [`장기요양보험료 (건강보험료 × ${(ltcRatio / 100).toFixed(2)}%)`, u.won(ltc)],
         ['한 달 합계', u.won(total)],
       ];
-      const notes = ['원 미만은 버렸어요. 고지서는 끝자리 처리 때문에 몇십 원 다를 수 있어요.'];
+      const notes = ['건강보험료는 10원 미만, 장기요양보험료는 원 미만을 버렸어요. 고지서와 끝자리가 몇십 원 다를 수 있어요.'];
       if (capped) notes.push(`건강보험료는 한 달 ${u.won(d.monthly_max)}을 넘지 않아요.`);
       if (base <= 0 && (taxBase > 0 || lease > 0)) notes.push('재산이 1억 원 공제 안쪽이라 재산 점수를 0으로 계산했어요.');
       notes.push('65세 이상·농어촌 경감, 주택 구입·전세 대출 공제는 넣지 않았어요.');
