@@ -374,7 +374,7 @@ class ReviewGateTest(unittest.TestCase):
 
 
 class HoldFixTest(unittest.TestCase):
-    BODY = "<p>" + "수수료는 23,000원이에요. " * 20 + "</p>"
+    BODY = "<p>수수료는 23,000원이에요. 수수료는 23,000원이에요.</p>" * 10  # 문단 300자 기준(읽기) 안쪽
 
     def run_fix(self, review):
         from bot import hold, schedule
@@ -789,7 +789,7 @@ class SimilarTopicTest(unittest.TestCase):
 class GateCoverageTest(unittest.TestCase):
     def test_long_article_needs_claims_for_every_fact_sentence(self):
         from bot import review_gate
-        body = "<p>" + "가" * 2100 + "</p>"  # 공백 뺀 2,100자 → 30개
+        body = ("<p>" + "가" * 70 + ".</p>") * 30  # 공백 뺀 2,100자 → 30개 (문장 100자·문단 300자 기준 안쪽)
         ok = [{"claim": f"사실 {i}", "urls": ["https://www.nts.go.kr/a"], "verdict": "맞음", "action": "유지"} for i in range(30)]
         self.assertEqual(review_gate.problems(ok, body_html=body), [])
         few = ok[:16]  # 11/4 자동차보험 글처럼 일부만 검수 → 막힘
@@ -2306,6 +2306,58 @@ class ReviewRatesTest(unittest.TestCase):
         self.assertIsNone(mod.bok_rates({"content_html": "<p>연차수당 계산</p>"}, rates))
         self.assertIsNone(mod.bok_rates({"content_html": "<p>금리</p>"}, None))
         self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
+
+
+class ReadabilityTest(unittest.TestCase):
+    """11/7 운영자 '글 가독성은 체크 안 하나': 목록 항목 200자·문단 300자·문장 100자, 법 조문 괄호 1개까지."""
+
+    def test_element_limits(self):
+        from bot.condition_gate import readability_element
+        self.assertEqual(readability_element("li", "짧은 항목이에요. 괜찮아요."), [])
+        self.assertTrue(any("목록 항목" in x for x in readability_element("li", "가나다라마. " * 40)))
+        self.assertTrue(any("문장이" in x for x in readability_element("p", "가" * 101 + ".")))
+        self.assertEqual(readability_element("p", "가" * 99 + "."), [])
+        two = "규정이 있어요(근로기준법 제60조). 예외도 있어요(가사근로자법 제16조)."
+        self.assertTrue(any("법 조문 괄호" in x for x in readability_element("li", two)))
+
+    def test_sentences_keep_parentheses(self):
+        from bot.condition_gate import split_sentences
+        self.assertEqual(split_sentences("가요(제1항. 다만 예외). 나요. 다요"), ["가요(제1항. 다만 예외).", "나요.", "다요"])
+        self.assertEqual(split_sentences("비율은 0.07%예요. 끝."), ["비율은 0.07%예요.", "끝."])
+
+    def test_body_skips_nested_lists(self):
+        from bot.condition_gate import readability
+        self.assertEqual(readability("<ul><li>짧아요<ul><li>하위</li></ul></li></ul><p>문단이에요.</p>"), [])
+        self.assertEqual(len(readability("<p>" + "가나다. " * 80 + "</p>")), 1)
+
+    def test_review_patch_blocked_when_long(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        post = {"content_html": "<ul><li>원래 항목이에요.</li></ul>", "title": "t", "excerpt": "e"}
+        long_fix = [{"type": "missing_condition", "why": "w", "find": "원래 항목", "tag": "li",
+                     "replace_paragraph": "고친 항목이에요. " * 30, "prevention": "review_only:x"}]
+        self.assertTrue(any("읽기" in e for e in apply_review.check(post, long_fix)))
+
+    def test_display_split_php(self):
+        import os
+        import shutil
+        import subprocess
+        import tempfile
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        li = ("<li><strong>상시 4명 이하</strong>: 적용되지 않아요. 동거 친족만 쓰는 사업장은 근로기준법이 적용되지 않아요. "
+              "다만 인증 기관과 계약한 가사근로자는 적용돼요. 이때 연차는 실제 근로시간 기준이고 15시간 미만이면 생기지 않아요 "
+              "(가사근로자의 고용개선 등에 관한 법률 제16조). 그래서 이 계산기 결과와 다를 수 있으니 계약서와 근로시간 기록을 챙겨 고용노동부 고객상담센터에 꼭 확인해 보세요.</li>")
+        code = ("<?php define('ABSPATH', 1);\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-readability.php'}';\n"
+                "echo firstlab_read_list_item(getenv('LI'));")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        out = subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env={**os.environ, "LI": li}).stdout
+        self.assertIn('<ul class="fl-split">', out)
+        self.assertIn("<li>다만 인증 기관", out)                       # 예외 문장은 따로
+        self.assertIn('<span class="fl-ref">(가사근로자의', out)        # 근거 괄호는 작게
+        self.assertEqual(re.sub(r"<[^>]+>", "", out).replace(" ", ""), re.sub(r"<[^>]+>", "", li).replace(" ", ""))  # 글자는 그대로
 
 
 class ExcerptReduceTest(unittest.TestCase):

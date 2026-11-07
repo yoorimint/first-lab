@@ -104,6 +104,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "notice_year_label": lambda: condition_gate.notice_year_label(post["title"], post["excerpt"], post["content_html"]),
               "unresolved_delegation": lambda: condition_gate.unresolved_delegation(post["content_html"]),
               "county_scope": lambda: condition_gate.county_scope(post["content_html"]),
+              "readability": lambda: condition_gate.readability(post["content_html"]),
               "labor_day_exception": lambda: condition_gate.labor_day_exception(post["content_html"]),
               "holiday_attendance": lambda: condition_gate.holiday_attendance(post["excerpt"], post["content_html"]),
               "round_headline": lambda: expiry.round_headline(post["title"], post["excerpt"], " ".join(expiry.blocks(post["content_html"]))),
@@ -155,6 +156,9 @@ def check(post: dict, items: list[dict]) -> list[str]:
             errors.append(f"{i}번: 찾을 문구에 여는 태그(<{tag}>)를 넣지 않는다 — 문단 안의 글자만: {find[:40]}")
         if p.get("replace_paragraph", "").lstrip().startswith(f"<{tag}"):
             errors.append(f"{i}번: 고친 문구는 <{tag}> 안쪽만 (겉 태그까지 넣으면 이중 문단이 됨, 11/5 #578)")
+        if "replace_paragraph" in p and tag in ("p", "li"):  # 검수 수정이 조건을 덧붙여 글을 빽빽하게 만들던 것 (11/7 운영자 가독성)
+            from bot.condition_gate import readability_element
+            errors += [f"{i}번: 읽기 — {x}" for x in readability_element(tag, p["replace_paragraph"])]
         if find and find in p.get("replace_paragraph", ""):
             errors.append(f"{i}번: 고친 문구 안에 찾을 문구가 그대로 있음 (고친 뒤에도 다시 걸림): {find[:40]}")
         # 조건 추가·완화가 공식 페이지에서 확인된 사실까지 지우지 않게 (11/5 #673: 공단 원문 그대로인 200원·230원을 지우고 '확인하세요'로만 바꿈)

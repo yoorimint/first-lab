@@ -1071,3 +1071,48 @@ def county_scope(body_html: str) -> list[str]:
             return ["'광역시 군·읍·면'으로 좁혀 씀 — 수도권·광역시·세종 밖으로 보는 곳은 광역시의 군과 지방자치법 제3조③④의"
                     f" 읍·면 전체(수도권·세종의 읍·면 포함) (소득세법 시행령 제167조의3①1호): {s.strip()[:60]}"]
     return []
+
+
+# 읽기 쉽게 (11/7 운영자 '글 가독성은 체크 안 하나' → 기준 승인): 목록 항목 200자·문단 300자·문장 100자 이하,
+# 법 조문 괄호 인용은 요소 하나에 1개까지. 화면 나누기(mu-plugins/first-lab-readability.php)와 같은 기준.
+READ_LI_MAX, READ_P_MAX, READ_SENT_MAX, READ_REFS_MAX = 200, 300, 100, 1
+LAW_REF = re.compile(r"\([^()<>]{0,60}(?:법|령|규칙|규정|고시)[^()<>]{0,30}제\d+조[^()<>]{0,60}\)")
+
+
+def split_sentences(text: str) -> list[str]:
+    """'.?!' 뒤 공백에서 자름 — 괄호 안은 자르지 않음 ('(…제1항. 다만…)')."""
+    out, start, depth = [], 0, 0
+    for i, ch in enumerate(text):
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth = max(0, depth - 1)
+        elif ch in ".?!" and depth == 0 and i + 1 < len(text) and text[i + 1].isspace():
+            out.append(text[start:i + 1].strip())
+            start = i + 1
+    if text[start:].strip():
+        out.append(text[start:].strip())
+    return out
+
+
+def readability_element(tag: str, inner_html: str) -> list[str]:
+    """요소 하나(문단·목록 항목 안쪽 HTML)의 읽기 문제."""
+    text = _plain(inner_html)
+    limit = READ_LI_MAX if tag == "li" else READ_P_MAX
+    out = []
+    if len(text) > limit:
+        out.append(f"{'목록 항목' if tag == 'li' else '문단'}이 {len(text)}자 (기준 {limit}자) — 나누거나 줄이기: {text[:30]}")
+    for s in split_sentences(text):
+        if len(s) > READ_SENT_MAX:
+            out.append(f"문장이 {len(s)}자 (기준 {READ_SENT_MAX}자) — 두 문장으로: {s[:30]}")
+    refs = LAW_REF.findall(text)
+    if len(refs) > READ_REFS_MAX:
+        out.append(f"법 조문 괄호가 {len(refs)}개 — 본문에는 1개까지, 나머지 근거는 글 끝 근거 칸으로: {refs[1][:30]}")
+    return out
+
+
+def readability(body_html: str, limit: int = 5) -> list[str]:
+    out = []
+    for tag, inner in re.findall(r"<(li|p)(?:\s[^>]*)?>((?:(?!</?(?:li|p|ul|ol)\b).)*)</\1>", body_html or "", flags=re.S):
+        out += readability_element(tag, inner)
+    return [f"읽기: {x}" for x in out[:limit]]
