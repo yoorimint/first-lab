@@ -2293,6 +2293,21 @@ class NoticeYearLabelTest(unittest.TestCase):
         self.assertEqual(notice_year_label("엑셀 자격증 22,000원", "", "<p>2027년 9월 1일부터 채용 공고 가점이 바뀌어요.</p>"), [])
 
 
+class ReviewRatesTest(unittest.TestCase):
+    """11/7 #1752: 검수자가 한국은행 사이트를 못 열어 4.96%를 확인불가로 — 서버 ECOS 값을 검수 파일에 넣음."""
+
+    def test_rates_only_for_rate_posts(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("unreviewed", ROOT / "automation" / "unreviewed.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        rates = {"household": {"month": "202609", "value": 4.96}}
+        self.assertEqual(mod.bok_rates({"content_html": "<p>가계대출 금리 4.96%</p>"}, rates), rates)
+        self.assertIsNone(mod.bok_rates({"content_html": "<p>연차수당 계산</p>"}, rates))
+        self.assertIsNone(mod.bok_rates({"content_html": "<p>금리</p>"}, None))
+        self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
+
+
 class UnresolvedDelegationTest(unittest.TestCase):
     """11/7 #1705 '신고일부터 4주 범위에서 대통령령으로 정한 기간' — 시행령 제71조의2는 '2주'."""
 

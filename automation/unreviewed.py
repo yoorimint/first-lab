@@ -84,28 +84,39 @@ def benefit_details(post: dict, detail_text=None) -> dict[str, str]:
     return out
 
 
-def save_body(post_id: int) -> Path:
+RATE_WORDS = re.compile(r"한국은행|ECOS|금리|환율|물가")
+
+
+def bok_rates(post: dict, rates: dict | None) -> dict | None:
+    """금리·환율을 쓰는 글이면 서버가 한국은행 ECOS API 로 받은 공식 값 (bot/bok_api) — 검수자는 한국은행 사이트를
+    못 열어 확인불가로 둠 (11/7 #1752 가계대출 4.96%, 서버 값과 같았음)."""
+    text = f"{post.get('title', '')} {post.get('excerpt', '')} {post.get('content_html', '')}"
+    return rates if rates and RATE_WORDS.search(text) else None
+
+
+def save_body(post_id: int, rates: dict | None = None) -> Path:
     """서버의 지금 본문을 JSON 파일로 (title, excerpt, content_html, cited_urls)."""
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     path = OUT_DIR / f"post-{post_id}.json"
     post = _get(f"/post/{post_id}")
     post["cited_urls"] = cited_urls(post)
     post["benefit_detail"] = benefit_details(post)
+    post["bok_rates"] = bok_rates(post, rates)
     path.write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
     return path
 
 
 def main() -> None:
+    state = _get("/maintenance")
     if len(sys.argv) > 1:
         todo = [{"post_id": int(x), "title": ""} for x in sys.argv[1:]]
     else:
-        state = _get("/maintenance")
         done = reviewed_ids()
         posts = state.get("ready_posts", []) + state.get("held_drafts", [])
         todo = [p for p in posts if int(p["post_id"]) not in done]
         print(f"# 검수 필요 {len(todo)}편 / 대기·보류 {len(posts)}편")
     for p in todo:
-        path = save_body(int(p["post_id"]))
+        path = save_body(int(p["post_id"]), state.get("rates"))
         raw = path.read_text(encoding="utf-8")
         title = p.get("title") or json.loads(raw)["title"]
         print(f"{p['post_id']}\t{title}\t{path}")
