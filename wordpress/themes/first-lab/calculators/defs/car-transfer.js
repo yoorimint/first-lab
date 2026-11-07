@@ -61,8 +61,9 @@
       const relief = rule.exempt
         ? (gross <= d.min_tax.free_max ? gross : FirstLabCalc.util.floor((gross * Math.round(d.min_tax.relief_rate * 100)) / 100))
         : Math.min(gross, rule.relief || 0);
-      const tax = gross - relief;
-      const penalty = penaltyFor(lateDays, d.penalty);
+      // 낼 세액·가산세는 10원 미만 버림 (지방회계법 제55조 '지방자치단체의 수입 … 10원 미만은 계산하지 아니할 수 있고')
+      const tax = FirstLabCalc.util.floor10(gross - relief);
+      const penalty = FirstLabCalc.util.floor10(penaltyFor(lateDays, d.penalty));
 
       const rows = [
         ['과세표준', u.won(base)],
@@ -77,7 +78,7 @@
       const notes = [
         '매매는 계약서의 거래가격이 시가표준액보다 낮으면 시가표준액으로 세금을 매겨요.',
         '공채 매입, 증지·인지, 번호판 값은 지역·차종마다 달라 여기에 넣지 않았어요.',
-        '실제 고지 금액은 원 단위 처리 등으로 조금 다를 수 있어요.',
+        '세액은 10원 미만을 버렸어요. 실제 고지 금액은 지역별 처리에 따라 조금 다를 수 있어요.',
       ];
       if (rule.relief) notes.push(`경형 승용차는 취득세 ${u.won(rule.relief)}까지 감면돼요 (${d.relief_until}까지).`);
       if (taxFree) notes.push('과세표준이 50만 원 이하라 취득세가 없어요 (지방세법 제17조).');
