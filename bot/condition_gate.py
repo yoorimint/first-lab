@@ -1129,3 +1129,15 @@ def average_wage_floor(body_html: str) -> list[str]:
     if m and "통상임금" not in text:
         return [f"평균임금 계산을 설명했는데 '통상임금보다 적으면 통상임금으로'(근로기준법 제2조②)가 없음: {m.group(0)[:50]}"]
     return []
+
+
+# 제목 금액이 그해에만 맞는 특례·한시 값인데 제목에 연도가 없음 (11/7 #1929 재산세 '3억이면 299,400원' —
+# 1주택 공정시장가액비율 43~45%·특례세율이 2026년분까지라 2027년에는 틀린 제목)
+_ONE_YEAR = re.compile(r"(20\d\d)년분[^.?!]{0,40}(?:에 한해|에만|까지 적용|까지만)")
+
+
+def year_only_headline(title: str, excerpt: str, body_html: str) -> list[str]:
+    m = _ONE_YEAR.search(_plain(body_html or ""))
+    if m and _HEAD_AMOUNT.search(title or "") and not re.search(r"20\d\d", title or ""):
+        return [f"본문은 '{m.group(0)[:30]}' (그해에만 맞는 값)인데 제목 금액에 연도가 없음 — 제목에 '{m.group(1)}년' 넣기"]
+    return []

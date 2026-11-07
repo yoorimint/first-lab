@@ -2319,6 +2319,17 @@ class ReviewRatesTest(unittest.TestCase):
         self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
 
 
+class YearOnlyHeadlineTest(unittest.TestCase):
+    """11/7 #1929 제목 '3억이면 299,400원' — 본문은 '2026년분 재산세에 한해' 비율이라 다음 해엔 틀린 제목."""
+
+    def test_flag_and_pass(self):
+        from bot.condition_gate import year_only_headline
+        body = "<p>1세대 1주택 43~45%는 시행령이 2026년분 재산세에 한해 정한 비율이에요.</p>"
+        self.assertEqual(len(year_only_headline("재산세 계산기: 3억이면 299,400원", "", body)), 1)
+        self.assertEqual(year_only_headline("재산세 계산기: 2026년 3억이면 299,400원", "", body), [])
+        self.assertEqual(year_only_headline("재산세 계산 방법", "", body), [])
+
+
 class LawAbsenceTableTest(unittest.TestCase):
     """11/7 #1901 표 칸 '법률 근거 없음' — 다른 법률 전체는 확인 안 한 부정 단정."""
 
