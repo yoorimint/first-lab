@@ -2308,6 +2308,16 @@ class ReviewRatesTest(unittest.TestCase):
         self.assertIn("bok_rates", (ROOT / "automation" / "review-prompt.md").read_text(encoding="utf-8"))
 
 
+class ExcerptReduceTest(unittest.TestCase):
+    """11/7 #1766 요약 '가산세 50%가 줄어요' ↔ 본문 '감면을 못 받는 경우' — '받아요'만 보던 검사가 놓침."""
+
+    def test_reduce_promise(self):
+        from bot.condition_gate import excerpt_vs_exclusions
+        body = "<h2>감면을 못 받는 경우</h2><p>조사 착수를 알고 낸 경우</p>"
+        self.assertEqual(len(excerpt_vs_exclusions("1개월 안이면 무신고가산세 50%가 줄어요.", body)), 1)
+        self.assertEqual(excerpt_vs_exclusions("1개월 안이면 50%가 줄어요(조사 착수를 알고 낸 경우는 감면 제외).", body), [])
+
+
 class CountyScopeTest(unittest.TestCase):
     """11/7 #1734·#1759: 중과 제외 3억 원 이하 주택 지역을 '광역시 군·읍·면'으로 좁혀 씀."""
 
