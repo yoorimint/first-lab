@@ -30,7 +30,7 @@
       if (sale > d.max_input) throw new u.InputError('금액이 너무 커요. 1,000억 원 이하로 넣어 주세요.');
       const acquire = num(v.acquire, '산 금액', u, d);
       const expense = num(v.expense, '비용', u, d);
-      const used = num(v.used, '이미 쓴 기본공제', u, d);
+      const used = num(v.used, '이미 쓴 기본공제 금액', u, d);
       const rate = v.kind === 'sme' ? d.rate_sme_pct : d.rate_pct;
       const local = v.kind === 'sme' ? d.local_sme_permille : d.local_permille;
       const income = sale - acquire - expense;

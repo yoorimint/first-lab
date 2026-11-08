@@ -78,6 +78,15 @@ for (const id of ids) {
   // 소수 오차 버림 금지: Math.floor/Math.trunc 대신 util.floor/trunc (3,800,000÷209×11×1.5 = 299,999.99… → 1원 빠짐, 11/5 두 번)
   const src = fs.readFileSync(path.join(DIR, 'defs', `${id}.js`), 'utf8');
   if (/Math\.(floor|trunc)\(/.test(src)) fail(id, 'Math.floor/Math.trunc 대신 FirstLabCalc.util.floor/trunc 를 써야 함 (소수 오차로 1원 빠짐)');
+  // 입력 이름을 `${name}은`·`${name}이` 안내에 끼워 넣는 계산기: 이름 끝 글자에 받침이 있어야 함 (11/8·11/9 '이미 쓴 기본공제은' 두 번 —
+  // 잘못된 입력 사례가 없는 칸은 josaProblem 이 못 봄 → 정의에서 바로 확인)
+  if (/\$\{(name|label)\}(은|이) /.test(src)) {
+    for (const m of src.matchAll(/num\([^,()]+,\s*'([^']+)'/g)) {
+      const last = m[1].trim().slice(-1);
+      const code = last.charCodeAt(0) - 0xac00;
+      if (code >= 0 && code < 11172 && code % 28 === 0) fail(id, `입력 이름 '${m[1]}' 끝에 받침이 없어 안내가 '${m[1]}은/이'로 나옴 — 이름을 바꾸거나 조사를 받침에 맞게`);
+    }
+  }
 
   let data;
   let cases;

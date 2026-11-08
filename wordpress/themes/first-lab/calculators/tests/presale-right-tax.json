@@ -24,5 +24,10 @@
   {"why": "올해 기본공제를 이미 다 씀 → 3,000만 전액 과세 × 60% = 1,800만 + 180만",
    "input": {"sale": 130000000, "acquire": 100000000, "used": 2500000, "hold": "long"},
    "expect": {"gain": 30000000, "deduction": 0, "base": 30000000, "income_tax": 18000000, "local_tax": 1800000, "total": 19800000},
-   "notes_exclude": ["기본공제 250만 원 안이라"]}
+   "notes_exclude": ["기본공제 250만 원 안이라"]},
+  {"why": "이미 쓴 공제 200만 원, 차익 30만 원 → 남은 공제 안이라 0원 (11/9 안내 문장)",
+   "input": {"sale": 100300000, "acquire": 100000000, "used": 2000000, "hold": "long"},
+   "expect": {"deduction": 300000, "base": 0, "total": 0},
+   "notes_include": ["남은 기본공제"]},
+  {"why": "음수 이미 쓴 공제 → 안내 (조사 확인)", "input": {"sale": 100300000, "acquire": 100000000, "used": "-1", "hold": "long"}, "expect_error": true}
 ]

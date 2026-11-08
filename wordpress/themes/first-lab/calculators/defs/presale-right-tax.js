@@ -30,7 +30,7 @@
       if (sale > d.max_input) throw new u.InputError('금액이 너무 커요. 1,000억 원 이하로 넣어 주세요.');
       const acquire = num(v.acquire, '산 금액', u, d);
       const expense = num(v.expense, '비용', u, d);
-      const used = num(v.used, '이미 쓴 기본공제', u, d);
+      const used = num(v.used, '이미 쓴 기본공제 금액', u, d);
       const long = v.hold === 'long';
       const rate = long ? d.rate_long_pct : d.rate_short_pct;
       const local = long ? d.local_long_permille : d.local_short_permille;
@@ -55,7 +55,7 @@
       ];
       const notes = [];
       if (gain <= 0) notes.push('판 금액이 산 금액과 비용보다 크지 않아 낼 세금이 없어요. 그래도 판 달 말일부터 2개월 안에 예정신고는 해요.');
-      else if (base === 0) notes.push('양도차익이 기본공제 250만 원 안이라 세금이 0원이에요.');
+      else if (base === 0) notes.push(used > 0 ? '양도차익이 남은 기본공제 안이라 세금이 0원이에요.' : '양도차익이 기본공제 250만 원 안이라 세금이 0원이에요.');
       notes.push('세금은 10원 미만을 버렸어요.');
       notes.push('같은 해에 부동산을 여러 건 팔았을 때의 합산 비교, 미등기·감면 특례는 넣지 않았어요.');
       return { values, rows, notes };
