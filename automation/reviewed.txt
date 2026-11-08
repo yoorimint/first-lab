@@ -385,3 +385,4 @@ calc:card-deduction
 calc:property-tax
 1929 재산세 계산기: 1주택 공시가격 3억이면 299,400원
 calc:stock-return
+647 CBM 계산기: 60×40×40cm 10개 0.96CBM·EMS 16kg
