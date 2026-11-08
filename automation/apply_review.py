@@ -107,6 +107,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "readability": lambda: condition_gate.readability(post["content_html"]),
               "average_wage_floor": lambda: condition_gate.average_wage_floor(post["content_html"]),
               "year_only_headline": lambda: condition_gate.year_only_headline(post["title"], post["excerpt"], post["content_html"]),
+              "leave_promotion_extinction": lambda: condition_gate.leave_promotion_extinction(post["content_html"]),
               "labor_day_exception": lambda: condition_gate.labor_day_exception(post["content_html"]),
               "holiday_attendance": lambda: condition_gate.holiday_attendance(post["excerpt"], post["content_html"]),
               "round_headline": lambda: expiry.round_headline(post["title"], post["excerpt"], " ".join(expiry.blocks(post["content_html"]))),

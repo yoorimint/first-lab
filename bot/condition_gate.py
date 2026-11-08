@@ -1159,3 +1159,17 @@ def year_only_headline(title: str, excerpt: str, body_html: str) -> list[str]:
     if m and _HEAD_AMOUNT.search(title or "") and not re.search(r"20\d\d", title or ""):
         return [f"본문은 '{m.group(0)[:30]}' (그해에만 맞는 값)인데 제목 금액에 연도가 없음 — 제목에 '{m.group(1)}년' 넣기"]
     return []
+
+
+# 연차 사용 촉진 → 보상 의무 면제는 '사용 기간이 끝나 소멸한' 연차만 (근로기준법 제61조①: '제60조제7항 본문에 따라 소멸된 경우').
+# 퇴사로 남은 연차까지 못 받는 것처럼 읽힘 (11/9 #2179, 같은 꼴 #1471 — 보관 글 279편 중 이 두 글만 걸림)
+_LEAVE_NO_PAY = re.compile(r"보상\s*(?:의무가|할 의무가|하지 않아도|안 해도)")
+_LEAVE_GONE = re.compile(r"(소멸|없어진|사라진|사용 기간이 끝나|기간이 지나)")
+
+
+def leave_promotion_extinction(body_html: str) -> list[str]:
+    for sent in _sentences(body_html or ""):
+        if re.search(r"(연차|휴가)", sent) and _LEAVE_NO_PAY.search(sent) and not _LEAVE_GONE.search(sent):
+            return [f"연차 사용 촉진의 보상 면제는 사용 기간이 끝나 소멸한 연차만(근로기준법 제61조①) — 그 조건이 없음: '{sent[:60]}'"]
+    return []
+

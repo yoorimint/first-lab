@@ -5254,3 +5254,13 @@ class CacheSurrogateTest(unittest.TestCase):
             got = cg._cached("rule", "x", lambda: "고시 본문 \ud83d 끝")
             self.assertEqual(got, "고시 본문  끝")
             self.assertEqual(cg._cached("rule", "x", lambda: "다시 안 부름"), "고시 본문  끝")  # 저장됐다가 읽힘
+
+
+class LeavePromotionTest(unittest.TestCase):
+    """11/9 #2179·#1471: 사용 촉진을 다 했으면 '보상 의무가 없어요' — 사용 기간이 끝나 소멸한 연차만 (근로기준법 제61조①)."""
+
+    def test_missing_extinction(self):
+        from bot.condition_gate import leave_promotion_extinction
+        self.assertTrue(leave_promotion_extinction("<li>촉진을 모두 했는데도 쓰지 않은 연차는 보상 의무가 없어요.</li>"))
+        self.assertEqual(leave_promotion_extinction("<li>촉진을 모두 했는데도 쓰지 않아 사용 기간이 끝나 없어진 연차는 보상 의무가 없어요.</li>"), [])
+        self.assertEqual(leave_promotion_extinction("<p>퇴직금은 보상 의무가 없어요.</p>"), [])  # 연차 얘기가 아님

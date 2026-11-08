@@ -186,6 +186,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.county_scope(body_html)
     out += condition_gate.average_wage_floor(body_html)
     out += condition_gate.year_only_headline(title, excerpt, body_html)
+    out += condition_gate.leave_promotion_extinction(body_html)
     out += condition_gate.readability(body_html)
     out += condition_gate.stale_forms(review, None if law_fetcher is None else (lambda *a: []))
     for item in review:
