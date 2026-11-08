@@ -1,0 +1,23 @@
+{
+ "type": "skip",
+ "keywords": [
+  {
+   "keyword": "KODEX미국AI전력핵심인프라",
+   "why": "특정 운용사 ETF 상품",
+   "brand": "KODEX"
+  },
+  {
+   "keyword": "로지텍MXMASTER3S",
+   "why": "특정 브랜드 상품",
+   "brand": "로지텍"
+  },
+  {
+   "keyword": "식자재왕도매마트",
+   "why": "특정 업체",
+   "brand": "식자재왕"
+  }
+ ],
+ "law_changes": [],
+ "new_benefits": [],
+ "slot": 1
+}
