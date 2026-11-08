@@ -1,0 +1,11 @@
+[
+  {"why": "1억·1년차: 1억 ÷ (11−1) × 120/100 = 1,200만 원 (시행령 제40조의2③3 계산식), 60세 → 100분의 5 (제129조①5의2가)", "input": {"balance": 100000000, "year": 1, "age": 60, "life": "no"}, "expect": {"limit": 12000000, "no_limit": 0, "rate_pct": 5, "rate_with_local_pct": 5.5}},
+  {"why": "1억·4년차: 1억 × 1.2 ÷ 7 = 17,142,857.14… → 원 미만 버림 17,142,857", "input": {"balance": 100000000, "year": 4, "age": 58, "life": "no"}, "expect": {"limit": 17142857, "rate_pct": 5}},
+  {"why": "10년차(한도 계산 마지막 해): 1억 ÷ 1 × 1.2 = 1억 2,000만 원", "input": {"balance": 100000000, "year": 10, "age": 64, "life": "no"}, "expect": {"limit": 120000000, "no_limit": 0}, "boundary": true},
+  {"why": "11년차: 제40조의2④ '연금수령연차가 11년 이상인 경우에는 그 계산식을 적용하지 아니한다' → 한도 없음", "input": {"balance": 100000000, "year": 11, "age": 65, "life": "no"}, "expect": {"limit": 100000000, "no_limit": 1}, "boundary": true, "notes_exclude": ["한도를 넘겨 꺼낸"]},
+  {"why": "나이 69세: 70세 미만 100분의 5", "input": {"balance": 50000000, "year": 2, "age": 69, "life": "no"}, "expect": {"rate_pct": 5, "rate_with_local_pct": 5.5, "limit": 6666666}, "boundary": true},
+  {"why": "나이 70세: 70세 이상 80세 미만 100분의 4, 지방소득세까지 4.4%", "input": {"balance": 50000000, "year": 2, "age": 70, "life": "no"}, "expect": {"rate_pct": 4, "rate_with_local_pct": 4.4}, "boundary": true},
+  {"why": "나이 79세 → 4%, 80세 → 3%", "input": {"balance": 50000000, "year": 2, "age": 80, "life": "no"}, "expect": {"rate_pct": 3, "rate_with_local_pct": 3.3}, "boundary": true},
+  {"why": "종신계약 60세: 나이 5%와 종신 3% 동시 충족 시 낮은 세율 (제129조①5의2 후단·다목)", "input": {"balance": 50000000, "year": 1, "age": 60, "life": "yes"}, "expect": {"rate_pct": 3, "rate_with_local_pct": 3.3}},
+  {"why": "55세 딱: 연금수령 가능 (시행령 제40조의2③1 '55세 이후')", "input": {"balance": 30000000, "year": 1, "age": 55, "life": "no"}, "expect": {"limit": 3600000, "rate_pct": 5}, "boundary": true, "notes_include": ["1,500만 원"]}
+]

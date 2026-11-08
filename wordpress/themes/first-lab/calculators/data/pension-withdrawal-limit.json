@@ -1,0 +1,17 @@
+{
+  "basis_date": "2026-11-08", "yearly": false,
+  "won10": "세액을 내지 않고 한도(인출 가능 금액)와 세율만 보여 줌",
+  "max_input": 100000000000,
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 시행령 (제40조의2 연금수령 요건·연금수령한도·연금수령연차)", "url": "https://www.law.go.kr/법령/소득세법시행령"},
+    {"name": "국가법령정보센터 소득세법 (제129조①5의2·5의3 연금소득 원천징수세율, 제14조③9 분리과세연금소득)", "url": "https://www.law.go.kr/법령/소득세법"}
+  ],
+  "min_age": 55,
+  "no_limit_year": 11,
+  "limit_pct": 120,
+  "rate_under70_pct": 5,
+  "rate_70to79_pct": 4,
+  "rate_80plus_pct": 3,
+  "rate_life_pct": 3,
+  "local_pct": 10
+}
