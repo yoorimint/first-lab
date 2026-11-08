@@ -31,7 +31,7 @@
 
 ## 이어받기 (다른 세션도 바로 할 수 있게)
 - 운영자 지시 기록: `automation/operator-notes.md` (운영자가 새로 지시하면 여기에 바로 적는다).
-- 35분 감시·새 글 외부 검수 절차: `automation/monitor.md` (검수 지시문 `automation/review-prompt.md`, 검수한 글 `automation/reviewed.txt`).
+- 30분 감시·새 글 외부 검수 절차: `automation/monitor.md` (검수 지시문 `automation/review-prompt.md`, 검수한 글 `automation/reviewed.txt`).
 - 임시 폴더(scratchpad)에만 적어 두지 않는다 — 세션이 바뀌면 사라진다.
 
 ## 범위
