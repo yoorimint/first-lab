@@ -1,0 +1,245 @@
+[
+  {
+    "why": "본문 예시: 1주당 1,000원 × 300주, 연 1회: 300,000 × 14% = 42,000원, 지방 4,200원, 세후 253,800원 (소득세법 제129조①2호나목·지방세법 제103조의13①, Python 으로 따로 계산)",
+    "input": {
+      "shares": "300",
+      "dps": "1000",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 300000,
+      "income_tax": 42000,
+      "local_tax": 4200,
+      "tax": 46200,
+      "net": 253800,
+      "annual_gross": 300000,
+      "annual_tax": 46200,
+      "annual_net": 253800
+    },
+    "notes_include": [
+      "2,000만 원 이하면 이렇게 떼고 끝나요"
+    ],
+    "notes_exclude": [
+      "고배당기업"
+    ]
+  },
+  {
+    "why": "본문 예시: 분기배당 1주당 500원 × 200주, 주가 50,000원: 1회 100,000원·세금 15,400원·세후 84,600원, 1년 400,000/61,600/338,400원, 수익률 2,000÷50,000=4.00%, 세후 338,400÷10,000,000=3.38%",
+    "input": {
+      "shares": "200",
+      "dps": "500",
+      "times": "4",
+      "price": "50000",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 100000,
+      "income_tax": 14000,
+      "local_tax": 1400,
+      "tax": 15400,
+      "net": 84600,
+      "annual_gross": 400000,
+      "annual_tax": 61600,
+      "annual_net": 338400,
+      "yield": 4,
+      "net_yield": 3.38
+    }
+  },
+  {
+    "why": "끝수: 37,000원 × 14% = 5,180원, 지방 518 → 510원 (10원 미만 버림, 국고금관리법 제47조①), 분기 4회 연 148,000원",
+    "input": {
+      "shares": "100",
+      "dps": "370",
+      "times": "4",
+      "price": "55000",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 37000,
+      "income_tax": 5180,
+      "local_tax": 510,
+      "tax": 5690,
+      "net": 31310,
+      "annual_gross": 148000,
+      "annual_tax": 22760,
+      "annual_net": 125240,
+      "yield": 2.69,
+      "net_yield": 2.28
+    }
+  },
+  {
+    "why": "기준선: 1년 배당 딱 2,000만 원은 종합과세 기준 '2천만원 이하'(소득세법 제14조③6호) — 넘는다는 안내가 나오면 안 됨",
+    "boundary": true,
+    "input": {
+      "shares": "10000",
+      "dps": "2000",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 20000000,
+      "income_tax": 2800000,
+      "local_tax": 280000,
+      "tax": 3080000,
+      "net": 16920000
+    },
+    "notes_include": [
+      "2,000만 원 이하면 이렇게 떼고 끝나요"
+    ],
+    "notes_exclude": [
+      "2,000만 원을 넘어요",
+      "고배당기업"
+    ]
+  },
+  {
+    "why": "기준선 바로 위: 20,002,000원 → 2,000만 원 초과 안내와 고배당기업 분리과세 안내 (조세특례제한법 제104조의27)",
+    "boundary": true,
+    "input": {
+      "shares": "10001",
+      "dps": "2000",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 20002000,
+      "income_tax": 2800280,
+      "local_tax": 280020,
+      "tax": 3080300,
+      "net": 16921700
+    },
+    "notes_include": [
+      "2,000만 원을 넘어요",
+      "고배당기업"
+    ]
+  },
+  {
+    "why": "소액: 7원 × 14% = 0.98원 → 원천징수세액 1,000원 미만이라 떼지 않음 (소득세법 제86조1호)",
+    "boundary": true,
+    "input": {
+      "shares": "1",
+      "dps": "7",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 7,
+      "income_tax": 0,
+      "local_tax": 0,
+      "tax": 0,
+      "net": 7
+    }
+  },
+  {
+    "why": "기준선: 1주×7,142원 → 7,142×14%=999.88원 → 990원, 1,000원 미만이라 소득세·지방소득세 모두 0원 (소득세법 제86조1호, 지방세법 제103조의13①)",
+    "boundary": true,
+    "input": {
+      "shares": "1",
+      "dps": "7142",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 7142,
+      "income_tax": 0,
+      "local_tax": 0,
+      "tax": 0,
+      "net": 7142
+    }
+  },
+  {
+    "why": "기준선 바로 위: 1주×7,143원 → 1,000.02원 → 1,000원(1,000원 미만 아님) 징수, 지방 100원, 세후 6,043원",
+    "boundary": true,
+    "input": {
+      "shares": "1",
+      "dps": "7143",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 7143,
+      "income_tax": 1000,
+      "local_tax": 100,
+      "tax": 1100,
+      "net": 6043
+    }
+  },
+  {
+    "why": "10주×500원=5,000원 → 700원 < 1,000원이라 0원, 월배당 12회 60,000원 그대로",
+    "input": {
+      "shares": "10",
+      "dps": "500",
+      "times": "12",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 5000,
+      "tax": 0,
+      "net": 5000,
+      "annual_gross": 60000,
+      "annual_tax": 0,
+      "annual_net": 60000
+    },
+    "notes_include": [
+      "1,000원 미만이면 세금을 떼지 않아요"
+    ]
+  },
+  {
+    "why": "세금 없이: 월배당 500원 × 1,000주 × 12회 = 600만 원 그대로, 해외주식 안내 없음",
+    "input": {
+      "shares": "1000",
+      "dps": "500",
+      "times": "12",
+      "price": "",
+      "tax": "none"
+    },
+    "expect": {
+      "gross": 500000,
+      "tax": 0,
+      "net": 500000,
+      "annual_gross": 6000000,
+      "annual_net": 6000000
+    },
+    "notes_exclude": [
+      "해외주식"
+    ]
+  },
+  {
+    "why": "반올림 경계: 10주×1,234원=12,340원, 세금 1,720+170=1,890원, 세후 10,450원 ÷ (100,000×10) = 정확히 1.045% → 1.05% (세전 1,234÷100,000=1.234% → 1.23%)",
+    "boundary": true,
+    "input": {
+      "shares": "10",
+      "dps": "1234",
+      "times": "1",
+      "price": "100000",
+      "tax": "normal"
+    },
+    "expect": {
+      "gross": 12340,
+      "income_tax": 1720,
+      "local_tax": 170,
+      "tax": 1890,
+      "net": 10450,
+      "yield": 1.23,
+      "net_yield": 1.05
+    }
+  },
+  {
+    "why": "주식 수 없음 → 안내",
+    "input": {
+      "shares": "",
+      "dps": "1000",
+      "times": "1",
+      "price": "",
+      "tax": "normal"
+    },
+    "expect_error": true
+  }
+]
