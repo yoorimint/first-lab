@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1165,
+ "replace": [
+  {
+   "old": "ai-5245d50bef",
+   "prompt": "a young part-time worker in an apron wiping a plain wooden cafe counter, seen from behind, with potted green plants and white mugs on bare shelves in soft daylight",
+   "alt": "작은 카페에서 나무 카운터를 닦는 아르바이트생 뒷모습",
+   "why": "뒤쪽 칠판에 엉터리 영어 글자(CNY CIAFT)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

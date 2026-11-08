@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 996,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a quiet city street at night with warm light from a small restaurant window where a worker is closing up, no signs or text",
+   "alt": "늦은 밤 불 켜진 작은 가게에서 마감하는 직원"
+  }
+ ]
+}
