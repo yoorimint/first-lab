@@ -242,5 +242,6 @@
       "kind": "sme"
     },
     "expect_error": true
-  }
+  },
+  {"why": "음수 이미 쓴 기본공제 → 안내 (조사 확인)", "input": {"sale": 1000000, "acquire": "0", "used": "-1", "kind": "sme"}, "expect_error": true}
 ]

@@ -37,7 +37,7 @@
       if (sale > d.max_input) throw new u.InputError('금액이 너무 커요. 1,000억 원 이하로 넣어 주세요.');
       const acquire = num(v.acquire, '산 금액', u, d);
       const expense = num(v.expense, '비용', u, d);
-      const used = num(v.used, '이미 쓴 기본공제', u, d);
+      const used = num(v.used, '이미 쓴 기본공제 금액', u, d);
       const kind = ['sme', 'general', 'major', 'major_short'].includes(v.kind) ? v.kind : 'sme';
       const f = u.floor;
       // 증권거래세: 양도가액 × 1만분의 35, 10원 미만 버림

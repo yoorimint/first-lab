@@ -14,6 +14,19 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
+// 안내 문장 조사: 받침 없는 말 뒤 '은·이', 받침 있는 말 뒤 '는·가' (입력 이름을 `${name}은` 에 끼워 넣다 틀림 — 11/8 비상장주식 계산기)
+function josaProblem(msg) {
+  for (const m of String(msg).matchAll(/([가-힣])(은|는|이|가) /g)) {
+    const jong = (m[1].charCodeAt(0) - 0xac00) % 28;
+    if ((jong === 0 && (m[2] === '은' || m[2] === '이')) || (jong !== 0 && (m[2] === '는' || m[2] === '가'))) {
+      if (/[있없하넣는]는$/.test(m[1] + m[2])) continue; // '있는·하는' 같은 꾸밈말
+      return m[0].trim();
+    }
+  }
+  return '';
+}
+
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = path.join(ROOT, 'wordpress/themes/first-lab/calculators');
 const MIN_CASES = 3;
@@ -141,7 +154,11 @@ for (const id of ids) {
     try {
       out = def.compute(c.input, util.dataOn(data, day), util);
     } catch (e) {
-      if (c.expect_error === true && e instanceof util.InputError) { checked += 1; continue; }
+      if (c.expect_error === true && e instanceof util.InputError) {
+        const bad = josaProblem(e.message);
+        if (bad) fail(id, `사례 ${i + 1} (${c.why}): 안내 문장 조사 오류 '${bad}' — 입력 이름 받침에 맞게 (11/8 '이미 쓴 기본공제은')`);
+        checked += 1; continue;
+      }
       fail(id, `사례 ${i + 1} 계산 오류: ${e.message}`);
       continue;
     } finally {
