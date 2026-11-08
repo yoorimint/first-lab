@@ -195,3 +195,4 @@ date,post,fixes,types
 2026-11-07,1929,3,missing_condition:3
 2026-11-08,647,0,
 2026-11-08,1937,2,missing_condition:2
+2026-11-08,1943,6,missing_condition:5 wrong_fact:1
