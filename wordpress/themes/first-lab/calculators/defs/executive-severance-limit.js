@@ -19,7 +19,7 @@
     title: '임원 퇴직금 한도 계산기',
     intro: '퇴직금과 구간별 근무개월, 기준 급여를 넣으면 소득세법상 퇴직소득 한도와 근로소득이 되는 초과분이 나와요.',
     inputs: [
-      { name: 'severance', label: '퇴직금 (원)', type: 'number', min: 0, step: 1000000, help: '받는 퇴직급여 전체예요. 비과세소득과 공적연금 일시금은 빼고 넣어요.' },
+      { name: 'severance', label: '퇴직금 (원)', type: 'number', min: 0, step: 1000000, help: '받는 퇴직급여 전체예요. 비과세소득, 공적연금 일시금, 회사 비용 한도를 넘어 상여로 처분된 금액은 빼고 넣어요.' },
       { name: 'm_pre2012', label: '2011년 12월 31일까지 근무개월 (없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '1개월이 안 되는 기간은 1개월로 세요.' },
       { name: 'm_2012', label: '2012년 1월~2019년 12월 근무개월 (최대 96)', type: 'number', min: 0, step: 1 },
       { name: 'm_2020', label: '2020년 1월 이후 근무개월', type: 'number', min: 0, step: 1 },

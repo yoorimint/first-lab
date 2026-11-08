@@ -432,3 +432,4 @@ calc:pension-withdrawal-limit
 calc:presale-right-tax
 calc:executive-severance-limit
 2203 금융재산 상속공제: 최대 2억 원, 순금융재산별 공제액
+2198 임원 퇴직금 한도: 2020년 이후 2배, 넘으면 근로소득
