@@ -300,6 +300,17 @@ def related_exceptions(articles: dict[str, str], article: str) -> list[tuple[str
 LAW_CACHE_DIR = Path(os.environ.get("FIRSTLAB_LAW_CACHE", "/tmp/firstlab-law-cache"))
 
 
+def _no_surrogates(value):
+    """짝 잃은 서로게이트 문자 제거 — 법제처 행정규칙 본문에 섞여 와서 캐시 저장(utf-8)이 실패하고 근거 대조 전체가 멈춤 (11/9 #2161)."""
+    if isinstance(value, str):
+        return re.sub(r"[\ud800-\udfff]", "", value)
+    if isinstance(value, dict):
+        return {k: _no_surrogates(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_no_surrogates(v) for v in value]
+    return value
+
+
 def _cached(kind: str, key: str, make):
     """같은 날 같은 법령은 다시 받지 않음 (글쓰기 작업이 근거 대조를 여러 번 돌림 — 11/5 한 번에 9분)."""
     import datetime as _dt
@@ -309,7 +320,7 @@ def _cached(kind: str, key: str, make):
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         pass
-    value = make()
+    value = _no_surrogates(make())
     if value:  # 못 받은 것(빈 값)은 저장하지 않음 — 다음에 다시 시도
         try:
             LAW_CACHE_DIR.mkdir(parents=True, exist_ok=True)

@@ -5241,3 +5241,16 @@ class UpcomingLawSourceTest(unittest.TestCase):
         self.assertEqual(r["counts"][FOUND], 1)
         r = check(review, fetcher=page, upcoming=lambda u: "")
         self.assertEqual(r["counts"][MISSING], 1)
+
+
+class CacheSurrogateTest(unittest.TestCase):
+    """11/9 #2161: 행정규칙 본문의 짝 잃은 서로게이트 문자로 캐시 저장이 실패해 근거 대조가 통째로 멈춤."""
+
+    def test_cached_strips_surrogates(self):
+        import os
+        from unittest import mock
+        from bot import condition_gate as cg
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(cg, "LAW_CACHE_DIR", Path(d)):
+            got = cg._cached("rule", "x", lambda: "고시 본문 \ud83d 끝")
+            self.assertEqual(got, "고시 본문  끝")
+            self.assertEqual(cg._cached("rule", "x", lambda: "다시 안 부름"), "고시 본문  끝")  # 저장됐다가 읽힘
