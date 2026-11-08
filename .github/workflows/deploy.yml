@@ -70,9 +70,41 @@ jobs:
   deploy:
     needs: [gate, check]
     runs-on: ubuntu-latest
-    timeout-minutes: 40   # 11/6: 서버 적용이 끝났는데 GitHub 쪽에서 작업이 '진행 중'으로 멈춰 다음 배포가 모두 대기 — 기본 6시간 대신 끊음 (command_timeout 30m + 여유)
+    timeout-minutes: 70   # 11/8 다시 시도 단계까지 (30m 두 번 + 여유). 11/6: 서버 적용이 끝났는데 GitHub 쪽에서 작업이 '진행 중'으로 멈춰 다음 배포가 모두 대기 — 기본 6시간 대신 끊음 (command_timeout 30m + 여유)
     steps:
       - name: Apply on server
+        id: apply
+        continue-on-error: true   # 11/8 두 번: 배포 도구(drone-ssh) 내려받기가 GitHub 504 로 실패 → 1분 뒤 한 번 더 (아래 두 단계는 내용이 같아야 함 — tests DeployRetryTest)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+          command_timeout: 30m   # 기본 10분 — 글·수정이 늘며 넘겨서 11/5 오후 배포가 계속 실패함 (보정·사진 정리는 한 번에 읽기로 줄임)
+          script: |
+            set -e
+            REPO=/opt/first-lab
+            if [ -d "$REPO/.git" ]; then
+              git -C "$REPO" fetch -q origin main
+              git -C "$REPO" reset -q --hard ${{ needs.gate.outputs.sha }}   # 검사를 통과한 바로 그 버전
+            else
+              git clone -q https://github.com/yoorimint/first-lab "$REPO"
+            fi
+            # 같은 서버의 사주데이 앱보다 낮은 몫으로 (11/6 10:06 배포 때 부하 5.14·사주데이 /healthz 응답 없음 1분)
+            # cgroup v2 에선 Nice 는 서비스 사이에 안 먹음 → CPUWeight·IOWeight(기본 100)를 낮춘 범위에서 실행
+            LOW="nice -n 10"
+            if command -v systemd-run >/dev/null; then LOW="systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20 nice -n 10"; fi
+            $LOW bash "$REPO/server/setup.sh"
+            $LOW bash "$REPO/server/wp-setup.sh"
+            $LOW bash "$REPO/server/bot-setup.sh"
+            $LOW bash "$REPO/server/bot-check.sh"
+            echo "${{ needs.gate.outputs.sha }}" > /var/www/first-lab/deployed-version.txt   # 따라잡기(gate)가 비교하는 값
+      - name: Wait before retry
+        if: steps.apply.outcome == 'failure'
+        run: sleep 60
+      - name: Apply on server (retry)
+        if: steps.apply.outcome == 'failure'
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SERVER_HOST }}

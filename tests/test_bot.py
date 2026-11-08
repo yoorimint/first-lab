@@ -3048,7 +3048,7 @@ class DeploySpeedTest(unittest.TestCase):
         self.assertIn("github.token", gate)   # 비공개 저장소: 인증 없이 읽으면 실패
         self.assertIn("ref: ${{ needs.gate.outputs.sha }}", check)
         self.assertNotIn("github.sha", deploy)
-        self.assertEqual(deploy.count("needs.gate.outputs.sha"), 2)
+        self.assertEqual(deploy.count("needs.gate.outputs.sha"), 4)  # 적용 단계 + 다시 시도 단계 (11/8 DeployRetryTest)
         self.assertIn("needs: [gate, check]", deploy)
 
     def test_shares_server_politely(self):
@@ -3933,7 +3933,7 @@ class DeployTimeoutTest(unittest.TestCase):
     def test_each_job_has_timeout(self):
         text = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
         self.assertEqual(text.count("runs-on: ubuntu-latest"), text.count("timeout-minutes:"))
-        self.assertIn("timeout-minutes: 40", text)
+        self.assertIn("timeout-minutes: 70", text)
 
 
 class DottedDateNumberTest(unittest.TestCase):
@@ -5203,3 +5203,17 @@ class KoreanHundredFormsTest(unittest.TestCase):
         self.assertTrue(has_number("1억2천4백만원", "12400"))
         self.assertTrue(has_number("3천300만원", "3300"))
         self.assertFalse(has_number("1억4백만원", "10500"))
+
+
+class DeployRetryTest(unittest.TestCase):
+    """11/8 두 번: 배포 도구 내려받기가 GitHub 504 로 실패해 배포가 1시간 넘게 멈춤 → 1분 뒤 같은 단계를 한 번 더."""
+
+    def test_retry_step_same_as_first(self):
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        deploy = wf.split("\n  deploy:")[1]
+        first = deploy.split("      - name: Apply on server\n")[1].split("      - name: Wait before retry")[0]
+        second = deploy.split("      - name: Apply on server (retry)\n")[1]
+        body = lambda t: t[t.index("        uses: appleboy"):]
+        self.assertIn("continue-on-error: true", first)
+        self.assertIn("if: steps.apply.outcome == 'failure'", second)
+        self.assertEqual(body(first).rstrip(), body(second).rstrip())  # 고칠 때 두 단계를 같이 고쳐야 함
