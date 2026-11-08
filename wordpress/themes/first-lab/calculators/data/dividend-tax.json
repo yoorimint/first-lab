@@ -1,5 +1,5 @@
 {
-  "law_checked": ["지방세법|2027-01-01"],
+  "law_checked": ["지방세법|2027-01-01", "소득세법|2027-01-01", "조세특례제한법|2027-01-01"],
   "basis_date": "2026-11-08", "yearly": false,
   "won10_keys": ["income_tax", "local_tax", "tax", "annual_tax"],
   "sources": [
