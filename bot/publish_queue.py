@@ -87,6 +87,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     notes = []
     # 초안 저장 관문: 검수를 통과 못 한 글은 공개(바로·예약)하지 않고 초안으로만 둔다
     failed = review_gate.problems(data.get("review"), article.title, article.excerpt, article.content_html)
+    failed += review_gate.second_review_missing(data.get("review"))
     if failed:
         notes.append(f"검수 미통과 → 초안 보류: {'; '.join(failed)[:200]}")
         status = "draft"

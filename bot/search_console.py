@@ -62,29 +62,98 @@ def check_key_file() -> None:
         raise SystemExit(f"서비스 계정 키 파일이 아닙니다 (없는 항목: {', '.join(missing)})")
 
 
-def fetch(days: int = 28) -> list[dict]:
-    """검색어·페이지별 성과. (서치콘솔 데이터는 2~3일 늦게 들어옴)"""
+def _query(dimensions: list[str], days: int, row_limit: int) -> list[dict]:
+    """서치콘솔 성과 조회 → [{keys, clicks, impressions, position}]. (데이터는 2~3일 늦게 들어옴)"""
     from google.auth.transport.requests import AuthorizedSession
     from google.oauth2 import service_account
 
     creds = service_account.Credentials.from_service_account_file(str(KEY_FILE), scopes=SCOPES)
     session = AuthorizedSession(creds)
     end = datetime.now().date() - timedelta(days=2)
-    body = {
-        "startDate": str(end - timedelta(days=days)),
-        "endDate": str(end),
-        "dimensions": ["query", "page"],
-        "rowLimit": 5000,
-    }
+    body = {"startDate": str(end - timedelta(days=days)), "endDate": str(end),
+            "dimensions": dimensions, "rowLimit": row_limit}
     url = ("https://www.googleapis.com/webmasters/v3/sites/"
            f"{urllib.parse.quote(SITE_URL, safe='')}/searchAnalytics/query")
     resp = session.post(url, json=body, timeout=60)
     resp.raise_for_status()
-    return [
-        {"query": r["keys"][0], "page": r["keys"][1], "clicks": int(r["clicks"]),
-         "impressions": int(r["impressions"]), "position": float(r["position"])}
-        for r in resp.json().get("rows", [])
-    ]
+    return [{"keys": r["keys"], "clicks": int(r["clicks"]), "impressions": int(r["impressions"]),
+             "position": float(r["position"])} for r in resp.json().get("rows", [])]
+
+
+def fetch(days: int = 28) -> list[dict]:
+    """검색어·페이지별 성과 (키워드 점수 조정용). 드물게 검색된 검색어는 구글이 빼고 줌 → 합계는 fetch_totals."""
+    return [{"query": r["keys"][0], "page": r["keys"][1], "clicks": r["clicks"],
+             "impressions": r["impressions"], "position": r["position"]}
+            for r in _query(["query", "page"], days, 5000)]
+
+
+# ── 검색 성과 요약 (11/8 운영자 '두 개 다 해 봐': 남의 사이트 비교 말고 우리 실제 성과로 판단) ──
+# 검색어를 빼고 날짜·페이지로만 물어야 익명 검색어까지 든 진짜 합계가 나온다 (검색어·페이지 조회는 7일 노출 1회로 보였음).
+SUMMARY_DAYS = 28
+TOP_PAGES = 5
+
+
+def fetch_totals(days: int = SUMMARY_DAYS) -> tuple[list[dict], list[dict]]:
+    """(날짜별, 글 주소별) 성과."""
+    daily = [{"date": r["keys"][0], **{k: r[k] for k in ("clicks", "impressions", "position")}}
+             for r in _query(["date"], days, 1000)]
+    pages = [{"page": r["keys"][0], **{k: r[k] for k in ("clicks", "impressions", "position")}}
+             for r in _query(["page"], days, 5000)]
+    return daily, pages
+
+
+def _weighted_position(rows: list[dict]) -> float | None:
+    imp = sum(r["impressions"] for r in rows)
+    return round(sum(r["position"] * r["impressions"] for r in rows) / imp, 1) if imp else None
+
+
+def summarize(daily: list[dict], pages: list[dict], published: int | None, today: str) -> dict:
+    """봇 기록(/maintenance 'search')에 남길 요약. 최근 7일과 그 전 7일을 같이 둬 늘고 주는지 보이게."""
+    daily = sorted(daily, key=lambda r: r["date"])
+    last7, prev7 = daily[-7:], daily[-14:-7]
+    top = sorted(pages, key=lambda r: (-r["clicks"], -r["impressions"]))[:TOP_PAGES]
+    return {
+        "date": today,
+        "days": SUMMARY_DAYS,
+        "clicks": sum(r["clicks"] for r in daily),
+        "impressions": sum(r["impressions"] for r in daily),
+        "position": _weighted_position(daily),
+        "last7": {"clicks": sum(r["clicks"] for r in last7), "impressions": sum(r["impressions"] for r in last7)},
+        "prev7": {"clicks": sum(r["clicks"] for r in prev7), "impressions": sum(r["impressions"] for r in prev7)},
+        "pages_seen": sum(1 for r in pages if r["impressions"] > 0),
+        "published": published,
+        "top": [{"page": urllib.parse.unquote(urllib.parse.urlparse(r["page"]).path), "clicks": r["clicks"],
+                 "impressions": r["impressions"], "position": round(r["position"], 1)} for r in top],
+    }
+
+
+def summary_line(s: dict) -> str:
+    """사람이 읽는 한 줄 (tick.py·봇 기록)."""
+    pos = f"{s['position']}위" if s.get("position") else "-"
+    pub = f"/공개 {s['published']}편" if s.get("published") is not None else ""
+    return (f"검색({s['days']}일, {s['date']} 기록): 노출 {s['impressions']:,}·클릭 {s['clicks']:,}·평균 {pos} · "
+            f"최근 7일 노출 {s['last7']['impressions']:,}(그 전 7일 {s['prev7']['impressions']:,}) · "
+            f"노출된 글 {s['pages_seen']}{pub}")
+
+
+def _published_count() -> int | None:
+    try:
+        from .settings import wp_cli
+        return int(wp_cli("post", "list", "--post_type=post", "--post_status=publish", "--format=count").strip())
+    except Exception:  # noqa: BLE001 - 글 수를 못 세도 성과 기록은 남김
+        return None
+
+
+def record(state: dict, today: str | None = None) -> str:
+    """하루 한 번 state['search'] 에 요약을 남김 (매일 수집·배포 점검이 부름 — 이미 오늘 것이 있으면 건너뜀)."""
+    today = today or datetime.now().strftime("%Y-%m-%d")
+    if (state.get("search") or {}).get("date") == today:
+        return ""
+    if not available():
+        return "서치콘솔: 미연동"
+    daily, pages = fetch_totals()
+    state["search"] = summarize(daily, pages, _published_count(), today)
+    return summary_line(state["search"])
 
 
 def update_signals(conn, rows: list[dict]) -> dict:

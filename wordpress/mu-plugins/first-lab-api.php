@@ -291,6 +291,7 @@ function firstlab_api_maintenance(): array {
 		'calc_yearly' => $state['calc_yearly'] ?? null,
 		'deploy_alert' => $state['deploy_alert'] ?? null,
 		'patch_problems' => $state['patch_problems'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)
+		'search'      => $state['search'] ?? null, // 구글 검색 성과 28일 요약 (bot/search_console.record, 하루 한 번)
 		'law_watch'   => $state['law_changes'] ?? null, // 법령 감시: 곧 시행될 개정·입법예고(확정 아님) — 감시 세션 확인용
 		// 공개 대기 글 전체 (감시 세션이 외부 검수 안 한 글을 글 번호로 찾음 — automation/unreviewed.py)
 		'ready_posts' => array_map(

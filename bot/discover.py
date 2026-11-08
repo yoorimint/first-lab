@@ -236,6 +236,13 @@ def main() -> None:
             failures.append(f"{label} 실패: {str(e)[:150]}")
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
+    try:  # 검색 성과 요약 (/maintenance 'search', bot/search_console.record)
+        from .search_console import record as record_search
+        line = record_search(state)
+        if line:
+            add_log(state, True, line)
+    except Exception as e:  # noqa: BLE001
+        failures.append(f"검색 성과 요약 실패: {str(e)[:150]}")
     for line in failures:
         add_log(state, False, line)
     expiring = secrets_expiring()  # 비밀값 이름_EXPIRES=YYYY-MM-DD 를 set-secrets.sh 로 넣어 두면 30일 전부터 알림 (/health → 메일)

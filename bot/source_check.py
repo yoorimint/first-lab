@@ -686,6 +686,7 @@ def main(argv: list[str]) -> None:
     # 서버 관문과 똑같은 검사 (review_gate.problems 가 조건 누락 관문까지 부름) — 여기서 고치면 보류되지 않음 (11/5 검토: 일부만 보던 것)
     from . import review_gate
     gate = review_gate.problems(review, data.get("title", ""), data.get("excerpt", ""), data.get("content_html", ""))
+    gate += review_gate.second_review_missing(review)  # 공개 대기열 첫 저장과 같게 (11/8)
     for x in gate:
         print(f"- [관문] {x}")
     for a in amended(review):

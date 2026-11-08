@@ -79,6 +79,21 @@ def _ok(item: dict) -> bool:
     return pair in (("맞음", "유지"), ("맞음", "수정"), ("틀림", "수정"))
 
 
+SECOND_ROUND = 2
+
+
+def second_review_missing(review: list[dict] | None) -> list[str]:
+    """새 글은 2차 독립 검수(고친 글을 새 하위 에이전트가 처음부터 다시 검수)를 거쳐야 함 — 그 검수자가 맞음으로 본 주장에 "round": 2.
+
+    왜 (11/8 운영자 '두 개 다 해 봐' — 오류율 낮추기): 글쓰기 작업의 1차 독립 검수 뒤에도 외부 검수가 글당 2.6곳을 더 고침(최근 7일 200편).
+    외부 검수가 사실상 2차 검수였고, 12/5 뒤엔 외부 검수가 없으므로 글쓰기 작업이 스스로 한 번 더 한다.
+    공개 대기열 첫 저장(publish_queue)에서만 봄 — 보류 글 고치기(hold.py)는 보류 사유를 보고 고치므로 다시 안 막음(영영 보류 방지).
+    """
+    if any(isinstance(i, dict) and i.get("round") == SECOND_ROUND for i in review or []):
+        return []
+    return ['2차 독립 검수 기록 없음 — 고친 글을 새 하위 에이전트에게 처음부터 다시 검수시키고, 그 검수자가 맞음으로 본 주장에 "round": 2']
+
+
 def min_claims(body_html: str) -> int:
     """본문 글자 수(태그 뺌)에 맞는 최소 검수 주장 수."""
     text = re.sub(r"\s+", "", re.sub(r"<[^>]+>", "", body_html or ""))

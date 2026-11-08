@@ -5114,3 +5114,67 @@ class BenefitApiTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SearchSummaryTest(unittest.TestCase):
+    """11/8 검색 성과 요약: 검색어 없이 날짜·글 주소로 합계 (익명 검색어 포함), 하루 한 번만 조회."""
+
+    def test_summarize_totals_weeks_and_top(self):
+        from bot import search_console as sc
+        daily = [{"date": f"2026-10-{d:02d}", "clicks": 1 if d > 20 else 0, "impressions": 10, "position": 20.0 if d > 20 else 40.0}
+                 for d in range(1, 29)]
+        pages = [{"page": "https://first-lab.kr/%EC%8B%A4%EC%97%85%EA%B8%89%EC%97%AC/", "clicks": 3, "impressions": 50, "position": 12.34},
+                 {"page": "https://first-lab.kr/b/", "clicks": 0, "impressions": 90, "position": 30.0},
+                 {"page": "https://first-lab.kr/c/", "clicks": 0, "impressions": 0, "position": 0.0}]
+        s = sc.summarize(daily, pages, 120, "2026-11-08")
+        self.assertEqual((s["clicks"], s["impressions"]), (8, 280))
+        self.assertEqual(s["last7"], {"clicks": 7, "impressions": 70})
+        self.assertEqual(s["prev7"], {"clicks": 1, "impressions": 70})
+        self.assertEqual(s["pages_seen"], 2)
+        self.assertEqual(s["top"][0]["page"], "/실업급여/")  # 클릭 많은 글 먼저, 주소는 읽을 수 있게
+        self.assertEqual(s["top"][0]["position"], 12.3)
+        self.assertAlmostEqual(s["position"], round((8 * 10 * 20 + 20 * 10 * 40) / 280, 1))
+        line = sc.summary_line(s)
+        self.assertIn("노출 280·클릭 8", line)
+        self.assertIn("노출된 글 2/공개 120편", line)
+
+    def test_no_impressions(self):
+        from bot import search_console as sc
+        s = sc.summarize([], [], None, "2026-11-08")
+        self.assertIsNone(s["position"])
+        self.assertIn("평균 -", sc.summary_line(s))
+
+    def test_record_once_a_day(self):
+        from unittest import mock
+        from bot import search_console as sc
+        state = {}
+        with mock.patch.object(sc, "available", return_value=True), \
+             mock.patch.object(sc, "fetch_totals", return_value=([], [])) as f, \
+             mock.patch.object(sc, "_published_count", return_value=5):
+            self.assertIn("검색(28일", sc.record(state, "2026-11-08"))
+            self.assertEqual(sc.record(state, "2026-11-08"), "")  # 같은 날 두 번째는 조회 안 함
+            sc.record(state, "2026-11-09")
+        self.assertEqual(f.call_count, 2)
+        self.assertEqual(state["search"]["date"], "2026-11-09")
+
+    def test_maintenance_exposes_search(self):
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        self.assertIn("'search'      => $state['search'] ?? null", php)
+
+
+class SecondReviewTest(unittest.TestCase):
+    """11/8 오류율 낮추기: 새 글은 2차 독립 검수("round": 2) 기록이 있어야 공개 대기열에 들어감."""
+
+    def test_missing_round2_held(self):
+        from bot.review_gate import second_review_missing
+        self.assertTrue(second_review_missing([{"claim": "a", "verdict": "맞음", "action": "유지"}]))
+        self.assertTrue(second_review_missing(None))
+        self.assertEqual(second_review_missing([{"claim": "a", "round": 2}]), [])
+
+    def test_only_intake_checks(self):
+        src = (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8")
+        self.assertIn("second_review_missing", src)
+        self.assertNotIn("second_review_missing", (ROOT / "bot" / "hold.py").read_text(encoding="utf-8"))  # 보류 고치기는 다시 안 막음
+
+    def test_writer_instruction(self):
+        self.assertIn('"round": 2', (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))

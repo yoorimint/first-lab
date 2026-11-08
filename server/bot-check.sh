@@ -53,6 +53,13 @@ from bot.state import add_log, load_state, save_state
 text = open(os.environ["API_OUT"], encoding="utf-8").read().strip().replace("\n", " / ")
 state = load_state()
 add_log(state, "실패" not in text, "배포 점검(공공 API): " + text[:1500])
+try:  # 검색 성과 요약 — 하루 한 번만 실제 조회 (새벽 수집이 실패한 날도 배포 때 채움)
+    from bot.search_console import record
+    line = record(state)
+    if line:
+        add_log(state, True, line)
+except Exception as e:  # noqa: BLE001
+    add_log(state, False, f"검색 성과 요약 실패: {str(e)[:150]}")
 save_state(state)
 PY
 rm -f "$API_OUT"

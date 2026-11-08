@@ -107,6 +107,13 @@ def main() -> int:
     reviews = [l for l in m["log"] if "대기 글 검수(직접)" in str(l.get("msg", ""))][:3]
     for l in reviews:
         print(f"  검수(글쓰기 작업): {l['time']} {str(l['msg'])[:100]}")
+    if m.get("search"):  # 구글 검색 성과 (bot/search_console.record)
+        from bot.search_console import summary_line  # noqa: E402
+        print(summary_line(m["search"]))
+        for t in m["search"].get("top") or []:
+            print(f"  {t['page'][:50]} 노출 {t['impressions']}·클릭 {t['clicks']}·{t['position']}위")
+    else:
+        print("검색: 아직 기록 없음 (배포 점검·새벽 수집이 채움)")
     try:  # 품질 한 줄 (automation/quality_report.py — 매일 점검 보고와 같은 숫자)
         import csv
         from quality_report import LOG, summary
