@@ -1,0 +1,246 @@
+[
+  {
+    "why": "본문 예시: 중소기업·대주주 아님, 1,000만 원에 사서 3,000만 원에 팖 → 증권거래세 10만 5천, 과세표준 1,739만 5천 × 10%",
+    "input": {
+      "sale": 30000000,
+      "acquire": 10000000,
+      "kind": "sme"
+    },
+    "expect": {
+      "stt": 105000,
+      "income": 19895000,
+      "deduction": 2500000,
+      "base": 17395000,
+      "income_tax": 1739500,
+      "local_tax": 173950,
+      "total": 1913450,
+      "all": 2018450
+    }
+  },
+  {
+    "why": "본문 예시: 중소기업 외 주식 20%, 같은 금액",
+    "input": {
+      "sale": 30000000,
+      "acquire": 10000000,
+      "kind": "general"
+    },
+    "expect": {
+      "stt": 105000,
+      "income": 19895000,
+      "deduction": 2500000,
+      "base": 17395000,
+      "income_tax": 3479000,
+      "local_tax": 347900,
+      "total": 3826900,
+      "all": 3931900
+    }
+  },
+  {
+    "why": "기본공제 경계: 양도소득금액이 딱 250만 원 → 과세표준 0원, 증권거래세 45,500원만",
+    "input": {
+      "sale": 13000000,
+      "acquire": 10454500,
+      "kind": "sme"
+    },
+    "expect": {
+      "stt": 45500,
+      "income": 2500000,
+      "deduction": 2500000,
+      "base": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0,
+      "all": 45500
+    },
+    "boundary": true,
+    "notes_include": [
+      "기본공제 250만 원 안이라"
+    ]
+  },
+  {
+    "why": "기본공제 바로 위: 양도소득금액 250만 100원 → 과세표준 100원 × 10% = 10원, 지방 1원 → 0원",
+    "input": {
+      "sale": 13000000,
+      "acquire": 10454400,
+      "kind": "sme"
+    },
+    "expect": {
+      "stt": 45500,
+      "income": 2500100,
+      "deduction": 2500000,
+      "base": 100,
+      "income_tax": 10,
+      "local_tax": 0,
+      "total": 10,
+      "all": 45510
+    },
+    "boundary": true
+  },
+  {
+    "why": "손실: 1,200만 원에 사서 1,000만 원에 팖 → 양도세 0원, 증권거래세 35,000원은 냄",
+    "input": {
+      "sale": 10000000,
+      "acquire": 12000000,
+      "kind": "sme"
+    },
+    "expect": {
+      "stt": 35000,
+      "income": -2035000,
+      "deduction": 0,
+      "base": 0,
+      "income_tax": 0,
+      "local_tax": 0,
+      "total": 0,
+      "all": 35000
+    },
+    "boundary": true,
+    "notes_include": [
+      "증권거래세는 손실이어도"
+    ]
+  },
+  {
+    "why": "대주주 과세표준 딱 3억 원 → 20% = 6,000만 원, 지방 600만 원",
+    "input": {
+      "sale": 400000000,
+      "acquire": 96100000,
+      "kind": "major"
+    },
+    "expect": {
+      "stt": 1400000,
+      "income": 302500000,
+      "deduction": 2500000,
+      "base": 300000000,
+      "income_tax": 60000000,
+      "local_tax": 6000000,
+      "total": 66000000,
+      "all": 67400000
+    },
+    "boundary": true
+  },
+  {
+    "why": "대주주 과세표준 3억 1,000원 → 6,000만 + 1,000 × 25% = 6,000만 250원, 지방 6,000,025 → 6,000,020원",
+    "input": {
+      "sale": 400000000,
+      "acquire": 96099000,
+      "kind": "major"
+    },
+    "expect": {
+      "stt": 1400000,
+      "income": 302501000,
+      "deduction": 2500000,
+      "base": 300001000,
+      "income_tax": 60000250,
+      "local_tax": 6000020,
+      "total": 66000270,
+      "all": 67400270
+    },
+    "boundary": true
+  },
+  {
+    "why": "대주주 3억 초과: 1억에 사서 5억에 팖",
+    "input": {
+      "sale": 500000000,
+      "acquire": 100000000,
+      "kind": "major"
+    },
+    "expect": {
+      "stt": 1750000,
+      "income": 398250000,
+      "deduction": 2500000,
+      "base": 395750000,
+      "income_tax": 83937500,
+      "local_tax": 8393750,
+      "total": 92331250,
+      "all": 94081250
+    }
+  },
+  {
+    "why": "대주주·중소기업 외·1년 미만 30%",
+    "input": {
+      "sale": 50000000,
+      "acquire": 20000000,
+      "kind": "major_short"
+    },
+    "expect": {
+      "stt": 175000,
+      "income": 29825000,
+      "deduction": 2500000,
+      "base": 27325000,
+      "income_tax": 8197500,
+      "local_tax": 819750,
+      "total": 9017250,
+      "all": 9192250
+    }
+  },
+  {
+    "why": "다른 주식에서 공제 100만 원 이미 씀 → 150만 원만 공제",
+    "input": {
+      "sale": 20000000,
+      "acquire": 10000000,
+      "used": 1000000,
+      "kind": "sme"
+    },
+    "expect": {
+      "stt": 70000,
+      "income": 9930000,
+      "deduction": 1500000,
+      "base": 8430000,
+      "income_tax": 843000,
+      "local_tax": 84300,
+      "total": 927300,
+      "all": 997300
+    }
+  },
+  {
+    "why": "그 밖의 비용 20만 원 포함, 20%",
+    "input": {
+      "sale": 20000000,
+      "acquire": 10000000,
+      "expense": 200000,
+      "kind": "general"
+    },
+    "expect": {
+      "stt": 70000,
+      "income": 9730000,
+      "deduction": 2500000,
+      "base": 7230000,
+      "income_tax": 1446000,
+      "local_tax": 144600,
+      "total": 1590600,
+      "all": 1660600
+    }
+  },
+  {
+    "why": "판 금액 0 → 안내",
+    "input": {
+      "sale": "0",
+      "kind": "sme"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "소수 금액 → 안내",
+    "input": {
+      "sale": "1.5",
+      "kind": "sme"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "음수 산 금액 → 안내",
+    "input": {
+      "sale": 1000000,
+      "acquire": "-1",
+      "kind": "sme"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "너무 큰 금액 → 안내",
+    "input": {
+      "sale": 200000000000,
+      "kind": "sme"
+    },
+    "expect_error": true
+  }
+]

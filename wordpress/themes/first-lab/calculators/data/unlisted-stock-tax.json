@@ -1,0 +1,16 @@
+{
+  "basis_date": "2026-11-08", "yearly": false,
+  "max_input": 100000000000,
+  "won10_keys": ["stt", "income_tax", "local_tax", "total", "all"],
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제94조①3호나목 비상장주식, 제103조 기본공제 250만 원, 제104조①11호 세율, 제105조 예정신고)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국가법령정보센터 소득세법 시행령 (제167조의8 비상장 대주주 4%·10억 원)", "url": "https://www.law.go.kr/법령/소득세법시행령"},
+    {"name": "국가법령정보센터 지방세법 (제103조의3①11호 개인지방소득세 세율)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국가법령정보센터 증권거래세법 (제8조① 1만분의 35)", "url": "https://www.law.go.kr/법령/증권거래세법"},
+    {"name": "국가법령정보센터 국고금관리법 (제47조 10원 미만 끝수)", "url": "https://www.law.go.kr/법령/국고금관리법"}
+  ],
+  "basic_deduction": 2500000,
+  "stt_per10000": 35,
+  "sme_pct": 10, "general_pct": 20, "major_short_pct": 30,
+  "major_low_pct": 20, "major_high_pct": 25, "major_step": 300000000, "major_step_tax": 60000000
+}
