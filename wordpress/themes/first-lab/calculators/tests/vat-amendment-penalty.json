@@ -1,0 +1,219 @@
+[
+  {
+    "why": "예시: 2026년 1기 확정 기한 7/27, 100만 원 더 냄, 9/10 수정신고·납부 → 1개월(8/27) 지나고 3개월(10/27) 안 → 75% 감면, 7/28~9/9 44일",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2026-09-10"
+    },
+    "expect": {
+      "cut_pct": 75,
+      "days": 44,
+      "full_penalty": 100000,
+      "under_penalty": 25000,
+      "delay_penalty": 9680,
+      "penalty": 34680,
+      "total": 1034680
+    }
+  },
+  {
+    "why": "1개월 경계: 기한 7/27 → 1개월 끝 8/27 (민법 제160조②: 기산일 7/28에 해당한 날의 전날) → 90% 감면",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2026-08-27"
+    },
+    "expect": {
+      "cut_pct": 90,
+      "days": 30,
+      "full_penalty": 100000,
+      "under_penalty": 10000,
+      "delay_penalty": 6600,
+      "penalty": 16600,
+      "total": 1016600
+    },
+    "boundary": true,
+    "notes_exclude": [
+      "2년이 넘으면"
+    ]
+  },
+  {
+    "why": "1개월 바로 다음 날 8/28 → 75% 감면",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2026-08-28"
+    },
+    "expect": {
+      "cut_pct": 75,
+      "days": 31,
+      "full_penalty": 100000,
+      "under_penalty": 25000,
+      "delay_penalty": 6820,
+      "penalty": 31820,
+      "total": 1031820
+    },
+    "boundary": true
+  },
+  {
+    "why": "기한 다음 날 납부: 기한 다음 날부터 납부일 전날까지 = 0일 → 납부지연가산세 0원 (제47조의4①1, 2026.7.1 시행)",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2026-07-28"
+    },
+    "expect": {
+      "cut_pct": 90,
+      "days": 0,
+      "full_penalty": 100000,
+      "under_penalty": 10000,
+      "delay_penalty": 0,
+      "penalty": 10000,
+      "total": 1010000
+    },
+    "boundary": true
+  },
+  {
+    "why": "2년 경계: 기한 2026-07-27 → 2년(24개월) 끝 2028-07-27 → 10% 감면, 다음 날 감면 없음",
+    "input": {
+      "extra_tax": 500000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2028-07-27"
+    },
+    "expect": {
+      "cut_pct": 10,
+      "days": 730,
+      "full_penalty": 50000,
+      "under_penalty": 45000,
+      "delay_penalty": 80300,
+      "penalty": 125300,
+      "total": 625300
+    },
+    "boundary": true
+  },
+  {
+    "why": "2년 넘김: 2028-07-28 → 감면 0%",
+    "input": {
+      "extra_tax": 500000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2028-07-28"
+    },
+    "expect": {
+      "cut_pct": 0,
+      "days": 731,
+      "full_penalty": 50000,
+      "under_penalty": 50000,
+      "delay_penalty": 80410,
+      "penalty": 130410,
+      "total": 630410
+    },
+    "boundary": true,
+    "notes_include": [
+      "2년이 넘으면"
+    ]
+  },
+  {
+    "why": "부정행위 40%: 300만 원, 기한 2026-10-26, 2026-12-15 (1~3개월 → 75% 감면)",
+    "input": {
+      "extra_tax": 3000000,
+      "fraud": "yes",
+      "due": "2026-10-26",
+      "paid": "2026-12-15"
+    },
+    "expect": {
+      "cut_pct": 75,
+      "days": 49,
+      "full_penalty": 1200000,
+      "under_penalty": 300000,
+      "delay_penalty": 32340,
+      "penalty": 332340,
+      "total": 3332340
+    },
+    "notes_include": [
+      "60%"
+    ]
+  },
+  {
+    "why": "말일 기한: 기한 2026-07-31 → 기산일 8/1(달의 처음) → 1개월 끝 8/31 (민법 제160조①)",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-07-31",
+      "paid": "2026-08-31"
+    },
+    "expect": {
+      "cut_pct": 90,
+      "days": 30,
+      "full_penalty": 100000,
+      "under_penalty": 10000,
+      "delay_penalty": 6600,
+      "penalty": 16600,
+      "total": 1016600
+    },
+    "boundary": true
+  },
+  {
+    "why": "해당일 없는 달: 기한 2026-11-29 → 기산일 11/30 → 3개월째 2월에 30일이 없어 2027-02-28 로 끝남 (민법 제160조③) → 2/28 납부는 75% 감면, 기한 다음 날~2/27 90일",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-11-29",
+      "paid": "2027-02-28"
+    },
+    "expect": {
+      "cut_pct": 75,
+      "days": 90,
+      "full_penalty": 100000,
+      "under_penalty": 25000,
+      "delay_penalty": 19800,
+      "penalty": 44800,
+      "total": 1044800
+    },
+    "boundary": true
+  },
+  {
+    "why": "그다음 날 2027-03-01 → 3~6개월 구간 50% 감면, 91일",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-11-29",
+      "paid": "2027-03-01"
+    },
+    "expect": {
+      "cut_pct": 50,
+      "days": 91,
+      "full_penalty": 100000,
+      "under_penalty": 50000,
+      "delay_penalty": 20020,
+      "penalty": 70020,
+      "total": 1070020
+    },
+    "boundary": true
+  },
+  {
+    "why": "납부일이 기한과 같으면 계산 대상 아님",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-07-27",
+      "paid": "2026-07-27"
+    },
+    "expect_error": true
+  },
+  {
+    "why": "2026-07-01 전 납부는 계산하지 않음 (납부지연 기간 규정 개정 전)",
+    "input": {
+      "extra_tax": 1000000,
+      "fraud": "no",
+      "due": "2026-04-27",
+      "paid": "2026-06-30"
+    },
+    "expect_error": true
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "basis_date": "2026-11-08", "yearly": false,
+  "max_input": 100000000000, "max_days": 3650,
+  "won10_keys": ["full_penalty", "under_penalty", "delay_penalty", "penalty"],
+  "sources": [
+    {"name": "국가법령정보센터 국세기본법 (제45조 수정신고, 제47조의3 과소신고가산세, 제47조의4 납부지연가산세, 제48조 가산세 감면)", "url": "https://www.law.go.kr/법령/국세기본법"},
+    {"name": "국가법령정보센터 국세기본법 시행령 (제27조의4 1일 10만분의 22, 제29조 감면 제외 사유)", "url": "https://www.law.go.kr/법령/국세기본법시행령"},
+    {"name": "국가법령정보센터 민법 (제157조·제160조 기간 계산)", "url": "https://www.law.go.kr/법령/민법"},
+    {"name": "국가법령정보센터 국고금관리법 (제47조 10원 미만 끝수)", "url": "https://www.law.go.kr/법령/국고금관리법"}
+  ],
+  "rate_pct": 10,
+  "fraud_rate_pct": 40,
+  "daily_rate_per_100k": 22,
+  "delay_rule_from": "2026-07-01",
+  "reduction": [
+    {"months": 1, "label": "1개월", "cut_pct": 90},
+    {"months": 3, "label": "3개월", "cut_pct": 75},
+    {"months": 6, "label": "6개월", "cut_pct": 50},
+    {"months": 12, "label": "1년", "cut_pct": 30},
+    {"months": 18, "label": "1년 6개월", "cut_pct": 20},
+    {"months": 24, "label": "2년", "cut_pct": 10}
+  ]
+}
