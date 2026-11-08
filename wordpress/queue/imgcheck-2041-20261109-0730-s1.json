@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 2041,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a calm small startup office with empty desks, potted plants and soft morning light through large windows",
+   "alt": "아침 햇살이 드는 조용한 작은 회사 사무실"
+  }
+ ]
+}

@@ -1,0 +1,696 @@
+{
+ "title": "전세금 보증보험 가입 조건: 주택가격 90% 이내, 계약 절반 전까지",
+ "excerpt": "전세금 보증보험은 보증금과 선순위채권 합이 주택가격 90% 이내, 수도권 7억 원 이하일 때 계약기간 절반 전까지 들 수 있어요. 보증료 계산과 최대 40만 원 지원도 정리했어요.",
+ "content_html": "<p>전세금 보증보험(전세보증금 반환보증)은 집주인이 계약이 끝나도 보증금을 안 돌려줄 때 보증기관이 대신 돌려주는 상품이에요. 핵심 조건은 세 가지예요. 전세보증금과 선순위채권을 더한 금액이 주택가격의 90% 이내여야 하고, 보증금은 수도권 7억 원·그 밖의 지역 5억 원 이하여야 해요. 그리고 전세계약기간의 절반이 지나기 전에 신청해야 해요.</p>\n<h2>어디서 가입하나요</h2>\n<p>공공 보증기관은 주택도시보증공사(HUG)와 한국주택금융공사(HF) 두 곳이에요. 둘의 차이는 누가 가입할 수 있느냐예요.</p>\n<table>\n<thead><tr><th>구분</th><th>HUG 전세보증금반환보증</th><th>HF 일반전세지킴보증</th></tr></thead>\n<tbody>\n<tr><td>가입 대상</td><td>전세계약서상 임차인 (개인·법인·외국인 가능)</td><td>HF 전세자금보증을 이용 중인 세대주 (보증금 5% 이상 지급, 주택가격 12억 원 이하)</td></tr>\n<tr><td>신청 창구</td><td>HUG 지사, 위탁은행, 모바일 앱</td><td>HF 전세자금보증을 이용하는 취급은행</td></tr>\n<tr><td>보증료율</td><td>연 0.097~0.211%</td><td>연 0.04~0.18%</td></tr>\n</tbody>\n</table>\n<p>HF 상품은 HF 보증을 낀 전세대출을 이용하는 사람만 그 대출을 받은 은행에서 가입할 수 있어요. 전세대출과 동시에 신청할 수도 있어요. 다만 이때는 HF 전세자금보증부 대출이 반드시 실행되어야 해요. 전세대출이 없거나 다른 보증으로 받았다면 HUG 상품을 먼저 보면 돼요. 다만 HUG는 질권설정이나 채권양도 통지가 된 전세대출이 있으면 가입할 수 없어요. SGI서울보증 보증부 대출은 예외예요.</p>\n<h2>가입 조건 한눈에 보기</h2>\n<ul>\n<li>전입신고와 확정일자를 받고 그 집에 살고 있어야 해요. HF는 전세대출과 동시에 신청하면 보증서 발급일까지 갖추는 조건으로 받아 줘요.</li>\n<li>전세계약기간이 1년 이상이어야 해요. HF는 2020년 4월 1일 이후 맺은 계약이어야 해요.</li>\n<li>보증금이 수도권(서울·경기·인천) 7억 원, 그 밖의 지역 5억 원 이하여야 해요.</li>\n<li>집주인이 그 집(HUG는 건물과 토지 모두)의 소유자여야 해요.</li>\n<li>등기부에 경매신청·압류·가압류 같은 권리침해가 없어야 해요.</li>\n<li>보증금 반환채권의 담보·양도를 금지하는 특약이 없어야 해요 (HUG).</li>\n<li>HUG는 공인중개사를 통해 체결한 계약서여야 해요. 다만 처음 계약을 중개사를 통해 했다면 갱신 계약서는 아니어도 돼요.</li>\n<li>HUG는 건축물대장에 위반건축물로 올라 있으면 안 돼요 (아파트 제외).</li>\n</ul>\n<p>HUG는 근린생활시설·공관·가정어린이집 등은 주택이 아니라 보증 대상에서 빼요. 주거용 오피스텔은 계약서나 중개대상물 확인·설명서에 주거용 표기가 있어야 해요.</p>\n<h2>보증한도 계산: 주택가격 × 90% − 선순위채권</h2>\n<p>보증한도는 주택가격의 90%에서 선순위채권(근저당 등 내 보증금보다 먼저 받는 돈)을 뺀 금액이에요. 선순위채권 자체도 주택가격×90%의 60% 이내여야 해요. 단독·다가구는 다른 세입자 보증금까지 더해 따지는 기준이 따로 있어요.</p>\n<table>\n<thead><tr><th>예시 (주택가격 3억 원)</th><th>보증한도</th><th>결과</th></tr></thead>\n<tbody>\n<tr><td>근저당 없음, 보증금 2억 원</td><td>2억 7,000만 원</td><td>가입 가능</td></tr>\n<tr><td>근저당 1억 원, 보증금 2억 원</td><td>1억 7,000만 원</td><td>가입 불가</td></tr>\n</tbody>\n</table>\n<p>두 번째 예시는 보증금과 근저당을 더한 3억 원이 주택가격의 90%인 2억 7,000만 원을 넘어서 안 돼요. 계약 전에 등기부 을구의 근저당 금액부터 보는 게 좋아요.</p>\n<h2>신청 기한: 계약기간 절반 전까지</h2>\n<p>HUG는 신규 계약이면 잔금지급일과 전입신고일 중 늦은 날부터 계약기간의 절반이 지나기 전까지 신청해요. 갱신 계약은 갱신 계약기간의 절반이 지나기 전까지예요. 2년 계약이면 대략 1년 안에 들어야 하는 셈이에요. HF도 임대차계약기간의 절반이 지나기 전까지예요. 다만 HF를 토스뱅크로 이용하면 전월세 보증금대출 실행일부터 3개월까지예요.</p><p>HUG는 미분양관리지역(HUG 누리집에 매월 공고) 임차인이면 기한이 지나도 특례로 받아 주는 기준이 따로 있어요.</p>\n<h2>보증료 계산 예시</h2>\n<p>HUG 보증료는 보증금액 × 보증료율 × 전세계약기간 ÷ 365로 계산해요. 요율은 보증금 구간, 아파트인지 여부, 부채비율에 따라 달라요.</p>\n<p>예를 들어 주택가격 3억 원 아파트에 보증금 2억 원, 근저당 없이 2년 계약이라고 해 볼게요. HUG 부채비율은 (선순위채권 + 보증금) ÷ 주택가액이고, 주택가액은 주택가격의 90%인 2억 7,000만 원이에요. 부채비율이 약 74%라 80% 이하 구간 요율 연 0.124%가 적용돼요. 보증료는 2억 원 × 0.124% × 730일 ÷ 365 = 496,000원이에요.</p>\n<p>HF는 LTV를 (선순위채권 + 보증금) ÷ 주택가격으로 봐요. 같은 조건이면 약 67%라 연 0.04%가 적용되고, 2년에 약 16만 원이에요.</p>\n<table>\n<thead><tr><th>HF 담보인정비율(LTV)</th><th>보증료율</th></tr></thead>\n<tbody>\n<tr><td>70% 이하</td><td>연 0.04%</td></tr>\n<tr><td>70% 초과 80% 이하</td><td>연 0.11%</td></tr>\n<tr><td>80% 초과 90% 이하</td><td>연 0.18%</td></tr>\n</tbody>\n</table>\n<h2>보증료 돌려받는 방법 2가지</h2>\n<h3>국토교통부 보증료 지원</h3>\n<ul>\n<li>대상: 전세보증금 3억 원 이하, 연소득 청년 5,000만 원·청년 외 6,000만 원·신혼부부 7,500만 원 이하인 무주택 임차인</li>\n<li>금액: 낸 보증료를 최대 40만 원까지 지원해요. 청년 외 가구는 낸 보증료의 90%를 40만 원 한도로 받아요.</li>\n<li>신청: 시·군·구청이나 주민센터 방문, 또는 정부24(gov.kr) 온라인 접수예요. 지자체 예산이 떨어지면 일찍 마감돼요.</li>\n<li>제외: 등록임대사업자의 임대주택에 사는 임차인, 법인 임차인, 외국인 등</li>\n</ul>\n<p>위 HUG 예시의 496,000원을 냈다면 청년은 40만 원을 받아요. 청년 외 가구는 90%인 446,400원이 한도를 넘어 40만 원이에요. 2025년 3월 30일 이전 가입 건은 한도가 30만 원이에요.</p>\n<h3>연말정산 보험료 세액공제</h3>\n<p>근로소득자(일용근로자 제외)는 보증대상 임차보증금이 3억 원 이하인 반환보증 보증료를 보험료 세액공제로 받을 수 있어요. 공제율은 12%이고 다른 보장성보험료와 합쳐 연 100만 원까지가 대상이에요. 보증료가 496,000원이면 공제액은 59,520원이에요.</p>\n<h2>보증금을 못 받았을 때 순서 (HF 안내 기준)</h2>\n<ol>\n<li>계약 만료 2개월 전까지 집주인에게 갱신하지 않겠다고 알려요 (내용증명이 안전해요).</li><li>계약이 끝나기 전에 전세대출(보증)과 반환보증 기한 연장을 은행에 직접 가서 해 둬요.</li>\n<li>계약이 끝난 뒤 법원에 임차권등기명령을 신청해요.</li>\n<li>계약이 끝나고 1개월이 지나도 못 받으면 보증기관에 보증사고 신고와 이행청구를 해요.</li>\n<li>심사가 끝나면 이사(집 비우기) 날짜에 맞춰 보증기관이 보증금을 지급해요.</li>\n</ol>\n<p>2개월 전 통지를 놓쳐 계약이 묵시적으로 갱신됐다면, 임차인은 언제든 해지를 통지할 수 있어요. 집주인이 통지를 받은 날부터 3개월이 지나면 해지돼요.</p>\n<p>HF는 임차권등기명령과 보증금 반환채권 양도를 이행청구의 필수 절차로 봐요. 임차권등기가 끝난 뒤에는 이사를 가도 이미 갖춘 대항력과 우선변제권이 유지돼요. HUG 절차는 HUG 누리집(khug.or.kr)에서 볼 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>계약 절반이 지났으면 아예 못 드나요?</h3>\n<p>원칙은 HUG·HF 모두 계약기간의 절반 전까지예요. 위의 미분양관리지역·토스뱅크 예외에 해당하지 않으면 다음 갱신 계약 때 갱신 계약기간 기준으로 다시 따져요.</p>\n<h3>보증금 일부만 가입할 수 있나요?</h3>\n<p>HF 일반전세지킴보증은 보증금 일부만 보증할 수 없고 계약서상 보증금 전액이 대상이에요. HUG도 보증금 일부만 가입하려면 가능한지 HUG 콜센터에 먼저 물어보는 게 좋아요.</p>\n<h3>문의는 어디로 하나요?</h3>\n<p>HUG는 콜센터 1566-9009, HF는 고객센터 1688-8114예요. 보증료 지원은 국토교통부 콜센터 1599-0001에서 안내해요.</p>",
+ "tags": [
+  "전세금 보증보험",
+  "전세보증금 반환보증",
+  "전세지킴보증"
+ ],
+ "category": "부동산·이사",
+ "images": [
+  {
+   "prompt": "a bright empty living room of a Korean apartment with moving boxes stacked near the window and afternoon sunlight on wooden floor",
+   "alt": "이삿짐 상자가 놓인 햇살 드는 빈 아파트 거실"
+  }
+ ],
+ "keyword": "전세금보증보험",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 전세금 보증보험 가입 조건: 주택가격 90% 이내, 계약 절반 전까지",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "[요약] 보증금과 선순위채권 합이 주택가격 90% 이내, 수도권 7억 원 이하일 때 계약기간 절반 전까지 가입, 보증료 최대 40만 원 지원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400",
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "전세보증금과 선순위채권을 더한 금액이 주택가격의 90% 이내",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보증금은 수도권 7억 원·그 밖의 지역 5억 원 이하",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "전세계약기간의 절반이 지나기 전에 신청",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공공 보증기관은 HUG와 HF 두 곳",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG 가입 대상은 전세계약서상 임차인 (개인·법인·외국인 가능)",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF 가입 대상은 HF 전세자금보증을 이용 중인 세대주 (보증금 5% 이상 지급, 주택가격 12억 원 이하)",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "HUG 신청 창구는 지사, 위탁은행, 모바일 앱",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF 신청 창구는 HF 전세자금보증을 이용하는 취급은행",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG 보증료율 연 0.097~0.211%",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF 보증료율 연 0.04~0.18%",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF는 전세대출과 동시 신청 가능, 이때 HF 전세자금보증부 대출이 반드시 실행되어야 함",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG는 질권설정이나 채권양도 통지가 된 전세대출이 있으면 가입 불가, SGI서울보증 보증부 대출은 예외",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "전입신고와 확정일자를 받고 거주해야 함",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF는 전세대출과 동시에 신청하면 보증서 발급일까지 갖추는 조건으로 받아 줌",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "전세계약기간이 1년 이상",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF는 2020년 4월 1일 이후 맺은 계약이어야 함",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "집주인이 그 집의 소유자여야 하고 HUG는 건물과 토지 모두",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "등기부에 경매신청·압류·가압류 같은 권리침해가 없어야 함",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG는 보증금 반환채권의 담보·양도 금지 특약이 없어야 함",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG는 공인중개사를 통해 체결한 계약서여야 하고, 처음 계약을 중개사를 통해 했다면 갱신 계약서는 예외",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG는 건축물대장에 위반건축물이면 안 됨 (아파트 제외)",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG는 근린생활시설·공관·가정어린이집 등은 보증 대상에서 뺌",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "주거용 오피스텔은 계약서나 중개대상물 확인·설명서에 주거용 표기 필요",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보증한도는 주택가격의 90%에서 선순위채권을 뺀 금액",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "선순위채권은 주택가격×90%의 60% 이내",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "단독·다가구는 다른 세입자 보증금까지 더해 따지는 기준이 따로 있음",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시: 주택가격 3억 원, 근저당 없음, 보증금 2억 원이면 보증한도 2억 7,000만 원으로 가입 가능",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400",
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시: 근저당 1억 원, 보증금 2억 원이면 보증한도 1억 7,000만 원으로 가입 불가 (합계 3억 원이 2억 7,000만 원 초과)",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400",
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG 신규 계약은 잔금지급일과 전입신고일 중 늦은 날부터 계약기간 절반 전, 갱신 계약은 갱신 계약기간 절반 전",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF는 임대차계약기간의 절반 전까지, 토스뱅크 이용 시 전월세 보증금대출 실행일부터 3개월까지",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "HUG는 미분양관리지역(HUG 누리집에 매월 공고) 임차인에게 기한이 지나도 받아 주는 특례 기준이 있음",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "원칙은 HUG·HF 모두 계약기간 절반 전까지, 예외에 해당하지 않으면 다음 갱신 계약 때 갱신 계약기간 기준",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "HUG 보증료 = 보증금액 × 보증료율 × 전세계약기간 ÷ 365, 요율은 보증금 구간·아파트 여부·부채비율로 다름",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG 부채비율 = (선순위채권 + 보증금) ÷ 주택가액, 주택가액은 주택가격의 90%인 2억 7,000만 원",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "부채비율 약 74%로 80% 이하 구간 요율 연 0.124%, 보증료 2억 원 × 0.124% × 730일 ÷ 365 = 496,000원",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "HF LTV = (선순위채권 + 보증금) ÷ 주택가격, 약 67%라 연 0.04%, 2년에 약 16만 원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "HF LTV 70% 이하 연 0.04%, 70% 초과 80% 이하 연 0.11%, 80% 초과 90% 이하 연 0.18%",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "국토교통부 보증료 지원 대상: 전세보증금 3억 원 이하, 연소득 청년 5,000만 원·청년 외 6,000만 원·신혼부부 7,500만 원 이하 무주택 임차인 (주거기본법 제15조)",
+   "urls": [
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보증료 최대 40만 원 지원, 청년 외 가구는 낸 보증료의 90%를 40만 원 한도로",
+   "urls": [
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "신청은 시·군·구청이나 주민센터 방문 또는 정부24 온라인, 지자체 예산 소진 시 조기 마감",
+   "urls": [
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "지원 제외: 등록임대사업자의 임대주택 임차인, 법인 임차인, 외국인 등",
+   "urls": [
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "496,000원을 냈다면 청년은 40만 원, 청년 외 가구는 90%인 446,400원이 한도를 넘어 40만 원",
+   "urls": [
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "2025년 3월 30일 이전 가입 건은 한도 30만 원",
+   "urls": [
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "근로소득자(일용근로자 제외)는 보증대상 임차보증금 3억 원 이하 반환보증 보증료를 보험료 세액공제 (소득세법 시행령 제118조의4)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령/제118조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공제율 12%, 다른 보장성보험료와 합쳐 연 100만 원까지 (소득세법 제59조의4)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보증료가 496,000원이면 공제액은 59,520원 (소득세법 제59조의4)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "계약 만료 2개월 전까지 집주인에게 갱신 거절 통지 (주택임대차보호법 제6조)",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제6조",
+    "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계약이 끝나기 전에 전세대출(보증)과 반환보증 기한 연장을 은행에 직접 방문해 함",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "계약이 끝난 뒤 법원에 임차권등기명령 신청 (주택임대차보호법 제3조의3)",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제3조의3",
+    "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계약이 끝나고 1개월이 지나도 못 받으면 보증사고 신고와 이행청구",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "심사가 끝나면 이사(명도) 날짜에 맞춰 보증기관이 지급",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF는 임차권등기명령과 보증금 반환채권 양도를 이행청구의 필수 절차로 봄",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "임차권등기가 끝난 뒤에는 이사를 가도 이미 갖춘 대항력과 우선변제권 유지 (주택임대차보호법 제3조의3)",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제3조의3"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HF 일반전세지킴보증은 보증금 일부 보증 불가, 계약서상 보증금 전액이 대상",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "문의처 HUG 콜센터 1566-9009, HF 고객센터 1688-8114, 국토교통부 콜센터 1599-0001",
+   "urls": [
+    "https://housing.seoul.go.kr/site/main/content/sh01_060400",
+    "https://www.hf.go.kr/ko/sub02/sub02_05_01.do",
+    "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "HUG는 보증한도 안에서 신청한 금액이 보증금액 — 2026.10.30 신청분부터 전액 보증으로 바뀌었다는 기사(파이낸셜뉴스 2026.9.18)만 있고 HUG 원문은 이 환경에서 못 열어 콜센터 확인 안내로 완화",
+   "urls": [
+    "https://www.fnnews.com/news/202609181036455257"
+   ],
+   "verdict": "확인불가",
+   "action": "완화",
+   "round": 2
+  },
+  {
+   "claim": "소득세법시행령 제118조의4 단서1 반영 — 연말정산 문단 '보증대상 임차보증금이 3억 원 이하인'",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법시행령/제118조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제59조의4 단서1 반영 — 연말정산 문단 '근로소득자(일용근로자 제외)'",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제59조의4 단서2 반영 — 연말정산 문단 '다른 보장성보험료와 합쳐 연 100만 원까지'",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제59조의4 단서3 해당 없음 — 장애인전용보험 구분, 글은 일반 보장성보험료(보증료)만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제59조의4 단서4 해당 없음 — 의료비 세액공제 조항, 글과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제59조의4 단서5 해당 없음 — 의료비 세액공제 조항, 글과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "소득세법 제59조의4 단서6 해당 없음 — 의료비 세액공제 조항, 글과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제59조의4"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주택임대차보호법 제6조 단서1 해당 없음 — 차임 연체 임차인의 묵시적 갱신 배제 규정, 글은 임차인이 갱신 거절을 통지하는 경우만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제6조"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주택임대차보호법 제3조의3 단서1 반영 — 청구 절차 문단 '임차권등기가 끝난 뒤에는 이사를 가도 이미 갖춘 대항력과 우선변제권이 유지돼요'",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제3조의3"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주택임대차보호법 제3조의3 단서2 해당 없음 — 임차권등기 뒤 그 집에 새로 들어온 임차인의 소액 우선변제 제한, 글은 기존 임차인 기준",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제3조의3"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "제6조의2 반영 — 묵시적 갱신 시 임차인은 언제든 해지 통지, 집주인이 통지를 받은 날부터 3개월 뒤 효력 (주택임대차보호법 제6조의2)",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제6조의2"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "제6조의3 해당 없음 — 계약갱신요구권은 임차인이 갱신을 원할 때의 규정, 글은 갱신하지 않고 보증금을 돌려받는 경우만 다룸 (주택임대차보호법 제6조의3)",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제6조의3"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "주택임대차보호법 제6조의2 단서1 반영 — 청구 절차 아래 문단 '임차인은 언제든 해지를 통지할 수 있어요. 집주인이 통지를 받은 날부터 3개월이 지나면 해지돼요'",
+   "urls": [
+    "https://www.law.go.kr/법령/주택임대차보호법/제6조의2"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  }
+ ],
+ "sources": [
+  {
+   "name": "한국주택금융공사 일반전세지킴보증 안내",
+   "url": "https://www.hf.go.kr/ko/sub02/sub02_05_01.do"
+  },
+  {
+   "name": "한국주택금융공사 전세보증금 반환 청구 절차",
+   "url": "https://www.hf.go.kr/ko/sub02/sub02_05_07.do"
+  },
+  {
+   "name": "정부24 국토교통부 전세보증금반환보증 보증료 지원",
+   "url": "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/161300000103"
+  }
+ ]
+}

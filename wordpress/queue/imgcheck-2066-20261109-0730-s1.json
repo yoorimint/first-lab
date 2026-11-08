@@ -1,0 +1,12 @@
+{
+ "type": "image_check",
+ "post_id": 2066,
+ "replace": [],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a quiet family living room with a wooden table, a teapot and two cups near a sunny window",
+   "alt": "햇살 드는 창가 거실 탁자 위 찻주전자와 찻잔"
+  }
+ ]
+}
