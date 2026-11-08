@@ -112,6 +112,8 @@ def main() -> int:
         print(summary_line(m["search"]))
         for t in m["search"].get("top") or []:
             print(f"  {t['page'][:50]} 노출 {t['impressions']}·클릭 {t['clicks']}·{t['position']}위")
+        for q in m["search"].get("queries") or []:
+            print(f"  검색어 '{q['query'][:30]}' → {q['page'][:30]} 노출 {q['impressions']}·클릭 {q['clicks']}·{q['position']}위")
     else:
         print("검색: 아직 기록 없음 (배포 점검·새벽 수집이 채움)")
     try:  # 품질 한 줄 (automation/quality_report.py — 매일 점검 보고와 같은 숫자)

@@ -153,7 +153,18 @@ def record(state: dict, today: str | None = None) -> str:
         return "서치콘솔: 미연동"
     daily, pages = fetch_totals()
     state["search"] = summarize(daily, pages, _published_count(), today)
+    try:  # 어떤 검색어로 노출됐는지 (11/8 운영자 '5위라고? 난 안 보이던데' — 평균 순위만으로는 어떤 검색어인지 모름)
+        state["search"]["queries"] = top_queries(fetch(SUMMARY_DAYS))
+    except Exception:  # noqa: BLE001 - 검색어 목록이 없어도 합계 기록은 남김
+        pass
     return summary_line(state["search"])
+
+
+def top_queries(rows: list[dict], limit: int = TOP_PAGES) -> list[dict]:
+    """노출 많은 검색어 (드물게 검색된 검색어는 구글이 빼고 줌 — 합계와 안 맞을 수 있음)."""
+    top = sorted(rows, key=lambda r: (-r["impressions"], -r["clicks"]))[:limit]
+    return [{"query": r["query"], "page": urllib.parse.unquote(urllib.parse.urlparse(r["page"]).path),
+             "impressions": r["impressions"], "clicks": r["clicks"], "position": round(r["position"], 1)} for r in top]
 
 
 def update_signals(conn, rows: list[dict]) -> dict:

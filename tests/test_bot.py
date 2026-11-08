@@ -5217,3 +5217,13 @@ class DeployRetryTest(unittest.TestCase):
         self.assertIn("continue-on-error: true", first)
         self.assertIn("if: steps.apply.outcome == 'failure'", second)
         self.assertEqual(body(first).rstrip(), body(second).rstrip())  # 고칠 때 두 단계를 같이 고쳐야 함
+
+
+class SearchQueriesTest(unittest.TestCase):
+    def test_top_queries(self):
+        from bot.search_console import top_queries
+        rows = [{"query": "자동차보험료 계산 방법", "page": "https://first-lab.kr/%EC%9E%90%EB%8F%99%EC%B0%A8/", "clicks": 0, "impressions": 12, "position": 4.26},
+                {"query": "b", "page": "https://first-lab.kr/b/", "clicks": 0, "impressions": 3, "position": 30.0}]
+        q = top_queries(rows)
+        self.assertEqual(q[0]["query"], "자동차보험료 계산 방법")
+        self.assertEqual((q[0]["page"], q[0]["position"]), ("/자동차/", 4.3))
