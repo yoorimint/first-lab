@@ -218,3 +218,5 @@ date,post,fixes,types
 2026-11-08,2108,2,unverified:2
 2026-11-08,2112,0,
 2026-11-08,2110,3,missing_condition:3
+2026-11-08,2127,3,missing_condition:1 unverified:1 wrong_fact:1
+2026-11-08,2124,2,missing_condition:2
