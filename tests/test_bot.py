@@ -5189,3 +5189,17 @@ class LeadParenThresholdTest(unittest.TestCase):
         self.assertTrue(lead_thresholds("담보를 내고 최대 5년 나눠 내요.", body))
         ok = "<p>세무서 허가를 받아 최대 5년(특례 재산은 15년)에 나눠 내요.</p><table><tr><td>기간</td><td>최대 5년(특례 15년)</td></tr></table>"
         self.assertEqual(lead_thresholds("최대 5년(특례 재산은 15년) 나눠 내요.", ok), [])
+
+
+class KoreanHundredFormsTest(unittest.TestCase):
+    """11/8 #2085: '1억 400만 원' ↔ 법령 '1억4백만원', '4,800만' ↔ '4천8백만원' 을 같은 값으로 (근거 대조 '페이지에 없음' 오탐)."""
+
+    def test_forms(self):
+        from bot.source_check import has_number, key_numbers
+        self.assertEqual(key_numbers("공급대가 1억 400만 원 미만"), ["10400"])
+        self.assertEqual(key_numbers("최대 1억 2,000만 원까지"), ["12000"])
+        self.assertTrue(has_number("1억4백만원을 말한다", "10400"))
+        self.assertTrue(has_number("4천8백만원 이상", "4800"))
+        self.assertTrue(has_number("1억2천4백만원", "12400"))
+        self.assertTrue(has_number("3천300만원", "3300"))
+        self.assertFalse(has_number("1억4백만원", "10500"))

@@ -57,8 +57,15 @@ def key_numbers(claim: str) -> list[str]:
         if any(m in claim for m in ("=", "×", "재계산", "예시")):
             return []  # 계산식의 비율은 예시 가정값(예금 금리 2.5% 등)이라 근거 페이지에 없음 — 표본 20개 중 2개 오탐
         return sorted(pct) if len(pct) <= MAX_NUMBERS else []
-    nums = sorted({n for n in _numbers(claim) if "." in n or len(n.lstrip("0")) >= 3} | pct | unit_numbers(claim))
+    joined = _join_eok_man(claim)
+    nums = sorted({n for n in _numbers(joined) if "." in n or len(n.lstrip("0")) >= 3} | pct | unit_numbers(claim))
     return nums if len(nums) <= MAX_NUMBERS else []
+
+
+def _join_eok_man(text: str) -> str:
+    """'1억 400만' → '10400만' (만 원 단위 한 숫자). 따로 두면 '400' 만 대조돼 법령 '1억4백만원' 과 못 맞춤 (11/8 #2085 '페이지에 없음' 오탐)."""
+    return re.sub(r"(\d+)\s*억\s*(\d[\d,]*)\s*만",
+                  lambda m: f"{int(m.group(1)) * 10000 + int(m.group(2).replace(',', ''))}만", text or "")
 
 
 # 두 자리 수 + 단위(14일·15회·39세·24개월·60시간) — 기간·나이·횟수 조건이 글의 핵심인데 세 자리 미만이라 대조 안 됐음 (11/6 운영자
@@ -294,6 +301,8 @@ def _korean_forms(number: str) -> list[str]:
     if n < 10000:  # 1천~9천999 (만 원 단위로 쓰는 경우)
         rest = n % 1000
         forms.append(rf"(?<![\d.]){n // 1000}\s*천\s*{rest if rest else ''}(?!\d)")
+        if rest and rest % 100 == 0:  # '4천8백' (11/8 #2085 법령 '4천8백만원')
+            forms.append(rf"(?<![\d.]){n // 1000}\s*천\s*{rest // 100}\s*백")
     else:  # 1억 이상 (만 원 단위 1만 = 1억)
         eok, rest = divmod(n, 10000)
         if rest == 0:
@@ -302,6 +311,10 @@ def _korean_forms(number: str) -> list[str]:
             forms.append(rf"(?<![\d.]){eok}\s*억\s*{rest // 1000}\s*천")
         else:
             forms.append(rf"(?<![\d.]){eok}\s*억\s*{rest}(?!\d)")
+        thousands, hundreds = divmod(rest, 1000)
+        if rest % 100 == 0 and hundreds:  # '1억4백', '1억2천4백' (법령 '1억4백만원')
+            th = rf"{thousands}\s*천\s*" if thousands else ""
+            forms.append(rf"(?<![\d.]){eok}\s*억\s*{th}{hundreds // 100}\s*백")
     return forms
 
 
