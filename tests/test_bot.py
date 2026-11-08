@@ -5178,3 +5178,14 @@ class SecondReviewTest(unittest.TestCase):
 
     def test_writer_instruction(self):
         self.assertIn('"round": 2', (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
+
+class LeadParenThresholdTest(unittest.TestCase):
+    """11/8 #2066: 요약·첫 문단 '최대 5년' ↔ 본문 '최대 5년(특례 15년)' — 괄호 속 예외를 요약이 뺌."""
+
+    def test_paren_alternative(self):
+        from bot.condition_gate import lead_thresholds
+        body = "<p>세무서 허가를 받아 최대 5년에 나눠 내요.</p><table><tr><td>기간</td><td>최대 5년(특례 15년)</td></tr></table>"
+        self.assertTrue(lead_thresholds("담보를 내고 최대 5년 나눠 내요.", body))
+        ok = "<p>세무서 허가를 받아 최대 5년(특례 재산은 15년)에 나눠 내요.</p><table><tr><td>기간</td><td>최대 5년(특례 15년)</td></tr></table>"
+        self.assertEqual(lead_thresholds("최대 5년(특례 재산은 15년) 나눠 내요.", ok), [])

@@ -869,6 +869,13 @@ def lead_thresholds(excerpt: str, body_html: str) -> list[str]:
             if alt:
                 out.append(f"요약·첫 문단은 '{m.group(0)}' 만 적었는데 본문에 '{alt.group(0)}' 조건이 있음: '{sent[:60]}' — 요약·첫 문단에도 넣기")
                 break
+        # 본문은 같은 기준값 바로 뒤 괄호에 다른 값을 둠: '최대 5년(특례 15년)' ↔ 요약 '최대 5년' (11/8 #2066 — 보관 글 279편 중 이 글만 걸림)
+        unit = re.escape(m.group(3))
+        pat = re.escape(m.group(0)).replace(r"\ ", r"\s*") + rf"\s*\(([^()]{{0,30}}?)(\d[\d,.]*)\s*{unit}\)"
+        for a in re.finditer(pat, _plain(body_html[first.end():] if first else body_html)):
+            if a.group(2) != m.group(2) and not re.search(rf"{re.escape(a.group(2))}\s*{unit}", lead):
+                out.append(f"요약·첫 문단은 '{m.group(0)}' 만 적었는데 본문은 '{a.group(0)}' — 괄호 속 예외도 요약·첫 문단에 넣기")
+                break
     return list(dict.fromkeys(out))[:2]
 
 
