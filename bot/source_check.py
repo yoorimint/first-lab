@@ -333,7 +333,7 @@ def has_number(text: str, number: str) -> bool:
     return any(re.search(p, text) for p in patterns)
 
 
-def check(review: list[dict] | None, fetcher=fetch) -> dict:
+def check(review: list[dict] | None, fetcher=fetch, upcoming=None) -> dict:
     """숫자 주장: 확인 / 페이지에 없음 / 못 엶. 숫자 없는 주장: 근거 페이지를 하나도 못 읽으면 '근거 못 읽음'."""
     items, plain = [], []
     for item in review or []:
@@ -351,6 +351,10 @@ def check(review: list[dict] | None, fetcher=fetch) -> dict:
             status, missing = UNOPENED, nums
         else:
             missing = [n for n in nums if not any(has_number(t, n) for t in texts)]
+            if missing:  # law.go.kr '/법령/이름' 은 현행 판만 엶 — 시행 예정 개정에만 있는 숫자는 그 판에서 찾음 (11/8 #2149 국적법 21725)
+                later = upcoming or (upcoming_law_text if fetcher is fetch else (lambda u: ""))  # 시험(가짜 fetcher)에선 API 안 부름
+                texts_later = [later(u) for u in urls]
+                missing = [n for n in missing if not any(t and has_number(t, n) for t in texts_later)]
             status = MISSING if missing else FOUND
         claims.append({"claim": claim[:120], "numbers": nums, "missing": missing, "status": status, "urls": urls[:3]})
     for claim, _, urls in plain:
@@ -457,6 +461,27 @@ def claim_article(item: dict, url: str) -> str | None:
         return None
     m = re.search(r"제\d+조(?:의\d+)?", str(item.get("claim", "")))
     return article_of(url) or (m.group(0) if m else None)
+
+
+_UPCOMING: dict[str, str] = {}
+
+
+def upcoming_law_text(url: str, today=None) -> str:
+    """'/법령/이름' 주소 → 시행 예정 판들의 본문(공포번호·부칙 포함 XML). 법제처 API 를 못 쓰거나 예정 판이 없으면 ''."""
+    import datetime as dt
+    m = re.search(r"law\.go\.kr/법령/([^/?#()]+)", urllib.parse.unquote(url))
+    if not m:
+        return ""
+    name = m.group(1)
+    if name not in _UPCOMING:
+        try:
+            from . import law_api
+            today = today or dt.date.today()
+            _UPCOMING[name] = " ".join(law_api.fetch("service", "law", MST=v["mst"]) or ""
+                                       for v in law_api.versions(name) if v["date"] > today)
+        except Exception:  # noqa: BLE001 - 대조 보조라 실패해도 원래 결과('페이지에 없음')대로
+            _UPCOMING[name] = ""
+    return _UPCOMING[name]
 
 
 def law_page(url: str) -> str:

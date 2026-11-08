@@ -5227,3 +5227,17 @@ class SearchQueriesTest(unittest.TestCase):
         q = top_queries(rows)
         self.assertEqual(q[0]["query"], "자동차보험료 계산 방법")
         self.assertEqual((q[0]["page"], q[0]["position"]), ("/자동차/", 4.3))
+
+
+class UpcomingLawSourceTest(unittest.TestCase):
+    """11/8 #2149: '/법령/국적법' 은 현행 판만 열려 시행 예정 개정의 '법률 제21725호' 가 '페이지에 없음' — 예정 판에서도 찾음."""
+
+    def test_found_in_upcoming(self):
+        from bot.source_check import check, FOUND, MISSING
+        review = [{"claim": "2026년 6월 2일 공포 법률 제21725호", "verdict": "맞음", "action": "유지",
+                   "urls": ["https://www.law.go.kr/법령/국적법"]}]
+        page = lambda u: "현행 국적법 본문 " * 20
+        r = check(review, fetcher=page, upcoming=lambda u: "<공포번호>21725</공포번호>")
+        self.assertEqual(r["counts"][FOUND], 1)
+        r = check(review, fetcher=page, upcoming=lambda u: "")
+        self.assertEqual(r["counts"][MISSING], 1)
