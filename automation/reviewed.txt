@@ -431,3 +431,4 @@ calc:pension-withdrawal-limit
 2177 건강보험료 인상 2027: 7.19% 동결, 장기요양만 0.9994%로
 calc:presale-right-tax
 calc:executive-severance-limit
+2203 금융재산 상속공제: 최대 2억 원, 순금융재산별 공제액
