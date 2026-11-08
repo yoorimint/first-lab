@@ -1,4 +1,5 @@
 {
+  "law_checked": ["지방세법|2027-01-01"],
   "basis_date": "2026-11-08", "yearly": false,
   "max_input": 100000000000,
   "won10_keys": ["stt", "income_tax", "local_tax", "total", "all"],
