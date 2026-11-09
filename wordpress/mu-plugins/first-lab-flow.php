@@ -120,6 +120,18 @@ if ( function_exists( 'add_filter' ) ) {
 		15
 	);
 
+	// 글이 FIRSTLAB_HUB_MIN 편 미만인 태그 페이지는 검색에서 뺌 — 태그가 900개 넘고 대부분 글 1편이라, 내용 없는 얇은 페이지가
+	// 검색에 잔뜩 걸리면 사이트 전체 평가가 깎일 수 있음 (11/9). 글이 쌓여 모음이 되면 저절로 다시 열림. The SEO Framework 필터.
+	add_filter(
+		'the_seo_framework_robots_meta_array',
+		static function ( $meta ) {
+			if ( is_tag() && (int) get_queried_object()->count < FIRSTLAB_HUB_MIN ) {
+				$meta['noindex'] = 'noindex';
+			}
+			return $meta;
+		}
+	);
+
 	// 주제 모음 페이지(태그 페이지) 위: 계산기와 전체 글 목록 — templates/archive.html 의 [firstlab_hub_intro]
 	add_shortcode(
 		'firstlab_hub_intro',

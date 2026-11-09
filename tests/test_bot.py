@@ -5364,3 +5364,5 @@ class FlowTest(unittest.TestCase):
         self.assertIn("[firstlab_hub_intro]", (ROOT / "wordpress" / "themes" / "first-lab" / "templates" / "archive.html").read_text(encoding="utf-8"))
         rel = (ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php").read_text(encoding="utf-8")
         self.assertIn("firstlab_flow_shown", rel)  # 본문 중간에 보여 준 글은 하단에서 뺌
+        flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
+        self.assertIn("the_seo_framework_robots_meta_array", flow)  # 글 3편 미만 태그 페이지는 noindex
