@@ -85,20 +85,32 @@ jobs:
           script: |
             set -e
             REPO=/opt/first-lab
+            PREV=$(cat /var/www/first-lab/deployed-version.txt 2>/dev/null || echo none)   # 지난번에 서버에 올린 버전
             if [ -d "$REPO/.git" ]; then
               git -C "$REPO" fetch -q origin main
               git -C "$REPO" reset -q --hard ${{ needs.gate.outputs.sha }}   # 검사를 통과한 바로 그 버전
             else
               git clone -q https://github.com/yoorimint/first-lab "$REPO"
             fi
+            # 빠른 배포 (11/9 운영자 '이렇게 비효율적으로 해야 돼?'): 글·화면·봇 코드만 바뀌면 바뀐 것만 반영 (1~2분).
+            # 서버 설정·워크플로·페이지·패키지가 바뀌었거나, 지난 버전을 모르거나, 그날 첫 배포면 전체 배포 (tests DeploySpeedTest)
+            CHANGED=$(git -C "$REPO" diff --name-only "$PREV" HEAD 2>/dev/null || echo FULL)
+            FULL_MARK=/var/lib/first-lab/bot/full-deploy-date
             # 같은 서버의 사주데이 앱보다 낮은 몫으로 (11/6 10:06 배포 때 부하 5.14·사주데이 /healthz 응답 없음 1분)
             # cgroup v2 에선 Nice 는 서비스 사이에 안 먹음 → CPUWeight·IOWeight(기본 100)를 낮춘 범위에서 실행
             LOW="nice -n 10"
             if command -v systemd-run >/dev/null; then LOW="systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20 nice -n 10"; fi
-            $LOW bash "$REPO/server/setup.sh"
-            $LOW bash "$REPO/server/wp-setup.sh"
-            $LOW bash "$REPO/server/bot-setup.sh"
-            $LOW bash "$REPO/server/bot-check.sh"
+            if printf '%s\n' "$CHANGED" | grep -qE '^(FULL|server/|\.github/|bot/requirements\.txt|wordpress/pages/)' || [ "$(cat "$FULL_MARK" 2>/dev/null)" != "$(date +%F)" ]; then
+              echo "전체 배포"
+              $LOW bash "$REPO/server/setup.sh"
+              $LOW bash "$REPO/server/wp-setup.sh"
+              $LOW bash "$REPO/server/bot-setup.sh"
+              $LOW bash "$REPO/server/bot-check.sh"
+              date +%F > "$FULL_MARK"
+            else
+              echo "빠른 배포"
+              $LOW bash "$REPO/server/quick-deploy.sh" "$CHANGED"
+            fi
             echo "${{ needs.gate.outputs.sha }}" > /var/www/first-lab/deployed-version.txt   # 따라잡기(gate)가 비교하는 값
       - name: Wait before retry
         if: steps.apply.outcome == 'failure'
@@ -115,18 +127,30 @@ jobs:
           script: |
             set -e
             REPO=/opt/first-lab
+            PREV=$(cat /var/www/first-lab/deployed-version.txt 2>/dev/null || echo none)   # 지난번에 서버에 올린 버전
             if [ -d "$REPO/.git" ]; then
               git -C "$REPO" fetch -q origin main
               git -C "$REPO" reset -q --hard ${{ needs.gate.outputs.sha }}   # 검사를 통과한 바로 그 버전
             else
               git clone -q https://github.com/yoorimint/first-lab "$REPO"
             fi
+            # 빠른 배포 (11/9 운영자 '이렇게 비효율적으로 해야 돼?'): 글·화면·봇 코드만 바뀌면 바뀐 것만 반영 (1~2분).
+            # 서버 설정·워크플로·페이지·패키지가 바뀌었거나, 지난 버전을 모르거나, 그날 첫 배포면 전체 배포 (tests DeploySpeedTest)
+            CHANGED=$(git -C "$REPO" diff --name-only "$PREV" HEAD 2>/dev/null || echo FULL)
+            FULL_MARK=/var/lib/first-lab/bot/full-deploy-date
             # 같은 서버의 사주데이 앱보다 낮은 몫으로 (11/6 10:06 배포 때 부하 5.14·사주데이 /healthz 응답 없음 1분)
             # cgroup v2 에선 Nice 는 서비스 사이에 안 먹음 → CPUWeight·IOWeight(기본 100)를 낮춘 범위에서 실행
             LOW="nice -n 10"
             if command -v systemd-run >/dev/null; then LOW="systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20 nice -n 10"; fi
-            $LOW bash "$REPO/server/setup.sh"
-            $LOW bash "$REPO/server/wp-setup.sh"
-            $LOW bash "$REPO/server/bot-setup.sh"
-            $LOW bash "$REPO/server/bot-check.sh"
+            if printf '%s\n' "$CHANGED" | grep -qE '^(FULL|server/|\.github/|bot/requirements\.txt|wordpress/pages/)' || [ "$(cat "$FULL_MARK" 2>/dev/null)" != "$(date +%F)" ]; then
+              echo "전체 배포"
+              $LOW bash "$REPO/server/setup.sh"
+              $LOW bash "$REPO/server/wp-setup.sh"
+              $LOW bash "$REPO/server/bot-setup.sh"
+              $LOW bash "$REPO/server/bot-check.sh"
+              date +%F > "$FULL_MARK"
+            else
+              echo "빠른 배포"
+              $LOW bash "$REPO/server/quick-deploy.sh" "$CHANGED"
+            fi
             echo "${{ needs.gate.outputs.sha }}" > /var/www/first-lab/deployed-version.txt   # 따라잡기(gate)가 비교하는 값

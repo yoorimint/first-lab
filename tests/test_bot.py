@@ -5625,10 +5625,29 @@ class DeploySpeedTest(unittest.TestCase):
     """11/9 운영자 '배포 왜 이렇게 오래 걸려': 전체 글을 한 편씩 읽는 보정은 배포를 기다리게 하지 않고 잠금 걸어 따로 실행."""
 
     def test_full_scan_runs_in_background(self):
-        sh = (ROOT / "server" / "bot-setup.sh").read_text(encoding="utf-8")
-        line = next(x for x in sh.splitlines() if x.startswith("MAINT="))
+        maint = (ROOT / "server" / "maint.sh").read_text(encoding="utf-8")
         for mod in ("bot.fix_posts", "bot.patch_check", "bot.migrate_photos", "bot.pending_images"):
-            self.assertIn(mod, line)
-        self.assertIn('setsid nohup flock /var/lib/first-lab/bot/maint.lock bash -c "$MAINT"', sh)
-        self.assertNotIn('"$VENV/bin/python" -m bot.fix_posts)', sh)  # 배포 안에서 직접 돌리지 않음
-        self.assertLess(sh.index("bot.publish_queue"), sh.index("MAINT="))  # 새 글·갱신 파일은 배포 안에서 먼저
+            self.assertIn(mod, maint)
+        for f in ("bot-setup.sh", "quick-deploy.sh"):
+            sh = (ROOT / "server" / f).read_text(encoding="utf-8")
+            self.assertIn('setsid nohup flock /var/lib/first-lab/bot/maint.lock bash "$REPO_DIR/server/maint.sh"', sh)
+            self.assertNotIn('-m bot.fix_posts)', sh)  # 배포 안에서 직접 돌리지 않음
+            self.assertLess(sh.index("bot.publish_queue"), sh.index("maint.sh"))  # 새 글·갱신 파일은 배포 안에서 먼저
+
+    def test_quick_deploy_only_when_safe(self):
+        """11/9 운영자 '이렇게 비효율적으로 해야 돼?': 글·화면·봇 코드만 바뀌면 빠른 배포, 서버 설정·워크플로·페이지·패키지·그날 첫 배포는 전체."""
+        import subprocess
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        self.assertEqual(wf.count('bash "$REPO/server/quick-deploy.sh" "$CHANGED"'), 2)  # 다시 시도 단계도 같게
+        cond = next(x.strip() for x in wf.splitlines() if "grep -qE '^(FULL|server/" in x)
+        test = cond.replace("if ", "", 1).rsplit("; then", 1)[0]
+        def full(changed, mark_today=True):
+            script = (f'FULL_MARK=$(mktemp); {"date +%F > $FULL_MARK" if mark_today else ":"}; CHANGED={changed!r}; '
+                      f'if {test}; then echo full; else echo quick; fi')
+            return subprocess.run(["bash", "-c", script], capture_output=True, text=True).stdout.strip()
+        self.assertEqual(full("wordpress/queue/a.json\nbot/run.py"), "quick")
+        self.assertEqual(full("wordpress/mu-plugins/x.php"), "quick")
+        self.assertEqual(full("server/setup.sh"), "full")
+        self.assertEqual(full("wordpress/pages/about.html"), "full")
+        self.assertEqual(full("FULL"), "full")
+        self.assertEqual(full("bot/run.py", mark_today=False), "full")  # 그날 첫 배포

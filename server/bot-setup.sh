@@ -42,8 +42,7 @@ log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카�
 # 전체 글을 한 편씩 읽는 보정(패치 반영·블록 형식·사진 정리·사진 대기 표시)은 배포를 기다리게 하지 않고 따로 돌린다
 # (11/9 운영자 '배포 왜 이렇게 오래 걸려' — 배포 한 번 20분 중 이 둘이 11분). 겹치는 배포가 동시에 돌지 않게 잠금, 결과는 maint.log·봇 기록.
 log "기존 글 보정·패치 반영 확인·사진 정리 (따로 실행 → /var/lib/first-lab/bot/maint.log)"
-MAINT="cd '$REPO_DIR' && P='$VENV/bin/python' && \$P -m bot.fix_posts; \$P -m bot.patch_check; \$P -m bot.migrate_photos; \$P -m bot.pending_images"
-setsid nohup flock /var/lib/first-lab/bot/maint.lock bash -c "$MAINT" > /var/lib/first-lab/bot/maint.log 2>&1 < /dev/null &
+setsid nohup flock /var/lib/first-lab/bot/maint.lock bash "$REPO_DIR/server/maint.sh" > /var/lib/first-lab/bot/maint.log 2>&1 < /dev/null &
 
 log "예약 발행 대기열: 운영자 승인한 초안 넣기 (항목마다 한 번만)"
 # 사용: queue_once <기록이름> <글번호...> — 아직 초안인 글만 공개 대기열에 넣는다
