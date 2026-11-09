@@ -438,3 +438,5 @@ calc:executive-severance-limit
 2201 전세금 보증보험 가입 조건: 주택가격 90% 이내, 계약 절반 전까지
 calc:inheritance-acquisition-tax
 calc:gift-acquisition-tax
+2206 상속 취득세율: 농지 외 2.8%, 무주택 가구 특례·신고기한
+2223 종합소득세 납부 방법: 1천만 원 넘으면 분납, 카드·홈택스
