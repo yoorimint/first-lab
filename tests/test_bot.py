@@ -5748,6 +5748,17 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_box_tick_length_and_stale_words(self):
+        """11/10: ✔ 줄이 길면 휴대폰에서 꺾임(22자까지), '지금 같은 11월'처럼 때가 지나면 틀리는 말은 막음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        old = "<p>답이에요. 원래 내용이에요.</p><h2>뜻</h2><p>설명이에요.</p>"
+        long_box = "<p>답이에요.<br>도입이에요.<br>✔ 아주 긴 조건 줄이라서 휴대폰 한 줄에 다 안 들어가요</p><h2>뜻</h2><p>설명이에요.</p>"
+        self.assertTrue(any("✔ 줄" in p for p in pc.problems(old, long_box)))
+        stale = "<p>답이에요.<br>도입이에요.</p><h2>뜻</h2><p>지금 같은 11월에는 일찍 닫아요.</p>"
+        self.assertTrue(any("시간이 지나면" in p for p in pc.problems(old, stale)))
+        self.assertFalse(any("시간이 지나면" in p for p in pc.problems(old, stale.replace("지금 같은 11월에는", "올해(2026년) 11월에는"))))
+
     def test_box_not_repeated_below(self):
         """11/10 운영자 '반복 줄여라': 한눈에 보기 상자의 숫자가 바로 아래(첫 소제목 전) 문단에 3개 이상 또 나오면 막음."""
         sys.path.insert(0, str(ROOT / "automation"))

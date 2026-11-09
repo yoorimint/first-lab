@@ -100,6 +100,15 @@ _BOXNUM = re.compile(r"\d[\d,.]*\d|\d")
 REPEAT_MAX = 2  # 상자 숫자가 첫 소제목 앞 문단에 3개 이상 또 나오면 되풀이 (11/10 운영자 '반복 줄여라')
 
 
+TICK_MAX = 22
+STALE_WORDS = re.compile(r"지금 같은 \d+월|이번 달|요즘 같은")  # 올해·내년은 '올해(2026년)'·'적용 연도가 올해인지'처럼 바른 쓰임이 많아 뺌
+
+
+def box_lines(html: str) -> list[str]:
+    lead = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
+    return [plain(x) for x in re.split(r"<br\s*/?>", lead.group(1))] if lead else []
+
+
 def box_repeats(html: str) -> list[str]:
     """한눈에 보기 상자(첫 문단)의 숫자 중 바로 아래(첫 소제목 전) 문단에 또 나온 것 (한 자리 1~3 은 뺌)."""
     lead = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
@@ -175,6 +184,12 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
     crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
     if crowded:
         out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")
+    long_ticks = [x for x in box_lines(new_html) if x.startswith("✔") and len(x) > TICK_MAX]
+    if long_ticks:
+        out.append(f"한눈에 보기 ✔ 줄이 {TICK_MAX}자 넘음 (휴대폰에서 두 줄로 꺾임): {long_ticks[0]}")
+    stale = sorted(set(STALE_WORDS.findall(plain(new_html))))
+    if stale:
+        out.append(f"시간이 지나면 틀리는 말: {', '.join(stale)} — '2026년'처럼 연도·기간으로 (11/10 '지금 같은 11월')")
     rep = box_repeats(new_html)
     if len(rep) > REPEAT_MAX:
         out.append(f"한눈에 보기 상자 내용이 바로 아래 문단에서 되풀이됨 (숫자 {', '.join(rep[:6])}) — 상자에 있는 건 아래에서 빼고 새 내용만")
