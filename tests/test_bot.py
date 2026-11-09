@@ -5457,9 +5457,17 @@ class DeadLinkRecheckTest(unittest.TestCase):
                 return reasons[args[3]]
             return ""
         released = []
-        out = ol.recheck_dead(wp, exists=lambda u: "semas" in u, release=released.append)
+        with mock.patch.object(ol, "_resolves", lambda h: False):
+            out = ol.recheck_dead(wp, exists=lambda u: "semas" in u, release=released.append)
         self.assertEqual(released, [1678])  # 열린 주소만, 다른 보류 이유는 건드리지 않음
         self.assertIn("ols.semas.or.kr", out[0])
+
+    def test_registered_name_is_not_dead(self):
+        """이름이 등록된 공식 주소(nip.kdca.go.kr)는 서버에서 연결이 막혀도 '없는 주소'가 아님 — 이름도 없고 연결도 안 될 때만."""
+        from bot import official_links as ol
+        never = lambda u: False  # noqa: E731
+        self.assertEqual(ol.dead_hosts(["nip.kdca.go.kr"], exists=never, resolves=lambda h: h == "nip.kdca.go.kr"), [])
+        self.assertEqual(ol.dead_hosts(["nosuch.go.kr"], exists=never, resolves=lambda h: False), ["nosuch.go.kr"])
 
     def test_exists_retries_once(self):
         from bot import official_links as ol

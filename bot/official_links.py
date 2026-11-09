@@ -59,9 +59,22 @@ def _exists(url: str) -> bool:
     return False
 
 
-def dead_hosts(hosts: list[str], exists=_exists) -> list[str]:
-    """연결조차 안 되는 주소 — 본문에 적힌 주소가 틀렸을 가능성 (공개하지 않고 보류, 11/9 운영자 '초안 때 들어가 보고 맞게')."""
-    return [h for h in hosts if not any(exists(u) for u in (f"https://{h}", f"https://www.{h}", f"http://{h}"))]
+def _resolves(host: str) -> bool:
+    """도메인 이름이 등록돼 있는지 (DNS). 11/10: nip.kdca.go.kr·semas.or.kr 은 실제 있는 공식 주소인데 해외 접속을 늦게 받거나 막아
+    서버에서 연결이 안 됨 → '없는 주소'로 보류됐음. 주소를 잘못 적은 경우는 보통 이름 자체가 없음."""
+    import socket
+    try:
+        socket.getaddrinfo(host, 443)
+        return True
+    except (socket.gaierror, UnicodeError, OSError):
+        return False
+
+
+def dead_hosts(hosts: list[str], exists=_exists, resolves=None) -> list[str]:
+    """없는 주소 — 이름(DNS)도 없고 연결도 안 되는 것만. 본문에 적힌 주소가 틀렸을 가능성 (공개하지 않고 보류, 11/9 운영자 '초안 때 들어가 보고 맞게')."""
+    resolves = resolves or _resolves
+    return [h for h in hosts if not (resolves(h) or resolves(f"www.{h}"))
+            and not any(exists(u) for u in (f"https://{h}", f"https://www.{h}", f"http://{h}"))]
 
 
 def verify(hosts: list[str], check=sources.reachable) -> list[dict]:
