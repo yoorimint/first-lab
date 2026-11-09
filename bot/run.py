@@ -401,6 +401,12 @@ def main() -> None:
         try:
             from . import official_links
             official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
+            if now.minute < 10:  # 한 시간마다: 다음 공개 순서 기록 — 공개 전 쉬운 말 다듬기용 (/maintenance publish_next, 11/10)
+                try:
+                    from .schedule import upcoming
+                    state["publish_next"] = {"at": f"{now:%Y-%m-%d %H:%M}", "ids": upcoming(now)}
+                except Exception as e:  # noqa: BLE001
+                    add_log(state, False, f"다음 공개 순서 계산 실패: {str(e)[:150]}")
             if now.minute < 10:  # 한 시간마다: 주소 연결 안 됨 보류 다시 열어 보기 (일시 장애로 평생 보류 안 되게, 11/10)
                 for line in official_links.recheck_dead():
                     add_log(state, True, f"보류 다시 검사: {line}")

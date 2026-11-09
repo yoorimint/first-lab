@@ -2863,6 +2863,30 @@ class GoldFirstTest(unittest.TestCase):
         self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}), 80)
         self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}, pending={80}), 85)
 
+    def test_upcoming_matches_publish_pick(self):
+        """11/10 '모든 글 90점 이상': 공개 전 쉬운 말 다듬기는 upcoming() 순서대로 — publish_next 가 고르는 글이 맨 앞이어야 함."""
+        import json as _json
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        from bot import naver_hub, review_queue, schedule
+        rows = [{"ID": 80, "post_name": "a", "post_title": "t", "post_date": "2026-11-05 10:00:00"},
+                {"ID": 85, "post_name": "b", "post_title": "t", "post_date": "2026-11-05 11:00:00"},
+                {"ID": 90, "post_name": "c", "post_title": "t", "post_date": "2026-11-05 12:00:00"}]
+
+        def wp(*args):
+            if args[:2] == ("post", "list"):
+                return _json.dumps(rows) if "--format=json" in args else "\n".join(str(r["ID"]) for r in rows)
+            if args[:3] == ("post", "meta", "get") and args[4] == "_firstlab_img_pending":
+                return '[{"prompt": "x"}]' if int(args[3]) == 80 else ""
+            return ""
+        with mock.patch.object(schedule, "wp_cli", side_effect=wp), \
+             mock.patch.object(naver_hub, "publish_priority", return_value={80: 9.0, 85: 1.0, 90: 5.0}), \
+             mock.patch.object(review_queue, "reviewed_ids", return_value={80, 85, 90}), \
+             mock.patch.object(schedule.seasons, "rank", return_value=schedule.seasons.NONE):
+            got = schedule.upcoming(datetime(2026, 11, 6, 8, 31, tzinfo=ZoneInfo("Asia/Seoul")))
+        self.assertEqual(got, [90, 85])  # 80 은 사진 대기라 빠짐
+        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0, 90: 5.0}, pending={80}), got[0])
+
     def test_photos_follow_publish_order(self):
         """사진 채우기: 공개된 글 → 대기열 글을 공개 순서(황금 점수)대로 → 나머지 초안."""
         from bot import pending_images

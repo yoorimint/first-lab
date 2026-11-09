@@ -126,6 +126,27 @@ def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
     return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, level[i], i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i]))
 
 
+UPCOMING = 8
+
+
+def upcoming(now_kst: datetime, n: int = UPCOMING) -> list[int]:
+    """다음에 공개될 초안 n 편 (publish_next 와 같은 순서 — 사진 대기 글은 뺌). 11/10 운영자 '모든 글 90점 이상':
+    감시 세션·글쓰기 작업이 공개 전에 이 순서대로 쉬운 말 다듬기를 한다 (/maintenance publish_next)."""
+    ids = ready_drafts()
+    if not ids:
+        return []
+    from . import review_queue
+    ordered = publish_order(ids, now_kst)
+    ordered = review_queue.prefer_prepublished(ordered, review_queue.prepublish_dates(ordered, wp_cli), f"{now_kst:%Y-%m-%d}")
+    out = []
+    for i in ordered[:MAX_PHOTO_CHECKS + n]:
+        if not _has_pending_images(i):
+            out.append(i)
+            if len(out) >= n:
+                break
+    return out
+
+
 def publish_next(now_kst: datetime) -> str | None:
     """가장 오래된 대기 초안 1편 공개 (공개 날짜는 지금). 대기열이 비었으면 None."""
     ids = ready_drafts()
