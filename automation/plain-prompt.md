@@ -1,6 +1,9 @@
 # 쉬운 말 다듬기 지시문 (감시 세션이 서브에이전트에게 줌, model: opus) — 11/9 운영자 '기존 글 전체 쉬운 말로'
 
 `{N}` 자리에 글 번호를 넣어 그대로 준다.
+순서 (11/10 — 19편 다듬기에서 조건·단서 빠짐·뜻풀이 오류 50곳 넘게 나옴): ① 이 지시문으로 다듬기(서브에이전트 A) → ② 다른 서브에이전트가 원래 글과 문장마다 뜻 비교·법 정의 대조 후 고치기 (지시문: 이 파일 끝 '뜻 검수') → ③ 감시 세션이 '틀림' 직접 확인 → plain_check --write. ②를 건너뛰고 반영하지 않는다.
+
+뜻 검수 지시 (②): ORIGINAL=/tmp/firstlab-review/post-{N}.json content_html, REWRITE=/tmp/firstlab-review/plain-{N}.html. 문장마다 비교해 조건이 빠지거나 넓어지거나 좁아진 곳, 단서(원칙적으로·보통·이상/초과/미만·상시 ○명)가 바뀐 곳, 해석을 덧붙인 곳, 상자·확인 목록이 과장한 곳, 틀린 뜻풀이(법 정의가 있으면 python3 -m bot.lawtext 로 대조)를 원문 → 다듬은 글 → 고친 글로 적고, 고친 본문을 plain-{N}-r.html 로 쓰고 plain_check 통과까지.
 
 ---
 You are rewriting ONE existing Korean info blog post into plain, easy Korean — same facts, easier words.
