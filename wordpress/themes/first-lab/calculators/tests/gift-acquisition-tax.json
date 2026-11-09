@@ -1,0 +1,50 @@
+[
+  {
+    "why": "비조정지역 아파트 증여, 시가인정액 5억 원 84㎡: 제11조①2호 3.5% 1,750만 원 + 지방교육세 (3.5%−2%)×20% = 0.3% 150만 원, 농특세 국민주택 규모 이하 비과세(농특세법 제4조 11호)",
+    "input": {"kind": "house", "base": 500000000, "adjusted": "no", "std3": "yes", "exempt": "no", "area": "small"},
+    "expect": {"rate": 350, "tax": 17500000, "edu": 1500000, "rural": 0, "total": 19000000},
+    "notes_exclude": ["12%로 계산했어요"]
+  },
+  {
+    "why": "조정대상지역 공시가격 3억 원 이상 아파트 증여(다주택자가 줌), 5억 원 84㎡: 제13조의2② 4%+2%×400% = 12% 6,000만 원 + 교육세 제151조①1호나목 (4%−2%)×20% = 0.4% 200만 원",
+    "input": {"kind": "house", "base": 500000000, "adjusted": "yes", "std3": "yes", "exempt": "no", "area": "small"},
+    "expect": {"rate": 1200, "tax": 60000000, "edu": 2000000, "rural": 0, "total": 62000000},
+    "notes_include": ["12%로 계산했어요"]
+  },
+  {
+    "why": "위와 같은 중과 대상이지만 85㎡ 초과: 농특세 (2%+8%)×10% = 1.0% 500만 원 (농특세법 제5조①6호 표준세율을 2%로 적용)",
+    "input": {"kind": "house", "base": 500000000, "adjusted": "yes", "std3": "yes", "exempt": "no", "area": "large"},
+    "expect": {"rate": 1200, "tax": 60000000, "edu": 2000000, "rural": 5000000, "total": 67000000}
+  },
+  {
+    "why": "조정대상지역 3억 원 이상이어도 1세대 1주택자가 자녀에게 증여하면 중과 제외(시행령 제28조의6②1호) → 3.5%, 85㎡ 초과 농특세 0.2% 100만 원",
+    "input": {"kind": "house", "base": 500000000, "adjusted": "yes", "std3": "yes", "exempt": "yes", "area": "large"},
+    "expect": {"rate": 350, "tax": 17500000, "edu": 1500000, "rural": 1000000, "total": 20000000},
+    "notes_include": ["12% 중과 없이 3.5%"],
+    "boundary": true
+  },
+  {
+    "why": "조정대상지역이지만 공시가격 3억 원 미만(시행령 제28조의6① 3억 원 이상만 중과) → 3.5%",
+    "input": {"kind": "house", "base": 400000000, "adjusted": "yes", "std3": "no", "exempt": "no", "area": "small"},
+    "expect": {"rate": 350, "tax": 14000000, "edu": 1200000, "rural": 0, "total": 15200000},
+    "notes_exclude": ["12%로 계산했어요"],
+    "boundary": true
+  },
+  {
+    "why": "토지 증여 1억 원: 3.5% 350만 원 + 0.3% 30만 원 + 농특세 2%×10% = 0.2% 20만 원 (조정대상지역 칸은 주택이 아니면 무시)",
+    "input": {"kind": "other", "base": 100000000, "adjusted": "yes", "std3": "yes", "exempt": "no", "area": "small"},
+    "expect": {"rate": 350, "tax": 3500000, "edu": 300000, "rural": 200000, "total": 4000000}
+  },
+  {
+    "why": "10원 끝수 경계: 1,000원 × 3.5% = 35원 → 30원, 교육세 0.3% = 3원 → 0원 (국고금관리법 제47조)",
+    "input": {"kind": "house", "base": 1000, "adjusted": "no", "std3": "no", "exempt": "no", "area": "small"},
+    "expect": {"rate": 350, "tax": 30, "edu": 0, "rural": 0, "total": 30},
+    "boundary": true
+  },
+  {
+    "why": "10원 끝수 경계: 3,334원 × 0.3% = 10.002원 → 10원, 3.5% = 116.69원 → 110원",
+    "input": {"kind": "house", "base": 3334, "adjusted": "no", "std3": "no", "exempt": "no", "area": "small"},
+    "expect": {"rate": 350, "tax": 110, "edu": 10, "rural": 0, "total": 120},
+    "boundary": true
+  }
+]

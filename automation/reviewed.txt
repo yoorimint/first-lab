@@ -437,3 +437,4 @@ calc:executive-severance-limit
 2194 분양권 양도세 계산: 1년 미만 70%, 1년 이상 60%
 2201 전세금 보증보험 가입 조건: 주택가격 90% 이내, 계약 절반 전까지
 calc:inheritance-acquisition-tax
+calc:gift-acquisition-tax
