@@ -1,0 +1,13 @@
+{
+  "won10": "세액공제액은 산출세액에서 빼는 금액이라 끝수 처리 대상이 아님 (10원 미만 버림은 실제로 내거나 돌려받는 세액에 함, 국고금관리법 제47조①)",
+  "basis_date": "2026-11-09", "yearly": false,
+  "max_input": 100000000000,
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제59조의4③ 교육비 세액공제)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국가법령정보센터 소득세법 시행령 (제118조의6 교육비 세액공제)", "url": "https://www.law.go.kr/법령/소득세법시행령"},
+    {"name": "국세청 근로소득 특별세액공제 안내 (교육비)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7874"}
+  ],
+  "rate_pct": 15,
+  "cap_school": 3000000,
+  "cap_univ": 9000000
+}

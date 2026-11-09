@@ -1,0 +1,44 @@
+[
+  {
+    "why": "초중고 1명 300만 원 딱(한도 기준선): 300만 전부 인정 × 15% = 45만 원 (소득세법 제59조의4③1호 '초ㆍ중ㆍ고등학생인 경우에는 1명당 연 300만원을 한도')",
+    "input": {"kind1": "school", "amount1": 3000000},
+    "expect": {"self": 0, "used1": 3000000, "family": 3000000, "special": 0, "eligible": 3000000, "credit": 450000, "over": 0},
+    "boundary": true,
+    "notes_include": ["예능학원·체육시설 수강료"]
+  },
+  {
+    "why": "초중고 1명 300만 1원: 300만 원만 인정, 1원은 공제 못 받음 → 45만 원",
+    "input": {"kind1": "school", "amount1": 3000001},
+    "expect": {"self": 0, "used1": 3000000, "family": 3000000, "special": 0, "eligible": 3000000, "credit": 450000, "over": 1},
+    "boundary": true,
+    "notes_include": ["1원은 공제받지 못해요"]
+  },
+  {
+    "why": "대학생 900만 원 딱과 900만 1원(한도 기준선): 같은 법 제1호 '대학생인 경우에는 1명당 연 900만원' → 900만 × 15% = 135만, 두 명 합 1,800만 × 15% = 270만",
+    "input": {"kind1": "univ", "amount1": 9000000, "kind2": "univ", "amount2": 9000001},
+    "expect": {"used1": 9000000, "used2": 9000000, "family": 18000000, "eligible": 18000000, "credit": 2700000, "over": 1},
+    "boundary": true
+  },
+  {
+    "why": "본문 예시: 본인 대학원 600만(본인은 한도 없음, 제2호나목 대학원 포함) + 대학생 자녀 800만(장학금 뺀 금액) + 초1 자녀 240만(방과후 60만·태권도 180만, 제1호마목) = 1,640만 × 15% = 246만 원",
+    "input": {"self": 6000000, "kind1": "univ", "amount1": 8000000, "kind2": "school", "amount2": 2400000},
+    "expect": {"self": 6000000, "used1": 8000000, "used2": 2400000, "family": 10400000, "special": 0, "eligible": 16400000, "credit": 2460000, "over": 0}
+  },
+  {
+    "why": "가족 대학원생은 공제 안 됨 (제1호 단서 '대학원에 지급하거나 … 교육비는 제외') + 장애인 특수교육비 500만은 한도 없음(제3호) → 500만 × 15% = 75만",
+    "input": {"kind1": "grad", "amount1": 7000000, "special": 5000000},
+    "expect": {"used1": 0, "family": 0, "special": 5000000, "eligible": 5000000, "credit": 750000, "over": 7000000},
+    "notes_include": ["대학원은 본인이 다닐 때만"]
+  },
+  {
+    "why": "본인 교육비 1,234,567원: 한도 없음, 15% = 185,185.05 → 원 미만 버림 185,185원",
+    "input": {"self": 1234567},
+    "expect": {"self": 1234567, "family": 0, "eligible": 1234567, "credit": 185185, "over": 0}
+  },
+  {
+    "why": "입학 전 아이 2명 각 400만: 1명당 300만 한도 → 600만 × 15% = 90만, 넘은 200만은 공제 못 받음",
+    "input": {"kind1": "preschool", "amount1": 4000000, "kind2": "preschool", "amount2": 4000000},
+    "expect": {"used1": 3000000, "used2": 3000000, "family": 6000000, "eligible": 6000000, "credit": 900000, "over": 2000000},
+    "notes_include": ["어린이집·유치원"]
+  }
+]
