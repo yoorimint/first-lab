@@ -139,7 +139,36 @@ function firstlab_read_list_item( string $html ): string {
 	return "<li{$attrs}>" . firstlab_read_refs( $inner ) . '</li>';
 }
 
+/**
+ * 본문 꾸밈 표시 (11/9 운영자 '가독성 좋게 컬러나 선 — 할 수 있는데 왜 안 했노'): 글자는 그대로, 화면에서 class 만 붙인다.
+ * - 첫 문단(핵심 답) → 요약 상자 (fl-lead)
+ * - '다만·단,'으로 시작하는 문단 → 주의 상자 (fl-note)
+ * - '자주 묻는 질문' 소제목 아래 질문 소제목 → Q 표시 (fl-q)
+ */
+function firstlab_read_decorate( string $html ): string {
+	// 첫 '본문' 문단 (작성일 줄·짧은 안내 줄은 건너뜀 — 11/9 시안에서 '작성 2026년 11월 7일' 줄이 상자가 됐음)
+	if ( preg_match_all( '/<p(\s[^>]*)?>(.*?)<\/p>/su', $html, $ps, PREG_OFFSET_CAPTURE ) ) {
+		foreach ( $ps[0] as $i => $m ) {
+			$text = trim( html_entity_decode( strip_tags( $ps[2][ $i ][0] ), ENT_QUOTES, 'UTF-8' ) );
+			if ( mb_strlen( $text ) >= 40 && ! preg_match( '/^(작성|수정|업데이트|최종)/u', $text ) ) {
+				$open = '<p' . $ps[1][ $i ][0] . '>';
+				$html = substr_replace( $html, '<p class="fl-lead">', $m[1], strlen( $open ) );
+				break;
+			}
+		}
+	}
+	$html = preg_replace( '/<p(?:\s+class="([^"]*)")?>(\s*(?:<strong>)?\s*(?:다만|단,|주의|※))/u', '<p class="fl-note $1">$2', $html ) ?? $html;
+	$faq  = mb_strpos( $html, '자주 묻는 질문' );
+	if ( false !== $faq ) {
+		$byte = strlen( mb_substr( $html, 0, $faq ) );
+		$tail = preg_replace( '/<h3(\s+class="([^"]*)")?>/u', '<h3 class="fl-q $2">', substr( $html, $byte ) ) ?? substr( $html, $byte );
+		$html = substr( $html, 0, $byte ) . $tail;
+	}
+	return $html;
+}
+
 if ( function_exists( 'add_filter' ) ) {
+	add_filter( 'the_content', static fn( $html ) => is_singular( 'post' ) && in_the_loop() && is_main_query() ? firstlab_read_decorate( (string) $html ) : $html, 14 ); // 글 흐름(15) 앞
 	add_filter( 'render_block_core/paragraph', static fn( $html ) => is_singular( 'post' ) ? firstlab_read_paragraph( (string) $html ) : $html );
 	add_filter( 'render_block_core/list-item', static fn( $html ) => is_singular( 'post' ) ? firstlab_read_list_item( (string) $html ) : $html );
 	add_action(

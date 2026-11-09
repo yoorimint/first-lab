@@ -11,3 +11,45 @@ ul.fl-split > li { margin: 0.25em 0; }
 .fl-next-title { font-weight: 700; margin: 0 0 .3em; font-size: .95em; }
 .fl-next ul { margin: 0; padding-left: 1.2em; }
 .fl-next li { margin: .2em 0; }
+
+/* ── 본문 꾸밈 (11/9 운영자 '가독성 좋게 컬러나 선') — 색은 파랑 하나 + 주의만 주황, 과하면 광고처럼 보여 신뢰가 떨어짐 ── */
+.wp-block-post-content { --fl-accent: #2f6fdb; --fl-accent-soft: #eef4ff; --fl-line: #dbe2ec; --fl-note: #e8913a; --fl-note-soft: #fff7ee; }
+.wp-block-post-content p, .wp-block-post-content li { line-height: 1.85; }
+.wp-block-post-content > p, .wp-block-post-content > ul, .wp-block-post-content > ol { margin-bottom: 1.1em; }
+
+/* 첫 문단 = 이 글의 답: 요약 상자 */
+.wp-block-post-content p.fl-lead { background: var(--fl-accent-soft); border: 1px solid #cfdcf6; border-radius: 12px; padding: 1em 1.1em 1em; position: relative; margin-top: .4em; }
+.wp-block-post-content p.fl-lead::before { content: "한눈에 보기"; display: block; font-size: .78em; font-weight: 700; letter-spacing: .02em; color: var(--fl-accent); margin-bottom: .35em; }
+
+/* 소제목: 왼쪽 굵은 줄 + 위 여백 — 스크롤할 때 새 내용의 시작이 보이게 */
+.wp-block-post-content h2 { border-left: 5px solid var(--fl-accent); padding: .15em 0 .15em .6em; margin-top: 2.3em; margin-bottom: .8em; line-height: 1.4; }
+.wp-block-post-content h3 { margin-top: 1.8em; padding-bottom: .3em; border-bottom: 1px dashed var(--fl-line); }
+
+/* 굵은 글씨(핵심 숫자·결론): 형광펜 밑줄 */
+.wp-block-post-content strong { background: linear-gradient(transparent 62%, #ffe98a 62%); padding: 0 .1em; }
+.wp-block-post-content h2 strong, .wp-block-post-content h3 strong, .wp-block-post-content th strong { background: none; }
+
+/* '다만·주의' 문단: 주황 줄 상자 */
+.wp-block-post-content p.fl-note { background: var(--fl-note-soft); border-left: 4px solid var(--fl-note); border-radius: 0 8px 8px 0; padding: .7em .95em; }
+
+/* 목록: 파란 점 */
+.wp-block-post-content ul:not(.fl-split) > li::marker { color: var(--fl-accent); }
+.wp-block-post-content ol > li::marker { color: var(--fl-accent); font-weight: 700; }
+
+/* 표: 굵은 검은 선 대신 연한 선, 머리줄 배경, 줄무늬 */
+.wp-block-post-content .wp-block-table { overflow-x: auto; margin: 1.3em 0; }
+.wp-block-post-content table { border-collapse: collapse; width: 100%; border: 1px solid var(--fl-line) !important; border-radius: 10px; font-size: .95em; }
+.wp-block-post-content th, .wp-block-post-content td { border: 1px solid var(--fl-line) !important; padding: .6em .75em; vertical-align: top; }
+.wp-block-post-content thead { border-bottom: none !important; }
+.wp-block-post-content thead th, .wp-block-post-content thead td { background: var(--fl-accent-soft); font-weight: 700; border-bottom: 2px solid #b9cbf0 !important; }
+.wp-block-post-content tbody tr:nth-child(even) td { background: #f8fafc; }
+
+/* 자주 묻는 질문: Q 표시 */
+.wp-block-post-content h3.fl-q { border-bottom: none; padding-left: 1.7em; position: relative; }
+.wp-block-post-content h3.fl-q::before { content: "Q"; position: absolute; left: 0; top: .05em; width: 1.3em; height: 1.3em; line-height: 1.3em; text-align: center; border-radius: 50%; background: var(--fl-accent); color: #fff; font-size: .8em; }
+
+@media (prefers-color-scheme: dark) {
+  .wp-block-post-content { --fl-accent-soft: rgba(47,111,219,.14); --fl-note-soft: rgba(232,145,58,.12); --fl-line: rgba(255,255,255,.14); }
+  .wp-block-post-content strong { background: linear-gradient(transparent 62%, rgba(255,214,0,.28) 62%); }
+  .wp-block-post-content tbody tr:nth-child(even) td { background: rgba(255,255,255,.03); }
+}

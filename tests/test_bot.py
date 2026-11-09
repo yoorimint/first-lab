@@ -5552,3 +5552,30 @@ class PageResaveTest(unittest.TestCase):
         self.assertIn("_firstlab_src_hash", sh)
         self.assertLess(sh.index('grep -qx "$id $src_hash"'), sh.index('wp post update "$id" --post_status="$status"'))
 
+
+
+class ReadDecorateTest(unittest.TestCase):
+    """11/9 운영자 '가독성 좋게 컬러나 선': 첫 본문 문단=요약 상자, '다만'=주의 상자, 자주 묻는 질문=Q (화면에서 class 만)."""
+
+    def test_decorate(self):
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        html = ('<p class="meta">작성 2026년 11월 7일</p><p>주휴수당은 1주 동안 일하기로 한 날을 모두 나온 근로자에게 주는 유급 주휴일의 하루치 임금이에요.</p>'
+                '<p>다만 예외예요.</p><h3>본문 소제목</h3><h2>자주 묻는 질문</h2><h3>질문?</h3>')
+        code = ("<?php define('ABSPATH', 1); function add_filter() {} function add_action() {}\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-readability.php'}';\n"
+                "echo firstlab_read_decorate(getenv('H'));")
+        import os
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            out = subprocess.run(["php", f.name], capture_output=True, text=True, check=True, env={**os.environ, "H": html}).stdout
+        finally:
+            os.unlink(f.name)
+        self.assertIn('<p class="meta">작성', out)                       # 작성일 줄은 상자 아님 (11/9 시안에서 잘못 붙었음)
+        self.assertIn('<p class="fl-lead">주휴수당은', out)
+        self.assertIn('class="fl-note', out)
+        self.assertIn("<h3>본문 소제목</h3>", out)
+        self.assertIn('<h3 class="fl-q', out)
