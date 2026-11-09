@@ -23,6 +23,16 @@ def is_done(content_html: str) -> bool:
     return DONE_MARK in (content_html or "")
 
 
+QUEUE = Path(__file__).resolve().parent.parent / "wordpress" / "queue"
+PENDING_HOURS = 2  # 갱신 파일을 올린 지 2시간 안이면 서버 반영 대기 중으로 보고 건너뜀 (그 뒤에도 표시가 없으면 반영 실패 → 다시 뽑힘)
+
+
+def pending(pid: int, now: float | None = None) -> bool:
+    import time
+    now = now or time.time()
+    return any(now - f.stat().st_mtime < PENDING_HOURS * 3600 for f in QUEUE.glob(f"refresh-plain-{pid}-*.json"))
+
+
 def order() -> list[int]:
     m = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/maintenance", token=True)
     ids = list(m.get("publish_order_all") or [])
@@ -34,6 +44,8 @@ def main(n: int = 6) -> int:
     OUT.mkdir(exist_ok=True)
     picked, left = [], 0
     for pid in order():
+        if pending(pid):
+            continue
         post = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/post/{pid}", token=True) if len(picked) < n else None
         if post is None:
             left += 1
