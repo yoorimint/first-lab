@@ -143,6 +143,14 @@ def publish_next(now_kst: datetime) -> str | None:
             reasons = freshness.check_post(candidate, now_kst.date())
         except Exception:  # noqa: BLE001 — 확인이 실패하면 막지 않음 (바뀌었다는 증거가 있을 때만 보류)
             reasons = []
+        if not reasons:  # 본문 공식 주소를 지금 열어 보고 기록 — 연결조차 안 되면 주소가 틀렸을 수 있어 보류 (11/9 운영자 '초안 때 들어가 보고 맞게')
+            try:
+                from . import official_links
+                dead = official_links.run_for(candidate).get("dead") or []
+                if dead:
+                    reasons = [f"본문 공식 주소가 연결되지 않음: {', '.join(dead)} — 주소가 맞는지 공식 기관 누리집으로 확인해 고치기"]
+            except Exception:  # noqa: BLE001 — 확인 자체가 실패하면 막지 않음 (화면 점검이 다시 봄)
+                pass
         if not reasons:
             post_id = candidate
             break
@@ -159,10 +167,10 @@ def publish_next(now_kst: datetime) -> str | None:
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
     slug = wp_cli("post", "get", str(post_id), "--field=post_name").strip()
     pinged = indexnow.notify([f"{indexnow.SITE}/{slug}/"]) if slug else "IndexNow: 주소 없음"  # 검색엔진에 바로 알림
-    try:  # 본문 공식 주소를 공개하는 순간 확인 — 화면 링크가 10분 차례를 기다리지 않게 (11/9 ITQ 글, bot/screen_check.py)
-        from . import official_links
-        official_links.run_for(post_id)
-    except Exception:  # noqa: BLE001 - 링크 확인 실패가 공개를 막지 않게 (화면 점검이 다시 봄)
+    try:  # 새 글이 예전 글의 관련 글이 되게, 공개 글 전체의 관련 글(내용 기준)을 다시 계산 (11/9 운영자, bot/related_posts.py)
+        from . import related_posts
+        related_posts.run()
+    except Exception:  # noqa: BLE001 - 관련 글 계산 실패가 공개를 막지 않게 (하루 한 번 다시 계산)
         pass
     extra = f", 공개 전 확인으로 보류 {', '.join(held)}" if held else ""
     return f"'{title}' 공개 (대기 {len(ids) - 1 - len(held)}편 남음, {pinged}{extra})"

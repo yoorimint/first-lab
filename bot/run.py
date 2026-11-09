@@ -401,6 +401,13 @@ def main() -> None:
         try:
             from . import official_links
             official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
+            if state.get("related_posts_date") != f"{now:%Y-%m-%d}":  # 관련 글(내용 기준) 하루 한 번 다시 계산 (공개 때도 함)
+                try:
+                    from . import related_posts
+                    add_log(state, True, related_posts.run())
+                    state["related_posts_date"] = f"{now:%Y-%m-%d}"
+                except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
+                    add_log(state, False, f"관련 글 계산 실패: {str(e)[:150]}")
             from . import screen_check  # 최근 공개 글 실제 화면에서 링크 안 된 공식 주소 (11/9 운영자 '발행 전에도 확인한다며')
             for line in screen_check.run(state, f"{now:%Y-%m-%d}"):
                 add_log(state, False, line)

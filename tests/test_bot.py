@@ -4139,9 +4139,10 @@ class OfficialLinksTest(unittest.TestCase):
         def wp(*a):
             calls.append(a)
             return json.dumps([{"id": 7, "content": html}]) if a[0] == "eval" else ""
-        self.assertEqual(o.run(wp=wp, check=lambda u: u in ok, today="2026-11-06"), "공식 사이트 링크 확인: 7(2)")
+        self.assertEqual(o.run(wp=wp, check=lambda u: u in ok, today="2026-11-06", exists=lambda u: False), "공식 사이트 링크 확인: 7(2)")
         saved = json.loads(calls[-1][-1])
         self.assertEqual((saved["hash"], len(saved["hosts"])), (o.content_hash(html), 2))
+        self.assertEqual((saved["v"], saved["dead"]), (o.VERSION, ["nope.go.kr"]))  # 연결조차 안 되는 주소는 따로 (공개 전 보류)
         self.assertIn("official_links.run()", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
 
     def test_max_links(self):
@@ -5442,4 +5443,60 @@ class ScreenCheckTest(unittest.TestCase):
         self.assertIn("#241", first[0])
         self.assertEqual(again, [])                                               # 같은 날 같은 문제는 한 번만 기록
         self.assertTrue(any(c[:3] == ("post", "meta", "update") for c in calls))  # 바로 다시 확인해 기록
+
+
+class DraftLinkHoldTest(unittest.TestCase):
+    """11/9 운영자 '링크도 미리 초안 만들면 들어가 보고 맞게 링크 만들게 해야 되는 거 아냐?' — 공개 직전 본문 주소를 열어 보고,
+    연결조차 안 되는 주소가 있으면 공개하지 않고 보류 (주소가 틀렸을 가능성). 봇 차단(403)은 주소가 있는 것으로 봄."""
+
+    def test_dead_vs_blocked(self):
+        from bot import official_links as o
+        self.assertEqual(o.dead_hosts(["nope.go.kr", "blocked.or.kr"], exists=lambda u: "blocked" in u), ["nope.go.kr"])
+
+    def test_publish_holds_dead_link(self):
+        from bot import schedule
+        src = (ROOT / "bot" / "schedule.py").read_text(encoding="utf-8")
+        self.assertIn("본문 공식 주소가 연결되지 않음", src)
+        self.assertLess(src.index("official_links.run_for(candidate)"), src.index('"--post_status=publish"'))  # 공개 전에 확인
+        self.assertIsNotNone(schedule)
+
+
+class ContentRelatedTest(unittest.TestCase):
+    """11/9 운영자 '제목으로 판단할 게 아니고 글 내용으로' — ITQ 조회 글에 등기부등본 발급 글이 붙었음 ('발급' 하나 겹침)."""
+
+    @staticmethod
+    def post(pid, title, body):
+        return {"id": pid, "title": title, "content": f"<p>{body}</p>"}
+
+    def test_content_decides(self):
+        from bot import related_posts as r
+        posts = [
+            self.post(1, "ITQ 자격증 조회 방법: 발급비 7,400원", "한국생산성본부 KPC 자격 사이트에서 ITQ 합격 여부와 점수, 엑셀 한글 파워포인트 등급을 조회하고 자격증을 발급해요."),
+            self.post(2, "건물 등기부등본 발급 방법과 수수료", "인터넷등기소에서 건물 등기사항증명서를 열람하거나 발급해요. 소유권 근저당 갑구 을구를 확인해요."),
+            self.post(3, "엑셀 자격증 비교: 컴활 2급·ITQ 엑셀", "컴퓨터활용능력 2급과 ITQ 엑셀 등급, 한국생산성본부 KPC 자격, 합격 점수와 응시료를 비교해요."),
+            self.post(4, "주휴수당 뜻", "주 15시간 이상 일하고 개근하면 유급휴일 하루치 임금을 받아요. 알바도 주휴수당을 받아요."),
+            self.post(5, "주휴수당 계산", "주휴수당은 1주 소정근로시간을 40으로 나눈 값에 8과 시급을 곱해요. 주 15시간 이상 알바도 받아요."),
+        ]
+        rel = r.related(posts)
+        self.assertNotIn(2, rel[1])          # '발급'만 겹치는 등기부등본은 안 붙음
+        self.assertEqual(rel[1][:1], [3])    # 같은 KPC·ITQ 엑셀 내용
+        self.assertEqual(rel[4][:1], [5])
+        self.assertEqual(rel[2], [])         # 비슷한 글이 없으면 없음
+
+    def test_screen_uses_only_record(self):
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("<?php define('ABSPATH', 1); function add_filter() {}\n"
+                f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-related.php'}';\n"
+                "echo json_encode(firstlab_related_from_meta('{\"ids\":[3,9,5]}', fn($id) => $id !== 9)), json_encode(firstlab_related_from_meta('', fn($id) => true));")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(code)
+        try:
+            out = subprocess.run(["php", f.name], capture_output=True, text=True, check=True).stdout
+        finally:
+            import os
+            os.unlink(f.name)
+        self.assertEqual(out, "[3,5][]")     # 공개 아닌 글은 빼고, 기록이 없으면 관련 글 없음 (제목으로 짐작 안 함)
 

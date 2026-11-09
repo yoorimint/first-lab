@@ -10,10 +10,13 @@ import datetime as dt
 import hashlib
 import json
 import re
+import urllib.error
+import urllib.request
 
 from . import sources
 
 META = "_firstlab_official_hosts"
+VERSION = 2  # 2: 조사 붙은 주소 인식(11/9) — 예전 기록은 다시 확인
 BATCH = 3
 MAX_HOSTS = 6
 # 글자 속 도메인 (앞에 주소·메일·경로가 붙은 것은 뺌 — 그건 이미 링크이거나 다른 말)
@@ -38,6 +41,23 @@ def hosts_in(html: str) -> list[str]:
     return out[:MAX_HOSTS]
 
 
+def _exists(url: str) -> bool:
+    """주소가 실제로 있는지 (응답이 오면 403·404 여도 있음 — 봇을 막는 공식 사이트도 있어서). 연결 자체가 안 되면 없음."""
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (first-lab link check)"})
+    try:
+        with urllib.request.urlopen(req, timeout=sources.TIMEOUT):
+            return True
+    except urllib.error.HTTPError:
+        return True
+    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+        return False
+
+
+def dead_hosts(hosts: list[str], exists=_exists) -> list[str]:
+    """연결조차 안 되는 주소 — 본문에 적힌 주소가 틀렸을 가능성 (공개하지 않고 보류, 11/9 운영자 '초안 때 들어가 보고 맞게')."""
+    return [h for h in hosts if not any(exists(u) for u in (f"https://{h}", f"https://www.{h}", f"http://{h}"))]
+
+
 def verify(hosts: list[str], check=sources.reachable) -> list[dict]:
     """열리는 주소만 [{'host', 'url'}] (www. 없이 먼저, 안 되면 www.)."""
     out = []
@@ -55,7 +75,7 @@ $ids = get_posts( array( 'post_type' => 'post', 'post_status' => array( 'publish
 foreach ( $ids as $id ) {
   $c = (string) get_post_field( 'post_content', $id );
   $m = json_decode( (string) get_post_meta( $id, '_firstlab_official_hosts', true ), true );
-  if ( is_array( $m ) && ( $m['hash'] ?? '' ) === substr( md5( $c ), 0, 12 ) ) { continue; }
+  if ( is_array( $m ) && ( $m['hash'] ?? '' ) === substr( md5( $c ), 0, 12 ) && (int) ( $m['v'] ?? 1 ) >= VERSION ) { continue; }
   $out[] = array( 'id' => $id, 'content' => $c );
   if ( count( $out ) >= BATCH ) { break; }
 }
@@ -63,26 +83,32 @@ echo wp_json_encode( $out );
 """
 
 
-def run(batch: int = BATCH, wp=None, check=sources.reachable, today: str | None = None) -> str | None:
+def run(batch: int = BATCH, wp=None, check=sources.reachable, today: str | None = None, exists=_exists) -> str | None:
     """기록이 없거나 본문이 바뀐 글 batch 편을 확인해 기록. 봇 기록 한 줄 (한 편도 안 했으면 None)."""
     if wp is None:
         from .settings import wp_cli as wp
-    todo = json.loads(wp("eval", _TODO_PHP.replace("BATCH", str(int(batch)))) or "[]")
+    todo = json.loads(wp("eval", _TODO_PHP.replace("BATCH", str(int(batch))).replace("VERSION", str(VERSION))) or "[]")
     done = []
     for row in todo if isinstance(todo, list) else []:
-        found = verify(hosts_in(row.get("content", "")), check)
-        record = {"hash": content_hash(row.get("content", "")), "hosts": found, "checked": today or f"{dt.date.today():%Y-%m-%d}"}
+        record = _record(row.get("content", ""), check, today, exists)
         wp("post", "meta", "update", str(row["id"]), META, json.dumps(record, ensure_ascii=False))
-        done.append(f"{row['id']}({len(found)})")
+        done.append(f"{row['id']}({len(record['hosts'])})")
     return f"공식 사이트 링크 확인: {', '.join(done)}" if done else None
 
 
-def run_for(post_id: int, wp=None, check=sources.reachable, today: str | None = None) -> list[dict]:
-    """한 글을 지금 바로 확인해 기록 (공개하는 순간·화면 점검에서 — 10분 차례를 기다리지 않게, 11/9 ITQ 글). 열린 주소 목록."""
+def _record(content: str, check=sources.reachable, today: str | None = None, exists=_exists) -> dict:
+    """{'hash', 'v', 'hosts': 링크로 쓸 열린 주소, 'dead': 연결조차 안 되는 주소, 'checked'}."""
+    hosts = hosts_in(content)
+    found = verify(hosts, check)
+    dead = dead_hosts([h for h in hosts if h not in {f["host"] for f in found}], exists)
+    return {"hash": content_hash(content), "v": VERSION, "hosts": found, "dead": dead,
+            "checked": today or f"{dt.date.today():%Y-%m-%d}"}
+
+
+def run_for(post_id: int, wp=None, check=sources.reachable, today: str | None = None, exists=_exists) -> dict:
+    """한 글을 지금 바로 확인해 기록 (공개 직전·화면 점검에서 — 10분 차례를 기다리지 않게, 11/9 ITQ 글). 기록을 돌려줌."""
     if wp is None:
         from .settings import wp_cli as wp
-    content = wp("post", "get", str(int(post_id)), "--field=post_content")
-    found = verify(hosts_in(content), check)
-    record = {"hash": content_hash(content), "hosts": found, "checked": today or f"{dt.date.today():%Y-%m-%d}"}
+    record = _record(wp("post", "get", str(int(post_id)), "--field=post_content"), check, today, exists)
     wp("post", "meta", "update", str(int(post_id)), META, json.dumps(record, ensure_ascii=False))
-    return found
+    return record

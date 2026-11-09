@@ -4,7 +4,8 @@
  * Description: 글 하단에 주제가 겹치는 다른 공개 글을 자동으로 연결 (새 글이 생기면 예전 글에도 자동 반영). 겹치는 글이 없으면 안 보임.
  *
  * 11/6 운영자 '자동차보험료 계산 글에 함께 보면 좋은 글이 왜 주식 평단가 계산기지?': 예전엔 같은 분류의 글을 제목 글자 비슷한 순으로 4개 채움
- * → 분류(금융·세금)에 공개 글이 2편뿐이라 '계산'만 겹치는 주식 글이 붙음. 이제 흔한 말(계산·방법·신청…)을 뺀 주제 낱말이 겹치는 글만.
+ * → 분류(금융·세금)에 공개 글이 2편뿐이라 '계산'만 겹치는 주식 글이 붙음.
+ * 11/9 운영자: 제목이 아니라 글 내용으로 — 관련 글은 bot/related_posts.py 기록만. 아래 제목 글자쌍 함수는 계산기 고르기(first-lab-flow.php)에만 씀.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -65,17 +66,22 @@ function firstlab_related_pick( string $title, array $rows, int $count = FIRSTLA
 	return array_slice( array_column( $scored, 0 ), 0, $count );
 }
 
-/** 공개 글 중 이 글과 주제가 겹치는 글 id (겹침 많은 순). 본문 중간 연결(first-lab-flow.php)과 하단 목록이 같이 씀 — 한 번만 계산. */
+/** 기록된 관련 글 id (JSON {"ids":[…]}) 중 지금 공개 상태인 것. */
+function firstlab_related_from_meta( string $raw, callable $is_public ): array {
+	$m = json_decode( $raw, true );
+	return array_values( array_filter( array_map( 'intval', (array) ( $m['ids'] ?? array() ) ), $is_public ) );
+}
+
+/** 공개 글 중 이 글과 내용이 비슷한 글 id (비슷한 순). 본문 중간 연결(first-lab-flow.php)과 하단 목록이 같이 씀.
+ * 11/9 운영자 '제목으로 판단할 게 아니고 글 내용으로' — 서버(bot/related_posts.py)가 본문 전체를 비교해 메타에 저장한 것만 씀.
+ * 기록이 없으면 관련 글 없음 (제목 글자로 짐작해 엉뚱한 글을 붙이지 않음). */
 function firstlab_related_ids( int $post_id, int $count = FIRSTLAB_RELATED_COUNT + 1 ): array {
 	static $cache = array();
 	if ( ! isset( $cache[ $post_id ] ) ) {
-		$cats = wp_get_post_categories( $post_id );
-		$rows = array();
-		// 분류가 달라도 주제가 같으면 연결 (자동차보험이 '금융·세금'·'자동차' 어느 쪽에 있든)
-		foreach ( get_posts( array( 'numberposts' => 300, 'post_status' => 'publish', 'post__not_in' => array( $post_id ), 'ignore_sticky_posts' => true ) ) as $p ) {
-			$rows[] = array( 'id' => $p->ID, 'title' => $p->post_title, 'same_cat' => (bool) array_intersect( $cats, wp_get_post_categories( $p->ID ) ) );
-		}
-		$cache[ $post_id ] = firstlab_related_pick( get_the_title( $post_id ), $rows, FIRSTLAB_RELATED_COUNT + 1 );
+		$cache[ $post_id ] = firstlab_related_from_meta(
+			(string) get_post_meta( $post_id, '_firstlab_related_ids', true ),
+			static fn( $id ) => $id > 0 && 'publish' === get_post_status( $id )
+		);
 	}
 	return array_slice( $cache[ $post_id ], 0, $count );
 }
