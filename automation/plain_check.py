@@ -46,6 +46,16 @@ def facts(html: str) -> dict[str, Counter]:
     }
 
 
+def sentences(html: str) -> list[str]:
+    """문장 목록 — 요소(문단·목록 항목·소제목·표 칸)마다 따로 나눔. 글 끝 '공식 안내 바로가기' 목록은 뺌
+    (11/9: 마침표 없는 링크 목록이 한 문장으로 붙어 괄호 수 검사에 걸렸음)."""
+    body = (html or "").split("공식 안내 바로가기")[0]
+    out = []
+    for _, inner in re.findall(r"<(p|li|h2|h3|td|th)[^>]*>(.*?)</\1>", body, re.S):
+        out += [x for x in re.split(r"(?<=[.?!])\s+", plain(inner)) if len(x) > 5]
+    return out
+
+
 def first_sentence(html: str) -> str:
     m = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
     text = plain(m.group(1)) if m else ""
@@ -70,7 +80,7 @@ def problems(old_html: str, new_html: str) -> list[str]:
         out.append(f"첫 문장 {len(first)}자 — {FIRST_MAX}자 이하 쉬운 답 한 줄로")
     if re.search(r"[(（]|제\s?\d+조", first):
         out.append("첫 문장에 괄호·법 조항 — 쉬운 말만")
-    sents = [x for x in re.split(r"(?<=[.?!])\s+", plain(new_html)) if len(x) > 5]
+    sents = sentences(new_html)
     avg = sum(map(len, sents)) / len(sents) if sents else 0
     if avg > AVG_MAX:
         out.append(f"문장 평균 {avg:.0f}자 — {AVG_MAX}자 이하로 (중학교 1학년이 한 번에 읽게, 운영자 11/9)")

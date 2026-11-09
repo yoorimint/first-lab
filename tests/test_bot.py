@@ -5597,3 +5597,6 @@ class PlainCheckTest(unittest.TestCase):
         self.assertTrue(any("법 조항" in p for p in pc.problems(self.OLD, new.replace("제55조", "제56조"))))
         self.assertTrue(any("링크" in p for p in pc.problems(self.OLD, new.replace("moel", "mohw"))))
         self.assertTrue(any("첫 문장" in p for p in pc.problems(self.OLD, self.OLD)))  # 원래 첫 문장엔 법 조항 — 쉬운 한 줄로
+        links = '<h2>공식 안내 바로가기</h2><ul><li><a href="https://x.go.kr">근로기준법 제55조 (휴일)</a></li><li><a href="https://y.go.kr">시행령 (주휴)</a></li></ul>'
+        self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
+        self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
