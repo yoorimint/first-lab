@@ -1,0 +1,24 @@
+{
+  "won10": "세액공제액은 산출세액에서 빼는 금액이라 끝수 처리 대상이 아님 (10원 미만 버림은 실제로 내거나 돌려받는 세액에 함, 국고금관리법 제47조①)",
+  "basis_date": "2026-11-09",
+  "yearly_checked": 2026,
+  "max_input": 100000000000,
+  "sources": [
+    {"name": "국가법령정보센터 소득세법 (제59조의4④ 기부금 세액공제, 제61조② 이월)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "국가법령정보센터 조세특례제한법 (제58조 고향사랑 기부금, 제76조 정치자금)", "url": "https://www.law.go.kr/법령/조세특례제한법"},
+    {"name": "국세청 기부금 세액공제 안내", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=239040&mi=40978"}
+  ],
+  "rate_low_pct": 15,
+  "rate_high_pct": 30,
+  "high_from": 10000000,
+  "general_limit_pct": 30,
+  "religious_limit_pct": 10,
+  "religious_mix_pct": 20,
+  "full_upto": 100000,
+  "political_rate_pct": 15,
+  "political_cap": 30000000,
+  "hometown_mid_upto": 200000,
+  "hometown_mid_rate_pct": 40,
+  "hometown_rate_pct": 15,
+  "hometown_cap": 20000000
+}
