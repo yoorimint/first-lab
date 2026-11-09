@@ -7,7 +7,10 @@ You are rewriting ONE existing Korean info blog post into plain, easy Korean —
 Input: /tmp/firstlab-review/post-{N}.json (field content_html; also title/excerpt for context). Do NOT edit any repo files.
 Write the full rewritten content_html to /tmp/firstlab-review/plain-{N}.html.
 
+Target reader: a Korean middle-school first grader (중학교 1학년). Every sentence should be understandable to them on first read.
+
 Rules
+0. Plain words: '사용자'→'회사(사장님)', '근로자'→'일하는 사람' where natural; say what a thing IS before its legal name. Put law names/articles at the END of a sentence in parentheses, e.g. "회사는 일주일에 하루 이상 돈 주는 쉬는 날을 줘야 해요(근로기준법 제55조)." One idea per sentence; average sentence ≤ 40 characters (the check script measures it). Before a hard rule, show a tiny example using ONLY numbers already in the original.
 1. Facts must not change. Keep EVERY number, amount, rate, date, period, law article (제N조…), link (<a href>) and shortcode ([firstlab_calc …]) exactly; keep every condition and exception (다만 …). Do not add new facts or numbers. Do not delete sentences that carry a condition.
 2. Keep the HTML structure: same h2/h3 headings (you may reword heading text slightly but keep the count), same tables (same rows; you may simplify cell wording but keep numbers), same lists. Keep the "공식 안내 바로가기" section as is.
 3. First paragraph: start with ONE plain sentence that answers the reader's question like you would to a friend — max 70 characters, no parentheses, no law article, no jargon. Then the original first-paragraph content (made easier).

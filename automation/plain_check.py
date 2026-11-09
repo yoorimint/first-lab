@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 FIRST_MAX = 70
+AVG_MAX = 40
 _TAG = re.compile(r"<[^>]+>")
 _NUM = re.compile(r"\d[\d,.]*")
 _ARTICLE = re.compile(r"제\s?\d+조(?:의\s?\d+)?(?:\s?제?\d+항)?")
@@ -69,6 +70,10 @@ def problems(old_html: str, new_html: str) -> list[str]:
         out.append(f"첫 문장 {len(first)}자 — {FIRST_MAX}자 이하 쉬운 답 한 줄로")
     if re.search(r"[(（]|제\s?\d+조", first):
         out.append("첫 문장에 괄호·법 조항 — 쉬운 말만")
+    sents = [x for x in re.split(r"(?<=[.?!])\s+", plain(new_html)) if len(x) > 5]
+    avg = sum(map(len, sents)) / len(sents) if sents else 0
+    if avg > AVG_MAX:
+        out.append(f"문장 평균 {avg:.0f}자 — {AVG_MAX}자 이하로 (중학교 1학년이 한 번에 읽게, 운영자 11/9)")
     from bot import condition_gate
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
     return out
