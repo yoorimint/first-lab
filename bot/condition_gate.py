@@ -261,7 +261,7 @@ LAW_GENERIC = ("방법", "법률", "불법", "편법", "합법", "문법", "해�
                "본국법", "구별법", "특별법", "일반법", "현행법", "모법", "상위법", "하위법", "실정법", "형사법", "민사법", "세법", "작성법",
                "계산법", "사용법", "공부법", "보관법", "관리법", "신청법", "활용법", "정리법", "조리법", "세척법", "측정법", "표기법", "투자법",
                "절약법", "대처법", "해결법", "예방법", "운동법", "치료법", "복용법", "구분법", "확인법", "선택법", "고르는법", "읽는법", "쓰는법",
-               "찾는법", "따는법", "보는법", "하는법", "내는법", "받는법", "구하는법", "대체역법")
+               "찾는법", "따는법", "보는법", "하는법", "내는법", "받는법", "구하는법", "대체역법", "특별조치법")
 _LAW_SPLIT = re.compile(r"[\s·,/()「」『』\[\]:;]+")
 _LAW_TOKEN = re.compile(r"^([가-힣]{2,}법)(?:에서|에는|에|은|는|이|가|을|를|의|으로|로|과|와|상|도|만|이나|에 따라)?$")
 
@@ -270,16 +270,20 @@ def _law_known(name: str) -> bool | None:
     """법제처에 정식 이름 또는 약칭으로 있는지 (띄어쓰기 무관). API 를 못 쓰면 None."""
     from . import law_api
     import xml.etree.ElementTree as ET
-    key = name.replace(" ", "")
+    key = re.sub(r"[\s·ㆍ]", "", name)
 
     def make():
-        xml = law_api.fetch("search", "law", query=key, display="20")
-        if not xml:
-            return None
-        for law in ET.fromstring(xml).iter("law"):
-            if key in ((law.findtext("법령명한글") or "").replace(" ", ""), (law.findtext("법령약칭명") or "").replace(" ", "")):
-                return True
-        return False
+        got = None
+        for target in ("law", "eflaw"):  # eflaw: 아직 시행 전인 새 법도 (11/9 '2027년 5월부터 「장애인평생교육법」')
+            xml = law_api.fetch("search", target, query=name.strip(), display="20")  # 띄어 쓴 이름 그대로 (붙이면 못 찾는 판이 있음)
+            if not xml:
+                continue
+            got = False
+            for law in ET.fromstring(xml).iter("law"):
+                names = (law.findtext("법령명한글") or "", law.findtext("법령약칭명") or "")
+                if key in (re.sub(r"[\s·ㆍ]", "", n) for n in names):
+                    return True
+        return got
     return _cached("law_known", key, make)
 
 
@@ -294,7 +298,7 @@ def unknown_law_names(body_html: str, known=_law_known) -> list[str]:
         if name.endswith(LAW_GENERIC) or name in out:
             continue
         prev = [re.sub(r"[^가-힣]", "", t) for t in toks[max(0, i - 3):i]]
-        cands = [name] + ["".join(prev[j:]) + name for j in range(len(prev) - 1, -1, -1) if prev[j]]
+        cands = [name] + [" ".join(prev[j:] + [name]) for j in range(len(prev) - 1, -1, -1) if prev[j]]
         results = [known(c) for c in cands]
         if None in results and not any(results):
             continue  # 법제처를 못 열면 막지 않음
