@@ -1,0 +1,178 @@
+[
+ {
+  "why": "두 귀 각각 45dB → 타) 제11급 220일, 평균임금 100,000 → 22,000,000",
+  "input": {
+   "left_db": 45,
+   "right_db": 45,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 11,
+   "base": 100000,
+   "lump": 22000000,
+   "pension": 0
+  }
+ },
+ {
+  "why": "한 귀 55dB·다른 귀 30dB → 파) 제14급 55일 → 5,500,000",
+  "input": {
+   "left_db": 55,
+   "right_db": 30,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 14,
+   "lump": 5500000
+  }
+ },
+ {
+  "why": "두 귀 각각 62dB → 바) 제9급 385일 → 38,500,000",
+  "input": {
+   "left_db": 62,
+   "right_db": 62,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 9,
+   "lump": 38500000
+  }
+ },
+ {
+  "why": "기준선: 한 귀 40dB·다른 귀 39dB → 파) 제14급",
+  "input": {
+   "left_db": 40,
+   "right_db": 39,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 14,
+   "lump": 5500000
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 두 귀 39dB → 등급 없음",
+  "input": {
+   "left_db": 39,
+   "right_db": 39,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 0,
+   "lump": 0
+  },
+  "boundary": true,
+  "notes_include": [
+   "40dB 미만"
+  ]
+ },
+ {
+  "why": "기준선: 두 귀 40dB → 타) 제11급",
+  "input": {
+   "left_db": 40,
+   "right_db": 40,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 11,
+   "lump": 22000000
+  },
+  "boundary": true
+ },
+ {
+  "why": "한 귀 70dB·다른 귀 20dB → 카) 제11급 (70 이상 80 미만)",
+  "input": {
+   "left_db": 70,
+   "right_db": 20,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 11
+  },
+  "boundary": true
+ },
+ {
+  "why": "한 귀 69dB·다른 귀 20dB → 파) 제14급",
+  "input": {
+   "left_db": 69,
+   "right_db": 20,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 14
+  },
+  "boundary": true
+ },
+ {
+  "why": "두 귀 각각 75dB → 라) 제7급, 연금 138일 13,800,000 / 일시금 616일 61,600,000",
+  "input": {
+   "left_db": 75,
+   "right_db": 75,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 7,
+   "lump": 61600000,
+   "pension": 13800000
+  },
+  "notes_include": [
+   "연금과 일시금 중 하나"
+  ]
+ },
+ {
+  "why": "두 귀 각각 95dB → 가) 제4급 1,012일 / 연금 224일",
+  "input": {
+   "left_db": 95,
+   "right_db": 95,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 4,
+   "lump": 101200000,
+   "pension": 22400000
+  }
+ },
+ {
+  "why": "평균임금 70,000 < 최저 보상기준 82,560 → 82,560 × 55 = 4,540,800",
+  "input": {
+   "left_db": 50,
+   "right_db": 0,
+   "avg_wage": 70000
+  },
+  "expect": {
+   "grade": 14,
+   "base": 82560,
+   "lump": 4540800
+  },
+  "boundary": true,
+  "notes_include": [
+   "범위 밖"
+  ]
+ },
+ {
+  "why": "평균임금 300,000 > 최고 268,299 → 268,299 × 220 = 59,025,780",
+  "input": {
+   "left_db": 45,
+   "right_db": 45,
+   "avg_wage": 300000
+  },
+  "expect": {
+   "grade": 11,
+   "base": 268299,
+   "lump": 59025780
+  },
+  "boundary": true
+ },
+ {
+  "why": "한 귀 85dB·다른 귀 45dB → 자) 제10급 297일 → 29,700,000",
+  "input": {
+   "left_db": 85,
+   "right_db": 45,
+   "avg_wage": 100000
+  },
+  "expect": {
+   "grade": 10,
+   "lump": 29700000
+  }
+ }
+]
