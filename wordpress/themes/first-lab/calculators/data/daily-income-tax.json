@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-09",
+  "basis_date": "2026-11-09", "law_checked": ["지방세법|2027-01-01", "소득세법|2027-01-01"],
   "yearly": false,
   "won10_keys": ["day_tax", "income_tax", "local_tax", "total"],
   "sources": [
