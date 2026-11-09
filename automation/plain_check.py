@@ -3,6 +3,7 @@
 다듬은 본문이 원래 본문과 '사실'이 같은지 코드로 확인한다 — 외부 검수를 다시 하지 않아도 되게.
   - 숫자(금액·비율·날짜·기간 등 숫자가 든 낱말), 법 조항(제N조), 링크 주소, 계산기 짧은 코드는 하나도 빠지거나 새로 생기면 안 됨
   - 소제목·표 개수 같고, 본문 길이 80% 이상
+  - 검색어: 제목·소제목 낱말, 본문에 3번 이상 나온 용어는 원래 횟수의 절반 이상 남김 (lost_terms)
   - 첫 문장: 쉬운 답 한 줄 — 70자 이하, 괄호·법 조항 없음
   - 읽기 기준(문장 100자·문단 300자·목록 200자, bot/condition_gate.readability)
 통과하면 글 갱신 파일(wordpress/queue/refresh-…json, type refresh)을 만든다 → 서버 bot/refresh.apply_direct 가 반영.
@@ -62,8 +63,41 @@ def first_sentence(html: str) -> str:
     return re.split(r"(?<=[.?!])\s", text, maxsplit=1)[0]
 
 
-def problems(old_html: str, new_html: str) -> list[str]:
+_PARTICLE = re.compile(r"(으로|에서|이에요|예요|입니다|이면|에는|에게|까지|부터|은|는|이|가|을|를|의|에|로|도|과|와|만)$")
+_VERB_END = re.compile(r"(요|다|면|고|지|기|게|며|서|던|된|한|인|운|든|까|나)$")
+
+
+def _terms(text: str, min_len: int) -> set[str]:
+    out = set()
+    for w in re.findall(r"[가-힣]{2,}", text):
+        w = _PARTICLE.sub("", w)
+        if len(w) >= min_len and not _VERB_END.search(w):
+            out.add(w)
+    return out
+
+
+def _headings(html: str) -> str:
+    return " ".join(plain(x) for x in re.findall(r"<h[23][^>]*>(.*?)</h[23]>", html or "", re.S))
+
+
+def lost_terms(old_html: str, new_html: str, title: str = "") -> list[str]:
+    """검색에 걸리는 낱말이 쉬운 말로 바뀌며 사라졌는지 (11/9 운영자 '검색에도 걸려야 되니 기존 단어 다 없애면 안 된다').
+    제목·소제목 낱말, 본문에 3번 이상 나온 3글자 이상 용어(소정근로시간·개근 등)는 원래 횟수의 절반(올림) 이상 남아야 한다."""
+    old_t, new_t = plain(old_html), plain(new_html)
+    words = _terms(f"{title} {_headings(old_html)}", 2) | {w for w in _terms(old_t, 3) if old_t.count(w) >= 3}
     out = []
+    for w in sorted(words, key=lambda x: -old_t.count(x)):
+        before, after = old_t.count(w), new_t.count(w)
+        if before and after < -(-before // 2):
+            out.append(f"{w} {before}→{after}")
+    return out
+
+
+def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
+    out = []
+    lost = lost_terms(old_html, new_html, title)
+    if lost:
+        out.append(f"검색어 줄어듦 (원래의 절반 이상 남기기, 쉬운 말은 옆에 덧붙이기): {', '.join(lost[:8])}")
     before, after = facts(old_html), facts(new_html)
     for kind in before:
         lost, added = before[kind] - after[kind], after[kind] - before[kind]
@@ -106,7 +140,7 @@ def main(argv: list[str]) -> int:
         return 2
     post_id, original, new_file = int(argv[0]), json.loads(Path(argv[1]).read_text(encoding="utf-8")), Path(argv[2])
     new_html = new_file.read_text(encoding="utf-8")
-    found = problems(original["content_html"], new_html)
+    found = problems(original["content_html"], new_html, original.get("title", ""))
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))
         return 1

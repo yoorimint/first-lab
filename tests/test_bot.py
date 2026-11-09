@@ -5650,6 +5650,17 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_search_terms_kept(self):
+        """11/9 운영자 '검색에도 걸려야 되니 기존 단어 다 없애면 안 된다' — #1419 첫 다듬기에서 소정근로시간 9→3, 소정근로일 6→1."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        old = "<h2>주휴수당 조건</h2>" + "<p>소정근로시간이 15시간 이상이에요.</p>" * 4
+        easy = "<h2>주휴수당 조건</h2><p>소정근로시간은 계약한 시간이에요.</p>" + "<p>계약한 시간이 15시간 이상이에요.</p>" * 3
+        self.assertIn("소정근로시간 4→1", pc.lost_terms(old, easy))
+        kept = "<h2>주휴수당 조건</h2><p>소정근로시간은 계약한 시간이에요.</p>" + "<p>소정근로시간이 15시간 이상이에요.</p>" * 2
+        self.assertEqual(pc.lost_terms(old, kept), [])
+        self.assertIn("조건 1→0", pc.lost_terms(old, kept.replace("조건", "받는 법")))  # 소제목 낱말도
+
 
 class NaverAdsDiagnoseTest(unittest.TestCase):
     """11/9: 키워드 도구 403 — 서버 키가 운영자 키와 같은지 비교하려고 끝 4자리는 비공개 state 에만, 공개 배포 기록엔 안 찍음."""
