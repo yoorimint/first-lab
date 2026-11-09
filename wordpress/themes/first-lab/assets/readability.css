@@ -32,6 +32,15 @@ ul.fl-split > li { margin: 0.25em 0; }
 /* '다만·주의' 문단: 주황 줄 상자 */
 .wp-block-post-content p.fl-note { background: var(--fl-note-soft); border-left: 4px solid var(--fl-note); border-radius: 0 8px 8px 0; padding: .7em .95em; }
 
+/* '이런 건 꼭 확인하세요' 목록 상자 + '한 줄 정리' (11/10) */
+.wp-block-post-content .fl-check { border: 1px solid var(--fl-line); border-top: 4px solid var(--fl-accent); border-radius: 10px; padding: .9em 1.1em .3em; margin: 2em 0 1.4em; }
+.wp-block-post-content .fl-check .fl-check-title { font-weight: 700; color: var(--fl-accent); margin: 0 0 .4em; }
+.wp-block-post-content .fl-check .fl-check-title::before { content: "✔ "; }
+.wp-block-post-content .fl-check ul { margin: 0 0 .6em; padding-left: 1.2em; }
+.wp-block-post-content .fl-check li { margin-bottom: .35em; }
+.wp-block-post-content p.fl-sum { background: var(--fl-accent); color: #fff; border-radius: 10px; padding: .85em 1.1em; font-weight: 600; }
+.wp-block-post-content p.fl-sum strong { background: none; color: #fff; }
+
 /* 목록: 파란 점 */
 .wp-block-post-content ul:not(.fl-split) > li::marker { color: var(--fl-accent); }
 .wp-block-post-content ol > li::marker { color: var(--fl-accent); font-weight: 700; }

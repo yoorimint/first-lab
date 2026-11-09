@@ -144,6 +144,7 @@ function firstlab_read_list_item( string $html ): string {
  * - 첫 문단(핵심 답) → 요약 상자 (fl-lead)
  * - '다만·단,'으로 시작하는 문단 → 주의 상자 (fl-note)
  * - '자주 묻는 질문' 소제목 아래 질문 소제목 → Q 표시 (fl-q)
+ * - '이런 건 꼭 확인하세요' 제목 문단 + 바로 뒤 목록 → 확인 상자 (fl-check), '한 줄 정리:' 문단 → 정리 상자 (fl-sum) (11/10 운영자 주휴수당 검토: 근거 줄 밑에 붙어 눈에 안 띄었음)
  */
 function firstlab_read_decorate( string $html ): string {
 	// 첫 '본문' 문단 (작성일 줄·짧은 안내 줄은 건너뜀 — 11/9 시안에서 '작성 2026년 11월 7일' 줄이 상자가 됐음)
@@ -158,6 +159,8 @@ function firstlab_read_decorate( string $html ): string {
 		}
 	}
 	$html = preg_replace( '/<p(?:\s+class="([^"]*)")?>(\s*(?:<strong>)?\s*(?:다만|단,|주의|※))/u', '<p class="fl-note $1">$2', $html ) ?? $html;
+	$html = preg_replace( '/<p(?:\s[^>]*)?>\s*<strong>\s*((?:이런 건 )?꼭 확인하세요)\s*<\/strong>\s*<\/p>\s*(<ul\b.*?<\/ul>)/su', '<div class="fl-check"><p class="fl-check-title">$1</p>$2</div>', $html ) ?? $html;
+	$html = preg_replace( '/<p(?:\s+class="([^"]*)")?>(\s*<strong>\s*한 줄 정리)/u', '<p class="fl-sum $1">$2', $html ) ?? $html;
 	// '자주 묻는 질문' 소제목(h2) 뒤의 h3 만 — 글자로 찾으면 목차의 '자주 묻는 질문'부터 잡혀 모든 소제목에 Q 가 붙었음 (11/9 운영자 화면)
 	if ( preg_match( '/<h2[^>]*>[^<]*자주 묻는 질문[^<]*<\/h2>/u', $html, $m, PREG_OFFSET_CAPTURE ) ) {
 		$byte = $m[0][1];
