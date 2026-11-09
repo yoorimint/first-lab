@@ -5442,6 +5442,40 @@ class FlowTest(unittest.TestCase):
         flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
         self.assertIn("the_seo_framework_robots_meta_array", flow)  # 글 3편 미만 태그 페이지는 noindex
 
+class DeadLinkRecheckTest(unittest.TestCase):
+    """11/10 #1678: ols.semas.or.kr 이 서버에서 한 번 안 열려 '주소 연결 안 됨' 보류 — 실제로는 열리는 주소. 글쓰기가 멈춘 동안 평생 보류 안 되게
+    한 번 더 기다려 보고(_exists 재시도), 한 시간마다 다시 열어 보고 열리면 보류를 푼다."""
+
+    def test_recheck_releases_when_host_opens(self):
+        from bot import official_links as ol
+        reasons = {"1678": ol.dead_reason(["ols.semas.or.kr"]), "1700": "다른 이유", "1701": ol.dead_reason(["nope.go.kr"])}
+
+        def wp(*args):
+            if args[:2] == ("post", "list"):
+                return json.dumps([{"ID": k} for k in reasons])
+            if args[:3] == ("post", "meta", "get"):
+                return reasons[args[3]]
+            return ""
+        released = []
+        out = ol.recheck_dead(wp, exists=lambda u: "semas" in u, release=released.append)
+        self.assertEqual(released, [1678])  # 열린 주소만, 다른 보류 이유는 건드리지 않음
+        self.assertIn("ols.semas.or.kr", out[0])
+
+    def test_exists_retries_once(self):
+        from bot import official_links as ol
+        calls = []
+
+        def urlopen(req, timeout):
+            calls.append(timeout)
+            if len(calls) == 1:
+                raise TimeoutError()
+            return contextlib.nullcontext()
+        import contextlib
+        with mock.patch.object(ol.urllib.request, "urlopen", urlopen):
+            self.assertTrue(ol._exists("https://ols.semas.or.kr"))
+        self.assertEqual(calls[1], ol.DEAD_RETRY_TIMEOUT)
+
+
 class DraftLinkHoldTest(unittest.TestCase):
     """11/9 운영자 '링크도 미리 초안 만들면 들어가 보고 맞게 링크 만들게 해야 되는 거 아냐?' — 공개 직전 본문 주소를 열어 보고,
     연결조차 안 되는 주소가 있으면 공개하지 않고 보류 (주소가 틀렸을 가능성). 봇 차단(403)은 주소가 있는 것으로 봄."""

@@ -41,16 +41,22 @@ def hosts_in(html: str) -> list[str]:
     return out[:MAX_HOSTS]
 
 
+DEAD_RETRY_TIMEOUT = 25
+DEAD_PREFIX = "본문 공식 주소가 연결되지 않음: "
+
+
 def _exists(url: str) -> bool:
     """주소가 실제로 있는지 (응답이 오면 403·404 여도 있음 — 봇을 막는 공식 사이트도 있어서). 연결 자체가 안 되면 없음."""
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (first-lab link check)"})
-    try:
-        with urllib.request.urlopen(req, timeout=sources.TIMEOUT):
+    for timeout in (sources.TIMEOUT, DEAD_RETRY_TIMEOUT):  # 한 번 느린 것으로 '없는 주소' 판정하지 않게 한 번 더 (11/10 ols.semas.or.kr 보류)
+        try:
+            with urllib.request.urlopen(req, timeout=timeout):
+                return True
+        except urllib.error.HTTPError:
             return True
-    except urllib.error.HTTPError:
-        return True
-    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
-        return False
+        except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+            continue
+    return False
 
 
 def dead_hosts(hosts: list[str], exists=_exists) -> list[str]:
@@ -117,7 +123,35 @@ def run_for(post_id: int, wp=None, check=sources.reachable, today: str | None = 
 
 
 def dead_reason(dead: list[str]) -> str:
-    return f"본문 공식 주소가 연결되지 않음: {', '.join(dead)} — 주소가 맞는지 공식 기관 누리집으로 확인해 고치기"
+    return f"{DEAD_PREFIX}{', '.join(dead)} — 주소가 맞는지 공식 기관 누리집으로 확인해 고치기"
+
+
+def recheck_dead(wp=None, exists=_exists, release=None) -> list[str]:
+    """'공식 주소 연결 안 됨'으로 보류된 초안의 주소를 다시 열어 봄 — 이제 열리면 보류를 풀고 공개 대기로 (11/10: ols.semas.or.kr 이
+    서버에서 한 번 안 열려 보류됐는데 실제로는 열리는 주소 — 글쓰기 작업이 멈춘 동안 평생 보류가 되지 않게). 봇이 한 시간마다."""
+    if wp is None:
+        from .settings import wp_cli as wp
+    from .review_gate import HOLD_META
+    if release is None:
+        from .schedule import mark_ready
+
+        def release(pid):
+            wp("post", "meta", "delete", str(pid), HOLD_META)
+            wp("post", "meta", "delete", str(pid), META)  # 본문 링크 기록도 다시 (열린 주소를 링크로)
+            mark_ready(pid)
+    rows = json.loads(wp("post", "list", "--post_type=post", "--post_status=draft", f"--meta_key={HOLD_META}",
+                         "--fields=ID", "--format=json", "--posts_per_page=-1") or "[]")
+    out = []
+    for row in rows:
+        pid = int(row["ID"])
+        reason = wp("post", "meta", "get", str(pid), HOLD_META) or ""
+        if not reason.startswith(DEAD_PREFIX):
+            continue
+        hosts = [h.strip() for h in reason[len(DEAD_PREFIX):].split(" — ")[0].split(",") if h.strip()]
+        if hosts and not dead_hosts(hosts, exists):
+            release(pid)
+            out.append(f"글 {pid}: {', '.join(hosts)} 이제 열림 → 보류 풀고 공개 대기")
+    return out
 
 
 def hold_dead(post_id: int, dead: list[str], wp) -> None:
