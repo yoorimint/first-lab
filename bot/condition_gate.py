@@ -903,6 +903,40 @@ def title_qualifier(title: str, body_html: str) -> list[str]:
     return out
 
 
+# 제목 '넣은 돈 → 받는 돈' 이 여러 공제율 중 한 구간 값인데 '최대' 같은 말이 없으면 (11/9 #2295 'IRP·DC 900만 원 채우면 148만 5,000원':
+# 16.5% 구간 값, 본문에 같은 900만 원이 13.2% 구간이면 118만 8,000원). 제목 두 금액 A·M 이 M = A×p (p 는 본문 비율)이고,
+# 본문에 다른 비율 q 로 계산한 A×q 금액도 나오면 걸림.
+_KO_WON = re.compile(r"(?:(\d[\d,]*)\s*억\s*)?(?:(\d[\d,]*)\s*만\s*)?(\d[\d,]*)?\s*원")
+_RATE = re.compile(r"(\d{1,2}(?:\.\d+)?)\s*%")
+TIER_HEDGE = re.compile(r"(최대|최고|까지|이하|구간|라면|이면|기준)")
+
+
+def _won_amounts(text: str) -> set[int]:
+    out = set()
+    for m in _KO_WON.finditer(text or ""):
+        eok, man, rest = (int(g.replace(",", "")) if g else 0 for g in m.groups())
+        if eok or man or rest:
+            out.add(eok * 100_000_000 + man * 10_000 + rest)
+    return out
+
+
+def title_tier_amount(title: str, excerpt: str, body_html: str) -> list[str]:
+    if TIER_HEDGE.search(title or ""):
+        return []
+    text = _plain(excerpt) + " " + _plain(body_html)
+    rates = {float(r) for r in _RATE.findall(text) if 0 < float(r) <= 50}
+    amounts = _won_amounts(title)
+    body_amounts = _won_amounts(text)
+    out = []
+    for a in amounts:
+        for m in amounts:
+            hit = next((p for p in rates if m != a and round(a * p / 100) == m), None)
+            others = [q for q in rates if q != hit and round(a * q / 100) in body_amounts and round(a * q / 100) != m] if hit else []
+            if others:
+                out.append(f"제목 '{m:,}원' 은 {hit:g}% 구간 값 — 본문에 같은 {a:,}원이 {others[0]:g}% 면 {round(a * others[0] / 100):,}원. 제목에 '최대' 또는 구간 조건을 넣기")
+    return out
+
+
 # 요약·첫 문단 자격 기간 ↔ 본문의 대상별 다른 기간 (11/5 #775 '둘 다 3개월 이상 일하고 있어야' ↔ '일용근로자는 … 45일 이상이면')
 MINIMUM = re.compile(r"(\d[\d,.]*)\s*(개월|년|일|시간)\s*(이상|이하|미만|초과)")
 _WORK = re.compile(r"(일하|근무|근로|가입|거주|재직)")

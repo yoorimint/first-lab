@@ -4484,6 +4484,14 @@ class LeadThresholdTest(unittest.TestCase):
         self.assertTrue(g.title_qualifier("극저신용대출: 11월 30일까지 피해자 접수", self.BODY))
         self.assertEqual(g.title_qualifier("극저신용대출: 불법사금융 피해자 11월 30일까지 접수", self.BODY), [])
 
+    def test_title_tier_amount(self):
+        """11/9 #2295: 제목 '900만 원 채우면 148만 5,000원'은 16.5% 구간 값 — 본문 13.2% 구간은 118만 8,000원."""
+        from bot import condition_gate as g
+        body = "<p>총급여 5,500만 원 이하는 16.5%, 넘으면 13.2%예요.</p><p>900만 원을 넣으면 148만 5,000원, 13.2%면 118만 8,000원이에요.</p>"
+        self.assertTrue(g.title_tier_amount("퇴직연금 세액공제: 900만 원 채우면 148만 5,000원", "", body))
+        self.assertEqual(g.title_tier_amount("퇴직연금 세액공제: 900만 원 채우면 최대 148만 5,000원", "", body), [])
+        self.assertEqual(g.title_tier_amount("퇴직연금 세액공제: 900만 원 채우면 148만 5,000원", "", "<p>16.5% 공제라 148만 5,000원이에요.</p>"), [])  # 구간이 하나면 그대로
+
 
 class CalcReviewGateTest(unittest.TestCase):
     """독립 검수 전 계산기는 공개하지 않는다 (11/5 운영자 '계산기들은 전부 발행처리했네?')."""
