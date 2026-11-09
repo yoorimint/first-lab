@@ -5656,6 +5656,11 @@ class NewLawWatchTest(unittest.TestCase):
         self.assertEqual([c["name"] for c in cands], ["소상공인 보호 및 지원에 관한 법률"])  # 타법개정·이미 다룬 법·국방 빼고
         self.assertGreaterEqual(w.score(cands[0], w.reason_of(cands[0], self.fake)), w.MIN_SCORE)
         self.assertEqual(w.score(cands[0], "용어를 알기 쉽게 정비하려는 것임"), 0)  # 자구 정비는 글감 아님
+        # 11/10 첫 실행: 기관 설립·업계 규제가 글감으로 뽑힘 → 이름으로 빼고, 사업자 규제는 점수를 깎음
+        self.assertEqual(w.candidates([{"name": "국립의학전문대학원 설립 및 운영에 관한 법률", "kind": "제정", "level": "법률",
+                                        "agency": "보건복지부", "date": "20261201", "mst": "1"}], set(), set()), [])
+        biz = "가상자산이전업무를 영위하려는 경우 등록하도록 하고, 전문외국환업무취급업자의 등록취소 근거를 마련하며 신고 의무를 정함"
+        self.assertLess(w.score({"kind": "일부개정"}, biz), w.MIN_SCORE)
         state = {}
         with mock.patch.object(law_api, "available", return_value=True), \
                 mock.patch("bot.state.load_state", return_value=state), mock.patch("bot.state.save_state"), \

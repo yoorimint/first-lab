@@ -16,7 +16,7 @@ from . import law_api
 
 FROM_DAYS, TO_DAYS = 14, 56   # 시행 2~8주 전에 써 두면 시행·신청이 시작될 때 자리를 잡고 있음
 KEEP = 10
-MIN_SCORE = 2
+MIN_SCORE = 3                 # 11/10 첫 실행: 2점이면 외국환거래법·항공보안법 같은 업계 규제가 올라옴
 MAX_DETAILS = 80              # 개정 이유를 열어 보는 최대 법령 수 (하루 한 번, 법제처 호출 수)
 KINDS = ("제정", "일부개정", "전부개정")   # 타법개정(다른 법 따라 이름만 바뀜)은 뺌
 LEVELS = ("법률", "대통령령")
@@ -29,6 +29,10 @@ PERSONAL = re.compile(r"(지원|수당|급여|공제|감면|면제|환급|장려
 INTERNAL = re.compile(r"(용어|자구|조문 정비|위임 근거|인용 조문|명확히|정비하려는|알기 쉽게|법체계)")
 # 기관·위원회 운영 이야기 (개인 글감 아님 — 점수를 깎음)
 INSTITUTION = re.compile(r"(위원회|위원 정수|실태조사|명칭|설치 근거|설립|공단의|기본계획|연구윤리|이전기관|지원체계)")
+# 사업자·기관이 지킬 규제 (개인 글감 아님 — 점수를 깎음, 11/10 첫 실행에서 대행업자·가맹점·인증사업자 개정이 글감으로 뽑힘)
+BUSINESS = re.compile(r"(사업자|대행업자|업자가|운영자|가맹점|과징금|인증사업|등록하도록|등록취소|감독관|관계 기관의 장)")
+# 법 이름만 봐도 기관 설립·업계 육성·시설 관리 법 (11/10 첫 실행: 국립의학전문대학원 설립법·환경오염시설 통합관리법·항공보안법 등)
+NAME_SKIP = re.compile(r"(설립|설치 및 운영|이전기관|산업발전|산업 진흥|진흥법|시설의|감독관|직무집행|보안법|발전사업)")
 
 
 def _rows(xml: str) -> list[dict]:
@@ -60,7 +64,7 @@ def candidates(rows: list[dict], covered: set[str], done: set[str]) -> list[dict
     for r in sorted(rows, key=lambda r: r["date"]):
         key = f"{r['name']}|{r['date']}"
         if (r["kind"] not in KINDS or r["level"] not in LEVELS or not any(a in r["agency"] for a in LIFE)
-                or r["name"].replace(" ", "") in covered or key in done or r["name"] in seen):
+                or r["name"].replace(" ", "") in covered or key in done or r["name"] in seen or NAME_SKIP.search(r["name"])):
             continue
         seen.add(r["name"])
         out.append(dict(r, key=key))
@@ -79,7 +83,8 @@ def reason_of(row: dict, fetch=law_api.fetch) -> str:
 def score(row: dict, reason: str) -> int:
     if not reason or (INTERNAL.search(reason) and len(set(PERSONAL.findall(reason))) < 2):
         return 0
-    return len(set(PERSONAL.findall(reason))) + (1 if row["kind"] == "제정" else 0) - len(set(INSTITUTION.findall(reason)))
+    return (len(set(PERSONAL.findall(reason))) + (1 if row["kind"] == "제정" else 0)
+            - len(set(INSTITUTION.findall(reason))) - len(set(BUSINESS.findall(reason))))
 
 
 def _covered() -> set[str]:
