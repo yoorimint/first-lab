@@ -4470,6 +4470,14 @@ class LeadThresholdTest(unittest.TestCase):
         self.assertEqual(g.unknown_law_names(body.replace("어선원 재해", "어선원 및 어선 재해"), known), [])
         self.assertEqual(g.unknown_law_names(body, lambda n: None), [])  # 법제처를 못 열면 막지 않음
 
+    def test_excerpt_principle(self):
+        """11/9 #2383: 요약 '신고기한부터 9개월 안에 결정' ↔ 본문 '원칙적으로 … 9개월 안에, 부득이하면 더 걸림'."""
+        from bot import condition_gate as g
+        body = "<p>이 결정은 원칙적으로 신고기한부터 9개월 안에 해요. 부득이한 사유가 있으면 더 걸릴 수 있어요.</p>"
+        self.assertTrue(g.excerpt_principle("신고기한부터 9개월 안에 결정해요.", body))
+        self.assertEqual(g.excerpt_principle("원칙적으로 신고기한부터 9개월 안에 결정해요.", body), [])
+        self.assertEqual(g.excerpt_principle("청구 기간(9개월·3개월)", body), [])  # 예외 기간도 같이 적으면 됨
+
     def test_excerpt_number_limits(self):
         """11/9 #2362: 요약 '미신고 때 급여 50% 징수' ↔ 본문 '보험급여의 50%(… 산재보험료의 5배까지)'."""
         from bot import condition_gate as g

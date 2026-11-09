@@ -162,6 +162,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.title_qualifier(title, body_html)
     out += condition_gate.title_tier_amount(title, excerpt, body_html)
     out += condition_gate.excerpt_number_limits(excerpt, body_html)
+    out += condition_gate.excerpt_principle(excerpt, body_html)
     from . import law_api
     if law_api.available():  # 법제처를 쓸 수 있는 서버에서만 (검사 환경은 건너뜀)
         out += condition_gate.unknown_law_names(body_html)

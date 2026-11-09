@@ -254,6 +254,28 @@ def excerpt_number_limits(excerpt: str, body_html: str) -> list[str]:
     return out[:2]
 
 
+# 요약이 본문 첫머리의 '원칙적으로 N개월'에서 '원칙'을 뺌 (11/9 #2383: 요약 '신고기한부터 9개월 안에 세무서가 조사해 결정' ↔
+# 본문 '이 결정은 원칙적으로 … 9개월 안에 해요. 부득이한 사유가 있으면 … 더 걸릴 수 있어요').
+_PRINCIPLE = re.compile(r"(원칙적으로|원칙은|원칙상)")
+_PERIOD = re.compile(r"\d[\d,.]*\s*(?:개월|일|년|주|%|만\s?원|원)")
+
+
+def excerpt_principle(excerpt: str, body_html: str) -> list[str]:
+    ex = _plain(excerpt or "")
+    if _PRINCIPLE.search(ex):
+        return []
+    paras = re.findall(r"<p[^>]*>.*?</p>", body_html or "", re.S)[:2]
+    out = []
+    for sent in _sentences("".join(paras)):
+        if not _PRINCIPLE.search(sent):
+            continue
+        for num in dict.fromkeys(_PERIOD.findall(sent[_PRINCIPLE.search(sent).end():])):
+            listed = any(num in g and "·" in g for g in re.findall(r"\(([^()]*)\)", ex))  # '(5년·3개월)'처럼 예외 기간도 같이 적었으면 됨
+            if num in ex and not listed:
+                out.append(f"요약의 '{num}' 은 본문에서 '원칙적으로' (예외 있음) — 요약에도 '원칙적으로' 넣기")
+    return out[:1]
+
+
 # 법령 이름이 법제처에 있는 이름(정식 이름·공식 약칭)인지 (11/9 #2362 '어선원 재해보상보험법' — 정식은 '어선원 및 어선 재해보상보험법').
 # 낱말 끝이 '법'인 것만 보고, 앞 낱말 1~3개를 붙여 본 이름 중 하나라도 법제처 정식 이름·약칭이면 맞음. 흔한 말(방법·개정법 등)은 뺌.
 LAW_GENERIC = ("방법", "법률", "불법", "편법", "합법", "문법", "해법", "요법", "비법", "기법", "공법", "화법", "수법", "용법", "어법",
