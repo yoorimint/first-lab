@@ -8,6 +8,7 @@ import base64
 import hashlib
 import hmac
 import json
+import re
 import time
 import urllib.parse
 import urllib.request
@@ -96,6 +97,12 @@ def ads_client() -> NaverAdsClient:
     ))
 
 
+def redact(text: str) -> str:
+    """네이버 오류 문구에는 보낸 키(라이선스) 전체가 그대로 들어 있음 (11/9 확인) → 긴 영숫자 묶음은 가림.
+    배포 기록(공개 저장소의 Actions 로그)에 찍혀도 키가 안 보이게."""
+    return re.sub(r"[0-9A-Za-z+/=_-]{24,}", "(가림)", text or "")
+
+
 def diagnose(client: NaverAdsClient | None = None) -> dict:
     """키워드 도구 연결 점검 (11/9: 403 으로 11/7 무렵부터 수집이 멈춤 — 운영자 '기존 키와 같은지 알아야').
     공개 배포 기록에는 정상/실패와 네이버 오류 문구만, 키 끝 4자리는 비공개 봇 상태(state)에만 남긴다."""
@@ -107,7 +114,7 @@ def diagnose(client: NaverAdsClient | None = None) -> dict:
         client.keyword_stats(["다이어트"])
         out.update(ok=True, status=200, message="")
     except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", "replace")[:300]
+        body = redact(e.read().decode("utf-8", "replace"))[:300]
         out.update(ok=False, status=e.code, message=body)
     except Exception as e:  # noqa: BLE001 - 연결 문제도 기록
         out.update(ok=False, status=0, message=f"{type(e).__name__}: {str(e)[:150]}")

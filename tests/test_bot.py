@@ -5665,6 +5665,14 @@ class NaverAdsDiagnoseTest(unittest.TestCase):
         r = n.diagnose(Fake("1234567", "xxxxbbb9", "s" * 20))
         self.assertEqual((r["ok"], r["status"], r["license_tail"]), (False, 403, "bbb9"))
         self.assertIn("Invalid API key", r["message"])
+        fake = "01000000" + "ab12" * 16  # 가짜 키 — 11/9: 네이버 오류 문구에 보낸 키 전체가 들어 있었음 → 가림
+
+        class Leaky(n.NaverAdsClient):
+            def keyword_stats(self, hints):
+                raise urllib.error.HTTPError("u", 403, "Forbidden", {}, io.BytesIO(f'{{"title":"Invalid API-KEY","detail":"API-KEY {fake} is invalid."}}'.encode()))
+        r = n.diagnose(Leaky("1234567", "xxxxbbb9", "s" * 20))
+        self.assertNotIn(fake[:20], r["message"])
+        self.assertIn("Invalid API-KEY", r["message"])
         src = (ROOT / "bot" / "naver_ads.py").read_text(encoding="utf-8")
         main = src[src.index('if __name__ == "__main__"'):]
         self.assertNotIn("license_tail", main.split("print(")[-1])  # 화면(공개 배포 기록)에는 키 끝자리 안 찍음

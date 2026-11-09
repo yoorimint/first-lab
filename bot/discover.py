@@ -19,7 +19,7 @@ from pathlib import Path
 
 from .keyword_db import connect, norm, summary, upsert
 from .keyword_filter import MODIFIERS
-from .naver_ads import ads_client
+from .naver_ads import ads_client, redact
 from .seed_words import FOCUS_SEEDS, SEED_WORDS
 from .seeds import google_trends_kr
 
@@ -109,7 +109,7 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
                     continue
                 stats["errors"] += 1
                 if e.code in (401, 403):
-                    stats["auth_error"] = f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+                    stats["auth_error"] = f"HTTP {e.code}: {redact(e.read().decode('utf-8', 'replace'))[:150]}"
                     return False
                 break
             except Exception:  # noqa: BLE001 - 응답 끊김·JSON 오류 하나가 그날 수집 전체를 멈추지 않게 (11/5 검토)
