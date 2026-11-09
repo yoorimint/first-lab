@@ -5,6 +5,7 @@
   - 소제목·표 개수 같고, 본문 길이 80% 이상
   - 검색어: 제목·소제목 낱말, 본문에 3번 이상 나온 용어는 원래 횟수의 절반 이상 남김 (lost_terms)
   - 첫 문장: 쉬운 답 한 줄 — 70자 이하, 괄호·법 조항 없음
+  - 문단마다 문장 2개까지 (긴 문단은 자동으로 끊음, 첫 문단 상자는 <br> 줄마다 2문장까지 — 사람이 나눔)
   - 읽기 기준(문장 100자·문단 300자·목록 200자, bot/condition_gate.readability)
 통과하면 글 갱신 파일(wordpress/queue/refresh-…json, type refresh)을 만든다 → 서버 bot/refresh.apply_direct 가 반영.
 
@@ -54,6 +55,44 @@ def sentences(html: str) -> list[str]:
     out = []
     for _, inner in re.findall(r"<(p|li|h2|h3|td|th)[^>]*>(.*?)</\1>", body, re.S):
         out += [x for x in re.split(r"(?<=[.?!])\s+", plain(inner)) if len(x) > 5]
+    return out
+
+
+MAX_SENT = 2  # 문단 하나(첫 문단은 줄 하나)에 문장 2개까지 — 11/10 운영자 '줄바꿈은 엿 바꿔 먹었나' (한눈에 보기 상자에 6문장이 한 덩어리)
+_SENT_END = re.compile(r"(?<=[.?!])\s+(?=[^<>]*(?:<|$))")
+
+
+def _balanced(chunk: str) -> bool:
+    return all(chunk.count(f"<{t}") == chunk.count(f"</{t}>") for t in ("strong", "a", "em", "b", "span"))
+
+
+def split_long_paragraphs(html: str, first_too: bool = False) -> str:
+    """문장 3개 이상인 문단을 문장 2개씩 끊어 여러 문단으로 (글 내용은 그대로). 꾸밈 태그가 문장을 걸쳐 끊기 어려우면 그대로 둠.
+    첫 문단(한눈에 보기 상자)은 사람이 줄(<br>)을 나눠 쓰므로 기본으로 건드리지 않음."""
+    first = re.search(r"<p[^>]*>", html or "")
+
+    def cut(m):
+        if (m.start() == first.start() and not first_too) or m.group(1) or "<br" in m.group(2):
+            return m.group(0)
+        parts = _SENT_END.split(m.group(2).strip())
+        if len(parts) <= MAX_SENT:
+            return m.group(0)
+        chunks = [" ".join(parts[i:i + MAX_SENT]) for i in range(0, len(parts), MAX_SENT)]
+        if not all(_balanced(c) for c in chunks):
+            return m.group(0)
+        return "\n".join(f"<p>{c}</p>" for c in chunks)
+    return re.sub(r"<p( [^>]*)?>(.*?)</p>", cut, html or "", flags=re.S)
+
+
+def crowded_paragraphs(html: str) -> list[str]:
+    """문장 3개 이상인 문단(첫 문단은 <br> 줄마다) — 공식 안내 목록은 뺌."""
+    body = (html or "").split("공식 안내 바로가기")[0]
+    out = []
+    for inner in re.findall(r"<p[^>]*>(.*?)</p>", body, re.S):
+        for line in re.split(r"<br\s*/?>", inner):
+            n = len([x for x in re.split(r"(?<=[.?!])\s+", plain(line)) if len(x) > 3])
+            if n > MAX_SENT:
+                out.append(plain(line)[:30])
     return out
 
 
@@ -121,6 +160,9 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
     crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
     if crowded:
         out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")
+    crowded_p = crowded_paragraphs(new_html)
+    if crowded_p:
+        out.append(f"문장 {MAX_SENT + 1}개 이상인 문단 {len(crowded_p)}개 — 휴대폰에서 한 덩어리로 보임, 문장 {MAX_SENT}개마다 끊기 (예: {crowded_p[0]}…)")
     from bot import condition_gate
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
     return out
@@ -139,7 +181,7 @@ def main(argv: list[str]) -> int:
         print(__doc__)
         return 2
     post_id, original, new_file = int(argv[0]), json.loads(Path(argv[1]).read_text(encoding="utf-8")), Path(argv[2])
-    new_html = new_file.read_text(encoding="utf-8")
+    new_html = split_long_paragraphs(new_file.read_text(encoding="utf-8"))  # 긴 문단은 자동으로 끊어서 검사·반영
     found = problems(original["content_html"], new_html, original.get("title", ""))
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))

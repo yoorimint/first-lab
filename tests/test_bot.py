@@ -5650,6 +5650,19 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_long_paragraphs_split(self):
+        """11/10 운영자 '줄바꿈은 엿 바꿔 먹었나' — 한눈에 보기 상자에 6문장 한 덩어리. 문단은 문장 2개까지, 넘으면 자동으로 끊음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        lead = "<p>첫 줄이에요. 둘째예요. 셋째예요.</p>"
+        body = "<p>하나예요. <strong>둘</strong>이에요. 셋이에요. 넷이에요. 다섯이에요.</p><p class=\"fl-basis\">근거: 법</p>"
+        self.assertEqual(len(pc.crowded_paragraphs(lead + body)), 2)
+        out = pc.split_long_paragraphs(lead + body)
+        self.assertEqual(out.count("<p>"), 1 + 3)  # 첫 문단(상자)은 사람이 <br> 로 나눔 — 그대로, 본문 5문장 → 2·2·1
+        self.assertEqual(pc.crowded_paragraphs(out), ["첫 줄이에요. 둘째예요. 셋째예요."])
+        self.assertEqual(pc.crowded_paragraphs("<p>첫 줄이에요.<br>둘째예요. 셋째예요.</p>"), [])
+        self.assertEqual(pc.split_long_paragraphs("<p>x</p><p><strong>가요. 나요.</strong> 다요.</p>"), "<p>x</p><p><strong>가요. 나요.</strong> 다요.</p>")  # 태그 걸치면 안 끊음
+
     def test_search_terms_kept(self):
         """11/9 운영자 '검색에도 걸려야 되니 기존 단어 다 없애면 안 된다' — #1419 첫 다듬기에서 소정근로시간 9→3, 소정근로일 6→1."""
         sys.path.insert(0, str(ROOT / "automation"))
