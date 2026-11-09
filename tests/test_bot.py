@@ -5619,3 +5619,16 @@ class NaverAdsDiagnoseTest(unittest.TestCase):
         src = (ROOT / "bot" / "naver_ads.py").read_text(encoding="utf-8")
         main = src[src.index('if __name__ == "__main__"'):]
         self.assertNotIn("license_tail", main.split("print(")[-1])  # 화면(공개 배포 기록)에는 키 끝자리 안 찍음
+
+
+class DeploySpeedTest(unittest.TestCase):
+    """11/9 운영자 '배포 왜 이렇게 오래 걸려': 전체 글을 한 편씩 읽는 보정은 배포를 기다리게 하지 않고 잠금 걸어 따로 실행."""
+
+    def test_full_scan_runs_in_background(self):
+        sh = (ROOT / "server" / "bot-setup.sh").read_text(encoding="utf-8")
+        line = next(x for x in sh.splitlines() if x.startswith("MAINT="))
+        for mod in ("bot.fix_posts", "bot.patch_check", "bot.migrate_photos", "bot.pending_images"):
+            self.assertIn(mod, line)
+        self.assertIn('setsid nohup flock /var/lib/first-lab/bot/maint.lock bash -c "$MAINT"', sh)
+        self.assertNotIn('"$VENV/bin/python" -m bot.fix_posts)', sh)  # 배포 안에서 직접 돌리지 않음
+        self.assertLess(sh.index("bot.publish_queue"), sh.index("MAINT="))  # 새 글·갱신 파일은 배포 안에서 먼저

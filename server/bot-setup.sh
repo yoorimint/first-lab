@@ -39,15 +39,11 @@ apply_settings_once 2026-11-05-direct-times-restore direct_times=07:40
 log "직접 작성한 글 올리기 (wordpress/queue → 이미지·카드·카테고리까지 봇과 같은 과정)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
 
-log "기존 글 보정 (블록 형식, 대표 이미지)"
-(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.fix_posts) || echo "보정 실패 (봇 동작에는 영향 없음)"
-RESTORE_MARK=/var/lib/first-lab/bot/once-2026-11-05-restore-swallowed.done   # 패치 버그로 사라진 문단 (bot/restore_swallowed.py)
-if [ ! -f "$RESTORE_MARK" ]; then
-  (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.restore_swallowed) && touch "$RESTORE_MARK" || echo "문단 되살리기 실패 (다음 배포 때 다시)"
-fi
-(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.patch_check) || echo "패치 반영 확인 실패 (봇 동작에는 영향 없음)"
-log "본문 AI 사진 → 대표 사진 1장으로 정리 (이미 정리된 글은 건너뜀)"
-(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.migrate_photos) || echo "사진 정리 실패 (봇 동작에는 영향 없음)"
+# 전체 글을 한 편씩 읽는 보정(패치 반영·블록 형식·사진 정리·사진 대기 표시)은 배포를 기다리게 하지 않고 따로 돌린다
+# (11/9 운영자 '배포 왜 이렇게 오래 걸려' — 배포 한 번 20분 중 이 둘이 11분). 겹치는 배포가 동시에 돌지 않게 잠금, 결과는 maint.log·봇 기록.
+log "기존 글 보정·패치 반영 확인·사진 정리 (따로 실행 → /var/lib/first-lab/bot/maint.log)"
+MAINT="cd '$REPO_DIR' && P='$VENV/bin/python' && \$P -m bot.fix_posts; \$P -m bot.patch_check; \$P -m bot.migrate_photos; \$P -m bot.pending_images"
+setsid nohup flock /var/lib/first-lab/bot/maint.lock bash -c "$MAINT" > /var/lib/first-lab/bot/maint.log 2>&1 < /dev/null &
 
 log "예약 발행 대기열: 운영자 승인한 초안 넣기 (항목마다 한 번만)"
 # 사용: queue_once <기록이름> <글번호...> — 아직 초안인 글만 공개 대기열에 넣는다
@@ -148,7 +144,6 @@ if [ ! -f "$GOLD_MARK" ] && grep -q '^NAVER_HUB_ID=' "$SECRETS" && ! pgrep -f "b
   setsid nohup bash -c "cd '$REPO_DIR' && '$VENV/bin/python' -m bot.naver_hub --daily" > /var/lib/first-lab/bot/golden-first.log 2>&1 < /dev/null &
 fi
 
-(cd "$REPO_DIR" && "$VENV/bin/python" -m bot.pending_images) || echo "사진 없는 글 표시 실패 (봇 동작에는 영향 없음)"
 
 log "보류 글 다시 검사 (검사 코드가 바뀌었으면 지금 코드로 통과하는 보류·쉬는 글을 바로 공개 대기열로 — bot/hold.py)"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.hold) || echo "보류 다시 검사 실패 (봇 동작에는 영향 없음)"
