@@ -5478,6 +5478,18 @@ class FlowTest(unittest.TestCase):
         flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
         self.assertIn("the_seo_framework_robots_meta_array", flow)  # 글 3편 미만 태그 페이지는 noindex
 
+class HeadingWithoutAmountsTest(unittest.TestCase):
+    """11/10 #34: 출처 없는 금액 표를 지운 뒤 '차종별 연 보험료 대략 범위' 소제목만 남음 — 돈 범위를 약속하는 소제목 아래 금액이 없으면 막음."""
+
+    def test_heading_promises_amounts(self):
+        from bot import condition_gate as c
+        bad = "<h2>차종별 연 보험료 대략 범위</h2><p>차종은 기본 보험료에 들어가요. 만 26세 미만은 비싸요.</p><h2>다음</h2>"
+        self.assertTrue(c.heading_without_amounts(bad))
+        self.assertEqual(c.heading_without_amounts(bad.replace("들어가요.", "들어가요. 경차는 약 50만 원이에요.")), [])
+        self.assertEqual(c.heading_without_amounts("<h2>과목별 출제 범위</h2><p>세 과목</p><h2>조사 기간은 얼마나 걸리나</h2><p>30일</p>"), [])
+        self.assertIn("heading_without_amounts", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+
 class DeadLinkRecheckTest(unittest.TestCase):
     """11/10 #1678: ols.semas.or.kr 이 서버에서 한 번 안 열려 '주소 연결 안 됨' 보류 — 실제로는 열리는 주소. 글쓰기가 멈춘 동안 평생 보류 안 되게
     한 번 더 기다려 보고(_exists 재시도), 한 시간마다 다시 열어 보고 열리면 보류를 푼다."""

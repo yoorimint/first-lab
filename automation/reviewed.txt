@@ -471,3 +471,4 @@ calc:education-tax-credit
 calc:donation-tax-credit
 2408 연말정산 기부금 세액공제: 15%, 1,000만 원 넘으면 30%
 34 자동차보험료 계산 방법
+34 자동차보험료 계산 방법

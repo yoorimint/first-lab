@@ -260,6 +260,24 @@ _PRINCIPLE = re.compile(r"(원칙적으로|원칙은|원칙상)")
 _PERIOD = re.compile(r"\d[\d,.]*\s*(?:개월|일|년|주|%|만\s?원|원)")
 
 
+_PROMISE = re.compile(r"(금액|요금|비용|보험료|수수료|가격|세금|과태료|벌금)")   # 돈 이야기 소제목 (+ '범위'·'얼마'가 같이 있을 때만)
+_AMOUNT = re.compile(r"\d[\d,.]*\s*(?:만\s*)?(?:원|%|달러)")
+
+
+def heading_without_amounts(body_html: str) -> list[str]:
+    """금액·범위를 약속하는 소제목(h2) 아래에 금액이 하나도 없으면 (11/10 #34: 출처 없는 금액 표를 지운 뒤
+    '차종별 연 보험료 대략 범위' 소제목만 남아 내용과 안 맞았음). 공식 안내·자주 묻는 질문 소제목은 뺌."""
+    out = []
+    parts = re.split(r"(<h2[^>]*>.*?</h2>)", body_html or "", flags=re.S)
+    for i in range(1, len(parts) - 1, 2):
+        head = re.sub(r"<[^>]+>", "", parts[i]).strip()
+        if "?" in head or "질문" in head or "바로가기" in head or not _PROMISE.search(head) or not re.search(r"범위|얼마", head):
+            continue
+        if not _AMOUNT.search(re.sub(r"<[^>]+>", " ", parts[i + 1])):
+            out.append(f"소제목 '{head}' 은 금액·범위를 약속하는데 그 아래에 금액이 없음 — 소제목을 내용에 맞게 바꾸기")
+    return out
+
+
 def excerpt_principle(excerpt: str, body_html: str) -> list[str]:
     ex = _plain(excerpt or "")
     if _PRINCIPLE.search(ex):

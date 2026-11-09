@@ -128,6 +128,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "title_tier_amount": lambda: condition_gate.title_tier_amount(post["title"], post["excerpt"], post["content_html"]),
               "excerpt_number_limits": lambda: condition_gate.excerpt_number_limits(post["excerpt"], post["content_html"]),
               "excerpt_principle": lambda: condition_gate.excerpt_principle(post["excerpt"], post["content_html"]),
+              "heading_without_amounts": lambda: condition_gate.heading_without_amounts(post["content_html"]),
               "unknown_law_names": lambda: condition_gate.unknown_law_names(post["content_html"]),
               "lead_minimums": lambda: condition_gate.lead_minimums(post["excerpt"], post["content_html"]),
               "variant_only": lambda: condition_gate.variant_only(post["content_html"]),
