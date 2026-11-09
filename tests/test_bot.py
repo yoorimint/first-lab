@@ -5460,3 +5460,37 @@ class ContentRelatedTest(unittest.TestCase):
             os.unlink(f.name)
         self.assertEqual(out, "[3,5][]")     # 공개 아닌 글은 빼고, 기록이 없으면 관련 글 없음 (제목으로 짐작 안 함)
 
+
+
+class PolicyWatchTest(unittest.TestCase):
+    """11/9 운영자 '법이 아닌 새 사업·정책 잡을 방법 강구해라' — 정책브리핑 보도자료에서 개인 지원·제도만 글감으로."""
+
+    PAGE = '''
+<li><a href="/briefing/pressReleaseView.do?newsId=156788001&amp;pageIndex=1">
+<span class="text"><strong>전세사기피해자 최소보장제 시행, 10일부터 최소지원금 신청하세요!</strong>
+<span class="lead">전세사기피해자에게 최소지원금을 지급하는 제도가 10일부터 시행돼 신청을 받는다.</span>
+<span class="source"><span>2026.11.09</span><span>국토교통부</span></span></span></a></li>
+<li><a href="/briefing/pressReleaseView.do?newsId=156788002&amp;pageIndex=1">
+<span class="text"><strong>2차관, 국제수로기구 사무총장 접견</strong>
+<span class="lead">지원 협력 신청 방안을 논의했다.</span>
+<span class="source"><span>2026.11.09</span><span>외교부</span></span></span></a></li>
+<li><a href="/briefing/pressReleaseView.do?newsId=156700000&amp;pageIndex=1">
+<span class="text"><strong>청년 월세 지원 신청 접수 시작</strong>
+<span class="lead">신청하세요.</span>
+<span class="source"><span>2026.10.01</span><span>국토교통부</span></span></span></a></li>'''
+
+    def test_parse_and_pick(self):
+        import datetime as dt
+        from bot import policy_watch as p
+        items = p.parse(self.PAGE)
+        self.assertEqual([i["key"] for i in items], ["156788001", "156788002", "156700000"])
+        self.assertEqual(items[0]["agency"], "국토교통부")
+        picked = p.pick(items, set(), dt.date(2026, 11, 9))
+        self.assertEqual([i["key"] for i in picked], ["156788001"])  # 외교 접견은 빼고, 지난 보도자료(10/1)도 뺌
+        self.assertEqual(p.pick(items, {"156788001"}, dt.date(2026, 11, 9)), [])  # 쓴 것·건너뛴 것은 다시 안 줌
+
+    def test_wired(self):
+        self.assertIn('"policy_watch"', (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("'new_policies'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        self.assertIn("new_policies_done", (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
+        self.assertIn("new_policies", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))

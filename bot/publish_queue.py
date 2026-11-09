@@ -165,7 +165,7 @@ def golden_note(conn, keyword: str, total: int) -> str:
 
 def _record_topic_done(data: dict) -> None:
     """'새로 생긴 혜택'·'바뀌는 제도' 글감 key 를 끝난 것으로 (/next 에 다시 안 나옴)."""
-    pairs = (("new_benefit", "new_benefits_done", 300), ("law_change", "law_changes_done", 200))
+    pairs = (("new_benefit", "new_benefits_done", 300), ("law_change", "law_changes_done", 200), ("new_policy", "new_policies_done", 300))
     if not any(data.get(k) for k, _, _ in pairs):
         return
     state = load_state()
@@ -205,7 +205,8 @@ def skip_keywords(data: dict) -> str:
         conn.commit()
     # 다룰 내용이 없는 '바뀌는 제도'·'새 혜택' 글감도 다시 안 주게 (안 그러면 다음 실행에 같은 첫 항목이 또 나옴)
     skipped = {"law_changes_done": [str(k) for k in data.get("law_changes", [])],
-               "new_benefits_done": [str(k) for k in data.get("new_benefits", [])]}
+               "new_benefits_done": [str(k) for k in data.get("new_benefits", [])],
+               "new_policies_done": [str(k) for k in data.get("new_policies", [])]}
     if any(skipped.values()):
         state = load_state()
         for field, keys in skipped.items():
