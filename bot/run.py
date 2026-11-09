@@ -401,11 +401,12 @@ def main() -> None:
         try:
             from . import official_links
             official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
-            if state.get("related_posts_date") != f"{now:%Y-%m-%d}":  # 관련 글(내용 기준) 하루 한 번 다시 계산 (공개 때도 함)
+            from . import related_posts
+            stamp = f"{now:%Y-%m-%d}/v{related_posts.VERSION}"  # 계산 방식이 바뀌면(VERSION) 그날 바로 다시
+            if state.get("related_posts_date") != stamp:  # 관련 글·계산기(내용 기준) 하루 한 번 다시 계산 (공개 때도 함)
                 try:
-                    from . import related_posts
                     add_log(state, True, related_posts.run())
-                    state["related_posts_date"] = f"{now:%Y-%m-%d}"
+                    state["related_posts_date"] = stamp
                 except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
                     add_log(state, False, f"관련 글 계산 실패: {str(e)[:150]}")
             from . import source_check
