@@ -36,3 +36,9 @@
 /* 계산기 모음 페이지 */
 .fl-calc-list { padding-left: 1.2em; }
 .fl-calc-list li { margin: 0.4em 0; }
+
+/* 주제 모음 페이지 위 (first-lab-flow.php [firstlab_hub_intro]) */
+.fl-hub { border: 1px solid #dfe5ee; border-radius: 8px; background: #f7f9fc; padding: 1em 1.2em; margin: 0 0 1.6em; }
+.fl-hub-lead { font-weight: 700; margin: 0 0 .6em; }
+.fl-hub-calcs, .fl-hub-list { margin: .4em 0; padding-left: 1.2em; }
+.fl-hub-list li, .fl-hub-calcs li { margin: .2em 0; }

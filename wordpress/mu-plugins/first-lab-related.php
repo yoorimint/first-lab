@@ -44,20 +44,30 @@ function firstlab_related_pick( string $title, array $rows, int $count = FIRSTLA
 	return array_slice( array_column( $scored, 0 ), 0, $count );
 }
 
+/** 공개 글 중 이 글과 주제가 겹치는 글 id (겹침 많은 순). 본문 중간 연결(first-lab-flow.php)과 하단 목록이 같이 씀 — 한 번만 계산. */
+function firstlab_related_ids( int $post_id, int $count = FIRSTLAB_RELATED_COUNT + 1 ): array {
+	static $cache = array();
+	if ( ! isset( $cache[ $post_id ] ) ) {
+		$cats = wp_get_post_categories( $post_id );
+		$rows = array();
+		// 분류가 달라도 주제가 같으면 연결 (자동차보험이 '금융·세금'·'자동차' 어느 쪽에 있든)
+		foreach ( get_posts( array( 'numberposts' => 300, 'post_status' => 'publish', 'post__not_in' => array( $post_id ), 'ignore_sticky_posts' => true ) ) as $p ) {
+			$rows[] = array( 'id' => $p->ID, 'title' => $p->post_title, 'same_cat' => (bool) array_intersect( $cats, wp_get_post_categories( $p->ID ) ) );
+		}
+		$cache[ $post_id ] = firstlab_related_pick( get_the_title( $post_id ), $rows, FIRSTLAB_RELATED_COUNT + 1 );
+	}
+	return array_slice( $cache[ $post_id ], 0, $count );
+}
+
 add_filter(
 	'the_content',
 	static function ( $content ) {
 		if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
 			return $content;
 		}
-		$post_id = get_the_ID();
-		$cats    = wp_get_post_categories( $post_id );
-		$rows    = array();
-		// 분류가 달라도 주제가 같으면 연결 (자동차보험이 '금융·세금'·'자동차' 어느 쪽에 있든)
-		foreach ( get_posts( array( 'numberposts' => 300, 'post_status' => 'publish', 'post__not_in' => array( $post_id ), 'ignore_sticky_posts' => true ) ) as $p ) {
-			$rows[] = array( 'id' => $p->ID, 'title' => $p->post_title, 'same_cat' => (bool) array_intersect( $cats, wp_get_post_categories( $p->ID ) ) );
-		}
-		$ids = firstlab_related_pick( get_the_title( $post_id ), $rows );
+		// 본문 중간 '이어서 보면 좋은 글'에 이미 보여 준 글은 빼고 4개 (first-lab-flow.php)
+		$shown = $GLOBALS['firstlab_flow_shown'] ?? array();
+		$ids   = array_slice( array_values( array_diff( firstlab_related_ids( get_the_ID() ), $shown ) ), 0, FIRSTLAB_RELATED_COUNT );
 		if ( ! $ids ) {
 			return $content; // 관련 글이 없으면 엉뚱한 글을 채우지 않음
 		}

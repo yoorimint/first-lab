@@ -5328,3 +5328,39 @@ class GA4SummaryTest(unittest.TestCase):
         self.assertIn("record_ga4", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
         self.assertIn("record_ga4", (ROOT / "server" / "bot-check.sh").read_text(encoding="utf-8"))
         self.assertIn("'ga4'         => $state['ga4'] ?? null", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+
+
+class FlowTest(unittest.TestCase):
+    """11/9 운영자 '1·2번만 해라': 본문 중간 '이어서 보면 좋은 글'·관련 계산기, 공개 글 3편 이상 태그 = 주제 모음."""
+
+    def _php(self, code: str) -> str:
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        boot = ("define('ABSPATH','/');function add_filter(){} function add_shortcode(){} "
+                "require 'wordpress/mu-plugins/first-lab-related.php';require 'wordpress/mu-plugins/first-lab-flow.php';")
+        return subprocess.run(["php", "-r", boot + code], cwd=ROOT, capture_output=True, text=True).stdout
+
+    def test_insert_before_second_h2(self):
+        out = self._php("echo firstlab_flow_insert_before_h2('<p>a</p><h2>1</h2><p>b</p><h2>2</h2>','[BOX]'); echo '|';"
+                        "var_dump(firstlab_flow_insert_before_h2('<p>a</p><h2>1</h2>','[BOX]'));")
+        self.assertTrue(out.startswith("<p>a</p><h2>1</h2><p>b</p>[BOX]\n<h2>2</h2>|"), out)
+        self.assertIn("NULL", out)  # 소제목 하나뿐이면 넣지 않음
+
+    def test_pick_calc_and_hub(self):
+        out = self._php(
+            "$c=firstlab_flow_pick_calc('양도소득세 계산 방법: 1주택 비과세',[['title'=>'주식 평단가 계산기','url'=>'a'],['title'=>'양도소득세 계산기','url'=>'b']]);echo $c['url'];echo '|';"
+            "var_dump(firstlab_flow_pick_calc('여권 발급 방법',[['title'=>'양도소득세 계산기','url'=>'b']]));echo '|';"
+            "$h=firstlab_hub_pick([['name'=>'홈택스','count'=>8,'url'=>'x'],['name'=>'연말정산','count'=>12,'url'=>'y'],['name'=>'월세','count'=>2,'url'=>'z']]);echo $h['url'];echo '|';"
+            "var_dump(firstlab_hub_pick([['name'=>'월세','count'=>2,'url'=>'z']]));")
+        parts = out.split("|")
+        self.assertEqual(parts[0], "b")
+        self.assertIn("NULL", parts[1])  # 겹치는 계산기가 없으면 안 붙임
+        self.assertEqual(parts[2], "y")  # 공개 글 많은 태그
+        self.assertIn("NULL", parts[3])  # 2편뿐이면 모음 아님
+
+    def test_wired(self):
+        self.assertIn("[firstlab_hub_intro]", (ROOT / "wordpress" / "themes" / "first-lab" / "templates" / "archive.html").read_text(encoding="utf-8"))
+        rel = (ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php").read_text(encoding="utf-8")
+        self.assertIn("firstlab_flow_shown", rel)  # 본문 중간에 보여 준 글은 하단에서 뺌

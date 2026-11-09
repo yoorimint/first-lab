@@ -4,3 +4,10 @@
 ul.fl-split > li { margin: 0.25em 0; }
 /* 근거 괄호 '(○○법 제N조)': 본문보다 작고 흐리게 — 읽는 흐름을 덜 끊게 */
 .fl-ref { font-size: 0.85em; opacity: 0.7; }
+
+/* 글 흐름 (first-lab-flow.php): 주제 모음 한 줄, 본문 중간 '이어서 보면 좋은 글' */
+.fl-hub-link { font-size: .92em; margin: .4em 0 1.2em; }
+.fl-next { border: 1px solid #dfe5ee; border-left: 4px solid #3b6fd8; border-radius: 6px; background: #f7f9fc; padding: .8em 1em; margin: 1.6em 0; }
+.fl-next-title { font-weight: 700; margin: 0 0 .3em; font-size: .95em; }
+.fl-next ul { margin: 0; padding-left: 1.2em; }
+.fl-next li { margin: .2em 0; }
