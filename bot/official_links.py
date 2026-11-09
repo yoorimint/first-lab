@@ -17,7 +17,8 @@ META = "_firstlab_official_hosts"
 BATCH = 3
 MAX_HOSTS = 6
 # 글자 속 도메인 (앞에 주소·메일·경로가 붙은 것은 뺌 — 그건 이미 링크이거나 다른 말)
-HOST_RE = re.compile(r"(?<![\w.@/-])((?:www\.)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\.kr)?)(?![\w-]|\.[a-z])", re.I)
+# 앞뒤 경계는 영문·숫자만 — \w 는 한글도 쳐서 'license.kpc.or.kr에서'(조사)가 주소로 안 잡혔음 (11/9 ITQ 글)
+HOST_RE = re.compile(r"(?<![A-Za-z0-9_.@/-])((?:www\.)?(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\.kr)?)(?![A-Za-z0-9_-]|\.[a-z])", re.I)
 
 
 def content_hash(html: str) -> str:
@@ -74,3 +75,14 @@ def run(batch: int = BATCH, wp=None, check=sources.reachable, today: str | None 
         wp("post", "meta", "update", str(row["id"]), META, json.dumps(record, ensure_ascii=False))
         done.append(f"{row['id']}({len(found)})")
     return f"공식 사이트 링크 확인: {', '.join(done)}" if done else None
+
+
+def run_for(post_id: int, wp=None, check=sources.reachable, today: str | None = None) -> list[dict]:
+    """한 글을 지금 바로 확인해 기록 (공개하는 순간·화면 점검에서 — 10분 차례를 기다리지 않게, 11/9 ITQ 글). 열린 주소 목록."""
+    if wp is None:
+        from .settings import wp_cli as wp
+    content = wp("post", "get", str(int(post_id)), "--field=post_content")
+    found = verify(hosts_in(content), check)
+    record = {"hash": content_hash(content), "hosts": found, "checked": today or f"{dt.date.today():%Y-%m-%d}"}
+    wp("post", "meta", "update", str(int(post_id)), META, json.dumps(record, ensure_ascii=False))
+    return found

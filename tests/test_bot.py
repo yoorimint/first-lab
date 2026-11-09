@@ -5404,3 +5404,42 @@ class FlowTest(unittest.TestCase):
         self.assertIn("firstlab_flow_shown", rel)  # 본문 중간에 보여 준 글은 하단에서 뺌
         flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
         self.assertIn("the_seo_framework_robots_meta_array", flow)  # 글 3편 미만 태그 페이지는 noindex
+
+class ScreenCheckTest(unittest.TestCase):
+    """11/9 운영자 '발행하기 전에도 확인한다며': ITQ 글 공개 뒤 본문 'license.kpc.or.kr' 가 링크 아님 — 화면을 열어 확인."""
+
+    PAGE = ('<header><a href="https://first-lab.kr">퍼스트랩</a></header>'
+            '<div class="entry-content alignfull wp-block-post-content has-global-padding">'
+            '<p>조회는 license.kpc.or.kr에서 해요. <a href="https://www.hometax.go.kr" class="firstlab-official">hometax.go.kr</a></p>'
+            '<h2>공식 안내 바로가기</h2><ul><li><a href="https://license.kpc.or.kr/nasec/a.do">안내 (license.kpc.or.kr)</a></li></ul></div>')
+
+    def test_host_with_korean_particle(self):
+        from bot import official_links as o
+        self.assertEqual(o.hosts_in("<p>license.kpc.or.kr에서 해요. wetax.go.kr로 내요.</p>"), ["license.kpc.or.kr", "wetax.go.kr"])
+
+    def test_unlinked_body_host(self):
+        from bot import screen_check
+        self.assertEqual(screen_check.unlinked_hosts(self.PAGE), ["license.kpc.or.kr"])
+        fixed = self.PAGE.replace("license.kpc.or.kr에서", '<a href="https://license.kpc.or.kr">license.kpc.or.kr</a>에서', 1)
+        self.assertEqual(screen_check.unlinked_hosts(fixed), [])  # 글 끝 목록·링크 안 글자는 안 셈
+
+    def test_run_logs_once_and_rechecks(self):
+        from bot import screen_check
+        calls = []
+
+        def wp(*args, **_):
+            calls.append(args)
+            if args[0] == "eval":
+                return '[{"id": 241, "url": "https://first-lab.kr/itq/"}]'
+            if args[:2] == ("post", "get"):
+                return "<p>license.kpc.or.kr</p>"
+            return ""
+        state = {}
+        with mock.patch("bot.sources.reachable", return_value=True):
+            first = screen_check.run(state, "2026-11-09", wp=wp, fetch=lambda u: self.PAGE)
+            again = screen_check.run(state, "2026-11-09", wp=wp, fetch=lambda u: self.PAGE)
+        self.assertEqual(len(first), 1)
+        self.assertIn("#241", first[0])
+        self.assertEqual(again, [])                                               # 같은 날 같은 문제는 한 번만 기록
+        self.assertTrue(any(c[:3] == ("post", "meta", "update") for c in calls))  # 바로 다시 확인해 기록
+

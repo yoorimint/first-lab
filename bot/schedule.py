@@ -159,5 +159,10 @@ def publish_next(now_kst: datetime) -> str | None:
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
     slug = wp_cli("post", "get", str(post_id), "--field=post_name").strip()
     pinged = indexnow.notify([f"{indexnow.SITE}/{slug}/"]) if slug else "IndexNow: 주소 없음"  # 검색엔진에 바로 알림
+    try:  # 본문 공식 주소를 공개하는 순간 확인 — 화면 링크가 10분 차례를 기다리지 않게 (11/9 ITQ 글, bot/screen_check.py)
+        from . import official_links
+        official_links.run_for(post_id)
+    except Exception:  # noqa: BLE001 - 링크 확인 실패가 공개를 막지 않게 (화면 점검이 다시 봄)
+        pass
     extra = f", 공개 전 확인으로 보류 {', '.join(held)}" if held else ""
     return f"'{title}' 공개 (대기 {len(ids) - 1 - len(held)}편 남음, {pinged}{extra})"

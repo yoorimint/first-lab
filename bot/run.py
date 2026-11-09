@@ -401,6 +401,9 @@ def main() -> None:
         try:
             from . import official_links
             official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
+            from . import screen_check  # 최근 공개 글 실제 화면에서 링크 안 된 공식 주소 (11/9 운영자 '발행 전에도 확인한다며')
+            for line in screen_check.run(state, f"{now:%Y-%m-%d}"):
+                add_log(state, False, line)
             from . import source_check
             source_check.backfill_reviewed()  # 예전 글의 '검수로 확인한 공식 사이트' 채우기 (글 끝 확인 줄, 다 채우면 할 일 없음)
         except Exception as e:  # noqa: BLE001 - 링크 확인 실패가 봇을 멈추지 않게
