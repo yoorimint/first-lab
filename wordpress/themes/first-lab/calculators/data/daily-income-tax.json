@@ -1,0 +1,16 @@
+{
+  "basis_date": "2026-11-09",
+  "yearly": false,
+  "won10_keys": ["day_tax", "income_tax", "local_tax", "total"],
+  "sources": [
+    {"name": "국세청 일용근로소득 원천징수 안내 (계산식·소액부징수 지급금액 기준·5일 일괄 지급 예시)", "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7863"},
+    {"name": "소득세법 제47조② (일용근로자 근로소득공제 1일 15만 원)·제59조③ (산출세액의 100분의 55 공제)·제129조①4호 (원천징수세율 100분의 6)", "url": "https://www.law.go.kr/법령/소득세법"},
+    {"name": "소득세법 제86조 (원천징수세액 1천 원 미만 소액 부징수)", "url": "https://www.law.go.kr/법령/소득세법/제86조"},
+    {"name": "지방세법 제103조의13① (원천징수 소득세의 100분의 10을 개인지방소득세로 특별징수)", "url": "https://www.law.go.kr/법령/지방세법/제103조의13"},
+    {"name": "국고금관리법 제47조① (10원 미만 끝수는 계산하지 않음)", "url": "https://www.law.go.kr/법령/국고금관리법/제47조"}
+  ],
+  "daily_deduction": 150000,
+  "tax_rate_pct": 6,
+  "tax_credit_pct": 55,
+  "small_tax_floor": 1000
+}
