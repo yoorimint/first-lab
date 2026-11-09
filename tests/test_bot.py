@@ -5356,6 +5356,9 @@ class FlowTest(unittest.TestCase):
             "var_dump(firstlab_hub_pick([['name'=>'월세','count'=>2,'url'=>'z']]));")
         parts = out.split("|")
         self.assertEqual(parts[0], "b")
+        wrong = self._php("var_dump(firstlab_flow_pick_calc('자동차보험료 계산 방법: 평균 68만 원과 연령·차종별 차이',"
+                          "[['title'=>'산재보험료 계산기 (2026년 업종별 요율)','url'=>'x']]));")
+        self.assertIn("NULL", wrong)  # 11/9 배포 직후: '보험료'만 같은 계산기가 붙었음
         self.assertIn("NULL", parts[1])  # 겹치는 계산기가 없으면 안 붙임
         self.assertEqual(parts[2], "y")  # 공개 글 많은 태그
         self.assertIn("NULL", parts[3])  # 2편뿐이면 모음 아님

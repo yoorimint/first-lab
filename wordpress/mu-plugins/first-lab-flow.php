@@ -14,7 +14,8 @@
 defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_HUB_MIN      = 3; // 태그에 공개 글이 이만큼 있어야 주제 모음으로 씀 (1~2편은 모음이라 할 수 없음)
-const FIRSTLAB_FLOW_CALC_MIN = 2; // 계산기 제목과 글 제목의 주제 글자쌍이 이만큼 겹쳐야 '관련 계산기'
+const FIRSTLAB_FLOW_CALC_MIN = 2; // 계산기 이름과 글 제목의 주제 글자쌍이 최소 이만큼 겹치고
+const FIRSTLAB_FLOW_CALC_SHARE = 0.75; // 계산기 이름 핵심 글자쌍의 이 비율 이상이 글 제목에 있어야 '이 글의 계산기'
 
 /** 두 번째 <h2 앞에 $box 를 넣음. 소제목이 2개 미만이면 null (넣을 자리 없음). */
 function firstlab_flow_insert_before_h2( string $html, string $box, int $nth = 2 ): ?string {
@@ -34,14 +35,21 @@ function firstlab_flow_after_first_p( string $html, string $line ): string {
 	return false === $pos ? $line . $html : substr( $html, 0, $pos + 4 ) . "\n" . $line . substr( $html, $pos + 4 );
 }
 
-/** 계산기 후보 [['title','url']] 중 글 제목과 가장 많이 겹치는 것 (FIRSTLAB_FLOW_CALC_MIN 미만이면 null). */
+/**
+ * 계산기 후보 [['title','url']] 중 이 글 주제의 계산기 (없으면 null).
+ * 계산기 이름(괄호·'계산기' 뺀 핵심)의 글자쌍이 FIRSTLAB_FLOW_CALC_SHARE 이상 글 제목에 있어야 함 —
+ * 겹침 개수만 보면 '보험료'만 같은 '자동차보험료 계산' 글에 '산재보험료 계산기'가 붙었음 (11/9 배포 직후 확인).
+ */
 function firstlab_flow_pick_calc( string $title, array $calcs ): ?array {
+	$have = firstlab_related_bigrams( $title );
 	$best = null;
-	$top  = FIRSTLAB_FLOW_CALC_MIN - 1;
+	$top  = 0.0;
 	foreach ( $calcs as $c ) {
-		$s = firstlab_related_score( $title, (string) $c['title'] );
-		if ( $s > $top ) {
-			$top  = $s;
+		$core = firstlab_related_bigrams( (string) preg_replace( '/\(.*?\)/u', '', (string) $c['title'] ) );
+		$hit  = count( array_intersect( $core, $have ) );
+		$rate = $core ? $hit / count( $core ) : 0.0;
+		if ( $hit >= FIRSTLAB_FLOW_CALC_MIN && $rate >= FIRSTLAB_FLOW_CALC_SHARE && $rate > $top ) {
+			$top  = $rate;
 			$best = $c;
 		}
 	}
