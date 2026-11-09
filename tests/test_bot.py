@@ -5264,3 +5264,25 @@ class LeavePromotionTest(unittest.TestCase):
         self.assertTrue(leave_promotion_extinction("<li>촉진을 모두 했는데도 쓰지 않은 연차는 보상 의무가 없어요.</li>"))
         self.assertEqual(leave_promotion_extinction("<li>촉진을 모두 했는데도 쓰지 않아 사용 기간이 끝나 없어진 연차는 보상 의무가 없어요.</li>"), [])
         self.assertEqual(leave_promotion_extinction("<p>퇴직금은 보상 의무가 없어요.</p>"), [])  # 연차 얘기가 아님
+
+
+class AnalyticsTagTest(unittest.TestCase):
+    """11/9 GA4: ID 형식이 맞을 때만 태그, 로그인한 운영자 방문은 빼고, 개인정보처리방침에 안내."""
+
+    def test_plugin(self):
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-analytics.php").read_text(encoding="utf-8")
+        self.assertIn("is_user_logged_in()", php)
+        self.assertIn("/^G-[A-Z0-9]{4,16}$/", php)
+        self.assertIn("Google 애널리틱스", (ROOT / "wordpress" / "pages" / "privacy-policy.html").read_text(encoding="utf-8"))
+
+    def test_tag_output(self):
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("define('ABSPATH','/');require 'wordpress/mu-plugins/first-lab-analytics.php';"
+                "echo firstlab_ga4_tag('')==='' ? 'EMPTY' : 'BAD'; echo '|';"
+                "echo strpos(firstlab_ga4_tag('G-ABC123XYZ9'),'gtag/js?id=G-ABC123XYZ9')!==false ? 'OK' : 'BAD';"
+                "echo '|'; echo firstlab_ga4_tag('G-x\"><script>')==='' ? 'SAFE' : 'BAD';")
+        out = subprocess.run(["php", "-r", code], cwd=ROOT, capture_output=True, text=True).stdout
+        self.assertEqual(out, "EMPTY|OK|SAFE")
