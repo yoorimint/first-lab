@@ -215,6 +215,18 @@ class DirectRefreshTest(unittest.TestCase):
         self.assertEqual(sum(state["refresh"].values()), 1)
         self.assertIn("정체", msg)
 
+    def test_plain_rewrite_not_counted_in_weekly_limit(self):
+        """11/10: 쉬운 말 다듬기 16편이 주간 갱신 한도를 채워 보강·근거 갱신이 멈춤 → 다듬기(kind plain)는 안 셈."""
+        wp, calls = self.fake_wp()
+        state = {"refresh": {}}
+        data = {"post_id": 59, "kind": "plain", "base_modified": "2026-11-04 10:00:00", "content_html": "<p>" + "나" * 120 + "</p>"}
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp):
+            refresh.apply_direct(data, state)
+        self.assertEqual(sum(state["refresh"].values()), 0)
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check
+        self.assertIn('"kind": "plain"', plain_check.refresh_file.__code__.co_consts.__repr__() + Path(plain_check.__file__).read_text(encoding="utf-8"))
+
     def test_apply_direct_refuses_conflict_and_shrink(self):
         for modified, html in (("2026-11-05 09:00:00", "<p>" + "나" * 120 + "</p>"),  # 그 사이 수정됨
                                ("2026-11-04 10:00:00", "<p>짧음</p>")):                  # 본문이 크게 줄어듦

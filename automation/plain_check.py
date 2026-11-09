@@ -170,7 +170,7 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
 
 def refresh_file(post_id: int, base_modified: str, new_html: str) -> Path:
     path = ROOT / "wordpress" / "queue" / f"refresh-plain-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
-    path.write_text(json.dumps({"type": "refresh", "post_id": post_id, "base_modified": base_modified, "content_html": new_html,
+    path.write_text(json.dumps({"type": "refresh", "kind": "plain", "post_id": post_id, "base_modified": base_modified, "content_html": new_html,
                                 "changes": "쉬운 말 다듬기 (숫자·법 조항·링크 그대로, automation/plain_check.py 대조 통과)"},
                                ensure_ascii=False), encoding="utf-8")
     return path

@@ -323,7 +323,8 @@ def apply_direct(data: dict, state: dict) -> str:
     # checked: 재검증해 보니 고칠 게 없음 → 갱신 날짜만 기록 (안 하면 근거 변경 표시가 안 풀려 매일 같은 글이 다시 뽑힘)
     _save(post_id, new_html, title, excerpt)
     _renew_evidence(post_id, data.get("review"))
-    _count_done(state)
+    if data.get("kind") != "plain":  # 쉬운 말 다듬기(automation/plain_check.py)는 사실이 같아 주간 갱신 한도에서 안 셈 (11/10: 다듬기 16편이 한도를 채워 보강이 멈췄음)
+        _count_done(state)
     if target.get("id") == post_id:
         state.pop("refresh_target", None)
         _chain_next(state)
