@@ -61,6 +61,9 @@ add_action(
 						// 새 사업·정책 (정책브리핑 보도자료, bot/policy_watch.py) — 법이 아닌 예산 사업, 정부24 등록 전에 먼저 쓰는 글감
 						'new_policies'  => ! $side ? array() : array_values( array_filter( (array) ( $state['new_policies'] ?? array() ),
 							static fn( $b ) => ! in_array( $b['key'] ?? '', (array) ( $state['new_policies_done'] ?? array() ), true ) ) ),
+						// 아직 안 다룬 분야의 곧 시행될 법령 (법제처, bot/new_law_watch.py) — 2~8주 뒤 시행
+						'new_laws'      => ! $side ? array() : array_values( array_filter( (array) ( $state['new_laws'] ?? array() ),
+							static fn( $b ) => ! in_array( $b['key'] ?? '', (array) ( $state['new_laws_done'] ?? array() ), true ) ) ),
 						// 최신 금리 (한국은행 ECOS, bot/bok_api.py) — 대출·이자 글의 금리 예시는 이 값 기준 (daily-writer.md)
 						'rates'         => $state['rates'] ?? null,
 						// 다음 해 요율·금액 확인이 안 된 계산기 (bot/calc_watch.py, 11/15~) — daily-writer.md 4-2

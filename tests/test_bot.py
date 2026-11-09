@@ -5494,3 +5494,42 @@ class PolicyWatchTest(unittest.TestCase):
         self.assertIn("'new_policies'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
         self.assertIn("new_policies_done", (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
         self.assertIn("new_policies", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
+
+class NewLawWatchTest(unittest.TestCase):
+    """11/9 운영자 '그것도 해라': 아직 안 다룬 분야의 곧 시행될 법령 — 법제처 시행 예정 목록에서 생활 분야 제정·개정만."""
+
+    LIST = ('<LawSearch><law><법령명한글>소상공인 보호 및 지원에 관한 법률</법령명한글><법령일련번호>1</법령일련번호><시행일자>20261127</시행일자>'
+            '<제개정구분명>일부개정</제개정구분명><법령구분명>법률</법령구분명><소관부처명>중소벤처기업부</소관부처명></law>'
+            '<law><법령명한글>가나 법</법령명한글><법령일련번호>2</법령일련번호><시행일자>20261127</시행일자>'
+            '<제개정구분명>타법개정</제개정구분명><법령구분명>법률</법령구분명><소관부처명>고용노동부</소관부처명></law>'
+            '<law><법령명한글>근로기준법</법령명한글><법령일련번호>3</법령일련번호><시행일자>20261201</시행일자>'
+            '<제개정구분명>일부개정</제개정구분명><법령구분명>법률</법령구분명><소관부처명>고용노동부</소관부처명></law>'
+            '<law><법령명한글>국방 법</법령명한글><법령일련번호>4</법령일련번호><시행일자>20261201</시행일자>'
+            '<제개정구분명>일부개정</제개정구분명><법령구분명>법률</법령구분명><소관부처명>국방부</소관부처명></law></LawSearch>')
+    REASON = ('<Law><제개정이유><제개정이유내용>◇ 개정이유 폐업하려는 소상공인에게 심리 상담과 법률 지원을 하고, 신청 절차를 정함'
+              '</제개정이유내용></제개정이유></Law>')
+
+    def fake(self, kind, target, **kw):
+        return self.LIST if kind == "search" else self.REASON
+
+    def test_pick_uncovered_life_laws(self):
+        import datetime as dt
+        from bot import new_law_watch as w, law_api
+        rows = w.upcoming(dt.date(2026, 11, 9), self.fake)
+        cands = w.candidates(rows, {"근로기준법"}, set())
+        self.assertEqual([c["name"] for c in cands], ["소상공인 보호 및 지원에 관한 법률"])  # 타법개정·이미 다룬 법·국방 빼고
+        self.assertGreaterEqual(w.score(cands[0], w.reason_of(cands[0], self.fake)), w.MIN_SCORE)
+        self.assertEqual(w.score(cands[0], "용어를 알기 쉽게 정비하려는 것임"), 0)  # 자구 정비는 글감 아님
+        state = {}
+        with mock.patch.object(law_api, "available", return_value=True), \
+                mock.patch("bot.state.load_state", return_value=state), mock.patch("bot.state.save_state"), \
+                mock.patch("bot.state.add_log"):
+            w.run(dt.date(2026, 11, 9), self.fake, covered={"근로기준법"})
+        self.assertEqual([x["key"] for x in state["new_laws"]], ["소상공인 보호 및 지원에 관한 법률|20261127"])
+
+    def test_wired(self):
+        self.assertIn('"new_law_watch"', (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("'new_laws'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        self.assertIn("new_laws_done", (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
+        self.assertIn("new_laws", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))

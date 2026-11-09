@@ -226,7 +226,7 @@ def main() -> None:
     if ok:  # 실패한 날은 다음 배포·타이머 때 다시 수집 (11/5 검토: 실패해도 '오늘 완료'가 찍혀 다시 안 함)
         STAMP_FILE.write_text(datetime.now().strftime("%Y-%m-%d"))
     failures = []
-    for label, module, func in (("법령 감시", "law_watch", "run"), ("새 혜택 감시", "benefit_watch", "run"), ("새 정책 감시", "policy_watch", "run"),
+    for label, module, func in (("법령 감시", "law_watch", "run"), ("새 혜택 감시", "benefit_watch", "run"), ("새 정책 감시", "policy_watch", "run"), ("새 법 감시", "new_law_watch", "run"),
                                 ("금리 갱신", "bok_api", "run"), ("계산기 연초 값·근거 법령 확인", "calc_watch", "run"),
                                 ("공개 글 근거 다시 보기", "recheck", "run")):
         try:  # 하나가 실패해도 나머지는 계속, 실패는 봇 기록(/maintenance)에 남김 — 12/5 뒤엔 journal 을 볼 사람이 없음
