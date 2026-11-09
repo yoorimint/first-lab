@@ -94,6 +94,7 @@ def _has_pending_images(post_id) -> bool:
 
 
 MAX_FRESH_CHECKS = 3  # 한 번에 공개 직전 확인을 하는 초안 수 (봇 1분 실행 시간)
+MAX_PHOTO_CHECKS = 20  # 사진이 준비된 글을 찾느라 보는 최대 수 (글마다 메타 조회 1번)
 HOLD_META = "_firstlab_hold"  # bot/review_gate.HOLD_META 와 같음 (순환 import 피함)
 
 
@@ -102,10 +103,10 @@ MAX_WAIT = timedelta(days=21)  # 이만큼 기다린 글은 황금 점수와 상
 # 11/6: 예전엔 '대기열 뒤 21편을 뺀 나머지'로 셈 — 하루 30편씩 쌓이자 하루도 안 된 글까지 '오래된 글'이 돼 황금 점수가 거의 안 쓰임
 
 
-def publish_order(ids: list[int], now_kst: datetime, photo_tiebreak: bool = False) -> list[int]:
+def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
     """대기 초안의 공개 순서 (사진 채우기도 이 순서로 — bot/pending_images, 11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진').
     시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 황금 점수·성수기 높은 글(운영자 지시 11/5,
-    bot/naver_hub.py) → 시즌 중인 글 → (photo_tiebreak: 사진이 다 들어간 글 — 글마다 조회라 공개 때만) → 오래된 순."""
+    bot/naver_hub.py) → 시즌 중인 글 → 오래된 순. 대표 사진이 아직 없는 글은 공개 때 건너뜀(publish_next)."""
     info = _draft_info(ids)
     texts = {i: info.get(i, {}).get("text", "") for i in ids}
     gold = naver_hub.publish_priority({i: texts[i].split(" ")[0] for i in ids}, now_kst.month)
@@ -122,8 +123,7 @@ def publish_order(ids: list[int], now_kst: datetime, photo_tiebreak: bool = Fals
     very_old = now_kst.replace(tzinfo=None) - MAX_WAIT_ANY
     level = {i: tier(labels.get(i, ""), norm(texts[i].split(" ")[0])) for i in ids}
     level = {i: min(t, 1) if info.get(i, {}).get("date") and info[i]["date"] <= very_old else t for i, t in level.items()}
-    return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, level[i], i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i],
-                                      _has_pending_images(i) if photo_tiebreak else False))
+    return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, level[i], i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i]))
 
 
 def publish_next(now_kst: datetime) -> str | None:
@@ -131,14 +131,24 @@ def publish_next(now_kst: datetime) -> str | None:
     ids = ready_drafts()
     if not ids:
         return None
-    ordered = publish_order(ids, now_kst, photo_tiebreak=True)
+    ordered = publish_order(ids, now_kst)
     # 공개 직전 재검수(bot/review_queue)를 마친 글을 먼저 — 없으면 순서 그대로 (공개가 멈추지 않게)
     from . import review_queue
     today = f"{now_kst:%Y-%m-%d}"
     ordered = review_queue.prefer_prepublished(ordered, review_queue.prepublish_dates(ordered, wp_cli), today)
     held = []
     post_id = None
-    for candidate in ordered[:MAX_FRESH_CHECKS]:
+    # 대표 사진이 아직 안 만들어진 글은 이번엔 건너뛰고 다음 순번 (11/9 운영자 '초안에서 해결해서 완벽하게 발행').
+    # 사진은 공개 순번대로 먼저 채우므로(pending_images) 보통은 앞 글이 이미 사진을 받아 있음 — 오늘 한도가 찬 뒤 새로 쓴 점수 높은 글만 해당.
+    ready = []
+    for i in ordered[:MAX_PHOTO_CHECKS]:
+        if not _has_pending_images(i):
+            ready.append(i)
+            if len(ready) >= MAX_FRESH_CHECKS:
+                break
+    if not ready:
+        return f"공개 안 함: 앞쪽 대기 글 {min(len(ordered), MAX_PHOTO_CHECKS)}편 모두 대표 사진 대기 중 (사진 채우기 뒤 다음 공개 때)"
+    for candidate in ready:
         try:
             reasons = freshness.check_post(candidate, now_kst.date())
         except Exception:  # noqa: BLE001 — 확인이 실패하면 막지 않음 (바뀌었다는 증거가 있을 때만 보류)

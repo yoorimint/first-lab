@@ -2806,12 +2806,13 @@ class GoldFirstTest(unittest.TestCase):
         self.assertEqual([tier("황금", "캠핑장예약"), tier("", "수습기간해고"), tier("좋음", "마라도여객선"), tier("", "캠핑장예약")], [0, 1, 2, 3])
         self.assertEqual(tier("좋음", "퇴직연금중도인출"), 1)
 
-    def test_gold_first_even_if_photo_pending(self):
-        """11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진 줘야지' — 공개는 황금 점수 순, 사진 대기는 같은 점수일 때만 뒤로."""
+    def test_photo_pending_post_waits_its_turn(self):
+        """11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진 줘야지' + 11/9 '완벽하게 발행': 황금 점수 순이되,
+        대표 사진이 아직 없는 글은 공개하지 않고 다음 순번 (사진은 공개 순번대로 먼저 채움)."""
         rows = [{"ID": 80, "post_name": "a", "post_title": "t", "post_date": "2026-11-05 10:00:00"},
                 {"ID": 85, "post_name": "b", "post_title": "t", "post_date": "2026-11-05 11:00:00"}]
-        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}, pending={80}), 80)
-        self.assertEqual(self._publish_pick(rows, {80: 5.0, 85: 5.0}, pending={80}), 85)
+        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}), 80)
+        self.assertEqual(self._publish_pick(rows, {80: 9.0, 85: 1.0}, pending={80}), 85)
 
     def test_photos_follow_publish_order(self):
         """사진 채우기: 공개된 글 → 대기열 글을 공개 순서(황금 점수)대로 → 나머지 초안."""
