@@ -63,6 +63,20 @@ def plan_line(plan: dict, done: dict) -> str:
     return " · ".join(f"{t} {'✅' if t in fired else '⏳'}" for t in plan[day])
 
 
+def keyword_line(collect: dict, ads: dict, now: datetime, max_days: int = 2) -> tuple[str, str | None]:
+    """키워드 수집 한 줄 + 문제 (11/9: 검색광고 API 403 이 11/7 부터 '새 키워드 0개 성공'으로 찍혀 아무도 몰랐음).
+    마지막 성공이 max_days 일보다 오래됐거나 검색광고 API 점검이 실패면 문제."""
+    ok_date = collect.get("ok_date") or ""
+    api = "-" if not ads else ("정상" if ads.get("ok") else f"실패 HTTP {ads.get('status')} {str(ads.get('message', ''))[:80]}")
+    line = f"키워드 수집: 마지막 성공 {ok_date or '-'} · 검색광고 API {api} ({ads.get('checked', '-')})"
+    bad = None
+    if ads and not ads.get("ok"):
+        bad = f"검색광고 API 실패 (HTTP {ads.get('status')})"
+    elif collect and (not ok_date or (now.date() - datetime.strptime(ok_date, "%Y-%m-%d").date()).days > max_days):
+        bad = f"키워드 수집 {max_days}일 넘게 성공 없음 (마지막 {ok_date or '-'})"
+    return line, bad
+
+
 def main() -> int:
     problems = []
     now = datetime.now(ZoneInfo("Asia/Seoul")).replace(tzinfo=None)
@@ -95,6 +109,10 @@ def main() -> int:
         problems.append(f"최근 1시간 오류 {len(errs)}건")
     if m.get("patch_problems"):
         problems.append(f"패치 미반영 {len(m['patch_problems'])}건: {m['patch_problems'][0][:80]}")
+    line, bad = keyword_line(m.get("keyword_collect") or {}, m.get("naver_ads_check") or {}, now)
+    print(line)
+    if bad:
+        problems.append(bad)
     held = m.get("held_drafts") or []
     print(f"보류 {len(held)}편" + (f": {[(x['post_id'], x['reason'][:40]) for x in held]}" if held else "") + f" · 쉬는 글 {len(m.get('gave_up') or [])}편")
     pp = m.get("publish_plan") or {}

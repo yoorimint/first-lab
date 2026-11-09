@@ -109,6 +109,7 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
                     continue
                 stats["errors"] += 1
                 if e.code in (401, 403):
+                    stats["auth_error"] = f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
                     return False
                 break
             except Exception:  # noqa: BLE001 - 응답 끊김·JSON 오류 하나가 그날 수집 전체를 멈추지 않게 (11/5 검토)
@@ -128,6 +129,8 @@ def discover(calls: int, extra_seeds: list[str] | None = None) -> dict:
         for i in range(0, len(words), BATCH):
             if stats["calls"] >= calls or not run_batch(conn, words[i:i + BATCH]):
                 break
+        if stats.get("auth_error"):  # 키가 거부되면 '0개 수집 성공'이 아니라 실패로 (11/7~9: 403 인데 성공으로 기록돼 3일 동안 아무도 몰랐음)
+            raise RuntimeError(f"네이버 검색광고 API 가 키를 거부함 ({stats['auth_error']}) — 검색광고 도구 → API 사용 관리에서 라이선스·비밀키 확인 후 set-secrets.sh")
         conn.executemany("INSERT OR REPLACE INTO seeds (word, used_date) VALUES (?,?)",
                          [(w, today) for w in words if w in SEED_WORDS or w in snowball])
         conn.commit()
@@ -199,6 +202,24 @@ def already_ran_today(today: str | None = None) -> bool:
         return False
 
 
+def record_collect(state: dict, ok: bool, msg: str, now: datetime | None = None) -> None:
+    """마지막 수집 성공 날짜를 남긴다 (/maintenance keyword_collect → automation/tick.py 가 이틀 넘게 성공 없으면 문제로).
+    검색광고 API 가 키를 거부한 날은 연결 점검(naver_ads.diagnose)도 다시 해서 naver_ads_check 를 새로 고친다."""
+    now = now or datetime.now()
+    kc = dict(state.get("keyword_collect") or {})
+    if ok:
+        kc["ok_date"] = now.strftime("%Y-%m-%d")
+    kc.update(last_try=now.strftime("%Y-%m-%d %H:%M"), last_ok=ok, last_msg=msg[:200])
+    state["keyword_collect"] = kc
+    if not ok and "검색광고 API" in msg:
+        try:
+            from .naver_ads import diagnose
+            state["naver_ads_check"] = {**diagnose(), "checked": now.strftime("%Y-%m-%d %H:%M")}
+        except Exception as e:  # noqa: BLE001 - 점검 실패가 기록을 막지 않게
+            state["naver_ads_check"] = {"ok": False, "status": 0, "message": f"점검 실패: {str(e)[:150]}",
+                                        "checked": now.strftime("%Y-%m-%d %H:%M")}
+
+
 def main() -> None:
     """systemd 일일 작업 진입점: 결과를 봇 기록에 남긴다."""
     from .settings import load_settings
@@ -236,6 +257,7 @@ def main() -> None:
             failures.append(f"{label} 실패: {str(e)[:150]}")
     state = load_state()  # 수집 중 봇이 바꾼 상태를 덮어쓰지 않도록 다시 읽음
     add_log(state, ok, msg)
+    record_collect(state, ok, msg)
     try:  # 검색 성과 요약 (/maintenance 'search', bot/search_console.record)
         from .search_console import record as record_search
         line = record_search(state)

@@ -300,6 +300,7 @@ function firstlab_api_maintenance(): array {
 		'patch_problems' => $state['patch_problems'] ?? null, // 계산기 연초 값 확인 필요 (bot/calc_watch.py)
 		'search'      => $state['search'] ?? null, // 구글 검색 성과 28일 요약 (bot/search_console.record, 하루 한 번)
 		'ga4'         => $state['ga4'] ?? null, // GA4 방문 28일 요약 (bot/ga4.record, 하루 한 번)
+		'keyword_collect' => $state['keyword_collect'] ?? null, // 키워드 수집 마지막 성공 날짜 (bot/discover.record_collect)
 		'naver_ads_check' => $state['naver_ads_check'] ?? null, // 키워드 도구 연결 점검 (bot/naver_ads.diagnose — 키 끝 4자리, 토큰 있어야 읽음)
 		'law_watch'   => $state['law_changes'] ?? null, // 법령 감시: 곧 시행될 개정·입법예고(확정 아님) — 감시 세션 확인용
 		// 공개 대기 글 전체 (감시 세션이 외부 검수 안 한 글을 글 번호로 찾음 — automation/unreviewed.py)

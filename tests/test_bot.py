@@ -781,6 +781,55 @@ class DiscoverOncePerDayTest(unittest.TestCase):
                 self.assertFalse(discover.already_ran_today("2026-11-06"))  # 다음 날 → 실행
 
 
+class KeywordCollectFailureTest(unittest.TestCase):
+    """11/9 운영자 '7일부터 안 됐는데 왜 이제 말하나': 검색광고 API 403 이 '새 키워드 0개 수집 성공'으로 기록돼
+    봇 기록·2시간 점검 어디에도 ❌ 가 안 떴음 → 키 거부는 실패로, 마지막 성공 날짜를 남기고 점검이 이틀 넘으면 문제로."""
+
+    def test_auth_error_fails_the_run(self):
+        import io
+        import sqlite3
+        import urllib.error
+        from contextlib import contextmanager
+        from bot import discover
+
+        class Fake:
+            def keyword_stats(self, batch):
+                raise urllib.error.HTTPError("u", 403, "Forbidden", {}, io.BytesIO(b'{"detail":"Invalid"}'))
+
+        @contextmanager
+        def conn():
+            c = sqlite3.connect(":memory:")
+            c.row_factory = sqlite3.Row
+            try:
+                yield c
+            finally:
+                c.close()
+
+        with mock.patch.object(discover, "ads_client", return_value=Fake()), \
+                mock.patch.object(discover, "connect", conn), mock.patch.object(discover, "google_trends_kr", return_value=[]), \
+                mock.patch.object(discover, "focus_snowball", return_value=[]), mock.patch.object(discover.time, "sleep"):
+            with self.assertRaisesRegex(RuntimeError, "검색광고 API.*403"):
+                discover.discover(5)
+
+    def test_last_success_recorded_and_stale_flagged(self):
+        from datetime import datetime
+        from bot import discover
+        sys.path.insert(0, str(ROOT / "automation"))
+        from tick import keyword_line
+        state = {}
+        discover.record_collect(state, True, "ok", datetime(2026, 11, 6, 4))
+        with mock.patch("bot.naver_ads.diagnose", return_value={"ok": False, "status": 403, "message": "Invalid"}):
+            discover.record_collect(state, False, "키워드 수집 실패: 네이버 검색광고 API 가 키를 거부함", datetime(2026, 11, 9, 4))
+        self.assertEqual(state["keyword_collect"]["ok_date"], "2026-11-06")
+        self.assertEqual(state["naver_ads_check"]["status"], 403)
+        _, bad = keyword_line(state["keyword_collect"], state["naver_ads_check"], datetime(2026, 11, 9, 12))
+        self.assertIn("검색광고 API 실패", bad)
+        _, bad = keyword_line(state["keyword_collect"], {"ok": True}, datetime(2026, 11, 9, 12))
+        self.assertIn("2일 넘게", bad)
+        _, bad = keyword_line({"ok_date": "2026-11-08"}, {"ok": True}, datetime(2026, 11, 9, 12))
+        self.assertIsNone(bad)
+
+
 class SimilarTopicTest(unittest.TestCase):
     def run_similar(self, keyword, slugs):
         import urllib.parse
