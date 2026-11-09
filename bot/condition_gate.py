@@ -254,6 +254,55 @@ def excerpt_number_limits(excerpt: str, body_html: str) -> list[str]:
     return out[:2]
 
 
+# 법령 이름이 법제처에 있는 이름(정식 이름·공식 약칭)인지 (11/9 #2362 '어선원 재해보상보험법' — 정식은 '어선원 및 어선 재해보상보험법').
+# 낱말 끝이 '법'인 것만 보고, 앞 낱말 1~3개를 붙여 본 이름 중 하나라도 법제처 정식 이름·약칭이면 맞음. 흔한 말(방법·개정법 등)은 뺌.
+LAW_GENERIC = ("방법", "법률", "불법", "편법", "합법", "문법", "해법", "요법", "비법", "기법", "공법", "화법", "수법", "용법", "어법",
+               "위법", "적법", "탈법", "입법", "사법", "무법", "개정법", "관련법", "한시법", "노동법", "행정법", "보호법", "특례법", "육성법",
+               "본국법", "구별법", "특별법", "일반법", "현행법", "모법", "상위법", "하위법", "실정법", "형사법", "민사법", "세법", "작성법",
+               "계산법", "사용법", "공부법", "보관법", "관리법", "신청법", "활용법", "정리법", "조리법", "세척법", "측정법", "표기법", "투자법",
+               "절약법", "대처법", "해결법", "예방법", "운동법", "치료법", "복용법", "구분법", "확인법", "선택법", "고르는법", "읽는법", "쓰는법",
+               "찾는법", "따는법", "보는법", "하는법", "내는법", "받는법", "구하는법", "대체역법")
+_LAW_SPLIT = re.compile(r"[\s·,/()「」『』\[\]:;]+")
+_LAW_TOKEN = re.compile(r"^([가-힣]{2,}법)(?:에서|에는|에|은|는|이|가|을|를|의|으로|로|과|와|상|도|만|이나|에 따라)?$")
+
+
+def _law_known(name: str) -> bool | None:
+    """법제처에 정식 이름 또는 약칭으로 있는지 (띄어쓰기 무관). API 를 못 쓰면 None."""
+    from . import law_api
+    import xml.etree.ElementTree as ET
+    key = name.replace(" ", "")
+
+    def make():
+        xml = law_api.fetch("search", "law", query=key, display="20")
+        if not xml:
+            return None
+        for law in ET.fromstring(xml).iter("law"):
+            if key in ((law.findtext("법령명한글") or "").replace(" ", ""), (law.findtext("법령약칭명") or "").replace(" ", "")):
+                return True
+        return False
+    return _cached("law_known", key, make)
+
+
+def unknown_law_names(body_html: str, known=_law_known) -> list[str]:
+    toks = [t for t in _LAW_SPLIT.split(_plain(body_html or "")) if t]
+    out = []
+    for i, tok in enumerate(toks):
+        m = _LAW_TOKEN.match(tok)
+        if not m:
+            continue
+        name = m.group(1)
+        if name.endswith(LAW_GENERIC) or name in out:
+            continue
+        prev = [re.sub(r"[^가-힣]", "", t) for t in toks[max(0, i - 3):i]]
+        cands = [name] + ["".join(prev[j:]) + name for j in range(len(prev) - 1, -1, -1) if prev[j]]
+        results = [known(c) for c in cands]
+        if None in results and not any(results):
+            continue  # 법제처를 못 열면 막지 않음
+        if not any(results):
+            out.append(name)
+    return [f"법령 이름 '{n}' 이 법제처 정식 이름·약칭에 없음 — 정식 이름으로 (예: 「어선원 및 어선 재해보상보험법」)" for n in out[:3]]
+
+
 # 다른 법률이 정한 예외 (같은 꼴 2번 → 검사, 11/6): #989 '4명 이하는 공휴일 유급휴일 아님' ↔ 노동절 제정법(5/1 은 규모 무관 유급휴일),
 # #996 '가사 사용인은 근로기준법 미적용' ↔ 가사근로자법 제6조(인증기관 소속 가사근로자는 적용). 같은 법 안의 특례(exception_articles)로는 못 봄
 # → 자주 쓰는 주제마다 알려진 다른 법 예외를 목록으로: 본문이 그 주제를 말하는데 예외 법의 말이 없으면 경고. 새로 찾으면 여기에 더한다.

@@ -4460,6 +4460,16 @@ class LeadThresholdTest(unittest.TestCase):
         self.assertTrue(g.title_qualifier("극저신용대출: 11월 30일까지 피해자 접수", self.BODY))
         self.assertEqual(g.title_qualifier("극저신용대출: 불법사금융 피해자 11월 30일까지 접수", self.BODY), [])
 
+    def test_unknown_law_names(self):
+        """11/9 #2362: '어선원 재해보상보험법' — 정식은 '어선원 및 어선 재해보상보험법'. 약칭(기간제법)·흔한 말(개정법)은 통과."""
+        from bot import condition_gate as g
+        names = {"선원법", "어선원및어선재해보상보험법", "사립학교교직원연금법", "기간제법", "근로기준법"}
+        known = lambda n: n.replace(" ", "") in names
+        body = "<p>선원법·어선원 재해보상보험법·사립학교교직원 연금법으로 보상, 기간제법에 따라, 근로기준법 제2조, 개정법, 계산 방법</p>"
+        self.assertEqual([x.split("'")[1] for x in g.unknown_law_names(body, known)], ["재해보상보험법"])
+        self.assertEqual(g.unknown_law_names(body.replace("어선원 재해", "어선원 및 어선 재해"), known), [])
+        self.assertEqual(g.unknown_law_names(body, lambda n: None), [])  # 법제처를 못 열면 막지 않음
+
     def test_excerpt_number_limits(self):
         """11/9 #2362: 요약 '미신고 때 급여 50% 징수' ↔ 본문 '보험급여의 50%(… 산재보험료의 5배까지)'."""
         from bot import condition_gate as g
