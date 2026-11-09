@@ -9,9 +9,8 @@ if [ ! -f "$SECRETS" ]; then
   echo "키 파일 없음($SECRETS) → 건너뜀"; exit 0
 fi
 chmod 600 "$SECRETS"
-cd "$REPO_DIR" && python3 -m bot.keywords 다이어트 --top 5 \
-  && echo "네이버 검색광고 API: 정상" \
-  || echo "네이버 검색광고 API: 실패 (키 값을 다시 확인하세요)"
+# 결과와 네이버 오류 문구만 출력 (키 끝 자리는 비공개 봇 상태 naver_ads_check 에만 — 11/9 운영자 '기존 키와 같은지')
+cd "$REPO_DIR" && python3 -m bot.naver_ads 2>&1 | tail -1
 
 echo -e "\n==> 공공 API 점검 (키 값은 출력 안 함)"
 # 법제처 API 는 신청 때 등록한 서버 주소에서만 됨 — 이 서버가 밖으로 나갈 때 쓰는 주소 (등록값과 같아야 함)

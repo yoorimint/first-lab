@@ -5600,3 +5600,22 @@ class PlainCheckTest(unittest.TestCase):
         links = '<h2>공식 안내 바로가기</h2><ul><li><a href="https://x.go.kr">근로기준법 제55조 (휴일)</a></li><li><a href="https://y.go.kr">시행령 (주휴)</a></li></ul>'
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
+
+
+class NaverAdsDiagnoseTest(unittest.TestCase):
+    """11/9: 키워드 도구 403 — 서버 키가 운영자 키와 같은지 비교하려고 끝 4자리는 비공개 state 에만, 공개 배포 기록엔 안 찍음."""
+
+    def test_diagnose_keeps_tail_private(self):
+        import io
+        import urllib.error
+        from bot import naver_ads as n
+
+        class Fake(n.NaverAdsClient):
+            def keyword_stats(self, hints):
+                raise urllib.error.HTTPError("u", 403, "Forbidden", {}, io.BytesIO(b'{"detail":"Invalid API key"}'))
+        r = n.diagnose(Fake("1234567", "xxxxbbb9", "s" * 20))
+        self.assertEqual((r["ok"], r["status"], r["license_tail"]), (False, 403, "bbb9"))
+        self.assertIn("Invalid API key", r["message"])
+        src = (ROOT / "bot" / "naver_ads.py").read_text(encoding="utf-8")
+        main = src[src.index('if __name__ == "__main__"'):]
+        self.assertNotIn("license_tail", main.split("print(")[-1])  # 화면(공개 배포 기록)에는 키 끝자리 안 찍음

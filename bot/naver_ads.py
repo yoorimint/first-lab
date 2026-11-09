@@ -94,3 +94,32 @@ def ads_client() -> NaverAdsClient:
     return NaverAdsClient(*require(
         load_secrets(), "NAVER_AD_CUSTOMER_ID", "NAVER_AD_ACCESS_LICENSE", "NAVER_AD_SECRET_KEY"
     ))
+
+
+def diagnose(client: NaverAdsClient | None = None) -> dict:
+    """키워드 도구 연결 점검 (11/9: 403 으로 11/7 무렵부터 수집이 멈춤 — 운영자 '기존 키와 같은지 알아야').
+    공개 배포 기록에는 정상/실패와 네이버 오류 문구만, 키 끝 4자리는 비공개 봇 상태(state)에만 남긴다."""
+    import urllib.error
+    client = client or ads_client()
+    out = {"license_tail": client.access_license[-4:], "customer_id_tail": str(client.customer_id)[-3:],
+           "secret_len": len(client.secret_key)}
+    try:
+        client.keyword_stats(["다이어트"])
+        out.update(ok=True, status=200, message="")
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", "replace")[:300]
+        out.update(ok=False, status=e.code, message=body)
+    except Exception as e:  # noqa: BLE001 - 연결 문제도 기록
+        out.update(ok=False, status=0, message=f"{type(e).__name__}: {str(e)[:150]}")
+    return out
+
+
+if __name__ == "__main__":  # python3 -m bot.naver_ads — 서버 점검: 결과는 state 에, 화면에는 키 일부도 안 찍음
+    from datetime import datetime
+    from .state import load_state, save_state
+    result = diagnose()
+    result["checked"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    state = load_state()
+    state["naver_ads_check"] = result
+    save_state(state)
+    print(f"네이버 검색광고 API: {'정상' if result['ok'] else '실패'} (HTTP {result['status']}) {result['message'][:200]}")
