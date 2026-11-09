@@ -174,5 +174,14 @@
    "grade": 10,
    "lump": 29700000
   }
+ },
+ {
+  "why": "오른쪽 귀 칸을 비우면 0dB 로 계산하지 않고 입력 안내 (11/9 검수)",
+  "input": {
+   "left_db": 45,
+   "right_db": "",
+   "avg_wage": 100000
+  },
+  "expect_error": true
  }
 ]

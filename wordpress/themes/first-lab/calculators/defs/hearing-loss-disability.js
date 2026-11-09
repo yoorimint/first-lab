@@ -34,6 +34,8 @@
     ],
 
     compute(v, d, u) {
+      // 빈 칸은 0dB 로 계산하지 않음 (11/9 검수: 한쪽 귀를 비우면 안내 없이 0dB 로 등급이 나왔음)
+      if ([v.left_db, v.right_db].some((x) => String(x ?? '').trim() === '')) throw new u.InputError('두 귀의 평균 청력손실치를 모두 넣어 주세요.');
       const raw = [Number(v.left_db), Number(v.right_db)];
       if (raw.some((x) => !(x >= 0))) throw new u.InputError('두 귀의 평균 청력손실치를 0 이상으로 넣어 주세요.');
       const wage = Number(v.avg_wage);
