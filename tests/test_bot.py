@@ -5736,6 +5736,16 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_box_not_repeated_below(self):
+        """11/10 운영자 '반복 줄여라': 한눈에 보기 상자의 숫자가 바로 아래(첫 소제목 전) 문단에 3개 이상 또 나오면 막음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        box = "<p>연차는 1년 미만 11일이에요.<br>✔ 80% 출근: 15일<br>✔ 최대 25일</p>"
+        rep = box + "<p>1년 미만은 11일, 80% 이상 출근하면 15일, 많아도 25일이에요.</p><h2>뜻</h2>"
+        self.assertEqual(pc.box_repeats(rep), ["11", "15", "25", "80"])
+        self.assertTrue(any("되풀이" in p for p in pc.problems(rep, rep)))
+        self.assertEqual(pc.box_repeats(box + "<p>근속 기간으로 정해져요.</p><h2>뜻</h2><p>11일 15일 25일</p>"), [])
+
     def test_long_paragraphs_split(self):
         """11/10 운영자 '줄바꿈은 엿 바꿔 먹었나' — 한눈에 보기 상자에 6문장 한 덩어리. 문단은 문장 2개까지, 넘으면 자동으로 끊음."""
         sys.path.insert(0, str(ROOT / "automation"))

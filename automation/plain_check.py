@@ -96,6 +96,21 @@ def crowded_paragraphs(html: str) -> list[str]:
     return out
 
 
+_BOXNUM = re.compile(r"\d[\d,.]*\d|\d")
+REPEAT_MAX = 2  # 상자 숫자가 첫 소제목 앞 문단에 3개 이상 또 나오면 되풀이 (11/10 운영자 '반복 줄여라')
+
+
+def box_repeats(html: str) -> list[str]:
+    """한눈에 보기 상자(첫 문단)의 숫자 중 바로 아래(첫 소제목 전) 문단에 또 나온 것 (한 자리 1~3 은 뺌)."""
+    lead = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
+    if not lead:
+        return []
+    end = html.find("<h2", lead.end())
+    box = set(_BOXNUM.findall(plain(lead.group(1)))) - {"1", "2", "3"}
+    intro = set(_BOXNUM.findall(plain(html[lead.end():end if end > 0 else None])))
+    return sorted(box & intro)
+
+
 def first_sentence(html: str) -> str:
     m = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
     text = plain(m.group(1)) if m else ""
@@ -160,6 +175,9 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
     crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
     if crowded:
         out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")
+    rep = box_repeats(new_html)
+    if len(rep) > REPEAT_MAX:
+        out.append(f"한눈에 보기 상자 내용이 바로 아래 문단에서 되풀이됨 (숫자 {', '.join(rep[:6])}) — 상자에 있는 건 아래에서 빼고 새 내용만")
     crowded_p = crowded_paragraphs(new_html)
     if crowded_p:
         out.append(f"문장 {MAX_SENT + 1}개 이상인 문단 {len(crowded_p)}개 — 휴대폰에서 한 덩어리로 보임, 문장 {MAX_SENT}개마다 끊기 (예: {crowded_p[0]}…)")
