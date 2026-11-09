@@ -5317,7 +5317,12 @@ class GA4SummaryTest(unittest.TestCase):
             line = ga4.record(state, "2026-11-10")
             self.assertIn("bot@x.iam.gserviceaccount.com", line)
             self.assertIn("실패", line)
-            self.assertEqual(ga4.record(state, "2026-11-10"), "")  # 같은 날 다시 안 부름 (다음 날 다시 시도)
+            self.assertIn("실패", ga4.record(state, "2026-11-10"))  # 실패한 날은 다음 실행 때 다시 시도
+        with mock.patch.object(ga4, "available", return_value=True), \
+             mock.patch.object(ga4, "fetch", return_value=([], [])) as f:
+            self.assertIn("세션 0", ga4.record(state, "2026-11-10"))
+            self.assertEqual(ga4.record(state, "2026-11-10"), "")  # 성공한 날은 다시 안 부름
+            self.assertEqual(f.call_count, 1)
 
     def test_wired(self):
         self.assertIn("record_ga4", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))

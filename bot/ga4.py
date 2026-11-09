@@ -115,8 +115,8 @@ def record(state: dict, today: str | None = None) -> str:
     """하루 한 번 state['ga4'] 에 요약. 권한이 없으면 무엇을 해야 하는지 남김 (같은 날 다시 안 부름)."""
     today = today or datetime.now().strftime("%Y-%m-%d")
     prev = state.get("ga4") or {}
-    if prev.get("date") == today:
-        return ""
+    if prev.get("date") == today and not prev.get("error"):
+        return ""  # 실패한 날은 다음 배포·수집 때 다시 시도 (운영자가 권한을 준 뒤 바로 확인되게)
     if not available():
         return "GA4: 서비스 계정 키 없음"
     try:
