@@ -117,6 +117,9 @@ done
 # 파일 첫 줄 <!-- title: 제목 --> 이 페이지 제목. 없으면 만들고, 있으면 내용을 갱신.
 log "고정 페이지 동기화"
 pages_csv=$(wp post list --post_type=page --post_status=any --fields=ID,post_name,post_status --format=csv)
+# 지난번 배포에 쓴 원본 지문 (페이지 ID → 제목·상태·내용 md5). 같으면 갱신하지 않음 — 배포 때마다 모든 페이지를 다시 저장해
+# 사이트맵 '마지막 수정일'이 하루 여러 번 바뀌었음 (11/9 다음 검색등록 '스팸성' 보류 — 자동 생성 사이트처럼 보일 수 있음)
+page_src=$(wp eval 'foreach ( get_posts( array( "post_type" => "page", "post_status" => "any", "numberposts" => -1 ) ) as $p ) { echo $p->ID, " ", get_post_meta( $p->ID, "_firstlab_src_hash", true ), "\n"; }')
 repo_slugs=$(for f in "$REPO_DIR"/wordpress/pages/*.html; do basename "$f" .html; done)
 for file in "$REPO_DIR"/wordpress/pages/*.html; do
   slug=$(basename "$file" .html)
@@ -142,8 +145,15 @@ for file in "$REPO_DIR"/wordpress/pages/*.html; do
   if [ -z "$id" ]; then
     id=$(wp post create --post_type=page --post_status="$status" --post_name="$slug" \
           --post_title="$title" --post_content="$content" --porcelain)
+    wp post meta update "$id" _firstlab_src_hash "$(printf '%s\n%s\n%s' "$title" "$status" "$content" | md5sum | cut -c1-32)" >/dev/null
   else
-    wp post update "$id" --post_status="$status" --post_name="$slug" --post_title="$title" --post_content="$content"
+    src_hash=$(printf '%s\n%s\n%s' "$title" "$status" "$content" | md5sum | cut -c1-32)
+    if printf '%s\n' "$page_src" | grep -qx "$id $src_hash"; then
+      echo "  (바뀐 것 없음 → 그대로)"
+    else
+      wp post update "$id" --post_status="$status" --post_name="$slug" --post_title="$title" --post_content="$content"
+      wp post meta update "$id" _firstlab_src_hash "$src_hash" >/dev/null
+    fi
   fi
   if [ "$slug" = "privacy-policy" ]; then
     wp option update wp_page_for_privacy_policy "$id"

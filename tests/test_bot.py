@@ -5541,3 +5541,14 @@ class NewLawWatchTest(unittest.TestCase):
         self.assertIn("'new_laws'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
         self.assertIn("new_laws_done", (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
         self.assertIn("new_laws", (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8"))
+
+
+class PageResaveTest(unittest.TestCase):
+    """11/9 다음 검색등록 '홍보/스팸성' 보류: 배포마다 고정·계산기 페이지 약 60개를 다시 저장해 사이트맵 마지막 수정일이 하루 여러 번 바뀜
+    (자동 생성 사이트처럼 보임) — 원본이 같으면 갱신하지 않음."""
+
+    def test_skip_unchanged_pages(self):
+        sh = (ROOT / "server" / "wp-setup.sh").read_text(encoding="utf-8")
+        self.assertIn("_firstlab_src_hash", sh)
+        self.assertLess(sh.index('grep -qx "$id $src_hash"'), sh.index('wp post update "$id" --post_status="$status"'))
+
