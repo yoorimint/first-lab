@@ -74,6 +74,9 @@ def problems(old_html: str, new_html: str) -> list[str]:
     avg = sum(map(len, sents)) / len(sents) if sents else 0
     if avg > AVG_MAX:
         out.append(f"문장 평균 {avg:.0f}자 — {AVG_MAX}자 이하로 (중학교 1학년이 한 번에 읽게, 운영자 11/9)")
+    crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
+    if crowded:
+        out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")
     from bot import condition_gate
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
     return out

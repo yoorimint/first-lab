@@ -9,8 +9,12 @@ Write the full rewritten content_html to /tmp/firstlab-review/plain-{N}.html.
 
 Target reader: a Korean middle-school first grader (중학교 1학년). Every sentence should be understandable to them on first read.
 
+Goal (운영자 11/9): someone who knows NOTHING about law or jargon reads it smoothly, top to bottom, and thinks "아, 그렇구나". Write like a kind friend explaining over coffee: what it is → why it matters to me → how much / what to do. Readability matters: short paragraphs (2–3 sentences), lists for steps or conditions.
+
 Rules
-0. Plain words: '사용자'→'회사(사장님)', '근로자'→'일하는 사람' where natural; say what a thing IS before its legal name. Put law names/articles at the END of a sentence in parentheses, e.g. "회사는 일주일에 하루 이상 돈 주는 쉬는 날을 줘야 해요(근로기준법 제55조)." One idea per sentence; average sentence ≤ 40 characters (the check script measures it). Before a hard rule, show a tiny example using ONLY numbers already in the original.
+00. Parentheses: at most ONE per sentence, and only for a key search term (e.g. 소정근로시간) — never stack '(유급휴일)…(근로기준법)…(소정근로일)'. Do NOT put law names/articles inside body sentences; instead end each section (before the next h2) with one short line: <p class="fl-basis">근거: 근로기준법 제55조, 같은 법 시행령 제30조</p> — keep every law/article of that section there (the check script counts them).
+000. Hard condition sentences: show a tiny example first ("예를 들어 …면 받아요 / …면 못 받아요") using ONLY numbers in the original, then the rule in one short sentence, then why (only if the original says why).
+0. Plain words: '사용자'→'회사(사장님)', '근로자'→'일하는 사람' where natural; say what a thing IS before its legal name. One idea per sentence; average sentence ≤ 40 characters (the check script measures it). Before a hard rule, show a tiny example using ONLY numbers already in the original.
 1. Facts must not change. Keep EVERY number, amount, rate, date, period, law article (제N조…), link (<a href>) and shortcode ([firstlab_calc …]) exactly; keep every condition and exception (다만 …). Do not add new facts or numbers. Do not delete sentences that carry a condition.
 2. Keep the HTML structure: same h2/h3 headings (you may reword heading text slightly but keep the count), same tables (same rows; you may simplify cell wording but keep numbers), same lists. Keep the "공식 안내 바로가기" section as is.
 3. First paragraph: start with ONE plain sentence that answers the reader's question like you would to a friend — max 70 characters, no parentheses, no law article, no jargon. Then the original first-paragraph content (made easier).

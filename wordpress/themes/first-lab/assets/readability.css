@@ -53,3 +53,6 @@ ul.fl-split > li { margin: 0.25em 0; }
   .wp-block-post-content strong { background: linear-gradient(transparent 62%, rgba(255,214,0,.28) 62%); }
   .wp-block-post-content tbody tr:nth-child(even) td { background: rgba(255,255,255,.03); }
 }
+
+/* 문단 끝 근거 줄 (쉬운 말 다듬기: 법 이름·조항을 본문 문장 대신 여기에 모음, 11/9) — 작고 흐리게 */
+.wp-block-post-content p.fl-basis { font-size: .82em; color: #6b7280; margin-top: -.3em; }
