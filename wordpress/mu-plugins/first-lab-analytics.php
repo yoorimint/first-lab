@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const FIRSTLAB_GA4_ID = ''; // 예: 'G-ABC123XYZ9' — 운영자가 GA4 속성을 만든 뒤 채움
+const FIRSTLAB_GA4_ID = 'G-SHDKPTJPJR'; // 11/9 운영자가 만든 GA4 속성 (퍼스트랩 웹 스트림)
 
 /** 넣을 태그 (ID 형식이 맞을 때만). */
 function firstlab_ga4_tag( string $id ): string {
