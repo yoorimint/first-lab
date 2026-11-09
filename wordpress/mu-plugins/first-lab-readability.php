@@ -158,9 +158,9 @@ function firstlab_read_decorate( string $html ): string {
 		}
 	}
 	$html = preg_replace( '/<p(?:\s+class="([^"]*)")?>(\s*(?:<strong>)?\s*(?:다만|단,|주의|※))/u', '<p class="fl-note $1">$2', $html ) ?? $html;
-	$faq  = mb_strpos( $html, '자주 묻는 질문' );
-	if ( false !== $faq ) {
-		$byte = strlen( mb_substr( $html, 0, $faq ) );
+	// '자주 묻는 질문' 소제목(h2) 뒤의 h3 만 — 글자로 찾으면 목차의 '자주 묻는 질문'부터 잡혀 모든 소제목에 Q 가 붙었음 (11/9 운영자 화면)
+	if ( preg_match( '/<h2[^>]*>[^<]*자주 묻는 질문[^<]*<\/h2>/u', $html, $m, PREG_OFFSET_CAPTURE ) ) {
+		$byte = $m[0][1];
 		$tail = preg_replace( '/<h3(\s+class="([^"]*)")?>/u', '<h3 class="fl-q $2">', substr( $html, $byte ) ) ?? substr( $html, $byte );
 		$html = substr( $html, 0, $byte ) . $tail;
 	}

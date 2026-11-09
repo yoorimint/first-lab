@@ -5562,7 +5562,7 @@ class ReadDecorateTest(unittest.TestCase):
         import subprocess
         if not shutil.which("php"):
             self.skipTest("php 없음")
-        html = ('<p class="meta">작성 2026년 11월 7일</p><p>주휴수당은 1주 동안 일하기로 한 날을 모두 나온 근로자에게 주는 유급 주휴일의 하루치 임금이에요.</p>'
+        html = ('<nav><ol><li><a href="#t">자주 묻는 질문</a></li></ol></nav><p class="meta">작성 2026년 11월 7일</p><p>주휴수당은 1주 동안 일하기로 한 날을 모두 나온 근로자에게 주는 유급 주휴일의 하루치 임금이에요.</p>'
                 '<p>다만 예외예요.</p><h3>본문 소제목</h3><h2>자주 묻는 질문</h2><h3>질문?</h3>')
         code = ("<?php define('ABSPATH', 1); function add_filter() {} function add_action() {}\n"
                 f"require '{ROOT / 'wordpress' / 'mu-plugins' / 'first-lab-readability.php'}';\n"
