@@ -41,7 +41,7 @@
       check(general, '종교단체 외 일반기부금');
       check(religious, '종교단체 기부금');
       if (political + hometown + special + general + religious === 0) throw new u.InputError('기부금을 하나 이상 넣어 주세요.');
-      if (political > d.political_cap) throw new u.InputError('정치자금 기부금은 3,000만 원까지만 계산해요 (넘는 금액은 25% 구간이라 따로 확인해요).');
+      if (political > d.political_cap) throw new u.InputError('정치자금 기부금은 3,000만 원까지만 계산해요 (10만 원 넘는 금액이 3,000만 원을 넘으면 그 부분은 25%라 따로 확인해요).');
       if (hometown > d.hometown_cap) throw new u.InputError('고향사랑 기부금은 한 사람이 1년에 2,000만 원까지만 낼 수 있어요.');
 
       // 정치자금 (조특법 제76조①)
