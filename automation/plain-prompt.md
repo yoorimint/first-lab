@@ -11,6 +11,15 @@ Target reader: a Korean middle-school first grader (중학교 1학년). Every se
 
 Goal (운영자 11/9): someone who knows NOTHING about law or jargon reads it smoothly, top to bottom, and thinks "아, 그렇구나". Write like a kind friend explaining over coffee: what it is → why it matters to me → how much / what to do. Readability matters: short paragraphs (2–3 sentences), lists for steps or conditions.
 
+Standard (운영자 11/10 '니가 봤을 때 최소 90점 이상 — 이 수준 기억해라, 우리 컨셉'): /home/user/first-lab/automation/plain-example-1419.html (주휴수당, 93점+) is THE reference. Read it first and match its shape and level:
+- First <p> = "한눈에 보기" box, split into lines with <br> (phone ≈ 18 Korean chars per line): line 1 a friendly hook naming the topic (no unverified claims like '의외로 많아요'), line 2 the plain answer, then 2–4 '✔ ' lines (each ≤ 18 chars: key conditions / key amount), optionally a short '(… 기준)' line. Keep the official search term in line 1 or 2.
+- Every <p> has at most 2 sentences, grouped by meaning (the check fails otherwise). Example first, rule after.
+- Level: easy words, ~해요 tone, but adults are reading — not childish. Terms stay (searched), explained once.
+- Before the FAQ h2 (or at the end of the last body section if there is no FAQ): <p><strong>이런 건 꼭 확인하세요</strong></p> + <ul> with 3–5 items summarizing facts ALREADY in the post (no new facts), then <p><strong>한 줄 정리:</strong> …</p> (one sentence with the main search term). These render as a box and a blue band.
+- Table header cells short (≤ 10 chars); move a long qualifier (e.g. '2026년, 시급 10,320원 기준') into a sentence right above the table.
+- Rare cases: shortest possible, never expanded.
+- Self-score before reporting (0–100, as a strict editor reading on a phone): if under 90, fix and re-check. Report the score and what still costs points.
+
 Rules
 00. Parentheses: at most ONE per sentence, and only for a key search term (e.g. 소정근로시간) — never stack '(유급휴일)…(근로기준법)…(소정근로일)'. Do NOT put law names/articles inside body sentences; instead end each section (before the next h2) with one short line: <p class="fl-basis">근거: 근로기준법 제55조, 같은 법 시행령 제30조</p> — keep every law/article of that section there (the check script counts them).
 000. Hard condition sentences: show a tiny example first ("예를 들어 …면 받아요 / …면 못 받아요") using ONLY numbers in the original, then the rule in one short sentence, then why (only if the original says why).
