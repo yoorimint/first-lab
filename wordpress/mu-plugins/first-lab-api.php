@@ -247,6 +247,7 @@ function firstlab_api_post( WP_REST_Request $request ) {
 		'title'        => $post->post_title,
 		'excerpt'      => $post->post_excerpt,
 		'content_html' => trim( preg_replace( '/<!--.*?-->/s', '', $post->post_content ) ),
+		'base_modified' => $post->post_modified, // 쉬운 말 다듬기 등 갱신 파일이 그 사이 바뀐 글을 덮지 않게 (automation/plain_check.py)
 		// 근거 대조 결과 (bot/source_check.py, 기록만): 감시 세션이 외부 검수 결과와 비교
 		'source_check' => json_decode( (string) get_post_meta( $post->ID, '_firstlab_source_check', true ), true ),
 	);

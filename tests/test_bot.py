@@ -5579,3 +5579,21 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('class="fl-note', out)
         self.assertIn("<h3>본문 소제목</h3>", out)
         self.assertIn('<h3 class="fl-q', out)
+
+
+class PlainCheckTest(unittest.TestCase):
+    """11/9 운영자 '기존 글도 쉬운 말로 — 니가 직접': 다듬은 본문의 숫자·법 조항·링크·계산기·소제목·표가 원래와 같아야 반영."""
+
+    OLD = ('<p>주휴수당은 근로기준법 제55조에 따라 1주 15시간 이상 일하면 받아요.</p><h2>얼마</h2>'
+           '<p>시급 10,320원이면 82,560원이에요. <a href="https://www.moel.go.kr">고용노동부</a></p>')
+
+    def test_same_facts_pass_and_changed_fail(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        new = ('<p>일주일 개근하면 하루치 돈을 더 받아요.</p><p>근로기준법 제55조에 따라 1주 15시간 이상 일하면 주휴수당을 받아요.</p>'
+               '<h2>얼마</h2><p>시급 10,320원이면 82,560원이에요. <a href="https://www.moel.go.kr">고용노동부</a></p>')
+        self.assertEqual(pc.problems(self.OLD, new), [])
+        self.assertTrue(any("숫자" in p for p in pc.problems(self.OLD, new.replace("82,560", "82,650"))))
+        self.assertTrue(any("법 조항" in p for p in pc.problems(self.OLD, new.replace("제55조", "제56조"))))
+        self.assertTrue(any("링크" in p for p in pc.problems(self.OLD, new.replace("moel", "mohw"))))
+        self.assertTrue(any("첫 문장" in p for p in pc.problems(self.OLD, self.OLD)))  # 원래 첫 문장엔 법 조항 — 쉬운 한 줄로
