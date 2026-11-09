@@ -4054,6 +4054,16 @@ class OfficialLinksTest(unittest.TestCase):
         self.assertEqual(out.count("hometax.go.kr"), 1)         # 이미 링크가 있는 사이트는 더 안 붙임
         self.assertNotIn('href="https://www.gov.kr"', out)      # 'mygov.kr'·'정부24시간'은 다른 말
 
+    def test_bottom_section_deep_link_does_not_block_body(self):
+        """11/9 운영자 'ITQ 글 왜 링크가 없노': 글 끝 '공식 안내 바로가기'의 하위 페이지 링크 때문에 본문 주소가 링크 안 됨."""
+        out = self.run_php('<p>조회는 license.kpc.or.kr에서 해요.</p><h2>공식 안내 바로가기</h2>'
+                           '<ul><li><a href="https://license.kpc.or.kr/nasec/refedu/refeduInfo.do">보수교육 안내</a></li></ul>')
+        self.assertNotIn('>license.kpc.or.kr</a>', out)  # 목록 밖 주소는 봇 확인 기록이 있어야 함 — 아래에서 기록을 줌
+        self.assertEqual(out.count("license.kpc.or.kr/nasec"), 1)
+        out = self.run_php('<p>홈택스에서 신고해요.</p><h2>공식 안내 바로가기</h2>'
+                           '<ul><li><a href="https://www.hometax.go.kr/websquare/a.do">홈택스 신고 안내</a></li></ul>')
+        self.assertIn('class="firstlab-official">홈택스</a>에서', out)  # 글 끝 하위 링크가 있어도 본문은 링크
+
     def test_name_with_particle_linked(self):
         """11/6: '정부24에서'·'홈택스로'처럼 조사가 붙으면 링크가 안 됐음 ('정부24시간'은 계속 다른 말)."""
         out = self.run_php("<p>정부24에서 신청하거나 홈택스로는 내요. 숲나들e로 예약. 정부24시간 상담</p>")
@@ -4089,7 +4099,9 @@ class OfficialLinksTest(unittest.TestCase):
 
     def test_section_not_duplicated_or_invented(self):
         listed = ('<p>홈택스에서 신청</p><h2>공식 안내 바로가기</h2><ul><li><a href="https://www.hometax.go.kr/x">홈택스</a></li></ul>')
-        self.assertEqual(self.run_fill(listed).count("hometax.go.kr"), 1)  # 목록에 이미 있으면 더 안 붙임
+        out = self.run_fill(listed)
+        self.assertEqual(out[out.index("공식 안내 바로가기"):].count("hometax.go.kr"), 1)  # 목록에 이미 있으면 더 안 붙임
+        self.assertIn('class="firstlab-official">홈택스</a>에서', out)  # 본문은 링크 (11/9: 글 끝 링크 때문에 본문이 안 되던 것)
         self.assertIn('href="https://www.gov.kr"', self.run_fill("<table><tr><td>등기소</td><td>정부24, 주민센터</td></tr></table>"))  # 표 칸 경계
         made = self.run_fill("<p>정부24에서 떼요.</p>")
         self.assertIn("공식 안내 바로가기</h2>", made)
@@ -4212,6 +4224,21 @@ echo "\n", json_encode(firstlab_related_pick('주식 평단가 계산기', [['id
 """).split()
         self.assertEqual(json.loads(out[0]), [8, 7])  # 같은 분류라도 '계산'만 겹치는 주식 글은 안 붙음, 주제 많이 겹치는 순
         self.assertEqual(json.loads(out[1]), [])      # 관련 글이 없으면 칸을 안 보임
+
+    def test_generic_issue_word_not_topic(self):
+        """11/9 운영자: 'ITQ 자격증 조회 … 발급비' 글에 '건물 등기부등본 발급 방법' — '발급'만 겹침. '연차'처럼 두 글자 주제는 그대로."""
+        out = self.run_php("""
+echo json_encode(firstlab_related_pick('ITQ 자격증 조회 방법: 합격 확인·진위확인·발급비 7,400원', [['id' => 65, 'title' => '건물 등기부등본 발급 방법과 수수료 총정리 (인터넷·방문)', 'same_cat' => false]]));
+echo "\n", json_encode(firstlab_related_pick('연차 개수 계산기: 1년 미만 11일', [['id' => 9, 'title' => '연차수당 계산 방법', 'same_cat' => false]]));
+""").split()
+        self.assertEqual(json.loads(out[0]), [])
+        self.assertEqual(json.loads(out[1]), [9])
+        more = self.run_php("""
+echo json_encode(firstlab_related_pick('상속재산분할협의서 양식: 꼭 넣을 7칸과 인감증명 3개월 기준', [['id' => 1, 'title' => '해촉증명서 양식: 적을 칸과 2025년 9월부터 바뀐 건보 조정 서류', 'same_cat' => false]]));
+echo "\n", json_encode(firstlab_related_pick('군산 근현대사 박물관: 통합권', [['id' => 2, 'title' => '주택임대사업자 양도세 혜택 3가지', 'same_cat' => false]]));
+""").split()
+        self.assertEqual(json.loads(more[0]), [])  # '증명'·'7칸과' 만 겹침
+        self.assertEqual(json.loads(more[1]), [])  # '대사' 만 겹침
 
     def test_same_topic_other_purpose_first(self):
         out = self.run_php("""echo json_encode(firstlab_related_pick('주휴수당 뜻', [

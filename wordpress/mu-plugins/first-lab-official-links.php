@@ -57,10 +57,14 @@ function firstlab_official_autolink( string $html, array $verified = array() ): 
 	$parts = preg_split( '/(<[^>]+>)/', $html, -1, PREG_SPLIT_DELIM_CAPTURE );
 	$skip  = 0; // <a>·<h1~6>·<code>·<script>·<style> 안
 	$done  = 0;
+	// 본문(글 끝 '공식 안내 바로가기' 앞)에 이미 그 사이트 링크가 있으면 뺌 — 글 끝 목록의 하위 페이지 링크(license.kpc.or.kr/nasec/…)까지
+	// 보면 본문의 'license.kpc.or.kr에서 해요' 가 링크가 안 됐음 (11/9 운영자 'ITQ 글 왜 링크가 없노')
+	$cut   = strpos( $html, FIRSTLAB_OFFICIAL_SECTION );
+	$scope = false === $cut ? $html : substr( $html, 0, $cut );
 	$sites = array_values(
 		array_filter(
 			array_merge( firstlab_official_sites(), firstlab_official_verified( $verified ) ),
-			static fn( $s ) => false === stripos( $html, '//' . $s[1] ) && false === stripos( $html, '//www.' . $s[1] ) // 이미 링크가 있으면 뺌
+			static fn( $s ) => false === stripos( $scope, '//' . $s[1] ) && false === stripos( $scope, '//www.' . $s[1] )
 		)
 	);
 	foreach ( $parts as $i => $part ) {
