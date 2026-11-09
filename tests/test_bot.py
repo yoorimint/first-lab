@@ -4460,6 +4460,14 @@ class LeadThresholdTest(unittest.TestCase):
         self.assertTrue(g.title_qualifier("극저신용대출: 11월 30일까지 피해자 접수", self.BODY))
         self.assertEqual(g.title_qualifier("극저신용대출: 불법사금융 피해자 11월 30일까지 접수", self.BODY), [])
 
+    def test_excerpt_number_limits(self):
+        """11/9 #2362: 요약 '미신고 때 급여 50% 징수' ↔ 본문 '보험급여의 50%(… 산재보험료의 5배까지)'."""
+        from bot import condition_gate as g
+        body = "<p>신고를 미룬 기간에 사고가 나면 지급된 보험급여의 50%(그동안 냈어야 할 산재보험료의 5배까지)를 물어내요.</p><p>세금은 22%(납부고지 전까지)예요.</p>"
+        self.assertTrue(g.excerpt_number_limits("미신고 때 급여 50% 징수", body))
+        self.assertEqual(g.excerpt_number_limits("미신고 때 급여 50%(보험료 5배 한도) 징수", body), [])
+        self.assertEqual(g.excerpt_number_limits("세율 22%", body), [])  # 숫자 없는 시점 괄호는 한도 아님
+
     def test_title_tier_amount(self):
         """11/9 #2295: 제목 '900만 원 채우면 148만 5,000원'은 16.5% 구간 값 — 본문 13.2% 구간은 118만 8,000원."""
         from bot import condition_gate as g

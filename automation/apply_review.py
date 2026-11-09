@@ -126,6 +126,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "lead_thresholds": lambda: condition_gate.lead_thresholds(post["excerpt"], post["content_html"]),
               "title_qualifier": lambda: condition_gate.title_qualifier(post["title"], post["content_html"]),
               "title_tier_amount": lambda: condition_gate.title_tier_amount(post["title"], post["excerpt"], post["content_html"]),
+              "excerpt_number_limits": lambda: condition_gate.excerpt_number_limits(post["excerpt"], post["content_html"]),
               "lead_minimums": lambda: condition_gate.lead_minimums(post["excerpt"], post["content_html"]),
               "variant_only": lambda: condition_gate.variant_only(post["content_html"]),
               "law_absence": lambda: condition_gate.law_absence(post["content_html"]),

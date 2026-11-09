@@ -161,6 +161,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.lead_thresholds(excerpt, body_html)
     out += condition_gate.title_qualifier(title, body_html)
     out += condition_gate.title_tier_amount(title, excerpt, body_html)
+    out += condition_gate.excerpt_number_limits(excerpt, body_html)
     out += condition_gate.title_length(title)
     out += condition_gate.calc_coverage(body_html)
     out += condition_gate.lead_minimums(excerpt, body_html)
