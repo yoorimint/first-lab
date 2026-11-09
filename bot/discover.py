@@ -243,6 +243,13 @@ def main() -> None:
             add_log(state, True, line)
     except Exception as e:  # noqa: BLE001
         failures.append(f"검색 성과 요약 실패: {str(e)[:150]}")
+    try:  # GA4 방문 요약 (/maintenance 'ga4', bot/ga4.record)
+        from .ga4 import record as record_ga4
+        line = record_ga4(state)
+        if line:
+            add_log(state, "실패" not in line, line)
+    except Exception as e:  # noqa: BLE001
+        failures.append(f"GA4 요약 실패: {str(e)[:150]}")
     for line in failures:
         add_log(state, False, line)
     expiring = secrets_expiring()  # 비밀값 이름_EXPIRES=YYYY-MM-DD 를 set-secrets.sh 로 넣어 두면 30일 전부터 알림 (/health → 메일)

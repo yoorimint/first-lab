@@ -5286,3 +5286,40 @@ class AnalyticsTagTest(unittest.TestCase):
                 "echo '|'; echo firstlab_ga4_tag('G-x\"><script>')==='' ? 'SAFE' : 'BAD';")
         out = subprocess.run(["php", "-r", code], cwd=ROOT, capture_output=True, text=True).stdout
         self.assertEqual(out, "EMPTY|OK|SAFE")
+
+
+class GA4SummaryTest(unittest.TestCase):
+    """11/9 GA4 방문 요약: 글별 참여·사이트 안 이동, 신호는 방문 30회 이상 글만, 실패하면 할 일을 남기고 그날은 다시 안 부름."""
+
+    def test_summarize(self):
+        from bot import ga4
+        pages = [{"pagePath": "/%EC%8B%A4%EC%97%85%EA%B8%89%EC%97%AC/", "sessions": 40, "engagementRate": 0.2, "userEngagementDuration": 800, "screenPageViews": 50},
+                 {"pagePath": "/b/", "sessions": 35, "engagementRate": 0.8, "userEngagementDuration": 3500, "screenPageViews": 40},
+                 {"pagePath": "/c/", "sessions": 5, "engagementRate": 0.0, "userEngagementDuration": 0, "screenPageViews": 5}]
+        moves = [{"pageReferrer": "https://first-lab.kr/b/", "pagePath": "/c/", "screenPageViews": 7},
+                 {"pageReferrer": "https://www.google.com/", "pagePath": "/b/", "screenPageViews": 30},
+                 {"pageReferrer": "https://first-lab.kr/b/", "pagePath": "/b/", "screenPageViews": 3}]  # 같은 글 새로고침은 이동 아님
+        s = ga4.summarize(pages, moves, "2026-11-10")
+        self.assertEqual(s["sessions"], 80)
+        self.assertEqual(s["internal_moves"], 7)
+        self.assertEqual(s["top_moves"][0], {"from": "/b/", "to": "/c/", "views": 7})
+        self.assertEqual(s["low_engagement"], ["/실업급여/"])
+        self.assertEqual(s["high_engagement"], ["/b/"])  # /c/ 는 방문 5회라 판단 안 함
+        self.assertIn("세션 80", ga4.summary_line(s))
+
+    def test_record_failure_tells_what_to_do(self):
+        from unittest import mock
+        from bot import ga4
+        state = {}
+        with mock.patch.object(ga4, "available", return_value=True), \
+             mock.patch.object(ga4, "fetch", side_effect=RuntimeError("GA4 API 403: PERMISSION_DENIED")), \
+             mock.patch.object(ga4, "service_email", return_value="bot@x.iam.gserviceaccount.com"):
+            line = ga4.record(state, "2026-11-10")
+            self.assertIn("bot@x.iam.gserviceaccount.com", line)
+            self.assertIn("실패", line)
+            self.assertEqual(ga4.record(state, "2026-11-10"), "")  # 같은 날 다시 안 부름 (다음 날 다시 시도)
+
+    def test_wired(self):
+        self.assertIn("record_ga4", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("record_ga4", (ROOT / "server" / "bot-check.sh").read_text(encoding="utf-8"))
+        self.assertIn("'ga4'         => $state['ga4'] ?? null", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))

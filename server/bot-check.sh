@@ -60,6 +60,13 @@ try:  # 검색 성과 요약 — 하루 한 번만 실제 조회 (새벽 수집�
         add_log(state, True, line)
 except Exception as e:  # noqa: BLE001
     add_log(state, False, f"검색 성과 요약 실패: {str(e)[:150]}")
+try:  # GA4 방문 요약 — 하루 한 번
+    from bot.ga4 import record as record_ga4
+    line = record_ga4(state)
+    if line:
+        add_log(state, "실패" not in line, line)
+except Exception as e:  # noqa: BLE001
+    add_log(state, False, f"GA4 요약 실패: {str(e)[:150]}")
 save_state(state)
 PY
 rm -f "$API_OUT"

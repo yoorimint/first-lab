@@ -116,6 +116,14 @@ def main() -> int:
             print(f"  검색어 '{q['query'][:30]}' → {q['page'][:30]} 노출 {q['impressions']}·클릭 {q['clicks']}·{q['position']}위")
     else:
         print("검색: 아직 기록 없음 (배포 점검·새벽 수집이 채움)")
+    g = m.get("ga4") or {}
+    if g.get("error"):
+        print(f"방문(GA4): 읽기 실패 — {g['error'][:120]}")
+    elif g:
+        from bot.ga4 import summary_line as ga4_line  # noqa: E402
+        print(ga4_line(g))
+        for t in g.get("top_moves") or []:
+            print(f"  이동 {t['from'][:25]} → {t['to'][:25]} {t['views']}회")
     try:  # 품질 한 줄 (automation/quality_report.py — 매일 점검 보고와 같은 숫자)
         import csv
         from quality_report import LOG, summary
