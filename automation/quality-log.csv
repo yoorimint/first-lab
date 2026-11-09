@@ -249,3 +249,5 @@ date,post,fixes,types
 2026-11-09,2295,2,headline:1 missing_condition:1
 2026-11-09,2331,4,missing_condition:4
 2026-11-09,2348,1,missing_condition:1
+2026-11-09,2346,2,missing_condition:2
+2026-11-09,2350,3,missing_condition:2 wrong_fact:1
