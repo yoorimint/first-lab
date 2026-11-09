@@ -6,7 +6,7 @@
  * 11/9 운영자 '1·2번만 해라' (블로그는 가게 — 글 수보다 손님 동선):
  *  1) 주제 모음: 공개 글이 FIRSTLAB_HUB_MIN 편 이상인 태그의 태그 페이지가 그 주제의 모음 페이지.
  *     글 첫 문단 뒤에 '이 주제 모아 보기' 한 줄, 태그 페이지 위에 계산기·전체 글 목록 ([firstlab_hub_intro]).
- *  2) 본문 중간 연결: 두 번째 소제목 앞에 '이어서 보면 좋은 글'(관련 글 1편)과 관련 계산기 1개.
+ *  2) 본문 중간 연결: 두 번째 소제목 앞에 '이어서 보면 좋은 글'(관련 글 1편)과 관련 계산기 1개 — 둘 다 서버가 글 내용으로 고른 기록(bot/related_posts.py).
  *     하단 '함께 보면 좋은 글'은 여기서 보여 준 글을 빼고 채움 (first-lab-related.php).
  * 글이 공개되는 대로 저절로 늘어난다 — 따로 만들 페이지·손볼 글 없음.
  */
@@ -14,8 +14,7 @@
 defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_HUB_MIN      = 3; // 태그에 공개 글이 이만큼 있어야 주제 모음으로 씀 (1~2편은 모음이라 할 수 없음)
-const FIRSTLAB_FLOW_CALC_MIN = 2; // 계산기 이름과 글 제목의 주제 글자쌍이 최소 이만큼 겹치고
-const FIRSTLAB_FLOW_CALC_SHARE = 0.75; // 계산기 이름 핵심 글자쌍의 이 비율 이상이 글 제목에 있어야 '이 글의 계산기'
+const FIRSTLAB_FLOW_CALC_META = '_firstlab_flow_calc'; // 글 내용으로 고른 계산기 id (bot/related_posts.py, 11/9 운영자 '글 내용으로 판단')
 
 /** 두 번째 <h2 앞에 $box 를 넣음. 소제목이 2개 미만이면 null (넣을 자리 없음). */
 function firstlab_flow_insert_before_h2( string $html, string $box, int $nth = 2 ): ?string {
@@ -35,25 +34,15 @@ function firstlab_flow_after_first_p( string $html, string $line ): string {
 	return false === $pos ? $line . $html : substr( $html, 0, $pos + 4 ) . "\n" . $line . substr( $html, $pos + 4 );
 }
 
-/**
- * 계산기 후보 [['title','url']] 중 이 글 주제의 계산기 (없으면 null).
- * 계산기 이름(괄호·'계산기' 뺀 핵심)의 글자쌍이 FIRSTLAB_FLOW_CALC_SHARE 이상 글 제목에 있어야 함 —
- * 겹침 개수만 보면 '보험료'만 같은 '자동차보험료 계산' 글에 '산재보험료 계산기'가 붙었음 (11/9 배포 직후 확인).
- */
-function firstlab_flow_pick_calc( string $title, array $calcs ): ?array {
-	$have = firstlab_related_bigrams( $title );
-	$best = null;
-	$top  = 0.0;
+/** 계산기 목록 중 id 가 같은 것 (없으면 null). 어느 계산기인지는 서버가 글 내용으로 정함 — 제목 글자로 짐작하지 않음
+ * (11/9: 제목 기준이라 '자동차보험료 계산' 글에 '산재보험료 계산기'가 붙었음). */
+function firstlab_flow_calc_by_id( string $id, array $calcs ): ?array {
 	foreach ( $calcs as $c ) {
-		$core = firstlab_related_bigrams( (string) preg_replace( '/\(.*?\)/u', '', (string) $c['title'] ) );
-		$hit  = count( array_intersect( $core, $have ) );
-		$rate = $core ? $hit / count( $core ) : 0.0;
-		if ( $hit >= FIRSTLAB_FLOW_CALC_MIN && $rate >= FIRSTLAB_FLOW_CALC_SHARE && $rate > $top ) {
-			$top  = $rate;
-			$best = $c;
+		if ( '' !== $id && $id === $c['id'] ) {
+			return $c;
 		}
 	}
-	return $best;
+	return null;
 }
 
 /** 글의 태그 [['name','count','url']] 중 주제 모음으로 쓸 태그 (공개 글이 가장 많은 것, 같으면 이름 짧은 것). */
@@ -63,7 +52,7 @@ function firstlab_hub_pick( array $tags ): ?array {
 	return $ok[0] ?? null;
 }
 
-/** 공개된 계산기 [['title','url']] (계산기를 넣은 대표 글이 있으면 그 글 주소 — first-lab-calc-home.php). */
+/** 공개된 계산기 [['id','title','url']] (계산기를 넣은 대표 글이 있으면 그 글 주소 — first-lab-calc-home.php). */
 function firstlab_flow_calcs(): array {
 	static $calcs = null;
 	if ( null === $calcs ) {
@@ -85,7 +74,6 @@ if ( function_exists( 'add_filter' ) ) {
 				return $content;
 			}
 			$post_id = get_the_ID();
-			$title   = get_the_title( $post_id );
 
 			// 1) 주제 모음 한 줄 (첫 문단 뒤)
 			$tags = array_map(
@@ -110,7 +98,7 @@ if ( function_exists( 'add_filter' ) ) {
 				}
 			}
 			$has_calc = false !== strpos( $content, 'firstlab-calc' ) || false !== strpos( $content, '[firstlab_calc' );
-			$calc     = $has_calc ? null : firstlab_flow_pick_calc( $title, firstlab_flow_calcs() );
+			$calc     = $has_calc ? null : firstlab_flow_calc_by_id( (string) get_post_meta( $post_id, FIRSTLAB_FLOW_CALC_META, true ), firstlab_flow_calcs() );
 			if ( $calc ) {
 				$items .= sprintf( '<li>🧮 <a href="%s">%s로 직접 계산해 보기</a></li>', esc_url( $calc['url'] ), esc_html( $calc['title'] ) );
 			}
@@ -149,7 +137,13 @@ if ( function_exists( 'add_filter' ) ) {
 				return '';
 			}
 			$posts = get_posts( array( 'tag_id' => $tag->term_id, 'numberposts' => 50, 'post_status' => 'publish', 'orderby' => 'title', 'order' => 'ASC' ) );
-			$calcs = array_filter( firstlab_flow_calcs(), static fn( $c ) => firstlab_related_score( $tag->name, (string) $c['title'] ) > 0 );
+			// 이 주제 글들이 실제로 쓰는 계산기: 본문에 넣은 계산기 + 글 내용으로 고른 계산기 (제목 글자 비교 안 함, 11/9)
+			$ids = array();
+			foreach ( $posts as $p ) {
+				preg_match_all( '/\[firstlab_calc id="([^"]+)"/', (string) $p->post_content, $m );
+				$ids = array_merge( $ids, $m[1], array( (string) get_post_meta( $p->ID, FIRSTLAB_FLOW_CALC_META, true ) ) );
+			}
+			$calcs = array_filter( firstlab_flow_calcs(), static fn( $c ) => in_array( $c['id'], $ids, true ) );
 			$out   = sprintf( '<p class="fl-hub-lead">%s 관련 글 %d편을 한곳에 모았어요.</p>', esc_html( $tag->name ), count( $posts ) );
 			if ( $calcs ) {
 				$out .= '<ul class="fl-hub-calcs">' . implode( '', array_map( static fn( $c ) => sprintf( '<li>🧮 <a href="%s">%s</a></li>', esc_url( $c['url'] ), esc_html( $c['title'] ) ), $calcs ) ) . '</ul>';

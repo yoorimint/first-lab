@@ -665,7 +665,7 @@ class MiscTest(unittest.TestCase):
 
     def test_related_box_prefers_same_subject(self):
         php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php").read_text(encoding="utf-8")
-        self.assertIn("firstlab_related_pick", php)   # 같은 주제 글끼리 먼저 연결 (주휴수당 뜻 ↔ 계산) — 동작은 RelatedPostsTest
+        self.assertIn("_firstlab_related_ids", php)   # 내용 기준 기록만 씀 (주휴수당 뜻 ↔ 계산) — 동작은 ContentRelatedTest
 
     def test_popular_page_sums_clicks_per_page(self):
         rows = [{"page": "a", "clicks": 3}, {"page": "b", "clicks": 4}, {"page": "a", "clicks": 3}]
@@ -4195,59 +4195,6 @@ class TocWebpTest(unittest.TestCase):
         self.assertIn("webp.run()", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
 
 
-class RelatedPostsTest(unittest.TestCase):
-    """글 아래 '함께 보면 좋은 글'은 주제가 겹치는 글만 (11/6 운영자: 자동차보험료 계산 글에 주식 평단가 계산기 — '계산'만 겹침)."""
-
-    def run_php(self, body):
-        import os
-        import shutil
-        import subprocess
-        if not shutil.which("php"):
-            self.skipTest("php 없음")
-        code = ("<?php define('ABSPATH', 1); function add_filter() {}\nrequire getenv('P');\n" + body)
-        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
-            f.write(code)
-        try:
-            return subprocess.run(["php", f.name], capture_output=True, text=True, check=True,
-                                  env={**os.environ, "P": str(ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php")}).stdout
-        finally:
-            os.unlink(f.name)
-
-    def test_topic_overlap_only(self):
-        out = self.run_php("""
-$t = '자동차보험료 계산 방법: 평균 68만 원과 연령·차종별 차이';
-echo json_encode(firstlab_related_pick($t, [
-  ['id' => 583, 'title' => '주식 평단가 계산기: 물타기·목표 수량·코스피 매도세 0.20%', 'same_cat' => true],
-  ['id' => 7, 'title' => '자동차 명의이전 방법과 비용', 'same_cat' => false],
-  ['id' => 8, 'title' => '자동차보험 할증 기준: 사고 1건이면 얼마나 오르나', 'same_cat' => false],
-]));
-echo "\n", json_encode(firstlab_related_pick('주식 평단가 계산기', [['id' => 34, 'title' => '자동차보험료 계산 방법', 'same_cat' => true]]));
-""").split()
-        self.assertEqual(json.loads(out[0]), [8, 7])  # 같은 분류라도 '계산'만 겹치는 주식 글은 안 붙음, 주제 많이 겹치는 순
-        self.assertEqual(json.loads(out[1]), [])      # 관련 글이 없으면 칸을 안 보임
-
-    def test_generic_issue_word_not_topic(self):
-        """11/9 운영자: 'ITQ 자격증 조회 … 발급비' 글에 '건물 등기부등본 발급 방법' — '발급'만 겹침. '연차'처럼 두 글자 주제는 그대로."""
-        out = self.run_php("""
-echo json_encode(firstlab_related_pick('ITQ 자격증 조회 방법: 합격 확인·진위확인·발급비 7,400원', [['id' => 65, 'title' => '건물 등기부등본 발급 방법과 수수료 총정리 (인터넷·방문)', 'same_cat' => false]]));
-echo "\n", json_encode(firstlab_related_pick('연차 개수 계산기: 1년 미만 11일', [['id' => 9, 'title' => '연차수당 계산 방법', 'same_cat' => false]]));
-""").split()
-        self.assertEqual(json.loads(out[0]), [])
-        self.assertEqual(json.loads(out[1]), [9])
-        more = self.run_php("""
-echo json_encode(firstlab_related_pick('상속재산분할협의서 양식: 꼭 넣을 7칸과 인감증명 3개월 기준', [['id' => 1, 'title' => '해촉증명서 양식: 적을 칸과 2025년 9월부터 바뀐 건보 조정 서류', 'same_cat' => false]]));
-echo "\n", json_encode(firstlab_related_pick('군산 근현대사 박물관: 통합권', [['id' => 2, 'title' => '주택임대사업자 양도세 혜택 3가지', 'same_cat' => false]]));
-""").split()
-        self.assertEqual(json.loads(more[0]), [])  # '증명'·'7칸과' 만 겹침
-        self.assertEqual(json.loads(more[1]), [])  # '대사' 만 겹침
-
-    def test_same_topic_other_purpose_first(self):
-        out = self.run_php("""echo json_encode(firstlab_related_pick('주휴수당 뜻', [
-  ['id' => 2, 'title' => '연차수당 계산', 'same_cat' => true],
-  ['id' => 1, 'title' => '주휴수당 계산 방법', 'same_cat' => false]]));""")
-        self.assertEqual(json.loads(out), [1, 2])  # 주휴수당 뜻 ↔ 계산 (11/5 운영자)
-
-
 class SlotSplitTest(unittest.TestCase):
     """동시 글쓰기 후보 나누기는 키워드로 (11/6: 순번으로 나눴더니 목록이 갱신되며 순번이 밀려 두 칸이 같은 키워드를 씀)."""
 
@@ -5384,20 +5331,33 @@ class FlowTest(unittest.TestCase):
         self.assertTrue(out.startswith("<p>a</p><h2>1</h2><p>b</p>[BOX]\n<h2>2</h2>|"), out)
         self.assertIn("NULL", out)  # 소제목 하나뿐이면 넣지 않음
 
-    def test_pick_calc_and_hub(self):
+    def test_calc_by_record_and_hub(self):
         out = self._php(
-            "$c=firstlab_flow_pick_calc('양도소득세 계산 방법: 1주택 비과세',[['title'=>'주식 평단가 계산기','url'=>'a'],['title'=>'양도소득세 계산기','url'=>'b']]);echo $c['url'];echo '|';"
-            "var_dump(firstlab_flow_pick_calc('여권 발급 방법',[['title'=>'양도소득세 계산기','url'=>'b']]));echo '|';"
+            "$cs=[['id'=>'stock-average','title'=>'주식 평단가 계산기','url'=>'a'],['id'=>'capital-gains-tax','title'=>'양도소득세 계산기','url'=>'b']];"
+            "$c=firstlab_flow_calc_by_id('capital-gains-tax',$cs);echo $c['url'];echo '|';"
+            "var_dump(firstlab_flow_calc_by_id('',$cs));echo '|';"
             "$h=firstlab_hub_pick([['name'=>'홈택스','count'=>8,'url'=>'x'],['name'=>'연말정산','count'=>12,'url'=>'y'],['name'=>'월세','count'=>2,'url'=>'z']]);echo $h['url'];echo '|';"
             "var_dump(firstlab_hub_pick([['name'=>'월세','count'=>2,'url'=>'z']]));")
         parts = out.split("|")
-        self.assertEqual(parts[0], "b")
-        wrong = self._php("var_dump(firstlab_flow_pick_calc('자동차보험료 계산 방법: 평균 68만 원과 연령·차종별 차이',"
-                          "[['title'=>'산재보험료 계산기 (2026년 업종별 요율)','url'=>'x']]));")
-        self.assertIn("NULL", wrong)  # 11/9 배포 직후: '보험료'만 같은 계산기가 붙었음
-        self.assertIn("NULL", parts[1])  # 겹치는 계산기가 없으면 안 붙임
-        self.assertEqual(parts[2], "y")  # 공개 글 많은 태그
-        self.assertIn("NULL", parts[3])  # 2편뿐이면 모음 아님
+        self.assertEqual(parts[0], "b")      # 서버가 글 내용으로 고른 계산기
+        self.assertIn("NULL", parts[1])      # 기록이 없으면 안 붙임 (제목으로 짐작 안 함 — 11/9 자동차보험료 글에 산재보험료 계산기)
+        self.assertEqual(parts[2], "y")      # 공개 글 많은 태그
+        self.assertIn("NULL", parts[3])      # 2편뿐이면 모음 아님
+        flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
+        self.assertNotIn("firstlab_related_score", flow)
+
+    def test_calc_chosen_by_content(self):
+        from bot import related_posts as r
+        posts = [{"id": 1, "title": "자동차보험료 계산 방법", "content": "<p>자동차보험료는 보험사마다 다르고 운전자 나이, 차종, 사고 이력, 특약에 따라 견적이 달라져요.</p>"},
+                 {"id": 2, "title": "개인사업자 부가세 신고기간", "content": "<p>부가가치세는 매출세액에서 매입세액을 빼서 계산해요. 일반과세자 간이과세자 신고 납부.</p>"},
+                 {"id": 3, "title": "양도세 계산기 사용법", "content": '<p>[firstlab_calc id="capital-gains-tax"]</p>'}]
+        calcs = [{"id": "calc:industrial-accident-insurance", "title": "산재보험료 계산기", "content": "업종별 산재보험료율 보수총액 사업주 부담 근로복지공단"},
+                 {"id": "calc:vat", "title": "부가가치세 계산기", "content": "부가가치세 매출세액 매입세액 일반과세자 간이과세자 공급가액"}]
+        got = r.flow_calcs(posts, calcs)
+        self.assertEqual(got[1], "")         # '보험료'만 같은 산재보험료 계산기는 안 붙음
+        self.assertEqual(got[2], "vat")
+        self.assertEqual(got[3], "")         # 본문에 계산기가 이미 있으면 안 붙임
+        self.assertEqual(len(r.calc_docs()), len(list((ROOT / "wordpress" / "themes" / "first-lab" / "calculators" / "defs").glob("*.js"))))
 
     def test_wired(self):
         self.assertIn("[firstlab_hub_intro]", (ROOT / "wordpress" / "themes" / "first-lab" / "templates" / "archive.html").read_text(encoding="utf-8"))

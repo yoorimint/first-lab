@@ -9,13 +9,16 @@
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import re
 from collections import Counter
+from pathlib import Path
 
 META = "_firstlab_related_ids"
+CALC_META = "_firstlab_flow_calc"   # 본문 중간 '이어서 보면 좋은 글'에 붙일 계산기 id (본문에 계산기가 없는 글만)
+CALC_MIN_SIMILARITY = 0.2          # 공개 대기 글 337편 시험: 0.2 이상은 맞는 계산기(부가세 신고→부가가치세), 아래는 엉뚱함
+CALC_DIR = Path(__file__).resolve().parent.parent / "wordpress" / "themes" / "first-lab" / "calculators"
 VERSION = 1
 TOP = 5
 MIN_SIMILARITY = 0.12   # 이보다 낮으면 관련 없음 (공개 대기 글 337편으로 맞춤 — tests 의 사례)
@@ -49,7 +52,7 @@ def terms(title: str, html: str) -> Counter:
 
 def vectors(posts: list[dict]) -> dict[int, dict[str, float]]:
     """{글 id: {조각: 가중치}} — TF(로그) × IDF, 길이 1로 맞춤."""
-    docs = {int(p["id"]): terms(p.get("title", ""), p.get("content", "")) for p in posts}
+    docs = {p["id"]: terms(p.get("title", ""), p.get("content", "")) for p in posts}
     n = len(docs) or 1
     df: Counter = Counter()
     for c in docs.values():
@@ -78,31 +81,77 @@ def related(posts: list[dict], top: int = TOP, minimum: float = MIN_SIMILARITY) 
     return out
 
 
+_EMBED = re.compile(r'\[firstlab_calc id="([^"]+)"')
+
+
+def calc_docs(calc_dir: Path = CALC_DIR, ids: set[str] | None = None) -> list[dict]:
+    """계산기마다 내용 문서: 이름·입력 칸 이름·도움말·안내 문구 + 근거 이름 (defs/<id>.js, data/<id>.json)."""
+    out = []
+    for f in sorted((calc_dir / "defs").glob("*.js")):
+        if ids is not None and f.stem not in ids:
+            continue
+        js = f.read_text(encoding="utf-8")
+        title = re.search(r"title:\s*'([^']+)'", js)
+        text = " ".join(re.findall(r"(?:label|help|title|description|note)\s*:\s*'([^']*)'", js))
+        data = calc_dir / "data" / f"{f.stem}.json"
+        if data.exists():
+            try:
+                text += " " + " ".join(s.get("name", "") for s in json.loads(data.read_text(encoding="utf-8")).get("sources", []))
+            except ValueError:
+                pass
+        out.append({"id": "calc:" + f.stem, "title": title.group(1) if title else f.stem, "content": text})
+    return out
+
+
+def flow_calcs(posts: list[dict], calcs: list[dict], minimum: float = CALC_MIN_SIMILARITY) -> dict:
+    """{글 id: 계산기 id 또는 ''} — 본문에 계산기가 이미 있는 글은 ''. 내용이 가장 비슷한 계산기 (minimum 이상만)."""
+    vec = vectors(posts + calcs)
+    out = {}
+    for p in posts:
+        if _EMBED.search(p.get("content", "")):
+            out[p["id"]] = ""
+            continue
+        best = max(((similarity(vec[p["id"]], vec[c["id"]]), c["id"]) for c in calcs), default=(0.0, ""))
+        out[p["id"]] = best[1][5:] if best[0] >= minimum else ""
+    return out
+
+
 _POSTS_PHP = r"""
 $out = array();
 foreach ( get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'numberposts' => -1 ) ) as $p ) {
   $out[] = array( 'id' => $p->ID, 'title' => $p->post_title, 'content' => $p->post_content );
 }
-echo wp_json_encode( $out );
+$calcs = array();
+foreach ( get_pages( array( 'post_status' => 'publish' ) ) as $p ) {
+  if ( str_ends_with( urldecode( $p->post_name ), '-calculator' ) ) { $calcs[] = substr( urldecode( $p->post_name ), 0, -11 ); }
+}
+echo wp_json_encode( array( 'posts' => $out, 'calcs' => $calcs ) );
 """
+
+
+def _save(wp, pid, key: str, value: str) -> bool:
+    try:
+        old = wp("post", "meta", "get", str(pid), key).strip()
+    except Exception:  # noqa: BLE001 - 메타가 없으면 오류로 끝남
+        old = None
+    if old != value:
+        wp("post", "meta", "update", str(pid), key, value)
+        return True
+    return False
 
 
 def run(wp=None) -> str:
     """공개 글 전체의 관련 글을 다시 계산해 메타에 저장 (바뀐 글만 씀). 봇 기록 한 줄."""
     if wp is None:
         from .settings import wp_cli as wp
-    posts = json.loads(wp("eval", _POSTS_PHP) or "[]")
+    got = json.loads(wp("eval", _POSTS_PHP) or "{}")
+    posts, live_calcs = got.get("posts", []), set(got.get("calcs", []))
     result = related(posts)
-    stamp = hashlib.md5(json.dumps(sorted((p["id"], len(p.get("content", ""))) for p in posts)).encode()).hexdigest()[:8]
+    calc_of = flow_calcs(posts, calc_docs(ids=live_calcs)) if live_calcs else {p["id"]: "" for p in posts}
     changed = 0
     for pid, ids in result.items():
-        record = json.dumps({"v": VERSION, "ids": ids, "of": stamp}, ensure_ascii=False)
-        try:
-            old = wp("post", "meta", "get", str(pid), META).strip()
-        except Exception:  # noqa: BLE001 - 메타가 없으면 오류로 끝남
-            old = ""
-        if json.loads(old or "{}").get("ids") != ids or not old:
-            wp("post", "meta", "update", str(pid), META, record)
-            changed += 1
+        changed += _save(wp, pid, META, json.dumps({"v": VERSION, "ids": ids}, ensure_ascii=False))
+        changed += _save(wp, pid, CALC_META, calc_of.get(pid, ""))
     linked = sum(1 for ids in result.values() if ids)
-    return f"관련 글(내용 기준) 다시 계산: 공개 {len(posts)}편 중 {linked}편에 관련 글, 바뀐 기록 {changed}편"
+    with_calc = sum(1 for c in calc_of.values() if c)
+    return f"관련 글·계산기(내용 기준) 다시 계산: 공개 {len(posts)}편 중 관련 글 {linked}편·계산기 {with_calc}편, 바뀐 기록 {changed}개"
