@@ -111,6 +111,16 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
         # 안 그러면 대기열에도 보류에도 없어 12/5 뒤 영영 방치됨 (11/5 검토)
         why = "제목 숫자가 본문에 없음 (제목·본문 맞추기)" if aligned and "제목(확인 필요)" in aligned else "글쓴이가 초안으로 둠 (핵심 근거 보강 필요)"
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, why)
+    if not failed:  # 초안 때 본문 공식 주소를 열어 보고 기록 — 링크는 이 기록으로 화면에 붙고, 연결조차 안 되면 보류해 고침 (11/9 운영자 '초안에서 해결')
+        try:
+            from . import official_links
+            dead = official_links.run_for(post_id).get("dead") or []
+        except Exception:  # noqa: BLE001 - 확인 자체가 실패하면 10분 확인·공개 직전 확인이 다시 봄
+            dead = []
+        if dead:
+            failed = [official_links.dead_reason(dead)]
+            wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, failed[0][:300])
+            notes.append(failed[0][:120])
     if not failed:
         freshness.mark_verified(post_id)  # 공개 직전 확인(bot/freshness.py)의 기준일
     # 근거 링크를 열어 주장 숫자 대조 — 지금은 기록만 (bot/source_check.py)

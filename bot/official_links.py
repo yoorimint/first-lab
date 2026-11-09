@@ -76,7 +76,7 @@ foreach ( $ids as $id ) {
   $c = (string) get_post_field( 'post_content', $id );
   $m = json_decode( (string) get_post_meta( $id, '_firstlab_official_hosts', true ), true );
   if ( is_array( $m ) && ( $m['hash'] ?? '' ) === substr( md5( $c ), 0, 12 ) && (int) ( $m['v'] ?? 1 ) >= VERSION ) { continue; }
-  $out[] = array( 'id' => $id, 'content' => $c );
+  $out[] = array( 'id' => $id, 'content' => $c, 'status' => get_post_status( $id ) );
   if ( count( $out ) >= BATCH ) { break; }
 }
 echo wp_json_encode( $out );
@@ -92,6 +92,8 @@ def run(batch: int = BATCH, wp=None, check=sources.reachable, today: str | None 
     for row in todo if isinstance(todo, list) else []:
         record = _record(row.get("content", ""), check, today, exists)
         wp("post", "meta", "update", str(row["id"]), META, json.dumps(record, ensure_ascii=False))
+        if record["dead"] and row.get("status") == "draft":
+            hold_dead(int(row["id"]), record["dead"], wp)
         done.append(f"{row['id']}({len(record['hosts'])})")
     return f"공식 사이트 링크 확인: {', '.join(done)}" if done else None
 
@@ -112,3 +114,18 @@ def run_for(post_id: int, wp=None, check=sources.reachable, today: str | None = 
     record = _record(wp("post", "get", str(int(post_id)), "--field=post_content"), check, today, exists)
     wp("post", "meta", "update", str(int(post_id)), META, json.dumps(record, ensure_ascii=False))
     return record
+
+
+def dead_reason(dead: list[str]) -> str:
+    return f"본문 공식 주소가 연결되지 않음: {', '.join(dead)} — 주소가 맞는지 공식 기관 누리집으로 확인해 고치기"
+
+
+def hold_dead(post_id: int, dead: list[str], wp) -> None:
+    """초안을 공개 대기에서 빼고 보류 (글쓰기 작업의 보류 수정이 고침 — 고치면 본문이 바뀌어 다시 확인됨). 11/9 운영자 '초안에서 해결'."""
+    from .review_gate import HOLD_META
+    from .schedule import QUEUE_META
+    wp("post", "meta", "update", str(post_id), HOLD_META, dead_reason(dead)[:300])
+    try:
+        wp("post", "meta", "delete", str(post_id), QUEUE_META)
+    except Exception:  # noqa: BLE001 - 대기 표시가 원래 없으면 오류로 끝남
+        pass

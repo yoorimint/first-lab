@@ -148,7 +148,7 @@ def publish_next(now_kst: datetime) -> str | None:
                 from . import official_links
                 dead = official_links.run_for(candidate).get("dead") or []
                 if dead:
-                    reasons = [f"본문 공식 주소가 연결되지 않음: {', '.join(dead)} — 주소가 맞는지 공식 기관 누리집으로 확인해 고치기"]
+                    reasons = [official_links.dead_reason(dead)]
             except Exception:  # noqa: BLE001 — 확인 자체가 실패하면 막지 않음 (화면 점검이 다시 봄)
                 pass
         if not reasons:
