@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1062,
+ "replace": [
+  {
+   "old": "ai-111b73334c",
+   "prompt": "A plain unbadged generic compact sedan with a smooth front and no emblem, parked on rollers inside a bright clean vehicle inspection bay, seen from the side, soft daylight",
+   "alt": "밝은 검사장 롤러 위에 올라선 승용차",
+   "why": "차 앞모습이 특정 브랜드 그릴·엠블럼처럼 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

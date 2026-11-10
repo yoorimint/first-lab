@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1173,
+ "replace": [
+  {
+   "old": "ai-61d98b20eb",
+   "prompt": "A quiet bright public service office waiting area with rows of wooden benches and large windows letting in sunlight, plain walls with no lettering",
+   "alt": "햇빛이 드는 조용한 민원실 대기 공간",
+   "why": "벽에 'TAX' 글자가 크게 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
