@@ -5778,6 +5778,22 @@ class PlainCheckTest(unittest.TestCase):
         self.assertIn("known_wrong", (ROOT / "bot" / "freshness.py").read_text(encoding="utf-8"))
         self.assertIn("known_wrong", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
+    def test_dated_wrong_and_daily_watch(self):
+        """11/10 #2161: 2026-12-08부터 근로감독관→노동감독관 (근로기준법 제101조 개정) — 그날부터 남은 글에 다시 확인 표시."""
+        import datetime as dt
+        from bot import condition_gate as cg, known_watch
+        html = "<p>체불이 확인되면 근로감독관이 시정지시를 해요.</p>"
+        self.assertEqual(cg.known_wrong(html, dt.date(2026, 12, 7)), [])
+        self.assertTrue(cg.known_wrong(html, dt.date(2026, 12, 8)))
+        self.assertEqual(cg.known_wrong("<p>근로감독관(2026년 12월 8일부터 노동감독관)이 조사해요.</p>", dt.date(2026, 12, 9)), [])
+        posts = {"1": {"status": "publish", "content": html}, "2": {"status": "draft", "content": "<p>문제없어요.</p>"},
+                 "3": {"status": "trash", "content": html}}
+        flagged = []
+        line = known_watch.run(dt.date(2026, 12, 8), posts, flag=lambda ids, why: flagged.append((ids, why)) or ids)
+        self.assertEqual([f[0] for f in flagged], [[1]])
+        self.assertIn("2026-12-08", flagged[0][1])
+        self.assertIn("1편", line)
+
     def test_duplicated_paragraph_blocked(self):
         """11/10 #1143: 원래 긴 문단을 안 지우고 나눈 문장을 아래에 또 씀 → 같은 내용 두 번 (바뀐 곳만 보는 최종 읽기로는 못 봄)."""
         sys.path.insert(0, str(ROOT / "automation"))

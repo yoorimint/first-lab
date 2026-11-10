@@ -412,6 +412,13 @@ def main() -> None:
             if now.minute < 10:  # 한 시간마다: 주소 연결 안 됨 보류 다시 열어 보기 (일시 장애로 평생 보류 안 되게, 11/10)
                 for line in official_links.recheck_dead():
                     add_log(state, True, f"보류 다시 검사: {line}")
+            if state.get("known_watch_date") != today:  # 하루 한 번: 확인된 틀린 문구가 남은 글에 다시 확인 표시 (bot/known_watch.py, 11/10)
+                try:
+                    from . import known_watch
+                    add_log(state, True, known_watch.run())
+                    state["known_watch_date"] = today
+                except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
+                    add_log(state, False, f"틀린 문구 감시 실패: {str(e)[:150]}")
             from . import related_posts
             stamp = f"{now:%Y-%m-%d}/v{related_posts.VERSION}"  # 계산 방식이 바뀌면(VERSION) 그날 바로 다시
             if state.get("related_posts_date") != stamp:  # 관련 글·계산기(내용 기준) 하루 한 번 다시 계산 (공개 때도 함)

@@ -1332,11 +1332,22 @@ KNOWN_WRONG = [
 ]
 
 
-def known_wrong(body_html: str) -> list[str]:
-    """법 원문으로 확인한, 여러 글에 되풀이된 틀린 문구."""
+# 정해진 날부터 틀리게 되는 문구 (시행 예정 개정, 법 원문 확인): (그날, 틀리게 되는 말, 같은 문장에 있으면 괜찮은 말, 고칠 말)
+DATED_WRONG = [
+    (dt.date(2026, 12, 8), r"근로감독관", r"노동감독관",
+     "2026년 12월 8일부터 '노동감독관' (근로기준법 제101조 개정, 노동감독관 직무집행법 — 11/10 #2161 다듬기에서 확인)"),
+]
+
+
+def known_wrong(body_html: str, today: dt.date | None = None) -> list[str]:
+    """법 원문으로 확인한, 여러 글에 되풀이된 틀린 문구 (+ 시행일이 지나 틀리게 된 말)."""
+    today = today or dt.date.today()
     out = []
     for sent in _sentences(body_html):
         for topic, wrong, fix in KNOWN_WRONG:
             if re.search(topic, sent) and re.search(wrong, sent):
                 out.append(f"확인된 틀린 문구: '{sent[:50]}' — {fix}")
+        for since, wrong, ok, fix in DATED_WRONG:
+            if today >= since and re.search(wrong, sent) and not re.search(ok, sent):
+                out.append(f"시행일 지나 바뀐 말: '{sent[:50]}' — {fix}")
     return list(dict.fromkeys(out))
