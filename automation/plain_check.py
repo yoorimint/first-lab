@@ -274,7 +274,7 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     before, after = facts(old_html), facts(new_html)
     for kind in before:
         lost, added = before[kind] - after[kind], after[kind] - before[kind]
-        if kind == "숫자":  # 같은 숫자를 한 번 더 쓰는 것(쉬운 첫 문장에 핵심 숫자 반복)은 괜찮음 — 새 숫자·빠진 숫자만
+        if kind in ("숫자", "법 조항"):  # 같은 숫자·조항을 한 번 더 쓰는 것(첫 문장 반복, 링크에 있던 조항을 근거 줄에)은 괜찮음 — 새로 생긴·빠진 것만 (11/10 #2261)
             added = Counter({k: v for k, v in added.items() if k not in before[kind] and k not in allow})
             lost = Counter({k: v for k, v in lost.items() if k not in allow})
         if lost:
