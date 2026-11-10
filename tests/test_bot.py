@@ -5765,11 +5765,13 @@ class PlainCheckTest(unittest.TestCase):
         for s in ("<p>중도상환수수료는 대출일부터 3년 이내에 갚을 때만 받을 수 있어요.</p>",
                   "<p>바우처는 분만예정일로부터 2년까지 써요.</p>",
                   "<p>장기요양보험은 2026년 11월분부터 13.14%예요.</p>",
-                  "<p>해외주식은 양도일까지 계속 5년 이상 국내에 주소를 둔 거주자가 내요.</p>"):
+                  "<p>해외주식은 양도일까지 계속 5년 이상 국내에 주소를 둔 거주자가 내요.</p>",
+                  "<p>새마을금고·농협·수협 같은 상호금융은 금융소비자보호법 대상이 아니에요.</p>"):
             self.assertTrue(cg.known_wrong(s), s)
         for s in ("<p>중도상환수수료는 3년 이내에 갚을 때나 다른 법령이 허용할 때 등, 법이 정한 경우에만 받을 수 있어요.</p>",
                   "<p>장기요양보험은 2026년 1월분부터 13.14%예요.</p>",
-                  "<p>해외주식은 이 5년 조건이 없어요.</p>"):
+                  "<p>해외주식은 이 5년 조건이 없어요.</p>",
+                  "<p>새마을금고나 지역 농협·수협 같은 조합의 상호금융은 금융소비자보호법 대상이 아니에요.</p>"):
             self.assertEqual(cg.known_wrong(s), [], s)
         self.assertIn("known_wrong", (ROOT / "bot" / "freshness.py").read_text(encoding="utf-8"))
         self.assertIn("known_wrong", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
