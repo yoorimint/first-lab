@@ -1331,6 +1331,9 @@ KNOWN_WRONG = [
     (r"실업급여", r"실업급여의? 정식 (?:이름|명칭)은 구직급여", "실업급여는 구직급여와 취업촉진 수당을 함께 이르는 말 — '흔히 실업급여라고 부르는 돈은 정확히는 구직급여' (고용보험법 제37조, #1800)"),
     (r"유증", r"(?<!선순위인 )(?<!선순위 )상속인이 아닌 (?:사람|자)에게", "배우자공제를 줄이는 유증은 '선순위인 상속인이 아닌 자에게' 한 것 — 후순위 상속인 포함 (상속세 및 증여세법 제24조1호, #2062·#1754)"),
     (r"장기요양", r"(?<!\d)11월분부터", "장기요양보험료 13.14%(소득 대비 0.9448%)는 2026년 1월분부터 (노인장기요양보험법 시행령 제4조, #1455)"),
+    ("본문:" + r"양도소득세|취득세|종합부동산세|중과", r"조정대상지역은[^.]{0,40}위축",
+     "세금 중과의 조정대상지역은 '주택 분양 등이 과열됐거나 과열될 우려가 있는' 지역(주택법 제63조의2①1호)만 — 위축 지역(2호)은 아님 "
+     "(소득세법 제104조⑦·지방세법 제13조의2, #1759·#1734)"),
 ]
 
 
@@ -1345,9 +1348,12 @@ def known_wrong(body_html: str, today: dt.date | None = None) -> list[str]:
     """법 원문으로 확인한, 여러 글에 되풀이된 틀린 문구 (+ 시행일이 지나 틀리게 된 말)."""
     today = today or dt.date.today()
     out = []
+    whole = _plain(body_html or "")
     for sent in _sentences(body_html):
         for topic, wrong, fix in KNOWN_WRONG:
-            if re.search(topic, sent) and re.search(wrong, sent):
+            # 주제 앞에 '본문:' 이 붙으면 글 전체에서 주제를 봄 (뜻풀이 문장엔 주제어가 없을 때 — 조정대상지역)
+            where = whole if topic.startswith("본문:") else sent
+            if re.search(topic.removeprefix("본문:"), where) and re.search(wrong, sent):
                 out.append(f"확인된 틀린 문구: '{sent[:50]}' — {fix}")
         for since, wrong, ok, fix in DATED_WRONG:
             if today >= since and re.search(wrong, sent) and not re.search(ok, sent):
