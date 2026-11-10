@@ -5750,6 +5750,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_plain_rewritten_posts_skip_old_patch_check(self):
+        """11/10: 쉬운 말 다듬기는 갱신일을 안 남겨서, 다시 쓴 글이 예전 패치 확인에 걸림(13→31개) → 본문 표시로 뺌."""
+        from bot import patch_check
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_queue
+        self.assertEqual(patch_check.PLAIN_MARK, plain_queue.DONE_MARK)
+        self.assertTrue(patch_check.rewritten("<p><strong>한 줄 정리:</strong> 요약</p>"))
+        self.assertFalse(patch_check.rewritten("<p>보통 글</p>"))
+
     def test_known_wrong_phrases(self):
         """11/10 뜻 검수에서 법 원문으로 틀렸다고 확인한 문구가 여러 글에 되풀이됨 → 새 글 관문·다듬기·공개 직전에서 막음."""
         from bot import condition_gate as cg

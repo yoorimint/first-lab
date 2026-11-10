@@ -19,6 +19,13 @@ def _refreshed_ids() -> set[int]:
     return set(json.loads(out or "[]"))
 
 
+PLAIN_MARK = "<strong>한 줄 정리"  # 쉬운 말로 다시 쓴 글 표시 (automation/plain_queue.DONE_MARK 와 같음)
+
+
+def rewritten(content: str) -> bool:
+    return PLAIN_MARK in (content or "")
+
+
 def run() -> str:
     sys.path.insert(0, str(ROOT / "automation"))
     from verify_patches import problems  # noqa: E402
@@ -28,9 +35,11 @@ def run() -> str:
     patches = json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8"))
     bulk = wpbulk.posts()
     refreshed = _refreshed_ids()
-    # 갱신(refresh)으로 다시 쓴 글은 예전 패치 문구가 없는 게 정상 → 확인에서 뺌 (11/5 검토: 영원히 안 풀리는 항목)
+    # 갱신(refresh)으로 다시 쓴 글은 예전 패치 문구가 없는 게 정상 → 확인에서 뺌 (11/5 검토: 영원히 안 풀리는 항목).
+    # 쉬운 말 다듬기는 갱신일을 안 남기므로(사실 확인이 아님, bot/refresh.apply_direct) 본문 표시('한 줄 정리')로 가림 (11/10: 문제 13→31개)
     posts = {int(pid): {"title": p.get("title", ""), "excerpt": p.get("excerpt", ""), "content_html": p.get("content", ""),
-                        "status": "trash" if int(pid) in refreshed else p.get("status", "")} for pid, p in bulk.items()}
+                        "status": "trash" if int(pid) in refreshed or rewritten(p.get("content", "")) else p.get("status", "")}
+             for pid, p in bulk.items()}
     found = problems(patches, posts)
     state = load_state()
     state["patch_problems"] = found[:20]
