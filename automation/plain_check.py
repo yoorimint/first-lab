@@ -23,8 +23,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-FIRST_MAX = 70
+FIRST_MAX = 55  # 11/10 운영자 '90점 넘는 거 확인하제?' — 기준 글 #1419 첫 문장 39자, 69자 글(#1798)은 휴대폰에서 네 줄
 AVG_MAX = 40
+LONG_SENT, LONG_RATIO = 60, 0.05  # 60자 넘는 문장은 5% 까지 (기준 글 #1419 3/128, 90점 못 미친 #1798 11/92·#1761 8/93)
 _TAG = re.compile(r"<[^>]+>")
 _NUM = re.compile(r"\d[\d,.]*")
 _ARTICLE = re.compile(r"제\s?\d+조(?:의\s?\d+)?(?:\s?제?\d+항)?")
@@ -212,6 +213,9 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     avg = sum(map(len, sents)) / len(sents) if sents else 0
     if avg > AVG_MAX:
         out.append(f"문장 평균 {avg:.0f}자 — {AVG_MAX}자 이하로 (중학교 1학년이 한 번에 읽게, 운영자 11/9)")
+    longs = [x for x in sents if not x.startswith(("근거", "한 줄 정리")) and "✔" not in x and len(x) > LONG_SENT]  # 상자 ✔ 줄은 마침표가 없어 한 문장으로 붙음 — 줄 길이는 TICK_MAX 가 봄
+    if sents and len(longs) > len(sents) * LONG_RATIO:
+        out.append(f"{LONG_SENT}자 넘는 문장 {len(longs)}개 (전체 {len(sents)}개의 {LONG_RATIO:.0%} 까지) — 둘로 나누기 (예: {longs[0][:40]}…)")
     crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
     if crowded:
         out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")

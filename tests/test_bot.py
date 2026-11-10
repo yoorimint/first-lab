@@ -5750,6 +5750,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_long_sentences_limited(self):
+        """11/10 운영자 '90점 넘는 거 확인하제?' — 60자 넘는 문장이 5%를 넘으면(#1798 11/92) 막음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        short = "<p>짧은 문장이에요.</p>" * 30
+        long_s = "<p>" + "가" * 70 + "예요.</p>"
+        self.assertFalse(any("넘는 문장" in p for p in pc.problems(short + long_s, short + long_s)))
+        self.assertTrue(any("넘는 문장" in p for p in pc.problems(short, short + long_s * 3)))
+
     def test_expired_deadline_not_carried_over(self):
         """11/10 #561 '이 기한은 2026년 11월 9일까지예요'·#1734 '…11월 9일에 끝나요' — 저장 뒤 지난 기한을 그대로 옮기면 막음."""
         import datetime as dt
