@@ -197,6 +197,8 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.year_only_headline(title, excerpt, body_html)
     out += condition_gate.leave_promotion_extinction(body_html)
     out += condition_gate.readability(body_html)
+    from . import plain_style  # 쉬운 말 모양·문장 길이 (11/10 운영자 '새로 적거나 수정하면 새로운 방식대로')
+    out += plain_style.problems(body_html)
     out += condition_gate.stale_forms(review, None if law_fetcher is None else (lambda *a: []))
     for item in review:
         if str(item.get("action", "")).strip() not in KEPT:

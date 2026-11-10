@@ -221,6 +221,47 @@ def lost_terms(old_html: str, new_html: str, title: str = "") -> list[str]:
     return out
 
 
+REQUIRED_PARTS = (("<strong>한 줄 정리", "'한 줄 정리:' 문단"), ("이런 건 꼭 확인하세요", "'이런 건 꼭 확인하세요' 목록"))
+
+
+def style_problems(html: str) -> list[str]:
+    """쉬운 말 기준(기준 글 #1419) — 새 글(bot/review_gate)·글 갱신(bot/refresh.apply_direct)·다듬기·공개 직전(bot/freshness) 모두 같은 잣대.
+    11/10 운영자 '글을 새로 적거나 수정하면 새로운 방식대로 가는 거지? 안 그러면 그러게 시스템 고치고'."""
+    out = []
+    first = first_sentence(html)
+    if len(first) > FIRST_MAX:
+        out.append(f"첫 문장 {len(first)}자 — {FIRST_MAX}자 이하 쉬운 답 한 줄로")
+    if re.search(r"[(（]|제\s?\d+조", first):
+        out.append("첫 문장에 괄호·법 조항 — 쉬운 말만")
+    sents = sentences(html)
+    avg = sum(map(len, sents)) / len(sents) if sents else 0
+    if avg > AVG_MAX:
+        out.append(f"문장 평균 {avg:.0f}자 — {AVG_MAX}자 이하로 (중학교 1학년이 한 번에 읽게, 운영자 11/9)")
+    longs = [x for x in sents if not x.startswith(("근거", "한 줄 정리")) and "✔" not in x and len(x) > LONG_SENT]  # 상자 ✔ 줄은 마침표가 없어 한 문장으로 붙음 — 줄 길이는 TICK_MAX 가 봄
+    if sents and len(longs) > len(sents) * LONG_RATIO:
+        out.append(f"{LONG_SENT}자 넘는 문장 {len(longs)}개 (전체 {len(sents)}개의 {LONG_RATIO:.0%} 까지) — 둘로 나누기 (예: {longs[0][:40]}…)")
+    crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
+    if crowded:
+        out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")
+    long_ticks = [x for x in box_lines(html) if x.startswith("✔") and len(x) > TICK_MAX]
+    if long_ticks:
+        out.append(f"한눈에 보기 ✔ 줄이 {TICK_MAX}자 넘음 (휴대폰에서 두 줄로 꺾임): {long_ticks[0]}")
+    stale = sorted(set(STALE_WORDS.findall(plain(html))))
+    if stale:
+        out.append(f"시간이 지나면 틀리는 말: {', '.join(stale)} — '2026년'처럼 연도·기간으로 (11/10 '지금 같은 11월')")
+    out += loose_definitions(html)
+    rep = box_repeats(html)
+    if len(rep) > REPEAT_MAX:
+        out.append(f"한눈에 보기 상자 내용이 바로 아래 문단에서 되풀이됨 (숫자 {', '.join(rep[:6])}) — 상자에 있는 건 아래에서 빼고 새 내용만")
+    crowded_p = crowded_paragraphs(html)
+    if crowded_p:
+        out.append(f"문장 {MAX_SENT + 1}개 이상인 문단 {len(crowded_p)}개 — 휴대폰에서 한 덩어리로 보임, 문장 {MAX_SENT}개마다 끊기 (예: {crowded_p[0]}…)")
+    if not any("✔" in x for x in box_lines(html)):
+        out.append("첫 문단이 '한눈에 보기' 상자가 아님 (첫 줄 답 → 짧은 도입 → ✔ 줄, <br> 로 나눔)")
+    out += [f"{name} 없음 (자주 묻는 질문 앞에)" for mark, name in REQUIRED_PARTS if mark not in (html or "")]
+    return out
+
+
 def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | None = None, written=None,
              post_id: int | None = None) -> list[str]:
     """allow: 법·공식 자료로 확인한 원래 글 오류를 고치며 바뀌는 숫자 (--fix 로만, 이유와 함께 갱신 파일에 남음).
@@ -242,38 +283,11 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
             out.append(f"{kind} 새로 생김: {', '.join(list(added)[:8])}")
     if len(plain(new_html)) < len(plain(old_html)) * 0.8:
         out.append("본문이 원래의 80%보다 짧음")
-    first = first_sentence(new_html)
-    if len(first) > FIRST_MAX:
-        out.append(f"첫 문장 {len(first)}자 — {FIRST_MAX}자 이하 쉬운 답 한 줄로")
-    if re.search(r"[(（]|제\s?\d+조", first):
-        out.append("첫 문장에 괄호·법 조항 — 쉬운 말만")
-    sents = sentences(new_html)
-    avg = sum(map(len, sents)) / len(sents) if sents else 0
-    if avg > AVG_MAX:
-        out.append(f"문장 평균 {avg:.0f}자 — {AVG_MAX}자 이하로 (중학교 1학년이 한 번에 읽게, 운영자 11/9)")
-    longs = [x for x in sents if not x.startswith(("근거", "한 줄 정리")) and "✔" not in x and len(x) > LONG_SENT]  # 상자 ✔ 줄은 마침표가 없어 한 문장으로 붙음 — 줄 길이는 TICK_MAX 가 봄
-    if sents and len(longs) > len(sents) * LONG_RATIO:
-        out.append(f"{LONG_SENT}자 넘는 문장 {len(longs)}개 (전체 {len(sents)}개의 {LONG_RATIO:.0%} 까지) — 둘로 나누기 (예: {longs[0][:40]}…)")
-    crowded = [x for x in sents if not x.startswith("근거") and x.count("(") > 1]
-    if crowded:
-        out.append(f"괄호 2개 이상인 문장 {len(crowded)}개 — 한 문장에 괄호 하나까지 (예: {crowded[0][:40]}…)")
-    long_ticks = [x for x in box_lines(new_html) if x.startswith("✔") and len(x) > TICK_MAX]
-    if long_ticks:
-        out.append(f"한눈에 보기 ✔ 줄이 {TICK_MAX}자 넘음 (휴대폰에서 두 줄로 꺾임): {long_ticks[0]}")
-    stale = sorted(set(STALE_WORDS.findall(plain(new_html))))
-    if stale:
-        out.append(f"시간이 지나면 틀리는 말: {', '.join(stale)} — '2026년'처럼 연도·기간으로 (11/10 '지금 같은 11월')")
-    out += loose_definitions(new_html)
     dup = duplicated_text(old_html, new_html)
     if dup:
         out.append(f"같은 내용이 두 번 나옴 {len(dup)}곳 — 원래 문단을 지우고 고친 문장만 남기기 (예: {dup[0][:40]}…)")
     out += expired_deadlines(new_html, written) if written else []
-    rep = box_repeats(new_html)
-    if len(rep) > REPEAT_MAX:
-        out.append(f"한눈에 보기 상자 내용이 바로 아래 문단에서 되풀이됨 (숫자 {', '.join(rep[:6])}) — 상자에 있는 건 아래에서 빼고 새 내용만")
-    crowded_p = crowded_paragraphs(new_html)
-    if crowded_p:
-        out.append(f"문장 {MAX_SENT + 1}개 이상인 문단 {len(crowded_p)}개 — 휴대폰에서 한 덩어리로 보임, 문장 {MAX_SENT}개마다 끊기 (예: {crowded_p[0]}…)")
+    out += style_problems(new_html)
     from bot import condition_gate
     out += condition_gate.known_wrong(new_html)
     out += condition_gate.html_unbalanced(new_html)
@@ -296,6 +310,10 @@ def refresh_file(post_id: int, base_modified: str, new_html: str, fix_reason: st
 
 
 def main(argv: list[str]) -> int:
+    if argv[:1] == ["--style"] and len(argv) == 2:  # 새 글·갱신 본문만 볼 때: python3 automation/plain_check.py --style 본문.html
+        found = style_problems(Path(argv[1]).read_text(encoding="utf-8"))
+        print("통과" if not found else "쉬운 말 기준 미달:\n  " + "\n  ".join(found))
+        return 1 if found else 0
     if len(argv) < 3:
         print(__doc__)
         return 2

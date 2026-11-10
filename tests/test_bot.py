@@ -204,6 +204,7 @@ class DirectRefreshTest(unittest.TestCase):
                     "--field=post_title": "제목"}.get(field, "")
         return wp, calls
 
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_apply_direct(self):
         wp, calls = self.fake_wp()
         state = {"refresh": {}, "refresh_target": {"id": 59, "why": "정체"}}
@@ -215,6 +216,7 @@ class DirectRefreshTest(unittest.TestCase):
         self.assertEqual(sum(state["refresh"].values()), 1)
         self.assertIn("정체", msg)
 
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_plain_rewrite_not_counted_in_weekly_limit(self):
         """11/10: 쉬운 말 다듬기 16편이 주간 갱신 한도를 채워 보강·근거 갱신이 멈춤 → 다듬기(kind plain)는 안 셈."""
         wp, calls = self.fake_wp()
@@ -229,6 +231,7 @@ class DirectRefreshTest(unittest.TestCase):
         import plain_check
         self.assertIn('"kind": "plain"', plain_check.refresh_file.__code__.co_consts.__repr__() + Path(plain_check.__file__).read_text(encoding="utf-8"))
 
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_rewrite_records_patch_upto(self):
         """11/10 운영자 '변경된 글 기준으로 고쳐야지': 본문을 다시 쓰면 그때까지 패치 수를 글에 남김 → 배포 때 예전 패치가 새 글을 덮어쓰지 않음."""
         wp, calls = self.fake_wp()
@@ -375,6 +378,7 @@ class QualityTest(unittest.TestCase):
 
 
 class ReviewGateTest(unittest.TestCase):
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_gate(self):
         from bot.review_gate import problems
         ok = [{"claim": "수수료 23,000원", "urls": ["https://main.kotsa.or.kr/a"], "verdict": "맞음", "action": "유지"},
@@ -415,6 +419,7 @@ class HoldFixTest(unittest.TestCase):
                                   "content_html": self.BODY, "review": review})
         return msg, calls
 
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_pass_goes_to_queue(self):
         review = [{"claim": f"수수료 23,000원 {i}", "urls": ["https://main.kotsa.or.kr/a"], "verdict": "맞음", "action": "유지"}
                   for i in range(5)]
@@ -871,6 +876,7 @@ class SimilarTopicTest(unittest.TestCase):
 
 
 class GateCoverageTest(unittest.TestCase):
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_long_article_needs_claims_for_every_fact_sentence(self):
         from bot import review_gate
         body = ("<p>" + "가" * 70 + ".</p>") * 30  # 공백 뺀 2,100자 → 30개 (문장 100자·문단 300자 기준 안쪽)
@@ -881,6 +887,7 @@ class GateCoverageTest(unittest.TestCase):
 
 
 class GateStructureNumberTest(unittest.TestCase):
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_step_counts_in_title_are_not_facts(self):
         from bot import review_gate
         review = [{"claim": f"등록 기한 30일, 과태료 100만 원 {i}", "urls": ["https://www.animal.go.kr/a"],
@@ -3548,6 +3555,7 @@ class ChangedMarkTest(unittest.TestCase):
         self.assertIn("2편", logs[0])
         self.assertEqual(calc_watch.mark_switches(dt.date(2027, 1, 2), state, bulk, self._wp(store), d), [])  # 한 번만
 
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])  # 다른 관문을 보는 테스트 — 쉬운 말 모양은 PlainStyleGateTest
     def test_draft_with_new_mark_is_held_before_publish(self):
         import datetime as dt
         from bot import changed, freshness, source_check
@@ -5769,9 +5777,13 @@ class PlainCheckTest(unittest.TestCase):
     def test_same_facts_pass_and_changed_fail(self):
         sys.path.insert(0, str(ROOT / "automation"))
         import plain_check as pc
-        new = ('<p>일주일 개근하면 하루치 돈을 더 받아요.</p><p>근로기준법 제55조에 따라 1주 15시간 이상 일하면 주휴수당을 받아요.</p>'
-               '<h2>얼마</h2><p>시급 10,320원이면 82,560원이에요. <a href="https://www.moel.go.kr">고용노동부</a></p>')
+        new = ('<p>일주일 개근하면 하루치 돈을 더 받아요.<br>알바도 받아요.<br>✔ 개근하면 하루치 더</p><p>근로기준법 제55조에 따라 1주 15시간 이상 일하면 주휴수당을 받아요.</p>'
+               '<h2>얼마</h2><p>시급 10,320원이면 82,560원이에요. <a href="https://www.moel.go.kr">고용노동부</a></p>'
+               '<p><strong>이런 건 꼭 확인하세요</strong></p><ul><li>개근해야 해요.</li></ul><p><strong>한 줄 정리:</strong> 개근하면 받아요.</p>')
         self.assertEqual(pc.problems(self.OLD, new), [])
+        # 쉬운 말 모양(상자·한 줄 정리·꼭 확인)이 없으면 새 글·갱신·다듬기 모두 막힘 (11/10 운영자 '새로 적거나 수정하면 새로운 방식대로')
+        self.assertTrue(any("한 줄 정리" in p for p in pc.style_problems(new.replace("<strong>한 줄 정리:</strong>", ""))))
+        self.assertTrue(any("한눈에 보기" in p for p in pc.style_problems(new.replace("✔", ""))))
         self.assertTrue(any("숫자" in p for p in pc.problems(self.OLD, new.replace("82,560", "82,650"))))
         self.assertTrue(any("법 조항" in p for p in pc.problems(self.OLD, new.replace("제55조", "제56조"))))
         self.assertTrue(any("링크" in p for p in pc.problems(self.OLD, new.replace("moel", "mohw"))))
@@ -6039,3 +6051,44 @@ class TestFileHygieneTest(unittest.TestCase):
                 if m:
                     seen[(cls, m.group(1))] += 1
             self.assertEqual([k for k, v in seen.items() if v > 1], [], f.name)
+
+
+class PlainStyleGateTest(unittest.TestCase):
+    """11/10 운영자 '이제 글을 새로 적거나 수정하면 새로운 방식대로 가는 거지? 안 그러면 그러게 시스템 고치고':
+    쉬운 말 기준(automation/plain_check.style_problems)이 다듬기에만 있었음 → 새 글·보류 수정·갱신·공개 직전·검수 패치 모두."""
+
+    GOOD = ('<p>주휴수당은 1주 15시간 이상 일하고 개근하면 받아요.<br>알바도 받을 수 있어요.<br>✔ 1주 15시간 이상</p>'
+            '<h2>얼마</h2><p>시급에 하루 시간을 곱해요.</p><p><strong>이런 건 꼭 확인하세요</strong></p><ul><li>개근해야 해요.</li></ul>'
+            '<p><strong>한 줄 정리:</strong> 개근하면 받아요.</p>')
+    OLD_STYLE = ('<p>주휴수당은 근로기준법 제55조에 따라 1주 동안의 소정근로일을 개근하고 1주 소정근로시간이 15시간 이상인 근로자에게 '
+                 '주는 유급휴일에 대한 수당으로, 상시 근로자 수와 관계없이 적용돼요. 시급제·일급제 모두 해당해요. 예외도 있어요.</p>')
+
+    def test_style_checked_everywhere(self):
+        from bot import plain_style
+        self.assertEqual(plain_style.problems(self.GOOD), [])
+        self.assertTrue(plain_style.problems(self.OLD_STYLE))
+        for f in ("review_gate.py", "refresh.py", "freshness.py"):
+            self.assertIn("plain_style.problems", (ROOT / "bot" / f).read_text(encoding="utf-8"), f)
+        self.assertIn("plain_patch_problems", (ROOT / "automation" / "apply_review.py").read_text(encoding="utf-8"))
+
+    def test_refresh_refuses_old_style(self):
+        from bot import refresh
+        calls = []
+        def wp(*args):
+            calls.append(args)
+            field = next((a for a in args if a.startswith("--field=")), "")
+            return {"--field=post_modified": "2026-11-04 10:00:00", "--field=post_content": "<p>옛 글</p>"}.get(field, "")
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp):
+            with self.assertRaises(RuntimeError) as e:
+                refresh.apply_direct({"post_id": 5, "base_modified": "2026-11-04 10:00:00", "content_html": self.OLD_STYLE}, {})
+        self.assertIn("쉬운 말", str(e.exception))
+        self.assertFalse([c for c in calls if c[:2] == ("post", "update")])
+
+    def test_review_patch_must_be_plain(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        long = "고친 문장 하나예요. 둘째 문장도 있어요. 셋째 문장까지 넣었어요."
+        self.assertTrue(apply_review.plain_patch_problems("<p>옛 문장</p>", long))
+        self.assertEqual(apply_review.plain_patch_problems("<p>옛 문장</p>", "고친 문장이에요. 조건도 있어요."), [])
+        self.assertTrue(apply_review.plain_patch_problems("<p><strong>한 줄 정리:</strong> 옛</p>", "새 요약이에요."))
+        self.assertTrue(apply_review.plain_patch_problems("<p>답<br>✔ 옛</p>", "답이에요.<br>도입이에요.<br>✔ 스물두 글자를 훌쩍 넘는 아주 긴 상자 줄이에요"))

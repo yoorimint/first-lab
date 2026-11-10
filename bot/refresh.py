@@ -314,6 +314,10 @@ def apply_direct(data: dict, state: dict) -> str:
         new_html = str(new_html)
         if len(new_html) < len(old) * MIN_KEEP_RATIO:
             raise RuntimeError(f"고친 본문이 너무 짧음 ({len(new_html)}자 < 기존 {len(old)}자의 80%) → 반영 안 함")
+        from . import plain_style  # 고친 글도 쉬운 말 기준 (11/10 운영자 '새로 적거나 수정하면 새로운 방식대로')
+        style = plain_style.problems(new_html)
+        if style:
+            raise RuntimeError(f"글 {post_id} 고친 본문이 쉬운 말 기준 미달 → 반영 안 함: {' / '.join(style[:3])}")
     title, excerpt = _checked_title(data, new_html or old) if data.get("title") else ("", "")
     target = state.get("refresh_target") or {}
     gold = target.get("gold_keyword") if target.get("id") == post_id else ""

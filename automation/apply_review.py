@@ -140,6 +140,25 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
     return "prevention 없음 — 'check:<검사 이름>' 또는 'review_only:<이유>' (재발 방지 없이 고치지 않는다, 11/5 운영자)"
 
 
+def plain_patch_problems(element: str, replacement: str) -> list[str]:
+    """고친 문단도 쉬운 말 기준 (11/10 운영자 '새로 적거나 수정하면 새로운 방식대로' — 예전 패치는 4문장짜리 긴 문단을 넣었음 #1775).
+    문장 2개까지·문장마다 60자까지(더 필요하면 insert_after 로 다음 문단), 상자 ✔ 줄 22자, '한 줄 정리' 표시는 남김."""
+    import plain_check as pc
+    out = []
+    text = pc.plain(replacement)
+    lines = re.split(r"<br\s*/?>", replacement) if "✔" in replacement else [replacement]
+    for line in lines:
+        sents = [x for x in re.split(r"(?<=[.?!])\s+", pc.plain(line)) if len(x) > 3]
+        if len(sents) > pc.MAX_SENT:
+            out.append(f"문장 {len(sents)}개 — {pc.MAX_SENT}개까지 (나머지는 insert_after 로 다음 문단에): {pc.plain(line)[:30]}")
+        out += [f"문장 {len(x)}자 — {pc.LONG_SENT}자까지, 둘로 나누기: {x[:30]}" for x in sents if len(x) > pc.LONG_SENT and "✔" not in x]
+        if pc.plain(line).startswith("✔") and len(pc.plain(line)) > pc.TICK_MAX:
+            out.append(f"한눈에 보기 ✔ 줄 {len(pc.plain(line))}자 — {pc.TICK_MAX}자까지: {pc.plain(line)}")
+    if "<strong>한 줄 정리" in (element or "") and "<strong>한 줄 정리" not in replacement:
+        out.append("'한 줄 정리:' 표시를 지움 — <strong>한 줄 정리:</strong> 를 남기기")
+    return out if text else []
+
+
 def check(post: dict, items: list[dict]) -> list[str]:
     """저장 전 검사: 유형 등록, 찾을 문구가 지금 본문에 딱 한 번, 고친 문구에 찾을 문구가 남지 않음."""
     errors = []
@@ -167,6 +186,7 @@ def check(post: dict, items: list[dict]) -> list[str]:
         if "replace_paragraph" in p and tag in ("p", "li"):  # 검수 수정이 조건을 덧붙여 글을 빽빽하게 만들던 것 (11/7 운영자 가독성)
             from bot.condition_gate import readability_element
             errors += [f"{i}번: 읽기 — {x}" for x in readability_element(tag, p["replace_paragraph"])]
+            errors += [f"{i}번: 쉬운 말 — {x}" for x in plain_patch_problems(element_around(body, find, tag), p["replace_paragraph"])]
         if find and find in p.get("replace_paragraph", ""):
             errors.append(f"{i}번: 고친 문구 안에 찾을 문구가 그대로 있음 (고친 뒤에도 다시 걸림): {find[:40]}")
         # 조건 추가·완화가 공식 페이지에서 확인된 사실까지 지우지 않게 (11/5 #673: 공단 원문 그대로인 200원·230원을 지우고 '확인하세요'로만 바꿈)
