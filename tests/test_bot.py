@@ -5750,6 +5750,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_final_read_shows_scorecard(self):
+        """11/10 운영자 '최종 검토할 때 점수도 확인해서 미달이면 다시 수정해야지' — 최종 읽기(plain_diff) 맨 위에 점수표."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_diff
+        good = "<p>짧은 답이에요.<br>✔ 조건</p>" + "<p>짧은 문장이에요.</p>" * 30
+        bad = "<p>" + "가" * 70 + "예요.</p>" + ("<p>" + "나" * 70 + "예요.</p>") * 5
+        self.assertIn("기준 충족", plain_diff.scorecard(good))
+        self.assertIn("미달", plain_diff.scorecard(bad))
+
     def test_long_sentences_limited(self):
         """11/10 운영자 '90점 넘는 거 확인하제?' — 60자 넘는 문장이 5%를 넘으면(#1798 11/92) 막음."""
         sys.path.insert(0, str(ROOT / "automation"))

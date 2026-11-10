@@ -41,12 +41,30 @@ def diff(old_html: str, new_html: str) -> str:
     return "\n".join(lines)
 
 
+def scorecard(html: str) -> str:
+    """최종 읽기 맨 위에 점수표 (11/10 운영자 '최종 검토할 때 점수도 확인해서 미달이면 다시 수정해야지') —
+    기준 글 #1419 와 같은 잣대(plain_check)로 재고, 미달이면 반영하지 말고 다시 다듬는다."""
+    import plain_check as pc
+    sents = [x for x in pc.sentences(html) if not x.startswith(("근거", "한 줄 정리")) and "✔" not in x]
+    longs = [x for x in sents if len(x) > pc.LONG_SENT]
+    first = len(pc.first_sentence(html))
+    avg = sum(map(len, sents)) / len(sents) if sents else 0
+    ok = first <= pc.FIRST_MAX and avg <= pc.AVG_MAX and len(longs) <= len(sents) * pc.LONG_RATIO
+    lines = [f"[점수표] {'기준 충족' if ok else '미달 → 다시 다듬기'} — 첫 문장 {first}자(≤{pc.FIRST_MAX}), 문장 평균 {avg:.0f}자(≤{pc.AVG_MAX}), "
+             f"{pc.LONG_SENT}자 넘는 문장 {len(longs)}/{len(sents)}(≤{pc.LONG_RATIO:.0%}) · 기준 글 #1419: 39자·29자·3/128",
+             "[상자] " + " / ".join(pc.box_lines(html))]
+    lines += [f"  긴 문장: {x}" for x in longs]
+    return "\n".join(lines)
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 2:
         print(__doc__)
         return 2
     old = json.loads(Path(argv[0]).read_text(encoding="utf-8"))["content_html"]
     new = Path(argv[1]).read_text(encoding="utf-8")
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    print(scorecard(new) + "\n")
     print(diff(old, new))
     return 0
 
