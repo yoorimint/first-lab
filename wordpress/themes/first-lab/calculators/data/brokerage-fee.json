@@ -1,0 +1,30 @@
+{
+  "basis_date": "2026-11-10", "yearly": false,
+  "sources": [
+    {"name": "국가법령정보센터 공인중개사법 시행규칙 (제20조 중개보수 한도·거래금액 계산, 별표 1 주택 상한요율, 별표 2 오피스텔 상한요율)", "url": "https://www.law.go.kr/법령/공인중개사법시행규칙"},
+    {"name": "국가법령정보센터 공인중개사법 (제32조 중개보수, 제33조 금지행위)", "url": "https://www.law.go.kr/법령/공인중개사법"},
+    {"name": "경기부동산포털 부동산 중개보수 요율 안내 (부가가치세 별도)", "url": "https://gris.gg.go.kr/reb/selectRebRateView.do"}
+  ],
+  "house": {
+    "sale": [
+      {"below": 50000000, "permil": 6, "cap": 250000},
+      {"below": 200000000, "permil": 5, "cap": 800000},
+      {"below": 900000000, "permil": 4},
+      {"below": 1200000000, "permil": 5},
+      {"below": 1500000000, "permil": 6},
+      {"permil": 7}
+    ],
+    "lease": [
+      {"below": 50000000, "permil": 5, "cap": 200000},
+      {"below": 100000000, "permil": 4, "cap": 300000},
+      {"below": 600000000, "permil": 3},
+      {"below": 1200000000, "permil": 4},
+      {"below": 1500000000, "permil": 5},
+      {"permil": 6}
+    ]
+  },
+  "officetel": {"sale": 5, "lease": 4},
+  "other_permil": 9,
+  "rent_times": 100, "rent_times_low": 70, "rent_low_below": 50000000,
+  "vat_rate": 0.1
+}

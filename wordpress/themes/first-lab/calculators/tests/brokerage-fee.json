@@ -1,0 +1,236 @@
+[
+  {
+    "why": "주택 매매 5억: 별표1 2억 이상 9억 미만 1천분의 4 → 2,000,000원, 부가세 10% 더하면 2,200,000원",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 500000000,
+      "rent": 0
+    },
+    "expect": {
+      "base": 500000000,
+      "permil": 4,
+      "fee": 2000000,
+      "with_vat": 2200000
+    }
+  },
+  {
+    "why": "주택 매매 4,900만 원: 1천분의 6 = 294,000원 > 한도 25만 원 → 250,000원",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 49000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 6,
+      "cap": 250000,
+      "fee": 250000
+    },
+    "boundary": true
+  },
+  {
+    "why": "주택 매매 딱 5천만 원(경계): '5천만원 이상 2억원 미만' 1천분의 5 = 250,000원 (한도 80만 원 안)",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 50000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 5,
+      "fee": 250000
+    },
+    "boundary": true
+  },
+  {
+    "why": "주택 매매 8억 9,900만 원(9억 바로 아래): 1천분의 4 = 3,596,000원",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 899000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 4,
+      "fee": 3596000
+    },
+    "boundary": true
+  },
+  {
+    "why": "주택 매매 딱 9억(경계): '9억원 이상 12억원 미만' 1천분의 5 = 4,500,000원",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 900000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 5,
+      "fee": 4500000
+    },
+    "boundary": true
+  },
+  {
+    "why": "주택 매매 딱 15억: '15억원 이상' 1천분의 7 = 10,500,000원",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 1500000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 7,
+      "fee": 10500000
+    },
+    "boundary": true
+  },
+  {
+    "why": "전세 9,900만 원: 1천분의 4 = 396,000원 > 한도 30만 원 → 300,000원",
+    "input": {
+      "kind": "house",
+      "deal": "lease",
+      "price": 99000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 4,
+      "cap": 300000,
+      "fee": 300000
+    },
+    "boundary": true
+  },
+  {
+    "why": "전세 딱 1억(경계): '1억원 이상 6억원 미만' 1천분의 3 = 300,000원",
+    "input": {
+      "kind": "house",
+      "deal": "lease",
+      "price": 100000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 3,
+      "fee": 300000
+    },
+    "boundary": true
+  },
+  {
+    "why": "전세 3억: 1천분의 3 = 900,000원, 부가세 더하면 990,000원",
+    "input": {
+      "kind": "house",
+      "deal": "lease",
+      "price": 300000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 3,
+      "fee": 900000,
+      "with_vat": 990000
+    }
+  },
+  {
+    "why": "월세 보증금 1천만 원·월 50만 원: 1천만 + 50만×100 = 6천만 원(5천만 이상) → 1천분의 4 = 240,000원",
+    "input": {
+      "kind": "house",
+      "deal": "lease",
+      "price": 10000000,
+      "rent": 500000
+    },
+    "expect": {
+      "base": 60000000,
+      "permil": 4,
+      "fee": 240000
+    },
+    "notes_exclude": [
+      "다시 계산"
+    ]
+  },
+  {
+    "why": "월세 보증금 500만 원·월 40만 원: 500만+4,000만 = 4,500만 원 < 5천만 → 500만 + 40만×70 = 3,300만 원, 1천분의 5 = 165,000원",
+    "input": {
+      "kind": "house",
+      "deal": "lease",
+      "price": 5000000,
+      "rent": 400000
+    },
+    "expect": {
+      "base": 33000000,
+      "permil": 5,
+      "fee": 165000
+    },
+    "notes_include": [
+      "월세에 70을 곱해"
+    ]
+  },
+  {
+    "why": "월세 보증금 0·월 50만 원: 50만×100 = 딱 5천만 원 → '미만'이 아니라 70배 재계산 안 함, 1천분의 4 = 200,000원",
+    "input": {
+      "kind": "house",
+      "deal": "lease",
+      "price": 0,
+      "rent": 500000
+    },
+    "expect": {
+      "base": 50000000,
+      "permil": 4,
+      "fee": 200000
+    },
+    "boundary": true,
+    "notes_exclude": [
+      "다시 계산"
+    ]
+  },
+  {
+    "why": "주거용 오피스텔 전세 2억: 별표2 임대차 1천분의 4 = 800,000원",
+    "input": {
+      "kind": "officetel",
+      "deal": "lease",
+      "price": 200000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 4,
+      "fee": 800000
+    }
+  },
+  {
+    "why": "오피스텔 매매 3억: 별표2 매매 1천분의 5 = 1,500,000원",
+    "input": {
+      "kind": "officetel",
+      "deal": "sale",
+      "price": 300000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 5,
+      "fee": 1500000
+    }
+  },
+  {
+    "why": "상가 매매 3억: 제20조④2호 1천분의 9 이내 → 상한 2,700,000원",
+    "input": {
+      "kind": "other",
+      "deal": "sale",
+      "price": 300000000,
+      "rent": 0
+    },
+    "expect": {
+      "permil": 9,
+      "fee": 2700000
+    },
+    "notes_include": [
+      "0.9% 이내"
+    ]
+  },
+  {
+    "why": "매매가 없음 → 입력 안내",
+    "input": {
+      "kind": "house",
+      "deal": "sale",
+      "price": 0,
+      "rent": 0
+    },
+    "expect": {},
+    "expect_error": true
+  }
+]
