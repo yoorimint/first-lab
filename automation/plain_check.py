@@ -101,7 +101,25 @@ REPEAT_MAX = 2  # 상자 숫자가 첫 소제목 앞 문단에 3개 이상 또 �
 
 
 TICK_MAX = 22
-STALE_WORDS = re.compile(r"지금 같은 \d+월|이번 달|요즘 같은")  # 올해·내년은 '올해(2026년)'·'적용 연도가 올해인지'처럼 바른 쓰임이 많아 뺌
+STALE_WORDS = re.compile(r"지금 같은 \d+월|이번 달|요즘 같은|지금은 잠시|현재 한시")  # 올해·내년은 '올해(2026년)'·'적용 연도가 올해인지'처럼 바른 쓰임이 많아 뺌
+
+
+# 법에 정의가 있는 용어를 풀 때 꼭 들어가야 하는 말 (11/10 감시 세션 직접 읽기에서 뜻 검수가 놓친 것 — 근로기준법 제2조·시행령 제6조)
+DEFINITION_MUST = {
+    "단시간근로자": (r"그 사업장|같은 사업장", "그 사업장에서 같은 일을 하는 통상 근로자보다 1주 소정근로시간이 짧은"),
+    "단시간 근로자": (r"그 사업장|같은 사업장", "그 사업장에서 같은 일을 하는 통상 근로자보다 1주 소정근로시간이 짧은"),
+    # 소정근로시간 '계약으로 정한 일하는 시간'은 법정 범위 말이 빠져도 뜻이 틀리지 않아 넣지 않음 (비교 대상이 바뀌는 단시간근로자만)
+}
+
+
+def loose_definitions(html: str) -> list[str]:
+    """'○○은/는 …예요' 처럼 용어를 풀어 쓴 문장에 법 정의의 핵심 말이 빠졌으면."""
+    out = []
+    for s in sentences(html):
+        for term, (must, hint) in DEFINITION_MUST.items():
+            if re.match(rf"\s*{term}(?:은|는)\s", s) and re.search(r"(이에요|예요|말해요|뜻이에요)\.?$", s) and not re.search(must, s):
+                out.append(f"'{term}' 뜻풀이에 법 정의 요소가 빠짐 — '{hint}' (문장: {s[:40]}…)")
+    return out
 
 
 def box_lines(html: str) -> list[str]:
@@ -190,6 +208,7 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
     stale = sorted(set(STALE_WORDS.findall(plain(new_html))))
     if stale:
         out.append(f"시간이 지나면 틀리는 말: {', '.join(stale)} — '2026년'처럼 연도·기간으로 (11/10 '지금 같은 11월')")
+    out += loose_definitions(new_html)
     rep = box_repeats(new_html)
     if len(rep) > REPEAT_MAX:
         out.append(f"한눈에 보기 상자 내용이 바로 아래 문단에서 되풀이됨 (숫자 {', '.join(rep[:6])}) — 상자에 있는 건 아래에서 빼고 새 내용만")

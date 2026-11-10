@@ -5748,6 +5748,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_definition_keeps_law_elements(self):
+        """11/10 감시 세션 직접 읽기: '단시간근로자는 통상 근로자보다 짧은 사람이에요'는 비교 대상('그 사업장에서 같은 일을 하는')이 빠짐 → 막음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        bad = "<p>단시간근로자는 같은 일을 하는 통상 근로자보다 1주 소정근로시간이 짧은 사람이에요.</p>"
+        self.assertTrue(pc.loose_definitions(bad))
+        self.assertEqual(pc.loose_definitions(bad.replace("같은 일을", "그 사업장에서 같은 일을")), [])
+        self.assertTrue(pc.STALE_WORDS.search("6,000원, 지금은 잠시 4,000원"))
+
     def test_box_tick_length_and_stale_words(self):
         """11/10: ✔ 줄이 길면 휴대폰에서 꺾임(22자까지), '지금 같은 11월'처럼 때가 지나면 틀리는 말은 막음."""
         sys.path.insert(0, str(ROOT / "automation"))
