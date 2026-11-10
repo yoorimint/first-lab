@@ -3188,11 +3188,11 @@ class DeploySpeedTest(unittest.TestCase):
         for script in ("setup.sh", "wp-setup.sh", "bot-setup.sh", "bot-check.sh"):
             self.assertIn(f'$LOW bash "$REPO/server/{script}"', wf)
 
-    def test_reviewed_list_change_deploys(self):
-        """서버가 automation/reviewed.txt 를 읽음 (계산기 공개·검수 관문) → 이 파일만 바뀌어도 배포."""
+    def test_every_main_push_deploys(self):
+        """서버가 automation/reviewed.txt 등을 읽음 → 경로 제한 없이 main 의 모든 커밋을 배포
+        (11/10: 문서만 바꾼 커밋이 배포되지 않아 서버 버전이 main 과 달라진 채 7시간 '배포 막힘' 알림)."""
         wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
-        paths = next(l for l in wf.splitlines() if l.strip().startswith("paths:"))
-        self.assertIn('"automation/reviewed.txt"', paths)
+        self.assertFalse([l for l in wf.splitlines() if l.strip().startswith("paths:")])
 
 class LawApiTest(unittest.TestCase):
     """법령 API: 서버는 신청값으로 직접, 다른 곳은 사이트 통로(토큰), 둘 다 없으면 None (화면 읽기로)."""
@@ -3884,6 +3884,16 @@ class DeployWatchTest(unittest.TestCase):
         self.assertNotIn("deploy_alert", state)
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=80), "ccc", "ddd"))
         self.assertIsNone(dw.check(state, t0 + timedelta(minutes=125), "ddd", "eee"))     # 배포가 진행 중이면 알림 없음
+
+    def test_clock_starts_when_main_moves_ahead(self):
+        """11/10: 서버가 main 과 같던 10시간을 기다린 시간으로 세어, 새 커밋 1분 뒤 '580분째' 거짓 알림."""
+        from datetime import datetime, timedelta
+        from bot import deploy_watch as dw
+        state, t0 = {}, datetime(2026, 11, 10, 13, 0)
+        self.assertIsNone(dw.check(state, t0, "aaa", "aaa"))
+        self.assertIsNone(dw.check(state, t0 + timedelta(hours=10), "aaa", "aaa"))
+        self.assertIsNone(dw.check(state, t0 + timedelta(hours=10, minutes=1), "aaa", "bbb"))   # 막 앞서기 시작 → 알림 없음
+        self.assertIn("61분째", dw.check(state, t0 + timedelta(hours=11, minutes=2), "aaa", "bbb"))
 
     def test_reads_main_via_repo_origin_and_logs_failure(self):
         """11/6: 비공개 저장소를 주소만으로 ls-remote → 빈 값 → 75분 막혀도 알림 없음. 배포가 쓰는 origin 으로 읽고, 못 읽으면 기록."""

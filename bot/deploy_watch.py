@@ -29,11 +29,16 @@ def check(state: dict, now: datetime, deployed: str, main: str) -> str | None:
     now = now.replace(tzinfo=None)  # 봇은 KST 시각(시간대 있음)을 넘김 — 저장한 시각(시간대 없음)과 빼려면 맞춰야 함 (11/5 검토: TypeError)
     w = state.get("deploy_watch") or {}
     stamp = now.strftime("%Y-%m-%d %H:%M")
-    if deployed != w.get("deployed"):
-        w = {"deployed": deployed, "since": stamp}          # 배포가 진행됨 → 시계 다시
+    behind = bool(main and deployed and main != deployed)
+    # 시계는 'main 이 서버보다 앞서기 시작한 때'부터 (배포가 진행되면 다시). 11/10: 서버가 main 과 같던 10시간을 기다린 시간으로 세어,
+    # 새 커밋이 올라온 지 1분 만에 '580분째 안 올라감' 거짓 알림 → 건강 점검 실패
+    if not behind:
+        w = {"deployed": deployed, "since": ""}
+    elif deployed != w.get("deployed") or not w.get("since"):
+        w = {"deployed": deployed, "since": stamp}
     w["main"] = main
     state["deploy_watch"] = w
-    if not main or not deployed or main == deployed:
+    if not behind:
         state.pop("deploy_alert", None)
         return None
     waited = (now - datetime.strptime(w["since"], "%Y-%m-%d %H:%M")).total_seconds() / 60

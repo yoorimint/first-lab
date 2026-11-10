@@ -4,7 +4,8 @@ name: Deploy server config
 on:
   push:
     branches: [main]
-    paths: ["server/**", "wordpress/**", "bot/**", "tests/**", "automation/reviewed.txt", ".github/workflows/deploy.yml"]   # reviewed.txt: 서버가 계산기 공개·검수 관문에 읽음
+    # 경로 제한 없음: main 의 모든 커밋을 배포 (11/10: 문서만 바꾼 커밋은 배포가 안 돌아 서버 버전이 main 과 계속 달라짐 →
+    #   15분 따라잡기 예약은 GitHub 이 몇 시간씩 미루기도 해 '배포 막힘' 알림이 7시간 남음. 서버도 automation/ 을 읽음)
   workflow_dispatch: # GitHub 화면에서 수동 실행도 가능
   schedule:
     # 따라잡기: GitHub 오류로 push 배포가 시작되지 않는 일이 있었음 (11/4) → 15분마다 서버 버전이 main 과 다르면 배포
