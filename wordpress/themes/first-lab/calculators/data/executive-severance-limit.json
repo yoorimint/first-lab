@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-08", "yearly": false,
+  "basis_date": "2026-11-08", "law_checked": ["소득세법|2027-01-01", "소득세법 시행령|2027-01-01"], "yearly": false,
   "max_input": 100000000000,
   "max_months": 1200,
   "sources": [
