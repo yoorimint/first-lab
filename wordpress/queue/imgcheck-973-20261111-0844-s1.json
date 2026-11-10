@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 973,
+ "replace": [
+  {
+   "old": "ai-f14d42b694",
+   "prompt": "A plain yellow excavator with no markings parked on an empty dirt construction site at sunrise, soft warm light, wide shot, no text, no logos.",
+   "alt": "해 뜰 무렵 빈 공사 현장에 세워 둔 굴착기",
+   "why": "굴착기 팔과 차체에 엉터리 상표 글자(ACTAT, CAAT)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}
