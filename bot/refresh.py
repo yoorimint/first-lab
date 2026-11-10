@@ -249,7 +249,7 @@ def _checked_title(data: dict, content: str) -> tuple[str, str]:
     return title, excerpt
 
 
-def _save(post_id: int, new_html: str | None, title: str = "", excerpt: str = "") -> None:
+def _save(post_id: int, new_html: str | None, title: str = "", excerpt: str = "", stamp: bool = True) -> None:
     """본문(None 이면 그대로)·제목·요약문(빈 값이면 그대로) 반영 + 갱신 날짜 기록.
     제목이 바뀌면 대표 이미지(제목 카드)는 1분마다 도는 봇이 다시 만든다 (run._sync_recent_cards)."""
     if new_html is not None:
@@ -257,7 +257,8 @@ def _save(post_id: int, new_html: str | None, title: str = "", excerpt: str = ""
     fields = [f"--post_title={title}"] * bool(title) + [f"--post_excerpt={excerpt}"] * bool(excerpt)
     if fields:
         wp_cli("post", "update", str(post_id), *fields)
-    wp_cli("post", "meta", "update", str(post_id), META_KEY, datetime.now().strftime("%Y-%m-%d"))
+    if stamp:
+        wp_cli("post", "meta", "update", str(post_id), META_KEY, datetime.now().strftime("%Y-%m-%d"))
 
 
 def _week() -> str:
@@ -321,9 +322,13 @@ def apply_direct(data: dict, state: dict) -> str:
     if new_html is None and not title and data.get("checked") is not True:
         raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음 (확인만 했으면 \"checked\": true)")
     # checked: 재검증해 보니 고칠 게 없음 → 갱신 날짜만 기록 (안 하면 근거 변경 표시가 안 풀려 매일 같은 글이 다시 뽑힘)
-    _save(post_id, new_html, title, excerpt)
-    _renew_evidence(post_id, data.get("review"))
-    if data.get("kind") != "plain":  # 쉬운 말 다듬기(automation/plain_check.py)는 사실이 같아 주간 갱신 한도에서 안 셈 (11/10: 다듬기 16편이 한도를 채워 보강이 멈췄음)
+    plain = data.get("kind") == "plain"
+    # 쉬운 말 다듬기는 사실을 다시 확인한 게 아님 → 확인한 날(갱신일·검수 통과일)을 오늘로 바꾸지 않음.
+    # 바꾸면 공개 직전 지난 기한 검사(expiry.passed_rounds)·다시 확인할 날(expiry.due_date)이 미뤄짐 (11/10 #561 '11월 9일까지예요')
+    _save(post_id, new_html, title, excerpt, stamp=not plain)
+    if not plain:
+        _renew_evidence(post_id, data.get("review"))
+    if not plain:  # 쉬운 말 다듬기(automation/plain_check.py)는 사실이 같아 주간 갱신 한도에서 안 셈 (11/10: 다듬기 16편이 한도를 채워 보강이 멈췄음)
         _count_done(state)
     if target.get("id") == post_id:
         state.pop("refresh_target", None)

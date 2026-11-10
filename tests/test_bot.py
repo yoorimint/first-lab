@@ -223,6 +223,8 @@ class DirectRefreshTest(unittest.TestCase):
         with mock.patch.object(refresh, "wp_cli", side_effect=wp):
             refresh.apply_direct(data, state)
         self.assertEqual(sum(state["refresh"].values()), 0)
+        # 다듬기는 사실 확인이 아님 → 확인한 날(갱신일·검수 통과일)을 오늘로 안 바꿈 (11/10: 바뀌면 지난 기한 검사가 미뤄짐)
+        self.assertFalse(any(refresh.META_KEY in a or "_firstlab_verified_at" in a for a in calls))
         sys.path.insert(0, str(ROOT / "automation"))
         import plain_check
         self.assertIn('"kind": "plain"', plain_check.refresh_file.__code__.co_consts.__repr__() + Path(plain_check.__file__).read_text(encoding="utf-8"))
@@ -5747,6 +5749,22 @@ class PlainCheckTest(unittest.TestCase):
         links = '<h2>공식 안내 바로가기</h2><ul><li><a href="https://x.go.kr">근로기준법 제55조 (휴일)</a></li><li><a href="https://y.go.kr">시행령 (주휴)</a></li></ul>'
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
+
+    def test_expired_deadline_not_carried_over(self):
+        """11/10 #561 '이 기한은 2026년 11월 9일까지예요'·#1734 '…11월 9일에 끝나요' — 저장 뒤 지난 기한을 그대로 옮기면 막음."""
+        import datetime as dt
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        written, today = dt.date(2026, 11, 6), dt.date(2026, 11, 10)
+        for s in ("이 기한은 2026년 11월 9일까지예요.", "이 기한은 늦어도 2026년 11월 9일에 끝나요."):
+            self.assertTrue(pc.expired_deadlines(f"<p>{s}</p>", written, today), s)
+        for s in ("이 기한은 2026년 11월 9일까지였어요.",                       # 지난 일로 씀
+                  "2026년 10월부터 바뀐 처분 기한 2년이에요.",                   # 이미 바뀐 규칙
+                  "10월 1일~31일에 신청: 그해 10월 보험료부터 조정돼요.",         # 해마다 같은 규칙
+                  "이 기한은 2026년 12월 31일까지예요."):                       # 아직 앞날
+            self.assertEqual(pc.expired_deadlines(f"<p>{s}</p>", written, today), [], s)
+        self.assertTrue(any("지난 기한" in p for p in pc.problems("<p>이 기한은 2026년 11월 9일까지예요.</p>",
+                                                                "<p>이 기한은 2026년 11월 9일까지예요.</p>", written=written)))
 
     def test_verified_fix_allows_number_change(self):
         """원래 글 오류를 법으로 확인해 고칠 때만 숫자 변경 허용 (--fix, 이유를 갱신 파일에 남김) — 11/10 #1455 장기요양 '11월분부터'→'1월분부터'."""

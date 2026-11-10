@@ -122,6 +122,15 @@ def loose_definitions(html: str) -> list[str]:
     return out
 
 
+def expired_deadlines(html: str, written, today=None) -> list[str]:
+    """11/10 #561 '이 기한은 2026년 11월 9일까지예요' — 마지막 저장(written) 때 앞날이던 기한이 지났는데 그대로 옮기지 않게
+    (공개 직전 검사 bot/expiry.passed_rounds 와 같은 판정. 쉬운 말 갱신은 확인한 날을 바꾸지 않으므로 여기서도 막음)."""
+    from datetime import date
+    from bot import expiry
+    return [f"지난 기한을 앞날처럼 씀 — 지난 일로 쓰거나 다음 회차로: {x}"
+            for x in expiry.passed_rounds(expiry.blocks(html), written, today or date.today())]
+
+
 def box_lines(html: str) -> list[str]:
     lead = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
     return [plain(x) for x in re.split(r"<br\s*/?>", lead.group(1))] if lead else []
@@ -174,8 +183,9 @@ def lost_terms(old_html: str, new_html: str, title: str = "") -> list[str]:
     return out
 
 
-def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | None = None) -> list[str]:
-    """allow: 법·공식 자료로 확인한 원래 글 오류를 고치며 바뀌는 숫자 (--fix 로만, 이유와 함께 갱신 파일에 남음)."""
+def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | None = None, written=None) -> list[str]:
+    """allow: 법·공식 자료로 확인한 원래 글 오류를 고치며 바뀌는 숫자 (--fix 로만, 이유와 함께 갱신 파일에 남음).
+    written: 원래 글을 마지막으로 저장한 날 (그 뒤 지난 기한 검사)."""
     allow = allow or set()
     out = []
     lost = lost_terms(old_html, new_html, title)
@@ -212,6 +222,7 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     if stale:
         out.append(f"시간이 지나면 틀리는 말: {', '.join(stale)} — '2026년'처럼 연도·기간으로 (11/10 '지금 같은 11월')")
     out += loose_definitions(new_html)
+    out += expired_deadlines(new_html, written) if written else []
     rep = box_repeats(new_html)
     if len(rep) > REPEAT_MAX:
         out.append(f"한눈에 보기 상자 내용이 바로 아래 문단에서 되풀이됨 (숫자 {', '.join(rep[:6])}) — 상자에 있는 건 아래에서 빼고 새 내용만")
@@ -243,13 +254,14 @@ def main(argv: list[str]) -> int:
     if fix and ":" not in fix:
         print("--fix=숫자,숫자:근거 — 바꾸는 이유(법·공식 자료)를 꼭 적기")
         return 2
-    found = problems(original["content_html"], new_html, original.get("title", ""), allow)
+    base = original.get("base_modified") or ""
+    written = datetime.strptime(base[:10], "%Y-%m-%d").date() if base else None
+    found = problems(original["content_html"], new_html, original.get("title", ""), allow, written)
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))
         return 1
     print("통과")
     if "--write" in argv:
-        base = original.get("base_modified") or ""
         if not base:
             print("원본 JSON 에 base_modified 가 없음 (서버 /post 응답) — 그 사이 바뀐 글을 덮을 수 있어 갱신 파일을 만들지 않음")
             return 1
