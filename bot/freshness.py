@@ -202,6 +202,8 @@ def check_post(post_id: int, today: dt.date | None = None) -> list[str]:
         title = excerpt = content = ""
     out += expiry.passed_rounds([title, excerpt] + expiry.blocks(content), since, today)
     out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(content)))
+    from .condition_gate import known_wrong  # 법 원문으로 틀렸다고 확인한 문구가 대기 초안에 남아 있으면 공개 전 보류 (11/10 #588·#1841)
+    out += known_wrong(content) if content else []
     out += template_twin(post_id, content) if content else []
     out += same_topic(post_id, urllib.parse.unquote(get("post_name")))
     # 대기열에 들어간 뒤라도 본문 계산기가 독립 검수 전이면 공개하지 않음 (11/5 운영자 '계산기들은 전부 발행처리했네?')

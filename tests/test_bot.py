@@ -5750,6 +5750,21 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_known_wrong_phrases(self):
+        """11/10 뜻 검수에서 법 원문으로 틀렸다고 확인한 문구가 여러 글에 되풀이됨 → 새 글 관문·다듬기·공개 직전에서 막음."""
+        from bot import condition_gate as cg
+        for s in ("<p>중도상환수수료는 대출일부터 3년 이내에 갚을 때만 받을 수 있어요.</p>",
+                  "<p>바우처는 분만예정일로부터 2년까지 써요.</p>",
+                  "<p>장기요양보험은 2026년 11월분부터 13.14%예요.</p>",
+                  "<p>해외주식은 양도일까지 계속 5년 이상 국내에 주소를 둔 거주자가 내요.</p>"):
+            self.assertTrue(cg.known_wrong(s), s)
+        for s in ("<p>중도상환수수료는 3년 이내에 갚을 때나 다른 법령이 허용할 때 등, 법이 정한 경우에만 받을 수 있어요.</p>",
+                  "<p>장기요양보험은 2026년 1월분부터 13.14%예요.</p>",
+                  "<p>해외주식은 이 5년 조건이 없어요.</p>"):
+            self.assertEqual(cg.known_wrong(s), [], s)
+        self.assertIn("known_wrong", (ROOT / "bot" / "freshness.py").read_text(encoding="utf-8"))
+        self.assertIn("known_wrong", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
     def test_duplicated_paragraph_blocked(self):
         """11/10 #1143: 원래 긴 문단을 안 지우고 나눈 문장을 아래에 또 씀 → 같은 내용 두 번 (바뀐 곳만 보는 최종 읽기로는 못 봄)."""
         sys.path.insert(0, str(ROOT / "automation"))
