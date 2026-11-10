@@ -5748,6 +5748,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_verified_fix_allows_number_change(self):
+        """원래 글 오류를 법으로 확인해 고칠 때만 숫자 변경 허용 (--fix, 이유를 갱신 파일에 남김) — 11/10 #1455 장기요양 '11월분부터'→'1월분부터'."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        old, new = "<p>요율은 2026년 11월분부터예요.</p>", "<p>요율은 2026년 1월분부터예요.</p>"
+        self.assertTrue(any("숫자" in p for p in pc.problems(old, new)))
+        self.assertTrue(any("숫자" in p for p in pc.problems(old, new, allow={"11"})))   # 새로 생긴 1 도 적어야
+        self.assertFalse(any("숫자" in p for p in pc.problems(old, new, allow={"11", "1"})))
+
     def test_definition_keeps_law_elements(self):
         """11/10 감시 세션 직접 읽기: '단시간근로자는 통상 근로자보다 짧은 사람이에요'는 비교 대상('그 사업장에서 같은 일을 하는')이 빠짐 → 막음."""
         sys.path.insert(0, str(ROOT / "automation"))

@@ -174,7 +174,9 @@ def lost_terms(old_html: str, new_html: str, title: str = "") -> list[str]:
     return out
 
 
-def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
+def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | None = None) -> list[str]:
+    """allow: 법·공식 자료로 확인한 원래 글 오류를 고치며 바뀌는 숫자 (--fix 로만, 이유와 함께 갱신 파일에 남음)."""
+    allow = allow or set()
     out = []
     lost = lost_terms(old_html, new_html, title)
     if lost:
@@ -183,7 +185,8 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
     for kind in before:
         lost, added = before[kind] - after[kind], after[kind] - before[kind]
         if kind == "숫자":  # 같은 숫자를 한 번 더 쓰는 것(쉬운 첫 문장에 핵심 숫자 반복)은 괜찮음 — 새 숫자·빠진 숫자만
-            added = Counter({k: v for k, v in added.items() if k not in before[kind]})
+            added = Counter({k: v for k, v in added.items() if k not in before[kind] and k not in allow})
+            lost = Counter({k: v for k, v in lost.items() if k not in allow})
         if lost:
             out.append(f"{kind} 빠짐: {', '.join(list(lost)[:8])}")
         if added:
@@ -220,10 +223,11 @@ def problems(old_html: str, new_html: str, title: str = "") -> list[str]:
     return out
 
 
-def refresh_file(post_id: int, base_modified: str, new_html: str) -> Path:
+def refresh_file(post_id: int, base_modified: str, new_html: str, fix_reason: str = "") -> Path:
     path = ROOT / "wordpress" / "queue" / f"refresh-plain-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
     path.write_text(json.dumps({"type": "refresh", "kind": "plain", "post_id": post_id, "base_modified": base_modified, "content_html": new_html,
-                                "changes": "쉬운 말 다듬기 (숫자·법 조항·링크 그대로, automation/plain_check.py 대조 통과)"},
+                                "changes": "쉬운 말 다듬기 (숫자·법 조항·링크 그대로, automation/plain_check.py 대조 통과)"
+                                           + (f" / 원래 글 오류 정정: {fix_reason}" if fix_reason else "")},
                                ensure_ascii=False), encoding="utf-8")
     return path
 
@@ -234,7 +238,12 @@ def main(argv: list[str]) -> int:
         return 2
     post_id, original, new_file = int(argv[0]), json.loads(Path(argv[1]).read_text(encoding="utf-8")), Path(argv[2])
     new_html = split_long_paragraphs(new_file.read_text(encoding="utf-8"))  # 긴 문단은 자동으로 끊어서 검사·반영
-    found = problems(original["content_html"], new_html, original.get("title", ""))
+    fix = next((a.split("=", 1)[1] for a in argv if a.startswith("--fix=")), "")  # 예: --fix=11,0.9448:장기요양 요율 2026년 1월분부터(노인장기요양보험법 시행령 제4조)
+    allow = set(fix.split(":", 1)[0].split(",")) if fix else set()
+    if fix and ":" not in fix:
+        print("--fix=숫자,숫자:근거 — 바꾸는 이유(법·공식 자료)를 꼭 적기")
+        return 2
+    found = problems(original["content_html"], new_html, original.get("title", ""), allow)
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))
         return 1
@@ -244,7 +253,7 @@ def main(argv: list[str]) -> int:
         if not base:
             print("원본 JSON 에 base_modified 가 없음 (서버 /post 응답) — 그 사이 바뀐 글을 덮을 수 있어 갱신 파일을 만들지 않음")
             return 1
-        print(refresh_file(post_id, base, new_html))
+        print(refresh_file(post_id, base, new_html, fix.split(":", 1)[1] if fix else ""))
     return 0
 
 
