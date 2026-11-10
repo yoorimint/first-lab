@@ -5767,7 +5767,8 @@ class PlainCheckTest(unittest.TestCase):
                   "<p>장기요양보험은 2026년 11월분부터 13.14%예요.</p>",
                   "<p>해외주식은 양도일까지 계속 5년 이상 국내에 주소를 둔 거주자가 내요.</p>",
                   "<p>새마을금고·농협·수협 같은 상호금융은 금융소비자보호법 대상이 아니에요.</p>",
-                  "<p>서면 촉구와 서면 통보 중 한 단계라도 빠졌다면 수당을 청구할 수 있어요.</p>"):
+                  "<p>서면 촉구와 서면 통보 중 한 단계라도 빠졌다면 수당을 청구할 수 있어요.</p>",
+                  "<p>실업급여의 정식 이름은 구직급여예요.</p>"):
             self.assertTrue(cg.known_wrong(s), s)
         for s in ("<p>중도상환수수료는 3년 이내에 갚을 때나 다른 법령이 허용할 때 등, 법이 정한 경우에만 받을 수 있어요.</p>",
                   "<p>장기요양보험은 2026년 1월분부터 13.14%예요.</p>",
@@ -5838,6 +5839,9 @@ class PlainCheckTest(unittest.TestCase):
         self.assertTrue(pc.loose_definitions(bad))
         self.assertEqual(pc.loose_definitions(bad.replace("같은 일을", "그 사업장에서 같은 일을")), [])
         self.assertTrue(pc.STALE_WORDS.search("6,000원, 지금은 잠시 4,000원"))
+        # 11/10 #1800·#475: '보수를 받은 날'은 법 정의(보수 지급의 기초가 된 날)와 다름
+        self.assertTrue(pc.loose_definitions("<p>피보험 단위기간은 보수를 받은 날을 합한 기간이에요.</p>"))
+        self.assertEqual(pc.loose_definitions("<p>피보험 단위기간은 보수 지급의 기초가 된 날을 합한 기간이에요.</p>"), [])
 
     def test_box_tick_length_and_stale_words(self):
         """11/10: ✔ 줄이 길면 휴대폰에서 꺾임(22자까지), '지금 같은 11월'처럼 때가 지나면 틀리는 말은 막음."""
