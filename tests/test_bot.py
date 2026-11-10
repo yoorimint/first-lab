@@ -6084,6 +6084,13 @@ class PlainStyleGateTest(unittest.TestCase):
         self.assertIn("쉬운 말", str(e.exception))
         self.assertFalse([c for c in calls if c[:2] == ("post", "update")])
 
+    def test_box_tick_lines_are_separate_sentences(self):
+        """11/10 #1734: 상자 ✔ 줄은 마침표 없이 <br> 로 나뉘는데 읽기 검사가 한 문장(106자)으로 봐서 ✔ 줄을 4개 넘게 못 씀 → 줄마다 따로."""
+        from bot import condition_gate as cg
+        box = "답이에요.<br>도입이에요.<br>" + "<br>".join(f"✔ 상자 줄 {i}번째 조건을 적어요" for i in range(6))
+        self.assertEqual(cg.readability_element("p", box), [])
+        self.assertTrue(cg.readability_element("p", "가" * 120 + "요."))
+
     def test_review_patch_must_be_plain(self):
         sys.path.insert(0, str(ROOT / "automation"))
         import apply_review

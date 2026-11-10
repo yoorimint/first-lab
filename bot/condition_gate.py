@@ -1266,7 +1266,8 @@ def readability_element(tag: str, inner_html: str) -> list[str]:
     out = []
     if len(text) > limit:
         out.append(f"{'목록 항목' if tag == 'li' else '문단'}이 {len(text)}자 (기준 {limit}자) — 나누거나 줄이기: {text[:30]}")
-    for s in split_sentences(text):
+    lines = re.split(r"<br\s*/?>", inner_html or "")  # 한눈에 보기 상자 ✔ 줄은 마침표 없이 <br> 로 나뉨 — 줄마다 따로 (11/10 #1734 상자가 한 문장 106자로 잡힘)
+    for s in [x for line in lines for x in split_sentences(_plain(line))]:
         if len(s) > READ_SENT_MAX:
             out.append(f"문장이 {len(s)}자 (기준 {READ_SENT_MAX}자) — 두 문장으로: {s[:30]}")
     refs = LAW_REF.findall(text)
