@@ -1352,3 +1352,18 @@ def known_wrong(body_html: str, today: dt.date | None = None) -> list[str]:
             if today >= since and re.search(wrong, sent) and not re.search(ok, sent):
                 out.append(f"시행일 지나 바뀐 말: '{sent[:50]}' — {fix}")
     return list(dict.fromkeys(out))
+
+
+BALANCED_TAGS = ("p", "ul", "ol", "li", "table", "tr", "td", "th", "h2", "h3", "strong", "a")
+
+
+def html_unbalanced(body_html: str) -> list[str]:
+    """여는 태그와 닫는 태그 수가 다른 것 (11/10 #2295: 목록 뒤에 짝 없는 '</li></ul>' — 화면에서 목록·문단이 깨질 수 있음)."""
+    html = re.sub(r"<!--.*?-->", "", body_html or "", flags=re.S)
+    out = []
+    for t in BALANCED_TAGS:
+        opened = len(re.findall(rf"<{t}(?:\s[^>]*)?>", html, re.I))
+        closed = len(re.findall(rf"</{t}\s*>", html, re.I))
+        if opened != closed:
+            out.append(f"HTML 태그 짝이 안 맞음: <{t}> {opened}개, </{t}> {closed}개")
+    return out

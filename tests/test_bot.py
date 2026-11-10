@@ -5759,6 +5759,13 @@ class PlainCheckTest(unittest.TestCase):
         self.assertTrue(patch_check.rewritten("<p><strong>한 줄 정리:</strong> 요약</p>"))
         self.assertFalse(patch_check.rewritten("<p>보통 글</p>"))
 
+    def test_html_unbalanced_blocked(self):
+        """11/10 #2295: 목록 뒤에 짝 없는 '</li></ul>' — 새 글 관문·다듬기 검사에서 막음."""
+        from bot import condition_gate as cg
+        self.assertEqual(cg.html_unbalanced("<ul><li>가</li></ul><p>나</p>"), [])
+        self.assertTrue(cg.html_unbalanced("<ul><li>가</li></ul></li></ul><p>나</p>"))
+        self.assertIn("html_unbalanced", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
     def test_known_wrong_phrases(self):
         """11/10 뜻 검수에서 법 원문으로 틀렸다고 확인한 문구가 여러 글에 되풀이됨 → 새 글 관문·다듬기·공개 직전에서 막음."""
         from bot import condition_gate as cg

@@ -275,6 +275,7 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
         out.append(f"문장 {MAX_SENT + 1}개 이상인 문단 {len(crowded_p)}개 — 휴대폰에서 한 덩어리로 보임, 문장 {MAX_SENT}개마다 끊기 (예: {crowded_p[0]}…)")
     from bot import condition_gate
     out += condition_gate.known_wrong(new_html)
+    out += condition_gate.html_unbalanced(new_html)
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
     return out
 
