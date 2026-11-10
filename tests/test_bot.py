@@ -5750,6 +5750,16 @@ class PlainCheckTest(unittest.TestCase):
         self.assertFalse(any("괄호" in p for p in pc.problems(self.OLD + links, new + links)))  # 글 끝 링크 목록은 문장 검사에서 뺌
         self.assertTrue(any("괄호" in p for p in pc.problems(self.OLD, new.replace("주휴수당을 받아요", "주휴수당(유급)을 받아요(법)"))))
 
+    def test_duplicated_paragraph_blocked(self):
+        """11/10 #1143: 원래 긴 문단을 안 지우고 나눈 문장을 아래에 또 씀 → 같은 내용 두 번 (바뀐 곳만 보는 최종 읽기로는 못 봄)."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        old = "<p>공제회는 사실관계를 확인한 뒤 결과를 근로자와 사업주에게 알려 주고 기록으로 남겨요.</p>"
+        dup = old + "<p>공제회는 사실관계를 확인한 뒤, 결과를 근로자와 사업주에게 알려 주고 기록으로 남겨요.</p>"
+        self.assertTrue(pc.duplicated_text(old, dup))
+        self.assertEqual(pc.duplicated_text(dup, dup), [])  # 원래 글에도 두 곳이면 다듬기 탓 아님
+        self.assertEqual(pc.duplicated_text(old, old + "<p>다른 내용으로 근로자는 적립된 일수를 공제회 누리집에서 언제든 볼 수 있어요.</p>"), [])
+
     def test_final_read_shows_scorecard(self):
         """11/10 운영자 '최종 검토할 때 점수도 확인해서 미달이면 다시 수정해야지' — 최종 읽기(plain_diff) 맨 위에 점수표."""
         sys.path.insert(0, str(ROOT / "automation"))

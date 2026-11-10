@@ -132,6 +132,41 @@ def expired_deadlines(html: str, written, today=None) -> list[str]:
             for x in expiry.passed_rounds(expiry.blocks(html), written, today or date.today())]
 
 
+DUP_MIN, DUP_SHARE = 30, 0.8  # 30자 넘는 문단·목록 항목끼리 글자 3개 묶음이 80% 넘게 겹치면 같은 내용 (#1143 0.82·0.89, 다른 내용인 비슷한 표 줄은 0.7대)
+
+
+def _units(html: str) -> list[str]:
+    body = (html or "").split("공식 안내 바로가기")[0]
+    body = re.sub(r"<p[^>]*>\s*<strong>이런 건 꼭 확인하세요</strong>\s*</p>\s*<ul[^>]*>.*?</ul>", " ", body, flags=re.S)  # 확인 목록은 본문 요약이라 겹치는 게 정상
+    texts = (plain(x) for _, x in re.findall(r"<(p|li|td)[^>]*>(.*?)</\1>", body, re.S))
+    return [t for t in texts if len(t) > DUP_MIN and not t.startswith(("근거", "한 줄 정리"))]
+
+
+def _grams(t: str) -> set[str]:
+    t = re.sub(r"\s+", "", t)
+    return {t[i:i + 3] for i in range(len(t) - 2)}
+
+
+def _dup_pairs(html: str) -> list[str]:
+    units = [(_grams(t), t) for t in _units(html)]
+    out = []
+    for i, (a, ta) in enumerate(units):
+        for b, tb in units[i + 1:]:
+            if a and b and len(a & b) / min(len(a), len(b)) > DUP_SHARE:
+                out.append(min(ta, tb, key=len))
+    return out
+
+
+def duplicated_text(old_html: str, new_html: str) -> list[str]:
+    """11/10 #1143: 다듬을 때 원래 긴 문단을 안 지우고 나눈 문장을 그 아래에 또 써서 같은 내용이 두 번 나옴
+    (최종 읽기 plain_diff 는 바뀐 곳만 보여 줘서 안 바뀐 원래 문단이 남은 걸 못 봄). 원래 글에 없던 겹침만."""
+    old_units = [_grams(t) for t in _units(old_html)]
+    def in_old(t: str) -> int:  # 원래 글에서 이 내용이 나온 문단 수 (원래도 두 곳이면 다듬기 탓이 아님 — 예: 근로기준법 1년·기간제법 2년)
+        g = _grams(t)
+        return sum(1 for u in old_units if g and u and len(g & u) / min(len(g), len(u)) > DUP_SHARE)
+    return [t for t in dict.fromkeys(_dup_pairs(new_html)) if in_old(t) < 2]
+
+
 def box_lines(html: str) -> list[str]:
     lead = re.search(r"<p[^>]*>(.*?)</p>", html or "", re.S)
     return [plain(x) for x in re.split(r"<br\s*/?>", lead.group(1))] if lead else []
@@ -226,6 +261,9 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     if stale:
         out.append(f"시간이 지나면 틀리는 말: {', '.join(stale)} — '2026년'처럼 연도·기간으로 (11/10 '지금 같은 11월')")
     out += loose_definitions(new_html)
+    dup = duplicated_text(old_html, new_html)
+    if dup:
+        out.append(f"같은 내용이 두 번 나옴 {len(dup)}곳 — 원래 문단을 지우고 고친 문장만 남기기 (예: {dup[0][:40]}…)")
     out += expired_deadlines(new_html, written) if written else []
     rep = box_repeats(new_html)
     if len(rep) > REPEAT_MAX:
