@@ -45,6 +45,7 @@ def scorecard(html: str) -> str:
     """최종 읽기 맨 위에 점수표 (11/10 운영자 '최종 검토할 때 점수도 확인해서 미달이면 다시 수정해야지') —
     기준 글 #1419 와 같은 잣대(plain_check)로 재고, 미달이면 반영하지 말고 다시 다듬는다."""
     import plain_check as pc
+    html = pc.split_long_paragraphs(html)  # plain_check 와 같은 기준으로 셈
     sents = [x for x in pc.sentences(html) if not x.startswith(("근거", "한 줄 정리")) and "✔" not in x]
     longs = [x for x in sents if len(x) > pc.LONG_SENT]
     first = len(pc.first_sentence(html))
