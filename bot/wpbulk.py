@@ -9,7 +9,8 @@ import json
 
 from .settings import wp_cli
 
-META_KEYS = ("_thumbnail_id", "_firstlab_card", "_firstlab_photo", "_firstlab_img_pending", "_firstlab_img_checked")
+META_KEYS = ("_thumbnail_id", "_firstlab_card", "_firstlab_photo", "_firstlab_img_pending", "_firstlab_img_checked",
+             "_firstlab_patches_upto", "_firstlab_refreshed")
 
 _PHP = r"""
 $out = array();

@@ -286,7 +286,9 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
 
 def refresh_file(post_id: int, base_modified: str, new_html: str, fix_reason: str = "") -> Path:
     path = ROOT / "wordpress" / "queue" / f"refresh-plain-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
+    upto = len(json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")))  # 이때까지의 패치는 이 글에 녹음 (bot/fix_posts.UPTO_META)
     path.write_text(json.dumps({"type": "refresh", "kind": "plain", "post_id": post_id, "base_modified": base_modified, "content_html": new_html,
+                                "patches_upto": upto,
                                 "changes": "쉬운 말 다듬기 (숫자·법 조항·링크 그대로, automation/plain_check.py 대조 통과)"
                                            + (f" / 원래 글 오류 정정: {fix_reason}" if fix_reason else "")},
                                ensure_ascii=False), encoding="utf-8")

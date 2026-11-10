@@ -229,6 +229,16 @@ class DirectRefreshTest(unittest.TestCase):
         import plain_check
         self.assertIn('"kind": "plain"', plain_check.refresh_file.__code__.co_consts.__repr__() + Path(plain_check.__file__).read_text(encoding="utf-8"))
 
+    def test_rewrite_records_patch_upto(self):
+        """11/10 운영자 '변경된 글 기준으로 고쳐야지': 본문을 다시 쓰면 그때까지 패치 수를 글에 남김 → 배포 때 예전 패치가 새 글을 덮어쓰지 않음."""
+        wp, calls = self.fake_wp()
+        data = {"post_id": 59, "kind": "plain", "base_modified": "2026-11-04 10:00:00", "content_html": "<p>" + "나" * 120 + "</p>",
+                "patches_upto": 1078}
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp):
+            refresh.apply_direct(data, {"refresh": {}})
+        self.assertIn(("post", "meta", "update", "59", "_firstlab_patches_upto", "1078"), calls)
+        self.assertIn('"patches_upto"', (ROOT / "automation" / "plain_check.py").read_text(encoding="utf-8"))
+
     def test_apply_direct_refuses_conflict_and_shrink(self):
         for modified, html in (("2026-11-05 09:00:00", "<p>" + "나" * 120 + "</p>"),  # 그 사이 수정됨
                                ("2026-11-04 10:00:00", "<p>짧음</p>")):                  # 본문이 크게 줄어듦
@@ -3124,6 +3134,26 @@ class DeploySpeedTest(unittest.TestCase):
         self.assertIn("새 문장", bulk["1"]["content"])
         self.assertEqual(bulk["1"]["title"], "새 제목")
 
+    def test_patches_before_rewrite_not_reapplied(self):
+        """11/10 #1775: 다시 쓴 글에 예전 패치가 다시 적용돼 '한 줄 정리'가 사라짐 → 다시 쓴 때(_firstlab_patches_upto) 전 패치는 건너뛰고,
+        그 뒤 새 검수 패치만 적용. 장치 전에 다시 쓴 글('한 줄 정리')은 한 번 표시."""
+        from bot import fix_posts
+        bulk = {"1": {"content": "<p>옛 문장</p><p>둘째 문장</p>", "title": "t", "excerpt": "e", "name": "n", "status": "draft",
+                      "meta": {"_firstlab_patches_upto": "1"}},
+                "2": {"content": "<p><strong>한 줄 정리:</strong> 요약</p>", "title": "t", "excerpt": "e", "name": "n", "status": "draft", "meta": {}}}
+        calls = []
+        patches = [{"post": 1, "why": "x", "find": "옛 문장", "replace_paragraph": "예전 고친 문장", "tag": "p"},
+                   {"post": 1, "why": "y", "find": "둘째 문장", "replace_paragraph": "새로 고친 문장", "tag": "p"}]
+        with mock.patch.object(fix_posts, "PATCHES") as path, mock.patch.object(fix_posts, "wp_cli", side_effect=lambda *a: calls.append(a) or ""):
+            path.exists.return_value = True
+            path.read_text.return_value = json.dumps(patches, ensure_ascii=False)
+            fix_posts.apply_patches(bulk)
+        self.assertIn("옛 문장", bulk["1"]["content"])        # 다시 쓰기 전 패치는 적용 안 함
+        self.assertIn("새로 고친 문장", bulk["1"]["content"])  # 다시 쓴 뒤 패치는 적용
+        self.assertIn(("post", "meta", "update", "2", "_firstlab_patches_upto", "2"), calls)  # 예전에 다시 쓴 글 표시
+        from bot import wpbulk
+        self.assertIn("_firstlab_patches_upto", wpbulk.META_KEYS)
+
     def test_deploy_timeout_raised(self):
         self.assertIn("command_timeout: 30m", (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8"))
 
@@ -5962,7 +5992,7 @@ class NaverAdsDiagnoseTest(unittest.TestCase):
         self.assertNotIn("license_tail", main.split("print(")[-1])  # 화면(공개 배포 기록)에는 키 끝자리 안 찍음
 
 
-class DeploySpeedTest(unittest.TestCase):
+class DeployQuickTest(unittest.TestCase):
     """11/9 운영자 '배포 왜 이렇게 오래 걸려': 전체 글을 한 편씩 읽는 보정은 배포를 기다리게 하지 않고 잠금 걸어 따로 실행."""
 
     def test_full_scan_runs_in_background(self):
@@ -5992,3 +6022,20 @@ class DeploySpeedTest(unittest.TestCase):
         self.assertEqual(full("wordpress/pages/about.html"), "full")
         self.assertEqual(full("FULL"), "full")
         self.assertEqual(full("bot/run.py", mark_today=False), "full")  # 그날 첫 배포
+
+
+class TestFileHygieneTest(unittest.TestCase):
+    def test_no_duplicate_test_names(self):
+        """11/10: tests/test_bot.py 에 'DeploySpeedTest' 가 두 번 있어 앞 묶음(배포 보정 테스트 4개)이 한 번도 안 돌았음 → 같은 이름 금지."""
+        import collections
+        for f in (ROOT / "tests").glob("test_*.py"):
+            cls, seen = None, collections.Counter()
+            classes = collections.Counter(re.findall(r"^class (\w+)\(", f.read_text(encoding="utf-8"), flags=re.M))
+            self.assertEqual([k for k, v in classes.items() if v > 1], [], f.name)
+            for line in f.read_text(encoding="utf-8").splitlines():
+                m = re.match(r"class (\w+)\(", line)
+                cls = m.group(1) if m else cls
+                m = re.match(r"    def (test_\w+)\(", line)
+                if m:
+                    seen[(cls, m.group(1))] += 1
+            self.assertEqual([k for k, v in seen.items() if v > 1], [], f.name)

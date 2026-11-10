@@ -326,6 +326,10 @@ def apply_direct(data: dict, state: dict) -> str:
     # 쉬운 말 다듬기는 사실을 다시 확인한 게 아님 → 확인한 날(갱신일·검수 통과일)을 오늘로 바꾸지 않음.
     # 바꾸면 공개 직전 지난 기한 검사(expiry.passed_rounds)·다시 확인할 날(expiry.due_date)이 미뤄짐 (11/10 #561 '11월 9일까지예요')
     _save(post_id, new_html, title, excerpt, stamp=not plain)
+    if new_html is not None:  # 다시 쓴 본문이 기준 — 그 전 패치는 배포 때 다시 덮어쓰지 않음 (bot/fix_posts.UPTO_META)
+        from .fix_posts import UPTO_META, patch_count
+        upto = data.get("patches_upto")
+        wp_cli("post", "meta", "update", str(post_id), UPTO_META, str(int(upto) if str(upto).isdigit() else patch_count()))
     if not plain:
         _renew_evidence(post_id, data.get("review"))
     if not plain:  # 쉬운 말 다듬기(automation/plain_check.py)는 사실이 같아 주간 갱신 한도에서 안 셈 (11/10: 다듬기 16편이 한도를 채워 보강이 멈췄음)

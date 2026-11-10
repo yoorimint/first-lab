@@ -54,6 +54,30 @@ def _classify_uncategorized(posts: list[dict]) -> None:
 
 
 PATCHES = Path(__file__).resolve().parent.parent / "wordpress" / "patches.json"
+# 글을 통째로 다시 쓰면(갱신·쉬운 말 다듬기) 그때까지의 패치는 새 글에 녹은 것으로 보고 다시 적용하지 않음.
+# 값 = 다시 쓸 때의 patches.json 항목 수 → 이 번호보다 앞 패치는 건너뜀, 뒤에 생긴 패치(새 검수)만 적용.
+# (11/10 #1775 등: 예전 패치가 다시 쓴 문단·'한 줄 정리'를 옛 문단으로 덮어씀. 운영자 '변경된 글 기준으로 고쳐야지')
+UPTO_META = "_firstlab_patches_upto"
+PLAIN_MARK = "<strong>한 줄 정리"  # 쉬운 말로 다시 쓴 글 표시 (bot/patch_check.PLAIN_MARK 와 같음)
+
+
+def patch_count() -> int:
+    return len(json.loads(PATCHES.read_text(encoding="utf-8"))) if PATCHES.exists() else 0
+
+
+def _upto(pid: str, bulk: dict[str, dict] | None) -> int:
+    raw = (bulk or {}).get(pid, {}).get("meta", {}).get(UPTO_META, "") if bulk is not None else _meta(pid, UPTO_META)
+    return int(raw) if str(raw).isdigit() else 0
+
+
+def _backfill_upto(bulk: dict[str, dict], total: int) -> None:
+    """이 장치 전에 이미 다시 쓴 글(본문 '한 줄 정리' 또는 갱신 기록)에 한 번 표시 — 이번 배포의 패치 적용이 끝난 뒤라 안전."""
+    for pid, b in bulk.items():
+        meta = b.get("meta", {})
+        if meta.get(UPTO_META) or not (PLAIN_MARK in (b.get("content") or "") or meta.get("_firstlab_refreshed")):
+            continue
+        wp_cli("post", "meta", "update", pid, UPTO_META, str(total))
+        meta[UPTO_META] = str(total)
 
 
 _PARA_END = "<!-- /wp:paragraph -->"
@@ -111,10 +135,13 @@ def apply_patches(bulk: dict[str, dict] | None = None) -> None:
     bulk: wpbulk.posts() 로 미리 읽은 글 (없으면 글마다 읽음). 고친 글은 bulk 에도 반영해 다음 패치가 이어서 본다."""
     if not PATCHES.exists():
         return
-    for patch in json.loads(PATCHES.read_text(encoding="utf-8")):
+    patches = json.loads(PATCHES.read_text(encoding="utf-8"))
+    for n, patch in enumerate(patches):
         pid = str(patch["post"])
         if "set_title" in patch or "set_excerpt" in patch:
             _patch_fields(pid, patch, bulk)
+            continue
+        if n < _upto(pid, bulk):  # 다시 쓰기 전 패치 → 새 글 기준이라 건너뜀
             continue
         if bulk is not None:
             if pid not in bulk:
@@ -140,6 +167,8 @@ def apply_patches(bulk: dict[str, dict] | None = None) -> None:
             bulk[pid]["content"] = content
         kind = "블록 추가" if "insert_after" in patch else "문단 수정"
         print(f"[보정] {pid} {kind}: {patch['why']}")
+    if bulk is not None:
+        _backfill_upto(bulk, len(patches))
 
 
 def _patch_fields(pid: str, patch: dict, bulk: dict[str, dict] | None = None) -> None:
