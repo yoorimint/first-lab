@@ -5759,6 +5759,27 @@ class PlainCheckTest(unittest.TestCase):
         self.assertTrue(patch_check.rewritten("<p><strong>한 줄 정리:</strong> 요약</p>"))
         self.assertFalse(patch_check.rewritten("<p>보통 글</p>"))
 
+    def test_rewrite_must_not_bring_back_patched_phrase(self):
+        """11/10 #1775 등 9편: 다시 쓴 글에 예전 패치의 find(고치기 전 문구)가 다시 들어가, 배포 때 apply_patches 가
+        그 문단('한 줄 정리' 포함)을 예전 고친 문단으로 덮어씀 → 다듬기 검사가 막고, 저장소의 새 갱신 파일도 막음."""
+        import glob
+        from bot import patch_check
+        patches = [{"post": 7, "find": "요율은 평균 1.47%이고", "tag": "p", "replace_paragraph": "평균 1.47%(출퇴근 포함)예요."},
+                   {"post": 7, "find": "계산기", "insert_after": "[calc]"}]
+        self.assertTrue(patch_check.reintroduced(7, "<p>2026년 요율은 평균 1.47%이고 더해요.</p>", patches))
+        self.assertEqual(patch_check.reintroduced(7, "<p>출퇴근 요율까지 합친 평균이 1.47%예요. 계산기</p>", patches), [])
+        self.assertEqual(patch_check.reintroduced(8, "<p>2026년 요율은 평균 1.47%이고</p>", patches), [])
+        self.assertIn("patch_check.reintroduced", (ROOT / "automation" / "plain_check.py").read_text(encoding="utf-8"))
+        bad = []
+        for f in glob.glob(str(ROOT / "wordpress" / "queue" / "refresh-*.json")):
+            stamp = re.search(r"-(\d{8}-\d{4,6})\.json$", f)
+            if not stamp or stamp.group(1)[:13].replace("-", "") < "202611100345":  # 이 검사 전에 만든 파일(이미 반영·정리됨)은 뺌
+                continue
+            data = json.loads(Path(f).read_text(encoding="utf-8"))
+            if data.get("content_html") and patch_check.reintroduced(int(data["post_id"]), data["content_html"]):
+                bad.append(Path(f).name)
+        self.assertEqual(bad, [])
+
     def test_html_unbalanced_blocked(self):
         """11/10 #2295: 목록 뒤에 짝 없는 '</li></ul>' — 새 글 관문·다듬기 검사에서 막음."""
         from bot import condition_gate as cg

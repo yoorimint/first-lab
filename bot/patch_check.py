@@ -26,6 +26,34 @@ def rewritten(content: str) -> bool:
     return PLAIN_MARK in (content or "")
 
 
+def _plain(text: str) -> str:
+    import html
+    import re
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html.unescape(text or ""))).strip()
+
+
+def reintroduced(post_id: int, content_html: str, patches: list[dict] | None = None) -> list[str]:
+    """다시 쓴 본문에 예전 패치가 고친 '틀린 문구(find)'가 다시 들어 있으면 그 문구들.
+
+    배포 때마다 bot/fix_posts.apply_patches 가 find 가 든 문단을 예전 고친 문단으로 덮어씀 →
+    쉬운 말로 다시 쓴 문단·'한 줄 정리'가 사라지고 같은 내용이 두 번 나옴 (11/10 #1775 등 9편).
+    끼워 넣기(insert_after)는 find 가 남는 게 정상이라 뺌."""
+    if patches is None:
+        patches = json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8"))
+    body = _plain(content_html)
+    out = []
+    for p in patches:
+        if int(p.get("post", 0)) != int(post_id) or not p.get("find") or "insert_after" in p:
+            continue
+        if not ("replace_paragraph" in p or p.get("remove_element") or p.get("remove_block")):
+            continue
+        find = p["find"]
+        hit = find in content_html if "<" in find else _plain(find) in body
+        if hit:
+            out.append(f"예전에 고친 문구가 다시 들어감 (배포 때 예전 패치가 이 문단을 덮어씀) — 뜻은 고친 쪽대로, 말을 바꿔 쓰기: {_plain(find)[:50]}")
+    return out
+
+
 def run() -> str:
     sys.path.insert(0, str(ROOT / "automation"))
     from verify_patches import problems  # noqa: E402

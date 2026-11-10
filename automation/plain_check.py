@@ -221,7 +221,8 @@ def lost_terms(old_html: str, new_html: str, title: str = "") -> list[str]:
     return out
 
 
-def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | None = None, written=None) -> list[str]:
+def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | None = None, written=None,
+             post_id: int | None = None) -> list[str]:
     """allow: 법·공식 자료로 확인한 원래 글 오류를 고치며 바뀌는 숫자 (--fix 로만, 이유와 함께 갱신 파일에 남음).
     written: 원래 글을 마지막으로 저장한 날 (그 뒤 지난 기한 검사)."""
     allow = allow or set()
@@ -276,6 +277,9 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     from bot import condition_gate
     out += condition_gate.known_wrong(new_html)
     out += condition_gate.html_unbalanced(new_html)
+    if post_id is not None:
+        from bot import patch_check
+        out += patch_check.reintroduced(post_id, new_html)
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
     return out
 
@@ -296,13 +300,14 @@ def main(argv: list[str]) -> int:
     post_id, original, new_file = int(argv[0]), json.loads(Path(argv[1]).read_text(encoding="utf-8")), Path(argv[2])
     new_html = split_long_paragraphs(new_file.read_text(encoding="utf-8"))  # 긴 문단은 자동으로 끊어서 검사·반영
     fix = next((a.split("=", 1)[1] for a in argv if a.startswith("--fix=")), "")  # 예: --fix=11,0.9448:장기요양 요율 2026년 1월분부터(노인장기요양보험법 시행령 제4조)
-    allow = set(fix.split(":", 1)[0].split(",")) if fix else set()
+    nums = fix.split(":", 1)[0]
+    allow = set(nums.split("|" if "|" in nums else ",")) if fix else set()  # '1,000' 처럼 쉼표 든 숫자는 '|' 로 나눔 (--fix=1,000|5|185:…)
     if fix and ":" not in fix:
         print("--fix=숫자,숫자:근거 — 바꾸는 이유(법·공식 자료)를 꼭 적기")
         return 2
     base = original.get("base_modified") or ""
     written = datetime.strptime(base[:10], "%Y-%m-%d").date() if base else None
-    found = problems(original["content_html"], new_html, original.get("title", ""), allow, written)
+    found = problems(original["content_html"], new_html, original.get("title", ""), allow, written, post_id)
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))
         return 1
