@@ -6322,6 +6322,21 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_dated_wrong_gwangju_jeonnam_merged(self):
+        """11/12 #1156: 2026.7.1 광주광역시·전라남도 폐지, 전남광주통합특별시 출범 → 지금 기관처럼 쓴 옛 이름만 막고, 조례 이름·과거 이야기는 통과."""
+        import datetime as dt
+        from bot import condition_gate as cg
+        after, before = dt.date(2026, 11, 12), dt.date(2026, 6, 1)
+        self.assertTrue(cg.known_wrong("<p>신청은 광주광역시 누리집에서 해요.</p>", after))
+        self.assertTrue(cg.known_wrong("<p>전라남도에 주소를 둔 사람이 대상이에요.</p>", after))
+        self.assertEqual(cg.known_wrong("<p>신청은 광주광역시 누리집에서 해요.</p>", before), [])
+        for ok in ("<p>근거: 광주광역시 체육시설 관리운영 조례 제17조</p>",
+                   "<p>2011년 전라남도농업기술원 자료를 보면 90%예요.</p>",
+                   "<p>옛 광주광역시가 2016년부터 운영했어요.</p>",
+                   "<p>주소는 전남광주통합특별시 광산구예요.</p>",
+                   "<p>전라남도교육청 누리집에서 봐요.</p>"):
+            self.assertEqual(cg.known_wrong(ok, after), [], ok)
+
     def test_known_wrong_december_chunap_rate(self):
         """11/11 #3134: '2026년 12월에 신청하면 … 10%' — 같은 12월 안에 내면 9.5% 특례(부칙 제3조)가 빠짐 → 막음."""
         from bot import condition_gate as cg
