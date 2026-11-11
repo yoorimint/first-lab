@@ -23,9 +23,11 @@ QUEUE = plain_queue.QUEUE
 HINTS = json.loads((Path(__file__).resolve().parent / "plus-hints.json").read_text(encoding="utf-8"))
 
 
-def pending(pid: int, now: float | None = None) -> bool:
+def pending(pid: int, now: float | None = None, out: Path | None = None) -> bool:
+    """서버 반영 대기 중이거나, 2시간 안에 뽑아 아직 보강·검수 중인 글 (같은 글을 두 번 뽑지 않게. 2시간 지나면 다시 뽑힘)."""
     now = now or time.time()
-    return any(now - f.stat().st_mtime < plain_queue.PENDING_HOURS * 3600 for f in QUEUE.glob(f"refresh-plus-{pid}-*.json"))
+    recent = [*QUEUE.glob(f"refresh-plus-{pid}-*.json"), *(out or OUT).glob(f"plus-{pid}.json")]
+    return any(now - f.stat().st_mtime < plain_queue.PENDING_HOURS * 3600 for f in recent)
 
 
 def wanted(post: dict) -> bool:

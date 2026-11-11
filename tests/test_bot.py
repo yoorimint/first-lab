@@ -6057,6 +6057,19 @@ class PlusCheckTest(unittest.TestCase):
         self.assertTrue(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": ""}))
         self.assertFalse(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": "2026-11-11"}))
         self.assertFalse(plus_queue.wanted({"content_html": "<p>아직 안 다듬음</p>", "plus_at": ""}))
+
+    def test_plus_queue_skips_post_in_progress(self):
+        import os, tempfile, time
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_queue
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d)
+            self.assertFalse(plus_queue.pending(987654, out=out))
+            (out / "plus-987654.json").write_text("{}")
+            self.assertTrue(plus_queue.pending(987654, out=out))      # 방금 뽑아 보강 중 → 다시 안 뽑음
+            old = time.time() - 3 * 3600
+            os.utime(out / "plus-987654.json", (old, old))
+            self.assertFalse(plus_queue.pending(987654, out=out))     # 2시간 지나면 다시 뽑힘 (평생 보류 금지)
         self.assertIn("plus_at", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
 
 
