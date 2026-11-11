@@ -308,3 +308,5 @@ date,post,fixes,types
 2026-11-11,2900,0,
 2026-11-11,3134,2,missing_condition:2
 2026-11-11,3140,2,missing_condition:2
+2026-11-11,3199,1,wrong_fact:1
+2026-11-11,3205,4,missing_condition:3 unverified:1
