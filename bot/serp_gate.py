@@ -39,12 +39,25 @@ def _site(url: str) -> str:
     return f"{host}/{first}" if host in ("blog.naver.com", "m.blog.naver.com", "tistory.com", "brunch.co.kr") else host
 
 
+# 같은 뜻의 다른 낱말 (11/12 #1082 '발급 비용' ↔ 본문 '수수료', #1197 '운영시간' ↔ '이용 시간', #1265 '월급' ↔ '임금'):
+# 본문이 답하는데 낱말만 달라 '없음'으로 막히면 보강이 상위 글 질문을 기록에서 지워 버림 → 묶음 안 낱말은 서로 같은 것으로 봄
+SYNONYMS = [
+    {"운영시간", "영업시간", "이용시간", "시간"},
+    {"비용", "수수료", "요금", "금액"},
+    {"월급", "임금", "급여"},
+]
+
+
+def _covered(word: str, body: set[str]) -> bool:
+    return word in body or any(word in group and group & body for group in SYNONYMS)
+
+
 def uncovered(questions: list[str], body_html: str) -> list[str]:
     body = _stems(re.sub(r"<[^>]+>", " ", body_html or ""))
     out = []
     for q in questions:
         words = _stems(str(q))
-        if words and len(words & body) < max(1, round(len(words) * COVER_RATIO)):
+        if words and sum(_covered(w, body) for w in words) < max(1, round(len(words) * COVER_RATIO)):
             out.append(str(q))
     return out
 

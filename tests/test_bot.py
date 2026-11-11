@@ -6444,6 +6444,14 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.body_self_question(kept, kept), [])  # 원래 있던 문단은 보강 검사 대상 아님
         self.assertIn("body_self_question", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_serp_question_covered_by_synonym(self):
+        """11/12 #1082·#1197: 본문이 '수수료 없음'·'이용 시간'으로 답하는데 질문 낱말('비용'·'운영시간')이 달라 '없음' → 보강이 질문을 지움.
+        같은 뜻 묶음(serp_gate.SYNONYMS)은 다룬 것으로 보고, 답이 정말 없는 질문은 그대로 막는다."""
+        from bot import serp_gate
+        body = "<p>발급 수수료는 없어요.</p><p>이용 시간은 새벽 3시부터예요.</p>"
+        self.assertEqual(serp_gate.uncovered(["발급 비용은 얼마일까?", "운영시간은 몇 시부터인가요?"], body), [])
+        self.assertEqual(serp_gate.uncovered(["주차는 무료인가요?"], body), ["주차는 무료인가요?"])
+
     def test_plus_article_verified_with_or_without_paragraph(self):
         """11/12 #1053: 본문 '제88조' 를 기록이 '제88조 제1항' 으로 확인했는데 '확인 안 됨'으로 막힘 → 조·항 표기 차이는 같은 조문으로 봄."""
         sys.path.insert(0, str(ROOT / "automation"))
