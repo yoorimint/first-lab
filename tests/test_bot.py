@@ -5963,6 +5963,20 @@ class AttackSurfaceTest(unittest.TestCase):
         self.assertIn("기록 없음", tick.login_line({}, datetime(2026, 11, 11)))
 
 
+    def test_two_factor(self):
+        """11/11 운영자 '입력키 입력으로 하나': 인증 앱 6자리(키 직접 입력) — 계산이 RFC 6238 과 같고, 비밀번호 확인 뒤·잠금 앞에서 검사,
+        한 번 쓴 코드 재사용 막음, 비상 코드는 해시로만 저장."""
+        import shutil, subprocess
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-2fa.php").read_text(encoding="utf-8")
+        self.assertRegex(src, r"'authenticate',[\s\S]*?firstlab_2fa_check[\s\S]*?\n\t50\n")   # core 20 뒤, 잠금 99 앞
+        self.assertIn("wp_hash_password", src)
+        self.assertNotIn("error_log", src)                              # 키·코드를 기록에 남기지 않음
+        if shutil.which("php"):
+            r = subprocess.run(["php", str(ROOT / "tests" / "php" / "test_2fa.php"), str(ROOT / "wordpress" / "mu-plugins" / "first-lab-2fa.php")],
+                               capture_output=True, text=True)
+            self.assertEqual(r.stdout.strip(), "OK", r.stdout + r.stderr)
+
+
 class IndexCheckTest(unittest.TestCase):
     """11/11 운영자 '색인 기록 만들어라': 공개 글 색인 여부를 매일 기록 → 하루 공개 편수 판단."""
 
