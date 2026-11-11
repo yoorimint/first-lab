@@ -6453,6 +6453,28 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.body_self_question(kept, kept), [])  # 원래 있던 문단은 보강 검사 대상 아님
         self.assertIn("body_self_question", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_blank_forms_built_from_spec(self):
+        """11/12 운영자 '알바이력서양식 같은 글은 실제 양식 첨부' → 테마 forms/<id>.json 마다 docx·pdf 가 있고, docx 에 spec 의 칸이 다 들어 있어야 함
+        (spec 만 고치고 automation/forms_build.py 를 안 돌리면 옛 파일이 나감). 화면 상자는 mu-plugins/first-lab-forms.php."""
+        import zipfile
+        sys.path.insert(0, str(ROOT / "automation"))
+        import forms_build
+        specs = sorted(forms_build.FORMS.glob("*.json"))
+        self.assertTrue(specs)
+        for f in specs:
+            spec = json.loads(f.read_text(encoding="utf-8"))
+            self.assertIsInstance(spec["post"], int, f.name)
+            for o in spec.get("official", []):
+                self.assertTrue(o["url"].startswith("https://"), o)
+            docx, pdf = f.with_suffix(".docx"), f.with_suffix(".pdf")
+            self.assertTrue(docx.is_file() and pdf.is_file(), f"{f.stem}: python3 automation/forms_build.py {f.stem}")
+            xml = re.sub(r"<[^>]+>", "", zipfile.ZipFile(docx).read("word/document.xml").decode("utf-8"))
+            for label in forms_build.labels(spec):
+                self.assertIn(label, xml, f"{f.stem}: '{label}' 칸이 docx 에 없음 — forms_build.py 다시 돌리기")
+            self.assertEqual(pdf.read_bytes()[:4], b"%PDF")
+        plugin = (ROOT / "wordpress" / "mu-plugins" / "first-lab-forms.php").read_text(encoding="utf-8")
+        self.assertIn("/forms/*.json", plugin)
+
     def test_official_hsk_center(self):
         """11/12 #1110: HSK 재채점 기한·비용은 중국고시센터(chinesetest.cn)에만 있음 → 공식 출처로 봄."""
         from bot import sources
