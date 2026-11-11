@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2247,
+ "replace": [
+  {
+   "old": "ai-c8acf9698e",
+   "prompt": "close-up of a charging cable plugged into the side port of a white electric car, green trees softly blurred in the background",
+   "alt": "흰색 전기차 옆면 충전구에 꽂힌 충전 케이블",
+   "why": "번호판·엠블럼에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
