@@ -2,12 +2,26 @@
   "basis_date": "2026-11-11",
   "yearly": false,
   "sources": [
-    {"name": "국가법령정보센터 고용보험법 (제40조 구직급여 수급 요건·기준기간 18개월, 제41조 피보험 단위기간)", "url": "https://www.law.go.kr/법령/고용보험법"},
-    {"name": "고용노동부 빠른인터넷상담: 피보험단위기간은 보수지급 기초가 된 날, 주 5일(토요일 무급) 사업장은 주 6일", "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"},
-    {"name": "고용노동부 빠른인터넷상담: 무급휴일 불산입, 월별 피보험단위기간 예시(8월 27일·31일)", "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202308161646480601000"}
+    {
+      "name": "국가법령정보센터 고용보험법 (제40조 구직급여 수급 요건·기준기간 18개월, 제41조 피보험 단위기간)",
+      "url": "https://www.law.go.kr/법령/고용보험법"
+    },
+    {
+      "name": "고용노동부 빠른인터넷상담: 피보험단위기간은 보수지급 기초가 된 날, 주 5일(토요일 무급) 사업장은 주 6일",
+      "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+    },
+    {
+      "name": "고용노동부 빠른인터넷상담: 무급휴일 불산입, 월별 피보험단위기간 예시(8월 27일·31일)",
+      "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202308161646480601000"
+    },
+    {
+      "name": "고용보험법 제40조②1호·시행령 제60조: 질병·부상·휴업·육아휴직 등으로 계속 30일 이상 보수를 못 받으면 18개월에 그 일수를 더함(3년 한도)",
+      "url": "https://www.law.go.kr/법령/고용보험법/제40조"
+    }
   ],
   "required_days": 180,
   "base_months": 18,
   "reach_search_days": 1100,
-  "max_days": 3660
+  "max_days": 3660,
+  "extend_min_days": 30
 }

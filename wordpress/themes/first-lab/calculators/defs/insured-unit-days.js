@@ -85,7 +85,8 @@
         if (isPaid(t)) c += 1;
         const ws = monthsBefore(u.addDays(t, 1), d.base_months);
         const inWindow = ws > start ? countBetween(ws, t) : c;
-        if (inWindow - unpaid >= d.required_days) { reach = t; break; }
+        // 이직일 이전 날은 '앞으로 채우는 날'이 아님 (11/11 검수: 무급일이 많으면 지난 날짜가 나왔음)
+        if (t > quit && inWindow - unpaid >= d.required_days) { reach = t; break; }
       }
 
       const perWeek = paid.length;
@@ -98,11 +99,12 @@
         ['피보험 단위기간', `${unitDays.toLocaleString('ko-KR')}일`],
         ['180일 조건', met ? '채웠어요' : `${shortfall.toLocaleString('ko-KR')}일 모자라요`],
       ];
-      if (!met) rows.push(['같은 형태로 계속 다니면', reach !== null ? `${u.korDate(reach)}에 180일` : '18개월 안에 180일을 못 채워요']);
+      if (!met) rows.push(['같은 형태로 계속 다니면', reach !== null ? `${u.korDate(reach)}에 180일` : (unpaid > 0 ? '무급으로 빠진 날이 있어 날짜를 셀 수 없어요 (고용센터 확인)' : '18개월 안에 180일을 못 채워요')]);
 
       const notes = [];
       notes.push('180일은 실업급여를 받을 수 있는 조건 중 하나예요. 퇴사 사유, 일할 의사와 능력, 재취업 노력 같은 다른 조건도 갖춰야 해요.');
       notes.push('평일 공휴일은 유급으로 보고 셌어요. 무급이었다면 그날 수를 무급으로 빠진 날에 더해 주세요.');
+      if (unpaid >= d.extend_min_days) notes.push('질병·부상, 육아휴직 등으로 30일 이상 이어서 보수를 못 받았다면 기준기간이 그 일수만큼 늘어나요(최대 3년). 이 계산기는 18개월로만 세니, 이런 경우는 관할 고용센터에서 확인해요.');
       if (pattern === 'w5') notes.push('무급인 토요일에 출근해 일한 날은 세지 않았어요. 그날이 들어가는지는 이직확인서나 관할 고용센터에서 확인해요.');
       if (pattern === 'mini' && n <= 2) notes.push('주 15시간 미만이고 주 2일 이하로 일했다면, 조건에 따라 18개월 대신 24개월 안에서 볼 수 있어요. 이 계산기는 18개월로만 세요.');
       if (start < windowStart) notes.push('가입일이 기준기간보다 앞이라 기준기간 안의 날만 셌어요.');

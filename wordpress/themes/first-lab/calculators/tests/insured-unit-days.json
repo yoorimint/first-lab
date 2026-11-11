@@ -1,43 +1,221 @@
 [
-  {"why": "고용노동부 상담 예시(2023.8월): 주 5일·토요일 무급·일요일 유급 주휴·공휴일 유급 → 8월 27일 (근무일·주휴일·광복절 합)",
-   "input": {"start": "2023-08-01", "quit": "2023-08-31", "pattern": "w5", "days": 3, "unpaid": 0},
-   "expect": {"counted": 27, "unitDays": 27, "met": false, "perWeek": 6}},
-  {"why": "고용노동부 상담 예시(2023.8월): 주 5일·토요일도 유급 → 31일",
-   "input": {"start": "2023-08-01", "quit": "2023-08-31", "pattern": "w5p", "days": 3, "unpaid": 0},
-   "expect": {"counted": 31, "perWeek": 7}},
-  {"why": "고용노동부 상담 예시(2023.8월): 주 6일·일요일 주휴 → 31일",
-   "input": {"start": "2023-08-01", "quit": "2023-08-31", "pattern": "w6", "days": 3, "unpaid": 0},
-   "expect": {"counted": 31}},
-  {"why": "고용노동부 상담 예시(2025.5월): 월급제 주 5일·토요일 무급 → 26일 (근무일 19·주휴일 4·유급휴일 3)",
-   "input": {"start": "2025-05-01", "quit": "2025-05-31", "pattern": "w5", "days": 3, "unpaid": 0},
-   "expect": {"counted": 26}},
-  {"why": "본문 예시: 2026-03-02(월)~08-31 6개월, 주 6일씩 157일 → 23일 모자람, 계속 다니면 09-27에 180일 (Python 따로 계산)",
-   "input": {"start": "2026-03-02", "quit": "2026-08-31", "pattern": "w5", "days": 3, "unpaid": 0},
-   "expect": {"counted": 157, "unitDays": 157, "met": false, "shortfall": 23, "reach": "2026-09-27"}},
-  {"why": "기준선: 09-27(일)까지 = 30주 × 6일 = 180일 → 채움",
-   "input": {"start": "2026-03-02", "quit": "2026-09-27", "pattern": "w5", "days": 3, "unpaid": 0},
-   "expect": {"unitDays": 180, "met": true, "shortfall": 0}, "boundary": true},
-  {"why": "기준선: 09-26(토, 무급)까지 179일 → 1일 모자람",
-   "input": {"start": "2026-03-02", "quit": "2026-09-26", "pattern": "w5", "days": 3, "unpaid": 0},
-   "expect": {"unitDays": 179, "met": false, "shortfall": 1}, "boundary": true},
-  {"why": "무급으로 빠진 날 5일 → 180-5=175, 5일 모자람, 채우는 날은 10-02",
-   "input": {"start": "2026-03-02", "quit": "2026-09-27", "pattern": "w5", "days": 3, "unpaid": 5},
-   "expect": {"counted": 180, "unitDays": 175, "shortfall": 5, "reach": "2026-10-02"}, "boundary": true},
-  {"why": "단시간 주 3일 + 일요일 주휴 = 주 4일: 03-02~11-30 157일, 계속 다니면 2027-01-10",
-   "input": {"start": "2026-03-02", "quit": "2026-11-30", "pattern": "part", "days": 3, "unpaid": 0},
-   "expect": {"perWeek": 4, "counted": 157, "met": false, "reach": "2027-01-10"}},
-  {"why": "초단시간 주 1일: 18개월 안에 못 채움, 24개월 안내",
-   "input": {"start": "2026-03-02", "quit": "2026-11-30", "pattern": "mini", "days": 1, "unpaid": 0},
-   "expect": {"perWeek": 1, "counted": 40, "reach": null},
-   "notes_include": ["주 15시간 미만이고 주 2일 이하로 일했다면, 조건에 따라 18개월 대신 24개월 안에서 볼 수 있어요. 이 계산기는 18개월로만 세요."]},
-  {"why": "초단시간 주 3일은 24개월 안내 없음",
-   "input": {"start": "2026-03-02", "quit": "2026-11-30", "pattern": "mini", "days": 3, "unpaid": 0},
-   "expect": {"counted": 118},
-   "notes_exclude": ["주 15시간 미만이고 주 2일 이하로 일했다면, 조건에 따라 18개월 대신 24개월 안에서 볼 수 있어요. 이 계산기는 18개월로만 세요."]},
-  {"why": "기준기간: 2026-11-30 이직이면 2025-06-01부터 18개월만 셈 (가입일 2024-01-01)",
-   "input": {"start": "2024-01-01", "quit": "2026-11-30", "pattern": "w5", "days": 3, "unpaid": 0},
-   "expect": {"windowStart": "2025-06-01", "from": "2025-06-01", "counted": 470, "met": true},
-   "notes_include": ["가입일이 기준기간보다 앞이라 기준기간 안의 날만 셌어요."]},
-  {"why": "이직일이 가입일보다 앞이면 안내 문장",
-   "input": {"start": "2026-09-01", "quit": "2026-03-01", "pattern": "w5", "days": 3, "unpaid": 0}, "expect_error": true}
+ {
+  "why": "고용노동부 상담 예시(2023.8월): 주 5일·토요일 무급·일요일 유급 주휴·공휴일 유급 → 8월 27일 (근무일·주휴일·광복절 합)",
+  "input": {
+   "start": "2023-08-01",
+   "quit": "2023-08-31",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "counted": 27,
+   "unitDays": 27,
+   "met": false,
+   "perWeek": 6
+  }
+ },
+ {
+  "why": "고용노동부 상담 예시(2023.8월): 주 5일·토요일도 유급 → 31일",
+  "input": {
+   "start": "2023-08-01",
+   "quit": "2023-08-31",
+   "pattern": "w5p",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "counted": 31,
+   "perWeek": 7
+  }
+ },
+ {
+  "why": "고용노동부 상담 예시(2023.8월): 주 6일·일요일 주휴 → 31일",
+  "input": {
+   "start": "2023-08-01",
+   "quit": "2023-08-31",
+   "pattern": "w6",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "counted": 31
+  }
+ },
+ {
+  "why": "고용노동부 상담 예시(2025.5월): 월급제 주 5일·토요일 무급 → 26일 (근무일 19·주휴일 4·유급휴일 3)",
+  "input": {
+   "start": "2025-05-01",
+   "quit": "2025-05-31",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "counted": 26
+  }
+ },
+ {
+  "why": "본문 예시: 2026-03-02(월)~08-31 6개월, 주 6일씩 157일 → 23일 모자람, 계속 다니면 09-27에 180일 (Python 따로 계산)",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-08-31",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "counted": 157,
+   "unitDays": 157,
+   "met": false,
+   "shortfall": 23,
+   "reach": "2026-09-27"
+  }
+ },
+ {
+  "why": "기준선: 09-27(일)까지 = 30주 × 6일 = 180일 → 채움",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-09-27",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "unitDays": 180,
+   "met": true,
+   "shortfall": 0
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 09-26(토, 무급)까지 179일 → 1일 모자람",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-09-26",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "unitDays": 179,
+   "met": false,
+   "shortfall": 1
+  },
+  "boundary": true
+ },
+ {
+  "why": "무급으로 빠진 날 5일 → 180-5=175, 5일 모자람, 채우는 날은 10-02",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-09-27",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 5
+  },
+  "expect": {
+   "counted": 180,
+   "unitDays": 175,
+   "shortfall": 5,
+   "reach": "2026-10-02"
+  },
+  "boundary": true
+ },
+ {
+  "why": "단시간 주 3일 + 일요일 주휴 = 주 4일: 03-02~11-30 157일, 계속 다니면 2027-01-10",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-11-30",
+   "pattern": "part",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "perWeek": 4,
+   "counted": 157,
+   "met": false,
+   "reach": "2027-01-10"
+  }
+ },
+ {
+  "why": "초단시간 주 1일: 18개월 안에 못 채움, 24개월 안내",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-11-30",
+   "pattern": "mini",
+   "days": 1,
+   "unpaid": 0
+  },
+  "expect": {
+   "perWeek": 1,
+   "counted": 40,
+   "reach": null
+  },
+  "notes_include": [
+   "주 15시간 미만이고 주 2일 이하로 일했다면, 조건에 따라 18개월 대신 24개월 안에서 볼 수 있어요. 이 계산기는 18개월로만 세요."
+  ]
+ },
+ {
+  "why": "초단시간 주 3일은 24개월 안내 없음",
+  "input": {
+   "start": "2026-03-02",
+   "quit": "2026-11-30",
+   "pattern": "mini",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "counted": 118
+  },
+  "notes_exclude": [
+   "주 15시간 미만이고 주 2일 이하로 일했다면, 조건에 따라 18개월 대신 24개월 안에서 볼 수 있어요. 이 계산기는 18개월로만 세요."
+  ]
+ },
+ {
+  "why": "기준기간: 2026-11-30 이직이면 2025-06-01부터 18개월만 셈 (가입일 2024-01-01)",
+  "input": {
+   "start": "2024-01-01",
+   "quit": "2026-11-30",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect": {
+   "windowStart": "2025-06-01",
+   "from": "2025-06-01",
+   "counted": 470,
+   "met": true
+  },
+  "notes_include": [
+   "가입일이 기준기간보다 앞이라 기준기간 안의 날만 셌어요."
+  ]
+ },
+ {
+  "why": "이직일이 가입일보다 앞이면 안내 문장",
+  "input": {
+   "start": "2026-09-01",
+   "quit": "2026-03-01",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 0
+  },
+  "expect_error": true
+ },
+ {
+  "why": "11/11 검수: 무급일이 많아 180일을 못 채운 경우, '계속 다니면' 날짜는 이직일 뒤여야 함 (전엔 2024-07-01 같은 지난 날짜가 나옴)",
+  "input": {
+   "start": "2023-01-02",
+   "quit": "2026-02-28",
+   "pattern": "w5",
+   "days": 3,
+   "unpaid": 289
+  },
+  "expect": {
+   "met": false,
+   "reach": null
+  },
+  "notes_include": [
+   "30일 이상 이어서 보수를 못 받았다면 기준기간이"
+  ]
+ }
 ]
