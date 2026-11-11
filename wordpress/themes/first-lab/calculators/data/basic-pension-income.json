@@ -1,0 +1,32 @@
+{
+ "basis_date": "2026-11-11",
+ "yearly_checked": 2026,
+ "year": 2026,
+ "max_input": 1000000000000,
+ "sources": [
+  {
+   "name": "보건복지부 기초연금 누리집 소득인정액 산정방식",
+   "url": "https://basicpension.mohw.go.kr/menu.es?mid=a10102020000"
+  },
+  {
+   "name": "국가법령정보센터 기초연금 지급대상자 선정기준액, 기준연금액 및 소득인정액 산정 세부기준에 관한 고시 (제2조 선정기준액, 제6조 근로소득 공제, 제6조의2 이자소득 월 4만 원, 제8조 기본재산액, 제9조 금융재산 2천만 원, 제11조 고급자동차)",
+   "url": "https://www.law.go.kr/행정규칙/기초연금지급대상자선정기준액,기준연금액및소득인정액산정세부기준에관한고시"
+  },
+  {
+   "name": "국가법령정보센터 기초연금법 시행규칙 (제2조 소득평가액, 제4조 재산의 소득환산액·환산율 4%)",
+   "url": "https://www.law.go.kr/법령/기초연금법시행규칙"
+  }
+ ],
+ "threshold_single": 2470000,
+ "threshold_couple": 3952000,
+ "earned_deduction": 1160000,
+ "earned_extra_pct": 30,
+ "basic_property": {
+  "metro": 135000000,
+  "city": 85000000,
+  "rural": 72500000
+ },
+ "financial_deduction": 20000000,
+ "conversion_pct": 4,
+ "interest_deduction": 40000
+}
