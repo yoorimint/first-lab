@@ -92,6 +92,29 @@ def referent_moved(old_html: str, new_html: str) -> list[str]:
     return out
 
 
+_WAGE = re.compile(r"(?:통상)?시급(?:이|은|을|으로|를)?\s*(?:(\d{1,3}(?:,\d{3})+|\d{4,6})원|(\d+)만(?:\s*(\d)천)?\s*원)")
+_EXAMPLE = re.compile(r"예를 들어|라고 해|라고 할게|라고 하면|라면")
+
+
+def min_wage() -> int:
+    """올해 최저시급 — 계산기 자료(해마다 calc_watch 가 고시와 맞춤)에서 읽음."""
+    path = ROOT / "wordpress" / "themes" / "first-lab" / "calculators" / "data" / "overtime-pay.json"
+    return int(json.loads(path.read_text(encoding="utf-8"))["min_wage"])
+
+
+def example_below_min_wage(sentences: list[str], floor: int) -> list[str]:
+    """예시로 든 시급이 올해 최저시급보다 낮으면 법에 어긋나는 예시 (11/11 #1576 '통상시급 1만 원' — 2026년 10,320원)."""
+    out = []
+    for s in sentences:
+        if not _EXAMPLE.search(s):
+            continue
+        for m in _WAGE.finditer(s):
+            won = int(m.group(1).replace(",", "")) if m.group(1) else int(m.group(2)) * 10000 + int(m.group(3) or 0) * 1000
+            if won < floor:
+                out.append(f"예시 시급 {won:,}원이 올해 최저시급 {floor:,}원보다 낮음: '{s[:40]}…' — 최저시급 이상으로")
+    return out
+
+
 def problems(old_html: str, new_html: str, record: dict, title: str = "", allow: set[str] | None = None,
              written=None, post_id: int | None = None, check_copy: bool = True) -> list[str]:
     allow = allow or set()
@@ -124,7 +147,9 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
     from bot import condition_gate, serp_gate
     out += condition_gate.known_wrong(new_html)
     old_sents = set(condition_gate._sentences(old_html))
-    out += condition_gate.source_absence([x for x in condition_gate._sentences(new_html) if x not in old_sents])
+    new_sents = [x for x in condition_gate._sentences(new_html) if x not in old_sents]
+    out += condition_gate.source_absence(new_sents)
+    out += example_below_min_wage(new_sents, min_wage())
     out += condition_gate.html_unbalanced(new_html)
     out += condition_gate.faq_answer_flip(new_html)
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []

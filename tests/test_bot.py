@@ -6394,6 +6394,17 @@ class PlainCheckTest(unittest.TestCase):
         old2 = "<p>A예요.</p><p>직접 신고하면 돼요. 그러면 고지는 없던 것이 돼요.</p>"
         self.assertEqual(plus_check.referent_moved(old2, old2.replace("</p><p>직접", "</p><p>B예요.</p><p>직접")), [])
 
+    def test_plus_example_wage_not_below_minimum(self):
+        """11/11 #1576: +@ 계산 예시 '통상시급이 1만 원이고 …' — 2026년 최저시급 10,320원보다 낮은 불법 시급 예시."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_check
+        floor = plus_check.min_wage()
+        self.assertGreaterEqual(floor, 10320)
+        self.assertTrue(plus_check.example_below_min_wage(["예를 들어 통상시급이 1만 원이고 9시~23시에 일했다고 해 볼게요."], floor))
+        self.assertTrue(plus_check.example_below_min_wage(["시급 9,860원이라면 하루 78,880원이에요."], floor))
+        self.assertEqual(plus_check.example_below_min_wage(["예를 들어 통상시급이 1만 2천 원이라고 해 볼게요."], floor), [])
+        self.assertEqual(plus_check.example_below_min_wage(["2024년 최저 시급은 9,860원이었어요."], floor), [])  # 예시가 아닌 사실 문장
+
     def test_calculator_notes_pass_known_wrong(self):
         """계산기 안내 문구도 글과 같은 '확인된 틀린 문구' 검사 (11/11 #3080 — 글은 고쳤는데 계산기 안내에 같은 누락이 남아 있었음)."""
         import re as _re
