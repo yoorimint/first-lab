@@ -6453,6 +6453,12 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.body_self_question(kept, kept), [])  # 원래 있던 문단은 보강 검사 대상 아님
         self.assertIn("body_self_question", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_official_hsk_center(self):
+        """11/12 #1110: HSK 재채점 기한·비용은 중국고시센터(chinesetest.cn)에만 있음 → 공식 출처로 봄."""
+        from bot import sources
+        self.assertTrue(sources.is_official("https://www.chinesetest.cn/report-sketch"))
+        self.assertFalse(sources.is_official("https://blog.naver.com/chinesetest"))
+
     def test_serp_question_covered_by_synonym(self):
         """11/12 #1082·#1197: 본문이 '수수료 없음'·'이용 시간'으로 답하는데 질문 낱말('비용'·'운영시간')이 달라 '없음' → 보강이 질문을 지움.
         같은 뜻 묶음(serp_gate.SYNONYMS)은 다룬 것으로 보고, 답이 정말 없는 질문은 그대로 막는다."""
