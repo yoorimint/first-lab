@@ -6293,7 +6293,10 @@ class PlainCheckTest(unittest.TestCase):
                   "<p>종합소득세를 신고한 사람이 소득세를 경정청구하면 개인지방소득세도 경정청구를 해야 해요.</p>",
                   "<p>연세액이 10만 원 미만인 차는 1월·3월에만 연납 신청을 할 수 있어요.</p>",
                   "<p>체납한 국세가 있으면 환급금이 그 세금에 먼저 충당될 수 있어요.</p>",
-                  "<p>해고예고수당은 퇴직 후 14일 이내에 받아요.</p>"):
+                  "<p>해고예고수당은 퇴직 후 14일 이내에 받아요.</p>",
+                  "<p>중소기업 취업자 소득세 감면을 경정청구해요.</p><p>감면액은 과세기간마다 200만 원이 한도예요.</p>",
+                  "<p>기초연금 안내.</p><p>공무원·군인·별정우체국 연금 수급권자와 그 배우자는 대상에서 빠져요.</p>",
+                  "<p>귀속연도는 돈을 받은 해라서 2026년 급여면 2026년 귀속이에요.</p>"):
             self.assertTrue(cg.known_wrong(s), s)
         # 세금 글이 아니면(청약 등) 위축 지역도 조정대상지역 — 막지 않음
         self.assertEqual(cg.known_wrong("<p>청약 안내.</p><p>조정대상지역은 과열·위축 지역이에요.</p>"), [])
@@ -6305,11 +6308,26 @@ class PlainCheckTest(unittest.TestCase):
                   "<p>보험모집인처럼 연말정산하는 사업소득만 있는 사업자도 장부 기록 불성실 가산세에서 빠져요.</p>",
                   "<p>해외주식은 이 5년 조건이 없어요.</p>",
                   "<p>해고예고수당은 해고와 동시에, 다른 금품은 14일 이내에 줘요.</p>",
+                  "<p>중소기업 소득세 감면을 경정청구해요.</p><p>감면 한도는 한 해 200만 원이고, 2022년 이전 몫은 150만 원이에요.</p>",
+                  "<p>중소기업 소득세 감면을 경정청구해요.</p><p>✔ 2023년분부터 한 해 200만 원</p>",
+                  "<p>기초연금 안내.</p><p>공무원·사학·군인·별정우체국 연금과 직역 10년 이상 연계퇴직연금 수급권자와 그 배우자는 빠져요.</p>",
+                  "<p>근로소득 귀속연도는 일한 해 기준이에요.</p>",
                   "<p>선순위인 상속인이 아닌 사람에게 한 유증은 빼요.</p>",
                   "<p>새마을금고나 지역 농협·수협 같은 조합의 상호금융은 금융소비자보호법 대상이 아니에요.</p>"):
             self.assertEqual(cg.known_wrong(s), [], s)
         self.assertIn("known_wrong", (ROOT / "bot" / "freshness.py").read_text(encoding="utf-8"))
         self.assertIn("known_wrong", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
+    def test_calculator_notes_pass_known_wrong(self):
+        """계산기 안내 문구도 글과 같은 '확인된 틀린 문구' 검사 (11/11 #3080 — 글은 고쳤는데 계산기 안내에 같은 누락이 남아 있었음)."""
+        import re as _re
+        from bot import condition_gate as cg
+        for f in sorted((ROOT / "wordpress" / "themes" / "first-lab" / "calculators" / "defs").glob("*.js")):
+            texts = _re.findall(r"'([^'\n]*[가-힣][^'\n]*)'|`([^`]*[가-힣][^`]*)`", f.read_text(encoding="utf-8"))
+            body = "".join(f"<p>{a or b}</p>" for a, b in texts)
+            self.assertEqual(cg.known_wrong(body), [], f.name)
+        for f in sorted((ROOT / "wordpress" / "pages").glob("*.html")):   # 계산기 화면 설명 문단도 (같은 날 #3080·#1455 문구가 남아 있었음)
+            self.assertEqual(cg.known_wrong(f.read_text(encoding="utf-8")), [], f.name)
 
     def test_dated_wrong_and_daily_watch(self):
         """11/10 #2161: 2026-12-08부터 근로감독관→노동감독관 (근로기준법 제101조 개정) — 그날부터 남은 글에 다시 확인 표시."""

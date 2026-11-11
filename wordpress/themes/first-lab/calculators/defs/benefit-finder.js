@@ -88,7 +88,7 @@
       { name: 'earned', label: '작년에 근로·사업·종교인소득이 있었나요? (나 또는 배우자)', type: 'select', default: 'no', options: OPTIONS.yesno },
       { name: 'income', label: '나와 배우자의 작년 총소득 합계 (원)', type: 'number', min: 0, step: 1, default: 0, help: '근로소득은 총급여액, 사업소득은 총수입금액 × 업종별 조정률, 종교인소득은 총수입금액, 기타소득은 총수입금액 − 필요경비, 이자·배당·연금소득은 총수입금액을 더해요. 비과세·퇴직·양도소득은 빼요.' },
       { name: 'property', label: '가구원 모두의 재산 합계 (원)', type: 'number', min: 0, step: 1, default: 0, help: '주택·토지·건축물과 승용자동차(영업용 제외)는 시가표준액, 전세금은 주택이면 간주전세금(기준시가 × 55%)과 실제 전세금 중 작은 금액, 그리고 금융자산·유가증권·회원권 등을 더해요. 빚은 빼지 않아요.' },
-      { name: 'public_pension', label: '나나 배우자가 공무원·사립학교교직원·군인·별정우체국 연금(퇴직연금·유족연금 등)을 받을 권리가 있나요?', type: 'select', default: 'no', options: OPTIONS.yesno, help: '기초연금을 따질 때 써요.' },
+      { name: 'public_pension', label: '나나 배우자가 공무원·사립학교교직원·군인·별정우체국 연금(퇴직연금·유족연금 등)이나 직역 10년 이상 연계퇴직연금을 받을 권리가 있나요?', type: 'select', default: 'no', options: OPTIONS.yesno, help: '기초연금을 따질 때 써요.' },
     ],
 
     compute(v, d, u) {
@@ -292,7 +292,7 @@
         } else if (age < bp.min_age) {
           results.basic_pension = [NO, `만 ${bp.min_age}세 이상부터 받아요. 만 ${bp.min_age}세 생일이 속한 달의 1개월 전부터 신청할 수 있어요.`];
         } else if (publicPension || job === 'public') {
-          results.basic_pension = [CHECK, '공무원·사학·군인·별정우체국 연금의 퇴직연금·유족연금 등 수급권자와 그 배우자는 원칙적으로 제외예요. 퇴직일시금만 받았거나 특례에 해당하면 받을 수 있어 연금 종류를 확인해요.'];
+          results.basic_pension = [CHECK, '공무원·사학·군인·별정우체국 연금의 퇴직연금·유족연금 등과 직역 10년 이상 연계퇴직연금 수급권자, 그 배우자는 원칙적으로 제외예요. 퇴직일시금만 받았거나 특례에 해당하면 받을 수 있어 연금 종류를 확인해요.'];
         } else if (upper100 <= limit100) {
           results.basic_pension = [LIKELY, `공제 전 금액으로 따져도 소득인정액이 ${typeLabel} 선정기준액 월 ${won(monthly)} 이하예요.`];
         } else {

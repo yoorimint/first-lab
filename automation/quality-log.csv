@@ -297,3 +297,11 @@ date,post,fixes,types
 2026-11-11,2982,1,outdated:1
 2026-11-11,3017,1,missing_condition:1
 2026-11-11,1143,1,my_mistake:1
+2026-11-11,3080,1,missing_condition:1
+2026-11-11,3097,2,unverified:1 wrong_fact:1
+2026-11-11,3108,1,unverified:1
+2026-11-11,3122,1,missing_condition:1
+2026-11-11,3086,0,
+2026-11-11,3101,0,
+2026-11-11,3111,0,
+2026-11-11,3118,5,missing_condition:1 outdated:4
