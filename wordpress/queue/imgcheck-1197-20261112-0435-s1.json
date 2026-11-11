@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1197,
+ "replace": [
+  {
+   "old": "ai-d0ef4ff09b",
+   "prompt": "stacks of crates filled with apples, pears and napa cabbages inside a wide wholesale market hall in early morning light, no people",
+   "alt": "이른 아침 도매시장 안에 쌓인 사과·배·배추 상자",
+   "why": "왼쪽 위 벽에 글자처럼 보이는 간판이 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
