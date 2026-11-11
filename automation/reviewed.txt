@@ -558,3 +558,4 @@ calc:officetel-acquisition-tax
 3580 소방시설관리사 응시자격 2027: 소방설비기사는 경력 없이 응시
 calc:parental-leave-benefit
 1245 운전면허 사진 규격
+calc:sports-toto-tax

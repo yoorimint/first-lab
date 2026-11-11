@@ -1,0 +1,48 @@
+{
+ "basis_date": "2026-11-11",
+ "yearly_checked": 2026,
+ "law_checked": [
+  "소득세법|2027-01-01"
+ ],
+ "max_input": 1000000000000,
+ "won10_keys": [
+  "income_tax",
+  "local_tax",
+  "total"
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 소득세법 제84조 (기타소득의 과세최저한: 투표권 환급금 10만 원·100배·200만 원)",
+   "url": "https://www.law.go.kr/법령/소득세법/제84조"
+  },
+  {
+   "name": "국가법령정보센터 소득세법 제37조 (투표권 환급금 필요경비 = 적중된 투표권의 단위투표금액)",
+   "url": "https://www.law.go.kr/법령/소득세법/제37조"
+  },
+  {
+   "name": "국가법령정보센터 소득세법 제129조 (원천징수세율 20%, 3억 원 초과분 30%)",
+   "url": "https://www.law.go.kr/법령/소득세법/제129조"
+  },
+  {
+   "name": "국가법령정보센터 지방세법 제103조의13 (개인지방소득세 특별징수 10%)",
+   "url": "https://www.law.go.kr/법령/지방세법/제103조의13"
+  },
+  {
+   "name": "국가법령정보센터 국고금관리법 제47조 (10원 미만 끝수)",
+   "url": "https://www.law.go.kr/법령/국고금관리법/제47조"
+  },
+  {
+   "name": "국가법령정보센터 소득세법 제86조 (소액 부징수: 원천징수세액 1천원 미만)",
+   "url": "https://www.law.go.kr/법령/소득세법/제86조"
+  }
+ ],
+ "ticket_max": 100000,
+ "small_payout_max": 100000,
+ "ratio_max": 100,
+ "exempt_max": 2000000,
+ "high_threshold": 300000000,
+ "rate_low": 0.2,
+ "rate_high": 0.3,
+ "local_rate": 0.1,
+ "min_collect": 1000
+}
