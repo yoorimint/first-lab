@@ -5817,6 +5817,20 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('<p class="fl-sum ">', out)
 
 
+class KoreanOnlyHookTest(unittest.TestCase):
+    def test_english_reply_is_sent_back(self):
+        """11/11 운영자 '또 영어로 하노': 마지막 답이 영어면 Stop 훅이 한글로 다시 쓰게 함 (.claude/hooks/korean_only.py)."""
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("korean_only", ROOT / ".claude" / "hooks" / "korean_only.py")
+        k = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(k)
+        self.assertTrue(k.is_english("Noted. Some of it can be done before approval, so I built that part now and pushed it."))
+        self.assertFalse(k.is_english("알겠어요. 테스트(IndexCheckTest)는 통과했고 저장소에 올렸어요. CTR·CPC·RPM 은 나중에 봐요."))
+        self.assertFalse(k.is_english("고쳤어요.\n```\nsome long english code block that should not count at all here ok\n```"))
+        settings = json.loads((ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        self.assertIn("korean_only.py", json.dumps(settings["hooks"]["Stop"]))
+
+
 class AdsOwnTrafficTest(unittest.TestCase):
     def test_no_ads_for_our_own_visits(self):
         """11/11 운영자 '무효클릭 무효트래픽 방지': 로그인(운영자)·광고 끄기 쿠키·우리 봇 요청엔 광고 코드를 안 넣음."""
