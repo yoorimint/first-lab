@@ -5902,6 +5902,14 @@ class AdsOwnTrafficTest(unittest.TestCase):
         self.assertIn('"FirstLab"', site)
 
 
+class QueuedRefreshImmutableTest(unittest.TestCase):
+    def test_check_and_push_refuses_editing_pushed_refresh(self):
+        """11/11 #1143: 올린 갱신 파일을 고쳤더니 서버는 첫 판(틀린 답)을 이미 반영하고 고친 판은 거절 → 올리기 전에 막음."""
+        sh = (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8")
+        self.assertIn('$1=="M" && $2 ~ /^wordpress\\/queue\\/refresh-', sh)
+        self.assertLess(sh.index("이미 올린 갱신 파일을 고침"), sh.index('git commit -q -m "$msg"'))
+
+
 class AttackSurfaceTest(unittest.TestCase):
     """11/11 운영자 'PHP 취약점 노리고 해킹 들어온다는데 우린 문제없나': 안 쓰는 통로(XML-RPC·작성자 아이디 노출) 닫고,
     운영체제 보안 패치(PHP 포함)는 자동 설치."""

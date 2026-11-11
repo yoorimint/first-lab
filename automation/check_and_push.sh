@@ -19,6 +19,10 @@ regen() { python3 automation/common_errors.py >/dev/null; }
 regen
 run_tests
 git add -A
+# 이미 올린 갱신 파일(refresh-*.json)은 고치지 않는다 — 서버가 첫 판을 반영한 뒤라 고친 판은 '그 사이 수정됨'으로 거절되고
+# 틀린 첫 판이 남음 (11/11 #1143 '아니요' 답). 고칠 것은 새 패치(apply_review.py)나 새 갱신 파일로.
+edited=$(git diff --cached --name-status | awk '$1=="M" && $2 ~ /^wordpress\/queue\/refresh-.*\.json$/ {print $2}')
+[ -z "$edited" ] || { echo "!! 이미 올린 갱신 파일을 고침 — 올리지 않음: $edited (apply_review.py 패치로 고치기)"; git reset -q; exit 1; }
 git diff --cached --quiet && { echo "바뀐 것 없음"; exit 0; }
 git commit -q -m "$msg"
 pushed=""
