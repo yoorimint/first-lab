@@ -1422,3 +1422,24 @@ def html_unbalanced(body_html: str) -> list[str]:
         if opened != closed:
             out.append(f"HTML 태그 짝이 안 맞음: <{t}> {opened}개, </{t}> {closed}개")
     return out
+
+
+# --- +@ 보강 끼워 넣기 검사 (automation/plus_check.py 가 씀) ---
+REFERENT = re.compile(r"위 (?:예시|예|표|계산|사례)|^이 (?:예시|사례|계산)|^[^.?!]{0,80}(?:도 같아요|도 마찬가지예요)\.|^다만 ")  # 앞 문단을 가리키는 말 ('다만'으로 시작하는 문단은 11/11 #2177·#3262·#1026 — 예시 문단이 끼어 '다만'이 엉뚱한 문장에 붙음; '이때·그러면'은 대개 같은 문단 안을 가리켜 뺌 — 보강 글 130편 대조; '…도 같아요'는 11/11 #3118 이직 문단이 끼어 '사업 양도로 넘어가도 같아요'가 신청서 얘기를 가리키게 됨)
+_UNIT = re.compile(r"<(p|li|tr|h2|h3|h4)[^>]*>(.*?)</\1>", re.S)
+
+
+def _units(html: str) -> list[str]:
+    return [t for t in (_plain(x) for _, x in _UNIT.findall(html or "")) if t]
+
+
+def referent_moved(old_html: str, new_html: str) -> list[str]:
+    """'위 예시라면 …' 처럼 바로 앞 문단을 가리키는 원래 문장 앞에 새 문단이 끼면 가리키는 대상이 바뀜
+    (11/11 #1802: 자녀 공제 예시가 '본인 1명 74,350원' 뒤에 끼어 '위 예시라면 80%는 59,480원'이 자녀 예시를 가리키게 됨)."""
+    old, new = _units(old_html), _units(new_html)
+    before = {t: old[i - 1] for i, t in enumerate(old) if i and REFERENT.search(t)}
+    out = []
+    for i, t in enumerate(new):
+        if t in before and i and not new[i - 1].startswith(before[t][:25]):  # 앞 문단 끝에 문장을 덧붙인 건 괜찮음
+            out.append(f"앞 문단을 가리키는 원래 문장 앞에 새 문단이 끼어 뜻이 바뀜: '{t[:30]}…' — 새 문단은 이 문장 뒤로 옮기기")
+    return out

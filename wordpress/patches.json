@@ -9903,5 +9903,59 @@
     "find": "대신 1년 일찍 받을 때마다 6%씩, 5년이면 30% 줄어든 금액을 평생 받아요.",
     "prevention": "review_only:받는 동안 지켜야 할 조건(지급 정지) 누락 — 조문 대조로만 판별",
     "insert_after": "받는 동안 원래 받는 나이가 되기 전에 소득이 있는 업무를 하면, 그 기간은 지급이 멈춰요."
+  },
+  {
+    "post": 1026,
+    "type": "my_mistake",
+    "tag": "p",
+    "why": "+@ 보강 문단 2개가 '11월 보험료부터 2025년 소득 반영'과 '다만 연금소득만은…' 사이에 끼어 '다만'이 납부기한 예시에 붙음",
+    "find": "보험료는 그 달 보험료를 다음 달 10일까지 내요.",
+    "prevention": "check:referent_moved",
+    "remove_element": true
+  },
+  {
+    "post": 1026,
+    "type": "my_mistake",
+    "tag": "p",
+    "why": "같은 이유(두 번째 끼운 문단)",
+    "find": "예를 들어 2026년 11월 20일에 신청하면 11월 보험료부터 조정돼요.",
+    "prevention": "check:referent_moved",
+    "remove_element": true
+  },
+  {
+    "post": 1026,
+    "type": "my_mistake",
+    "tag": "p",
+    "why": "뺀 문단을 '다만 연금소득만은' 문단 뒤로",
+    "find": "다만 연금소득만은 1월~10월에도 전년도 자료를 써요.",
+    "prevention": "check:referent_moved",
+    "insert_after": "보험료는 그 달 보험료를 다음 달 10일까지 내요. 그래서 2026년 11월 보험료의 납부마감일은 2026년 12월 10일이에요."
+  },
+  {
+    "post": 1026,
+    "type": "my_mistake",
+    "tag": "p",
+    "why": "뺀 두 번째 문단을 그 뒤로",
+    "find": "그래서 2026년 11월 보험료의 납부마감일은 2026년 12월 10일이에요.",
+    "prevention": "check:referent_moved",
+    "insert_after": "예를 들어 2026년 11월 20일에 신청하면 11월 보험료부터 조정돼요. 12월 11일에 신청하면 11월분 마감이 지났으니, 12월 보험료부터 조정돼요."
+  },
+  {
+    "post": 2823,
+    "type": "my_mistake",
+    "tag": "p",
+    "why": "+@ 문단이 '부부 두 사람이 함께 출석'과 '다만 한쪽이 재외국민…' 사이에 끼어 '다만'이 법원 찾기 안내에 붙음",
+    "find": "내 관할 가정법원은 대한민국 법원 누리집(scourt.go.kr)의",
+    "prevention": "check:referent_moved",
+    "remove_element": true
+  },
+  {
+    "post": 2823,
+    "type": "my_mistake",
+    "tag": "p",
+    "why": "뺀 문단을 '다만 한쪽이 재외국민' 문단 뒤로",
+    "find": "다만 한쪽이 재외국민이거나 수감자라서 출석하기 어려우면",
+    "prevention": "check:referent_moved",
+    "insert_after": "내 관할 가정법원은 대한민국 법원 누리집(scourt.go.kr)의 '각급법원 안내'에서 찾을 수 있어요."
   }
 ]

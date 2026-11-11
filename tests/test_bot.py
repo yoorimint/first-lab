@@ -6396,6 +6396,10 @@ class PlainCheckTest(unittest.TestCase):
         # 11/11 #3118: '…넘어가도 같아요' 앞에 신청서 문단이 끼어 '같아요'가 엉뚱한 말을 가리킴
         old3 = "<p>옮겨도 기간이 새로 시작되지 않아요.</p><p>사업 양도로 고용이 넘어가도 같아요.</p>"
         self.assertTrue(plus_check.referent_moved(old3, old3.replace("</p><p>사업", "</p><p>새 회사에 신청서를 내요.</p><p>사업")))
+        # 11/11 #2177·#1026: '다만 연금소득만은…' 앞에 예시 문단이 끼어 '다만'이 예시에 붙음. 앞 문단 끝에 문장만 덧붙인 건 괜찮음
+        old4 = "<p>11월 보험료부터 전년도 소득을 써요.</p><p>다만 연금소득만은 1~10월에도 전년도 자료를 써요.</p>"
+        self.assertTrue(plus_check.referent_moved(old4, old4.replace("</p><p>다만", "</p><p>예를 들어 11월 20일에 신청하면 돼요.</p><p>다만")))
+        self.assertEqual(plus_check.referent_moved(old4, old4.replace("써요.</p><p>다만", "써요. 납부기한은 다음 달 10일이에요.</p><p>다만")), [])
 
     def test_plus_example_wage_not_below_minimum(self):
         """11/11 #1576: +@ 계산 예시 '통상시급이 1만 원이고 …' — 2026년 최저시급 10,320원보다 낮은 불법 시급 예시."""
