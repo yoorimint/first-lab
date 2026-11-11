@@ -5910,6 +5910,20 @@ class QueuedRefreshImmutableTest(unittest.TestCase):
         self.assertLess(sh.index("이미 올린 갱신 파일을 고침"), sh.index('git commit -q -m "$msg"'))
 
 
+class BenefitPhoneTest(unittest.TestCase):
+    def test_api_phone_checked_against_page(self):
+        """11/11 #3032: 정부24 API 문의처(051-794-3755, 2025-11-27)가 화면(051-794-3724, 2026.10.29)보다 늦음 → 화면 번호를 덧붙임."""
+        from bot import benefit_detail as bd
+        api = "서비스명: 소액대출\n문의처: 기금관리처/051-794-3755\n수정일시: 2025-11-27"
+        note = bd.phone_note(api, "<li>국민행복기금관리처(☎ 051-794-3724)</li>")
+        self.assertIn("051-794-3724", note)
+        self.assertEqual(bd.phone_note(api, "<p>051-794-3755</p>"), "")      # 같으면 덧붙이지 않음
+        self.assertEqual(bd.phone_note(api, ""), "")                          # 화면 못 읽으면 그대로
+        def fetch(kind, **kw):
+            return {"data": [{"서비스명": "소액대출", "문의처": "기금관리처/051-794-3755"}]} if kind == "serviceDetail" else {"data": []}
+        self.assertIn("051-794-3724", bd._fetch_text("B1", fetch, page=lambda sid: "☎ 051-794-3724"))
+
+
 class AttackSurfaceTest(unittest.TestCase):
     """11/11 운영자 'PHP 취약점 노리고 해킹 들어온다는데 우린 문제없나': 안 쓰는 통로(XML-RPC·작성자 아이디 노출) 닫고,
     운영체제 보안 패치(PHP 포함)는 자동 설치."""

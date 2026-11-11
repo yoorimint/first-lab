@@ -46,13 +46,39 @@ def _first(got: dict | None) -> dict | None:
     return rows[0] if rows and isinstance(rows[0], dict) else None
 
 
-def _fetch_text(service_id: str, fetch=None) -> str:
+PHONE = re.compile(r"(?<!\d)(0\d{1,2}-\d{3,4}-\d{4}|1\d{3}-\d{4})(?!\d)")
+PAGE_URL = "https://www.gov.kr/portal/rcvfvrSvc/dtlEx/{sid}"
+
+
+def _page(service_id: str) -> str:
+    import urllib.request
+    req = urllib.request.Request(PAGE_URL.format(sid=service_id), headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        return r.read().decode("utf-8", "replace")
+
+
+def phone_note(api_text: str, page_html: str) -> str:
+    """정부24 API 의 문의처 번호가 정부24 화면에 없으면 화면 번호를 덧붙임 (11/11 #3032: API 수정일 2025-11-27 '051-794-3755',
+    화면(최종수정 2026.10.29)은 '051-794-3724' — API 가 늦게 바뀜). 화면을 못 읽으면 빈 글자."""
+    api = set(PHONE.findall(next((l for l in api_text.splitlines() if l.startswith("문의처:")), "")))
+    page = list(dict.fromkeys(PHONE.findall(page_html or "")))
+    if not api or not page or api & set(page):
+        return ""
+    return f"※ 정부24 화면의 문의처 번호는 {', '.join(page[:3])} 예요 (API 번호 {', '.join(sorted(api))} 는 화면에 없음 — 화면 번호가 더 최신일 수 있어 화면 번호를 씀)"
+
+
+def _fetch_text(service_id: str, fetch=None, page=None) -> str:
     fetch = fetch or benefit_api.fetch
     cond = {"cond[서비스ID::EQ]": service_id}
     detail = _first(fetch("serviceDetail", **cond))
     if not detail:
         return ""
-    return to_text(detail, _first(fetch("supportConditions", **cond)))
+    text = to_text(detail, _first(fetch("supportConditions", **cond)))
+    try:
+        note = phone_note(text, (page or _page)(service_id))
+    except Exception:  # noqa: BLE001 - 화면을 못 열면 API 글자만
+        note = ""
+    return text + ("\n" + note if note else "")
 
 
 def detail_text(service_id: str, fetch=None) -> str | None:
