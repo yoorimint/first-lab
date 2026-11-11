@@ -6469,11 +6469,22 @@ class PlainCheckTest(unittest.TestCase):
             docx, pdf = f.with_suffix(".docx"), f.with_suffix(".pdf")
             self.assertTrue(docx.is_file() and pdf.is_file(), f"{f.stem}: python3 automation/forms_build.py {f.stem}")
             xml = re.sub(r"<[^>]+>", "", zipfile.ZipFile(docx).read("word/document.xml").decode("utf-8"))
+            self.assertEqual(forms_build.label_problems(spec), [], f.name)  # 칸 이름만 — 작성 요령·괄호·'알바' 금지 (11/12 운영자)
             for label in forms_build.labels(spec):
                 self.assertIn(label, xml, f"{f.stem}: '{label}' 칸이 docx 에 없음 — forms_build.py 다시 돌리기")
             self.assertEqual(pdf.read_bytes()[:4], b"%PDF")
         plugin = (ROOT / "wordpress" / "mu-plugins" / "first-lab-forms.php").read_text(encoding="utf-8")
         self.assertIn("/forms/*.json", plugin)
+
+    def test_blank_form_labels_are_plain(self):
+        """11/12 운영자 '실제 자료에 알바 이력서라고 적으면 안 되지 그냥 이력서', '다른 증명서도 단어 이상하게 적은 거 아냐?'
+        → 서류에 찍히는 제목·칸 이름에 작성 요령·괄호 설명·글 주제어가 섞이면 막는다."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import forms_build
+        bad = {"title": "알바 이력서", "blocks": [{"heading": "경력 (최근 것부터, 없으면 비슷한 경험)", "rows": ["실지급액(선택)"]}]}
+        self.assertEqual(len(forms_build.label_problems(bad)), 3)
+        good = {"title": "이력서", "blocks": [{"heading": "근무 가능 시간", "rows": ["시작 가능일", "희망 시급"]}]}
+        self.assertEqual(forms_build.label_problems(good), [])
 
     def test_official_hsk_center(self):
         """11/12 #1110: HSK 재채점 기한·비용은 중국고시센터(chinesetest.cn)에만 있음 → 공식 출처로 봄."""
