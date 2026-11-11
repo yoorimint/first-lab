@@ -20,6 +20,7 @@ import tick  # noqa: E402
 
 OUT = plain_queue.OUT
 QUEUE = plain_queue.QUEUE
+HINTS = json.loads((Path(__file__).resolve().parent / "plus-hints.json").read_text(encoding="utf-8"))
 
 
 def pending(pid: int, now: float | None = None) -> bool:
@@ -47,7 +48,8 @@ def main(n: int = 4) -> int:
             continue
         (OUT / f"plus-{pid}.json").write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
         keyword = post.get("keyword") or post.get("title", "").split(":")[0]
-        (OUT / f"naver-{pid}.txt").write_text(naver_top.report(keyword), encoding="utf-8")
+        hint = HINTS.get(str(pid), "")   # 다듬기·검수 중에 찾은 '보강 때 고칠 것' (automation/plus-hints.json)
+        (OUT / f"naver-{pid}.txt").write_text((f"# 감시 세션 메모 (꼭 반영): {hint}\n" if hint else "") + naver_top.report(keyword), encoding="utf-8")
         picked.append(pid)
     print("\n".join(map(str, picked)))
     print(f"# 이번 {len(picked)}편 (아직 쉬운 말 안 된 글 {not_plain}편은 건너뜀)")
