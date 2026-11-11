@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.request
@@ -77,6 +78,21 @@ def keyword_line(collect: dict, ads: dict, now: datetime, max_days: int = 2) -> 
     return line, bad
 
 
+def _mask(ip: str) -> str:
+    """IP 앞 두 마디만 (감시 기록에 그대로 남기지 않음)."""
+    parts = re.split(r"[.:]", ip or "")
+    return ".".join(parts[:2]) + ".*" if len(parts) > 2 else (ip or "?")
+
+
+def login_line(logins: dict, now: datetime) -> str:
+    """관리자 로그인 한 줄 (first-lab-security.php): 최근 성공 3건, 오늘 실패·잠금 수."""
+    day = now.strftime("%Y-%m-%d")
+    ok = logins.get("ok") or []
+    recent = ", ".join(f"{x['time'][5:]} {x['user']} {_mask(x['ip'])}" for x in ok[:3]) or "기록 없음"
+    return (f"로그인: 최근 {recent} · 오늘 실패 {(logins.get('fails') or {}).get(day, 0)}회"
+            f" · 잠금 {(logins.get('locks') or {}).get(day, 0)}회")
+
+
 def main() -> int:
     problems = []
     now = datetime.now(ZoneInfo("Asia/Seoul")).replace(tzinfo=None)
@@ -115,6 +131,7 @@ def main() -> int:
         problems.append(bad)
     held = m.get("held_drafts") or []
     print(f"보류 {len(held)}편" + (f": {[(x['post_id'], x['reason'][:40]) for x in held]}" if held else "") + f" · 쉬는 글 {len(m.get('gave_up') or [])}편")
+    print(login_line(m.get("logins") or {}, now))
     pp = m.get("publish_plan") or {}
     print("공개 계획: " + plan_line(pp.get("plan") or {}, pp.get("done") or {}))
     stats = m.get("server_stats") or {}

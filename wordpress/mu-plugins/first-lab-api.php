@@ -304,6 +304,7 @@ function firstlab_api_maintenance(): array {
 		'ga4'         => $state['ga4'] ?? null, // GA4 방문 28일 요약 (bot/ga4.record, 하루 한 번)
 		'index'       => $state['index'] ?? null, // 공개 글 구글 색인 요약 (bot/index_check.record, 하루 한 번)
 		'publish_order_all' => $state['publish_order_all'] ?? null, // 대기 글 전체 공개 순서 (쉬운 말 다듬기 순서)
+		'logins'      => get_option( 'firstlab_login_log', null ), // 관리자 로그인 성공(시각·IP·기기)·날짜별 실패·잠금 수 (first-lab-security.php) — 모르는 로그인 감시
 		'draft_signals' => $state['draft_signals'] ?? null, // 대기 글별 키워드 월 검색량·블로그 글 수·황금지수 (bot/naver_hub.draft_signals, 한 시간마다)
 		'publish_next' => $state['publish_next'] ?? null, // 다음 공개 순서 (bot/schedule.upcoming, 한 시간마다) — 공개 전 쉬운 말 다듬기용
 		'keyword_collect' => $state['keyword_collect'] ?? null, // 키워드 수집 마지막 성공 날짜 (bot/discover.record_collect)

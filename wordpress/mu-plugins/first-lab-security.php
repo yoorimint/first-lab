@@ -29,3 +29,73 @@ add_filter(
 		return $endpoints;
 	}
 );
+
+// ---------- 로그인 보안 (11/11 운영자 '비번 털리면 끝나잖아') ----------
+
+// 앱 비밀번호 끔: 비밀번호 말고 따로 만들 수 있는 '두 번째 열쇠'. 우리 봇·글쓰기 작업은 자체 토큰(X-Firstlab-Token)을 써서 필요 없음.
+add_filter( 'wp_is_application_passwords_available', '__return_false' );
+
+const FIRSTLAB_LOGIN_MAX_FAILS = 5;            // 같은 IP 에서 이만큼 틀리면
+const FIRSTLAB_LOGIN_LOCK_MIN  = 30;           // 이 분(分) 동안 로그인 막음 (맞는 비밀번호여도)
+const FIRSTLAB_LOGIN_KEEP      = 20;           // 성공 기록 몇 건 남길지
+
+function firstlab_login_ip(): string {
+	return preg_replace( '/[^0-9a-fA-F:.]/', '', (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+}
+
+function firstlab_login_fail_key( string $ip ): string {
+	return 'firstlab_login_fail_' . md5( $ip );
+}
+
+// 잠긴 IP 는 비밀번호가 맞아도 들어오지 못함 (core 확인 뒤 priority 99 에서 결과를 덮음)
+add_filter(
+	'authenticate',
+	static function ( $user ) {
+		if ( (int) get_transient( firstlab_login_fail_key( firstlab_login_ip() ) ) >= FIRSTLAB_LOGIN_MAX_FAILS ) {
+			return new WP_Error( 'firstlab_locked', sprintf( '로그인을 여러 번 틀려 %d분 동안 막혔어요.', FIRSTLAB_LOGIN_LOCK_MIN ) );
+		}
+		return $user;
+	},
+	99
+);
+
+// 실패: IP 별로 세고(15분 창), 한도에 닿으면 잠금 시간으로 늘림. 날짜별 실패·잠금 수는 /maintenance 로 봄
+add_action(
+	'wp_login_failed',
+	static function () {
+		$key = firstlab_login_fail_key( firstlab_login_ip() );
+		$n   = (int) get_transient( $key ) + 1;
+		set_transient( $key, $n, ( $n >= FIRSTLAB_LOGIN_MAX_FAILS ? FIRSTLAB_LOGIN_LOCK_MIN : 15 ) * MINUTE_IN_SECONDS );
+		$log = (array) get_option( 'firstlab_login_log', array() );
+		$day = wp_date( 'Y-m-d' );
+		$log['fails'][ $day ] = (int) ( $log['fails'][ $day ] ?? 0 ) + 1;
+		if ( FIRSTLAB_LOGIN_MAX_FAILS === $n ) {
+			$log['locks'][ $day ] = (int) ( $log['locks'][ $day ] ?? 0 ) + 1;
+		}
+		foreach ( array( 'fails', 'locks' ) as $k ) {  // 최근 14일만
+			$log[ $k ] = array_slice( (array) ( $log[ $k ] ?? array() ), -14, null, true );
+		}
+		update_option( 'firstlab_login_log', $log, false );
+	}
+);
+
+// 성공: 언제·어느 IP·어떤 기기로 들어왔는지 남김 → 모르는 로그인을 감시 기록에서 바로 알아봄
+add_action(
+	'wp_login',
+	static function ( $login ) {
+		delete_transient( firstlab_login_fail_key( firstlab_login_ip() ) );
+		$log = (array) get_option( 'firstlab_login_log', array() );
+		$ok  = (array) ( $log['ok'] ?? array() );
+		array_unshift(
+			$ok,
+			array(
+				'time' => wp_date( 'Y-m-d H:i' ),
+				'user' => (string) $login,
+				'ip'   => firstlab_login_ip(),
+				'ua'   => substr( sanitize_text_field( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ), 0, 120 ),
+			)
+		);
+		$log['ok'] = array_slice( $ok, 0, FIRSTLAB_LOGIN_KEEP );
+		update_option( 'firstlab_login_log', $log, false );
+	}
+);

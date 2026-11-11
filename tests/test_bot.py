@@ -5939,6 +5939,29 @@ class AttackSurfaceTest(unittest.TestCase):
         for need in ("DISALLOW_FILE_EDIT", "unattended-upgrades", "Unattended-Upgrade \"1\""):
             self.assertIn(need, (ROOT / "server" / "setup.sh").read_text(encoding="utf-8"))
 
+    def test_login_hardening(self):
+        """11/11 운영자 '비번 털리면 끝나잖아': 앱 비밀번호(두 번째 열쇠) 끔, 같은 IP 5번 틀리면 30분 잠금(맞는 비번도),
+        로그인 성공 시각·IP·기기 기록 → /maintenance 'logins' → 감시 tick 한 줄."""
+        sec = (ROOT / "wordpress" / "mu-plugins" / "first-lab-security.php").read_text(encoding="utf-8")
+        self.assertIn("'wp_is_application_passwords_available', '__return_false'", sec)
+        self.assertIn("FIRSTLAB_LOGIN_MAX_FAILS = 5", sec)
+        self.assertIn("'wp_login_failed'", sec)
+        self.assertRegex(sec, r"'authenticate',[\s\S]*?firstlab_locked[\s\S]*?\n\t99\n")   # core 비밀번호 확인 뒤에 덮어야 함
+        self.assertIn("'logins'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        # 봇·글쓰기 작업은 자체 토큰만 씀 — 앱 비밀번호를 꺼도 끊기는 곳 없음
+        for f in list((ROOT / "bot").glob("*.py")) + list((ROOT / "automation").glob("*.py")):
+            self.assertNotIn("Application-Password", f.read_text(encoding="utf-8"), f.name)
+        sys.path.insert(0, str(ROOT / "automation"))
+        import tick
+        from datetime import datetime
+        line = tick.login_line({"ok": [{"time": "2026-11-11 18:02", "user": "admin", "ip": "211.234.5.6"}],
+                                "fails": {"2026-11-11": 7}, "locks": {"2026-11-11": 1}}, datetime(2026, 11, 11, 18, 30))
+        self.assertIn("211.234.*", line)
+        self.assertNotIn("5.6", line)                      # IP 전체는 감시 기록에 안 남김
+        self.assertIn("실패 7회", line)
+        self.assertIn("잠금 1회", line)
+        self.assertIn("기록 없음", tick.login_line({}, datetime(2026, 11, 11)))
+
 
 class IndexCheckTest(unittest.TestCase):
     """11/11 운영자 '색인 기록 만들어라': 공개 글 색인 여부를 매일 기록 → 하루 공개 편수 판단."""
