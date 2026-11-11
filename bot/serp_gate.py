@@ -48,16 +48,19 @@ SYNONYMS = [
 ]
 
 
-def _covered(word: str, body: set[str]) -> bool:
-    return word in body or any(word in group and group & body for group in SYNONYMS)
+def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
+    """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
+    return (word in body or any(word in group and group & body for group in SYNONYMS)
+            or (len(word) >= 3 and word in body_joined))
 
 
 def uncovered(questions: list[str], body_html: str) -> list[str]:
-    body = _stems(re.sub(r"<[^>]+>", " ", body_html or ""))
+    text = re.sub(r"<[^>]+>", " ", body_html or "")
+    body, joined = _stems(text), re.sub(r"\s+", "", text)
     out = []
     for q in questions:
         words = _stems(str(q))
-        if words and sum(_covered(w, body) for w in words) < max(1, round(len(words) * COVER_RATIO)):
+        if words and sum(_covered(w, body, joined) for w in words) < max(1, round(len(words) * COVER_RATIO)):
             out.append(str(q))
     return out
 
