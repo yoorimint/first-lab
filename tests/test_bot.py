@@ -5933,6 +5933,26 @@ class PlainCheckTest(unittest.TestCase):
         self.assertTrue(any("숫자" in p for p in pc.problems(old, new, allow={"11"})))   # 새로 생긴 1 도 적어야
         self.assertFalse(any("숫자" in p for p in pc.problems(old, new, allow={"11", "1"})))
 
+    def test_excerpt_must_follow_rewritten_body(self):
+        """11/11 #1265: 다듬은 본문 첫 문단 바로 뒤에 '다만 8시간 미만…'이 왔는데 요약은 그대로 → 요약에 단서 빠짐.
+        본문 때문에 새로 걸리는 요약은 막고, --excerpt 로 새 요약을 주면 함께 반영 (refresh 파일에 title·excerpt)."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plain_check as pc
+        excerpt = "임산부 단축근무는 임신 12주 이내 하루 2시간을 줄이는 제도예요."
+        old = "<p>임산부 단축근무는 임신 12주 이내에 하루 2시간을 줄이는 제도예요.</p><p>임금은 그대로예요.</p>"
+        new = ("<p>임산부 단축근무는 임신 12주 이내에 하루 2시간을 줄이는 제도예요.</p>"
+               "<p>다만 하루 8시간 미만으로 일하면 달라요.</p>")
+        self.assertEqual(pc.excerpt_problems(excerpt, old, old), [])
+        self.assertTrue(any("단서" in p for p in pc.excerpt_problems(excerpt, old, new)))
+        fixed = excerpt + " 다만 하루 8시간 미만이면 달라요."
+        self.assertEqual(pc.excerpt_problems(excerpt, old, new, fixed), [])
+        self.assertTrue(any("숫자" in p for p in pc.excerpt_problems(excerpt, old, new, fixed + " 3일 전까지 신청해요.")))
+        with mock.patch.object(pc, "ROOT", Path(tempfile.mkdtemp())) as root:
+            (root / "wordpress" / "queue").mkdir(parents=True)
+            (root / "wordpress" / "patches.json").write_text("[]", encoding="utf-8")
+            data = json.loads(pc.refresh_file(1265, "2026-11-07 01:27:43", new, "", "제목", fixed).read_text(encoding="utf-8"))
+        self.assertEqual((data["title"], data["excerpt"]), ("제목", fixed))   # refresh.apply_direct 는 title 이 있어야 요약도 바꿈
+
     def test_definition_keeps_law_elements(self):
         """11/10 감시 세션 직접 읽기: '단시간근로자는 통상 근로자보다 짧은 사람이에요'는 비교 대상('그 사업장에서 같은 일을 하는')이 빠짐 → 막음."""
         sys.path.insert(0, str(ROOT / "automation"))

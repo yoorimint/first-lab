@@ -9,7 +9,8 @@
   - 읽기 기준(문장 100자·문단 300자·목록 200자, bot/condition_gate.readability)
 통과하면 글 갱신 파일(wordpress/queue/refresh-…json, type refresh)을 만든다 → 서버 bot/refresh.apply_direct 가 반영.
 
-사용: python3 automation/plain_check.py <글번호> <원본 JSON(unreviewed 저장본)> <다듬은 본문 HTML 파일> [--write]
+  - 요약문: 다듬은 본문과 새로 어긋나면 막음 → --excerpt=<새 요약 파일> 로 요약도 함께 고침 (excerpt_problems)
+사용: python3 automation/plain_check.py <글번호> <원본 JSON(unreviewed 저장본)> <다듬은 본문 HTML 파일> [--write] [--excerpt=파일]
 """
 from __future__ import annotations
 
@@ -298,11 +299,36 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     return out
 
 
-def refresh_file(post_id: int, base_modified: str, new_html: str, fix_reason: str = "") -> Path:
+EXCERPT_CHECKS = ("excerpt_caveats", "excerpt_qualifiers", "excerpt_parentheticals", "excerpt_vs_exclusions",
+                  "excerpt_number_limits", "excerpt_principle", "excerpt_apply_date")
+
+
+def excerpt_problems(excerpt: str, old_html: str, new_html: str, new_excerpt: str = "") -> list[str]:
+    """다듬은 본문과 요약문이 어긋나는지 (11/11 #1265: 다듬으며 첫 문단 바로 뒤에 '다만 8시간 미만…'이 와서
+    요약문에 단서가 빠진 꼴이 됨 — 본문만 고치고 요약은 그대로 둬서). 원래 글에서도 걸리던 건 빼고 새로 걸린 것만.
+    새 요약(--excerpt)을 주면 그 요약은 모두 통과해야 하고, 숫자는 본문에 있어야 함."""
+    from bot import condition_gate
+    from bot.writer import EXCERPT_MAX, numbers_match
+    def run(text: str, html: str) -> list[str]:
+        return [x for name in EXCERPT_CHECKS for x in getattr(condition_gate, name)(text, html)] if text else []
+    if new_excerpt:
+        out = run(new_excerpt, new_html)
+        out += [f"새 요약문 {len(new_excerpt)}자 — {EXCERPT_MAX}자까지"] * (len(new_excerpt) > EXCERPT_MAX)
+        out += ["새 요약문의 숫자가 본문에 없음"] * (not numbers_match(new_excerpt, new_html))
+    else:
+        before = set(run(excerpt, old_html))
+        out = [x for x in run(excerpt, new_html) if x not in before]
+        if out:
+            out.append("→ 요약문을 새 본문에 맞게 고쳐 파일로 쓰고 --excerpt=파일 로 다시 검사 (요약도 함께 반영됨)")
+    return [f"요약문: {x}" for x in out]
+
+
+def refresh_file(post_id: int, base_modified: str, new_html: str, fix_reason: str = "", title: str = "", excerpt: str = "") -> Path:
     path = ROOT / "wordpress" / "queue" / f"refresh-plain-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
     upto = len(json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")))  # 이때까지의 패치는 이 글에 녹음 (bot/fix_posts.UPTO_META)
     path.write_text(json.dumps({"type": "refresh", "kind": "plain", "post_id": post_id, "base_modified": base_modified, "content_html": new_html,
                                 "patches_upto": upto,
+                                **({"title": title, "excerpt": excerpt} if excerpt else {}),  # refresh.apply_direct 는 title 이 있을 때만 요약도 바꿈
                                 "changes": "쉬운 말 다듬기 (숫자·법 조항·링크 그대로, automation/plain_check.py 대조 통과)"
                                            + (f" / 원래 글 오류 정정: {fix_reason}" if fix_reason else "")},
                                ensure_ascii=False), encoding="utf-8")
@@ -328,6 +354,9 @@ def main(argv: list[str]) -> int:
     base = original.get("base_modified") or ""
     written = datetime.strptime(base[:10], "%Y-%m-%d").date() if base else None
     found = problems(original["content_html"], new_html, original.get("title", ""), allow, written, post_id)
+    excerpt_arg = next((a.split("=", 1)[1] for a in argv if a.startswith("--excerpt=")), "")
+    new_excerpt = Path(excerpt_arg).read_text(encoding="utf-8").strip() if excerpt_arg else ""
+    found += excerpt_problems(original.get("excerpt", ""), original["content_html"], new_html, new_excerpt)
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))
         return 1
@@ -336,7 +365,8 @@ def main(argv: list[str]) -> int:
         if not base:
             print("원본 JSON 에 base_modified 가 없음 (서버 /post 응답) — 그 사이 바뀐 글을 덮을 수 있어 갱신 파일을 만들지 않음")
             return 1
-        print(refresh_file(post_id, base, new_html, fix.split(":", 1)[1] if fix else ""))
+        print(refresh_file(post_id, base, new_html, fix.split(":", 1)[1] if fix else "",
+                           original.get("title", "") if new_excerpt else "", new_excerpt))
     return 0
 
 
