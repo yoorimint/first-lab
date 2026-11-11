@@ -250,6 +250,8 @@ function firstlab_api_post( WP_REST_Request $request ) {
 		'base_modified' => $post->post_modified, // 쉬운 말 다듬기 등 갱신 파일이 그 사이 바뀐 글을 덮지 않게 (automation/plain_check.py)
 		// 근거 대조 결과 (bot/source_check.py, 기록만): 감시 세션이 외부 검수 결과와 비교
 		'source_check' => json_decode( (string) get_post_meta( $post->ID, '_firstlab_source_check', true ), true ),
+		'keyword'      => urldecode( $post->post_name ), // 글 주소 = 키워드 (bot/publish_queue publish slug=keyword) — +@ 보강의 네이버 상위 글 검색어
+		'plus_at'      => (string) get_post_meta( $post->ID, '_firstlab_plus_at', true ), // +@ 보강한 날 (bot/refresh.PLUS_META, automation/plus_queue.py)
 	);
 }
 

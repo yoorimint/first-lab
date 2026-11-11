@@ -1,0 +1,129 @@
+"""+@ 보강 검사 (11/11 운영자 '+@ 가 중요하다 — 쉬운 말 작업 다 하면 바로 초안 전부 +@ 작업해라').
+
+대기 초안마다 네이버 상위 글(automation/naver_top.py)을 보고, 상위 글이 다루는데 우리 글에 없는 것(+)과
+상위 글에도 없는 우리만의 것(@: 계산 예시·상황별 판단·최신 개정·확인 방법)을 더한 본문을 검사한다.
+쉬운 말 다듬기(plain_check)와 달리 새 사실이 들어가므로:
+  - 원래 숫자·법 조항·링크·계산기는 하나도 빠지면 안 됨 (더하기만, 고칠 땐 --fix 와 근거)
+  - 새로 생긴 숫자·조항은 모두 검수 기록(review)의 '맞음' 주장 + 공식 기관 주소로 확인돼야 함
+  - 쉬운 말 기준·틀린 문구·옛 패치 문구·요약 어긋남은 plain_check 와 같게
+  - serp(상위 글 3곳·질문·더한 것)를 본문이 다 다루고, 상위 글 문장을 옮기지 않아야 함 (bot/serp_gate.py)
+통과하면 wordpress/queue/refresh-plus-<번호>-….json (kind "plus") → 서버 bot/refresh.apply_direct 가 serp 를 다시 보고 반영.
+
+사용: python3 automation/plus_check.py <글번호> <원본 JSON> <보강 본문 HTML> <보강 기록 JSON> [--write] [--fix=숫자|…:근거] [--excerpt=파일]
+  보강 기록 JSON = {"serp": {...}, "review": [{"claim", "urls", "verdict", "action"}, ...], "added": ["더한 내용 한 줄", ...]}
+"""
+from __future__ import annotations
+
+import json
+import sys
+from datetime import datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "automation"))
+
+import plain_check as pc  # noqa: E402
+
+GROW_MIN = 1.05   # 본문이 이만큼은 늘어야 '보강'
+
+
+def _verified_text(review: list[dict]) -> str:
+    from bot.sources import is_official
+    return " ".join(str(c.get("claim", "")) for c in review or []
+                    if c.get("verdict") == "맞음" and any(is_official(u) for u in c.get("urls") or []))
+
+
+def problems(old_html: str, new_html: str, record: dict, title: str = "", allow: set[str] | None = None,
+             written=None, post_id: int | None = None, check_copy: bool = True) -> list[str]:
+    allow = allow or set()
+    out = []
+    review = record.get("review") or []
+    verified = pc.facts(_verified_text(review))
+    before, after = pc.facts(old_html), pc.facts(new_html)
+    for kind in before:
+        lost = [k for k in before[kind] if k not in after[kind] and k not in allow]
+        if lost:
+            out.append(f"{kind} 빠짐 (보강은 더하기만): {', '.join(lost[:8])}")
+        added = [k for k in after[kind] if k not in before[kind] and k not in allow]
+        if kind in ("숫자", "법 조항"):
+            unverified = [k for k in added if k not in verified[kind]]
+            if unverified:
+                out.append(f"새 {kind}가 검수 기록의 '맞음'(공식 주소) 주장에 없음: {', '.join(unverified[:8])}")
+    bad = [c.get("claim", "")[:40] for c in review if c.get("verdict") != "맞음" and c.get("action") in ("유지", "수정")]
+    if bad:
+        out.append(f"'맞음'이 아닌데 본문에 남긴 주장 {len(bad)}개: {' / '.join(bad[:3])} — 빼거나 완화")
+    if len(pc.plain(new_html)) < len(pc.plain(old_html)) * GROW_MIN:
+        out.append(f"본문이 {int((GROW_MIN - 1) * 100)}% 넘게 늘지 않음 — 보강(+@)이 거의 없음")
+    if not record.get("added"):
+        out.append("더한 내용(added) 목록이 없음")
+    lost_terms = pc.lost_terms(old_html, new_html, title)
+    if lost_terms:
+        out.append(f"검색어 줄어듦: {', '.join(lost_terms[:8])}")
+    dup = pc.duplicated_text(old_html, new_html)
+    if dup:
+        out.append(f"같은 내용이 두 번 나옴 {len(dup)}곳 (예: {dup[0][:40]}…)")
+    out += pc.expired_deadlines(new_html, written) if written else []
+    out += pc.style_problems(new_html)
+    from bot import condition_gate, serp_gate
+    out += condition_gate.known_wrong(new_html)
+    out += condition_gate.html_unbalanced(new_html)
+    out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
+    if post_id is not None:
+        from bot import patch_check
+        out += patch_check.reintroduced(post_id, new_html)
+    out += serp_gate.problems(record.get("serp"), new_html)
+    if check_copy:
+        out += serp_gate.copied(record.get("serp"), new_html)
+    return out
+
+
+def refresh_file(post_id: int, base_modified: str, new_html: str, record: dict, fix_reason: str = "",
+                 title: str = "", excerpt: str = "") -> Path:
+    path = ROOT / "wordpress" / "queue" / f"refresh-plus-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
+    upto = len(json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")))
+    added = "; ".join(str(a) for a in record.get("added") or [])[:300]
+    path.write_text(json.dumps({"type": "refresh", "kind": "plus", "post_id": post_id, "base_modified": base_modified,
+                                "content_html": new_html, "patches_upto": upto,
+                                "serp": record.get("serp"), "review": record.get("review"),
+                                **({"title": title, "excerpt": excerpt} if excerpt else {}),
+                                "changes": f"+@ 보강: {added}" + (f" / 원래 글 오류 정정: {fix_reason}" if fix_reason else "")},
+                               ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) < 4:
+        print(__doc__)
+        return 2
+    post_id = int(argv[0])
+    original = json.loads(Path(argv[1]).read_text(encoding="utf-8"))
+    new_html = pc.split_long_paragraphs(Path(argv[2]).read_text(encoding="utf-8"))
+    record = json.loads(Path(argv[3]).read_text(encoding="utf-8"))
+    fix = next((a.split("=", 1)[1] for a in argv if a.startswith("--fix=")), "")
+    if fix and ":" not in fix:
+        print("--fix=숫자|숫자:근거 — 바꾸는 이유(법·공식 자료)를 꼭 적기")
+        return 2
+    nums = fix.split(":", 1)[0]
+    allow = set(nums.split("|" if "|" in nums else ",")) if fix else set()
+    base = original.get("base_modified") or ""
+    written = datetime.strptime(base[:10], "%Y-%m-%d").date() if base else None
+    found = problems(original["content_html"], new_html, record, original.get("title", ""), allow, written, post_id)
+    excerpt_arg = next((a.split("=", 1)[1] for a in argv if a.startswith("--excerpt=")), "")
+    new_excerpt = Path(excerpt_arg).read_text(encoding="utf-8").strip() if excerpt_arg else ""
+    found += pc.excerpt_problems(original.get("excerpt", ""), original["content_html"], new_html, new_excerpt)
+    if found:
+        print("통과 못 함:\n  " + "\n  ".join(found))
+        return 1
+    print("통과")
+    if "--write" in argv:
+        if not base:
+            print("원본 JSON 에 base_modified 가 없음 — 그 사이 바뀐 글을 덮을 수 있어 갱신 파일을 만들지 않음")
+            return 1
+        print(refresh_file(post_id, base, new_html, record, fix.split(":", 1)[1] if fix else "",
+                           original.get("title", "") if new_excerpt else "", new_excerpt))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

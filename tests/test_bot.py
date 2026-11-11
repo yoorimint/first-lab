@@ -242,6 +242,23 @@ class DirectRefreshTest(unittest.TestCase):
         self.assertIn(("post", "meta", "update", "59", "_firstlab_patches_upto", "1078"), calls)
         self.assertIn('"patches_upto"', (ROOT / "automation" / "plain_check.py").read_text(encoding="utf-8"))
 
+    @mock.patch("bot.plain_style.problems", new=lambda html: [])
+    def test_plus_refresh_needs_serp_and_marks_done(self):
+        """11/11 운영자 '+@ 가 중요하다': 보강(kind plus)은 상위 글 기록이 서버에서 다시 통과해야 반영, 반영하면 보강한 날 표시."""
+        wp, calls = self.fake_wp()
+        data = {"post_id": 59, "kind": "plus", "base_modified": "2026-11-04 10:00:00", "content_html": "<p>" + "나" * 120 + "</p>"}
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp), self.assertRaises(RuntimeError):
+            refresh.apply_direct(data, {"refresh": {}})   # serp 없음
+        self.assertFalse(any(a[:2] == ("post", "update") for a in calls))
+        wp, calls = self.fake_wp()
+        with mock.patch.object(refresh, "wp_cli", side_effect=wp), \
+                mock.patch("bot.serp_gate.problems", return_value=[]), mock.patch("bot.serp_gate.copied", return_value=[]):
+            state = {"refresh": {}}
+            refresh.apply_direct(dict(data, serp={"urls": []}), state)
+        self.assertTrue(any(a[:4] == ("post", "meta", "update", "59") and refresh.PLUS_META in a for a in calls))
+        self.assertEqual(sum(state["refresh"].values()), 0)   # 다듬기처럼 주간 한도에서 안 셈
+        self.assertFalse(any("_firstlab_verified_at" in a for a in calls))  # 새로 더한 부분만 확인 → 확인한 날 그대로
+
     def test_apply_direct_refuses_conflict_and_shrink(self):
         for modified, html in (("2026-11-05 09:00:00", "<p>" + "나" * 120 + "</p>"),  # 그 사이 수정됨
                                ("2026-11-04 10:00:00", "<p>짧음</p>")):                  # 본문이 크게 줄어듦
@@ -5819,6 +5836,56 @@ class NaverTopTest(unittest.TestCase):
         self.assertNotIn("댓글", out)
         self.assertIn("못 엶", out)   # 글 하나 못 열어도 나머지는 계속
         self.assertIn("unavailable", nt.report("x", get=lambda u: (_ for _ in ()).throw(OSError("blocked")), pause=0))
+
+
+class PlusCheckTest(unittest.TestCase):
+    """11/11 운영자 '+@ 가 중요하다 — 초안 전부 +@': 보강은 더하기만, 새 숫자는 공식 출처 '맞음' 주장에 있어야, 본문이 늘어야 통과."""
+
+    OLD = ("<p>복비는 중개보수예요.<br>계산법을 볼게요.<br>✔ 매매 5억이면 200만 원</p><p>상한요율은 0.4%예요.</p>"
+           "<p><strong>이런 건 꼭 확인하세요</strong></p><ul><li>최대치예요.</li></ul><p><strong>한 줄 정리:</strong> 상한 안에서 협의해요.</p>")
+    REC = {"serp": {"urls": ["https://blog.naver.com/a/1", "https://blog.naver.com/b/1", "https://x.example.com/p"],
+                    "questions": ["오피스텔 요율", "부가세 별도", "상한요율"], "added": "구간 경계 계산 예시"},
+           "review": [{"claim": "주거용 오피스텔 매매 상한요율은 0.5%예요", "urls": ["https://www.law.go.kr/x"], "verdict": "맞음", "action": "유지"}],
+           "added": ["오피스텔 요율"]}
+
+    def _pc(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_check
+        return plus_check
+
+    def _new(self, extra):
+        return self.OLD.replace("<p>상한요율은 0.4%예요.</p>", "<p>상한요율은 0.4%예요.</p>" + extra)
+
+    def test_verified_addition_passes(self):
+        pc = self._pc()
+        new = self._new("<p>주거용 오피스텔 매매 상한요율은 0.5%예요. 부가세는 따로 붙을 수 있어요.</p>"
+                        "<p>오피스텔은 면적과 설비 요건을 갖춰야 해요. 요건은 계약 전에 확인해요.</p>")
+        with mock.patch("bot.patch_check.reintroduced", return_value=[]):
+            self.assertEqual([p for p in pc.problems(self.OLD, new, self.REC, check_copy=False) if "쉬운 말" not in p and "문장" not in p], [])
+
+    def test_unverified_number_or_lost_fact_or_no_growth_fails(self):
+        pc = self._pc()
+        unverified = self._new("<p>상가는 0.9%예요. 부가세는 따로 붙을 수 있어요.</p><p>오피스텔 요율도 있어요. 상한요율 안에서 정해요.</p>")
+        self.assertTrue(any("검수 기록" in p for p in pc.problems(self.OLD, unverified, self.REC, check_copy=False)))
+        lost = self._new("<p>주거용 오피스텔 매매 상한요율은 0.5%예요.</p>").replace("200만 원", "많이")
+        self.assertTrue(any("빠짐" in p for p in pc.problems(self.OLD, lost, self.REC, check_copy=False)))
+        self.assertTrue(any("늘지 않음" in p for p in pc.problems(self.OLD, self.OLD, self.REC, check_copy=False)))
+
+    def test_refresh_file_is_plus_kind_with_serp(self):
+        pc = self._pc()
+        with mock.patch.object(pc, "ROOT", Path(tempfile.mkdtemp())) as root:
+            (root / "wordpress" / "queue").mkdir(parents=True)
+            (root / "wordpress" / "patches.json").write_text("[]", encoding="utf-8")
+            data = json.loads(pc.refresh_file(5, "2026-11-11 00:00:00", "<p>x</p>", self.REC).read_text(encoding="utf-8"))
+        self.assertEqual((data["kind"], data["serp"]["added"]), ("plus", "구간 경계 계산 예시"))
+
+    def test_queue_picks_plain_done_not_plus_done(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_queue
+        self.assertTrue(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": ""}))
+        self.assertFalse(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": "2026-11-11"}))
+        self.assertFalse(plus_queue.wanted({"content_html": "<p>아직 안 다듬음</p>", "plus_at": ""}))
+        self.assertIn("plus_at", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
 
 
 class SerpGateTest(unittest.TestCase):

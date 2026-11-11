@@ -37,6 +37,7 @@ RETITLE_MAX_POSITION = 10
 RETITLE_MIN_IMPRESSIONS = 100
 RETITLE_MAX_CTR = 0.02
 TITLE_MAX = 60
+PLUS_META = "_firstlab_plus_at"   # +@ 보강한 날 (11/11 운영자)
 STUCK_POSITION = (5, 20)
 STUCK_MIN_IMPRESSIONS = 30
 DECLINE_RATIO = 0.7                # 28일 전 대비 노출이 70% 이하로 떨어지면 하락
@@ -318,6 +319,11 @@ def apply_direct(data: dict, state: dict) -> str:
         style = plain_style.problems(new_html)
         if style:
             raise RuntimeError(f"글 {post_id} 고친 본문이 쉬운 말 기준 미달 → 반영 안 함: {' / '.join(style[:3])}")
+    if data.get("kind") == "plus":  # +@ 보강(automation/plus_check.py) — 상위 글 질문을 다 다뤘고 베끼지 않았는지 서버가 다시 봄
+        from . import serp_gate
+        failed = serp_gate.problems(data.get("serp"), new_html or "") + serp_gate.copied(data.get("serp"), new_html or "")
+        if failed:
+            raise RuntimeError(f"글 {post_id} +@ 보강이 상위 글 기준 미달 → 반영 안 함: {' / '.join(failed[:2])}")
     title, excerpt = _checked_title(data, new_html or old) if data.get("title") else ("", "")
     target = state.get("refresh_target") or {}
     gold = target.get("gold_keyword") if target.get("id") == post_id else ""
@@ -326,10 +332,12 @@ def apply_direct(data: dict, state: dict) -> str:
     if new_html is None and not title and data.get("checked") is not True:
         raise RuntimeError("바꿀 내용(content_html 또는 title)이 없음 (확인만 했으면 \"checked\": true)")
     # checked: 재검증해 보니 고칠 게 없음 → 갱신 날짜만 기록 (안 하면 근거 변경 표시가 안 풀려 매일 같은 글이 다시 뽑힘)
-    plain = data.get("kind") == "plain"
+    plain = data.get("kind") in ("plain", "plus")  # +@ 보강도 새로 더한 부분만 확인한 것 → 확인한 날·주간 한도는 다듬기와 같게
     # 쉬운 말 다듬기는 사실을 다시 확인한 게 아님 → 확인한 날(갱신일·검수 통과일)을 오늘로 바꾸지 않음.
     # 바꾸면 공개 직전 지난 기한 검사(expiry.passed_rounds)·다시 확인할 날(expiry.due_date)이 미뤄짐 (11/10 #561 '11월 9일까지예요')
     _save(post_id, new_html, title, excerpt, stamp=not plain)
+    if data.get("kind") == "plus":  # 보강 끝난 글 표시 (automation/plus_queue.py 가 건너뜀, /post 의 plus_at)
+        wp_cli("post", "meta", "update", str(post_id), PLUS_META, datetime.now().strftime("%Y-%m-%d"))
     if new_html is not None:  # 다시 쓴 본문이 기준 — 그 전 패치는 배포 때 다시 덮어쓰지 않음 (bot/fix_posts.UPTO_META)
         from .fix_posts import UPTO_META, patch_count
         upto = data.get("patches_upto")
