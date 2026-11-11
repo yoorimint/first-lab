@@ -1,0 +1,12 @@
+{
+  "basis_date": "2026-11-11", "yearly_checked": 2026, "laws": ["지방세법", "농어촌특별세법"],
+  "sources": [
+    {"name": "국가법령정보센터 지방세법 제11조 (부동산 취득의 세율, 그 밖의 원인 농지 외 1천분의 40)", "url": "https://www.law.go.kr/법령/지방세법/제11조"},
+    {"name": "국가법령정보센터 지방세법 제151조 (지방교육세 과세표준과 세율)", "url": "https://www.law.go.kr/법령/지방세법/제151조"},
+    {"name": "국가법령정보센터 농어촌특별세법 제5조 (과세표준과 세율)", "url": "https://www.law.go.kr/법령/농어촌특별세법/제5조"}
+  ],
+  "won10_keys": ["tax", "edu", "rural", "total"],
+  "rate": 0.04,
+  "edu_rate": 0.004,
+  "rural_rate": 0.002
+}
