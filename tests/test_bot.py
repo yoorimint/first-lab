@@ -6379,6 +6379,20 @@ class PlainCheckTest(unittest.TestCase):
             self.assertEqual(cg.source_absence([s]), [], s)
         self.assertIn("source_absence", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_plus_no_self_question_in_body(self):
+        """11/11 #3080: 질문 검사를 통과하려고 본문 문단에 '상담은 어디로 하면 될까요? …' 를 끼움 → 새 p·li 안 질문 문장은 막는다."""
+        from bot import condition_gate as cg
+        old = "<p>신청은 주민센터에서 해요.</p>"
+        bad = old + "<p>상담은 어디로 하면 될까요? 국번 없이 1355로 할 수 있어요.</p>"
+        good = old + "<h3>상담은 어디로 하나요?</h3><p>국번 없이 1355로 할 수 있어요.</p>"
+        quoted = old + "<p>'따로 신청해야 하나요?'라는 질문이 많아요.</p>"
+        self.assertTrue(cg.body_self_question(old, bad))
+        self.assertEqual(cg.body_self_question(old, good), [])
+        self.assertEqual(cg.body_self_question(old, quoted), [])
+        kept = "<p>왜 그럴까요? 원래 있던 문장이에요.</p>"
+        self.assertEqual(cg.body_self_question(kept, kept), [])  # 원래 있던 문단은 보강 검사 대상 아님
+        self.assertIn("body_self_question", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
+
     def test_plus_insert_keeps_referent(self):
         """11/11 #1802: 자녀 공제 예시가 '본인 1명 74,350원' 문단 뒤에 끼어, 원래 문장 '위 예시라면 80%는 59,480원'이
         자녀 예시를 가리키게 됨 → 앞 문단을 가리키는 원래 문장 앞에 새 문단을 끼우면 plus_check 가 막는다."""

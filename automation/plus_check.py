@@ -72,7 +72,7 @@ def added_problems(record: dict, old_html: str, new_html: str) -> list[str]:
     return out
 
 
-from bot.condition_gate import REFERENT, _units, referent_moved  # noqa: E402,F401 (apply_review 의 check: 이름으로도 쓰려고 bot 쪽에 둠)
+from bot.condition_gate import REFERENT, _units, body_self_question, referent_moved  # noqa: E402,F401 (apply_review 의 check: 이름으로도 쓰려고 bot 쪽에 둠)
 
 
 _WAGE = re.compile(r"(?:통상)?시급(?:이|은|을|으로|를)?\s*(?:(\d{1,3}(?:,\d{3})+|\d{4,6})원|(\d+)만(?:\s*(\d)천)?\s*원)")
@@ -119,6 +119,7 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
         out.append(f"'맞음'이 아닌데 본문에 남긴 주장 {len(bad)}개: {' / '.join(bad[:3])} — 빼거나 완화")
     out += added_problems(record, old_html, new_html)
     out += referent_moved(old_html, new_html)
+    out += body_self_question(old_html, new_html)
     lost_terms = pc.lost_terms(old_html, new_html, title)
     if lost_terms:
         out.append(f"검색어 줄어듦: {', '.join(lost_terms[:8])}")
