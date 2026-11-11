@@ -1,0 +1,14 @@
+{
+  "type": "image_check",
+  "post_id": 1053,
+  "replace": [
+    {
+      "old": "ai-279ab97ea5",
+      "prompt": "A clean silver sedan parked on a quiet residential street at sunset, with two people standing beside it talking.",
+      "alt": "해 질 녘 주택가에 세워진 은색 승용차 옆에서 이야기하는 두 사람",
+      "why": "AI 사진 대신 제목 카드가 대표 사진으로 들어가 있음"
+    }
+  ],
+  "remove": [],
+  "add": []
+}
