@@ -329,3 +329,6 @@ date,post,fixes,types
 2026-11-11,3264,3,missing_condition:3
 2026-11-11,3262,0,
 2026-11-11,3276,0,
+2026-11-11,3290,1,unverified:1
+2026-11-11,3281,3,missing_condition:1 unverified:2
+2026-11-11,3293,6,unverified:6
