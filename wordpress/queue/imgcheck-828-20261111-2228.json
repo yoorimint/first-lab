@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 828,
+ "replace": [
+  {
+   "old": "ai-48a6cd78e0",
+   "prompt": "a young part-time worker wiping a wooden counter in a small cozy cafe with plain white walls and potted plants, soft afternoon light",
+   "alt": "오후 햇살이 드는 작은 카페에서 나무 카운터를 닦는 아르바이트생",
+   "why": "뒤쪽 칠판 두 개에 엉터리 영문 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
