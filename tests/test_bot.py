@@ -5840,6 +5840,23 @@ class AdsOwnTrafficTest(unittest.TestCase):
         for need in ("is_user_logged_in()", "FIRSTLAB_NOADS_COOKIE", "'FirstLab'", "firstlab_noads"):
             self.assertIn(need, php)
 
+    def test_click_bomb_refresh_and_bot_flood_guard(self):
+        """11/11 운영자 '악의적으로 계속 클릭·새로고침·봇': 기기별 클릭 폭탄·새로고침 폭주는 하루 광고 끔,
+        IP별 요청 폭주는 nginx 429, 광고 끈 화면은 캐시에 안 남김(남에게 광고 없는 화면이 나가지 않게)."""
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-adsense.php").read_text(encoding="utf-8")
+        for need in ("FIRSTLAB_GUARD_VIEWS", "FIRSTLAB_GUARD_CLICKS", "ins.adsbygoogle", "'blur'", "max-age="):
+            self.assertIn(need, php)
+        head = php[php.index("'wp_head'"):]
+        self.assertLess(head.index("firstlab_pv"), head.index("adsbygoogle.js"))
+        http = (ROOT / "server" / "nginx" / "first-lab-http.conf").read_text(encoding="utf-8")
+        self.assertIn("zone=firstlab_pages", http)
+        self.assertIn("Googlebot", http)  # 검색 크롤러는 제한에서 뺌 (색인 늦어지지 않게)
+        site = (ROOT / "server" / "nginx" / "first-lab.conf").read_text(encoding="utf-8")
+        php_loc = site[site.index("location ~ \\.php$"):]
+        self.assertIn("limit_req zone=firstlab_pages", php_loc[:400])
+        self.assertIn('"firstlab_noads=1"', site)
+        self.assertIn('"FirstLab"', site)
+
 
 class IndexCheckTest(unittest.TestCase):
     """11/11 운영자 '색인 기록 만들어라': 공개 글 색인 여부를 매일 기록 → 하루 공개 편수 판단."""
