@@ -6367,6 +6367,18 @@ class PlainCheckTest(unittest.TestCase):
         self.assertIn("known_wrong", (ROOT / "bot" / "freshness.py").read_text(encoding="utf-8"))
         self.assertIn("known_wrong", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
+    def test_source_absence_in_plus_additions(self):
+        """11/11 +@ 보강에서 '자료·안내·규칙에 … 없어요' 단정이 5번 (#1752 발표 자료에 70% 숫자가 없다 → 실제로는 붙임에 있었음).
+        보강으로 새로 쓴 문장에만 적용 (plus_check) — 원래 글 문장은 건드리지 않음."""
+        from bot import condition_gate as cg
+        for s in ("무주택 확인 서류는 법령에 정해져 있지 않아요.", "이 발표 자료에는 담보 한도를 70%로 올린다는 숫자가 없어요.",
+                  "그해에 다 못 쓴 공제를 다음 해로 넘기는 규정은 없어요.", "재발급 절차는 공제회 발급 안내에 따로 나와 있지 않아요."):
+            self.assertTrue(cg.source_absence([s]), s)
+        for s in ("고용노동부 안내에 따르면 연체이자는 없어요.", "방법이 없어요.", "공제 한도는 법에 정해져 있어요.",
+                  "증빙이 없으면 인정되지 않아요."):
+            self.assertEqual(cg.source_absence([s]), [], s)
+        self.assertIn("source_absence", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
+
     def test_calculator_notes_pass_known_wrong(self):
         """계산기 안내 문구도 글과 같은 '확인된 틀린 문구' 검사 (11/11 #3080 — 글은 고쳤는데 계산기 안내에 같은 누락이 남아 있었음)."""
         import re as _re

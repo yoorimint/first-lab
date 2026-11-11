@@ -101,6 +101,8 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
     out += pc.style_problems(new_html)
     from bot import condition_gate, serp_gate
     out += condition_gate.known_wrong(new_html)
+    old_sents = set(condition_gate._sentences(old_html))
+    out += condition_gate.source_absence([x for x in condition_gate._sentences(new_html) if x not in old_sents])
     out += condition_gate.html_unbalanced(new_html)
     out += condition_gate.faq_answer_flip(new_html)
     out += condition_gate.readability(new_html) if hasattr(condition_gate, "readability") else []
