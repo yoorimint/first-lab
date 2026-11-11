@@ -6110,6 +6110,18 @@ class PlusCheckTest(unittest.TestCase):
         self.assertFalse(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": "2026-11-11"}))
         self.assertFalse(plus_queue.wanted({"content_html": "<p>아직 안 다듬음</p>", "plus_at": ""}))
 
+    def test_plus_queue_waits_for_review_patch(self):
+        """11/11 #3017: 검수 패치가 서버에 반영되기 전 본문으로 보강을 시작함 → 반영될 때까지(최대 2시간) 건너뜀."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_queue
+        post = {"post_id": 7, "content_html": "<p>응급처치, 아이 건강관리, 돌봄 실습도 배워요.</p>"}
+        patches = [{"post": 7, "find": "응급처치, 아이 건강관리, 돌봄 실습도 배워요."}]
+        now = 1_000_000.0
+        self.assertTrue(plus_queue.patch_pending(post, patches, last_change=now - 600, now=now))
+        self.assertFalse(plus_queue.patch_pending({**post, "content_html": "<p>고친 문장</p>"}, patches, last_change=now - 600, now=now))
+        self.assertFalse(plus_queue.patch_pending(post, patches, last_change=now - 3 * 3600, now=now))   # 2시간 지나면 기다리지 않음
+        self.assertFalse(plus_queue.patch_pending({**post, "post_id": 8}, patches, last_change=now - 600, now=now))
+
     def test_plus_queue_skips_post_in_progress(self):
         import os, tempfile, time
         sys.path.insert(0, str(ROOT / "automation"))
