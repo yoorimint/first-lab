@@ -6322,6 +6322,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_dated_wrong_koroad_name(self):
+        """11/12 #1245: 정식 이름 '한국도로교통공단'(2024.7.31 한국도로교통공단법)을 '도로교통공단'으로 잘못 고친 일 → 옛 이름은 막고 정식 이름은 통과."""
+        import datetime as dt
+        from bot import condition_gate as cg
+        today = dt.date(2026, 11, 12)
+        self.assertTrue(cg.known_wrong("<p>도로교통공단 고객센터(1577-1120)에 물어보세요.</p>", today))
+        self.assertEqual(cg.known_wrong("<p>한국도로교통공단 고객센터(1577-1120)에 물어보세요.</p>", today), [])
+        self.assertEqual(cg.known_wrong("<p>예전 이름은 도로교통공단이었어요.</p>", today), [])
+
     def test_dated_wrong_gwangju_jeonnam_merged(self):
         """11/12 #1156: 2026.7.1 광주광역시·전라남도 폐지, 전남광주통합특별시 출범 → 지금 기관처럼 쓴 옛 이름만 막고, 조례 이름·과거 이야기는 통과."""
         import datetime as dt
