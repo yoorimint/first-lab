@@ -6322,6 +6322,14 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_known_wrong_child_credit_2026_march(self):
+        """11/11 #553: 간이세액표 자녀 차감액이 2026.3.1부터 20,830·45,830·33,330원 — 옛 12,500원 쓰면 막음 (옛 금액이라고 밝히면 통과)."""
+        from bot import condition_gate as cg
+        self.assertTrue(cg.known_wrong("<p>8세 이상 20세 이하 자녀가 1명이면 12,500원을 빼요.</p>"))
+        self.assertTrue(cg.known_wrong("<p>자녀 2명이면 29,160원을 빼요.</p>"))
+        self.assertEqual(cg.known_wrong("<p>예전 안내의 자녀 1명 12,500원은 지금 기준이 아니에요.</p>"), [])
+        self.assertEqual(cg.known_wrong("<p>8세 이상 20세 이하 자녀가 1명이면 20,830원을 빼요.</p>"), [])
+
     def test_known_wrong_jongbu_reform_sept_revision(self):
         """11/11 #451: 종부세 정부 개편안을 8/3안대로 '비거주 1주택 9억·세부담 상한 변경'으로 씀 — 9/1 수정안에서 철회 → 막음."""
         from bot import condition_gate as cg
