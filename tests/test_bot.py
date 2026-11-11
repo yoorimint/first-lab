@@ -5778,6 +5778,49 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('<p class="fl-sum ">', out)
 
 
+class NaverTopTest(unittest.TestCase):
+    """11/11 운영자 '네이버 검색 화면 직접 여는 거 해라' — 일반 웹 검색 순서는 네이버 상위 글과 달라서
+    블로그 탭·통합검색 화면을 열어 상위 글을 순서대로 모음 (automation/naver_top.py). 네트워크 없이 화면 해석만 검사."""
+
+    def _mod(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import naver_top
+        return naver_top
+
+    def test_blog_tab_order_and_dedup(self):
+        nt = self._mod()
+        page = ('<a href="https://blog.naver.com/aa/224000000001">1</a><a href="https://blog.naver.com/aa/224000000001">1</a>'
+                '<a href="https://m.blog.naver.com/bb/224000000002">2</a><a href="https://blog.naver.com/cc/224000000003">3</a>')
+        self.assertEqual(nt.blog_links(page, 2), ["https://blog.naver.com/aa/224000000001", "https://blog.naver.com/bb/224000000002"])
+        self.assertIn("m.blog.naver.com/PostView.naver?blogId=aa&logNo=224000000001", nt.mobile("https://blog.naver.com/aa/224000000001"))
+
+    def test_web_results_skip_naver_and_own_site(self):
+        nt = self._mod()
+        page = ('<a href="https://search.naver.com/x">n</a><a href="https://first-lab.kr/a">us</a>'
+                '<a href="https://www.myhome.go.kr/fee">1</a><a href="https://www.myhome.go.kr/other">dup host</a>'
+                '<a href="https://calc.example.com/">root only</a><a href="https://calc.example.com/brokerage">2</a>')
+        self.assertEqual(nt.web_links(page, 5), ["https://www.myhome.go.kr/fee", "https://calc.example.com/brokerage"])
+
+    def test_report_reads_post_body_and_survives_failures(self):
+        nt = self._mod()
+        post = ('<meta property="og:title" content="복비 계산법"><div class="se-main-container"><p>월세는 어떻게 환산할까요? 100배예요.</p>'
+                '</div><div class="comment_area">댓글</div>')
+        def get(url):
+            if "tab.blog" in url:
+                return '<a href="https://blog.naver.com/aa/224000000001">x</a><a href="https://blog.naver.com/bb/224000000002">y</a>'
+            if "nexearch" in url:
+                return ""
+            if "bb" in url:
+                raise OSError("timeout")
+            return post
+        out = nt.report("복비 계산기", get=get, pause=0)
+        self.assertIn("복비 계산법", out)
+        self.assertIn("월세는 어떻게 환산할까요?", out)
+        self.assertNotIn("댓글", out)
+        self.assertIn("못 엶", out)   # 글 하나 못 열어도 나머지는 계속
+        self.assertIn("unavailable", nt.report("x", get=lambda u: (_ for _ in ()).throw(OSError("blocked")), pause=0))
+
+
 class SerpGateTest(unittest.TestCase):
     """11/11 운영자 '키워드 정해서 상위 글 확인하고 거기 있는 자료 + 없는 콘텐츠 넣고 있나' — #2766 은 검색 1번, 상위 글 안 열고 씀.
     새 글은 상위 글 3곳 이상의 질문을 적고(serp), 그 질문을 본문이 모두 다루고, 우리만 더한 것을 적어야 초안 저장 관문 통과."""
