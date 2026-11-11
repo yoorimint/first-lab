@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2177,
+ "replace": [
+  {
+   "old": "ai-d2fd406727",
+   "prompt": "a young office worker sitting by a sunny window holding a plain ceramic mug and looking outside thoughtfully, soft natural light, no electronics",
+   "alt": "밝은 창가에서 머그잔을 들고 생각에 잠긴 직장인",
+   "why": "노트북에 애플 로고가 뚜렷하게 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2338,
+ "replace": [
+  {
+   "old": "ai-c33fb16b97",
+   "prompt": "a tidy wooden office desk by a bright window with a potted green plant and a plain ceramic mug, soft morning light, no electronics",
+   "alt": "아침 햇살이 드는 창가 책상 위 화분과 머그잔",
+   "why": "노트북 뚜껑에 로고 모양 자국이 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
