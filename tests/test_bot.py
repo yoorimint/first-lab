@@ -2874,6 +2874,21 @@ class GoldFirstTest(unittest.TestCase):
             schedule.publish_next(datetime(2026, 11, 5, 9, 0, tzinfo=ZoneInfo("Asia/Seoul")))
         self.assertEqual(next(c for c in calls if c[:2] == ("post", "update"))[2], "85")  # 황금 점수 높은 글 먼저, 시즌 지난 글은 점수가 높아도 뒤
 
+    def test_deadline_posts_go_first(self):
+        """11/11: 기한 11월 30일 중간예납 글이 대기 340편 중 309번째(5개월 뒤 공개) → 제목·요약문 날짜가 45일 안이면 맨 먼저."""
+        import datetime as dt
+        from bot import schedule, seasons
+        today = dt.date(2026, 11, 11)
+        self.assertEqual(schedule.urgent_due("중간예납: 11월 30일까지, 1천만 원 넘으면 2027년 2월 1일까지", today), dt.date(2026, 11, 30))
+        self.assertEqual(schedule.urgent_due("2026년 8월 11일 공포, 12월 10일 이후 부착분부터", today), dt.date(2026, 12, 10))
+        self.assertIsNone(schedule.urgent_due("2027년 2월 12일부터 상한 1천만 원", today))   # 45일 밖
+        self.assertIsNone(schedule.urgent_due("2026년 6월 7일 접수가 끝났어요", today))      # 지난 날짜
+        self.assertEqual(seasons.rank("종합소득세중간예납", today), seasons.IN)              # 5월 종소세 시즌으로 잡히지 않게
+        rows = [{"ID": 1, "post_name": "a", "post_title": "황금 글", "post_excerpt": "기한 없음"},
+                {"ID": 2, "post_name": "b", "post_title": "중간예납", "post_excerpt": "11월 30일까지 내요"},
+                {"ID": 3, "post_name": "c", "post_title": "운전 기록", "post_excerpt": "2026년 12월 3일부터 요구"}]
+        self.assertEqual(self._publish_pick(rows, {1: 9.0, 2: 0.1, 3: 0.1}), 2)
+
     def _publish_pick(self, rows, prio, pending=()):
         import json as _json
         from datetime import datetime

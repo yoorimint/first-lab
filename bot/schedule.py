@@ -7,8 +7,9 @@
 from __future__ import annotations
 
 import random
+import re
 import subprocess
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from . import freshness, indexnow, naver_hub, seasons
 from .settings import wp_cli
@@ -68,7 +69,7 @@ def _draft_info(ids: list[int]) -> dict[int, dict]:
         return {}
     try:
         rows = json.loads(wp_cli("post", "list", "--post_type=post", "--post_status=draft", f"--post__in={','.join(map(str, ids))}",
-                                 "--fields=ID,post_name,post_title,post_date", "--format=json", "--posts_per_page=-1") or "[]")
+                                 "--fields=ID,post_name,post_title,post_excerpt,post_date", "--format=json", "--posts_per_page=-1") or "[]")
     except Exception:  # noqa: BLE001 — 못 읽으면 계절 순서 없이 기존 순서
         return {}
     if not isinstance(rows, list):
@@ -81,7 +82,8 @@ def _draft_info(ids: list[int]) -> dict[int, dict]:
             date = datetime.strptime(str(r.get("post_date", "")), "%Y-%m-%d %H:%M:%S")
         except ValueError:
             date = None
-        out[int(r["ID"])] = {"text": urllib.parse.unquote(r.get("post_name", "")) + " " + r.get("post_title", ""), "date": date}
+        out[int(r["ID"])] = {"text": urllib.parse.unquote(r.get("post_name", "")) + " " + r.get("post_title", ""), "date": date,
+                             "brief": r.get("post_title", "") + " " + (r.get("post_excerpt") or "")}
     return out
 
 
@@ -103,9 +105,37 @@ MAX_WAIT = timedelta(days=21)  # 이만큼 기다린 글은 황금 점수와 상
 # 11/6: 예전엔 '대기열 뒤 21편을 뺀 나머지'로 셈 — 하루 30편씩 쌓이자 하루도 안 된 글까지 '오래된 글'이 돼 황금 점수가 거의 안 쓰임
 
 
+# 11/11: 기한·시행일이 있는 글(중간예납 11월 30일, 12월 10일 시행 등)이 대기 340편 뒤에 서서 5개월 뒤 공개될 뻔함
+# → 제목·요약문에 든 날짜가 오늘부터 URGENT_DAYS 안이면 맨 먼저 (날짜가 빠른 글부터). 날짜가 지나면 원래 순서로.
+URGENT_DAYS = 45
+_DATE = re.compile(r"(?:(20\d\d)년\s*)?(\d{1,2})월\s*(\d{1,2})일")
+
+
+def due_date(brief: str, today: date) -> date | None:
+    """제목·요약문에서 오늘 이후 가장 이른 날짜. 연도가 없으면 앞에 나온 연도, 그것도 없으면 올해(지났으면 다음 해)."""
+    found, year = [], None
+    for m in _DATE.finditer(brief or ""):
+        y = int(m.group(1)) if m.group(1) else None
+        year = y or year
+        try:
+            d = date(y or year or today.year, int(m.group(2)), int(m.group(3)))
+        except ValueError:
+            continue
+        if not (y or year) and d < today:
+            d = d.replace(year=today.year + 1)
+        if d >= today:
+            found.append(d)
+    return min(found) if found else None
+
+
+def urgent_due(brief: str, today: date, days: int = URGENT_DAYS) -> date | None:
+    d = due_date(brief, today)
+    return d if d and d <= today + timedelta(days=days) else None
+
+
 def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
     """대기 초안의 공개 순서 (사진 채우기도 이 순서로 — bot/pending_images, 11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진').
-    시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 황금 점수·성수기 높은 글(운영자 지시 11/5,
+    기한·시행일이 45일 안인 글이 맨 먼저(날짜 빠른 순, urgent_due) → 시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 황금 점수·성수기 높은 글(운영자 지시 11/5,
     bot/naver_hub.py) → 시즌 중인 글 → 오래된 순. 대표 사진이 아직 없는 글은 공개 때 건너뜀(publish_next)."""
     info = _draft_info(ids)
     texts = {i: info.get(i, {}).get("text", "") for i in ids}
@@ -123,7 +153,10 @@ def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
     very_old = now_kst.replace(tzinfo=None) - MAX_WAIT_ANY
     level = {i: tier(labels.get(i, ""), norm(texts[i].split(" ")[0])) for i in ids}
     level = {i: min(t, 1) if info.get(i, {}).get("date") and info[i]["date"] <= very_old else t for i, t in level.items()}
-    return sorted(ids, key=lambda i: (rank[i] == seasons.OFF, level[i], i not in reviewed, i not in old, -round(gold.get(i, 0.0), 2), rank[i]))
+    today = now_kst.date()
+    due = {i: urgent_due(info.get(i, {}).get("brief", ""), today) for i in ids}
+    return sorted(ids, key=lambda i: (due[i] is None, due[i] or today, rank[i] == seasons.OFF, level[i], i not in reviewed,
+                                      i not in old, -round(gold.get(i, 0.0), 2), rank[i]))
 
 
 UPCOMING = 8
