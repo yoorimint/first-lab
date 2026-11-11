@@ -314,3 +314,6 @@ date,post,fixes,types
 2026-11-11,3174,0,
 2026-11-11,3183,0,
 2026-11-11,3163,1,missing_condition:1
+2026-11-11,3134,1,missing_condition:1
+2026-11-11,3140,2,missing_condition:2
+2026-11-11,3163,0,
