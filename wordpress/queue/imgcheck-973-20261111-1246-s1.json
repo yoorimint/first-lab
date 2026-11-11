@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 973,
+ "replace": [
+  {
+   "old": "ai-4e7b987ccb",
+   "prompt": "a quiet construction site at sunrise with piles of brown earth, a half-built concrete frame and orange safety cones, with no machinery and no vehicles",
+   "alt": "해 뜰 무렵 흙더미와 짓다 만 건물 뼈대가 있는 공사 현장",
+   "why": "굴착기에 CAT 상표 로고·글자(C1T3)가 보임 — 장비 없는 장면으로 교체"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
