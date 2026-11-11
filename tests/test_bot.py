@@ -6322,6 +6322,13 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_known_wrong_december_chunap_rate(self):
+        """11/11 #3134: '2026년 12월에 신청하면 … 10%' — 같은 12월 안에 내면 9.5% 특례(부칙 제3조)가 빠짐 → 막음."""
+        from bot import condition_gate as cg
+        self.assertTrue(cg.known_wrong("<p>추납을 2026년 12월에 신청하면 납부 기한이 2027년 1월 말일이라 10%가 적용돼요.</p>"))
+        self.assertTrue(cg.known_wrong("<h2>추납 계산</h2><p>2026년 12월에 신청하면 납부 기한이 2027년 1월 말일이라 10%가 적용돼요.</p>"))
+        self.assertEqual(cg.known_wrong("<p>추납을 2026년 12월에 신청하면 기한이 1월이라 10%지만, 12월 안에 다 내면 9.5%예요.</p>"), [])
+
     def test_known_wrong_simple_book_spacing(self):
         """11/11 #1023: '보험 모집인'(띄어씀)·'연말정산까지 해 주는'으로 바꿔 써서 간편장부대상자 누락 검사를 빠져나감 → 넓혀 막음."""
         from bot import condition_gate as cg
