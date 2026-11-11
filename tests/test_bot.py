@@ -5817,6 +5817,16 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('<p class="fl-sum ">', out)
 
 
+class AdsOwnTrafficTest(unittest.TestCase):
+    def test_no_ads_for_our_own_visits(self):
+        """11/11 운영자 '무효클릭 무효트래픽 방지': 로그인(운영자)·광고 끄기 쿠키·우리 봇 요청엔 광고 코드를 안 넣음."""
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-adsense.php").read_text(encoding="utf-8")
+        head = php[php.index("'wp_head'"):]
+        self.assertLess(head.index("firstlab_ads_off()"), head.index("adsbygoogle.js"))
+        for need in ("is_user_logged_in()", "FIRSTLAB_NOADS_COOKIE", "'FirstLab'", "firstlab_noads"):
+            self.assertIn(need, php)
+
+
 class IndexCheckTest(unittest.TestCase):
     """11/11 운영자 '색인 기록 만들어라': 공개 글 색인 여부를 매일 기록 → 하루 공개 편수 판단."""
 
