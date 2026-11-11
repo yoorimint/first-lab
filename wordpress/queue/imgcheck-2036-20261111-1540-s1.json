@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2036,
+ "replace": [
+  {
+   "old": "ai-620459a0d1",
+   "prompt": "a tidy small office with a wooden desk, an office chair and a potted plant beside a bright window in soft morning light",
+   "alt": "창가에 책상과 화분이 놓인 작은 사무실",
+   "why": "대표 사진이 글자가 든 제목 카드임 (AI 사진 없음)"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
