@@ -6322,6 +6322,14 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_known_wrong_simple_book_spacing(self):
+        """11/11 #1023: '보험 모집인'(띄어씀)·'연말정산까지 해 주는'으로 바꿔 써서 간편장부대상자 누락 검사를 빠져나감 → 넓혀 막음."""
+        from bot import condition_gate as cg
+        bad = "<p>보험 모집인처럼 돈을 준 곳이 연말정산까지 해 주는 사업소득만 있으면 신고하지 않아도 될 수 있어요.</p>"
+        self.assertTrue(cg.known_wrong(bad))
+        ok = "<p>간편장부대상자인 보험 모집인이 연말정산을 받은 사업소득만 있으면 신고하지 않아도 돼요.</p>"
+        self.assertEqual(cg.known_wrong(ok), [])
+
     def test_known_wrong_child_credit_2026_march(self):
         """11/11 #553: 간이세액표 자녀 차감액이 2026.3.1부터 20,830·45,830·33,330원 — 옛 12,500원 쓰면 막음 (옛 금액이라고 밝히면 통과)."""
         from bot import condition_gate as cg
