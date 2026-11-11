@@ -345,3 +345,6 @@ date,post,fixes,types
 2026-11-11,3528,1,missing_condition:1
 2026-11-11,3580,1,missing_condition:1
 2026-11-11,1245,1,wrong_fact:1
+2026-11-11,3595,0,
+2026-11-11,3649,0,
+2026-11-11,3614,2,missing_condition:2
