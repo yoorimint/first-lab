@@ -5970,6 +5970,8 @@ class AttackSurfaceTest(unittest.TestCase):
         src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-2fa.php").read_text(encoding="utf-8")
         self.assertRegex(src, r"'authenticate',[\s\S]*?firstlab_2fa_check[\s\S]*?\n\t50\n")   # core 20 뒤, 잠금 99 앞
         self.assertIn("wp_hash_password", src)
+        self.assertIn("add_menu_page(", src)                            # 11/11 '키가 어딨노': 왼쪽 메뉴 전용 화면 + 맨 위 안내
+        self.assertIn("check_admin_referer( 'firstlab_2fa' )", src)     # 전용 화면 저장은 nonce 확인 뒤
         self.assertNotIn("error_log", src)                              # 키·코드를 기록에 남기지 않음
         if shutil.which("php"):
             r = subprocess.run(["php", str(ROOT / "tests" / "php" / "test_2fa.php"), str(ROOT / "wordpress" / "mu-plugins" / "first-lab-2fa.php")],
