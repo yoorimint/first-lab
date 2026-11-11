@@ -10,7 +10,8 @@
 통과하면 wordpress/queue/refresh-plus-<번호>-….json (kind "plus") → 서버 bot/refresh.apply_direct 가 serp 를 다시 보고 반영.
 
 사용: python3 automation/plus_check.py <글번호> <원본 JSON> <보강 본문 HTML> <보강 기록 JSON> [--write] [--fix=숫자|…:근거] [--excerpt=파일]
-  보강 기록 JSON = {"serp": {...}, "review": [{"claim", "urls", "verdict", "action"}, ...], "added": ["더한 내용 한 줄", ...]}
+  보강 기록 JSON = {"serp": {...}, "review": [{"claim", "urls", "verdict", "action"}, ...],
+                   "added": [{"type": "+질문|@계산예시|@상황판단|@최신개정|@조회방법", "for": "누구의 어떤 궁금증", "text": "더한 것 한 줄"}, ...]}
 """
 from __future__ import annotations
 
@@ -25,13 +26,49 @@ sys.path.insert(0, str(ROOT / "automation"))
 
 import plain_check as pc  # noqa: E402
 
-GROW_MIN = 1.05   # 본문이 이만큼은 늘어야 '보강'
+GROW_MAX = 1.6    # 이보다 길어지면 꼭 필요한 것만 넣었는지 의심 (11/11 운영자 '+@ 도 아무거나 넣으면 안 되는 거 알제')
+# 더한 것마다 종류를 밝힘 — 분량 채우기·주제 밖 배경 설명·홍보는 종류가 없어 못 들어옴
+ADD_TYPES = {
+    "+질문": "상위 글이 답하는데 우리 글에 없던 질문 (for 에 serp.questions 의 그 질문)",
+    "@계산예시": "실제 숫자로 해 보는 계산 (공식 기준값으로)",
+    "@상황판단": "이런 경우엔 이렇게 — 조건별로 갈리는 판단",
+    "@최신개정": "시행일이 정해진 개정·바뀐 기준 (확정 여부·시행일 함께)",
+    "@조회방법": "내 경우를 직접 확인하는 곳 (기관·메뉴·전화)",
+}
+GROW_MIN_CHARS = 800   # 짧은 글에 문단 하나 더한 건 비율이 커도 괜찮음
+MAX_AT = 3        # @ 는 1~3개 — 많이 넣는 게 목표가 아님
 
 
 def _verified_text(review: list[dict]) -> str:
     from bot.sources import is_official
     return " ".join(str(c.get("claim", "")) for c in review or []
                     if c.get("verdict") == "맞음" and any(is_official(u) for u in c.get("urls") or []))
+
+
+def added_problems(record: dict, old_html: str, new_html: str) -> list[str]:
+    """더한 것이 검색한 사람에게 필요한 것인지 (분량 채우기 막기). 길이를 늘리는 게 목표가 아님 — 늘지 않으면 +@ 가 없는 것,
+    너무 늘면 꼭 필요한 것만 넣었는지 다시 보게."""
+    out = []
+    added = record.get("added") or []
+    if not added:
+        return ["더한 내용(added) 목록이 없음 — 더한 것마다 {type, for, text}"]
+    questions = [str(q) for q in (record.get("serp") or {}).get("questions") or []]
+    for a in added:
+        kind = a.get("type") if isinstance(a, dict) else None
+        if kind not in ADD_TYPES:
+            out.append(f"더한 것의 종류가 없거나 정해진 종류가 아님: {str(a)[:40]} — {', '.join(ADD_TYPES)} 중 하나만 (배경 설명·분량 채우기는 넣지 않음)")
+        elif kind == "+질문" and str(a.get("for", "")) not in questions:
+            out.append(f"'+질문' 은 serp.questions 의 질문에 답하는 것만: {str(a.get('for', ''))[:40]}")
+        elif not str(a.get("for", "")).strip():
+            out.append(f"'{kind}' 를 왜 넣는지(for: 이 키워드로 찾는 사람의 어떤 궁금증) 적기")
+    if sum(1 for a in added if isinstance(a, dict) and str(a.get("type", "")).startswith("@")) > MAX_AT:
+        out.append(f"@ 는 {MAX_AT}개까지 — 꼭 필요한 것만")
+    old_len, new_len = len(pc.plain(old_html)), len(pc.plain(new_html))
+    if new_len <= old_len:
+        out.append("본문이 늘지 않음 — 더한 내용이 없음")
+    elif new_len > old_len * GROW_MAX and new_len - old_len > GROW_MIN_CHARS:
+        out.append(f"본문이 {int((GROW_MAX - 1) * 100)}% 넘게 늘어남 — 검색한 사람에게 꼭 필요한 것만 남기기")
+    return out
 
 
 def problems(old_html: str, new_html: str, record: dict, title: str = "", allow: set[str] | None = None,
@@ -53,10 +90,7 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
     bad = [c.get("claim", "")[:40] for c in review if c.get("verdict") != "맞음" and c.get("action") in ("유지", "수정")]
     if bad:
         out.append(f"'맞음'이 아닌데 본문에 남긴 주장 {len(bad)}개: {' / '.join(bad[:3])} — 빼거나 완화")
-    if len(pc.plain(new_html)) < len(pc.plain(old_html)) * GROW_MIN:
-        out.append(f"본문이 {int((GROW_MIN - 1) * 100)}% 넘게 늘지 않음 — 보강(+@)이 거의 없음")
-    if not record.get("added"):
-        out.append("더한 내용(added) 목록이 없음")
+    out += added_problems(record, old_html, new_html)
     lost_terms = pc.lost_terms(old_html, new_html, title)
     if lost_terms:
         out.append(f"검색어 줄어듦: {', '.join(lost_terms[:8])}")
@@ -82,7 +116,7 @@ def refresh_file(post_id: int, base_modified: str, new_html: str, record: dict, 
                  title: str = "", excerpt: str = "") -> Path:
     path = ROOT / "wordpress" / "queue" / f"refresh-plus-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
     upto = len(json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8")))
-    added = "; ".join(str(a) for a in record.get("added") or [])[:300]
+    added = "; ".join(f"{a.get('type')} {a.get('text', '')}" if isinstance(a, dict) else str(a) for a in record.get("added") or [])[:300]
     path.write_text(json.dumps({"type": "refresh", "kind": "plus", "post_id": post_id, "base_modified": base_modified,
                                 "content_html": new_html, "patches_upto": upto,
                                 "serp": record.get("serp"), "review": record.get("review"),

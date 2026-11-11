@@ -5846,7 +5846,7 @@ class PlusCheckTest(unittest.TestCase):
     REC = {"serp": {"urls": ["https://blog.naver.com/a/1", "https://blog.naver.com/b/1", "https://x.example.com/p"],
                     "questions": ["오피스텔 요율", "부가세 별도", "상한요율"], "added": "구간 경계 계산 예시"},
            "review": [{"claim": "주거용 오피스텔 매매 상한요율은 0.5%예요", "urls": ["https://www.law.go.kr/x"], "verdict": "맞음", "action": "유지"}],
-           "added": ["오피스텔 요율"]}
+           "added": [{"type": "+질문", "for": "오피스텔 요율", "text": "주거용 오피스텔 상한요율"}]}
 
     def _pc(self):
         sys.path.insert(0, str(ROOT / "automation"))
@@ -5870,6 +5870,21 @@ class PlusCheckTest(unittest.TestCase):
         lost = self._new("<p>주거용 오피스텔 매매 상한요율은 0.5%예요.</p>").replace("200만 원", "많이")
         self.assertTrue(any("빠짐" in p for p in pc.problems(self.OLD, lost, self.REC, check_copy=False)))
         self.assertTrue(any("늘지 않음" in p for p in pc.problems(self.OLD, self.OLD, self.REC, check_copy=False)))
+
+    def test_additions_must_be_needed_not_padding(self):
+        """11/11 운영자 '+@ 도 아무거나 넣으면 안 되는 거 알제' — 종류 없는 배경 설명·분량 채우기, 상위 글 질문이 아닌 '+질문',
+        @ 4개 이상, 60% 넘게 불린 글은 막음."""
+        pc = self._pc()
+        new = self._new("<p>주거용 오피스텔 매매 상한요율은 0.5%예요.</p>")
+        rec = dict(self.REC, added=[{"type": "배경", "for": "", "text": "부동산 중개의 역사"}])
+        self.assertTrue(any("종류" in p for p in pc.added_problems(rec, self.OLD, new)))
+        rec = dict(self.REC, added=[{"type": "+질문", "for": "상위 글에 없는 질문", "text": "x"}])
+        self.assertTrue(any("serp.questions" in p for p in pc.added_problems(rec, self.OLD, new)))
+        rec = dict(self.REC, added=[{"type": "@계산예시", "for": "얼마인지", "text": str(i)} for i in range(4)])
+        self.assertTrue(any("까지" in p for p in pc.added_problems(rec, self.OLD, new)))
+        padded = self._new("<p>" + "오피스텔 요율 설명이에요. " * 80 + "</p>")
+        self.assertTrue(any("60%" in p for p in pc.added_problems(self.REC, self.OLD, padded)))
+        self.assertEqual(pc.added_problems(self.REC, self.OLD, new), [])
 
     def test_refresh_file_is_plus_kind_with_serp(self):
         pc = self._pc()
