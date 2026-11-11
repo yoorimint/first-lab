@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1873,
+ "replace": [
+  {
+   "old": "ai-d90c21e6a8",
+   "prompt": "a wheelchair user rolling along a sunny accessible park path lined with trees, seen from behind",
+   "alt": "햇살 드는 공원 산책로를 휠체어로 지나가는 사람의 뒷모습",
+   "why": "대표 사진이 제목 글자 카드라 글자가 들어 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
