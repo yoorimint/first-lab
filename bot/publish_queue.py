@@ -89,6 +89,7 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     failed = review_gate.problems(data.get("review"), article.title, article.excerpt, article.content_html)
     failed += review_gate.second_review_missing(data.get("review"))
     failed += serp_gate.problems(data.get("serp"), article.content_html)  # 상위 글 질문을 다 다뤘는지 (11/11 운영자)
+    failed += serp_gate.copied(data.get("serp"), article.content_html)    # 상위 글을 베끼지 않았는지 (11/11 운영자)
     if serp_gate.note(data.get("serp")):
         notes.append(serp_gate.note(data.get("serp")))
     if failed:

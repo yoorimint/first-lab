@@ -18,6 +18,9 @@ from urllib.parse import urlparse
 from .condition_gate import _stems
 
 OWN_HOST = "first-lab.kr"
+COPY_MIN_CHARS = 18   # 띄어쓰기·문장부호 뺀 길이가 이만큼 넘는 문장이
+COPY_MAX_SAME = 2     # 한 상위 글과 이만큼 넘게 똑같으면 베낀 것으로 봄 (법 조문 인용 한두 문장은 겹칠 수 있음)
+COPY_CHECK_URLS = 8
 MIN_SITES = 3
 MIN_QUESTIONS = 3
 COVER_RATIO = 0.5   # 질문 낱말의 절반 이상이 본문에 있으면 다룬 것으로 봄
@@ -63,6 +66,34 @@ def problems(serp, body_html: str) -> list[str]:
         out.append(f"상위 글이 다루는데 본문에 없는 질문 {len(missing)}개: {' / '.join(m[:30] for m in missing[:3])} — 본문에 답을 넣기")
     if len(str(serp.get("added") or "").strip()) < 10:
         out.append("상위 글 분석: 상위 글에 없는데 우리가 더한 것(added)을 적기 — 계산 예시·계산기·상황별 판단·최신 개정 중 하나 이상")
+    return out
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"[\s\u200b.,!?·'\"“”‘’()\[\]]+", "", text)
+
+
+def copied(serp, body_html: str, get=None) -> list[str]:
+    """상위 글 문장을 그대로 옮겼는지 (11/11 운영자 '상위 블로그 글하고 똑같이 적진 않겠지? 참고 조사만 하는 거지?').
+    serp 의 상위 글을 다시 열어, 우리 본문의 긴 문장이 한 글과 COPY_MAX_SAME 개 넘게 똑같으면 막음. 못 열면 넘어감."""
+    if not isinstance(serp, dict):
+        return []
+    if get is None:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "automation"))
+        import naver_top
+        get = lambda u: naver_top.text_of(naver_top.fetch(naver_top.mobile(u)))[1]  # noqa: E731
+    ours = [s for s in (_norm(x) for x in re.split(r"(?<=[.!?요다])\s+", re.sub(r"<[^>]+>", " ", body_html or ""))) if len(s) >= COPY_MIN_CHARS]
+    out = []
+    for url in [u for u in serp.get("urls") or [] if str(u).startswith("http")][:COPY_CHECK_URLS]:
+        try:
+            theirs = _norm(get(url))
+        except Exception:  # noqa: BLE001 - 못 여는 글은 비교 못 함 (막지 않음)
+            continue
+        same = [s for s in ours if s in theirs]
+        if len(same) > COPY_MAX_SAME:
+            out.append(f"상위 글 문장을 그대로 옮김 {len(same)}곳 ({url[:60]}) — 참고만 하고 우리 말로 다시 쓰기")
     return out
 
 

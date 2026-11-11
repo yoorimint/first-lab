@@ -5854,7 +5854,21 @@ class SerpGateTest(unittest.TestCase):
 
     def test_gate_is_wired_into_save_and_writer_check(self):
         for f in ("bot/publish_queue.py", "bot/source_check.py"):
-            self.assertIn("serp_gate.problems", (ROOT / f).read_text(encoding="utf-8"))
+            text = (ROOT / f).read_text(encoding="utf-8")
+            self.assertIn("serp_gate.problems", text)
+            self.assertIn("serp_gate.copied", text)
+
+    def test_copied_sentences_from_top_post_hold(self):
+        """11/11 운영자 '상위 블로그 글하고 똑같이 적진 않겠지?' — 참고만, 문장을 옮기면 막음. 법 문장 한두 개 겹침은 괜찮음."""
+        from bot import serp_gate
+        theirs = ("월세는 보증금에 월세의 100배를 더한 금액을 거래금액으로 봐요. 그 금액에 임대차 요율을 곱해 상한을 구해요. "
+                  "다만 합계가 5천만 원 미만이면 월세에 70을 곱해 다시 더해야 해요. 부가세는 중개사무소에 따라 따로 붙을 수 있어요.")
+        body = "<p>" + theirs + "</p>"
+        serp = {"urls": ["https://blog.naver.com/a/1"]}
+        self.assertTrue(serp_gate.copied(serp, body, get=lambda u: theirs))
+        own = "<p>월세는 보증금에 월세의 100배를 더한 금액을 거래금액으로 봐요. 나머지는 우리 말로 새로 써서 설명한 문장이에요.</p>"
+        self.assertEqual(serp_gate.copied(serp, own, get=lambda u: theirs), [])
+        self.assertEqual(serp_gate.copied(serp, body, get=lambda u: (_ for _ in ()).throw(OSError("x"))), [])  # 못 열면 넘어감
 
 
 class PlainCheckTest(unittest.TestCase):

@@ -727,6 +727,7 @@ def main(argv: list[str]) -> None:
     gate += review_gate.second_review_missing(review)  # 공개 대기열 첫 저장과 같게 (11/8)
     from . import serp_gate
     gate += serp_gate.problems(data.get("serp"), data.get("content_html", ""))  # 상위 글 분석 (11/11)
+    gate += serp_gate.copied(data.get("serp"), data.get("content_html", ""))
     for x in gate:
         print(f"- [관문] {x}")
     for a in amended(review):
