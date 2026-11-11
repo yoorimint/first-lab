@@ -6140,13 +6140,19 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(patch_check.reintroduced(7, "<p>출퇴근 요율까지 합친 평균이 1.47%예요. 계산기</p>", patches), [])
         self.assertEqual(patch_check.reintroduced(8, "<p>2026년 요율은 평균 1.47%이고</p>", patches), [])
         self.assertIn("patch_check.reintroduced", (ROOT / "automation" / "plain_check.py").read_text(encoding="utf-8"))
+        all_patches = json.loads((ROOT / "wordpress" / "patches.json").read_text(encoding="utf-8"))
+        self.assertTrue(patch_check.reintroduced(1344, "<p>다세대주택에 주민공동시설을 두면, 건축위원회를 거쳐 용적률을 완화받을 수 있어요.</p>", all_patches))
         bad = []
         for f in glob.glob(str(ROOT / "wordpress" / "queue" / "refresh-*.json")):
             stamp = re.search(r"-(\d{8}-\d{4,6})\.json$", f)
             if not stamp or stamp.group(1)[:13].replace("-", "") < "202611100345":  # 이 검사 전에 만든 파일(이미 반영·정리됨)은 뺌
                 continue
             data = json.loads(Path(f).read_text(encoding="utf-8"))
-            if data.get("content_html") and patch_check.reintroduced(int(data["post_id"]), data["content_html"]):
+            # 그 파일을 만든 뒤에 생긴 패치(patches_upto 이후)는 다시 쓴 본문을 고치는 새 패치라 '다시 들어감'이 아님
+            # (11/11 #1344: 다듬은 본문을 공개 직전 재검수가 고친 패치 4개가 이 검사에 걸림)
+            upto = data.get("patches_upto")
+            patches = all_patches[:int(upto)] if upto is not None else all_patches
+            if data.get("content_html") and patch_check.reintroduced(int(data["post_id"]), data["content_html"], patches):
                 bad.append(Path(f).name)
         self.assertEqual(bad, [])
 
