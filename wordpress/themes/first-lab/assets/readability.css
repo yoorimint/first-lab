@@ -65,3 +65,9 @@ ul.fl-split > li { margin: 0.25em 0; }
 
 /* 문단 끝 근거 줄 (쉬운 말 다듬기: 법 이름·조항을 본문 문장 대신 여기에 모음, 11/9) — 작고 흐리게 */
 .wp-block-post-content p.fl-basis { font-size: .82em; color: #6b7280; margin-top: -.3em; }
+/* 빈 양식 내려받기 상자 (mu-plugins/first-lab-forms.php, 11/12) */
+.wp-block-post-content .fl-form-box { border: 1px solid var(--fl-line); border-left: 4px solid var(--fl-accent); border-radius: 10px; padding: .9em 1.1em .5em; margin: 1.6em 0; }
+.wp-block-post-content .fl-form-box .fl-form-title { font-weight: 700; margin: 0 0 .4em; }
+.wp-block-post-content .fl-form-box p { margin: 0 0 .6em; }
+.wp-block-post-content .fl-form-btn { display: inline-block; padding: .45em .9em; margin: 0 .4em .4em 0; border-radius: 8px; background: var(--fl-accent); color: #fff; text-decoration: none; font-weight: 600; }
+.wp-block-post-content .fl-form-official { font-size: .92em; }
