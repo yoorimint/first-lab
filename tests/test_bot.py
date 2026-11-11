@@ -6429,6 +6429,16 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.body_self_question(kept, kept), [])  # 원래 있던 문단은 보강 검사 대상 아님
         self.assertIn("body_self_question", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_plus_article_verified_with_or_without_paragraph(self):
+        """11/12 #1053: 본문 '제88조' 를 기록이 '제88조 제1항' 으로 확인했는데 '확인 안 됨'으로 막힘 → 조·항 표기 차이는 같은 조문으로 봄."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_check
+        self.assertTrue(plus_check._is_verified("법 조항", "제88조", {"제88조제1항": 1}))
+        self.assertTrue(plus_check._is_verified("법 조항", "제88조제1항", {"제88조": 1}))
+        self.assertFalse(plus_check._is_verified("법 조항", "제88조제2항", {"제88조제1항": 1}))
+        self.assertFalse(plus_check._is_verified("법 조항", "제8조", {"제88조": 1}))
+        self.assertFalse(plus_check._is_verified("숫자", "88", {"8": 1}))
+
     def test_plus_insert_keeps_referent(self):
         """11/11 #1802: 자녀 공제 예시가 '본인 1명 74,350원' 문단 뒤에 끼어, 원래 문장 '위 예시라면 80%는 59,480원'이
         자녀 예시를 가리키게 됨 → 앞 문단을 가리키는 원래 문장 앞에 새 문단을 끼우면 plus_check 가 막는다."""

@@ -98,6 +98,17 @@ def example_below_min_wage(sentences: list[str], floor: int) -> list[str]:
     return out
 
 
+def _is_verified(kind: str, key: str, verified) -> bool:
+    """본문의 '제88조' 는 기록의 '제88조제1항' 주장으로도 확인된 것으로 봄 (반대도 같음 — 11/12 #1053: 본문은 조만, 기록은 항까지 적어
+    '확인 안 됨'으로 막혀 검수가 조문 표기를 억지로 바꿈). 다른 항끼리(제1항 ↔ 제2항)는 같은 것으로 보지 않음."""
+    if key in verified:
+        return True
+    if kind != "법 조항":
+        return False
+    base = re.sub(r"제?\d+항$", "", key)
+    return (base != key and base in verified) or any(re.sub(r"제?\d+항$", "", v) == key for v in verified)
+
+
 def problems(old_html: str, new_html: str, record: dict, title: str = "", allow: set[str] | None = None,
              written=None, post_id: int | None = None, check_copy: bool = True) -> list[str]:
     allow = allow or set()
@@ -111,7 +122,7 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
             out.append(f"{kind} 빠짐 (보강은 더하기만): {', '.join(lost[:8])}")
         added = [k for k in after[kind] if k not in before[kind] and k not in allow]
         if kind in ("숫자", "법 조항"):
-            unverified = [k for k in added if k not in verified[kind]]
+            unverified = [k for k in added if not _is_verified(kind, k, verified[kind])]
             if unverified:
                 out.append(f"새 {kind}가 검수 기록의 '맞음'(공식 주소) 주장에 없음: {', '.join(unverified[:8])}")
     bad = [c.get("claim", "")[:40] for c in review if c.get("verdict") != "맞음" and c.get("action") in ("유지", "수정")]
