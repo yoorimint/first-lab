@@ -18,6 +18,7 @@ spec: wordpress/themes/first-lab/forms/<id>.json
 서류에 찍히는 글자(title·heading·rows·table)는 진짜 양식처럼 칸 이름만 — 작성 요령·괄호 설명·'알바' 같은 글 주제어는 넣지 않는다
 (11/12 운영자 '실제 자료에 알바 이력서라고 적으면 안 되지 그냥 이력서', '다른 증명서도 단어 이상하게 적은 거 아냐?').
 요령은 글 본문에 있다. label_problems() 가 막고 tests 가 확인한다.
+올리기 전 최종 확인은 감시 세션이 직접 (automation/monitor.md '빈 양식 파일 최종 확인', 운영자 11/12).
 
 사용: python3 automation/forms_build.py [id ...]   (id 를 안 주면 전부)
 필요: python-docx, reportlab, 나눔고딕 글꼴 (/usr/share/fonts/truetype/nanum)
