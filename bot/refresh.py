@@ -7,7 +7,8 @@
   2) 같은 주제 검색어가 쌓인 글: 새 글 대신 이 글에 답을 보강 (select_keyword 가 같은 주제 새 글을 막음)
   3) 해마다 바뀌는 정보: 1월·7월에 세금·지원금·요금 등 → 수치 재검증
   4) 오래된 글: 발행 180일 이상 + 최근 노출 있음 + 수치 포함 → 수치 재검증
-건드리지 않음: 잘 나가는 글(is_strong — 검색 평균 3위 안·클릭률 2% 이상, 또는 방문 30회 이상에 참여율 65% 이상),
+건드리지 않음: 잘 나가는 글(is_strong — 검색 평균 3위 안·클릭률 2% 이상, 순위와 상관없이 클릭이 두 기간 꾸준함,
+  또는 방문 30회 이상에 참여율 65% 이상),
   노출 없는 글, 최근 갱신한 글. 잘 나가는 글도 사실이 틀려진 경우(근거 변경·확인 기한·수치 재검증)는 고친다 — 보강·제목 바꾸기만 안 함
   (11/11 운영자 '데이터 모이면 잘 나가는 기존 글은 수정 안 하지?')
 비용: 재검증 = Haiku + 검색 (약 30~70원), 보강 = 글쓰기 모델 + 검색 (Opus 기준 약 700원)
@@ -46,6 +47,9 @@ DECLINE_RATIO = 0.7                # 28일 전 대비 노출이 70% 이하로 �
 TOP_POSITION = 3
 STRONG_MIN_IMPRESSIONS = 30        # 이만큼 노출된 글만 '잘 나감' 판단 (몇 번 노출로 판단하면 틀림)
 STRONG_MIN_CTR = 0.02              # 3위 안이어도 클릭률이 이보다 낮으면 제목 손볼 여지가 있는 글 (retitle 기준과 같음)
+STEADY_CLICKS = 20                 # 순위와 상관없이 최근 28일·그 전 28일 모두 클릭이 이만큼이면 '꾸준히 들어오는 글' (경험칙)
+# 11/11 운영자 '그 기준에 안 들어도 실제 돈이 꾸준히 들어오는 글도 있을 거 아냐' — 글별 수익은 애드센스 승인 뒤 기록(운영자 11/9
+# '승인 나면 그때'), 그날 수익이 꾸준한 글도 여기 기준에 더함 (automation/monitor.md 애드센스 승인 날 할 일)
 OLD_DAYS = 180
 YEARLY_MONTHS = (1, 7)
 SIBLING_MIN_COUNT = 3              # 같은 주제 검색어가 이만큼 쌓이면 보강 대상
@@ -139,8 +143,10 @@ def due_for(post: dict, today) -> tuple | None:
 RECHECK_PER_DAY = 3   # 기한 지난 글 재검증을 하루 이만큼까지 이어서 (글쓰기 월정액 사용량 — 늘리려면 이 값)
 
 
-def is_strong(latest: dict | None, url: str = "", strong_pages=()) -> str:
+def is_strong(latest: dict | None, url: str = "", strong_pages=(), older: dict | None = None) -> str:
     """잘 나가는 글이면 그 이유 (보강·제목 바꾸기를 하지 않음). 사실 고치기는 따로 — 이 판단과 상관없이 함."""
+    if latest and older and latest["clicks"] >= STEADY_CLICKS and older["clicks"] >= STEADY_CLICKS:
+        return f"클릭이 꾸준함 (최근 28일 {latest['clicks']}회, 그 전 {older['clicks']}회)"
     if latest and latest["impressions"] >= STRONG_MIN_IMPRESSIONS and latest["position"] <= TOP_POSITION:
         ctr = latest["clicks"] / latest["impressions"]
         if ctr >= STRONG_MIN_CTR:
@@ -180,7 +186,7 @@ def pick_targets(conn, limit: int, fixes_only: bool = False, strong_pages=()) ->
         if fixes_only:
             continue
         latest, older = _history(conn, p["url"])
-        strong = is_strong(latest, p["url"], strong_pages)
+        strong = is_strong(latest, p["url"], strong_pages, older)
         p["siblings"] = siblings(conn, p["url"])
         gold = "" if strong else gold_sibling(hub, p["siblings"])
         if gold:  # 최근에 갱신했어도 — 보강하면 그 키워드는 '사용됨'이 되어 다시 안 뽑힘 (apply_direct)

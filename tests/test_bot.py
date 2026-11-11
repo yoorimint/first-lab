@@ -404,6 +404,10 @@ class QualityTest(unittest.TestCase):
         self.assertEqual(pick(8.0, 2, 50)[0][1], "enhance")   # 같은 글이 잘 읽히지 않으면 정체 보강 대상
         self.assertTrue(refresh.is_strong({"impressions": 100, "position": 1.5, "clicks": 10}))
         self.assertEqual(refresh.is_strong({"impressions": 10, "position": 1.0, "clicks": 5}), "")  # 노출이 너무 적으면 판단 안 함
+        # 11/11 운영자 '그 기준에 안 들어도 실제 돈이 꾸준히 들어오는 글' — 순위가 중간이어도 두 기간 연속 클릭이 꾸준하면 지킴
+        steady = {"impressions": 900, "position": 7.0, "clicks": 25}
+        self.assertIn("꾸준", refresh.is_strong(steady, older={"impressions": 800, "position": 7.5, "clicks": 22}))
+        self.assertEqual(refresh.is_strong(steady, older={"impressions": 800, "position": 7.5, "clicks": 5}), "")  # 한 번 반짝은 아님
 
     def test_retitle_numbers_must_be_in_body(self):
         body = "<p>승용차 정기검사 수수료는 23,000원이에요.</p>"
