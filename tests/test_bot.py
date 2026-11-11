@@ -6466,6 +6466,8 @@ class PlainCheckTest(unittest.TestCase):
         body = "<p>발급 수수료는 없어요.</p><p>이용 시간은 새벽 3시부터예요.</p>"
         self.assertEqual(serp_gate.uncovered(["발급 비용은 얼마일까?", "운영시간은 몇 시부터인가요?"], body), [])
         self.assertEqual(serp_gate.uncovered(["주차는 무료인가요?"], body), ["주차는 무료인가요?"])
+        # 띄어쓰기만 다른 낱말 (11/12 #1483 '배시간' ↔ '배 시간')
+        self.assertEqual(serp_gate.uncovered(["마라도 배시간과 왕복요금"], "<p>마라도 배 시간과 왕복 요금은 아래 표예요.</p>"), [])
 
     def test_plus_article_verified_with_or_without_paragraph(self):
         """11/12 #1053: 본문 '제88조' 를 기록이 '제88조 제1항' 으로 확인했는데 '확인 안 됨'으로 막힘 → 조·항 표기 차이는 같은 조문으로 봄."""
