@@ -5832,6 +5832,20 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('<p class="fl-sum ">', out)
 
 
+class HwpTextTest(unittest.TestCase):
+    def test_reads_hwpx(self):
+        """11/11: 보도자료 첨부 .hwpx 를 검수 도구가 못 읽어 검수자가 손으로 풀었음 → hwptext 가 HWPX 도 읽음."""
+        import importlib.util, io, tempfile, zipfile
+        spec = importlib.util.spec_from_file_location("hwptext", ROOT / "automation" / "hwptext.py")
+        h = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(h)
+        with tempfile.NamedTemporaryFile(suffix=".hwpx", delete=False) as f:
+            with zipfile.ZipFile(f, "w") as z:
+                z.writestr("Contents/section0.xml", '<hs:sec><hp:p><hp:run><hp:t>LH 콜센터(1600-1004)</hp:t></hp:run></hp:p>'
+                                                    '<hp:p><hp:run><hp:t>둘째 &amp; 문단</hp:t></hp:run></hp:p></hs:sec>')
+        self.assertEqual(h.text_of(f.name), "LH 콜센터(1600-1004)\n둘째 & 문단")
+
+
 class KoreanOnlyHookTest(unittest.TestCase):
     def test_english_reply_is_sent_back(self):
         """11/11 운영자 '또 영어로 하노': 마지막 답이 영어면 Stop 훅이 한글로 다시 쓰게 함 (.claude/hooks/korean_only.py)."""
