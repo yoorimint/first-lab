@@ -23,5 +23,9 @@
   "base_months": 18,
   "reach_search_days": 1100,
   "max_days": 3660,
-  "extend_min_days": 30
+  "extend_min_days": 30,
+  "law_checked": [
+    "고용보험법|2026-11-27",
+    "고용보험법|2027-01-01"
+  ]
 }
