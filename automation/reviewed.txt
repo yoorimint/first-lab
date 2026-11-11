@@ -559,3 +559,6 @@ calc:officetel-acquisition-tax
 calc:parental-leave-benefit
 1245 운전면허 사진 규격
 calc:sports-toto-tax
+3595 사용인감계 양식: 교육지원청 예시 7칸과 법인인감증명서 떼는 법
+3649 스포츠토토 세금: 비과세 기준 200만 원·100배와 22% 계산법
+3614 육아휴직 급여 계산기: 첫 석 달 최대 250만 원, 구간별 금액
