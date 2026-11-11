@@ -6218,6 +6218,15 @@ class PlainCheckTest(unittest.TestCase):
         self.assertTrue(cg.html_unbalanced("<ul><li>가</li></ul></li></ul><p>나</p>"))
         self.assertIn("html_unbalanced", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
+    def test_faq_answer_flip(self):
+        """11/11 #1143: 질문만 '매달 신고해야 하나요?'로 바꾸고 답은 '아니요. … 매달 … 해야 해요' 그대로 → 막음."""
+        from bot import condition_gate as cg
+        bad = "<h3>전자카드 현장도 매달 신고해야 하나요?</h3><p>아니요. 전자카드 현장도 매달 근로일수 신고와 공제부금 납부를 해야 해요.</p>"
+        self.assertTrue(cg.faq_answer_flip(bad))
+        self.assertEqual(cg.faq_answer_flip(bad.replace("아니요.", "네.")), [])
+        self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
+        self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
+
     def test_known_wrong_phrases(self):
         """11/10 뜻 검수에서 법 원문으로 틀렸다고 확인한 문구가 여러 글에 되풀이됨 → 새 글 관문·다듬기·공개 직전에서 막음."""
         from bot import condition_gate as cg

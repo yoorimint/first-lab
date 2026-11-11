@@ -292,6 +292,7 @@ def problems(old_html: str, new_html: str, title: str = "", allow: set[str] | No
     from bot import condition_gate
     out += condition_gate.known_wrong(new_html)
     out += condition_gate.html_unbalanced(new_html)
+    out += condition_gate.faq_answer_flip(new_html)
     if post_id is not None:
         from bot import patch_check
         out += patch_check.reintroduced(post_id, new_html)

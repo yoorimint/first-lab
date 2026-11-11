@@ -1373,6 +1373,26 @@ def known_wrong(body_html: str, today: dt.date | None = None) -> list[str]:
 BALANCED_TAGS = ("p", "ul", "ol", "li", "table", "tr", "td", "th", "h2", "h3", "strong", "a")
 
 
+_ANSWER_VERB = {"하나요": "해요", "되나요": "돼요", "있나요": "있어요", "없나요": "없어요", "받나요": "받아요", "내나요": "내요"}
+
+
+def faq_answer_flip(body_html: str) -> list[str]:
+    """자주 묻는 질문의 '아니요'가 바로 뒤 문장과 거꾸로인 것 (11/11 #1143: 질문을 '안 해도 되나요?'→'매달 신고해야 하나요?'로
+    바꾸고 답의 '아니요'는 그대로 — '아니요. 전자카드 현장도 매달 … 해야 해요'). 질문 끝 말이 답 첫 문장에 그대로 긍정으로 있으면 막음."""
+    out = []
+    for q_html, a_html in re.findall(r"<h3[^>]*>(.*?)</h3>\s*<p[^>]*>(.*?)</p>", body_html or "", flags=re.S):
+        q, a = _plain(q_html).strip(), _plain(a_html).strip()
+        words = q.rstrip("?").split()
+        if not q.endswith("?") or len(words) < 2 or not re.match(r"아니(요|에요)", a):
+            continue
+        verb = _ANSWER_VERB.get(words[-1])
+        first = re.split(r"(?<=[.!?])\s+", re.sub(r"^아니(요|에요)[.,]?\s*", "", a))[0]
+        shared = {w for w in words[:-2] if len(w) >= 2} & set(first.split())
+        if verb and f"{words[-2][-2:]} {verb}" in first and len(shared) >= 2:
+            out.append(f"자주 묻는 질문 답이 거꾸로: '{q[:40]}' → '아니요' 뒤에 '{first[:40]}' — '네'로 고치거나 질문을 바꾸기")
+    return out
+
+
 def html_unbalanced(body_html: str) -> list[str]:
     """여는 태그와 닫는 태그 수가 다른 것 (11/10 #2295: 목록 뒤에 짝 없는 '</li></ul>' — 화면에서 목록·문단이 깨질 수 있음)."""
     html = re.sub(r"<!--.*?-->", "", body_html or "", flags=re.S)
