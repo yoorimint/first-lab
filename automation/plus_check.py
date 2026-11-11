@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -71,6 +72,26 @@ def added_problems(record: dict, old_html: str, new_html: str) -> list[str]:
     return out
 
 
+REFERENT = re.compile(r"위 (?:예시|예|표|계산|사례)|^이 (?:예시|사례|계산)")  # 앞 문단의 예시를 가리키는 말 ('이때·그러면'은 대개 같은 문단 안을 가리켜 뺌 — 11/11 보강 글 130편 대조)
+_UNIT = re.compile(r"<(p|li|tr|h2|h3|h4)[^>]*>(.*?)</\1>", re.S)
+
+
+def _units(html: str) -> list[str]:
+    return [t for t in (pc.plain(x) for _, x in _UNIT.findall(html or "")) if t]
+
+
+def referent_moved(old_html: str, new_html: str) -> list[str]:
+    """'위 예시라면 …' 처럼 바로 앞 문단을 가리키는 원래 문장 앞에 새 문단이 끼면 가리키는 대상이 바뀜
+    (11/11 #1802: 자녀 공제 예시가 '본인 1명 74,350원' 뒤에 끼어 '위 예시라면 80%는 59,480원'이 자녀 예시를 가리키게 됨)."""
+    old, new = _units(old_html), _units(new_html)
+    before = {t: old[i - 1] for i, t in enumerate(old) if i and REFERENT.search(t)}
+    out = []
+    for i, t in enumerate(new):
+        if t in before and i and new[i - 1] != before[t]:
+            out.append(f"앞 문단을 가리키는 원래 문장 앞에 새 문단이 끼어 뜻이 바뀜: '{t[:30]}…' — 새 문단은 이 문장 뒤로 옮기기")
+    return out
+
+
 def problems(old_html: str, new_html: str, record: dict, title: str = "", allow: set[str] | None = None,
              written=None, post_id: int | None = None, check_copy: bool = True) -> list[str]:
     allow = allow or set()
@@ -91,6 +112,7 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
     if bad:
         out.append(f"'맞음'이 아닌데 본문에 남긴 주장 {len(bad)}개: {' / '.join(bad[:3])} — 빼거나 완화")
     out += added_problems(record, old_html, new_html)
+    out += referent_moved(old_html, new_html)
     lost_terms = pc.lost_terms(old_html, new_html, title)
     if lost_terms:
         out.append(f"검색어 줄어듦: {', '.join(lost_terms[:8])}")
