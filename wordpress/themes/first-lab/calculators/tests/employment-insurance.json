@@ -1,0 +1,168 @@
+[
+ {
+  "why": "본문 예시: 월급 320만 원 중 식대 20만 원 비과세 → 보수 300만 원, 근로자 300만×0.9%=27,000원, 회사 27,000+300만×0.25%=7,500 → 34,500원 (시행령 제12조①)",
+  "input": {
+   "pay": 3200000,
+   "nontax": 200000,
+   "size": "under150",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 3000000,
+   "employee": 27000,
+   "employer_unemp": 27000,
+   "employer_stable": 7500,
+   "employer": 34500,
+   "total": 61500
+  },
+  "notes_include": [
+   "월평균보수"
+  ],
+  "notes_exclude": [
+   "65세 전부터"
+  ]
+ },
+ {
+  "why": "본문 표: 1,000명 이상 → 고안직능 300만×0.85%=25,500, 회사 52,500원",
+  "input": {
+   "pay": 3000000,
+   "nontax": 0,
+   "size": "over1000",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 3000000,
+   "employee": 27000,
+   "employer_unemp": 27000,
+   "employer_stable": 25500,
+   "employer": 52500,
+   "total": 79500
+  }
+ },
+ {
+  "why": "본문 표: 150명 이상 우선지원대상기업 0.45% → 300만×0.45%=13,500, 회사 40,500원",
+  "input": {
+   "pay": 3000000,
+   "nontax": 0,
+   "size": "priority",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 3000000,
+   "employee": 27000,
+   "employer_unemp": 27000,
+   "employer_stable": 13500,
+   "employer": 40500,
+   "total": 67500
+  }
+ },
+ {
+  "why": "150명 이상 1,000명 미만 0.65%: 300만×0.65%=19,500",
+  "input": {
+   "pay": 3000000,
+   "nontax": 0,
+   "size": "under1000",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 3000000,
+   "employee": 27000,
+   "employer_unemp": 27000,
+   "employer_stable": 19500,
+   "employer": 46500,
+   "total": 73500
+  }
+ },
+ {
+  "why": "본문 예시: 65세 이후 새로 고용 → 근로자 0원, 회사는 고안직능 7,500원만 (법 제13조③)",
+  "input": {
+   "pay": 3000000,
+   "nontax": 0,
+   "size": "under150",
+   "age65": "yes"
+  },
+  "expect": {
+   "base": 3000000,
+   "employee": 0,
+   "employer_unemp": 0,
+   "employer_stable": 7500,
+   "employer": 7500,
+   "total": 7500
+  },
+  "notes_include": [
+   "65세 전부터"
+  ]
+ },
+ {
+  "why": "기준선: 비과세가 월급과 같으면 보수 0원 → 보험료 0원",
+  "input": {
+   "pay": 200000,
+   "nontax": 200000,
+   "size": "under150",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 0,
+   "employee": 0,
+   "employer_unemp": 0,
+   "employer_stable": 0,
+   "employer": 0,
+   "total": 0
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 바로 위: 보수 1원 → 0.009원·0.0025원 모두 원 미만 버림 0원",
+  "input": {
+   "pay": 200001,
+   "nontax": 200000,
+   "size": "under150",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 1,
+   "employee": 0,
+   "employer_unemp": 0,
+   "employer_stable": 0,
+   "employer": 0,
+   "total": 0
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 보수 1,112원 → 근로자 1,112×0.9%=10.008원 → 10원, 고안직능 1,112×0.25%=2.78원 → 2원 (원 미만 버림 경계)",
+  "input": {
+   "pay": 1112,
+   "nontax": 0,
+   "size": "under150",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 1112,
+   "employee": 10,
+   "employer_unemp": 10,
+   "employer_stable": 2,
+   "employer": 12,
+   "total": 22
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선 바로 아래: 보수 1,111원 → 근로자 9.999원 → 9원, 고안직능 2.7775원 → 2원",
+  "input": {
+   "pay": 1111,
+   "nontax": 0,
+   "size": "under150",
+   "age65": "no"
+  },
+  "expect": {
+   "base": 1111,
+   "employee": 9,
+   "employer_unemp": 9,
+   "employer_stable": 2,
+   "employer": 11,
+   "total": 20
+  },
+  "boundary": true
+ }
+]
