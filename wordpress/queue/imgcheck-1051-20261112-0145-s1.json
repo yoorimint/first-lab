@@ -1,0 +1,14 @@
+{
+  "type": "image_check",
+  "post_id": 1051,
+  "replace": [
+    {
+      "old": "ai-f84ee8b358",
+      "prompt": "A bright empty modern building hallway with two red fire extinguishers standing on a polished floor beside a plain white wall, soft daylight.",
+      "alt": "밝은 건물 복도 흰 벽 옆에 놓인 빨간 소화기 두 개",
+      "why": "벽 안내판과 소화기 라벨에 엉터리 글자가 그대로 있음 (지난 교체가 반영 안 됨)"
+    }
+  ],
+  "remove": [],
+  "add": []
+}
