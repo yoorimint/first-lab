@@ -5778,6 +5778,42 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('<p class="fl-sum ">', out)
 
 
+class SerpGateTest(unittest.TestCase):
+    """11/11 운영자 '키워드 정해서 상위 글 확인하고 거기 있는 자료 + 없는 콘텐츠 넣고 있나' — #2766 은 검색 1번, 상위 글 안 열고 씀.
+    새 글은 상위 글 3곳 이상의 질문을 적고(serp), 그 질문을 본문이 모두 다루고, 우리만 더한 것을 적어야 초안 저장 관문 통과."""
+
+    BODY = ("<p>복비는 중개보수예요. 월세는 보증금에 월세의 100배를 더해 계산해요.</p>"
+            "<p>부가세는 따로 붙을 수 있어요. 오피스텔 요율은 0.5%예요.</p>")
+    GOOD = {"urls": ["https://blog.naver.com/a/1", "https://blog.naver.com/b/2", "https://www.example.com/x"],
+            "questions": ["월세 복비 계산", "부가세 별도", "오피스텔 요율"], "added": "구간 경계 예시와 계산기"}
+
+    def test_complete_analysis_passes(self):
+        from bot import serp_gate
+        self.assertEqual(serp_gate.problems(self.GOOD, self.BODY), [])
+
+    def test_missing_or_thin_analysis_holds(self):
+        from bot import serp_gate
+        self.assertTrue(serp_gate.problems(None, self.BODY))
+        one_site = dict(self.GOOD, urls=["https://blog.naver.com/a/1", "https://blog.naver.com/a/2", "https://first-lab.kr/x"])
+        self.assertTrue(any("사이트" in p for p in serp_gate.problems(one_site, self.BODY)))
+        self.assertTrue(any("added" in p for p in serp_gate.problems(dict(self.GOOD, added=""), self.BODY)))
+
+    def test_question_not_answered_in_body_holds(self):
+        from bot import serp_gate
+        serp = dict(self.GOOD, questions=self.GOOD["questions"] + ["분양권 프리미엄 포함 여부"])
+        self.assertTrue(any("분양권" in p for p in serp_gate.problems(serp, self.BODY)))
+
+    def test_search_unavailable_is_logged_not_held(self):
+        from bot import serp_gate
+        serp = {"unavailable": "검색 도구 오류"}
+        self.assertEqual(serp_gate.problems(serp, self.BODY), [])
+        self.assertIn("못 함", serp_gate.note(serp))
+
+    def test_gate_is_wired_into_save_and_writer_check(self):
+        for f in ("bot/publish_queue.py", "bot/source_check.py"):
+            self.assertIn("serp_gate.problems", (ROOT / f).read_text(encoding="utf-8"))
+
+
 class PlainCheckTest(unittest.TestCase):
     """11/9 운영자 '기존 글도 쉬운 말로 — 니가 직접': 다듬은 본문의 숫자·법 조항·링크·계산기·소제목·표가 원래와 같아야 반영."""
 

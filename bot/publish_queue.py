@@ -23,7 +23,7 @@ from datetime import datetime
 import json
 from pathlib import Path
 
-from . import freshness, hold, image_check, refresh, related, review_gate, source_check, sources
+from . import freshness, hold, image_check, refresh, related, review_gate, serp_gate, source_check, sources
 from .keyword_db import connect, norm, set_status
 from .publisher import STATUS_LABEL, existing_post_id, publish, similar_post
 from .settings import load_settings, wp_cli
@@ -88,6 +88,9 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
     # 초안 저장 관문: 검수를 통과 못 한 글은 공개(바로·예약)하지 않고 초안으로만 둔다
     failed = review_gate.problems(data.get("review"), article.title, article.excerpt, article.content_html)
     failed += review_gate.second_review_missing(data.get("review"))
+    failed += serp_gate.problems(data.get("serp"), article.content_html)  # 상위 글 질문을 다 다뤘는지 (11/11 운영자)
+    if serp_gate.note(data.get("serp")):
+        notes.append(serp_gate.note(data.get("serp")))
     if failed:
         notes.append(f"검수 미통과 → 초안 보류: {'; '.join(failed)[:200]}")
         status = "draft"
