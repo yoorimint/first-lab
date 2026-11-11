@@ -1,0 +1,1 @@
+{"type": "fix_hold", "post_id": 3211, "give_up": true, "why": "근거 주소 lllcard.kr(국가평생교육진흥원 평생교육이용권 누리집)가 bot/sources.py OFFICIAL_HOSTS 에 없어 '공식 기관 출처 없음'으로만 보류 — 내용 문제 아님, 코드에 주소 추가 필요(글쓰기 작업 범위 밖)"}
