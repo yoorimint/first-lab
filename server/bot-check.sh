@@ -85,7 +85,4 @@ journalctl -u firstlab-bot.service --since "-5min" --no-pager -o cat 2>/dev/null
 
 
 
-echo -e "\n==> 공식 통계 사이트 접속 시험 (11/10: 이 컨테이너에선 안 열리는 보험개발원 보험통계포털 — 서버에서 열리면 연령별 자동차보험료 통계를 쓸 수 있음)"
-for u in https://incos.kidi.or.kr/ https://www.e-insmarket.or.kr/; do
-  printf '%s %s\n' "$(curl -sS -o /dev/null -w '%{http_code}' -m 20 "$u" 2>/dev/null || echo 실패)" "$u"
-done
+# 11/11 결과: 보험개발원 보험통계포털(incos.kidi.or.kr)은 서버에서도 응답 없음(000), 보험다모아는 403 → 연령별 자동차보험료 통계는 못 씀. 시험 끝 (배포마다 20초 걸려 뺌)
