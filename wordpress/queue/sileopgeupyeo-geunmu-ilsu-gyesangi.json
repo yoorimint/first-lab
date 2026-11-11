@@ -1,0 +1,449 @@
+{
+ "title": "실업급여 근무일수 계산기: 180일 채우는 날 세는 법",
+ "excerpt": "실업급여 근무일수(피보험 단위기간)는 일한 날과 유급휴일을 세요. 주 5일·토요일 무급이면 6개월을 다녀도 180일이 안 될 수 있어서, 계산기로 180일 채우는 날을 확인해요.",
+ "content_html": "<p>실업급여 근무일수는 일한 날과 유급휴일을 더해 세고, 퇴사 전 18개월 안에 180일이 필요해요.<br>퇴사를 앞두고 6개월을 채웠는지 헷갈린다면 먼저 세어 봐요.<br>✔ 퇴사 전 18개월 안에서<br>✔ 보수 받은 날 합계 180일<br>✔ 무급 토요일은 빼고 셈</p>\n<p>달력으로 6개월을 다녀도 180일이 안 될 수 있어요. 쉬는 날 중 돈이 안 나오는 날은 세지 않기 때문이에요.</p>\n<p class=\"fl-basis\">근거: 고용보험법 제40조, 제41조</p>\n\n<h2>실업급여 근무일수(피보험 단위기간) 뜻</h2>\n<p>흔히 말하는 실업급여 근무일수의 정식 이름은 피보험 단위기간이에요. 고용보험에 든 기간 중 보수 지급의 기초가 된 날을 합한 날 수예요.</p>\n<p>쉽게 말해 그날 몫의 돈이 나온 날이에요. 그래서 일하지 않았어도 유급휴일이면 들어가고, 무급휴일은 빠져요.</p>\n<p>이 날 수가 이직일 이전 18개월 동안 합해서 180일 이상이어야 해요. 이 18개월을 기준기간이라고 불러요.</p>\n<p class=\"fl-basis\">근거: 고용보험법 제40조제1항·제2항, 제41조제1항</p>\n\n<h2>근무일수에 들어가는 날, 빠지는 날</h2>\n<p>예를 들어 월~금 일하고 일요일이 유급 주휴일, 토요일이 무급 휴무일이면 한 주에 6일이 쌓여요. 고용노동부도 이런 사업장은 일주일에 6일로 센다고 안내해요.</p>\n<table>\n<thead><tr><th>구분</th><th>어떤 날</th></tr></thead>\n<tbody>\n<tr><td>들어가요</td><td>일한 날, 유급 주휴일, 유급인 공휴일·토요일</td></tr>\n<tr><td>들어가요</td><td>평균임금 70% 이상 휴업수당을 받은 휴업 기간</td></tr>\n<tr><td>들어가요</td><td>회사에서 돈을 받은 유급휴가 기간(출산전후휴가 등)</td></tr>\n<tr><td>빠져요</td><td>무급 휴무 토요일, 무급휴일</td></tr>\n<tr><td>빠져요</td><td>결근해서 월급에서 깎인 날</td></tr>\n</tbody>\n</table>\n<p>근무일·유급휴일은 하루 몇 시간 일했는지 따지지 않고 세요. 무급 토요일에 출근해 일한 날을 넣는지는 이직확인서의 보수 지급 기초일수나 관할 고용센터에서 확인해요.</p>\n<p>유급 주휴일은 1주 15시간 이상 일하기로 하고 개근한 사람이 받는 쉬는 날이에요. 자세한 조건은 <a href=\"https://first-lab.kr/주휴수당뜻/\">주휴수당 받는 조건</a>에 정리했어요.</p>\n<p class=\"fl-basis\">근거: 고용보험법 제41조제1항</p>\n\n<h2>실업급여 근무일수 계산기</h2>\n<p>가입일과 이직일, 일하는 형태를 넣으면 기준기간 안의 피보험 단위기간을 세어 줘요. 180일이 모자라면 같은 형태로 계속 다닐 때 채우는 날도 보여 줘요.</p>\n<p>[firstlab_calc id=\"insured-unit-days\"]</p>\n<p>예를 들어 2026년 3월 2일(월)에 들어가 8월 31일까지 6개월을 다녔다고 해 볼게요. 주 5일·토요일 무급이면 157일이라 23일이 모자라요.</p>\n<p>같은 형태로 계속 다니면 2026년 9월 27일에 180일을 채워요. 한 주에 6일씩, 딱 30주가 걸리는 셈이에요.</p>\n<p>계산기는 평일 공휴일을 유급으로 보고 세요. 무급으로 쉰 공휴일이나 무급휴직한 날이 있으면 '무급으로 빠진 날'에 넣어요.</p>\n\n<h2>일하는 형태별 한 주에 세는 날</h2>\n<p>1주에 쌓이는 날이 적을수록 180일까지 오래 걸려요. 아래는 일요일을 주휴일로 본 예시예요.</p>\n<table>\n<thead><tr><th>일하는 형태</th><th>한 주에 세는 날</th></tr></thead>\n<tbody>\n<tr><td>주 5일, 토요일 무급</td><td>6일</td></tr>\n<tr><td>주 5일, 토요일도 유급</td><td>7일</td></tr>\n<tr><td>주 6일, 일요일 주휴</td><td>7일</td></tr>\n<tr><td>주 3일, 주 15시간 이상</td><td>4일 (일한 3일 + 주휴 1일)</td></tr>\n<tr><td>주 3일, 주 15시간 미만</td><td>3일 (주휴일 없음)</td></tr>\n</tbody>\n</table>\n<p>토요일이 유급인지 무급인지는 근로계약서나 취업규칙에서 확인해요. 같은 주 5일이라도 이 차이로 한 주에 하루가 달라져요.</p>\n\n<h2>18개월이 늘어나거나 24개월이 되는 경우</h2>\n<p>18개월 중 아파서 30일 이상 계속 보수를 못 받았다면, 그 일수만큼 기준기간이 늘어나요. 다만 늘어나도 3년을 넘지 않아요.</p>\n<p>이렇게 늘어나는 사유는 질병·부상과 함께 아래도 있어요.</p>\n<ul>\n<li>사업장의 휴업</li>\n<li>임신·출산·육아에 따른 휴직</li>\n<li>고용노동부장관이 고시하는 휴직 등</li>\n</ul>\n<p>다만 휴업·휴직 같은 위 사유는, 그 기간에 고용노동부장관이 정하는 금품을 받았다면 늘어나지 않아요.</p>\n<p>초단시간 근로자는 24개월로 볼 수 있어요. 이직 당시 주 15시간 미만·주 2일 이하로 일했고, 24개월 중 90일 이상을 그렇게 일했다면 기준기간이 이직일 이전 24개월이 돼요.</p>\n<p>예전에 실업급여(구직급여)를 받은 적이 있다면, 그 실업급여와 관련해 고용보험 자격을 잃은 날 이전의 기간은 다시 세지 않아요. 그 뒤에 다닌 날만 모아 180일을 채워야 해요.</p>\n<p class=\"fl-basis\">근거: 고용보험법 제40조제2항, 제41조제2항, 고용보험법 시행령 제60조</p>\n\n<h2>일용직은 조건이 더 있어요</h2>\n<p>마지막에 일용근로자로 일하다 그만뒀다면 180일 말고 조건이 더 붙어요. 아래 둘 중 하나를 갖춰야 해요.</p>\n<ul>\n<li>신청한 달의 전달 1일부터 신청일까지, 일한 날이 그 기간 총 일수의 3분의 1 미만</li>\n<li>건설일용근로자는 신청일 이전 14일 동안 연속해서 일한 내역이 없음</li>\n</ul>\n<p>또 기준기간 중 다른 일터를 자발적 퇴사처럼 실업급여가 제한되는 사유로 그만둔 적이 있다면, 일용근로자로 90일 이상 일했어야 해요.</p>\n<p class=\"fl-basis\">근거: 고용보험법 제40조제1항제5호·제6호</p>\n\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>토요일이 무급이면 주 5일은 한 주에 6일만 쌓여요</li>\n<li>무급휴직·결근으로 깎인 날은 빠져요</li>\n<li>180일은 이직일 이전 18개월 안에서 세요</li>\n<li>180일을 넘겨도 퇴사 사유 등 다른 조건을 갖춰야 해요</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 실업급여 근무일수는 달력 날짜가 아니라 보수를 받은 날로 세니, 주 5일이면 6개월보다 조금 더 다녀야 180일이 돼요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>회사를 여러 곳 다녔으면 합칠 수 있나요?</h3>\n<p>네, 기준기간 18개월 안이면 여러 회사의 피보험 단위기간을 합해서 180일을 봐요. 퇴사 사유 같은 다른 조건은 따로 따져요.</p>\n<h3>정확한 날 수는 어디서 확인하나요?</h3>\n<p>퇴사할 때 회사가 고용센터에 내는 이직확인서에 보수 지급 기초일수가 적혀요. 회사에 이직확인서를 요청해 그 서류로 확인할 수 있어요.</p>\n<h3>180일만 채우면 실업급여를 받나요?</h3>\n<p>아니요, 180일은 조건 중 하나예요. 일할 의사와 능력이 있는데도 취업하지 못한 상태여야 하고, 퇴사 사유가 수급 제한 사유가 아니어야 하며, 재취업 노력도 해야 해요.</p>\n",
+ "tags": [
+  "실업급여 근무일수 계산기",
+  "피보험 단위기간",
+  "실업급여 180일",
+  "실업급여 조건"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a calm young office worker walking out of a modern office building at sunset carrying a small box of belongings, seen from behind",
+   "alt": "해 질 녘 작은 상자를 들고 회사 건물을 나서는 직장인 뒷모습"
+  }
+ ],
+ "keyword": "실업급여근무일수계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "제목·첫 문단: 실업급여 근무일수는 이직일 이전 18개월 안에 180일이 필요 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일한 날과 유급휴일을 더해 세고 무급휴일은 빼고 셈 — 무급 토요일은 빼고 셈 (고용보험법 제41조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제41조",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202308161646480601000"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "요약: 주 5일·토요일 무급이면 6개월을 다녀도 180일이 안 될 수 있음 (2026-03-02~08-31 예시 157일, 고용노동부 '8개월 가량')",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "정식 이름은 피보험 단위기간, 보수 지급의 기초가 된 날의 합 (고용보험법 제41조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제41조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "이직일 이전 18개월을 기준기간이라 부름 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "본문: 주 5일·토요일 무급·일요일 유급 주휴면 한 주 6일 — 고용노동부 '일주일에 6일의 보수지급기초일수'",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일한 날·유급 주휴일·유급인 공휴일·토요일은 들어감",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "평균임금 70% 이상 휴업수당을 받은 휴업 기간은 들어감",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202308161646480601000"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "출산전후휴가 등 회사에서 돈을 받은 유급휴가 기간은 들어감",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202308161646480601000"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "무급 휴무 토요일·무급휴일은 빠짐",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202505290211153270366"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "결근해서 월급에서 깎인 날은 빠짐",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "근무일·유급휴일은 하루 몇 시간 일했는지 따지지 않고 셈 (1일 소정근로시간에 관계없음)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "유급 주휴일은 1주 15시간 이상 일하기로 하고 개근한 사람이 받음 (근로기준법 제55조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제55조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시: 2026-03-02~08-31 157일, 23일 모자람",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시: 같은 형태로 계속 다니면 2026년 9월 27일에 180일, 한 주 6일씩 30주",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계산기는 평일 공휴일을 유급으로 보고 세고, 무급 공휴일·무급휴직은 '무급으로 빠진 날'에 넣음 (defs/insured-unit-days.js)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "형태별: 주 5일 토 무급 6일, 토 유급 7일, 주 6일 7일 (고용노동부 8월 27일·31일 예시)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202308161646480601000"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "형태별: 주 3일·주 15시간 이상 4일, 주 15시간 미만 3일 (근로기준법 제55조)",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제55조",
+    "https://www.law.go.kr/법령/고용보험법/제41조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "아파서 30일 이상 계속 보수를 못 받으면 그 일수만큼 기준기간이 늘고 3년을 넘지 않음 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "늘어나는 사유: 사업장의 휴업, 임신·출산·육아에 따른 휴직, 고용노동부장관이 고시하는 휴직 등 (고용보험법 시행령 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "초단시간: 이직 당시 주 15시간 미만·주 2일 이하, 24개월 중 90일 이상이면 기준기간 24개월 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일용직: 신청한 달의 전달 1일부터 신청일까지 근로일이 총 일수의 3분의 1 미만 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "건설일용근로자: 신청일 이전 14일 동안 연속해서 근로내역 없음 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일용직 추가 조건은 둘 중 하나, 최종 이직 당시 일용근로자였던 사람만 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "기준기간 중 다른 일터를 수급 제한 사유로 그만둔 적이 있으면 일용근로자로 90일 이상 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "180일을 넘겨도 퇴사 사유·일할 의사와 능력·재취업 노력 등 다른 조건 필요 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FAQ: 기준기간 18개월 안이면 여러 회사의 피보험 단위기간을 합산 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FAQ: 회사가 내는 이직확인서에 보수 지급 기초일수, 회사에 요청해 확인 (고용보험법 제42조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제42조",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FAQ: 180일은 조건 중 하나 — 일할 의사와 능력, 수급 제한 사유 아님, 재취업 노력 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "기준기간: 2026-11-30 이직이면 2025-06-01부터 셈 (고용보험법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예전에 구직급여를 받았다면 그 구직급여와 관련된 피보험자격 상실일 이전 기간은 세지 않음 (고용보험법 제41조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제41조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "기준기간 연장 시 고용노동부장관이 정하는 금품을 받으면 제외 — 시행령 사유(휴업·휴직)에만 해당 (고용보험법 시행령 제60조)",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제60조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "무급 토요일 출근일 포함 여부는 이직확인서·관할 고용센터에서 확인으로 완화 (고용노동부 답변 엇갈림)",
+   "urls": [
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102",
+    "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202505290211153270366"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제40조 단서1 반영 — '일용직은 조건이 더 있어요' 절 첫 문장 '마지막에 일용근로자로 일하다 그만뒀다면'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제40조 단서2 반영 — 첫 문단 '합해서 180일', FAQ '일할 의사와 능력이 있는데도 취업하지 못한 상태'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제40조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제41조 단서1 해당 없음 — 자영업자 피보험 단위기간 규정, 이 글은 근로자만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제41조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "근로기준법 제55조 단서1 해당 없음 — 공휴일을 다른 근로일로 대체하는 합의 규정, 글은 주휴일 유급 여부만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/근로기준법/제55조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법시행령 제60조 단서1 반영 — '다만 휴업·휴직 같은 위 사유는, 그 기간에 고용노동부장관이 정하는 금품을 받았다면 늘어나지 않아요'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법시행령/제60조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제42조 단서1 해당 없음 — 실업 신고 출석 예외 규정, 글은 이직확인서의 보수 지급 기초일수 확인만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제42조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제58조 반영 — 이직 사유 제한은 FAQ '퇴사 사유가 수급 제한 사유가 아니어야'와 일용직 절 '실업급여가 제한되는 사유'로 안내, 세부 사유는 이 글(180일 계산) 범위 밖",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제58조"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제77조의3 해당 없음 — 예술인 구직급여 특례, 이 글은 근로자 피보험 단위기간만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제77조의3"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제77조의8 해당 없음 — 노무제공자 구직급여 특례, 이 글은 근로자 피보험 단위기간만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제77조의8"
+   ],
+   "round": 2
+  },
+  {
+   "claim": "고용보험법 제58조 단서1 반영 — FAQ '퇴사 사유가 수급 제한 사유가 아니어야', 일용직 절 '실업급여가 제한되는 사유'",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/고용보험법/제58조"
+   ],
+   "round": 2
+  }
+ ],
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/wlsrudck/224465755418",
+   "https://blog.naver.com/jayangdong8734/224459789959",
+   "https://blog.naver.com/hippo_daily-/224471129613",
+   "https://blog.naver.com/wise-routine/224461987768",
+   "https://blog.naver.com/econwatcher/224457412035"
+  ],
+  "questions": [
+   "6개월 일하면 실업급여 180일을 채우나요?",
+   "피보험 단위기간 180일은 어떻게 세나요?",
+   "무급휴일·주휴일은 근무일수에 들어가나요?",
+   "퇴사 전 18개월 기준은 무엇인가요?",
+   "일용직은 조건이 다른가요?"
+  ],
+  "added": "주 근무 형태별 피보험 단위기간 계산기(180일 채우는 날까지), 6개월 근무 157일 계산 예시, 기준기간 연장·24개월 특례·이전 수급자격 제외"
+ },
+ "sources": [
+  {
+   "name": "국가법령정보센터 고용보험법 제40조 (구직급여 수급 요건·기준기간)",
+   "url": "https://www.law.go.kr/법령/고용보험법/제40조"
+  },
+  {
+   "name": "국가법령정보센터 고용보험법 제41조 (피보험 단위기간)",
+   "url": "https://www.law.go.kr/법령/고용보험법/제41조"
+  },
+  {
+   "name": "고용노동부 빠른인터넷상담 (피보험단위기간 계산, 주 5일 사업장 주 6일)",
+   "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408140928135660102"
+  }
+ ]
+}
