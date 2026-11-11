@@ -336,3 +336,5 @@ date,post,fixes,types
 2026-11-11,3321,0,
 2026-11-11,1026,4,my_mistake:4
 2026-11-11,2823,2,my_mistake:2
+2026-11-11,3349,4,missing_condition:2 unverified:2
+2026-11-11,3376,2,missing_condition:2
