@@ -6322,6 +6322,19 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_known_wrong_jongbu_reform_sept_revision(self):
+        """11/11 #451: 종부세 정부 개편안을 8/3안대로 '비거주 1주택 9억·세부담 상한 변경'으로 씀 — 9/1 수정안에서 철회 → 막음."""
+        from bot import condition_gate as cg
+        bad = ("<p>종합부동산세 개편안이에요.</p><table><tr><td>살지 않는 1주택 공제</td><td>12억 원</td><td>9억 원</td></tr></table>",
+               "<p>종부세 개편안에는 세율과 세부담 상한을 바꾸는 안도 함께 있어요.</p>")
+        for h in bad:
+            self.assertTrue(cg.known_wrong(h), h)
+        good = ("<p>종부세 개편안에서 세부담 상한을 200%로 올리는 안은 9월에 빠져 지금처럼 150%예요.</p>",
+                "<p>종합부동산세는 부부 공동명의 1주택은 살면 각자 9억 원, 안 살면 각자 6억 원이에요.</p>",
+                "<table><tr><td>살지 않는 1주택 공제</td><td>12억 원</td><td>12억 원</td></tr></table><p>종부세</p>")
+        for h in good:
+            self.assertEqual(cg.known_wrong(h), [], h)
+
     def test_known_wrong_phrases(self):
         """11/10 뜻 검수에서 법 원문으로 틀렸다고 확인한 문구가 여러 글에 되풀이됨 → 새 글 관문·다듬기·공개 직전에서 막음."""
         from bot import condition_gate as cg
