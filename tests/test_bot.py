@@ -6163,6 +6163,12 @@ class PlusCheckTest(unittest.TestCase):
         self.assertFalse(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": "2026-11-11"}))
         self.assertFalse(plus_queue.wanted({"content_html": "<p>아직 안 다듬음</p>", "plus_at": ""}))
 
+    def test_plus_queue_skips_unreviewed_drafts(self):
+        """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
+        src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
+        self.assertIn("reviewed_ids()", src)
+        self.assertIn("pid not in done_review", src)
+
     def test_plus_queue_waits_for_review_patch(self):
         """11/11 #3017: 검수 패치가 서버에 반영되기 전 본문으로 보강을 시작함 → 반영될 때까지(최대 2시간) 건너뜀."""
         sys.path.insert(0, str(ROOT / "automation"))
@@ -6333,6 +6339,7 @@ class PlainCheckTest(unittest.TestCase):
                   "<p>연세액이 10만 원 미만인 차는 1월·3월에만 연납 신청을 할 수 있어요.</p>",
                   "<p>체납한 국세가 있으면 환급금이 그 세금에 먼저 충당될 수 있어요.</p>",
                   "<p>해고예고수당은 퇴직 후 14일 이내에 받아요.</p>",
+                  "<p>두루누리 안내.</p><p>신규가입자는 신청 전 1년 동안 고용보험과 국민연금 자격을 얻은 적이 없는 사람이에요.</p>",
                   "<p>임금명세서 과태료예요.</p><p>아예 안 주면 1차 위반 30만 원이고, 둘 다 근로자 1명마다 매겨져요.</p>",
                   "<p>중소기업 취업자 소득세 감면을 경정청구해요.</p><p>감면액은 과세기간마다 200만 원이 한도예요.</p>",
                   "<p>기초연금 안내.</p><p>공무원·군인·별정우체국 연금 수급권자와 그 배우자는 대상에서 빠져요.</p>",
@@ -6352,6 +6359,7 @@ class PlainCheckTest(unittest.TestCase):
                   "<p>중소기업 소득세 감면을 경정청구해요.</p><p>✔ 2023년분부터 한 해 200만 원</p>",
                   "<p>기초연금 안내.</p><p>공무원·사학·군인·별정우체국 연금과 직역 10년 이상 연계퇴직연금 수급권자와 그 배우자는 빠져요.</p>",
                   "<p>근로소득 귀속연도는 일한 해 기준이에요.</p>",
+                  "<p>두루누리 안내.</p><p>고용보험은 신청 전 1년간 자격 취득이, 국민연금은 사업장 가입 이력이 없어야 해요.</p>",
                   "<p>급여 실수령액이에요.</p><p>2명을 넘는 자녀 1명마다 33,330원을 더 빼요.</p>",
                   "<p>선순위인 상속인이 아닌 사람에게 한 유증은 빼요.</p>",
                   "<p>새마을금고나 지역 농협·수협 같은 조합의 상호금융은 금융소비자보호법 대상이 아니에요.</p>"):

@@ -55,10 +55,13 @@ def wanted(post: dict) -> bool:
 def main(n: int = 4) -> int:
     OUT.mkdir(exist_ok=True)
     picked, not_plain = [], 0
+    from unreviewed import reviewed_ids
+    done_review = reviewed_ids()
     for pid in plain_queue.order():
         if len(picked) >= n:
             break
-        if pending(pid):
+        # 외부 검수 전인 새 초안은 건너뜀 (11/11 #3140: 검수 중인 글이 보강에 뽑혀 검수 패치와 부딪칠 뻔함). 검수 끝나면 reviewed.txt 에 들어가 다음 차례에 뽑힘
+        if pending(pid) or pid not in done_review:
             continue
         post = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/post/{pid}", token=True)
         if not plain_queue.is_done(post.get("content_html", "")):
