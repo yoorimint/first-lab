@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 1278,
+ "replace": [
+  {
+   "old": "ai-e9f85efe4c",
+   "prompt": "A technician's hands carefully connecting blue network cables in a softly lit equipment room, shallow depth of field, no screens or lights showing digits",
+   "alt": "장비실에서 파란 네트워크 케이블을 연결하는 손",
+   "why": "장비 표시창에 숫자처럼 보이는 초록 글자"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}
