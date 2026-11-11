@@ -6393,6 +6393,9 @@ class PlainCheckTest(unittest.TestCase):
         # '이때·그러면'은 대개 같은 문단 안을 가리킴 — 막지 않음
         old2 = "<p>A예요.</p><p>직접 신고하면 돼요. 그러면 고지는 없던 것이 돼요.</p>"
         self.assertEqual(plus_check.referent_moved(old2, old2.replace("</p><p>직접", "</p><p>B예요.</p><p>직접")), [])
+        # 11/11 #3118: '…넘어가도 같아요' 앞에 신청서 문단이 끼어 '같아요'가 엉뚱한 말을 가리킴
+        old3 = "<p>옮겨도 기간이 새로 시작되지 않아요.</p><p>사업 양도로 고용이 넘어가도 같아요.</p>"
+        self.assertTrue(plus_check.referent_moved(old3, old3.replace("</p><p>사업", "</p><p>새 회사에 신청서를 내요.</p><p>사업")))
 
     def test_plus_example_wage_not_below_minimum(self):
         """11/11 #1576: +@ 계산 예시 '통상시급이 1만 원이고 …' — 2026년 최저시급 10,320원보다 낮은 불법 시급 예시."""
