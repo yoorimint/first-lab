@@ -5817,6 +5817,71 @@ class ReadDecorateTest(unittest.TestCase):
         self.assertIn('<p class="fl-sum ">', out)
 
 
+class IndexCheckTest(unittest.TestCase):
+    """11/11 운영자 '색인 기록 만들어라': 공개 글 색인 여부를 매일 기록 → 하루 공개 편수 판단."""
+
+    def _conn(self):
+        import sqlite3
+        c = sqlite3.connect(":memory:")
+        c.row_factory = sqlite3.Row
+        return c
+
+    def test_records_indexed_and_waiting(self):
+        import datetime as dt
+        from bot import index_check as ic
+        today = dt.date(2026, 11, 30)
+        posts = [{"post_id": 1, "url": "https://first-lab.kr/a/", "published": "2026-11-01"},
+                 {"post_id": 2, "url": "https://first-lab.kr/b/", "published": "2026-11-02"},
+                 {"post_id": 3, "url": "https://first-lab.kr/c/", "published": "2026-11-29"}]
+        res = {"https://first-lab.kr/a/": {"verdict": "PASS", "coverage": "Submitted and indexed", "last_crawl": ""},
+               "https://first-lab.kr/b/": {"verdict": "NEUTRAL", "coverage": "Crawled - currently not indexed", "last_crawl": ""},
+               "https://first-lab.kr/c/": {"verdict": "NEUTRAL", "coverage": "URL is unknown to Google", "last_crawl": ""}}
+        conn = self._conn()
+        s, errors = ic.run(conn, posts, today, ask=lambda u: res[u])
+        self.assertEqual(errors, [])
+        self.assertEqual((s["published"], s["checked"], s["indexed"]), (3, 3, 1))
+        self.assertEqual((s["old"], s["old_indexed"], s["old_ratio"]), (2, 1, 0.5))  # 14일 지난 글만 판단
+        self.assertEqual(s["signal"], "유지")
+        self.assertEqual(s["not_indexed"], {"읽어 갔지만 색인 안 함": 1, "구글이 아직 모름": 1})
+        self.assertIn("공개 3편 중 1편 색인", ic.summary_line(s))
+        # 다음 날: 색인된 글(1)은 14일 뒤에 다시, 미색인(2·3)만 다시 물음
+        asked = []
+        res["https://first-lab.kr/b/"] = {"verdict": "PASS", "coverage": "Submitted and indexed", "last_crawl": ""}
+        s2, _ = ic.run(conn, posts, today + dt.timedelta(days=1), ask=lambda u: asked.append(u) or res[u])
+        self.assertEqual(asked, ["https://first-lab.kr/b/", "https://first-lab.kr/c/"])
+        self.assertEqual(s2["indexed"], 2)
+        self.assertEqual(s2["signal"], "늘려도 됨")
+        row = conn.execute("SELECT first_indexed FROM index_status WHERE post_id=2").fetchone()
+        self.assertEqual(row["first_indexed"], "2026-12-01")
+        # 14일 뒤에는 색인된 글도 다시 확인 (빠졌는지)
+        asked.clear()
+        ic.run(conn, posts, today + dt.timedelta(days=15), ask=lambda u: asked.append(u) or res[u])
+        self.assertIn("https://first-lab.kr/a/", asked)
+
+    def test_failures_stop_early_and_retry(self):
+        import datetime as dt
+        from bot import index_check as ic
+        posts = [{"post_id": i, "url": f"https://first-lab.kr/{i}/", "published": "2026-11-01"} for i in range(10)]
+        calls = []
+
+        def boom(u):
+            calls.append(u)
+            raise RuntimeError("403")
+        s, errors = ic.run(self._conn(), posts, dt.date(2026, 11, 30), ask=boom)
+        self.assertEqual(len(calls), 3)  # 권한 문제면 3번에서 멈춤
+        self.assertEqual(s["checked"], 0)
+        st = {}
+        with mock.patch.object(ic, "available", return_value=True), \
+             mock.patch.object(ic, "published_posts", return_value=posts), \
+             mock.patch.object(ic, "inspect", side_effect=RuntimeError("403")), \
+             mock.patch("bot.keyword_db.connect", return_value=self._conn()):
+            line = ic.record(st, "2026-11-30")
+        self.assertIn("실패", line)
+        self.assertNotIn("index", st)  # 실패한 날은 기록 안 함 → 다음 수집 때 다시
+        self.assertIn("record_index", (ROOT / "bot" / "discover.py").read_text(encoding="utf-8"))
+        self.assertIn("'index'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+
+
 class NaverTopTest(unittest.TestCase):
     """11/11 운영자 '네이버 검색 화면 직접 여는 거 해라' — 일반 웹 검색 순서는 네이버 상위 글과 달라서
     블로그 탭·통합검색 화면을 열어 상위 글을 순서대로 모음 (automation/naver_top.py). 네트워크 없이 화면 해석만 검사."""

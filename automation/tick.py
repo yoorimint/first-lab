@@ -142,6 +142,12 @@ def main() -> int:
         print(ga4_line(g))
         for t in g.get("top_moves") or []:
             print(f"  이동 {t['from'][:25]} → {t['to'][:25]} {t['views']}회")
+    ix = m.get("index") or {}
+    if ix:  # 공개 글 색인 (bot/index_check.record)
+        from bot.index_check import summary_line as index_line  # noqa: E402
+        print(index_line(ix))
+        for w in ix.get("waiting") or []:
+            print(f"  미색인 #{w['post_id']} {w['published']} 공개 · {w['coverage']}")
     try:  # 품질 한 줄 (automation/quality_report.py — 매일 점검 보고와 같은 숫자)
         import csv
         from quality_report import LOG, summary

@@ -36,6 +36,7 @@
    - 배포 뒤 `python3 automation/verify_patches.py` — 고친 내용이 서버 글에 실제로 들어갔는지 전수 확인 (종료코드 1 이면 원인 찾기).
 4. **서버 상태** (읽기 API `/wp-json/firstlab/v1/maintenance`, 헤더 X-Firstlab-Token):
    - 봇 기록의 오류, 연속 작성 자동 정지, 보류 초안(이유가 진짜인지 관문 오탐인지), 예약 공개.
+   - 색인 (`index`, bot/index_check): 공개 14일 지난 글 색인률이 80% 이상으로 2주 이어지면 운영자에게 하루 공개 편수를 3편으로 늘릴지 묻는다. 미색인 사유가 '읽어 갔지만 색인 안 함'으로 쌓이면 그 글들 품질부터 본다.
    - 배포: `curl -s https://first-lab.kr/deployed-version.txt` 가 main 과 다르면 15분 따라잡기(deploy.yml schedule)가 도는지.
    - 배포 기록의 `[대표 사진] 요약: 사진 N · 대기 M · 없음 K` — K 가 늘면 원인 확인.
    - 사진: 한도(하루 약 50장, 오전 9시 초기화) 소진 시 '대기' 로 넘어가는지, 오전 9시 이후 '사진 채우기' 로 채워지는지.
