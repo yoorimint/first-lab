@@ -72,14 +72,26 @@ def questions(text: str) -> list[str]:
     return list(dict.fromkeys(q.strip() for q in re.findall(r"[^.?!]{6,80}\?", text)))[:12]
 
 
+def _retry(get, url: str, pause: float, tries: int = 3) -> str:
+    """검색 화면은 연결이 잠깐 끊길 때가 있어(11/11 #808 Connection reset) 쉬었다가 두 번 더 연다."""
+    for i in range(tries):
+        try:
+            return get(url)
+        except Exception:  # noqa: BLE001
+            if i == tries - 1:
+                raise
+            time.sleep(pause * (i + 2))
+    raise AssertionError
+
+
 def report(keyword: str, n_blog: int = 5, n_web: int = 3, get=fetch, pause: float = PAUSE) -> str:
     q = urllib.parse.quote(keyword)
     lines = [f"# 네이버 상위 글: {keyword}"]
     targets = []
     try:
-        targets += [("블로그", u) for u in blog_links(get(SEARCH.format(q=f"ssc=tab.blog.all&query={q}")), n_blog)]
+        targets += [("블로그", u) for u in blog_links(_retry(get, SEARCH.format(q=f"ssc=tab.blog.all&query={q}"), pause), n_blog)]
         time.sleep(pause)
-        targets += [("웹", u) for u in web_links(get(SEARCH.format(q=f"where=nexearch&query={q}")), n_web)]
+        targets += [("웹", u) for u in web_links(_retry(get, SEARCH.format(q=f"where=nexearch&query={q}"), pause), n_web)]
     except Exception as e:  # noqa: BLE001 - 검색 화면이 안 열리면 serp 에 unavailable 로 적게
         return "\n".join(lines + [f"검색 화면을 못 엶: {e} → serp 에 {{\"unavailable\": \"네이버 검색 화면 안 열림\"}}"])
     for i, (kind, url) in enumerate(targets, 1):

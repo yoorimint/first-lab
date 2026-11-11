@@ -5994,6 +5994,19 @@ class NaverTopTest(unittest.TestCase):
         self.assertIn("못 엶", out)   # 글 하나 못 열어도 나머지는 계속
         self.assertIn("unavailable", nt.report("x", get=lambda u: (_ for _ in ()).throw(OSError("blocked")), pause=0))
 
+    def test_search_screen_retried_after_reset(self):
+        """11/11 #808: 검색 화면 연결이 한 번 끊겨 상위 글 없이 보강할 뻔함 → 두 번 더 열어 봄."""
+        nt = self._mod()
+        calls = []
+        def get(url):
+            calls.append(url)
+            if "tab.blog" in url and calls.count(url) == 1:
+                raise OSError("Connection reset by peer")
+            return '<a href="https://blog.naver.com/aa/224000000001">x</a>' if "tab.blog" in url else ""
+        out = nt.report("난임치료휴가", get=get, pause=0)
+        self.assertNotIn("unavailable", out)
+        self.assertIn("224000000001", out)
+
 
 class PlusCheckTest(unittest.TestCase):
     """11/11 운영자 '+@ 가 중요하다 — 초안 전부 +@': 보강은 더하기만, 새 숫자는 공식 출처 '맞음' 주장에 있어야, 본문이 늘어야 통과."""
