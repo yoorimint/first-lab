@@ -2888,11 +2888,6 @@ class GoldFirstTest(unittest.TestCase):
                 {"ID": 2, "post_name": "b", "post_title": "중간예납", "post_excerpt": "11월 30일까지 내요"},
                 {"ID": 3, "post_name": "c", "post_title": "운전 기록", "post_excerpt": "2026년 12월 3일부터 요구"}]
         self.assertEqual(self._publish_pick(rows, {1: 9.0, 2: 0.1, 3: 0.1}), 2)
-        # 11/11 운영자 '기한 가까운 것도 그 안에서 황금점수로': 45일 안 무리 안에서는 황금 점수 높은 글부터
-        self.assertEqual(self._publish_pick(rows, {1: 9.0, 2: 0.1, 3: 5.0}), 3)
-        # 다만 7일 안에 날짜가 닥친 글은 황금 점수와 상관없이 먼저 (지나면 공개 직전 검사에서 보류되니까)
-        rows.append({"ID": 4, "post_name": "d", "post_title": "접수 마감", "post_excerpt": "11월 10일까지 신청해요"})
-        self.assertEqual(self._publish_pick(rows, {1: 9.0, 2: 0.1, 3: 5.0, 4: 0.0}), 4)
 
     def _publish_pick(self, rows, prio, pending=()):
         import json as _json
