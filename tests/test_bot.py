@@ -6379,6 +6379,21 @@ class PlainCheckTest(unittest.TestCase):
             self.assertEqual(cg.source_absence([s]), [], s)
         self.assertIn("source_absence", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_plus_insert_keeps_referent(self):
+        """11/11 #1802: 자녀 공제 예시가 '본인 1명 74,350원' 문단 뒤에 끼어, 원래 문장 '위 예시라면 80%는 59,480원'이
+        자녀 예시를 가리키게 됨 → 앞 문단을 가리키는 원래 문장 앞에 새 문단을 끼우면 plus_check 가 막는다."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_check
+        old = ("<p>예를 들어 본인 1명이면 소득세는 74,350원이에요.</p>"
+               "<p>신청하면 80%나 120%로 뗄 수 있어요. 위 예시라면 80%는 59,480원이에요.</p>")
+        bad = old.replace("</p><p>신청하면", "</p><p>자녀가 1명이면 36,020원이에요.</p><p>신청하면")
+        good = old + "<p>자녀가 1명이면 36,020원이에요.</p>"
+        self.assertTrue(plus_check.referent_moved(old, bad))
+        self.assertEqual(plus_check.referent_moved(old, good), [])
+        # '이때·그러면'은 대개 같은 문단 안을 가리킴 — 막지 않음
+        old2 = "<p>A예요.</p><p>직접 신고하면 돼요. 그러면 고지는 없던 것이 돼요.</p>"
+        self.assertEqual(plus_check.referent_moved(old2, old2.replace("</p><p>직접", "</p><p>B예요.</p><p>직접")), [])
+
     def test_calculator_notes_pass_known_wrong(self):
         """계산기 안내 문구도 글과 같은 '확인된 틀린 문구' 검사 (11/11 #3080 — 글은 고쳤는데 계산기 안내에 같은 누락이 남아 있었음)."""
         import re as _re
