@@ -5902,6 +5902,22 @@ class AdsOwnTrafficTest(unittest.TestCase):
         self.assertIn('"FirstLab"', site)
 
 
+class AttackSurfaceTest(unittest.TestCase):
+    """11/11 운영자 'PHP 취약점 노리고 해킹 들어온다는데 우린 문제없나': 안 쓰는 통로(XML-RPC·작성자 아이디 노출) 닫고,
+    운영체제 보안 패치(PHP 포함)는 자동 설치."""
+
+    def test_unused_entry_points_closed(self):
+        site = (ROOT / "server" / "nginx" / "first-lab.conf").read_text(encoding="utf-8")
+        self.assertIn("location = /xmlrpc.php { return 403; }", site)
+        self.assertIn("location ^~ /author/ { return 404; }", site)
+        self.assertIn("if ($arg_author) { return 404; }", site)
+        self.assertNotIn("(wp-login|xmlrpc)", site)                       # 로그인 위치에 XML-RPC 가 다시 섞이지 않게
+        self.assertIn("location = /wp-login.php", site)
+        self.assertLess(site.index("location = /xmlrpc.php"), site.index("location ~ \\.php$"))
+        for need in ("DISALLOW_FILE_EDIT", "unattended-upgrades", "Unattended-Upgrade \"1\""):
+            self.assertIn(need, (ROOT / "server" / "setup.sh").read_text(encoding="utf-8"))
+
+
 class IndexCheckTest(unittest.TestCase):
     """11/11 운영자 '색인 기록 만들어라': 공개 글 색인 여부를 매일 기록 → 하루 공개 편수 판단."""
 

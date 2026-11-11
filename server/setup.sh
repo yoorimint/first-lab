@@ -109,6 +109,16 @@ else
   echo "  fail2ban 설치 실패 (사이트에는 영향 없음)"
 fi
 
+# ---------- 6-1. 보안 업데이트 자동 설치 (11/11 운영자 'PHP 취약점 노리고 해킹') ----------
+log "보안 업데이트 자동 설치 (PHP·nginx 등 운영체제 보안 패치)"
+if dpkg -s unattended-upgrades &>/dev/null || DEBIAN_FRONTEND=noninteractive apt-get install -y -q unattended-upgrades; then
+  printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
+  systemctl enable -q --now unattended-upgrades 2>/dev/null || true
+  echo "  PHP $(php -r 'echo PHP_VERSION;' 2>/dev/null) · 밀린 보안 업데이트 $(apt-get -s upgrade 2>/dev/null | grep -c '^Inst.*-security')개 · 자동 설치 $(systemctl is-enabled unattended-upgrades 2>/dev/null)"
+else
+  echo "  unattended-upgrades 설치 실패 (사이트에는 영향 없음)"
+fi
+
 # ---------- 7. 확인 ----------
 log "확인"
 sleep 1
