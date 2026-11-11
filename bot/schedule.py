@@ -108,6 +108,9 @@ MAX_WAIT = timedelta(days=21)  # 이만큼 기다린 글은 황금 점수와 상
 # 11/11: 기한·시행일이 있는 글(중간예납 11월 30일, 12월 10일 시행 등)이 대기 340편 뒤에 서서 5개월 뒤 공개될 뻔함
 # → 제목·요약문에 든 날짜가 오늘부터 URGENT_DAYS 안이면 맨 먼저 (날짜가 빠른 글부터). 날짜가 지나면 원래 순서로.
 URGENT_DAYS = 45
+# 11/11 운영자 '기한 가까운 것도 그 안에서 황금점수로 줄 세워': 45일 안 무리 안에서는 황금 점수 높은 글부터.
+# 다만 SOON_DAYS 안에 날짜가 닥친 글은 날짜 순으로 맨 먼저 (황금 점수에 밀려 날짜가 지나 버리면 공개 직전 검사에서 보류됨).
+SOON_DAYS = 7
 _DATE = re.compile(r"(?:(20\d\d)년\s*)?(\d{1,2})월\s*(\d{1,2})일")
 
 
@@ -135,7 +138,7 @@ def urgent_due(brief: str, today: date, days: int = URGENT_DAYS) -> date | None:
 
 def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
     """대기 초안의 공개 순서 (사진 채우기도 이 순서로 — bot/pending_images, 11/6 운영자 '점수 높은 것대로 줄 세우고 그것들 먼저 사진').
-    기한·시행일이 45일 안인 글이 맨 먼저(날짜 빠른 순, urgent_due) → 시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 황금 점수·성수기 높은 글(운영자 지시 11/5,
+    기한·시행일이 45일 안인 글이 맨 먼저(7일 안이면 날짜 순, 나머지는 황금 점수 순, urgent_due) → 시즌 지난 글은 맨 뒤(bot/seasons.py) → 외부 검수 마친 글 → 21일 넘게 기다린 글 → 황금 점수·성수기 높은 글(운영자 지시 11/5,
     bot/naver_hub.py) → 시즌 중인 글 → 오래된 순. 대표 사진이 아직 없는 글은 공개 때 건너뜀(publish_next)."""
     info = _draft_info(ids)
     texts = {i: info.get(i, {}).get("text", "") for i in ids}
@@ -155,7 +158,10 @@ def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
     level = {i: min(t, 1) if info.get(i, {}).get("date") and info[i]["date"] <= very_old else t for i, t in level.items()}
     today = now_kst.date()
     due = {i: urgent_due(info.get(i, {}).get("brief", ""), today) for i in ids}
-    return sorted(ids, key=lambda i: (due[i] is None, due[i] or today, rank[i] == seasons.OFF, level[i], i not in reviewed,
+    soon = {i: due[i] if due[i] and due[i] <= today + timedelta(days=SOON_DAYS) else None for i in ids}
+    return sorted(ids, key=lambda i: (due[i] is None, soon[i] is None, soon[i] or today,
+                                      -round(gold.get(i, 0.0), 2) if due[i] else 0, due[i] or today,
+                                      rank[i] == seasons.OFF, level[i], i not in reviewed,
                                       i not in old, -round(gold.get(i, 0.0), 2), rank[i]))
 
 
