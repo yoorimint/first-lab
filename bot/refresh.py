@@ -7,7 +7,9 @@
   2) 같은 주제 검색어가 쌓인 글: 새 글 대신 이 글에 답을 보강 (select_keyword 가 같은 주제 새 글을 막음)
   3) 해마다 바뀌는 정보: 1월·7월에 세금·지원금·요금 등 → 수치 재검증
   4) 오래된 글: 발행 180일 이상 + 최근 노출 있음 + 수치 포함 → 수치 재검증
-건드리지 않음: 3위 안에 드는 글(1번 예외 없음), 노출 없는 글, 최근 갱신한 글
+건드리지 않음: 잘 나가는 글(is_strong — 검색 평균 3위 안·클릭률 2% 이상, 또는 방문 30회 이상에 참여율 65% 이상),
+  노출 없는 글, 최근 갱신한 글. 잘 나가는 글도 사실이 틀려진 경우(근거 변경·확인 기한·수치 재검증)는 고친다 — 보강·제목 바꾸기만 안 함
+  (11/11 운영자 '데이터 모이면 잘 나가는 기존 글은 수정 안 하지?')
 비용: 재검증 = Haiku + 검색 (약 30~70원), 보강 = 글쓰기 모델 + 검색 (Opus 기준 약 700원)
 
 작성 방식이 월정액(direct)이면 API 를 쓰지 않는다: 대상만 골라 state["refresh_target"] 에 두고,
@@ -42,6 +44,8 @@ STUCK_POSITION = (5, 20)
 STUCK_MIN_IMPRESSIONS = 30
 DECLINE_RATIO = 0.7                # 28일 전 대비 노출이 70% 이하로 떨어지면 하락
 TOP_POSITION = 3
+STRONG_MIN_IMPRESSIONS = 30        # 이만큼 노출된 글만 '잘 나감' 판단 (몇 번 노출로 판단하면 틀림)
+STRONG_MIN_CTR = 0.02              # 3위 안이어도 클릭률이 이보다 낮으면 제목 손볼 여지가 있는 글 (retitle 기준과 같음)
 OLD_DAYS = 180
 YEARLY_MONTHS = (1, 7)
 SIBLING_MIN_COUNT = 3              # 같은 주제 검색어가 이만큼 쌓이면 보강 대상
@@ -135,7 +139,23 @@ def due_for(post: dict, today) -> tuple | None:
 RECHECK_PER_DAY = 3   # 기한 지난 글 재검증을 하루 이만큼까지 이어서 (글쓰기 월정액 사용량 — 늘리려면 이 값)
 
 
-def pick_targets(conn, limit: int, fixes_only: bool = False) -> list[tuple[dict, str, str]]:
+def is_strong(latest: dict | None, url: str = "", strong_pages=()) -> str:
+    """잘 나가는 글이면 그 이유 (보강·제목 바꾸기를 하지 않음). 사실 고치기는 따로 — 이 판단과 상관없이 함."""
+    if latest and latest["impressions"] >= STRONG_MIN_IMPRESSIONS and latest["position"] <= TOP_POSITION:
+        ctr = latest["clicks"] / latest["impressions"]
+        if ctr >= STRONG_MIN_CTR:
+            return f"검색 평균 {latest['position']:.1f}위·클릭률 {ctr:.1%}"
+    path = urllib.parse.unquote(urllib.parse.urlparse(url).path or "")
+    if path and path in {urllib.parse.unquote(x) for x in strong_pages or ()}:
+        return "방문 30회 이상에 참여율 65% 이상 (GA4)"
+    return ""
+
+
+def strong_pages_of(state: dict | None) -> list[str]:
+    return list(((state or {}).get("ga4") or {}).get("high_engagement") or [])
+
+
+def pick_targets(conn, limit: int, fixes_only: bool = False, strong_pages=()) -> list[tuple[dict, str, str]]:
     """(글, 방식 'retitle'|'enhance'|'recheck', 이유) 목록.
     fixes_only: 근거가 바뀐 글(bot/changed.py 표시)만 — 주당 갱신 한도를 다 써도 틀려진 글은 고친다."""
     conn.executescript(GSC_SCHEMA)
@@ -159,19 +179,25 @@ def pick_targets(conn, limit: int, fixes_only: bool = False) -> list[tuple[dict,
             continue
         if fixes_only:
             continue
+        latest, older = _history(conn, p["url"])
+        strong = is_strong(latest, p["url"], strong_pages)
         p["siblings"] = siblings(conn, p["url"])
-        gold = gold_sibling(hub, p["siblings"])
+        gold = "" if strong else gold_sibling(hub, p["siblings"])
         if gold:  # 최근에 갱신했어도 — 보강하면 그 키워드는 '사용됨'이 되어 다시 안 뽑힘 (apply_direct)
             p["gold_keyword"] = gold
             picks.append((0.5, p, "enhance", f"황금 키워드 '{gold}' — 같은 주제·목적이라 새 글 대신 이 글을 보강 (제목·본문에 그 말)"))
             continue
         if p["refreshed"] and p["refreshed"] >= recent:
             continue
-        latest, older = _history(conn, p["url"])
         sib_volume = sum(v for _, v in p["siblings"])
         imp = latest["impressions"] if latest else 0
         pos = latest["position"] if latest else 999
         ctr = (latest["clicks"] / imp) if latest and imp else 0.0
+        if strong:  # 잘 나가는 글은 보강·제목 바꾸기 안 함 — 아래 수치 재검증(사실 확인)만
+            if (now.month in YEARLY_MONTHS and p["has_number"] and any(w in p["title"] for w in YEARLY_WORDS)
+                    and not (p["refreshed"] or "").startswith(now.strftime("%Y-%m"))):
+                picks.append((3, p, "recheck", f"{now.month}월 제도·요금 변경 시기 (잘 나가는 글: {strong} — 수치만 확인)"))
+            continue
         if latest and imp >= RETITLE_MIN_IMPRESSIONS and pos <= RETITLE_MAX_POSITION and ctr < RETITLE_MAX_CTR:
             picks.append((0, p, "retitle", f"평균 {pos:.0f}위인데 클릭률 {ctr:.1%} (노출 {imp})"))
         elif latest and imp >= STUCK_MIN_IMPRESSIONS and STUCK_POSITION[0] <= pos <= STUCK_POSITION[1]:
@@ -274,7 +300,7 @@ def _count_done(state: dict) -> None:
 def plan_direct(state: dict, fixes_only: bool = False) -> list[str]:
     """월정액 방식: 오늘 갱신할 글을 골라 두기만 한다 (매일 글쓰기 세션이 처리)."""
     with connect() as conn:
-        targets = pick_targets(conn, 1, fixes_only)
+        targets = pick_targets(conn, 1, fixes_only, strong_pages_of(state))
     if not targets:
         state.pop("refresh_target", None)
         return []
@@ -396,7 +422,7 @@ def run_weekly(settings: BotSettings, state: dict) -> list[str]:
     if settings.daily_cost_cap > 0 and spent_today(state) >= settings.daily_cost_cap:
         return [f"글 갱신 건너뜀: 오늘 AI 비용 하루 상한 ${settings.daily_cost_cap:.0f} 도달"]
     with connect() as conn:
-        targets = pick_targets(conn, 1)
+        targets = pick_targets(conn, 1, strong_pages=strong_pages_of(state))
         for post, _, _ in targets:
             post["queries"] = top_queries(conn, post["url"])
     logs = []

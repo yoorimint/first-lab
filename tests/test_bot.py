@@ -387,6 +387,24 @@ class QualityTest(unittest.TestCase):
             picks = refresh.pick_targets(conn, 1)
         self.assertEqual(picks[0][1], "retitle")
 
+    def test_strong_post_not_enhanced_or_retitled(self):
+        """11/11 운영자 '데이터 모이면 잘 나가는 기존 글은 수정 안 하지? 잘 나간다는 기준이 뭐야' — 검색 평균 3위 안·클릭률 2% 이상,
+        또는 GA4 잘 읽힘(방문 30회+·참여율 65%+)이면 보강·제목 바꾸기를 안 함. 사실이 틀려진 경우(근거 변경)는 그대로 고침."""
+        url = "https://first-lab.kr/a/"
+        posts = json.dumps([{"id": 7, "title": "t", "url": url, "date": "2026-09-01", "refreshed": "", "has_number": True}])
+        def pick(position, clicks, impressions=300, strong_pages=()):
+            conn = memory_db([])
+            conn.executescript(refresh.GSC_SCHEMA)
+            conn.execute("INSERT INTO gsc_page_history VALUES ('2026-11-04', ?, ?, ?, ?)", (url, clicks, impressions, position))
+            with mock.patch.object(refresh, "wp_cli", return_value=posts):
+                return refresh.pick_targets(conn, 1, strong_pages=strong_pages)
+        self.assertEqual(pick(2.0, 30), [])                  # 2위·클릭률 10% → 잘 나감, 손대지 않음
+        self.assertEqual(pick(2.0, 2)[0][1], "retitle")       # 2위인데 클릭률 0.7% → 제목은 손볼 대상
+        self.assertEqual(pick(8.0, 2, 50, strong_pages=["/a/"]), [])   # 순위는 중간이어도 GA4 잘 읽힘 → 보강 안 함
+        self.assertEqual(pick(8.0, 2, 50)[0][1], "enhance")   # 같은 글이 잘 읽히지 않으면 정체 보강 대상
+        self.assertTrue(refresh.is_strong({"impressions": 100, "position": 1.5, "clicks": 10}))
+        self.assertEqual(refresh.is_strong({"impressions": 10, "position": 1.0, "clicks": 5}), "")  # 노출이 너무 적으면 판단 안 함
+
     def test_retitle_numbers_must_be_in_body(self):
         body = "<p>승용차 정기검사 수수료는 23,000원이에요.</p>"
         self.assertEqual(refresh._checked_title({"title": "정기검사 비용 23,000원 정리"}, body)[0], "정기검사 비용 23,000원 정리")
