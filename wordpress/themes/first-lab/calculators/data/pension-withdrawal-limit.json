@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-08", "yearly": false,
+  "basis_date": "2026-11-08", "yearly": false, "law_checked": ["소득세법|2027-01-01", "소득세법 시행령|2027-01-01"],
   "won10": "세액을 내지 않고 한도(인출 가능 금액)와 세율만 보여 줌",
   "max_input": 100000000000,
   "sources": [
