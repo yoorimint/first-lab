@@ -10,7 +10,8 @@
     equal_payment(P, r, n) {
       // 같은 공식을 아주 작은 금리에서도 정밀도를 잃지 않는 형태로: P·r / (1 − (1+r)^−n)
       const monthly = r === 0 ? P / n : (P * r) / -Math.expm1(-n * Math.log1p(r));
-      return { first: monthly, last: monthly, interest: monthly * n - P };
+      // 금리 0%면 이자는 0 — P/n·n 의 소수 오차로 '-0원'이 보이지 않게 (11/11 외부 검수, 1억·0%·360개월)
+      return { first: monthly, last: monthly, interest: r === 0 ? 0 : Math.max(0, monthly * n - P) };
     },
     // 원금균등: 원금은 매달 P/n 씩, 이자는 남은 원금에 → 이자 합계 = P·r·(n+1)/2
     equal_principal(P, r, n) {

@@ -105,5 +105,19 @@
       "interest": 0
     },
     "boundary": true
+  },
+  {
+    "why": "금리 0%에 원금이 개월 수로 나누어떨어지지 않아도 이자 총액은 0원 ('-0원' 표시 버그, 11/11 외부 검수)",
+    "input": {
+      "principal": "100000000",
+      "rate": "0",
+      "months": "360",
+      "method": "equal_payment"
+    },
+    "expect": {
+      "first": 277778,
+      "last": 277778,
+      "interest": 0
+    }
   }
 ]
