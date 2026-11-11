@@ -2935,6 +2935,20 @@ class GoldFirstTest(unittest.TestCase):
         with mock.patch.object(naver_hub, "publish_labels", return_value=labels):
             self.assertEqual(self._publish_pick(rows, {10: 9.0}), 10)
 
+    def test_draft_signals_show_search_and_docs(self):
+        """11/11 운영자 '키워드 검색량 대비 글 갯수가 작나' — 대기 글마다 검색량·블로그 글 수·황금지수를 /maintenance 에."""
+        import tempfile
+        from bot import keyword_db, naver_hub
+        with tempfile.TemporaryDirectory() as d, keyword_db.connect(Path(d) / "k.db") as c:
+            naver_hub.load(c)
+            c.execute("INSERT INTO keywords (keyword, norm, total, first_seen, last_checked) VALUES ('캠코소액대출','캠코소액대출',1890,'x','x')")
+            c.execute("INSERT INTO naver_signals (norm, docs) VALUES ('캠코소액대출', 4416)")
+            got = naver_hub.draft_signals({3032: "캠코소액대출", 2917: "전남광주어르신교통카드"}, conn=c)
+        self.assertEqual(got[3032], {"kw": "캠코소액대출", "search": 1890, "docs": 4416, "index": 0.43, "label": "황금"})
+        self.assertEqual(got[2917]["search"], None)     # 아직 조회 안 된 새 키워드는 비어 있다고 표시 (지어내지 않음)
+        self.assertIn("draft_signals", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+        self.assertIn("draft_signals", (ROOT / "bot" / "run.py").read_text(encoding="utf-8"))
+
     def test_writing_tier(self):
         from bot.select_keyword import tier
         self.assertEqual([tier("황금", "캠핑장예약"), tier("", "수습기간해고"), tier("좋음", "마라도여객선"), tier("", "캠핑장예약")], [0, 1, 2, 3])

@@ -159,6 +159,12 @@ def publish_order(ids: list[int], now_kst: datetime) -> list[int]:
                                       i not in old, -round(gold.get(i, 0.0), 2), rank[i]))
 
 
+def draft_signals(ids: list[int]) -> dict[int, dict]:
+    """공개 대기 글마다 키워드 검색량·블로그 글 수·황금지수 (bot/naver_hub.draft_signals, /maintenance draft_signals)."""
+    info = _draft_info(ids)
+    return naver_hub.draft_signals({i: info.get(i, {}).get("text", "").split(" ")[0] for i in ids if info.get(i, {}).get("text")})
+
+
 UPCOMING = 8
 
 

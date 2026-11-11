@@ -382,6 +382,22 @@ def publish_labels(keywords: dict[int, str], conn=None) -> dict[int, str]:
     return {pid: (gold_label(sigs.get(norm(k)), totals.get(norm(k), 0)) if is_info(k) else "") for pid, k in keywords.items()}
 
 
+def draft_signals(keywords: dict[int, str], conn=None) -> dict[int, dict]:
+    """초안 번호 → {키워드, 월 검색량, 블로그 글 수, 황금지수, 등급} (11/11 운영자 '키워드 검색량 대비 글 갯수가 작나' —
+    공개 대기 글마다 /maintenance draft_signals 로 보이게). 아직 조회 안 된 값은 None."""
+    got = _signals_of(keywords, conn)
+    if not got:
+        return {}
+    sigs, totals = got
+    out = {}
+    for pid, k in keywords.items():
+        sig, total = sigs.get(norm(k)), totals.get(norm(k), 0)
+        index = gold_index(sig, total)
+        out[pid] = {"kw": k, "search": total or None, "docs": (sig or {}).get("docs"),
+                    "index": round(index, 2) if index is not None else None, "label": gold_label(sig, total)}
+    return out
+
+
 def load(conn) -> dict[str, dict]:
     conn.execute(SCHEMA)
     have = {r[1] for r in conn.execute("PRAGMA table_info(naver_signals)")}

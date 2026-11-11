@@ -407,6 +407,8 @@ def main() -> None:
                     state["publish_next"] = {"at": f"{now:%Y-%m-%d %H:%M}", "ids": upcoming(now)}
                     from .schedule import publish_order, ready_drafts  # 대기 글 전체 공개 순서 (11/10 '초안 전부 쉬운 말로' — 이 순서대로 다듬기)
                     state["publish_order_all"] = publish_order(ready_drafts(), now)
+                    from .schedule import draft_signals  # 대기 글별 검색량·블로그 글 수·황금지수 (11/11 운영자 질문)
+                    state["draft_signals"] = {str(k): v for k, v in draft_signals(state["publish_order_all"]).items()}
                 except Exception as e:  # noqa: BLE001
                     add_log(state, False, f"다음 공개 순서 계산 실패: {str(e)[:150]}")
             if now.minute < 10:  # 한 시간마다: 주소 연결 안 됨 보류 다시 열어 보기 (일시 장애로 평생 보류 안 되게, 11/10)
