@@ -1433,6 +1433,21 @@ def _units(html: str) -> list[str]:
     return [t for t in (_plain(x) for _, x in _UNIT.findall(html or "")) if t]
 
 
+_SELF_Q = re.compile(r"[^.?!]{2,}\?(?![\"'”’」』])")
+
+
+def body_self_question(old_html: str, new_html: str) -> list[str]:
+    """새로 넣은 본문 문단(p·li)이 스스로 묻고 답하는 문장을 품으면 막는다. 질문은 소제목(h3)으로.
+    (11/11 #3080: 상위 글 질문 검사를 통과하려고 '상담은 어디로 하면 될까요? 국번 없이 …' 처럼 본문에 질문을 끼워 넣음)"""
+    old = set(_units(old_html))
+    out = []
+    for tag, inner in _UNIT.findall(new_html or ""):
+        t = _plain(inner)
+        if tag in ("p", "li") and t and t not in old and _SELF_Q.search(t):
+            out.append(f"새 본문 문단 안에 질문 문장: '{t[:30]}…' — 질문은 소제목(h3)으로 두고 문단은 답만")
+    return out
+
+
 def referent_moved(old_html: str, new_html: str) -> list[str]:
     """'위 예시라면 …' 처럼 바로 앞 문단을 가리키는 원래 문장 앞에 새 문단이 끼면 가리키는 대상이 바뀜
     (11/11 #1802: 자녀 공제 예시가 '본인 1명 74,350원' 뒤에 끼어 '위 예시라면 80%는 59,480원'이 자녀 예시를 가리키게 됨)."""
