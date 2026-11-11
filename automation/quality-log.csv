@@ -317,3 +317,10 @@ date,post,fixes,types
 2026-11-11,3134,1,missing_condition:1
 2026-11-11,3140,2,missing_condition:2
 2026-11-11,3163,0,
+2026-11-11,3234,3,missing_condition:3
+2026-11-11,3213,2,missing_condition:2
+2026-11-11,3215,4,missing_condition:2 wrong_fact:2
+2026-11-11,3217,0,
+2026-11-11,3219,0,
+2026-11-11,3225,0,
+2026-11-11,3228,0,
