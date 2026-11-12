@@ -6501,6 +6501,10 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(serp_gate.uncovered(["주차는 무료인가요?"], body), ["주차는 무료인가요?"])
         # 띄어쓰기만 다른 낱말 (11/12 #1483 '배시간' ↔ '배 시간')
         self.assertEqual(serp_gate.uncovered(["마라도 배시간과 왕복요금"], "<p>마라도 배 시간과 왕복 요금은 아래 표예요.</p>"), [])
+        # 붙여 쓴 합성어 (11/12 #477 '부동산경매사는 국가자격증인가요?' ↔ '국가가 만든 부동산 경매 자격증은 없어요')
+        body = "<p>국가가 만든 부동산 경매 자격증은 없어요. 모두 민간자격이에요.</p>"
+        self.assertEqual(serp_gate.uncovered(["부동산경매사는 국가자격증인가요?"], body), [])
+        self.assertEqual(serp_gate.uncovered(["배당금 세금은?"], body), ["배당금 세금은?"])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""

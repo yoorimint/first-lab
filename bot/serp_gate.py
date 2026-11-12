@@ -48,10 +48,28 @@ SYNONYMS = [
 ]
 
 
+_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
+
+
+def _split_covered(word: str, body: set[str]) -> bool:
+    """붙여 쓴 합성어가 본문 낱말(2자 이상)로 나뉘면 다룬 것으로 봄 — 끝 한 글자(사·증 등)는 남아도 됨
+    (11/12 #477 질문 '부동산경매사는 국가자격증인가요?' ↔ 본문 '국가가 만든 부동산 경매 자격증은 없어요')."""
+    if len(word) < 4:
+        return False
+    ok = [True] + [False] * len(word)  # ok[i]: 앞 i 글자가 본문 낱말로 나뉨
+    for i in range(len(word)):
+        if ok[i]:
+            for j in range(i + 2, len(word) + 1):
+                if word[i:j] in body:
+                    ok[j] = True
+    return ok[-1] or (ok[-2] and len(word) >= 5)
+
+
 def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
     """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
+    word = _COPULA.sub("", word) if len(word) > 4 else word
     return (word in body or any(word in group and group & body for group in SYNONYMS)
-            or (len(word) >= 3 and word in body_joined))
+            or (len(word) >= 3 and word in body_joined) or _split_covered(word, body))
 
 
 def uncovered(questions: list[str], body_html: str) -> list[str]:
