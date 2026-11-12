@@ -6573,6 +6573,9 @@ class PlainCheckTest(unittest.TestCase):
         # 소수점↔끝수, '처리하나요' (11/12 #214)
         vat = "<p>나누어떨어지지 않으면 원 단위 끝수가 생겨요. 처리 방식은 반올림이나 버림이에요.</p>"
         self.assertEqual(serp_gate.uncovered(["원 미만 소수점은 어떻게 처리하나요?"], vat), [])
+        # 누락↔빠졌, '놓쳤거나' (11/12 #1750)
+        tax = "<p>연말정산 때 공제가 빠졌다면 5월에 직접 반영해요. 그 기간을 놓쳤다면 경정청구를 해요.</p>"
+        self.assertEqual(serp_gate.uncovered(["만약 연말정산 기간을 놓쳤거나 누락된 게 있다면?"], tax), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
