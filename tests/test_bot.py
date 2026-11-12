@@ -6559,6 +6559,9 @@ class PlainCheckTest(unittest.TestCase):
                  "<p>자녀 사망으로 자녀 수가 바뀌거나, 막내가 만 19세가 되면 자동으로 해지돼요.</p>")
         self.assertEqual(serp_gate.uncovered(["언제부터 3천원 할인이 적용될까?", "월 3천원이면 하수도요금도 할인될까?"], water + "<p>하수도요금도 같이 감면돼요.</p>"), [])
         self.assertEqual(serp_gate.uncovered(["배당금 세금은 언제 내나요?"], water), ["배당금 세금은 언제 내나요?"])
+        # 기업↔회사, '고용했다면', 소수점 올림·버림 (11/12 #2151)
+        job = "<p>500명 회사가 장애인을 한 명도 고용하지 않으면 16명이 모자라요. 의무 인원은 소수점 이하를 버린 수예요.</p>"
+        self.assertEqual(serp_gate.uncovered(["500인 기업이 장애인을 0명 고용했다면?", "소수점은 올리나요, 버리나요?"], job), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
