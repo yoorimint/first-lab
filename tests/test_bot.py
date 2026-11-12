@@ -6236,6 +6236,19 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("condition_gate.rate_decimals(body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
         self.assertIn("condition_gate.rate_decimals(new_html)", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_plus_fix_requires_title_decision(self):
+        """11/12 #1297: 검수가 원래 1박 요금(18,000원)을 33,000원으로 바로잡았는데(--fix) 제목 '1박 18,000원'이 그대로 나갈 뻔함.
+        --fix 를 쓰고 제목에 숫자가 있으면 새 제목(--title) 또는 확인(--keep-title)이 있어야 하고, 새 제목 숫자는 본문에 있어야 한다."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_check
+        body = "<p>제1야영장은 1박 2일 33,000원이에요. 체류 1일당 18,000원이에요.</p>"
+        allow = {"54,000"}
+        self.assertTrue(plus_check.title_problems("함허동천 요금: 1박 18,000원", "", body, allow))
+        self.assertEqual(plus_check.title_problems("함허동천 요금: 1박 18,000원", "", body, allow, keep_title=True), [])
+        self.assertEqual(plus_check.title_problems("함허동천 요금: 1박 18,000원", "함허동천 요금: 1박 33,000원", body, allow), [])
+        self.assertTrue(plus_check.title_problems("함허동천 요금: 1박 18,000원", "함허동천 요금: 1박 35,000원", body, allow))
+        self.assertEqual(plus_check.title_problems("함허동천 요금: 1박 18,000원", "", body, set()), [])  # --fix 없으면 묻지 않음
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
