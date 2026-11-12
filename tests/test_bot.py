@@ -6605,6 +6605,12 @@ class PlainCheckTest(unittest.TestCase):
         refund = "<p>경정청구는 홈택스나 관할 세무서에 신청해요. 세무서는 2개월 안에 결과를 알려 줘야 해요.</p>"
         self.assertEqual(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], refund), [])
         self.assertTrue(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], "<p>연말정산은 2월에 해요.</p>"))
+        # 11/12 #2350 '얼마씩'·'뭐가'는 의문 말, '들어가나요' ↔ 본문 '들어가요'
+        extra = "<p>기본공제 대상자가 70세 이상이면 1명당 100만 원을 더 빼요. 이것을 추가공제라고 해요.</p>"
+        self.assertEqual(serp_gate.uncovered(["추가공제는 얼마씩 붙나요?"], extra), [])
+        limit = "<p>소득공제 종합한도 2,500만 원에는 주택청약, 신용카드, 노란우산 등이 들어가요.</p>"
+        self.assertEqual(serp_gate.uncovered(["종합한도 2,500만 원에는 뭐가 들어가나요?"], limit), [])
+        self.assertTrue(serp_gate.uncovered(["종합한도 2,500만 원에는 뭐가 들어가나요?"], "<p>연말정산은 2월에 해요.</p>"))
         # 11/12 #2078 '입금되나요' ↔ 본문 '지급해요'
         self.assertEqual(serp_gate.uncovered(["조회된 환급금은 언제 입금되나요?"], "<p>세무서는 결정한 날부터 30일 안에 환급금을 지급해요.</p>"), [])
 
