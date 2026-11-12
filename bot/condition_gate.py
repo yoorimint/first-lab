@@ -294,6 +294,32 @@ def excerpt_principle(excerpt: str, body_html: str) -> list[str]:
     return out[:1]
 
 
+_PRINCIPLE_ANY = re.compile(r"원칙(?:적으로|은|상)?(?=\s|\d)")
+
+
+def summary_principle(title: str, body_html: str) -> list[str]:
+    """'한 줄 정리'가 원칙(예외 있음)인 기간·금액을 단정 (11/12 #3939 제목 '판정은 원칙 30일 이내'·첫 문단 '원칙 30일' ↔
+    한 줄 정리 '30일 안에 등급이 정해져요' — 법 제16조① 단서 연장). 제목·첫 문단에서 '원칙' 뒤에 나온 기간이
+    한 줄 정리에 '원칙' 없이 있으면 막음."""
+    m = re.search(r"<p[^>]*>\s*<strong>한 줄 정리:?</strong>(.*?)</p>", body_html or "", re.S)
+    if not m:
+        return []
+    summ = _plain(m.group(1))
+    if _PRINCIPLE_ANY.search(summ):
+        return []
+    lead = "".join(re.findall(r"<p[^>]*>.*?</p>", body_html or "", re.S)[:2])
+    pieces = [x for x in re.split(r"<br\s*/?>|✔", lead) if x.strip()]  # ✔ 줄마다 따로 ('✔ 원칙은 공급한 때 ✔ 월합계는 10일' #1707)
+    nums = []
+    for text in (_plain(title or ""), *(s for x in pieces for s in _sentences(x))):
+        hit = _PRINCIPLE_ANY.search(text)
+        if hit:
+            nums += _PERIOD.findall(text[hit.end():])
+    for num in dict.fromkeys(n.strip() for n in nums):
+        if num and num in summ:
+            return [f"한 줄 정리의 '{num}' 은 제목·첫 문단에서 '원칙' (예외 있음) — 한 줄 정리에도 '원칙적으로' 넣기"]
+    return []
+
+
 # 법령 이름이 법제처에 있는 이름(정식 이름·공식 약칭)인지 (11/9 #2362 '어선원 재해보상보험법' — 정식은 '어선원 및 어선 재해보상보험법').
 # 낱말 끝이 '법'인 것만 보고, 앞 낱말 1~3개를 붙여 본 이름 중 하나라도 법제처 정식 이름·약칭이면 맞음. 흔한 말(방법·개정법 등)은 뺌.
 LAW_GENERIC = ("방법", "법률", "불법", "편법", "합법", "문법", "해법", "요법", "비법", "기법", "공법", "화법", "수법", "용법", "어법",
