@@ -48,7 +48,7 @@ SYNONYMS = [
 ]
 
 
-_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
+_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
 
 
 def _splits(word: str, body: set[str]) -> bool:
@@ -70,11 +70,19 @@ def _split_covered(word: str, body: set[str]) -> bool:
     return _splits(word, body) or (len(word) >= 4 and (word[1:] in body or _splits(word[1:], body)))
 
 
+_JOSA_START = tuple("이은는을를의에도과와으로만")
+
+
+def _prefix_covered(word: str, body: set[str]) -> bool:
+    """본문 낱말이 이 말 + 조사·말끝이면 다룬 것으로 봄 ('대상' ↔ 본문 '대상이었어요', 11/12 #869)."""
+    return len(word) >= 2 and any(b.startswith(word) and b[len(word):].startswith(_JOSA_START) for b in body)
+
+
 def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
     """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
     word = _COPULA.sub("", word) if len(word) > 3 else word
     return (word in body or any(word in group and group & body for group in SYNONYMS)
-            or (len(word) >= 3 and word in body_joined) or _split_covered(word, body))
+            or (len(word) >= 3 and word in body_joined) or _split_covered(word, body) or _prefix_covered(word, body))
 
 
 _ASKING = {"얼마나", "어떤", "어떻게", "언제", "어디", "어디서", "무엇", "무슨", "누가", "누구", "왜", "몇",
