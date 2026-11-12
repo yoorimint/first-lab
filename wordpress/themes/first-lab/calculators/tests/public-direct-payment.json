@@ -1,0 +1,239 @@
+[
+ {
+  "why": "진흥지역 논 3ha(30,000㎡): 2ha × 215만 + 1ha × 207만 = 637만 원 (고시 제2025-3244호 단가, 시행령 제9조 구간)",
+  "input": {
+   "zone": 30000,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 6370000,
+   "small": "none"
+  }
+ },
+ {
+  "why": "비진흥 논 1ha + 비진흥 밭 3ha: 별표 2 쌓는 순서 → 논 1ha × 187만 + 밭 1ha × 150만 + 밭 2ha × 143만 = 623만 원",
+  "input": {
+   "zone": 0,
+   "paddy": 10000,
+   "field": 30000,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 6230000,
+   "small": "none"
+  }
+ },
+ {
+  "why": "진흥 2.5ha + 비진흥 논 1ha: 2ha × 215만 + 0.5ha × 207만 + 1ha × 179만(쌓인 면적 2.5~3.5ha라 2구간) = 712만 5,000원",
+  "input": {
+   "zone": 25000,
+   "paddy": 10000,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 7125000,
+   "small": "none"
+  }
+ },
+ {
+  "why": "기준선: 1구간 끝 20,000㎡ 딱 → 20,000 × 215 = 430만 원",
+  "input": {
+   "zone": 20000,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 4300000,
+   "small": "none"
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 20,001㎡ → 1㎡만 2구간 207원 = 4,300,207원",
+  "input": {
+   "zone": 20001,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 4300207,
+   "small": "none"
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 60,001㎡ → 2만 × 215 + 4만 × 207 + 1 × 198 = 12,580,198원",
+  "input": {
+   "zone": 60001,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 12580198,
+   "small": "none"
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 농업인 상한 30만㎡(시행령 제11조) — 31만㎡ 넣으면 30만㎡까지만: 430만 + 828만 + 24만㎡ × 198 = 6,010만 원",
+  "input": {
+   "zone": 310000,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 60100000,
+   "small": "none"
+  },
+  "boundary": true,
+  "notes_include": [
+   "300,000㎡까지만"
+  ]
+ },
+ {
+  "why": "기준선: 소농 면적 5,000㎡ 딱(별표 1의2 '이하') → 소농직불금 안내",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 5000,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 750000,
+   "small": "auto"
+  },
+  "boundary": true,
+  "notes_include": [
+   "1,300,000원(소농직불금)"
+  ]
+ },
+ {
+  "why": "기준선: 5,001㎡ 비진흥 밭 → 750,150원 < 130만 원이라 소농 선택 신청 안내 (법 제10조③)",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 5001,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 750150,
+   "small": "choice"
+  },
+  "boundary": true,
+  "notes_include": [
+   "골라 신청"
+  ]
+ },
+ {
+  "why": "비진흥 밭 9,000㎡ → 135만 원 ≥ 130만 원이라 선택 안내 없음",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 9000,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 1350000,
+   "small": "none"
+  },
+  "notes_exclude": [
+   "골라 신청"
+  ]
+ },
+ {
+  "why": "기준선: 999㎡ → 1천㎡ 미만이라 대상 아님 (법 제9조③2호)",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 999,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 0,
+   "small": "none"
+  },
+  "boundary": true,
+  "notes_include": [
+   "받을 수 없어요"
+  ]
+ },
+ {
+  "why": "기준선: 1,000㎡ 딱 → 150,000원, 소농 면적 이하",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 1000,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 150000,
+   "small": "auto"
+  },
+  "boundary": true
+ },
+ {
+  "why": "농업법인은 소농직불금 제외 (법 제10조① 단서)",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 5000,
+   "who": "corp"
+  },
+  "expect": {
+   "pay": 750000,
+   "small": "none"
+  },
+  "notes_include": [
+   "농업법인은 소농직불금"
+  ]
+ },
+ {
+  "why": "상한 초과 + 농지 섞음: 진흥 29만 + 밖 밭 2만 → 30만㎡까지 (2만×215 + 4만×207 + 23만×198 + 1만×136 = 430만 + 828만 + 4,554만 + 136만 = 5,948만 원), 빼는 순서는 법령에 없어 안내",
+  "input": {
+   "zone": 290000,
+   "paddy": 0,
+   "field": 20000,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 59480000,
+   "small": "none"
+  },
+  "notes_include": [
+   "단가가 낮은 농지부터 뺀 값"
+  ]
+ },
+ {
+  "why": "상한 초과지만 한 종류뿐이면 빼는 순서 안내 없음",
+  "input": {
+   "zone": 310000,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect": {
+   "pay": 60100000,
+   "small": "none"
+  },
+  "notes_exclude": [
+   "단가가 낮은 농지부터 뺀 값"
+  ]
+ },
+ {
+  "why": "면적을 하나도 안 넣으면 안내",
+  "input": {
+   "zone": 0,
+   "paddy": 0,
+   "field": 0,
+   "who": "farmer"
+  },
+  "expect_error": true
+ }
+]
