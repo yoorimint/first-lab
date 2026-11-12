@@ -6570,6 +6570,9 @@ class PlainCheckTest(unittest.TestCase):
         # 동승↔탑승·타고, 복수 '들' (11/12 #861 '부모가 동승하지 않고 자녀들만 이동하면?')
         car = "<p>탑승: 부모 중 한 명이 반드시 타고 있어야 해요. 다른 가족이 자녀만 태우고 가면 대상이 아니에요.</p>"
         self.assertEqual(serp_gate.uncovered(["부모가 동승하지 않고 자녀들만 이동하면 어떻게 되나요?"], car), [])
+        # 소수점↔끝수, '처리하나요' (11/12 #214)
+        vat = "<p>나누어떨어지지 않으면 원 단위 끝수가 생겨요. 처리 방식은 반올림이나 버림이에요.</p>"
+        self.assertEqual(serp_gate.uncovered(["원 미만 소수점은 어떻게 처리하나요?"], vat), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
