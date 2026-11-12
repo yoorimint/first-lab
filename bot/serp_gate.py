@@ -83,6 +83,12 @@ def uncovered(questions: list[str], body_html: str) -> list[str]:
     return out
 
 
+def written_plus(serp) -> bool:
+    """쓸 때 상위 글 질문(+)과 더한 것(@)까지 넣은 글인지 (11/12 운영자 '새 초안은 보강해서 나오는 거 아냐?').
+    그런 새 글은 +@ 보강 차례(automation/plus_queue.py)에서 빼고, 올릴 때 보강 끝 표시(refresh.PLUS_META)를 붙인다."""
+    return isinstance(serp, dict) and not serp.get("unavailable") and bool(serp.get("questions"))
+
+
 def problems(serp, body_html: str) -> list[str]:
     if not isinstance(serp, dict):
         return ["상위 글 분석 기록(serp) 없음 — 상위 글 5~10개를 열어 질문·목차를 serp 에 적고, 그 질문을 모두 다룰 것 (daily-writer.md 3단계)"]
