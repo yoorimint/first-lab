@@ -1,7 +1,7 @@
 # 매일 글쓰기 (예약 세션용 작업 지시서)
 
 Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1편**을 써서 올리고, 갱신할 글이 있으면 (하루 1개까지) 고친다.
-실행은 사이트 서버가 시킨다: 설정의 "글 작성 시각"마다 1번, "지금 글 1개 만들기" 버튼, 연속 작성 중에는 한 편 끝날 때마다 1번 (`bot/routine.py`).
+실행은 사이트 서버가 시킨다: 설정의 "글 작성 시각"마다 1번, "지금 글 1개 만들기" 버튼, 연속 작성 중에는 한 편 끝날 때마다 1번 (`bot/routine.py`, API 봇 방식이면 서버 안에서 `bot/api_writer.py`).
 그래서 실행 1번 = 새 글 1편이다 (하루에 여러 번 실행될 수 있음).
 이 문서를 고치면 다음 실행부터 바로 반영된다 (예약 작업은 "이 문서를 따르라"고만 한다).
 
@@ -19,6 +19,12 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 6. 끝에 `wordpress/queue/done-<날짜시각>.json` = `{"type": "run_done", "summary": "<이번에 한 일 한 줄>"}` 을 **항상** 만들고 (`slot-N` 실행이면 이름 끝에 `-s<N>` 을 붙이고 JSON 에 `"slot": N` — 동시 실행끼리 파일 이름이 겹치지 않게, skip 파일도 같은 규칙) (서버가 이걸 보고 다음 실행을 시작 — 없으면 60분을 기다림), **검사 1번 → 커밋 1개 → push 1번** (5단계 명령). 단계마다 따로 push 하지 않는다 (다음 실행과 겹침).
 - 사용량: 새 글 1편에 웹 검색·열람 합계 40번 안쪽 (상위 글 3~5개, 사실 조사 10번, 하위 검수 15번, 보강 10번).
 
+## API 봇 실행 (환경 변수 `FIRSTLAB_LOCAL=1` 일 때만 — 설정 '글 작성 방식: API 봇', `bot/api_writer.py`)
+서버 안에서 같은 지시서로 돈다. 다른 점은 아래뿐이고 나머지는 이 문서 그대로:
+- 0단계 git 명령·5단계 검사·커밋·push 는 하지 않는다 (서버가 최신 main 을 받아 둠, push 권한 없음). `/next` 의 `write_mode` 는 `"bot"` 이어야 한다.
+- 결과는 `wordpress/queue/` 의 **새 파일**로만 낸다 (끝 표시 done 파일 포함) — 세션이 끝나면 서버가 새 파일만 가져가 같은 관문으로 올린다.
+- 저장소 파일을 바꿔야 하는 일은 건너뛰고 다음 일로: `deploy_alert`, `review_target`(patches.json), `calc_yearly`, 새 계산기·`calc:` 줄, 검사 코드 수정, 이유가 '계산기 독립 검수 전'인 보류 글. 새 계산기가 있어야 하는 후보는 skip 파일에 넣지 말고 다음 후보로.
+
 ## 0. 준비
 - 저장소 루트에서 작업한다. 최신 main 을 받는다: `git fetch origin main && git checkout -B daily-writer origin/main`
 - 환경 변수 `FIRSTLAB_API_TOKEN` 이 없으면 글을 쓰지 말고 "토큰 없음"으로 끝낸다.
@@ -35,7 +41,7 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 ```
 curl -s -H "X-Firstlab-Token: $FIRSTLAB_API_TOKEN" https://first-lab.kr/wp-json/firstlab/v1/next
 ```
-- 응답의 `write_mode` 가 `"direct"` 가 아니면(설정 페이지에서 "API 봇" 선택) 글을 쓰지 말고 "봇 방식이라 쉼"으로 끝낸다.
+- 응답의 `write_mode` 가 `"direct"` 가 아니면(설정 페이지에서 "API 봇" 선택 — 서버가 같은 지시서로 씀) 글을 쓰지 말고 "봇 방식이라 쉼"으로 끝낸다 (API 봇 실행은 반대로 `"bot"` 이어야 함).
 - **배포가 막혔으면 그것부터**: 응답의 `deploy_alert` 가 있으면 GitHub 검사와 같게 root 가 아닌 사용자로 `useradd -M ci 2>/dev/null; runuser -u ci -- env HOME=/tmp python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` 를 돌려 (root 로는 권한 문제가 안 보임) 실패한 검사를 고쳐(대개 지난 실행이 올린 파일) 커밋·main 에 올리고, 그 뒤에 아래를 한다. 못 고치면 보고 첫 줄에 "배포 막힘: <실패한 검사>". 검사가 모두 통과하면 GitHub 쪽 문제(결제·한도 등)라 고칠 것이 없다 — 보고 첫 줄 "배포 막힘: GitHub 쪽(검사 통과)" 만 쓰고 바로 다음 일.
 - **고친 내용이 안 들어간 글**: 응답의 `patch_problems` 가 있으면 첫 항목의 글(글 번호)을 `python3 automation/unreviewed.py <번호>` 로 받아, 그 문구를 고친 본문으로 6단계 갱신 파일(`refresh`, `base_modified` 는 응답 대신 받은 글의 값)을 올린다.
 - **대기 글 검수** (`review_target` 이 있고 실행 순서상 차례일 때 — 새 글은 안 씀):

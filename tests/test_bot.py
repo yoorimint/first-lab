@@ -172,7 +172,8 @@ class PublishQueueTest(unittest.TestCase):
             q.mkdir(); done.mkdir()
             f = q / "a.json"
             f.write_text('{"keyword": "x"}', encoding="utf-8")
-            with mock.patch.object(publish_queue, "QUEUE_DIR", q), mock.patch.object(publish_queue, "DONE_DIR", done):
+            with mock.patch.object(publish_queue, "QUEUE_DIR", q), mock.patch.object(publish_queue, "DONE_DIR", done), \
+                    mock.patch.object(publish_queue, "LOCAL_QUEUE_DIR", Path(tmp, "local")):
                 self.assertEqual(publish_queue.pending(), [f])
                 publish_queue._marker(f).touch()
                 self.assertEqual(publish_queue.pending(), [])
@@ -184,15 +185,17 @@ class DirectRefreshTest(unittest.TestCase):
     POST = {"id": 59, "title": "t", "url": "u", "siblings": [("a", 100)]}
 
     def test_direct_mode_only_plans(self):
-        s = BotSettings.from_option({"write_mode": "direct"}, {})
-        state = {"refresh": {}}
-        with mock.patch.object(refresh, "pick_targets", return_value=[(self.POST, "enhance", "정체")]), \
-                mock.patch.object(refresh, "refresh_post") as api_call, mock.patch.object(refresh, "connect"):
-            logs = refresh.run_weekly(s, state)
-        api_call.assert_not_called()  # API 로 고치지 않음
-        self.assertEqual(state["refresh_target"]["id"], 59)
-        self.assertEqual(state["refresh_target"]["siblings"], ["a"])
-        self.assertIn("대상 준비", logs[0])
+        for mode in ("direct", "bot"):  # 11/12: API 봇도 같은 글쓰기 작업이 고침 (예전 API 바로 저장 길 없앰)
+            s = BotSettings.from_option({"write_mode": mode}, {})
+            state = {"refresh": {}}
+            with mock.patch.object(refresh, "pick_targets", return_value=[(self.POST, "enhance", "정체")]), \
+                    mock.patch.object(refresh, "wp_cli") as wp, mock.patch.object(refresh, "connect"):
+                logs = refresh.run_weekly(s, state)
+            self.assertFalse(any(c.args[:2] == ("post", "update") for c in wp.call_args_list))  # 글을 바로 고치지 않음
+            self.assertFalse(hasattr(refresh, "refresh_post"))
+            self.assertEqual(state["refresh_target"]["id"], 59)
+            self.assertEqual(state["refresh_target"]["siblings"], ["a"])
+            self.assertIn("대상 준비", logs[0])
 
     def fake_wp(self, modified="2026-11-04 10:00:00", content="<p>" + "가" * 100 + "</p>"):
         calls = []

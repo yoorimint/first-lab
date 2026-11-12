@@ -20,13 +20,13 @@ function firstlab_bot_fields(): array {
 			'label'   => '글 작성 방식',
 			'type'    => 'select',
 			'default' => 'direct',
-			'options' => array( 'direct' => '월정액 (Claude 구독으로 매일 아침 직접 작성)', 'bot' => 'API 봇 (발행 시각마다 봇이 작성, API 비용)' ),
-			'help'    => '월정액: "글 작성 시각"·연속 작성·"지금 글 1개 만들기" 모두 Claude 가 씀 (API 요금 없음, 구독 사용량). 후보 안전 검사도 Claude 가 함. API 봇: 전부 API 로 씀 (API 봇 사용을 켜야 글 작성 시각에 씀)',
+			'options' => array( 'direct' => '월정액 (Claude 구독 예약 작업이 씀)', 'bot' => 'API 봇 (같은 작업을 서버가 Claude API 키로 실행)' ),
+			'help'    => '두 방식은 쓰는 사람·지시서(automation/daily-writer.md)·검수 관문·발행 방식(초안/바로/예약)·글 작성 시각·연속 작성·지금 글 1개 만들기·매일 점검이 모두 같고, 요금만 다름. 월정액: Claude 구독 사용량 (API 요금 없음). API 봇: 서버가 같은 작업을 Claude Code 로 돌리고 아래 Claude API 키로 요금이 나감 — \'API 봇 사용\' 을 켜고 AI 제공사를 Anthropic Claude 로. 서버 메모리 때문에 한 번에 1편씩 (2번 작성자 없음), 저장소를 고쳐야 하는 일(대기 글 검수 패치·계산기 새로 만들기·연초 값)은 월정액 실행이 함',
 		),
-		'maint_times'    => array( 'label' => '매일 점검 시각', 'type' => 'text', 'default' => '06:10', 'help' => '월정액: 이 시각에 Claude 가 서버 기록(실행 실패·연속 작성 자동 정지·검수 보류)을 점검해 휴대폰으로 알림. 비우면 안 함' ),
+		'maint_times'    => array( 'label' => '매일 점검 시각', 'type' => 'text', 'default' => '06:10', 'help' => '두 방식 모두: 이 시각에 Claude 가 서버 기록(실행 실패·연속 작성 자동 정지·검수 보류)을 점검. 월정액은 휴대폰 알림, API 봇은 봇 기록(/maintenance)에 남김. 비우면 안 함' ),
 		'direct_enabled' => array( 'label' => '글 작성 시각 사용', 'type' => 'checkbox', 'default' => 1, 'help' => '끄면 아래 시각에 자동으로 쓰지 않음 (연속 작성·지금 글 1개 만들기는 그대로 동작)' ),
-		'direct_times'   => array( 'label' => '글 작성 시각', 'type' => 'textarea', 'default' => '07:40', 'help' => '한 줄에 하나 (줄 수 = 하루 작성 편수, 예: 07:40 과 13:40 두 줄이면 하루 2편). 월정액: Claude 가 씀 (서버에 Claude 예약 작업 토큰 필요). API 봇: API 봇 사용이 켜져 있을 때 API 로 씀. 연속 작성 중에는 쉼. 공개는 발행 방식을 따름' ),
-		'enabled'        => array( 'label' => 'API 봇 사용', 'type' => 'checkbox', 'default' => 0, 'help' => '글 작성 방식이 API 봇일 때만 의미 있음: 켜면 글 작성 시각마다 API(유료)로 씀. 월정액 방식에서는 쓰지 않음. 공개(발행 방식·예약 공개)와는 상관없음' ),
+		'direct_times'   => array( 'label' => '글 작성 시각', 'type' => 'textarea', 'default' => '07:40', 'help' => '한 줄에 하나 (줄 수 = 하루 작성 편수, 예: 07:40 과 13:40 두 줄이면 하루 2편). 두 방식 모두 같은 글쓰기 작업 (월정액: 서버에 Claude 예약 작업 토큰 필요, API 봇: API 봇 사용 켜짐). API 봇이 앞 글을 쓰는 중이면 끝난 뒤 시작 (3시간 안). 연속 작성 중에는 쉼. 공개는 발행 방식을 따름' ),
+		'enabled'        => array( 'label' => 'API 봇 사용', 'type' => 'checkbox', 'default' => 0, 'help' => '글 작성 방식이 API 봇일 때만 의미 있음 (요금 스위치): 켜야 글 작성 시각·연속 작성·지금 글 1개 만들기·매일 점검이 Claude API 키로 실행됨. 끄면 아무것도 쓰지 않고 봇 기록에 이유를 남김. 공개(발행 방식·예약 공개)와는 상관없음' ),
 		'post_status'    => array(
 			'label'   => '발행 방식',
 			'type'    => 'select',
@@ -39,9 +39,8 @@ function firstlab_bot_fields(): array {
 			'help'    => '직접 작성·봇 글 모두 적용. 사실 확인이 부족하거나 제목 숫자가 본문과 다른 글은 어느 방식이든 초안으로 남김',
 		),
 		'schedule_times' => array( 'label' => '예약 공개 시각', 'type' => 'textarea', 'default' => '09:00', 'help' => '예약 발행일 때만 사용. 한 줄에 하나 (줄 수 = 하루 공개 글 수, 예: 09:00 과 18:00 두 줄이면 하루 2편). 시각마다 공개 대기 초안 중 가장 오래된 것 1편을 공개. 확인이 필요한 초안과 예전 봇 초안은 대기열에 안 들어감' ),
-		'fact_check'     => array( 'label' => '자동 사실 검증', 'type' => 'checkbox', 'default' => 1, 'help' => '글 완성 후 별도 AI 가 핵심 수치를 웹 검색으로 재확인·수정. 확인 못 한 주장이 많으면 자동 발행 대신 초안으로 남김' ),
-		'daily_cost_cap' => array( 'label' => '하루 AI 비용 상한 (달러)', 'type' => 'number', 'default' => 3, 'min' => 0, 'max' => 100, 'help' => '오늘 쓴 AI 비용(글 작성·검수·갱신 합계)이 이 금액에 닿으면 그날은 더 쓰지 않음. 글 1개 약 0.5달러 (0 = 상한 없음)' ),
-		'refresh_per_week' => array( 'label' => '글 갱신 (주당 최대)', 'type' => 'number', 'default' => 5, 'min' => 0, 'max' => 20, 'help' => '순위 정체·하락 글 보강, 1·7월 제도 변경 재검증, 6개월 지난 글 재검증. 하루 최대 1개 (0 = 끔). 월정액 방식이면 서버가 대상만 고르고 매일 글쓰기 세션이 고침 (API 비용 없음)' ),
+		'daily_cost_cap' => array( 'label' => '하루 AI 비용 상한 (달러)', 'type' => 'number', 'default' => 3, 'min' => 0, 'max' => 100, 'help' => 'API 봇: 오늘 쓴 Claude API 비용이 이 금액에 닿으면 그날은 새 실행을 시작하지 않고 다음 날 다시 (실행마다 남은 금액을 예산으로 넘김). 글 1편 실행 약 3~8달러 추정 — 하루 편수 × 8 정도로 (0 = 상한 없음, 한 번 실행은 15달러까지). 월정액은 해당 없음' ),
+		'refresh_per_week' => array( 'label' => '글 갱신 (주당 최대)', 'type' => 'number', 'default' => 5, 'min' => 0, 'max' => 20, 'help' => '순위 정체·하락 글 보강, 1·7월 제도 변경 재검증, 6개월 지난 글 재검증. 하루 최대 1개 (0 = 끔). 두 방식 모두 서버가 대상만 고르고 글쓰기 작업이 고쳐 갱신 파일로 올림 (관문 통과해야 반영)' ),
 		'jitter_minutes' => array( 'label' => '공개 시각 랜덤 범위 (± 분)', 'type' => 'number', 'default' => 30, 'min' => 0, 'max' => 180, 'help' => '예약 공개 시각에 적용. 예: 30 이면 09:00 → 08:30~09:30 사이 무작위 (매일 달라짐)' ),
 		'provider'       => array(
 			'label'   => 'AI 제공사',
@@ -49,7 +48,7 @@ function firstlab_bot_fields(): array {
 			'default' => 'gemini',
 			'options' => array( 'gemini' => 'Google Gemini', 'anthropic' => 'Anthropic Claude', 'openai' => 'OpenAI GPT' ),
 		),
-		'model'          => array( 'label' => '모델 이름', 'type' => 'text', 'default' => '', 'help' => '비워두면 제공사별 기본 모델 사용' ),
+		'model'          => array( 'label' => '모델 이름', 'type' => 'text', 'default' => '', 'help' => 'API 봇 글쓰기 모델 (예: claude-opus-5-5). 비워두면 claude-opus-5-5' ),
 		'gemini_key'     => array( 'label' => 'Gemini API 키', 'type' => 'secret' ),
 		'anthropic_key'  => array( 'label' => 'Claude API 키', 'type' => 'secret' ),
 		'openai_key'     => array( 'label' => 'OpenAI API 키', 'type' => 'secret' ),
@@ -357,13 +356,13 @@ function firstlab_bot_render_status(): void {
 			} elseif ( 'bot' !== ( firstlab_bot_get()['write_mode'] ?? 'direct' ) ) {
 				echo '월정액 방식: Claude 예약 작업을 바로 실행합니다 (글은 20~40분 뒤 배포와 함께 올라옴). 발행 방식(초안/바로/예약)을 따릅니다.';
 			} else {
-				echo 'API 봇이 1~3분 안에 씁니다. 발행 방식(초안/바로/예약)을 따릅니다.';
+				echo 'API 봇 방식: 서버가 월정액과 같은 글쓰기 작업을 바로 시작합니다 (Claude API 키 요금, 글은 20~60분 뒤 같은 관문을 거쳐 올라옴, 앞 글을 쓰는 중이면 끝난 뒤). 발행 방식(초안/바로/예약)을 따릅니다.';
 			}
 			?>
 		</span>
 	</form>
 
-	<h2>연속 작성 (월정액)</h2>
+	<h2>연속 작성</h2>
 	<?php
 	$running    = '1' === get_option( FIRSTLAB_BOT_CONTINUOUS, '0' );
 	$continuous = (array) ( $state['continuous'] ?? array() );
@@ -384,7 +383,7 @@ function firstlab_bot_render_status(): void {
 					(int) ( $continuous['count'] ?? 0 )
 				);
 			} else {
-				echo '멈춤. 시작을 누르면 Claude 가 정지할 때까지 한 편씩 계속 씁니다 (구독 사용량 사용, 한도에 닿거나 3번 연속 실패하면 스스로 멈춤).';
+				echo '멈춤. 시작을 누르면 Claude 가 정지할 때까지 한 편씩 계속 씁니다 (월정액: 구독 사용량, API 봇: API 키 요금·하루 비용 상한까지 — 한도에 닿거나 3번 연속 실패하면 스스로 멈춤).';
 			}
 			?>
 		</span>
@@ -396,7 +395,7 @@ function firstlab_bot_render_status(): void {
 		<strong>2번 작성자:</strong>
 		<?php if ( $writer2 ) : ?>
 			<?php submit_button( '끄기', 'secondary', 'off', false ); ?>
-			<span class="description">켜짐 — 두 편을 동시에 씀 (구독 사용량 2배). 끄면 2번이 쓰던 한 편까지 마치고 1번만 씀.</span>
+			<span class="description">켜짐 — 두 편을 동시에 씀 (구독 사용량 2배, 월정액만 — API 봇은 서버에서 한 번에 1편). 끄면 2번이 쓰던 한 편까지 마치고 1번만 씀.</span>
 		<?php else : ?>
 			<?php submit_button( '켜기', 'primary', 'on', false ); ?>
 			<span class="description">꺼짐 — 1번 작성자만 한 편씩 씀 (후보 전부를 1번이 받음).</span>
