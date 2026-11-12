@@ -46,5 +46,6 @@
 - 설정: 워드프레스 관리자 > 설정 > **퍼스트랩 봇** (`wordpress/mu-plugins/first-lab-bot-settings.php`)
 - 서버 명령 (가상환경): `cd /opt/first-lab && /opt/first-lab-venv/bin/python -m bot.run --now`
 - 키: 설정 페이지 값 우선, 없으면 `/etc/first-lab/secrets.env` (`server/set-secrets.sh` 로 입력)
+- API 봇이 저장소를 고치는 일(대기 글 검수 반영·새 계산기·연초 기준값)까지 하려면 서버 비밀값 `GITHUB_PUSH_TOKEN` (이 저장소만, Contents 읽기·쓰기 fine-grained 토큰): `bash /opt/first-lab/server/set-secrets.sh GITHUB_PUSH_TOKEN`. 세션에는 안 넘기고, 검사 통과 뒤 서버(root)가 main 에 올림 (`bot/api_writer.push_changes`)
 
 > 공개 저장소이므로 비밀번호·API 키는 절대 커밋하지 않는다.
