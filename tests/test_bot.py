@@ -5887,6 +5887,18 @@ class AdsOwnTrafficTest(unittest.TestCase):
         for need in ("is_user_logged_in()", "FIRSTLAB_NOADS_COOKIE", "'FirstLab'", "firstlab_noads"):
             self.assertIn(need, php)
 
+    def test_ads_txt_served_by_nginx_without_php(self):
+        """11/12 운영자 '승인됨이었는데 Ads.txt 찾을 수 없음': ads.txt 가 PHP 를 거치면 배포·부하로 502·429 가 날 때
+        애드센스 크롤러가 못 읽음 → nginx 가 PHP 없이 바로 주고, 게시자 ID 는 애드센스 코드와 같아야 한다."""
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-adsense.php").read_text(encoding="utf-8")
+        pub = re.search(r"FIRSTLAB_ADSENSE_CLIENT = 'ca-(pub-\d+)'", php).group(1)
+        conf = (ROOT / "server" / "nginx" / "first-lab.conf").read_text(encoding="utf-8")
+        block = re.search(r"location = /ads\.txt \{(.*?)\}", conf, re.S)
+        self.assertIsNotNone(block, "nginx 에 ads.txt 고정 응답이 없음")
+        self.assertIn(f'return 200 "google.com, {pub}, DIRECT, f08c47fec0942fa0\\n"', block.group(1))
+        # https 서버 블록 안 (80 은 https 로 넘김)
+        self.assertGreater(conf.index("location = /ads.txt"), conf.rindex("listen 443"))
+
     def test_click_bomb_refresh_and_bot_flood_guard(self):
         """11/11 운영자 '악의적으로 계속 클릭·새로고침·봇': 기기별 클릭 폭탄·새로고침 폭주는 하루 광고 끔,
         IP별 요청 폭주는 nginx 429, 광고 끈 화면은 캐시에 안 남김(남에게 광고 없는 화면이 나가지 않게)."""
@@ -6508,6 +6520,8 @@ class PlainCheckTest(unittest.TestCase):
         body = "<p>국가가 만든 부동산 경매 자격증은 없어요. 모두 민간자격이에요.</p>"
         self.assertEqual(serp_gate.uncovered(["부동산경매사는 국가자격증인가요?"], body), [])
         self.assertEqual(serp_gate.uncovered(["배당금 세금은?"], body), ["배당금 세금은?"])
+        # '~이란?' 질문 (11/12 #1885 '작업중지권이란?' ↔ 본문 '작업중지권은 …')
+        self.assertEqual(serp_gate.uncovered(["작업중지권이란?"], "<p>흔히 말하는 작업중지권은 급박한 위험이 있을 때 작업을 멈추는 권리예요.</p>"), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""

@@ -48,7 +48,7 @@ SYNONYMS = [
 ]
 
 
-_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
+_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
 
 
 def _split_covered(word: str, body: set[str]) -> bool:
@@ -67,7 +67,7 @@ def _split_covered(word: str, body: set[str]) -> bool:
 
 def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
     """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
-    word = _COPULA.sub("", word) if len(word) > 4 else word
+    word = _COPULA.sub("", word) if len(word) > 3 else word
     return (word in body or any(word in group and group & body for group in SYNONYMS)
             or (len(word) >= 3 and word in body_joined) or _split_covered(word, body))
 

@@ -183,3 +183,4 @@
 - "언제든 api로 바꾸면 똑같이 돌아가게 해야 되는 거 아닌가 자동발행이든 예약발행이든" — 글 작성 방식을 'API 봇'으로 바꿔도 같은 글쓰기 지시(daily-writer.md)·같은 관문(publish_queue)·같은 발행(자동·예약)으로 돌아야 한다. 비용만 저장한 Claude API 키로 나감. 키는 운영자가 설정 화면에 저장함.
 - 확인한 문제(11/12): 예전 API 봇 경로(bot/run.create_one)는 관문 없이 바로 공개 대기열에 넣고, 매일 점검은 월정액일 때만 돎 → 고침 (아래).
 - 11/12 운영자 '키는 여기 저장했으니 상관없고 언제든 api로 바꾸면 똑같이 돌아가게 해야 되는 거 아닌가 자동발행이든 예약발행이든': 설정 '글 작성 방식: API 봇' + 'API 봇 사용' 이면 서버가 같은 지시서·같은 실행 메시지로 Claude Code 를 돌리고(bot/api_writer.py, 키 = 설정 페이지 Claude API 키, 모델 = 설정 모델 이름) 결과는 같은 관문(publish_queue)·같은 발행 방식으로. 예전 API 봇 한 번 쓰기(관문 없이 공개 대기열)·API 바로 갱신은 없앰. 서버에 push 권한이 없어 저장소를 고치는 일(대기 글 검수 패치·계산기·연초 값)은 API 봇에서 건너뜀 (daily-writer.md 'API 봇 실행').
+- 11/12 운영자 '애드센스 승인됨이었는데 Ads.txt 찾을 수 없음': 지금 /ads.txt 는 200·게시자 ID 맞음. 원인은 ads.txt 를 워드프레스(PHP)가 만들어 줘서 배포·부하로 502·429 가 난 순간 크롤러가 못 읽은 것으로 봄(크롤 기록은 볼 수 없음) → nginx 가 PHP 없이 고정 응답 (server/nginx/first-lab.conf, test_ads_txt_served_by_nginx_without_php), 2시간 감시(tick.py)가 ads.txt 를 읽어 확인.
