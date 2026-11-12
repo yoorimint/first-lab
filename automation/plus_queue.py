@@ -84,7 +84,11 @@ def main(n: int = 4) -> int:
         # 외부 검수 전인 새 초안은 건너뜀 (11/11 #3140: 검수 중인 글이 보강에 뽑혀 검수 패치와 부딪칠 뻔함). 검수 끝나면 reviewed.txt 에 들어가 다음 차례에 뽑힘
         if pending(pid) or pid not in done_review:
             continue
-        post = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/post/{pid}", token=True)
+        try:
+            post = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/post/{pid}", token=True)
+        except OSError as e:  # 11/12 서버 부하 중 연결 끊김 한 번에 대기열 전체가 멈춤 → 그 글만 건너뛰고 다음 차례에 다시
+            print(f"# {pid} 못 읽음 ({type(e).__name__}) — 다음 차례에 다시", file=sys.stderr)
+            continue
         if not plain_queue.is_done(post.get("content_html", "")):
             not_plain += 1
             continue
@@ -93,7 +97,13 @@ def main(n: int = 4) -> int:
         (OUT / f"plus-{pid}.json").write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
         keyword = post.get("keyword") or post.get("title", "").split(":")[0]
         hint = HINTS.get(str(pid), "")   # 다듬기·검수 중에 찾은 '보강 때 고칠 것' (automation/plus-hints.json)
-        (OUT / f"naver-{pid}.txt").write_text((f"# 감시 세션 메모 (꼭 반영): {hint}\n" if hint else "") + naver_top.report(keyword), encoding="utf-8")
+        try:
+            top = naver_top.report(keyword)
+        except OSError as e:
+            print(f"# {pid} 상위 글 못 읽음 ({type(e).__name__}) — 다음 차례에 다시", file=sys.stderr)
+            (OUT / f"plus-{pid}.json").unlink(missing_ok=True)
+            continue
+        (OUT / f"naver-{pid}.txt").write_text((f"# 감시 세션 메모 (꼭 반영): {hint}\n" if hint else "") + top, encoding="utf-8")
         picked.append(pid)
     print("\n".join(map(str, picked)))
     print(f"# 이번 {len(picked)}편 (아직 쉬운 말 안 된 글 {not_plain}편은 건너뜀)")
