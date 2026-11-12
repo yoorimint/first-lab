@@ -1,0 +1,269 @@
+[
+ {
+  "why": "일시상환 5년 가정(금융위 2021.10.26): 3,000만 원·연 6.49% → 원금 600만 + 이자 194만 7천 = 7,947,000원, 연소득 5,000만 원이면 15.9%. 더 받을 수 있는 금액은 DSR로는 2,000만÷0.2649=75,500,188원이지만 연소득 이내라 5,000만 원",
+  "input": {
+   "income": "50000000",
+   "sector": "bank",
+   "loan": "30000000",
+   "rate": "6.49",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "stress": 0,
+   "new_yearly": 7947000,
+   "total_yearly": 7947000,
+   "dsr": 15.9,
+   "limit": 40,
+   "max_loan": 50000000
+  },
+  "notes_include": [
+   "스트레스 금리를 더하지 않았어요",
+   "연소득 이내"
+  ]
+ },
+ {
+  "why": "기준선: 신용대출 합계 딱 1억 원이면 '1억원 초과' 아님 → 스트레스 없음. 2,000만 + 500만 = 2,500만 원, 연소득 1억이면 25%",
+  "input": {
+   "income": "100000000",
+   "sector": "bank",
+   "loan": "100000000",
+   "rate": "5",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "stress": 0,
+   "new_yearly": 25000000,
+   "dsr": 25
+  },
+  "boundary": true,
+  "notes_exclude": [
+   "스트레스 금리 1.5%포인트를 더해"
+  ]
+ },
+ {
+  "why": "기준선: 1억 원 + 기존 1원 = 1억 원 초과 → 스트레스 1.5%p (금융위 2025.5.20). 2,000만 + 1억×6.5% = 2,650만 원, 26.5%",
+  "input": {
+   "income": "100000000",
+   "sector": "bank",
+   "loan": "100000000",
+   "rate": "5",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "1",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "stress": 1.5,
+   "new_yearly": 26500000,
+   "now_yearly": 0,
+   "dsr": 26.5
+  },
+  "boundary": true,
+  "notes_include": [
+   "스트레스 금리 1.5%포인트를 더해"
+  ]
+ },
+ {
+  "why": "스트레스 금리는 신규취급분에만(금융위 스트레스 DSR 안내 '대상대출: 신규취급분'): 기존 8,000만 + 새 3,000만 = 1억 1,000만 원 초과 → 새 대출만 7.99%: 600만+239만 7천, 기존은 6.49% 그대로 1,600만+519만 2천, 합계 29,589,000원 ÷ 1억 2,000만 = 24.7%",
+  "input": {
+   "income": "120000000",
+   "sector": "bank",
+   "loan": "30000000",
+   "rate": "6.49",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "80000000",
+   "credit_now_rate": "6.49",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "stress": 1.5,
+   "new_yearly": 8397000,
+   "now_yearly": 21192000,
+   "total_yearly": 29589000,
+   "dsr": 24.7
+  },
+  "notes_include": [
+   "이미 있는 신용대출은 넣은 금리 그대로"
+  ]
+ },
+ {
+  "why": "분할상환은 실제 만기(금융위 2021.10.26): 3,000만 원·6.49%·5년 원리금균등 월 586,844원 ×12 = 7,042,127원 (Python 별도 계산), 14.1%",
+  "input": {
+   "income": "50000000",
+   "sector": "bank",
+   "loan": "30000000",
+   "rate": "6.49",
+   "method": "installment",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "new_yearly": 7042127,
+   "dsr": 14.1
+  }
+ },
+ {
+  "why": "제2금융권 50%: 다른 대출 1년 1,500만 + 새 1,000만(10%) 일시상환 300만 = 1,800만 원 → 36%. 더 받을 금액 (2,500만−1,500만)÷0.3 = 33,333,333원",
+  "input": {
+   "income": "50000000",
+   "sector": "nonbank",
+   "loan": "10000000",
+   "rate": "10",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "15000000"
+  },
+  "expect": {
+   "total_yearly": 18000000,
+   "dsr": 36,
+   "limit": 50,
+   "max_loan": 33333333
+  },
+  "boundary": true,
+  "notes_exclude": [
+   "연소득 이내로만"
+  ]
+ },
+ {
+  "why": "금리 0%·분할 1년이면 원금 그대로 1,200만 원",
+  "input": {
+   "income": "60000000",
+   "sector": "bank",
+   "loan": "12000000",
+   "rate": "0",
+   "method": "installment",
+   "years": "1",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "new_yearly": 12000000,
+   "dsr": 20
+  },
+  "boundary": true
+ },
+ {
+  "why": "40% 넘으면 넘는다고 안내: 연소득 3,000만, 다른 대출 1,000만, 새 1,000만(5%) 일시상환 250만 → 1,250만 = 41.7%",
+  "input": {
+   "income": "30000000",
+   "sector": "bank",
+   "loan": "10000000",
+   "rate": "5",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "10000000"
+  },
+  "expect": {
+   "dsr": 41.7,
+   "max_loan": 8000000
+  },
+  "notes_include": [
+   "40%를 넘어요"
+  ]
+ },
+ {
+  "why": "기준선 바로 위: 연소득 1억, 다른 대출 1년 40,040,000원 = 40.04% → 반올림하면 40.0이지만 40%를 넘음",
+  "input": {
+   "income": "100000000",
+   "sector": "bank",
+   "loan": "0",
+   "rate": "0",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "40040000"
+  },
+  "expect": {
+   "dsr": 40,
+   "max_loan": 0
+  },
+  "notes_include": [
+   "40.04%로 40%를 넘어요"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "기준선 딱 40%: 연소득 1억, 다른 대출 1년 4,000만 원 → 40% 안",
+  "input": {
+   "income": "100000000",
+   "sector": "bank",
+   "loan": "0",
+   "rate": "0",
+   "method": "bullet",
+   "years": "5",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "40000000"
+  },
+  "expect": {
+   "dsr": 40
+  },
+  "notes_include": [
+   "40%로 40% 안이에요"
+  ],
+  "boundary": true
+ },
+ {
+  "why": "연소득 없으면 안내",
+  "input": {
+   "income": "0",
+   "sector": "bank",
+   "loan": "1000000",
+   "rate": "5",
+   "method": "bullet"
+  },
+  "expect_error": true
+ },
+ {
+  "why": "기준선: 분할상환 최장 10년(금융위 2021.10.26 Q&A '실제만기(최장 10년)') — 3,000만·6.49%·10년 1년 원리금 4,085,896원",
+  "input": {
+   "income": "50000000",
+   "sector": "bank",
+   "loan": "30000000",
+   "rate": "6.49",
+   "method": "installment",
+   "years": "10",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect": {
+   "new_yearly": 4085896
+  },
+  "boundary": true
+ },
+ {
+  "why": "기준선: 11년은 DSR 인정 만기(최장 10년)를 넘어 안내",
+  "input": {
+   "income": "50000000",
+   "sector": "bank",
+   "loan": "30000000",
+   "rate": "6.49",
+   "method": "installment",
+   "years": "11",
+   "credit_now": "0",
+   "credit_now_rate": "0",
+   "other_yearly": "0"
+  },
+  "expect_error": true,
+  "boundary": true
+ }
+]

@@ -1,0 +1,410 @@
+{
+ "title": "신용대출 DSR 계산기: 원금 ÷ 5년에 이자 더해 계산",
+ "excerpt": "신용대출 DSR은 원금을 5년에 나눠 갚는다고 보고 계산해요. 3,000만 원·연 6.49%면 1년 원리금 7,947,000원, 연소득 5,000만 원이면 15.9%예요.",
+ "content_html": "<p>신용대출 DSR은 원금을 5년에 나눠 갚는다고 보고 계산해요. 3,000만 원을 연 6.49%로 빌리면 1년 원리금이 7,947,000원이에요.<br>대출 상담 전에 내 한도를 미리 볼 수 있어요.<br>✔ 은행 40%·제2금융권 50%<br>✔ 신용대출 1억 넘으면 +1.5%p<br>✔ 신용대출은 연소득 이내<br>(마이너스통장은 한도 기준)</p>\n<p>연소득 5,000만 원이면 DSR은 15.9%예요. 아래 계산기에 내 숫자를 넣으면 바로 나와요.</p>\n\n<h2>신용대출 DSR 계산기</h2>\n<p>DSR은 1년에 갚는 대출의 원금과 이자를 모두 더해 연소득으로 나눈 비율이에요. 우리말로 총부채원리금상환비율이라고 해요.</p>\n<p>다만 분양 주택 중도금대출·이주비대출처럼 DSR 계산에서 뺄 수 있는 대출도 있어요.</p>\n<p>[firstlab_calc id=\"credit-loan-dsr\"]</p>\n<p>결과는 은행 심사 전 어림값이에요. 실제 한도는 신용점수와 소득을 인정하는 방식에 따라 달라져요.</p>\n\n<h2>신용대출 DSR 계산 방법: 만기일시는 5년, 분할상환은 실제 만기</h2>\n<p>예를 들어 만기 1년짜리 신용대출 3,000만 원을 받는다고 해 볼게요. DSR에서는 1년 만기라도 원금을 5년에 나눠 갚는다고 봐서, 원금은 1년에 600만 원으로 잡혀요.</p>\n<p>여기에 이자 1,947,000원(연 6.49%)을 더하면 7,947,000원이에요. 연 6.49%는 한국은행이 집계한 2026년 9월 은행 일반신용대출 평균 금리예요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>상환 방식</th><th>DSR 원금 계산</th><th>1년 원리금</th></tr></thead>\n<tbody>\n<tr><td>만기일시</td><td>원금 ÷ 5년</td><td>7,947,000원</td></tr>\n<tr><td>분할상환 5년</td><td>실제 만기</td><td>7,042,127원</td></tr>\n</tbody>\n</table></figure>\n<p>위 표는 3,000만 원, 연 6.49% 기준이에요. 분할상환은 원리금균등으로 계산했고, 연소득 5,000만 원이면 DSR이 14.1%예요.</p>\n<p class=\"fl-basis\">근거: 금융위원회 가계부채 관리 강화방안(2021년 10월 26일)</p>\n\n<h2>DSR 기준: 은행 40%, 제2금융권 50%</h2>\n<p>연소득 5,000만 원이면 은행에서는 1년 원리금 합계가 2,000만 원까지예요. 저축은행·카드사 같은 제2금융권은 50%라 2,500만 원까지예요.</p>\n<p>이 기준은 총대출액이 1억 원을 넘는 사람에게 적용돼요. 총대출액에는 새로 신청하는 금액도 들어가요.</p>\n<p>총대출액이 1억 원 이하면 이 비율 대신 금융회사 자체 심사로 정해요. 주택담보대출·카드론 등 이미 갚고 있는 대출의 원리금도 함께 더해요.</p>\n<p class=\"fl-basis\">근거: 상호저축은행업감독규정 별표 5, 금융위원회 가계부채 관리 강화방안(2021년 10월 26일)</p>\n\n<h2>신용대출이 1억 원을 넘으면 스트레스 금리 1.5%p</h2>\n<p>스트레스 금리는 나중에 금리가 오를 때를 가정해 DSR 계산에만 더하는 금리예요. 실제로 내는 이자는 그대로예요.</p>\n<p>2025년 7월 1일부터 3단계 스트레스 DSR이 시행됐어요. 2026년 7월부터는 스트레스 금리를 6월·12월마다 1.5~3.0% 안에서 다시 정해요.</p>\n<p>2026년 7월 1일~12월 31일에 신용대출에 더하는 금리는 1.5%예요. 다만 신용대출은 잔액이 1억 원을 넘을 때만 더해요.</p>\n<p>예를 들어 이미 신용대출 8,000만 원(연 6.49%)이 있는데 3,000만 원을 더 받으면, 합계가 1억 1,000만 원이에요. 스트레스 금리는 새로 받는 대출에 더해서, 새 3,000만 원을 연 6.49% 대신 7.99%로 계산해요.</p>\n<p>그러면 두 대출의 1년 원리금은 29,589,000원이 돼요. 이미 있는 대출을 어떤 금리로 계산하는지는 대출받을 금융회사에서 확인해요.</p>\n<p>스트레스 금리가 없을 때보다 450,000원 늘어요. 연소득이 1억 2,000만 원이면 DSR은 24.7%예요.</p>\n<p class=\"fl-basis\">근거: 금융위원회 3단계 스트레스 DSR 시행방안(2025년 5월 20일), 금융위원회 공고 제2026-362호(2026년 6월 18일)</p>\n\n<h2>신용대출 한도는 연소득 이내</h2>\n<p>연소득 5,000만 원이고 다른 대출이 없으면, DSR 40%로는 연 6.49% 신용대출을 75,500,188원까지 받을 수 있어요. 하지만 신용대출 한도는 연소득 이내라 실제로는 5,000만 원까지예요.</p>\n<p>이 기준은 2025년 6월 28일부터 적용됐어요. 그래서 연소득보다 큰 신용대출은 DSR 비율이 낮아도 받기 어려워요.</p>\n<p>또 1억 원이 넘는 신용대출을 받은 사람은 대출을 받은 날부터 1년 동안 규제지역에서 집을 사기 어려워요. 집 살 계획이 있다면 신용대출 금액부터 정하는 게 좋아요.</p>\n<p class=\"fl-basis\">근거: 금융위원회 가계부채 관리 강화 방안(2025년 6월 27일), 금융위원회 대출수요 관리 방안 FAQ(2025년 10월 15일)</p>\n\n<h2>마이너스통장·카드론은 이렇게 넣어요</h2>\n<p>마이너스통장은 한도대출이라, 쓴 돈이 아니라 한도 전체를 대출액으로 봐요. 한도 5,000만 원에 1,000만 원만 썼어도 5,000만 원으로 넣어요.</p>\n<p>카드론도 2022년 1월부터 DSR 계산에 들어가요. 카드론 원리금을 몇 년 만기로 계산하는지는 대출받을 금융회사에서 확인해요.</p>\n<p class=\"fl-basis\">근거: 상호저축은행업감독규정 별표 5, 금융위원회 가계부채 관리 강화방안(2021년 10월 26일)</p>\n\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>만기일시 신용대출은 원금을 5년에 나눠 계산</li>\n<li>마이너스통장은 쓴 돈이 아니라 한도 기준</li>\n<li>신용대출 합계가 1억 원을 넘으면 금리에 1.5%p 더함</li>\n<li>DSR이 낮아도 신용대출은 연소득 이내</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 신용대출 DSR 계산기는 원금 ÷ 5년에 이자를 더한 1년 원리금을 연소득으로 나눠 40%·50% 안인지 보는 거예요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>분할상환으로 받으면 DSR이 줄어드나요?</h3>\n<p>분할상환은 실제 만기로 계산해서, 만기가 길수록 줄어요. 3,000만 원을 연 6.49%, 10년 원리금균등으로 받으면 1년 원리금이 4,085,896원이에요.</p>\n<p>다만 DSR에 넣는 만기는 최장 10년이에요. 거치기간 없이 매월·분기마다 나눠 갚고, 나눠 갚는 금액이 대출액의 40% 이상이어야 분할상환으로 인정돼요.</p>\n<p>다만 만기가 4년처럼 짧으면 만기일시보다 오히려 늘 수 있어요.</p>\n<h3>안 쓰는 마이너스통장도 DSR에 들어가나요?</h3>\n<p>네, 한도 전체가 들어가요. 쓰지 않는 한도를 줄이거나 닫으면 그만큼 DSR이 낮아져요.</p>\n<h3>고정금리 신용대출도 스트레스 금리를 더하나요?</h3>\n<p>고정금리 기간이 긴 대출은 일부만 더하거나 더하지 않을 수 있어요. 내 대출에 적용되는 비율은 금융회사 상담 때 확인해요.</p>\n",
+ "tags": [
+  "신용대출 DSR",
+  "DSR 계산기",
+  "스트레스 DSR",
+  "마이너스통장 DSR"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a young office worker sitting by a cafe window holding a coffee cup and looking outside in soft morning light, seen from the side",
+   "alt": "카페 창가에서 커피를 들고 생각에 잠긴 직장인"
+  }
+ ],
+ "keyword": "신용대출DSR계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "[제목] 신용대출 DSR 계산기: 원금 ÷ 5년에 이자 더해 계산 (신용대출 산정만기 5년)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=76740&fileTy=ATTACH&fileNo=6"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "[요약] 신용대출 DSR은 원금을 5년에 나눠 갚는다고 보고 계산, 3,000만 원·연 6.49%면 1년 원리금 7,947,000원, 연소득 5,000만 원이면 15.9%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만기일시 신용대출은 DSR에서 원금을 5년에 나눠 갚는다고 봄 (신용대출 산정만기 5년)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "3,000만 원 원금 1년 600만 원으로 잡힘",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "이자 1,947,000원(연 6.49%), 합계 7,947,000원",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "연 6.49%는 한국은행 집계 2026년 9월 은행 일반신용대출 평균 금리",
+   "urls": [
+    "https://ecos.bok.or.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "분할상환 신용대출은 실제 만기로 DSR 계산",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "분할상환 5년 원리금균등 1년 원리금 7,042,127원, 연소득 5,000만 원이면 DSR 14.1%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "DSR = 1년에 갚는 대출 원금과 이자를 모두 더해 연소득으로 나눈 비율, 총부채원리금상환비율 (상호저축은행업감독규정 제39조의2·별표 5)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=169812717",
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "분양 주택 중도금대출·이주비대출처럼 DSR 계산에서 뺄 수 있는 대출이 있음 (상호저축은행업감독규정 별표 5 4.마) (상호저축은행업감독규정 제39조의2·별표 5)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=169812717"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "은행 DSR 40%, 제2금융권 50%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740",
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "연소득 5,000만 원이면 은행 2,000만 원, 제2금융권 2,500만 원까지",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "DSR 40%·50% 기준은 총대출액 1억 원 초과 차주에게 적용, 대출 신청금액 포함 (상호저축은행업감독규정 제39조의2·별표 5)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=169812717",
+    "https://www.fsc.go.kr/no010101/76740",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=76740&fileTy=ATTACH&fileNo=6"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "총대출액 1억 원 이하면 금융회사 자체 심사(평균 DSR 관리)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740",
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "주택담보대출·카드론 등 이미 갚고 있는 대출의 원리금도 함께 더함",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "스트레스 금리는 DSR 계산에만 쓰고 실제 이자에는 붙지 않음",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2025년 7월 1일부터 3단계 스트레스 DSR 시행",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2026년 7월부터 스트레스 금리를 6월·12월마다 1.5~3.0% 안에서 다시 정함 (금융위원회 공고 제2026-362호)",
+   "urls": [
+    "https://better.fsc.go.kr/fsc_new/status/adminMap/PrvntcDetail.do?muNo=144&postNo=5349&stNo=11"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "2026년 7월 1일~12월 31일 신용대출에 더하는 스트레스 금리 1.5%",
+   "urls": [
+    "https://better.fsc.go.kr/fsc_new/status/adminMap/PrvntcDetail.do?muNo=144&postNo=5349&stNo=11",
+    "https://www.fsc.go.kr/no010101/84617",
+    "https://www.heraldk.com/article/2026062923213382321"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "신용대출은 잔액이 1억 원을 넘을 때만 스트레스 금리를 더함",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84617",
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "스트레스 금리는 새로 받는 대출(신규취급분)에 더함, 1억 원 판단은 기존+신규 잔액",
+   "urls": [
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "기존 8,000만 원+새 3,000만 원 = 1억 1,000만 원, 새 대출 7.99%로 계산 시 두 대출 1년 원리금 29,589,000원",
+   "urls": [
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "스트레스 금리가 없을 때보다 450,000원 늘고 연소득 1억 2,000만 원이면 DSR 24.7%",
+   "urls": [
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "이미 있는 대출 계산 금리는 금융회사에서 확인 (안내)",
+   "urls": [
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "완화",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "연소득 5,000만 원·다른 대출 없음, DSR 40%로는 연 6.49% 신용대출 75,500,188원까지",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "신용대출 한도는 차주별 연소득 이내",
+   "urls": [
+    "https://www.fsc.go.kr/edu/news/84845"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "연소득 이내 기준은 2025년 6월 28일부터 적용",
+   "urls": [
+    "https://www.fsc.go.kr/edu/news/84845"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "1억 원 넘는 신용대출을 받으면 대출 실행일부터 1년간 규제지역 주택 구입 제한",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/85518"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "마이너스통장은 한도대출이라 쓴 돈이 아니라 한도 전체를 대출액으로 봄 (상호저축은행업감독규정 제39조의2·별표 5)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=169812717",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=76740&fileTy=ATTACH&fileNo=6"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "카드론은 2022년 1월부터 DSR 계산에 포함",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "카드론 원리금 계산 만기는 금융회사에서 확인 (안내)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "완화",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "분할상환은 만기가 길수록 DSR이 줄어듦, 10년 원리금균등 1년 원리금 4,085,896원",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "DSR에 넣는 분할상환 신용대출 만기는 최장 10년, 거치기간 없이 매월·분기 균등분할상환, 분할상환금액이 대출액의 40% 이상이어야 인정",
+   "urls": [
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=76740&fileTy=ATTACH&fileNo=6"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "만기 4년처럼 짧으면 분할상환이 만기일시보다 오히려 늘 수 있음 (48개월 8,535,723원)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/76740"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "안 쓰는 마이너스통장도 한도 전체가 들어가고, 한도를 줄이면 DSR이 낮아짐 (상호저축은행업감독규정 제39조의2·별표 5)",
+   "urls": [
+    "https://www.law.go.kr/LSW/flDownload.do?flSeq=169812717",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=76740&fileTy=ATTACH&fileNo=6"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "고정금리 기간이 긴 대출은 스트레스 금리를 일부만 더하거나 더하지 않을 수 있음 (만기 5년 이상 고정 미적용, 3~5년 60%)",
+   "urls": [
+    "https://fsc.go.kr/no040101?cnId=2035&curPage=13&pastPage=13"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상호저축은행업감독규정 제39조의2 ② 감독원장이 긴급하다고 인정하면 별표5 비율을 따로 정할 수 있음 — 해당 없음: 일반 기준 안내 글, 특별 조정 발동 없음 (상호저축은행업감독규정 제39조의2)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/상호저축은행업감독규정"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  }
+ ],
+ "sources": [
+  {
+   "name": "금융위원회 가계부채 관리 강화방안 보도자료 (신용대출 DSR 산정만기 5년)",
+   "url": "https://www.fsc.go.kr/no010101/76740"
+  },
+  {
+   "name": "금융위원회 3단계 스트레스 DSR 시행방안 보도자료",
+   "url": "https://www.fsc.go.kr/no010101/84617"
+  },
+  {
+   "name": "금융위원회 가계부채 관리 강화 방안 보도자료 (신용대출 연소득 이내)",
+   "url": "https://www.fsc.go.kr/edu/news/84845"
+  }
+ ],
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/lucky-vicky-note/224469599577",
+   "https://blog.naver.com/wise-routine/224463370512",
+   "https://blog.naver.com/chang_dong_office/224459485158",
+   "https://toss.im/tossfeed/calculator/dsr"
+  ],
+  "questions": [
+   "DSR은 무엇을 무엇으로 나눈 값인가요",
+   "신용대출은 DSR에 어떻게 계산되나요",
+   "스트레스 금리를 더하면 DSR이 왜 달라지나요",
+   "마이너스통장은 DSR에 어떻게 들어가나요",
+   "은행과 2금융권 DSR 기준은 몇 %인가요"
+  ],
+  "added": "신용대출 전용 DSR 계산기(만기일시 5년·분할상환 최장 10년·1억 초과 신규분 스트레스 금리·연소득 이내 한도 반영), 2026년 9월 평균 금리 6.49% 기준 계산 예시"
+ }
+}
