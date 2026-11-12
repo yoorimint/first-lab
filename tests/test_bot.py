@@ -6265,6 +6265,12 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("condition_gate.summary_principle(title, body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
         self.assertIn("condition_gate.summary_principle(title, new_html)", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
 
+    def test_deploy_check_rebuilds_common_errors_first(self):
+        """11/13 02:40: 글쓰기 작업 2개가 거의 동시에 올려 병합 뒤 자주 틀린 유형표가 한 발 늦음 → 배포 전 검사 실패로 80분 막힘.
+        배포 검사가 테스트 전에 표를 다시 만든다."""
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        self.assertLess(wf.index("python automation/common_errors.py"), wf.index("python -m unittest discover -s tests"))
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
