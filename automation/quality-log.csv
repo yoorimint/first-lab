@@ -369,3 +369,8 @@ date,post,fixes,types
 2026-11-12,1990,2,missing_condition:2
 2026-11-12,2807,5,missing_condition:3 unverified:2
 2026-11-12,808,3,unverified:3
+2026-11-12,4107,1,missing_condition:1
+2026-11-12,4133,4,missing_condition:4
+2026-11-12,4147,8,missing_condition:3 outdated:4 wrong_fact:1
+2026-11-12,4123,0,
+2026-11-12,4131,0,
