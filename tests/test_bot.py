@@ -6605,6 +6605,8 @@ class PlainCheckTest(unittest.TestCase):
         refund = "<p>경정청구는 홈택스나 관할 세무서에 신청해요. 세무서는 2개월 안에 결과를 알려 줘야 해요.</p>"
         self.assertEqual(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], refund), [])
         self.assertTrue(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], "<p>연말정산은 2월에 해요.</p>"))
+        # 11/12 #2078 '입금되나요' ↔ 본문 '지급해요'
+        self.assertEqual(serp_gate.uncovered(["조회된 환급금은 언제 입금되나요?"], "<p>세무서는 결정한 날부터 30일 안에 환급금을 지급해요.</p>"), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
