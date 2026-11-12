@@ -356,3 +356,5 @@ date,post,fixes,types
 2026-11-12,3816,1,wrong_fact:1
 2026-11-12,3743,2,missing_condition:2
 2026-11-12,3756,0,
+2026-11-12,3795,4,missing_condition:3 outdated:1
+2026-11-12,3797,0,
