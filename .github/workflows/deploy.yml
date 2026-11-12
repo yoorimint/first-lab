@@ -21,7 +21,7 @@ jobs:
   # 예약·수동 실행 때 그 묶음을 가져와 → 최신 main 위에서 같은 검사 → 통과하면 이 작업 토큰으로 main 에 → 아래 gate 가 같은 실행에서 바로 배포.
   # 비밀값(SSH)을 가진 작업은 묶음 코드를 돌리지 않고, 묶음 코드를 돌리는 검사 작업은 비밀값·쓰기 권한이 없다 (automation/api_sync.py).
   sync_fetch:
-    if: github.event_name != 'push'
+    # push 때도 돈다 (11/12: 예약 실행은 GitHub 이 몇 시간씩 미뤄 묶음이 쌓임 — 03:14Z 뒤 예약 실행 없음 확인)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -159,7 +159,8 @@ jobs:
     steps:
       - id: cmp
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
+          # push 실행인데 API 봇 묶음을 main 에 올렸으면(pushed) 그 최신 main 을 배포 — 아니면 push 한 커밋
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ needs.sync_push.outputs.status }}" != "pushed" ]; then
             echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"; echo "need=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           # 작업 토큰으로 읽음 (11/6 비공개였을 때 인증 없는 읽기가 실패 — 11/6 공개 전환 뒤에도 그대로 둠, 다시 비공개가 돼도 안 깨지게)

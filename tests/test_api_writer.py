@@ -808,7 +808,8 @@ class WorkflowTest(unittest.TestCase):
     def test_deploy_sync_jobs(self):
         jobs = self.jobs("deploy.yml")
         self.assertEqual(list(jobs), ["sync_fetch", "sync_check", "sync_push", "sync_report", "gate", "check", "deploy"])
-        self.assertIn("if: github.event_name != 'push'", jobs["sync_fetch"])
+        self.assertNotIn("event_name != 'push'", jobs["sync_fetch"])   # push 때도 가져감 (예약 실행이 몇 시간씩 밀림, 11/12)
+        self.assertIn('needs.sync_push.outputs.status }}" != "pushed"', jobs["gate"])  # 올렸으면 최신 main 배포
         self.assertEqual([k for k, v in jobs.items() if "contents: write" in v], ["sync_push"])   # main 에 쓰는 작업은 하나
         self.assertNotIn("secrets.", jobs["sync_check"])               # 묶음 코드를 돌리는 작업엔 비밀값 없음
         self.assertNotIn("secrets.", jobs["sync_push"])
