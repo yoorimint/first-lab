@@ -1,0 +1,363 @@
+{
+ "title": "건강보험 가입자명부 발급: EDI 신청 5단계, 결과는 당일 또는 익일",
+ "excerpt": "건강보험 가입자명부는 건강보험 EDI 제증명신청에서 전원·일부, 상실자 포함 여부를 골라 신청하고 당일 또는 익일 받은문서에서 받아요. 다른 용도면 관할 지사 신청이에요.",
+ "content_html": "<p><strong>건강보험 가입자명부</strong>는 회사가 건강보험 EDI에서 신청해 받는 직원 가입 기록이에요.<br>입사·퇴사 증빙을 내야 하는 담당자라면 알아 두세요.<br>✔ 직원별 취득일·상실일<br>✔ 전원 또는 일부만 신청<br>✔ 퇴사자는 상실자 포함<br>✔ 결과는 당일 또는 익일</p>\n<p>정식 이름은 '사업장가입자명부'예요. 직원 개인이 자기 기록을 떼는 서류와는 달라요.</p>\n<h2 class=\"wp-block-heading\">건강보험 가입자명부란</h2>\n<p>사업장이 건강보험에 취득·상실시킨 가입자의 내용을 확인하는 서류예요. 취득은 가입자 자격을 얻는 것, 상실은 자격을 잃는 것이에요.</p>\n<p>명부에는 직원마다 자격취득일과 자격상실일이 나와요. 그래서 누가 언제 입사하고 퇴사했는지 확인할 때 쓰여요.</p>\n<p>다만 이 명부는 건강보험관리 등의 목적 밖으로는 쓸 수 없어요. 신청서를 쓸 때 명부의 용도를 분명히 적어야 해요.</p>\n<h2 class=\"wp-block-heading\">건강보험 EDI 발급 순서 5단계</h2>\n<p>건강보험 EDI(edi.nhis.or.kr)에 사업장으로 로그인해야 신청할 수 있어요. 법인 사업장은 사업장 명의 인증서만 쓸 수 있어요.</p>\n<p>개인 사업장은 사업자 명의 인증서나 대표자 개인인증서도 등록할 수 있어요. 다만 용도제한용 개인인증서는 안 돼요.</p>\n<ol class=\"wp-block-list\">\n<li>건강보험 EDI에 사업장 인증서로 로그인해요.</li>\n<li>전체서식 → 제증명 → 제증명신청 → 가입자명부 발급 신청서를 열어요.</li>\n<li>사업장 관리번호와 단위사업장 기호는 자동으로 나와요. 가입자 전원인지 일부인지, 상실자를 넣을지 골라요.</li>\n<li>신고(신청) 버튼을 눌러 신청해요.</li>\n<li>처리 결과는 당일 또는 익일 받은문서에서 확인해요. 제증명 → 제증명 발급확인 → 사업장 가입자 명부 화면에서도 볼 수 있어요.</li>\n</ol>\n<h2 class=\"wp-block-heading\">전원·일부, 상실자 포함 고르기</h2>\n<p>예를 들어 퇴사한 직원 한 명의 기록만 필요하면 '일부'와 '상실자 포함'을 골라요. 지금 다니는 직원 전체만 필요하면 '전원'과 '상실자 미포함'이에요.</p>\n<figure class=\"wp-block-table\"><table class=\"has-fixed-layout\">\n<thead><tr><th>선택</th><th>뜻</th></tr></thead>\n<tbody>\n<tr><td>가입자 전원</td><td>사업장 가입자 전체를 명부에 넣어요.</td></tr>\n<tr><td>가입자 일부 추가</td><td>고른 사람만 넣어요.</td></tr>\n<tr><td>상실자 포함</td><td>자격을 잃은 사람(퇴사자 등)도 넣어요.</td></tr>\n<tr><td>상실자 미포함</td><td>자격을 잃은 사람은 빼요.</td></tr>\n</tbody>\n</table></figure>\n<p>일부만 넣을 때는 대상자의 성명과 주민(외국인)등록번호를 입력하고 [대상자등록]을 눌러요. 사람이 많으면 [파일가져오기]로 한 번에 등록할 수 있어요.</p>\n<h2 class=\"wp-block-heading\">건강보험 일이 아닌 곳에 낼 때</h2>\n<p>건강보험 업무 목적 밖으로 쓸 명부는 EDI로 신청할 수 없어요. 이때는 사업장 관할 지사를 찾아가 신청해요.</p>\n<p>제출처가 '4대보험 가입자명부'를 달라고 하면 4대사회보험 정보연계센터(4insure.or.kr) 서류일 수 있어요. 정보연계센터는 4대사회보험 가입내역 증명서로 사업장 가입자명부를 발급해요.</p>\n<p>정보연계센터에는 '300인 이상 증명서 신청/발급' 메뉴가 따로 있어요. 발급한 증명서는 발급번호와 사업장 관리번호 등을 넣어 발급 사실을 확인할 수 있어요.</p>\n<p>다만 이 확인은 최근 90일 이내 발급한 증명서만 돼요. 진위 확인을 하려면 증명서를 출력(인쇄·PDF 저장)하거나 웹팩스로 전송해 둬야 해요.</p>\n<h2 class=\"wp-block-heading\">직원 본인이 필요하면: 자격득실확인서</h2>\n<p>직원 한 사람이 자기 건강보험 이력을 증명하려면 명부 대신 자격득실확인서를 떼요. 건강보험 취득·상실 이력이 나오고, 지금 가입자가 아니어도 가입 이력이 있으면 발급돼요.</p>\n<p>국민건강보험공단 누리집, 건강보험25시 앱, 무인민원발급기에서 받을 수 있어요. 보험료를 냈다는 증명은 따로 <a href=\"https://first-lab.kr/사대보험징수포털/\">사회보험통합징수포털</a> 등에서 받는 납부확인서예요.</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul class=\"wp-block-list\">\n<li>신청서에 명부의 용도를 분명히 적었나요?</li>\n<li>퇴사자가 필요하면 '상실자 포함'을 골랐나요?</li>\n<li>건강보험 업무가 아닌 용도면 관할 지사 신청이에요.</li>\n<li>제출처가 원하는 서류 이름이 맞는지 봐요.</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 건강보험 가입자명부는 건강보험 EDI 제증명신청에서 신청하고, 당일 또는 익일 받은문서에서 받아요.</p>\n<h2 class=\"wp-block-heading\">자주 묻는 질문</h2>\n<h3 class=\"wp-block-heading\">신청하면 바로 나오나요?</h3>\n<p>바로 나오지 않을 수 있어요. 공단 안내로는 처리 결과를 당일 또는 익일 받은문서에서 확인해요.</p>\n<h3 class=\"wp-block-heading\">직원이 회사 명부를 직접 뗄 수 있나요?</h3>\n<p>명부는 사업장이 EDI에 로그인해 신청하는 서류예요. 직원 본인 기록은 자격득실확인서로 받으면 돼요.</p>\n<h3 class=\"wp-block-heading\">궁금한 점은 어디에 묻나요?</h3>\n<p>건강보험은 국민건강보험공단 1577-1000이에요. 정보연계센터 이용 문의는 063-711-7800, 평일 9시부터 18시까지이고, 점심시간 12시~13시는 쉬어요.</p>\n",
+ "tags": [
+  "건강보험 가입자명부",
+  "사업장가입자명부",
+  "건강보험 EDI",
+  "자격득실확인서"
+ ],
+ "category": "생활정보",
+ "images": [
+  {
+   "prompt": "a tidy small office desk with a laptop closed, a potted plant and a cup of coffee by a sunny window",
+   "alt": "햇살이 드는 사무실 책상과 노트북"
+  }
+ ],
+ "keyword": "건강보험가입자명부",
+ "status": "auto",
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/gommbear/224469494358",
+   "https://blog.naver.com/isk0501/224459024279",
+   "https://blog.naver.com/happyday_2503/224463426123",
+   "https://blog.naver.com/a_haha8/224440779287",
+   "https://gov.jjyu.co.kr/policy/four-insurance-workplace-establishment/four-insurance-enrollee-list/"
+  ],
+  "questions": [
+   "건강보험 사업장 가입자명부는 어디서 어떻게 발급하나요",
+   "퇴사자도 가입자명부에 포함되나요",
+   "신청하면 언제 받을 수 있나요",
+   "4대보험 가입자명부는 어디서 떼나요"
+  ],
+  "added": "전원·일부와 상실자 포함 선택표, 건강보험 업무 외 용도는 관할 지사 신청, 정보연계센터 발급 사실 확인(90일), 직원 개인용 자격득실확인서 구분"
+ },
+ "review": [
+  {
+   "claim": "제목: 건강보험 EDI 신청 5단계, 처리 결과는 당일 또는 익일 받은문서에서 확인",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "요약: 건강보험 EDI 제증명신청에서 전원·일부, 상실자 포함 여부를 골라 신청",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "요약: 건강보험 업무 목적 밖(다른 용도)이면 EDI 신청 불가, 관할 지사 신청",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상자: 건강보험 가입자명부는 회사가 건강보험 EDI에서 신청해 받는 직원 가입 기록",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html",
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상자: 직원별 취득일·상실일",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상자: 전원 또는 일부만 신청, 퇴사자는 상실자 포함",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정식 이름은 사업장가입자명부",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html",
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "사업장이 건강보험에 취득·상실시킨 가입자의 내용을 확인하는 서류",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "명부에 직원마다 자격취득일과 자격상실일이 나옴",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "건강보험관리 등의 목적 밖 사용 불가, 신청서에 용도를 명확히 적어야 함",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "건강보험 EDI 로그인: 법인 사업장은 사업장 명의 인증서만",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/certificateReg.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "개인 사업장은 사업자 명의 인증서나 대표자 개인인증서 등록 가능, 용도제한용 제외",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/certificateReg.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "1단계: 건강보험 EDI에 사업장 인증서로 로그인",
+   "urls": [
+    "https://edi.nhis.or.kr/homeapp/wep/o/certificateReg.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2단계: 전체서식 → 제증명 → 제증명신청 → 가입자명부 발급 신청서",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "3단계: 사업장 관리번호·단위사업장 기호 자동 표출, 전원·일부와 상실자 포함 여부 선택",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "4단계: 신고(신청) 버튼으로 신청",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "5단계: 처리 결과는 당일 또는 익일 받은문서에서 확인",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "5단계: 제증명 → 제증명 발급확인 → 사업장 가입자 명부 화면",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시: 퇴사자 한 명은 일부+상실자 포함, 재직자 전체는 전원+상실자 미포함",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "표: 가입자 전원·가입자 일부 추가·상실자 포함·상실자 미포함 선택",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일부 추가: 성명·주민(외국인)등록번호 입력 후 대상자등록, 파일가져오기로 일괄 등록",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "건강보험 업무 목적 밖 명부는 EDI 신청 불가, 사업장 관할 지사 방문 신청",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "4대사회보험 정보연계센터는 4대사회보험 가입내역 증명서로 사업장 가입자명부 발급",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/cert/selectCerfIssuFctView.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정보연계센터에 '300인 이상 증명서 신청/발급' 메뉴",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/cert/selectCerfIssuFctView.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "발급번호와 사업장 관리번호 등을 넣어 발급 사실 확인",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/cert/selectCerfIssuFctView.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "발급 사실 확인은 최근 90일 이내 발급한 증명서만",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/cert/selectCerfIssuFctView.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "진위 확인을 하려면 출력(인쇄·PDF 저장) 또는 웹팩스 전송",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/cert/selectCerfIssuFctView.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "자격득실확인서: 건강보험 취득·상실 이력 제공, 가입 이력이 있는 사람도 발급",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050333"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "자격득실확인서 발급처: 국민건강보험공단 누리집·건강보험25시 앱·무인민원발급기",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050333"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보험료 납부 증명은 사회보험통합징수포털 등에서 받는 납부확인서",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050356"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "국민건강보험공단 1577-1000",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050333",
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050356"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정보연계센터 이용 문의 063-711-7800, 평일 9시부터 18시까지",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/main/main.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정보연계센터 고객센터 점심시간 12시~13시 휴무 (2026년 11월 2일부터)",
+   "urls": [
+    "https://www.4insure.or.kr/pbiz/ntcn/selectInstNtcMttrDetail.do?pstSn=2055777"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FAQ: 명부는 사업장이 EDI에 로그인해 신청, 직원 본인 기록은 자격득실확인서",
+   "urls": [
+    "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html",
+    "https://www.gov.kr/portal/service/serviceInfo/PTR000050333"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  }
+ ],
+ "sources": [
+  {
+   "name": "국민건강보험공단 건강보험 EDI 사업장가입자명부발급 신청서 도움말",
+   "url": "https://edi.nhis.or.kr/webedi/help/html/confi/co_03.html"
+  },
+  {
+   "name": "국민건강보험공단 건강보험 EDI 사업장가입자명부 도움말",
+   "url": "https://edi.nhis.or.kr/webedi/help/html/confi/co_06.html"
+  },
+  {
+   "name": "정부24 건강보험 자격득실확인서 발급 안내",
+   "url": "https://www.gov.kr/portal/service/serviceInfo/PTR000050333"
+  }
+ ]
+}
