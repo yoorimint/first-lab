@@ -1,0 +1,10 @@
+{
+ "type": "image_check",
+ "post_id": 2812,
+ "replace": [],
+ "remove": [
+  "ai-51dcf16624"
+ ],
+ "add": [],
+ "why": "소화기에 FIRE 글자·경고문 라벨이 보임 (2회차라 제거)"
+}

@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3068,
+ "replace": [
+  {
+   "old": "ai-6a6c1e4e33",
+   "prompt": "a calm sunlit living room with an empty armchair and a soft blanket beside a window, warm and quiet atmosphere",
+   "alt": "햇살 드는 거실의 빈 안락의자",
+   "why": "공원 벤치·목도리 장면이 후견등기 증명서 주제와 관계없음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
