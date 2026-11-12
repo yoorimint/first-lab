@@ -244,13 +244,35 @@ _LIMIT_PAREN = r"\s*\(([^()]{2,50}?(?:까지|한도|초과할 수 없|넘을 수
 def excerpt_number_limits(excerpt: str, body_html: str) -> list[str]:
     ex, body = _plain(excerpt or ""), _plain(body_html or "")
     out = []
-    for num in dict.fromkeys(re.findall(r"\d[\d,.]*\s*(?:%|배|만\s?원|원)", ex)):
+    for num in dict.fromkeys(re.findall(r"\d[\d,.]*\s*(?:%|배|억\s?원|만\s?원|원)", ex)):  # '4억 원' 도 (11/13 #4220 청년 5억 원 빠짐)
         for m in re.finditer(re.escape(num) + _LIMIT_PAREN, body):
             qual = m.group(1)
-            keys = re.findall(r"\d[\d,.]*\s*(?:배|%|만\s?원|원|년|개월|시간|일)", qual)
+            keys = re.findall(r"\d[\d,.]*\s*(?:배|%|억\s?원|만\s?원|원|년|개월|시간|일)", qual)
             if keys and not any(k in ex for k in keys) and "한도" not in ex:  # 숫자 한도만 ('납부고지 전까지' 같은 시점은 뺌)
                 out.append(f"요약의 '{num}' 에 본문 한도 '({qual})' 이 빠짐 — 요약에도 넣기")
                 break
+    return out[:2]
+
+
+_NOT_GROUP = {"월", "연", "총", "최대", "최소", "하루", "약", "합계", "모두", "매월", "매년"}
+_GROUP_ALT = r"\s*\(([가-힣·]{1,10})\s*(\d[\d,.]*\s*(?:억\s?원|만\s?원|원|%|세|년|개월|일))(?:\s*(?:이하|이상|미만|초과))?\)"
+
+
+def group_alternatives(excerpt: str, body_html: str) -> list[str]:
+    """요약·첫 문단이 본문의 '숫자(집단 다른 숫자)' 중 앞 숫자만 씀 (11/13 #4220 본문 '재산 4억 원(청년 5억 원) 이하' ↔
+    요약·첫 문단 '재산 4억 원 이하' — 시행령 제3조③ 단서). 같은 숫자 뒤 괄호에 다른 집단의 다른 값이 있으면 요약·첫 문단에도 넣기."""
+    body = _plain(body_html or "")
+    first = _plain("".join(re.findall(r"<p[^>]*>.*?</p>", body_html or "", re.S)[:1]))
+    out = []
+    for where, text in (("요약", _plain(excerpt or "")), ("첫 문단", first)):
+        for num in dict.fromkeys(re.findall(r"\d[\d,.]*\s*(?:억\s?원|만\s?원|원|%|세|년|개월|일)", text)):
+            for m in re.finditer(re.escape(num) + _GROUP_ALT, body):
+                group, alt = m.group(1), m.group(2)
+                if group in _NOT_GROUP or group.endswith(("의", "당", "면")):
+                    continue  # '(월 120만 원)'·'(소득세의 10%)'·'(시간당 2,400원)' 은 설명이지 다른 집단의 값이 아님
+                if alt != num and alt not in text:
+                    out.append(f"{where}의 '{num}' 에 본문 '({group} {alt})' 이 빠짐 — {where}에도 넣기")
+                    break
     return out[:2]
 
 
