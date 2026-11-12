@@ -126,6 +126,8 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
         notes.append(f"공식 링크 제외 {len(dropped)}개: {'; '.join(dropped)[:150]}")
     post_id, link, image_note = publish(article, status, slug=keyword,
                                         cloudflare=(settings.cf_account_id, settings.cf_api_token))
+    if serp_gate.written_plus(data.get("serp")):  # 쓸 때 +@ 까지 한 글 → 보강 차례에서 빠지게 (automation/plus_queue.py, 11/12)
+        wp_cli("post", "meta", "update", str(post_id), refresh.PLUS_META, datetime.now().strftime("%Y-%m-%d"))
     if failed:  # 설정 페이지 '검수 보류 초안' 목록에 이유와 함께 보이게
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
     elif status == "draft" and (data.get("status") == "draft" or (aligned and "제목(확인 필요)" in aligned)):

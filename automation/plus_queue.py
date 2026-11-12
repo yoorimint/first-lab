@@ -14,6 +14,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(1, str(Path(__file__).resolve().parents[1]))  # bot.serp_gate
 import naver_top  # noqa: E402
 import plain_queue  # noqa: E402
 import tick  # noqa: E402
@@ -48,7 +49,26 @@ def patch_pending(post: dict, patches: list[dict] | None = None, last_change: fl
     return any(p.get("post") == post.get("post_id") and p.get("find") and p["find"] in text for p in patches)
 
 
-def wanted(post: dict) -> bool:
+def written_plus_keywords() -> set[str]:
+    """쓸 때 이미 +@(상위 글 질문·더한 것)를 넣은 새 글의 키워드 — 저장소 글 파일의 serp 기록 (11/12 운영자
+    '새 초안은 보강해서 나오는 거 아냐?'). 11/12 전에 올린 글은 서버에 보강 표시가 없어서 여기서 거른다."""
+    from bot import serp_gate
+    out = set()
+    for f in QUEUE.glob("*.json"):
+        if f.name.startswith("refresh"):
+            continue
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(data, dict) and data.get("keyword") and serp_gate.written_plus(data.get("serp")):
+            out.add(data["keyword"])
+    return out
+
+
+def wanted(post: dict, written: set[str] | None = None) -> bool:
+    if post.get("keyword") and post["keyword"] in (written if written is not None else written_plus_keywords()):
+        return False
     return plain_queue.is_done(post.get("content_html", "")) and not post.get("plus_at")
 
 
@@ -57,6 +77,7 @@ def main(n: int = 4) -> int:
     picked, not_plain = [], 0
     from unreviewed import reviewed_ids
     done_review = reviewed_ids()
+    written = written_plus_keywords()
     for pid in plain_queue.order():
         if len(picked) >= n:
             break
@@ -67,7 +88,7 @@ def main(n: int = 4) -> int:
         if not plain_queue.is_done(post.get("content_html", "")):
             not_plain += 1
             continue
-        if not wanted(post) or patch_pending(post):
+        if not wanted(post, written) or patch_pending(post):
             continue
         (OUT / f"plus-{pid}.json").write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
         keyword = post.get("keyword") or post.get("title", "").split(":")[0]

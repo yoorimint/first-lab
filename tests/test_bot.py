@@ -6178,6 +6178,22 @@ class PlusCheckTest(unittest.TestCase):
         self.assertFalse(plus_queue.wanted({"content_html": "<strong>한 줄 정리:</strong> x", "plus_at": "2026-11-11"}))
         self.assertFalse(plus_queue.wanted({"content_html": "<p>아직 안 다듬음</p>", "plus_at": ""}))
 
+    def test_new_post_written_with_plus_is_not_queued_again(self):
+        """11/12 운영자 '새 초안은 보강해서 나오는 거 아냐?': 쓸 때 상위 글 질문(serp)까지 넣은 새 글은
+        보강 차례에서 빼고(옛 글은 키워드로), 올릴 때 보강 끝 표시를 붙인다."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_queue
+        from bot import serp_gate
+        self.assertTrue(serp_gate.written_plus({"urls": ["a", "b", "c"], "questions": ["q1", "q2", "q3"], "added": "x"}))
+        self.assertFalse(serp_gate.written_plus({"unavailable": "검색 안 됨"}))
+        self.assertFalse(serp_gate.written_plus(None))
+        done = "<strong>한 줄 정리:</strong> x"
+        self.assertFalse(plus_queue.wanted({"content_html": done, "plus_at": "", "keyword": "새글"}, {"새글"}))
+        self.assertTrue(plus_queue.wanted({"content_html": done, "plus_at": "", "keyword": "옛글"}, {"새글"}))
+        src = (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8")
+        self.assertIn('serp_gate.written_plus(data.get("serp"))', src)
+        self.assertIn("refresh.PLUS_META", src)
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
