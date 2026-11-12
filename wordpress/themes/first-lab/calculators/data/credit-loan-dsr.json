@@ -1,0 +1,30 @@
+{
+ "basis_date": "2026-11-12",
+ "yearly_checked": 2026,
+ "sources": [
+  {
+   "name": "금융위원회 「가계부채 관리 강화방안」 보도자료 (2021.10.26) — 신용대출 DSR 산정만기 5년, 분할상환은 실제만기, 은행 40%·제2금융권 50%",
+   "url": "https://www.fsc.go.kr/no010101/76740"
+  },
+  {
+   "name": "금융위원회 「3단계 스트레스 DSR 시행방안」 보도자료 (2025.5.20) — 스트레스 금리 1.50%, 신용대출은 잔액 1억원 초과 때만",
+   "url": "https://www.fsc.go.kr/no010101/84617"
+  },
+  {
+   "name": "금융위원회 「가계부채 관리 강화 방안」 보도자료 (2025.6.27) — 신용대출 한도 차주별 연소득 이내",
+   "url": "https://www.fsc.go.kr/edu/news/84845"
+  },
+  {
+   "name": "금융위원회 공고 제2026-362호 3단계 스트레스 DSR 행정지도 변경시행 예고 (2026.6.18) — 연 2회 산정, 2026.7.1~",
+   "url": "https://better.fsc.go.kr/fsc_new/status/adminMap/PrvntcDetail.do?muNo=144&postNo=5349&stNo=11"
+  }
+ ],
+ "credit_years": 5,
+ "stress_rate": 1.5,
+ "stress_threshold": 100000000,
+ "limit_bank": 40,
+ "limit_nonbank": 50,
+ "max_years": 10,
+ "yearly_recheck": "2026-12-31",
+ "yearly_pending": "2027년 1월부터 쓸 스트레스 금리 (금융위원회 공고 제2026-362호: 6월·12월 연 2회 산정, 신용대출 등 1.5~3.0%)"
+}
