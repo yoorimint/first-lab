@@ -99,6 +99,12 @@ def main() -> int:
     deployed = urllib.request.urlopen(f"{SITE}/deployed-version.txt", timeout=20).read().decode().strip()
     main_sha = subprocess.run(["git", "rev-parse", "origin/main"], capture_output=True, text=True).stdout.strip()
     print(f"배포: 서버 {deployed[:7]} / main {main_sha[:7]}" + ("" if deployed == main_sha else " (다름)"))
+    try:  # 11/12 애드센스 'Ads.txt 찾을 수 없음' — 크롤러가 읽는 그대로 확인 (nginx 고정 응답, server/nginx/first-lab.conf)
+        ads = urllib.request.urlopen(f"{SITE}/ads.txt", timeout=20).read().decode().strip()
+        if not ads.startswith("google.com, pub-"):
+            problems.append(f"ads.txt 내용 이상: {ads[:60]}")
+    except Exception as e:  # noqa: BLE001
+        problems.append(f"ads.txt 못 읽음: {str(e)[:80]}")
     try:
         runs = get("https://api.github.com/repos/yoorimint/first-lab/actions/runs?per_page=6")["workflow_runs"]
         for r in runs[:4]:
