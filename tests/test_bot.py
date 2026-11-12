@@ -6502,6 +6502,15 @@ class PlainCheckTest(unittest.TestCase):
         # 띄어쓰기만 다른 낱말 (11/12 #1483 '배시간' ↔ '배 시간')
         self.assertEqual(serp_gate.uncovered(["마라도 배시간과 왕복요금"], "<p>마라도 배 시간과 왕복 요금은 아래 표예요.</p>"), [])
 
+    def test_plus_fix_allows_link(self):
+        """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_check
+        self.assertEqual(plus_check.fix_allow("https://www.ddm.go.kr/www/contents.do?key=46:동대문구 옛 감면 안내"),
+                         {"https://www.ddm.go.kr/www/contents.do?key=46"})
+        self.assertEqual(plus_check.fix_allow("3|41:지침 49쪽"), {"3", "41"})
+        self.assertEqual(plus_check.fix_allow(""), set())
+
     def test_plus_article_verified_with_or_without_paragraph(self):
         """11/12 #1053: 본문 '제88조' 를 기록이 '제88조 제1항' 으로 확인했는데 '확인 안 됨'으로 막힘 → 조·항 표기 차이는 같은 조문으로 봄."""
         sys.path.insert(0, str(ROOT / "automation"))
