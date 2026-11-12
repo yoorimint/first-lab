@@ -6567,6 +6567,9 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(serp_gate.uncovered(["누가 65세부터 이용할 수 있을까?", "가까운 위탁병원은 어떻게 찾을까?",
                                               "위탁병원에서 신분은 어떻게 밝히나요?"], vet), [])
         self.assertEqual(serp_gate.uncovered(["배당금 세금은 언제 내나요?"], vet), ["배당금 세금은 언제 내나요?"])
+        # 동승↔탑승·타고, 복수 '들' (11/12 #861 '부모가 동승하지 않고 자녀들만 이동하면?')
+        car = "<p>탑승: 부모 중 한 명이 반드시 타고 있어야 해요. 다른 가족이 자녀만 태우고 가면 대상이 아니에요.</p>"
+        self.assertEqual(serp_gate.uncovered(["부모가 동승하지 않고 자녀들만 이동하면 어떻게 되나요?"], car), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""

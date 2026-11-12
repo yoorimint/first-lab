@@ -48,11 +48,12 @@ SYNONYMS = [
     {"할인", "감면", "경감"},   # 11/12 #882 '3천원 할인' ↔ 본문 '3,000원 감면'
     {"변동", "변경"},
     {"기업", "회사", "사업장"},   # 11/12 #2151 '500인 기업' ↔ 본문 '500명 회사'
+    {"동승", "탑승", "타고"},   # 11/12 #861 '부모가 동승하지 않고' ↔ '부 또는 모가 반드시 타고'
     {"올리나", "올려", "올림", "올린"}, {"버리나", "버려", "버림", "버린"},   # 소수점 처리 질문 (#2151)
 ]
 
 
-_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지|될까|했다면|했나|할까|할|을까|나요)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
+_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지|될까|했다면|했나|할까|할|을까|나요|들)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
 
 
 def _splits(word: str, body: set[str]) -> bool:
@@ -84,7 +85,7 @@ def _prefix_covered(word: str, body: set[str]) -> bool:
 def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
     """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
     word = _COPULA.sub("", word) if len(word) >= 3 and len(_COPULA.sub("", word)) >= 2 else word
-    return (word in body or any(word in group and group & body for group in SYNONYMS)
+    return (word in body or any(any(word.startswith(g) for g in group) and any(b.startswith(g) for g in group for b in body) for group in SYNONYMS)
             or (len(word) >= 3 and word in body_joined) or _split_covered(word, body) or _prefix_covered(word, body))
 
 
