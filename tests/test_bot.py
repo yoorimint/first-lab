@@ -6521,6 +6521,7 @@ class PlainCheckTest(unittest.TestCase):
         """11/12 #1110: HSK 재채점 기한·비용은 중국고시센터(chinesetest.cn)에만 있음 → 공식 출처로 봄."""
         from bot import sources
         self.assertTrue(sources.is_official("https://www.chinesetest.cn/report-sketch"))
+        self.assertTrue(sources.is_official("https://www.applyhome.co.kr/cu/cub/selectFAQList.do"))  # 11/12 #249 청약홈
         self.assertFalse(sources.is_official("https://blog.naver.com/chinesetest"))
 
     def test_serp_question_covered_by_synonym(self):
