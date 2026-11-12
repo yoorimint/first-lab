@@ -72,12 +72,15 @@ def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
             or (len(word) >= 3 and word in body_joined) or _split_covered(word, body))
 
 
+_ASKING = {"얼마나", "어떤", "어떻게", "언제", "어디", "어디서", "무엇", "무슨", "누가", "누구", "왜", "몇"}
+
+
 def uncovered(questions: list[str], body_html: str) -> list[str]:
     text = re.sub(r"<[^>]+>", " ", body_html or "")
     body, joined = _stems(text), re.sub(r"\s+", "", text)
     out = []
     for q in questions:
-        words = _stems(str(q))
+        words = _stems(str(q)) - _ASKING  # 의문사는 주제가 아니라 본문에 없어도 답일 수 있음 (11/12 #872·#823)
         if words and sum(_covered(w, body, joined) for w in words) < max(1, round(len(words) * COVER_RATIO)):
             out.append(str(q))
     return out

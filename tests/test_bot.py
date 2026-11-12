@@ -6538,6 +6538,10 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(serp_gate.uncovered(["배당금 세금은?"], body), ["배당금 세금은?"])
         # '~이란?' 질문 (11/12 #1885 '작업중지권이란?' ↔ 본문 '작업중지권은 …')
         self.assertEqual(serp_gate.uncovered(["작업중지권이란?"], "<p>흔히 말하는 작업중지권은 급박한 위험이 있을 때 작업을 멈추는 권리예요.</p>"), [])
+        # 의문사('얼마나·어떤')는 빼고 셈 (11/12 #872 '신청하면 어떤 순서로 진행되고 지원은 얼마나 이어지나요')
+        body = "<p>신청하면 4단계 순서로 결정해요.</p><p>지원 기간은 1년 이내예요.</p>"
+        self.assertEqual(serp_gate.uncovered(["신청하면 어떤 순서로 진행되고 지원은 얼마나 이어지나요"], body), [])
+        self.assertEqual(serp_gate.uncovered(["배당금 세금은 언제 내나요?"], body), ["배당금 세금은 언제 내나요?"])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
