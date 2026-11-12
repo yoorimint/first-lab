@@ -51,14 +51,19 @@ def unfinished(started_ids: set[int], pushed_ids: set[int]) -> list[int]:
 def main() -> int:
     files = pushed()
     now = time.time()
-    missing, waiting = [], []
+    missing, waiting, unread = [], [], []
     for pid, f in sorted(files.items()):
-        post = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/post/{pid}", token=True)
+        try:
+            post = tick.get(f"{tick.SITE}/wp-json/firstlab/v1/post/{pid}", token=True)
+        except OSError:  # 11/13 서버 부하 중 연결 끊김 한 번에 점검 전체가 멈춤 → 그 글만 '못 읽음'으로 남기고 계속
+            unread.append(pid)
+            continue
         if post.get("plus_at"):
             continue
         (waiting if now - made_at(f) < DEPLOY_GRACE else missing).append(pid)
     todo = unfinished(started(), set(files))
-    print(f"올린 보강 {len(files)}편 · 서버 반영 {len(files) - len(missing) - len(waiting)}편")
+    print(f"올린 보강 {len(files)}편 · 서버 반영 {len(files) - len(missing) - len(waiting) - len(unread)}편"
+          + (f" · 못 읽음 {len(unread)}편(다음 점검에 다시)" if unread else ""))
     print(f"배포 기다림(30분 안): {waiting or '없음'}")
     print(f"반영 안 됨: {missing or '없음'}")
     print(f"시작했는데 안 올린 글: {todo or '없음'}")

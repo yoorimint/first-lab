@@ -6282,6 +6282,25 @@ class PlusCheckTest(unittest.TestCase):
         self.assertEqual(condition_gate.group_alternatives("모두 360만 원, 지방소득세 0.3%예요.", explain), [])
         self.assertIn("condition_gate.group_alternatives(excerpt, body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
+    def test_plus_audit_survives_connection_reset(self):
+        """11/13: 서버 부하 중 /post 연결 끊김(ConnectionResetError) 한 번에 보강 점검(plus_audit) 전체가 멈춤 → 그 글만 '못 읽음'."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import io
+        from contextlib import redirect_stdout
+        from unittest import mock
+        import plus_audit
+
+        def get(url, token=False):
+            if url.endswith("/1"):
+                raise ConnectionResetError(104, "reset")
+            return {"plus_at": "2026-11-13"}
+        buf = io.StringIO()
+        with mock.patch.object(plus_audit, "pushed", return_value={1: Path("a"), 2: Path("b")}), \
+                mock.patch.object(plus_audit, "started", return_value=set()), \
+                mock.patch.object(plus_audit.tick, "get", side_effect=get), redirect_stdout(buf):
+            self.assertEqual(plus_audit.main(), 0)
+        self.assertIn("못 읽음 1편", buf.getvalue())
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
