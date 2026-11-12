@@ -157,6 +157,15 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
     return out
 
 
+def fix_allow(fix: str) -> set[str]:
+    """--fix=값|값:근거 의 값들. 값이 주소면 'https:' 의 콜론을 근거 구분으로 읽지 않음 (11/12 #176 옛 정보가 남은 동대문구 링크를 못 뺌)."""
+    if not fix:
+        return set()
+    sep = fix.find(":", fix.find("//") + 2) if fix.startswith(("http://", "https://")) else fix.find(":")
+    vals = fix[:sep] if sep >= 0 else fix
+    return set(vals.split("|" if "|" in vals else ","))
+
+
 def refresh_file(post_id: int, base_modified: str, new_html: str, record: dict, fix_reason: str = "",
                  title: str = "", excerpt: str = "") -> Path:
     path = ROOT / "wordpress" / "queue" / f"refresh-plus-{post_id}-{datetime.now():%Y%m%d-%H%M%S}.json"
@@ -183,8 +192,7 @@ def main(argv: list[str]) -> int:
     if fix and ":" not in fix:
         print("--fix=숫자|숫자:근거 — 바꾸는 이유(법·공식 자료)를 꼭 적기")
         return 2
-    nums = fix.split(":", 1)[0]
-    allow = set(nums.split("|" if "|" in nums else ",")) if fix else set()
+    allow = fix_allow(fix)
     base = original.get("base_modified") or ""
     written = datetime.strptime(base[:10], "%Y-%m-%d").date() if base else None
     found = problems(original["content_html"], new_html, record, original.get("title", ""), allow, written, post_id)
