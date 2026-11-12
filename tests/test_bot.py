@@ -3339,7 +3339,11 @@ class NaverHubTest(unittest.TestCase):
     """네이버 API HUB (11/5 운영자 승인: 블로그 문서 수·검색어 트렌드만, 종류별 하루 상한) — 황금 키워드·성수기."""
 
     def test_season_and_score(self):
-        from bot import naver_hub as h
+        from unittest import mock
+        from bot import naver_hub as h, keyword_filter as kf
+        patch = mock.patch.object(kf, "_learned_cache", [[]])  # 서버의 배운 브랜드 파일(learned-brands.json, 11/12 '카시오' 있음)과 무관하게
+        patch.start()
+        self.addCleanup(patch.stop)
         series = {f"{y}-{m:02d}": (100.0 if m in (1, 2) else 50.0 if m == 3 else 10.0) for y in (2025, 2026) for m in range(1, 13)}
         peak, low = h.season(series)
         self.assertEqual(peak, [1, 2])                        # 연말정산처럼 1~2월에 몰림
