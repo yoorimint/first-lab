@@ -6618,6 +6618,8 @@ class PlainCheckTest(unittest.TestCase):
         refund = "<p>경정청구는 홈택스나 관할 세무서에 신청해요. 세무서는 2개월 안에 결과를 알려 줘야 해요.</p>"
         self.assertEqual(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], refund), [])
         self.assertTrue(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], "<p>연말정산은 2월에 해요.</p>"))
+        # 11/12 #1187 '가격' ↔ 본문 '요금'
+        self.assertEqual(serp_gate.uncovered(["캐빈 가격은 얼마일까?"], "<p>캐빈 요금은 날짜를 고르면 예약 화면에 나와요.</p>"), [])
         # 11/12 #2350 '얼마씩'·'뭐가'는 의문 말, '들어가나요' ↔ 본문 '들어가요'
         extra = "<p>기본공제 대상자가 70세 이상이면 1명당 100만 원을 더 빼요. 이것을 추가공제라고 해요.</p>"
         self.assertEqual(serp_gate.uncovered(["추가공제는 얼마씩 붙나요?"], extra), [])
