@@ -19,9 +19,16 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 6. 끝에 `wordpress/queue/done-<날짜시각>.json` = `{"type": "run_done", "summary": "<이번에 한 일 한 줄>"}` 을 **항상** 만들고 (`slot-N` 실행이면 이름 끝에 `-s<N>` 을 붙이고 JSON 에 `"slot": N` — 동시 실행끼리 파일 이름이 겹치지 않게, skip 파일도 같은 규칙) (서버가 이걸 보고 다음 실행을 시작 — 없으면 60분을 기다림), **검사 1번 → 커밋 1개 → push 1번** (5단계 명령). 단계마다 따로 push 하지 않는다 (다음 실행과 겹침).
 - 사용량: 새 글 1편에 웹 검색·열람 합계 40번 안쪽 (상위 글 3~5개, 사실 조사 10번, 하위 검수 15번, 보강 10번).
 
-## API 봇 실행 (환경 변수 `FIRSTLAB_LOCAL=1` 일 때만 — 설정 '글 작성 방식: API 봇', `bot/api_writer.py`)
-서버 안에서 같은 지시서로 돈다. 다른 점은 아래뿐이고 나머지는 이 문서 그대로:
-- 0단계 git 명령·5단계 검사·커밋·push 는 하지 않는다 (서버가 최신 main 을 받아 둠, push 권한 없음). `/next` 의 `write_mode` 는 `"bot"` 이어야 한다.
+## API 봇 실행 (환경 변수 `FIRSTLAB_LOCAL` 이 있을 때만 — 설정 '글 작성 방식: API 봇', `bot/api_writer.py`)
+서버 안에서 같은 지시서로 돈다. 0단계 git 명령은 하지 않고(서버가 최신 main 을 받아 둠) `/next` 의 `write_mode` 는 `"bot"` 이어야 한다. 그 밖의 다른 점은 아래뿐:
+
+`FIRSTLAB_LOCAL=push` (서버에 GitHub 올리기 토큰 있음): 저장소를 고치는 일까지 이 문서 그대로 **다 한다** (`deploy_alert`·대기 글 검수·`calc_yearly`·새 계산기·검사 코드).
+- 5단계 검사는 돌리되 **커밋·push 는 하지 않는다** — 바뀐 파일을 작업 폴더에 그대로 두면 세션이 끝난 뒤 서버가 최신 main 위에 합쳐 같은 검사를 다시 돌리고, 통과할 때만 main 에 올린다 (안 되면 아무것도 안 올리고 다음 실행이 다시).
+- `deploy_alert` 검사는 `useradd·runuser` 없이 `python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` (이미 root 가 아님).
+- 서버가 올리는 파일: `wordpress/queue`·`patches.json`·계산기·`wordpress/pages`, `automation` 검수 기록(reviewed.txt·common-errors.md·review-only-log.md·quality-log.csv·error_types.json·`*_check.py`), `bot/`·`tests/`. 그 밖(지시서·server/ 등)은 바꿔도 빠진다.
+
+`FIRSTLAB_LOCAL=1` (토큰 없음):
+- 5단계 검사·커밋·push 는 하지 않는다 (push 권한 없음).
 - 결과는 `wordpress/queue/` 의 **새 파일**로만 낸다 (끝 표시 done 파일 포함) — 세션이 끝나면 서버가 새 파일만 가져가 같은 관문으로 올린다.
 - 저장소 파일을 바꿔야 하는 일은 건너뛰고 다음 일로: `deploy_alert`, `review_target`(patches.json), `calc_yearly`, 새 계산기·`calc:` 줄, 검사 코드 수정, 이유가 '계산기 독립 검수 전'인 보류 글. 새 계산기가 있어야 하는 후보는 skip 파일에 넣지 말고 다음 후보로.
 

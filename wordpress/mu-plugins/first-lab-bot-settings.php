@@ -21,7 +21,7 @@ function firstlab_bot_fields(): array {
 			'type'    => 'select',
 			'default' => 'direct',
 			'options' => array( 'direct' => '월정액 (Claude 구독 예약 작업이 씀)', 'bot' => 'API 봇 (같은 작업을 서버가 Claude API 키로 실행)' ),
-			'help'    => '두 방식은 쓰는 사람·지시서(automation/daily-writer.md)·검수 관문·발행 방식(초안/바로/예약)·글 작성 시각·연속 작성·지금 글 1개 만들기·매일 점검이 모두 같고, 요금만 다름. 월정액: Claude 구독 사용량 (API 요금 없음). API 봇: 서버가 같은 작업을 Claude Code 로 돌리고 아래 Claude API 키로 요금이 나감 — \'API 봇 사용\' 을 켜고 AI 제공사를 Anthropic Claude 로. 서버 메모리 때문에 한 번에 1편씩 (2번 작성자 없음), 저장소를 고쳐야 하는 일(대기 글 검수 패치·계산기 새로 만들기·연초 값)은 월정액 실행이 함',
+			'help'    => '두 방식은 쓰는 사람·지시서(automation/daily-writer.md)·검수 관문·발행 방식(초안/바로/예약)·글 작성 시각·연속 작성·지금 글 1개 만들기·매일 점검이 모두 같고, 요금만 다름. 월정액: Claude 구독 사용량 (API 요금 없음). API 봇: 서버가 같은 작업을 Claude Code 로 돌리고 아래 Claude API 키로 요금이 나감 — \'API 봇 사용\' 을 켜고 AI 제공사를 Anthropic Claude 로. 서버 메모리 때문에 한 번에 1편씩 (2번 작성자 없음). 저장소를 고쳐야 하는 일(대기 글 검수 결과 반영·계산기 새로 만들기·연초 기준값)은 서버 비밀값 GITHUB_PUSH_TOKEN(이 저장소만, Contents 읽기·쓰기 토큰 — 이 화면이 아니라 서버 set-secrets.sh 로만 넣음)이 있을 때 함: 검사를 통과해야 main 에 올라감. 토큰이 없으면 그 일은 건너뛰고 봇 기록에 하루 한 번 알림',
 		),
 		'maint_times'    => array( 'label' => '매일 점검 시각', 'type' => 'text', 'default' => '06:10', 'help' => '두 방식 모두: 이 시각에 Claude 가 서버 기록(실행 실패·연속 작성 자동 정지·검수 보류)을 점검. 월정액은 휴대폰 알림, API 봇은 봇 기록(/maintenance)에 남김. 비우면 안 함' ),
 		'direct_enabled' => array( 'label' => '글 작성 시각 사용', 'type' => 'checkbox', 'default' => 1, 'help' => '끄면 아래 시각에 자동으로 쓰지 않음 (연속 작성·지금 글 1개 만들기는 그대로 동작)' ),

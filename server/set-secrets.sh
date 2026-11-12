@@ -2,6 +2,7 @@
 # 서버 비밀값 입력/수정 도구. 입력 내용은 화면과 명령 기록에 남지 않는다.
 #   사용: bash /opt/first-lab/server/set-secrets.sh 키이름1 [키이름2 ...]
 #   예)   bash /opt/first-lab/server/set-secrets.sh NAVER_AD_CUSTOMER_ID NAVER_AD_ACCESS_LICENSE NAVER_AD_SECRET_KEY
+#   예)   bash /opt/first-lab/server/set-secrets.sh GITHUB_PUSH_TOKEN   (API 봇이 검사 통과한 저장소 수정을 main 에 올림 — 이 저장소만, Contents 읽기·쓰기)
 set -euo pipefail
 SECRETS=/etc/first-lab/secrets.env
 [ $# -ge 1 ] || { echo "사용법: $0 키이름 [키이름 ...]"; exit 1; }
