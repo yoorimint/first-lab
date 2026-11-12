@@ -6551,6 +6551,9 @@ class PlainCheckTest(unittest.TestCase):
         bike = "<p>앞·뒤 각각 브레이크 1개 이상이 있어야 해요. 하나만 있는 자전거는 안 돼요.</p>"
         self.assertEqual(serp_gate.uncovered(["앞브레이크 하나만 있으면 될까?"], bike), [])
         self.assertEqual(serp_gate.uncovered(["전기자전거 보험료는 얼마?"], bike), ["전기자전거 보험료는 얼마?"])
+        # 본문 낱말에 조사·말끝이 붙은 경우·'~되나요' (11/12 #869 '누가 지원 대상에서 제외되나요?' ↔ '지원 대상이었어요', '제외')
+        rest = "<p>퇴직공제금을 받은 사람은 지원 대상이었어요. 다음 경우는 제외해요.</p>"
+        self.assertEqual(serp_gate.uncovered(["누가 지원 대상에서 제외되나요?"], rest), [])
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
