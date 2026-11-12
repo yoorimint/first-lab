@@ -16,8 +16,139 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ── API 봇 저장소 반영 (운영자 11/12 '그냥 api로 할 때 지금하고 똑같은 작업을') ──
+  # 글 작성 방식이 API 봇이면 서버 안 글쓰기가 저장소 수정(검수 패치·계산기·연초 값·검사 코드)을 묶음으로 남긴다 (bot/api_writer.py OUTBOX).
+  # 예약·수동 실행 때 그 묶음을 가져와 → 최신 main 위에서 같은 검사 → 통과하면 이 작업 토큰으로 main 에 → 아래 gate 가 같은 실행에서 바로 배포.
+  # 비밀값(SSH)을 가진 작업은 묶음 코드를 돌리지 않고, 묶음 코드를 돌리는 검사 작업은 비밀값·쓰기 권한이 없다 (automation/api_sync.py).
+  sync_fetch:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      has: ${{ steps.fetch.outputs.has }}
+      head: ${{ steps.fetch.outputs.head }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -q paramiko
+      - id: fetch
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: python automation/api_sync.py fetch --out "$RUNNER_TEMP/outbox"
+      - if: steps.fetch.outputs.has == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-outbox
+          path: ${{ runner.temp }}/outbox/outbox.bundle
+          retention-days: 1
+
+  sync_check:
+    needs: sync_fetch
+    if: needs.sync_fetch.outputs.has == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      status: ${{ steps.check.outputs.status }}
+      why: ${{ steps.check.outputs.why }}
+      sha: ${{ steps.check.outputs.sha }}
+      base: ${{ steps.check.outputs.base }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"   # 서버(Ubuntu 22.04)와 같은 버전
+      - run: pip install -q -r bot/requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: api-outbox
+          path: ${{ runner.temp }}/in
+      - id: check
+        run: python automation/api_sync.py check --bundle "$RUNNER_TEMP/in/outbox.bundle" --work "$RUNNER_TEMP/work" --out "$RUNNER_TEMP/tested"
+      - if: steps.check.outputs.status == 'ok'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-tested
+          path: ${{ runner.temp }}/tested/tested.bundle
+          retention-days: 1
+
+  sync_push:
+    needs: sync_check
+    if: needs.sync_check.outputs.status == 'ok'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write   # main 에 올리는 것은 이 작업 하나 (묶음 코드는 돌리지 않음 — 검사한 커밋을 fast-forward 만)
+    outputs:
+      status: ${{ steps.push.outputs.status }}
+      why: ${{ steps.push.outputs.why }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: actions/download-artifact@v4
+        with:
+          name: api-tested
+          path: ${{ runner.temp }}/tested
+      - id: push
+        env:
+          SHA: ${{ needs.sync_check.outputs.sha }}
+          BASE: ${{ needs.sync_check.outputs.base }}
+        run: python automation/api_sync.py push --bundle "$RUNNER_TEMP/tested/tested.bundle" --sha "$SHA" --base "$BASE"
+
+  sync_report:
+    needs: [sync_fetch, sync_check, sync_push]
+    if: ${{ !cancelled() && needs.sync_fetch.outputs.has == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -q paramiko
+      - env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          HEAD_SHA: ${{ needs.sync_fetch.outputs.head }}
+          CHECK_RESULT: ${{ needs.sync_check.result }}
+          CHECK_STATUS: ${{ needs.sync_check.outputs.status }}
+          CHECK_WHY: ${{ needs.sync_check.outputs.why }}
+          PUSH_RESULT: ${{ needs.sync_push.result }}
+          PUSH_STATUS: ${{ needs.sync_push.outputs.status }}
+          PUSH_WHY: ${{ needs.sync_push.outputs.why }}
+          PUSHED_SHA: ${{ needs.sync_check.outputs.sha }}
+        run: python automation/api_sync.py report
+
   gate:
     # 예약 실행일 때만: 서버에 반영된 버전(배포 끝에 기록)이 main 과 같으면 건너뜀
+    # API 봇 묶음을 올렸으면(sync_push) 그 main 을 같은 실행에서 배포 — 반영 작업이 건너뛰거나 실패해도 배포는 그대로
+    needs: sync_push
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     # 배포할 버전(sha): push 는 그 커밋, 예약·수동은 main 의 최신 커밋.
@@ -43,7 +174,8 @@ jobs:
   check:
     # 서버에 올리기 전 검사: 하나라도 실패하면 배포하지 않는다 (운영 중인 봇이 멈추는 것 방지)
     needs: gate
-    if: needs.gate.outputs.need == 'true'
+    # 앞 반영 작업이 건너뛰어져도 이어서 건너뛰지 않게 상태를 직접 봄
+    if: ${{ !cancelled() && needs.gate.result == 'success' && needs.gate.outputs.need == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -70,6 +202,7 @@ jobs:
 
   deploy:
     needs: [gate, check]
+    if: ${{ !cancelled() && needs.check.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 70   # 11/8 다시 시도 단계까지 (30m 두 번 + 여유). 11/6: 서버 적용이 끝났는데 GitHub 쪽에서 작업이 '진행 중'으로 멈춰 다음 배포가 모두 대기 — 기본 6시간 대신 끊음 (command_timeout 30m + 여유)
     steps:

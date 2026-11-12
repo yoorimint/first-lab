@@ -1,16 +1,21 @@
 # 자동 운영 건강 점검 (하루 1번) — 이상하면 이 작업이 실패 → GitHub 가 저장소 주인에게 메일을 보냄.
 # Claude 예약 작업과 상관없는 알림 통로 (11/5 검토: 토큰 만료·요금제 한도로 글쓰기가 멈추면 알릴 곳이 없었음).
 # 값은 공개 /wp-json/firstlab/v1/health (비밀값 없음, wordpress/mu-plugins/first-lab-api.php).
+# API 봇 매일 점검 보고 (11/12): 월정액은 예약 작업 끝 메시지가 휴대폰 알림 — API 봇은 서버가 보고를 남기면 15분 안에 가져가
+#   문제가 있으면(또는 점검 실행 실패) maint_report 작업이 실패 → 같은 메일. 보고 내용은 공개 기록에 안 찍음 (문제 수만, 전문은 봇 기록).
 name: Health check
 
 on:
   schedule:
-    - cron: "23 0 * * *"   # 매일 09:23 (한국 시간)
+    - cron: "23 0 * * *"            # 매일 09:23 (한국 시간) — 건강 점검
+    - cron: "8,23,38,53 * * * *"    # 15분마다 — API 봇 매일 점검 보고 (automation/api_sync.py maint)
   workflow_dispatch:
 
 jobs:
   health:
+    if: github.event_name != 'schedule' || github.event.schedule == '23 0 * * *'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Check first-lab.kr
         run: |
@@ -43,3 +48,23 @@ jobs:
               sys.exit(1)
           print("✅ 이상 없음")
           PY
+
+  maint_report:
+    if: github.event_name != 'schedule' || github.event.schedule != '23 0 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -q paramiko
+      - name: API 봇 매일 점검 보고
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+        run: python automation/api_sync.py maint
