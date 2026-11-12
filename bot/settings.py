@@ -40,13 +40,13 @@ def _times(text: str) -> list[str]:
 
 @dataclass
 class BotSettings:
-    write_mode: str = "direct"  # direct = 월정액 직접 작성(봇은 예비) | bot = API 봇이 작성
+    write_mode: str = "direct"  # direct = 월정액(Claude 예약 작업) | bot = API 봇(서버 안 같은 작업, bot/api_writer.py)
     maint_times: list[str] = field(default_factory=lambda: ["06:10"])  # 매일 점검 시각 (비우면 안 함)
     direct_enabled: bool = True  # '글 작성 시각 사용' (끄면 정해진 시각에 자동으로 쓰지 않음)
-    direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 글 작성 시각 (월정액: Claude, API 봇: API)
+    direct_times: list[str] = field(default_factory=lambda: ["07:40"])  # 글 작성 시각 (두 방식 모두 같은 글쓰기 작업)
     routine_fire_url: str = ""  # 월정액: Claude 예약 작업 실행 주소·토큰 (secrets.env, bot/routine.py)
     routine_token: str = ""
-    enabled: bool = False
+    enabled: bool = False   # API 봇 사용 (API 봇 방식의 요금 스위치)
     post_status: str = "draft"   # draft | publish | schedule(예약 발행)
     schedule_times: list[str] = field(default_factory=lambda: ["09:00"])  # 예약 발행 공개 시각
     jitter_minutes: int = 30    # 예약 공개 시각 ± 랜덤(분)
@@ -64,7 +64,6 @@ class BotSettings:
     gemini_key: str = ""  # 경쟁도 조회(구글 검색 연동)용 - 글쓰기 AI 와 무관하게 사용
     cf_account_id: str = ""   # 본문 AI 이미지 (Cloudflare Workers AI)
     cf_api_token: str = ""
-    fact_check: bool = True    # 자동 사실 검증
     refresh_per_week: int = 5  # 발행 글 갱신 주당 최대 개수
     competition_checks: int = 15  # 하루 경쟁도 조회 한도 (Gemini 무료 한도가 작음)
     daily_cost_cap: float = 3.0   # 하루 AI 비용 상한 (달러, 0 = 없음)
@@ -100,7 +99,6 @@ class BotSettings:
             daily_cost_cap=float(raw.get("daily_cost_cap") if raw.get("daily_cost_cap") not in (None, "") else 3),
             cf_account_id=(raw.get("cf_account_id") or "").strip() or secrets.get("CF_ACCOUNT_ID", ""),
             cf_api_token=(raw.get("cf_api_token") or "").strip() or secrets.get("CF_API_TOKEN", ""),
-            fact_check=bool(int(raw.get("fact_check", 1) or 0)),
             refresh_per_week=int(raw.get("refresh_per_week") if raw.get("refresh_per_week") not in (None, "") else 5),
         )
 

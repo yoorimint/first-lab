@@ -1,14 +1,15 @@
 """봇 실행 진입점. systemd 타이머가 1분마다 실행한다.
 
   - (키워드 수집은 별도 작업 firstlab-discover: 매일 + 배포 직후)
-  - 하루 1회: 상위 후보 사전 검토 (API 봇: 안전 검사 + 경쟁도 / 월정액: 경쟁도만)
+  - 하루 1회: 상위 후보 경쟁도 조회 (안전 판단은 글쓰기 작업이 함)
   - 예약 발행: 오늘의 공개 시각(설정 ± 랜덤)마다 가장 오래된 대기 초안 1편 공개 (bot/schedule.py)
-  - '글 작성 시각'·'지금 글 1개 만들기'·연속 작성 → 월정액: Claude 예약 작업 실행 (bot/routine.py, API 요금 없음)
-    / API 봇 방식('API 봇 사용' 켜짐): API 로 1개 생성
+  - '글 작성 시각'·'지금 글 1개 만들기'·연속 작성·매일 점검 → 글쓰기 작업 시작 (fire_routine 한 곳에서 고름):
+    월정액 = Claude 예약 작업(bot/routine.py, 구독 사용량) / API 봇 = 서버 안 같은 작업(bot/api_writer.py, API 키 요금).
+    두 방식 모두 같은 지시서(automation/daily-writer.md)·같은 관문(bot/publish_queue)·같은 발행 방식 (운영자 11/12)
   - 한 번 실행에 글은 최대 1개 (몰아서 발행 방지)
 
 사용: python3 -m bot.run            (평소: 할 일이 있을 때만 실행)
-      python3 -m bot.run --now      (점검용: 즉시 1개 생성)
+      python3 -m bot.run --now      (점검용: 글쓰기 작업 1번 바로 시작)
 """
 from __future__ import annotations
 
@@ -17,91 +18,24 @@ import fcntl
 import json
 import re
 import subprocess
-import sys
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from . import competition, factcheck, pending_images, related, routine, schedule
-from .discover import discover
-from .keyword_db import connect, set_competition, set_status, summary
-from .llm import LLMBusy, make_llm
-from .publisher import STATUS_LABEL, publish
-from .select_keyword import check_top_competition, pick_keyword, ranked_candidates, review_top
+from . import api_writer, pending_images, routine, schedule
+from .keyword_db import connect, set_status, summary
+from .select_keyword import check_top_competition, ranked_candidates
 from .settings import BotSettings, load_settings, wp_cli
-from .state import (add_log, add_spend, continuous_on, load_state, pop_excluded, pop_manual_request, save_state,
+from .state import (add_log, continuous_on, load_state, pop_excluded, pop_manual_request, save_state,
                     set_continuous, spent_today, writer2_on)
-from .writer import align_with_body, write_article
 
 KST = ZoneInfo("Asia/Seoul")
 LOCK_FILE = "/run/firstlab-bot.lock"
-MIN_POOL = 30           # 후보가 이보다 적으면 글 쓰기 전에 창고를 조금 확장
-RETRY_REVIEW_MIN = 20   # AI 혼잡 시 사전 검토 재시도 간격(분)
-RETRY_MANUAL_MIN = 5    # AI 혼잡 시 수동 요청 재시도 간격(분)
-MANUAL_RETRIES = 12     # 수동 요청 최대 재시도 횟수
 CONTINUOUS_TIMEOUT_MIN = 90  # 연속 작성: 한 편이 이 시간 안에 안 올라오면 실패로 보고 다음 편 실행 (11/5: 60분이면 계산기 글이 끝나기 전에 다음 실행이 겹침)
 # 글쓰기 작업 한 번이 끝났다는 기록 (새 글·대기 글 검수·실행 끝 파일). 보류 수정·계산기 연초 값만 한 실행은
 # 앞의 두 기록이 없어 60분 시간 초과(실패)로 셌음 → 3번이면 연속 작성이 스스로 멈춤 (11/5 22:13 실행 74번 뒤 47분 멈춤).
 # 그래서 글쓰기 작업은 실행마다 끝에 run_done 파일을 올린다 (daily-writer 실행 순서 6번).
 DONE_MARKS = ("직접 작성 글:", "대기 글 검수(직접):", "글쓰기 실행 끝(직접):")
 CONTINUOUS_MAX_FAILS = 3     # 연속으로 이만큼 실패하면 연속 작성을 자동으로 멈춤 (사용량 한도·후보 소진 등)
-
-
-def _record_competition(conn, keyword: str, urls: list[str]) -> None:
-    """글쓰기 때 한 웹 검색 결과로 이 키워드의 경쟁도를 기록 (무료). 같은 주제 키워드 추정에 쓰인다."""
-    comp = competition.from_urls(urls)
-    if comp is None:
-        return
-    set_competition(conn, keyword, comp.difficulty, f"글쓰기 검색: {comp.summary}: {', '.join(comp.domains)}")
-    conn.commit()
-
-
-def create_one(settings: BotSettings, used_llms: list | None = None) -> str:
-    """키워드 선정 → 글 작성 → 워드프레스 저장. 결과 메시지 반환.
-    used_llms: 만든 AI 객체를 담아 돌려줌 → 실패해도 호출한 쪽에서 쓴 비용을 셀 수 있게."""
-    used_llms = used_llms if used_llms is not None else []
-    llm = make_llm(settings.provider, settings.api_key, settings.model)
-    used_llms.append(llm)
-    with connect() as conn:
-        if len(ranked_candidates(conn, settings)) < MIN_POOL:
-            discover(5, settings.hint_keywords)
-        light = make_llm(settings.provider, settings.api_key, settings.model, light=True)  # 판정·검증용 (저렴)
-        used_llms.append(light)
-        keyword = pick_keyword(conn, settings, light)
-        if not keyword:
-            raise RuntimeError("안전 검사를 통과한 후보가 없습니다. 새벽 키워드 수집 후 다시 시도됩니다")
-        cands = related.candidates(keyword)
-        article = write_article(llm, keyword, settings.target_length, settings.extra_prompt,
-                                persona=settings.persona, links=related.prompt_section(cands))
-        allowed_links = {c["url"] for c in cands}
-        _record_competition(conn, keyword, getattr(llm, "search_urls", []))
-        status, check_note = settings.post_status, ""
-        if settings.fact_check:
-            try:
-                # 검수는 Haiku 로 충분 (내부 블라인드 시험: Sonnet 검수와 품질 차이 없음, 비용은 약 1/20)
-                fc = factcheck.verify(light, keyword, article.content_html, article.title, article.excerpt)
-                article.content_html, check_note = fc.content_html, ", " + fc.summary
-                if fc.title and len(fc.title) <= 60:
-                    article.title = fc.title
-                if fc.excerpt:
-                    article.excerpt = fc.excerpt[:200]
-                if fc.needs_review:
-                    status = "draft"  # 확인 못 한 주장이 많으면 자동 발행 대신 초안
-            except Exception as e:  # noqa: BLE001 - 검증 실패 시 원문 유지 + 초안
-                status, check_note = "draft", f", 사실검증 실패({str(e)[:60]}) → 검토 필요"
-        article.content_html, link_count = related.clean_links(article.content_html, allowed_links)
-        aligned = align_with_body(article)  # 마지막 안전장치: 제목·요약문 숫자가 본문과 다르면 바로잡음
-        if aligned:
-            check_note += f", 본문과 숫자 불일치 → {'·'.join(aligned)} 보정"
-            if "제목(확인 필요)" in aligned:
-                status = "draft"  # 제목 숫자가 본문과 다르면 자동 발행하지 않음
-        post_id, link, image_note = publish(article, status, slug=keyword,
-                                            cloudflare=(settings.cf_account_id, settings.cf_api_token))
-        set_status(conn, keyword, "used", f"post {post_id}")
-    kind = STATUS_LABEL.get(status, "초안 저장")
-    cost = getattr(llm, "cost_usd", 0.0) + getattr(light, "cost_usd", 0.0)
-    cost_note = f", AI 비용 약 ${cost:.2f}(≈{cost * 1400:,.0f}원)" if cost else ""
-    return (f"[{kind}] '{article.title}' (키워드: {keyword}, 모델: {llm.model}, {image_note}, "
-            f"내부 링크 {link_count}개{check_note}{cost_note}) {link}")
 
 
 CACHE_DIR = "/var/cache/nginx/first-lab"
@@ -166,48 +100,42 @@ def clear_cache() -> None:
 
 
 def daily_review(state: dict, settings: BotSettings, now: datetime) -> None:
-    """하루 1회 상위 후보 사전 검토 → 설정 페이지에 근거 표시.
-    API 봇: AI 안전 검사 + 경쟁도 / 월정액: 경쟁도만 (Gemini 무료. 안전 판단은 글쓰기 세션이 하고 제외 목록을 올림)"""
-    today, stamp = now.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d %H:%M")
-    if state.get("review_date") == today or stamp < state.get("review_retry_at", ""):
-        return
-    if settings.write_mode == "direct":
-        try:
-            with connect() as conn:
-                n = check_top_competition(conn, settings)
-            add_log(state, True, f"후보 검토: 경쟁도 {n}건 조회 (월정액: 안전 판단은 글쓰기 세션이 함)")
-        except Exception as e:  # noqa: BLE001
-            add_log(state, False, f"후보 검토 실패: {e}")
-        state["review_date"], state["dashboard_at"] = today, ""
-        return
-    if not settings.api_key:
+    """하루 1회 상위 후보 경쟁도 조회 → 설정 페이지에 근거 표시 (Gemini 무료).
+    안전 판단(업체·의료·정치 등)은 두 방식 모두 글쓰기 작업이 하고 제외 목록(skip 파일)을 올림."""
+    today = now.strftime("%Y-%m-%d")
+    if state.get("review_date") == today:
         return
     try:
         with connect() as conn:
-            llm = make_llm(settings.provider, settings.api_key, settings.model, light=True)
-            n = review_top(conn, settings, llm)
-        add_log(state, True, f"후보 검토: 상위 후보 안전 검사 + 경쟁도 {n}건 조회")
-        state["review_date"] = today
-    except LLMBusy as e:  # 혼잡 → 20분 뒤 다시 (오늘 안에)
-        state["review_retry_at"] = (now + timedelta(minutes=RETRY_REVIEW_MIN)).strftime("%Y-%m-%d %H:%M")
-        add_log(state, False, f"후보 검토 보류: {e} → {state['review_retry_at'][11:]}에 다시 시도")
+            n = check_top_competition(conn, settings)
+        add_log(state, True, f"후보 검토: 경쟁도 {n}건 조회 (안전 판단은 글쓰기 작업이 함)")
     except Exception as e:  # noqa: BLE001
         add_log(state, False, f"후보 검토 실패: {e}")
-        state["review_date"] = today
-    state["dashboard_at"] = ""  # 현황 즉시 갱신
+    state["review_date"], state["dashboard_at"] = today, ""
 
 
 def fire_routine(state: dict, settings: BotSettings, label: str, text: str = "") -> bool:
-    """월정액: Claude 예약 작업 실행 (글은 그 세션이 써서 저장소로 올리고, 배포 때 사이트에 반영)."""
+    """글쓰기 작업 시작 — 방식은 여기 한 곳에서만 고른다 (부르는 곳: 글 작성 시각·수동·연속 작성·매일 점검).
+    월정액: Claude 예약 작업 / API 봇: 서버 안에서 같은 지시서로 (bot/api_writer.py). 결과는 둘 다 wordpress/queue → publish_queue 관문."""
+    api = settings.write_mode == "bot"
     try:
-        url = routine.fire(settings.routine_fire_url, settings.routine_token, text)
-        add_log(state, True, f"{label}: Claude 글쓰기 작업 시작 {url}")
+        if api:
+            url = api_writer.fire(settings, text, spent=spent_today(state), label=label)
+        else:
+            url = routine.fire(settings.routine_fire_url, settings.routine_token, text)
+        add_log(state, True, f"{label}: Claude 글쓰기 작업 시작{' (API 봇)' if api else ''} {url}")
         state["last_fire_ok_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")  # /health (외부 알림)
         return True
     except Exception as e:  # noqa: BLE001 - 응답 형식이 바뀌어도(미리보기 기능) 봇이 멈추지 않게 (11/5 검토)
-        add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패 - {str(e)[:150]}")
+        add_log(state, False, f"{label}: Claude 글쓰기 작업 실행 실패{' (API 봇)' if api else ''} - {str(e)[:150]}")
         state["last_fire_error_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         return False
+
+
+def writer_busy(settings: BotSettings) -> bool:
+    """API 봇 글쓰기가 아직 도는 중 (서버 메모리 때문에 한 번에 1개) → 시작할 일은 끝날 때까지 미룸 (시각 3시간 안).
+    월정액은 클라우드라 언제나 False."""
+    return settings.write_mode == "bot" and api_writer.busy()
 
 
 def latest_post_log(state: dict) -> str:
@@ -254,7 +182,7 @@ def slot_done_log(state: dict, slot: int) -> str:
 def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
     """연속 작성 (설정 페이지 시작·정지): 칸(WRITERS 개)마다 한 편이 끝나면 바로 다음 편을 실행.
     한 편이 CONTINUOUS_TIMEOUT_MIN 안에 안 끝나면 실패로 세고, 한 칸이라도 3번 연속 실패하면 스스로 멈춘다 (사용량 한도·후보 소진 대비)."""
-    if settings.write_mode != "direct" or not continuous_on():
+    if not continuous_on():
         for slot in range(1, WRITERS + 1):
             state.pop(slot_key(slot), None)
         return
@@ -263,7 +191,8 @@ def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
         # (11/6 09:45 실행: '후보 20개는 직전 실행이 제외한 것' → 새 글 없이 끝남). 아래 refresh_dashboard 뒤 다음 분에 시작.
         return
     # 설정 페이지 '2번 작성자' 끄면 1번 칸만 (11/7 운영자). 2번이 쓰던 한 편은 그대로 마치고, 칸 기록만 지움
-    active = WRITERS if writer2_on() else 1
+    # API 봇은 서버(2GB) 안에서 돌아 한 번에 1개 → 1번 칸만
+    active = WRITERS if writer2_on() and settings.write_mode != "bot" else 1
     for slot in range(active + 1, WRITERS + 1):
         state.pop(slot_key(slot), None)
     for slot in range(1, active + 1):
@@ -294,11 +223,15 @@ def _slot_step(state: dict, settings: BotSettings, now: datetime, slot: int) -> 
             state.pop(slot_key(s_), None)
         add_log(state, False, f"연속 작성 자동 정지: {slot}번 실행이 {fails}번 연속으로 끝나지 않음 (사용량 한도·후보 소진·오류 확인 필요)")
         return False
+    if writer_busy(settings):
+        return True  # 앞 실행이 결과를 올리는 중 → 끝나면 다음 분에 시작
     seen = done_of()
     state[key] = {"fired_at": stamp, "fails": fails, "count": count, "seen": seen}
     save_state(state)  # 실행 전에 저장 — 중간에 죽어도 다음 분에 또 실행하지 않게 (11/5 검토)
     label = f"연속 작성 {count + 1}번째" + (f" ({slot}번 칸)" if WRITERS > 1 else "")
-    ok = fire_routine(state, settings, label, f"slot-{slot}" if WRITERS > 1 else "")
+    # API 봇(한 칸)은 칸 번호 없이 — /next 가 후보 전부를 줌 (칸 번호가 있으면 2번 칸 몫을 뺌)
+    text = f"slot-{slot}" if WRITERS > 1 and settings.write_mode != "bot" else ""
+    ok = fire_routine(state, settings, label, text)
     state[key] = {"fired_at": stamp, "fails": fails if ok else fails + 1, "count": count, "seen": seen}
     return True
 
@@ -321,7 +254,7 @@ def refresh_dashboard(state: dict, settings: BotSettings) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--now", action="store_true", help="즉시 1개 생성")
+    parser.add_argument("--now", action="store_true", help="글쓰기 작업 1번 바로 시작 (설정의 방식대로)")
     args = parser.parse_args()
 
     lock = open(LOCK_FILE, "w")
@@ -349,7 +282,6 @@ def main() -> None:
                 set_status(conn, kw, "excluded", "관리자 제외")
 
     daily_review(state, settings, now)
-    stamp = now.strftime("%Y-%m-%d %H:%M")
 
     # 예약 발행: 오늘의 공개 시각(설정 ± 랜덤)마다 가장 오래된 대기 초안 1편 공개
     if settings.post_status == "schedule":
@@ -444,8 +376,8 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001
             add_log(state, False, f"근거 기록 채우기 실패: {str(e)[:150]}")
 
-    # 매일 점검: 공개 대기 글 재검수·기록 점검 (Claude 예약 작업을 점검 모드로 실행, automation/maintenance.md)
-    if settings.write_mode == "direct" and settings.maint_times:
+    # 매일 점검: 서버 기록 점검 (글쓰기 작업을 점검 모드로 실행, automation/maintenance.md) — 두 방식 모두
+    if settings.maint_times and not writer_busy(settings):
         fired = state.get("maint_fired", {}).get(today, [])
         due = schedule.due_slot(settings.maint_times, fired, now.replace(tzinfo=None))
         if due:
@@ -453,55 +385,19 @@ def main() -> None:
             save_state(state)  # 실행 전에 저장 (중간에 죽으면 매분 다시 실행하던 경로, 11/5 검토)
             fire_routine(state, settings, f"매일 점검 {due}", routine.MAINT_TEXT)
 
-    # 글 생성: 수동 요청, 연속 작성, 글 작성 시각 (월정액 → Claude, API 봇 방식 + 'API 봇 사용' → API)
-    reason = None
-    if pop_manual_request():
-        if settings.write_mode == "direct":  # 월정액: API 대신 Claude 가 씀
-            fire_routine(state, settings, "수동 요청", routine.MANUAL_TEXT)
-        else:
-            state["manual_attempts"], state["manual_next"] = 0, ""
-            reason = "수동"
-    elif args.now or (state.get("manual_next") and stamp >= state["manual_next"]):
-        reason = "수동(재시도)" if not args.now else "수동"
+    # 글쓰기: 수동 요청, 연속 작성, 글 작성 시각 → fire_routine (방식은 그 안에서). API 봇이 쓰는 중이면 끝날 때까지 미룸
+    # (수동 요청은 지우지 않고 남겨 둠, 시각은 3시간 안에 다시)
+    busy = writer_busy(settings)
+    if args.now or (not busy and pop_manual_request()):
+        fire_routine(state, settings, "수동 요청", routine.MANUAL_TEXT)
     continuous_step(state, settings, now)
-    if settings.direct_enabled and not state.get("continuous"):
+    if settings.direct_enabled and not state.get("continuous") and not writer_busy(settings):
         fired = state.get("direct_fired", {}).get(today, [])
         due = schedule.due_slot(settings.direct_times, fired, now.replace(tzinfo=None))
         if due:
             state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림, 실패해도 같은 시각은 다시 안 함
             save_state(state)  # 실행 전에 저장 (11/5 검토)
-            if settings.write_mode == "direct":
-                fire_routine(state, settings, f"글 작성 {due}")
-            elif settings.enabled and reason is None:
-                reason = f"자동 {due}"
-
-    cap = settings.daily_cost_cap
-    if reason and cap > 0 and spent_today(state) >= cap:
-        add_log(state, False, f"{reason} 건너뜀: 오늘 AI 비용 ${spent_today(state):.2f} → 하루 상한 ${cap:.0f} 도달 (내일 다시)")
-        state["manual_next"] = ""
-        reason = None
-    if reason:
-        used_llms: list = []
-        try:
-            msg = create_one(settings, used_llms)
-            add_log(state, True, f"{reason}: {msg}")
-            state["manual_next"] = ""
-            print(msg)
-        except LLMBusy as e:  # 혼잡·한도 → 수동 요청은 5분 뒤 자동 재시도 (최대 12번 = 1시간)
-            attempts = state.get("manual_attempts", 0) + 1
-            if reason.startswith("수동") and attempts <= MANUAL_RETRIES:
-                state["manual_attempts"] = attempts
-                state["manual_next"] = (now + timedelta(minutes=RETRY_MANUAL_MIN)).strftime("%Y-%m-%d %H:%M")
-                add_log(state, False, f"{reason} 보류: {e} → {state['manual_next'][11:]}에 자동 재시도 ({attempts}/{MANUAL_RETRIES})")
-            else:
-                state["manual_next"] = ""
-                add_log(state, False, f"{reason} 실패: {e}")
-        except Exception as e:  # noqa: BLE001 - 어떤 오류든 기록하고 다음 실행에 영향 없게
-            state["manual_next"] = ""
-            detail = e.stderr if isinstance(e, subprocess.CalledProcessError) and e.stderr else e
-            add_log(state, False, f"{reason} 실패: {detail}")
-            print(f"실패: {detail}", file=sys.stderr)
-        add_spend(state, sum(getattr(x, "cost_usd", 0.0) for x in used_llms))  # 실패해도 쓴 비용은 반영
+            fire_routine(state, settings, f"글 작성 {due}")
 
     if now.minute % 10 == 0:  # 배포 밀림 감지 (bot/deploy_watch.py) — 어떤 오류도 봇을 멈추지 않게
         try:
@@ -510,7 +406,7 @@ def main() -> None:
         except Exception:  # noqa: BLE001
             pass
 
-    if reason or excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
+    if excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
         refresh_dashboard(state, settings)  # 변화가 있거나 1시간마다
         state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
 

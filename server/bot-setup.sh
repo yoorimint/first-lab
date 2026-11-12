@@ -20,6 +20,34 @@ if ! cmp -s "$REQ" "$VENV/.installed-requirements"; then
 fi
 "$VENV/bin/pip" list 2>/dev/null | grep -iE "^(anthropic|google-genai|openai) "
 
+log "API 봇용 Claude Code (설정 '글 작성 방식: API 봇' 이면 월정액과 같은 글쓰기 작업을 서버에서 실행 — bot/api_writer.py)"
+# 고정 버전만 설치 (자동 업데이트 없음). 이미 그 버전이면 건너뜀. 실패해도 배포는 계속 (API 봇이 '설치 안 됨'으로 기록).
+# 메모리: 글쓰기 한 번에 약 300~700MB (추정) — systemd 상한 1200MB, 한 번에 1개, 낮은 CPU 몫 (bot/api_writer.py)
+NODE_VER=22.23.5
+NODE_SHA256=cdeb8670a0c81f51b4dc4ac61919f9b1ad917b304bf8221eb939570663d240f8   # nodejs.org SHASUMS256.txt (linux-x64)
+CLAUDE_VER=2.1.311   # npm 'stable'
+install_api_writer() {
+  id firstlab-writer &>/dev/null || useradd --system --user-group --home-dir /var/lib/first-lab/writer --shell /usr/sbin/nologin firstlab-writer || return 1
+  install -d -o firstlab-writer -g firstlab-writer -m 750 /var/lib/first-lab/writer || return 1
+  install -d -m 750 /var/lib/first-lab/bot/local-queue || return 1
+  if [ "$(/opt/first-lab-node/bin/node --version 2>/dev/null)" != "v$NODE_VER" ]; then
+    local tmp; tmp=$(mktemp -d)
+    # (함수를 '||' 로 부르면 set -e 가 안 먹어 단계마다 return)
+    curl -fsSL --max-time 300 -o "$tmp/node.tar.xz" "https://nodejs.org/dist/v$NODE_VER/node-v$NODE_VER-linux-x64.tar.xz" || return 1
+    echo "$NODE_SHA256  $tmp/node.tar.xz" | sha256sum -c --quiet || { rm -rf "$tmp"; echo "node 내려받은 파일 지문이 다름"; return 1; }
+    rm -rf "/opt/first-lab-node-$NODE_VER" && mkdir -p "/opt/first-lab-node-$NODE_VER" || return 1
+    tar -xJf "$tmp/node.tar.xz" -C "/opt/first-lab-node-$NODE_VER" --strip-components=1 || return 1
+    ln -sfn "/opt/first-lab-node-$NODE_VER" /opt/first-lab-node
+    rm -rf "$tmp"
+  fi
+  if [ "$(/opt/first-lab-claude/bin/claude --version 2>/dev/null | cut -d' ' -f1)" != "$CLAUDE_VER" ]; then
+    PATH="/opt/first-lab-node/bin:$PATH" npm install -g -q --prefix /opt/first-lab-claude --no-fund --no-audit \
+      "@anthropic-ai/claude-code@$CLAUDE_VER" || return 1
+  fi
+  echo "node $(/opt/first-lab-node/bin/node --version) · Claude Code $(/opt/first-lab-claude/bin/claude --version 2>/dev/null | cut -d' ' -f1)"
+}
+install_api_writer || echo "API 봇용 Claude Code 설치 실패 (월정액 방식에는 영향 없음, 다음 전체 배포 때 다시)"
+
 log "봇 설정 일회성 변경 (운영자 승인 항목, 한 번만 적용 → 이후 설정 페이지 값 존중)"
 # 사용: 이름=값 목록. 적용 기록(MARK)이 있으면 건너뛰므로 설정 페이지에서 다시 바꿔도 덮어쓰지 않는다.
 apply_settings_once() {

@@ -15,10 +15,13 @@
 근거 기록 파일: {"type": "evidence", "post_id", "keyword", "review": [글쓰기 검수와 같은 형식]} → 근거 기록이 없던 예전 봇 글에
   근거 대조 기록을 만듦 (11/5 운영자 '예전 봇 글도 근거 기록 만들어라') → 법령 감시·공개 직전 확인·공개 글 다시 보기가 이 글도 봄
 같은 파일은 한 번만 올린다 (서버의 완료 표시 파일로 확인 → 파일 내용을 바꾸면 새 글로 다시 올라감).
+API 봇 방식(bot/api_writer.py)의 결과는 저장소가 아닌 LOCAL_QUEUE_DIR 에 들어오고, 여기서 같은 관문으로 함께 올린다.
 """
 from __future__ import annotations
 
+import fcntl
 import hashlib
+from contextlib import contextmanager
 from datetime import datetime
 import json
 from pathlib import Path
@@ -31,7 +34,9 @@ from .state import add_log, load_state, save_state
 from .writer import align_with_body, parse_article
 
 QUEUE_DIR = Path(__file__).resolve().parent.parent / "wordpress" / "queue"
+LOCAL_QUEUE_DIR = Path("/var/lib/first-lab/bot/local-queue")  # API 봇 결과 (bot/api_writer.LOCAL_QUEUE_DIR 와 같은 곳)
 DONE_DIR = Path("/var/lib/first-lab/bot/queue-done")
+RUN_LOCK = "/run/firstlab-publish-queue.lock"  # 배포와 API 봇이 같은 파일을 동시에 올려 글이 두 편 되지 않게
 
 
 def _marker(path: Path) -> Path:
@@ -58,7 +63,20 @@ def _bump_file_fail(path: Path) -> int:
 
 
 def pending() -> list[Path]:
-    return [p for p in sorted(QUEUE_DIR.glob("*.json")) if not _marker(p).exists()]
+    files = sorted([*QUEUE_DIR.glob("*.json"), *LOCAL_QUEUE_DIR.glob("*.json")], key=lambda p: (p.name, str(p)))
+    return [p for p in files if not _marker(p).exists()]
+
+
+@contextmanager
+def _one_at_a_time():
+    try:
+        handle = open(RUN_LOCK, "a")
+    except OSError:  # 잠금 파일을 못 만드는 환경(검사 등)
+        yield
+        return
+    with handle:
+        fcntl.flock(handle, fcntl.LOCK_EX)  # 앞 실행이 끝날 때까지 기다림
+        yield
 
 
 def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
@@ -229,6 +247,11 @@ def run_marks() -> tuple[str, ...]:
 
 
 def main() -> None:
+    with _one_at_a_time():
+        _main()
+
+
+def _main() -> None:
     files = pending()
     if not files:
         print("올릴 글 없음")

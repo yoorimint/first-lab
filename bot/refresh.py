@@ -23,15 +23,13 @@ import re
 import urllib.parse
 from datetime import datetime, timedelta
 
-from . import changed, expiry, factcheck
+from . import changed, expiry
 from .blocks import to_blocks
 from .keyword_db import connect, norm
 from .keyword_filter import subject, subject_intent
-from .llm import make_llm
 from .search_console import SCHEMA as GSC_SCHEMA
 from .settings import BotSettings, wp_cli
 from .writer import numbers_match
-from .state import add_spend, spent_today
 
 META_KEY = "_firstlab_refreshed"   # 마지막 갱신 날짜
 MIN_KEEP_RATIO = 0.8              # 고친 본문이 기존의 80% 미만이면 반영하지 않음 (내용 유실 방지)
@@ -230,45 +228,8 @@ RETITLE_SYSTEM = """너는 한국어 정보 블로그 편집자다. 검색 순�
 최종 답은 JSON 하나만: {"title": "...", "excerpt": "...", "changes": "무엇을 바꿨는지 한 줄"}"""
 
 
-def _queries_text(queries: list[dict]) -> str:
-    return "\n".join(f"- {q['query']} (노출 {q['impressions']}, 클릭 {q['clicks']}, 평균 {q['position']:.0f}위)"
-                     for q in queries) or "- (검색어 기록 없음)"
-
-
 def _html(content: str) -> str:
     return re.sub(r"<!--.*?-->", "", content, flags=re.S).strip()
-
-
-def refresh_post(post: dict, mode: str, settings: BotSettings) -> tuple[str, float]:
-    """(결과 설명, 쓴 비용 달러)"""
-    content = _html(wp_cli("post", "get", str(post["id"]), "--field=post_content"))
-    if mode == "retitle":
-        llm = make_llm(settings.provider, settings.api_key, settings.model)
-        raw = llm.generate(RETITLE_SYSTEM, f"현재 제목: {post['title']}\n[실제 검색어]\n{_queries_text(post.get('queries', []))}"
-                                           f"\n\n[본문 HTML]\n{content}")
-        data = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
-        title, excerpt = _checked_title(data, content)
-        _save(post["id"], None, title, excerpt)
-        cost = getattr(llm, "cost_usd", 0.0)
-        return f"제목 수정 → '{title}' (약 ${cost:.2f})", cost
-    if mode == "recheck":
-        llm = make_llm(settings.provider, settings.api_key, settings.model, light=True)
-        fc = factcheck.verify(llm, post["title"], content)
-        new_html, note = fc.content_html, fc.summary
-        changed = fc.fixed + fc.removed > 0
-    else:
-        llm = make_llm(settings.provider, settings.api_key, settings.model)
-        related = ", ".join(k for k, _ in post.get("siblings", []))
-        extra = f"\n이 글에서 함께 답할 검색어 (빠진 내용이면 보강): {related}" if related else ""
-        raw = llm.generate(ENHANCE_SYSTEM, f"글 제목: {post['title']}{extra}\n\n[기존 본문 HTML]\n{content}",
-                           web_search=True)
-        data = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
-        new_html = str(data.get("content_html") or "")
-        changed = len(new_html) >= len(content) * MIN_KEEP_RATIO
-        note = str(data.get("changes", ""))[:80]
-    _save(post["id"], new_html if changed else None)
-    cost = getattr(llm, "cost_usd", 0.0)
-    return f"{'수정' if changed else '변경 없음'} - {note} (약 ${cost:.2f})", cost
 
 
 def _checked_title(data: dict, content: str) -> tuple[str, str]:
@@ -415,30 +376,8 @@ def _renew_evidence(post_id: int, review: list | None) -> None:
 
 
 def run_weekly(settings: BotSettings, state: dict) -> list[str]:
-    """하루 1번 호출. 이번 주(월요일 시작) 갱신 수가 한도 미만이면 최대 1개 갱신 (주중에 고르게 분산)."""
+    """하루 1번 호출. 갱신할 글 1개를 골라 두면 글쓰기 작업(월정액·API 봇 같은 지시서 6단계)이 고쳐 갱신 파일로 올림
+    → publish_queue 의 refresh.apply_direct 관문. 이번 주 한도를 넘어도 근거가 바뀐 글은 계속 (틀린 채 두지 않음).
+    (11/12: 예전 API 봇은 여기서 API 로 바로 고쳐 저장했음 — 관문 없이 반영되던 길이라 없앰)"""
     done = state.setdefault("refresh", {}).get(_week(), 0)
-    fixes_only = settings.refresh_per_week <= done  # 한도를 넘어도 근거가 바뀐 글은 계속 (틀린 채 두지 않음)
-    if settings.write_mode == "direct":
-        return plan_direct(state, fixes_only)
-    if fixes_only:
-        state.pop("refresh_target", None)
-        return []
-    if not settings.api_key:
-        return []
-    if settings.daily_cost_cap > 0 and spent_today(state) >= settings.daily_cost_cap:
-        return [f"글 갱신 건너뜀: 오늘 AI 비용 하루 상한 ${settings.daily_cost_cap:.0f} 도달"]
-    with connect() as conn:
-        targets = pick_targets(conn, 1, strong_pages=strong_pages_of(state))
-        for post, _, _ in targets:
-            post["queries"] = top_queries(conn, post["url"])
-    logs = []
-    for post, mode, why in targets:
-        try:
-            result, cost = refresh_post(post, mode, settings)
-            add_spend(state, cost)
-            kind = {"retitle": "제목", "enhance": "보강"}.get(mode, "재검증")
-            logs.append(f"글 갱신({kind}): '{post['title']}' - {why} → {result}")
-        except Exception as e:  # noqa: BLE001
-            logs.append(f"글 갱신 실패: '{post['title']}' - {e}")
-        _count_done(state)
-    return logs
+    return plan_direct(state, settings.refresh_per_week <= done)
