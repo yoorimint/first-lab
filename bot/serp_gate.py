@@ -51,9 +51,8 @@ SYNONYMS = [
 _COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
 
 
-def _split_covered(word: str, body: set[str]) -> bool:
-    """붙여 쓴 합성어가 본문 낱말(2자 이상)로 나뉘면 다룬 것으로 봄 — 끝 한 글자(사·증 등)는 남아도 됨
-    (11/12 #477 질문 '부동산경매사는 국가자격증인가요?' ↔ 본문 '국가가 만든 부동산 경매 자격증은 없어요')."""
+def _splits(word: str, body: set[str]) -> bool:
+    """붙여 쓴 합성어가 본문 낱말(2자 이상)로 나뉘는지 — 끝 한 글자(사·증 등)는 남아도 됨."""
     if len(word) < 4:
         return False
     ok = [True] + [False] * len(word)  # ok[i]: 앞 i 글자가 본문 낱말로 나뉨
@@ -65,6 +64,12 @@ def _split_covered(word: str, body: set[str]) -> bool:
     return ok[-1] or (ok[-2] and len(word) >= 5)
 
 
+def _split_covered(word: str, body: set[str]) -> bool:
+    """붙여 쓴 합성어를 다룬 것으로 봄 (11/12 #477 '부동산경매사는 국가자격증인가요?' ↔ 본문 '부동산 경매 자격증').
+    앞 한 글자만 붙은 것도 한 번 떼어 봄 (11/12 #1408 '앞브레이크' ↔ 본문 '브레이크')."""
+    return _splits(word, body) or (len(word) >= 4 and (word[1:] in body or _splits(word[1:], body)))
+
+
 def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
     """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
     word = _COPULA.sub("", word) if len(word) > 3 else word
@@ -72,7 +77,8 @@ def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
             or (len(word) >= 3 and word in body_joined) or _split_covered(word, body))
 
 
-_ASKING = {"얼마나", "어떤", "어떻게", "언제", "어디", "어디서", "무엇", "무슨", "누가", "누구", "왜", "몇"}
+_ASKING = {"얼마나", "어떤", "어떻게", "언제", "어디", "어디서", "무엇", "무슨", "누가", "누구", "왜", "몇",
+           "될까", "되나", "될까요", "있으면", "없으면", "하면", "해야"}  # 의문사·말끝 — 주제어가 아님 (11/12 #1408 '앞브레이크 하나만 있으면 될까?')
 
 
 def uncovered(questions: list[str], body_html: str) -> list[str]:
