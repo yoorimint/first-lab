@@ -52,7 +52,7 @@ SYNONYMS = [
 ]
 
 
-_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지|될까|했다면|했나|할까)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
+_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지|될까|했다면|했나|할까|할|을까|나요)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
 
 
 def _splits(word: str, body: set[str]) -> bool:
@@ -74,23 +74,22 @@ def _split_covered(word: str, body: set[str]) -> bool:
     return _splits(word, body) or (len(word) >= 4 and (word[1:] in body or _splits(word[1:], body)))
 
 
-_JOSA_START = tuple("이가은는을를의에도과와으로만하되돼")  # 하·되: '이사하거나'·'적용되나'
 
 
 def _prefix_covered(word: str, body: set[str]) -> bool:
-    """본문 낱말이 이 말 + 조사·말끝이면 다룬 것으로 봄 ('대상' ↔ 본문 '대상이었어요', 11/12 #869)."""
-    return len(word) >= 2 and any(b.startswith(word) and b[len(word):].startswith(_JOSA_START) for b in body)
+    """본문 낱말이 이 말로 시작하면 다룬 것으로 봄 — 조사·말끝·뒤에 붙은 말 ('대상' ↔ '대상이었어요' #869, '신분' ↔ '신분증명서' #2159)."""
+    return len(word) >= 2 and any(b.startswith(word) and len(b) > len(word) for b in body)
 
 
 def _covered(word: str, body: set[str], body_joined: str = "") -> bool:
     """띄어쓰기만 다른 낱말도 같은 것으로 봄 (11/12 #1483 질문 '배시간' ↔ 본문 '배 시간')."""
-    word = _COPULA.sub("", word) if len(word) > 3 else word
+    word = _COPULA.sub("", word) if len(word) >= 3 and len(_COPULA.sub("", word)) >= 2 else word
     return (word in body or any(word in group and group & body for group in SYNONYMS)
             or (len(word) >= 3 and word in body_joined) or _split_covered(word, body) or _prefix_covered(word, body))
 
 
 _ASKING = {"얼마나", "어떤", "어떻게", "언제", "어디", "어디서", "무엇", "무슨", "누가", "누구", "왜", "몇",
-           "될까", "되나", "될까요", "있으면", "없으면", "하면", "해야"}  # 의문사·말끝 — 주제어가 아님 (11/12 #1408 '앞브레이크 하나만 있으면 될까?')
+           "될까", "되나", "될까요", "있으면", "없으면", "하면", "해야", "있을까", "있나", "찾을까", "가까운"}  # 의문사·말끝 — 주제어가 아님 (11/12 #1408 '앞브레이크 하나만 있으면 될까?')
 
 
 def uncovered(questions: list[str], body_html: str) -> list[str]:
