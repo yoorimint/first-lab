@@ -30,6 +30,7 @@ install_api_writer() {
   id firstlab-writer &>/dev/null || useradd --system --user-group --home-dir /var/lib/first-lab/writer --shell /usr/sbin/nologin firstlab-writer || return 1
   install -d -o firstlab-writer -g firstlab-writer -m 750 /var/lib/first-lab/writer || return 1
   install -d -m 750 /var/lib/first-lab/bot/local-queue || return 1
+  install -d -m 700 /var/lib/first-lab/bot/outbox || return 1   # main 에 올릴 저장소 수정 묶음 (root 전용 — GitHub Actions 가 배포 SSH 로 가져감, automation/api_sync.py)
   if [ "$(/opt/first-lab-node/bin/node --version 2>/dev/null)" != "v$NODE_VER" ]; then
     local tmp; tmp=$(mktemp -d)
     # (함수를 '||' 로 부르면 set -e 가 안 먹어 단계마다 return)

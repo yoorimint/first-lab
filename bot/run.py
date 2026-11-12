@@ -399,6 +399,12 @@ def main() -> None:
             save_state(state)  # 실행 전에 저장 (11/5 검토)
             fire_routine(state, settings, f"글 작성 {due}")
 
+    if now.minute % 10 == 9:  # API 봇 저장소 반영 묶음 정리 (GitHub 가 오래 안 가져가면 실패로 — 영원히 안 남게, 방식과 상관없이)
+        try:
+            api_writer.housekeeping()
+        except Exception as e:  # noqa: BLE001
+            add_log(state, False, f"API 봇 반영 묶음 정리 실패: {str(e)[:150]}")
+
     if now.minute % 10 == 0:  # 배포 밀림 감지 (bot/deploy_watch.py) — 어떤 오류도 봇을 멈추지 않게
         try:
             from .deploy_watch import run as watch_deploy
