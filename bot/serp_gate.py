@@ -45,10 +45,12 @@ SYNONYMS = [
     {"운영시간", "영업시간", "이용시간", "시간"},
     {"비용", "수수료", "요금", "금액"},
     {"월급", "임금", "급여"},
+    {"할인", "감면", "경감"},   # 11/12 #882 '3천원 할인' ↔ 본문 '3,000원 감면'
+    {"변동", "변경"},
 ]
 
 
-_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
+_COPULA = re.compile(r"(?:인가|일까|인지|이야|인데|이란|란|되나|됐나|되는지|될까)$")  # '국가자격증인가요' → '국가자격증' (요는 _stems 가 뗌)
 
 
 def _splits(word: str, body: set[str]) -> bool:
@@ -70,7 +72,7 @@ def _split_covered(word: str, body: set[str]) -> bool:
     return _splits(word, body) or (len(word) >= 4 and (word[1:] in body or _splits(word[1:], body)))
 
 
-_JOSA_START = tuple("이은는을를의에도과와으로만")
+_JOSA_START = tuple("이가은는을를의에도과와으로만하되돼")  # 하·되: '이사하거나'·'적용되나'
 
 
 def _prefix_covered(word: str, body: set[str]) -> bool:
@@ -94,7 +96,8 @@ def uncovered(questions: list[str], body_html: str) -> list[str]:
     body, joined = _stems(text), re.sub(r"\s+", "", text)
     out = []
     for q in questions:
-        words = _stems(str(q)) - _ASKING  # 의문사는 주제가 아니라 본문에 없어도 답일 수 있음 (11/12 #872·#823)
+        norm = re.sub(r"(\d+)천\s*원", lambda m: f"{int(m.group(1)) * 1000:,}원", str(q))  # '3천원' ↔ 본문 '3,000원' (#882)
+        words = _stems(norm) - _ASKING  # 의문사는 주제가 아니라 본문에 없어도 답일 수 있음 (11/12 #872·#823)
         if words and sum(_covered(w, body, joined) for w in words) < max(1, round(len(words) * COVER_RATIO)):
             out.append(str(q))
     return out
