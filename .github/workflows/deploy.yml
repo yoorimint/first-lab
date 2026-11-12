@@ -190,6 +190,10 @@ jobs:
         run: pip install -q -r bot/requirements.txt
       - name: Python syntax
         run: python -m compileall -q bot tests
+      - name: Derived files
+        # 자주 틀린 유형표는 patches.json 에서 만드는 파일 — 글쓰기 작업 2개가 거의 동시에 올리면 병합 뒤 표가 한 발 늦어
+        # 배포가 80분 막힘 (11/13 02:40 8ea8dc7). 검사 전에 다시 만들어 이 표 때문에는 배포가 막히지 않게 (내용 검사는 그대로)
+        run: python automation/common_errors.py
       - name: Unit tests
         run: python -m unittest discover -s tests -v
       - name: Calculators
