@@ -1407,6 +1407,41 @@ def known_wrong(body_html: str, today: dt.date | None = None) -> list[str]:
     return list(dict.fromkeys(out))
 
 
+_FRACTION = re.compile(r"(10만|1만|1천|1000|100)\s*분의\s*(\d+(?:\.\d+)?)")
+_FRACTION_DEN = {"10만": 100000, "1만": 10000, "1천": 1000, "1000": 1000, "100": 100}
+_PERCENT = re.compile(r"(\d+(?:\.\d+)?)\s*%")
+# 법이 정한 율 — 문장에 이 말이 있으면 % 가 이 값의 소수점 자리만 다른지 봄 (국세기본법 시행령 제27조의4 ①하루 10만분의 22 ②월 1만분의 67)
+KNOWN_RATES = ((r"납부지연가산세|가산세", r"하루|1일당|매일", 0.022), (r"납부지연가산세|가산세", r"한 달|달마다|매월|개월마다", 0.67))  # '1월 1일'·'7월' 같은 날짜는 단위로 안 봄
+
+
+def _decimal_shift(value: float, right: float) -> bool:
+    """value 가 right 의 10배·100배·1/10·1/100 … (소수점 자리만 틀림)."""
+    if value <= 0 or abs(value - right) < 1e-9:
+        return False
+    ratio = value / right
+    return any(abs(ratio - 10 ** k) < 1e-6 * 10 ** k for k in (-3, -2, -1, 1, 2, 3))
+
+
+def rate_decimals(body_html: str) -> list[str]:
+    """퍼센트 소수점 자리 틀림 (11/12 #1766 '월 1만분의 67'을 '한 달마다 0.067%'로 씀 — 실제 0.67%).
+    ① 'N분의 M'과 같은 문장의 % 가 그 값의 자리만 다르면, ② 가산세 글에서 하루·한 달 율이 법 값의 자리만 다르면 막음."""
+    out = []
+    whole = _plain(body_html or "")
+    blocks = [_plain(b).strip() for b in re.split(r"</(?:p|li|td|th|h2|h3)>", body_html or "")]  # 문단 단위 ('…때마다' 에서 문장이 끊김)
+    for sent in [b for b in blocks if b]:
+        pcts = [float(v) for v in _PERCENT.findall(sent)]
+        if not pcts:
+            continue
+        rights = [float(m) * 100 / _FRACTION_DEN[d] for d, m in _FRACTION.findall(sent)]
+        for topic, unit, rate in KNOWN_RATES:
+            if re.search(topic, whole) and re.search(unit, sent):  # 주제어는 앞 문장에 있을 수 있음 (#1766)
+                rights.append(rate)
+        for right in rights:
+            if not any(abs(v - right) < 1e-9 for v in pcts) and any(_decimal_shift(v, right) for v in pcts):
+                out.append(f"퍼센트 소수점 자리 틀림: '{sent[:50]}' — 법 값은 {right:g}%")
+    return list(dict.fromkeys(out))
+
+
 BALANCED_TAGS = ("p", "ul", "ol", "li", "table", "tr", "td", "th", "h2", "h3", "strong", "a")
 
 

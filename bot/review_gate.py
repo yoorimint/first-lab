@@ -165,6 +165,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.excerpt_principle(excerpt, body_html)
     out += condition_gate.heading_without_amounts(body_html)
     out += condition_gate.known_wrong(body_html)
+    out += condition_gate.rate_decimals(body_html)
     out += condition_gate.html_unbalanced(body_html)
     out += condition_gate.faq_answer_flip(body_html)
     from . import law_api

@@ -6223,6 +6223,19 @@ class PlusCheckTest(unittest.TestCase):
             self.assertFalse((Path(d) / "plus-1.json").exists())
             self.assertTrue((Path(d) / "plus-2.json").exists())
 
+    def test_rate_decimal_place_wrong_is_blocked(self):
+        """11/12 #1766: 시행령 제27조의4② '월 1만분의 67'(0.67%)을 '한 달마다 0.067%'로 씀 — 검사가 못 잡아 외부 검수가 찾음.
+        가산세 글의 하루·한 달 율, 'N분의 M' 옆 % 가 법 값의 소수점 자리만 다르면 막는다 (새 글 관문·보강 검사 둘 다)."""
+        from bot import condition_gate
+        wrong = "<p>납부지연가산세도 붙어요.</p><p>2026년 7월 1일 이후에는 한 달이 지날 때마다 0.067%씩 더 붙어요.</p>"
+        self.assertTrue(condition_gate.rate_decimals(wrong))
+        self.assertTrue(condition_gate.rate_decimals("<p>하루 10만분의 22(0.22%)씩 붙어요.</p>"))
+        ok = ("<p>납부지연가산세는 하루 0.022%예요. 한 달마다 0.67%씩 더 붙어요. 고지서 기한까지 안 내면 3%가 붙어요.</p>"
+              "<p>무신고가산세는 20%예요.</p><p>해외주식은 1월 1일~12월 31일 이익의 22%예요.</p>")
+        self.assertEqual(condition_gate.rate_decimals(ok), [])
+        self.assertIn("condition_gate.rate_decimals(body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+        self.assertIn("condition_gate.rate_decimals(new_html)", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
