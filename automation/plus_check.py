@@ -142,6 +142,7 @@ def problems(old_html: str, new_html: str, record: dict, title: str = "", allow:
     from bot import condition_gate, serp_gate
     out += condition_gate.known_wrong(new_html)
     out += condition_gate.rate_decimals(new_html)
+    out += condition_gate.summary_principle(title, new_html)
     old_sents = set(condition_gate._sentences(old_html))
     new_sents = [x for x in condition_gate._sentences(new_html) if x not in old_sents]
     out += condition_gate.source_absence(new_sents)

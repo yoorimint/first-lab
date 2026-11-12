@@ -6249,6 +6249,22 @@ class PlusCheckTest(unittest.TestCase):
         self.assertTrue(plus_check.title_problems("함허동천 요금: 1박 18,000원", "함허동천 요금: 1박 35,000원", body, allow))
         self.assertEqual(plus_check.title_problems("함허동천 요금: 1박 18,000원", "", body, set()), [])  # --fix 없으면 묻지 않음
 
+    def test_summary_line_keeps_principle(self):
+        """11/12 #3939: 제목 '판정은 원칙 30일 이내'·첫 문단 '원칙 30일' ↔ 한 줄 정리 '30일 안에 등급이 정해져요'(법 제16조① 단서 연장)
+        — 외부 검수가 찾음. 한 줄 정리가 원칙인 기간을 '원칙' 없이 단정하면 막는다 (새 글 관문·보강 검사)."""
+        from bot import condition_gate
+        bad = ("<p>노인장기요양등급 신청은 공단에 신청서를 내요.<br>✔ 신청 후 원칙 30일 안에 판정<br>✔ 결과 불만은 90일 안에</p>"
+               "<p><strong>한 줄 정리:</strong> 방문조사와 의사소견서로 30일 안에 등급이 정해져요.</p>")
+        self.assertTrue(condition_gate.summary_principle("판정은 원칙 30일 이내", bad))
+        good = bad.replace("의사소견서로 30일", "의사소견서로 원칙적으로 30일")
+        self.assertEqual(condition_gate.summary_principle("판정은 원칙 30일 이내", good), [])
+        # 원칙 뒤 다른 ✔ 줄의 숫자는 원칙이 아님 (#1707 '✔ 원칙은 공급한 때에 발급 ✔ 월합계는 다음 달 10일')
+        other = ("<p>세금계산서 발급 방법이에요. ✔ 원칙은 공급한 때에 발급 ✔ 월합계는 다음 달 10일까지</p>"
+                 "<p><strong>한 줄 정리:</strong> 월합계는 다음 달 10일까지 할 수 있어요.</p>")
+        self.assertEqual(condition_gate.summary_principle("세금계산서 발급 방법", other), [])
+        self.assertIn("condition_gate.summary_principle(title, body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+        self.assertIn("condition_gate.summary_principle(title, new_html)", (ROOT / "automation" / "plus_check.py").read_text(encoding="utf-8"))
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
