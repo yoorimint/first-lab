@@ -6198,6 +6198,31 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn('serp_gate.written_plus(data.get("serp"))', src)
         self.assertIn("refresh.PLUS_META", src)
 
+    def test_plus_queue_skips_post_on_connection_reset(self):
+        """11/12: 서버 부하 중 /post 연결이 한 번 끊기자(ConnectionResetError) 보강 대기열 전체가 멈춤 → 그 글만 건너뛰고 나머지를 고른다."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import tempfile
+        from unittest import mock
+        import plus_queue
+        done = "<strong>한 줄 정리:</strong> x"
+
+        def get(url, token=False):
+            if url.endswith("/1"):
+                raise ConnectionResetError(104, "reset")
+            return {"post_id": 2, "content_html": done, "plus_at": "", "keyword": "둘"}
+        with tempfile.TemporaryDirectory() as d, \
+                mock.patch.object(plus_queue, "OUT", Path(d)), \
+                mock.patch.object(plus_queue.plain_queue, "order", return_value=[1, 2]), \
+                mock.patch("unreviewed.reviewed_ids", return_value={1, 2}), \
+                mock.patch.object(plus_queue, "pending", return_value=False), \
+                mock.patch.object(plus_queue, "patch_pending", return_value=False), \
+                mock.patch.object(plus_queue, "written_plus_keywords", return_value=set()), \
+                mock.patch.object(plus_queue.tick, "get", side_effect=get), \
+                mock.patch.object(plus_queue.naver_top, "report", return_value="상위 글"):
+            self.assertEqual(plus_queue.main(2), 0)
+            self.assertFalse((Path(d) / "plus-1.json").exists())
+            self.assertTrue((Path(d) / "plus-2.json").exists())
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
