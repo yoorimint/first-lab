@@ -1,0 +1,249 @@
+[
+ {
+  "why": "별표 11: 단독 총급여액 등 1,800만 원(1,800만~1,810만 구간) = 508,000원. 식으로는 165만-(1,800만-900만)×165/1,300 = 507,692원이지만 법은 산정표 금액(제100조의5⑤)",
+  "input": {
+   "household": "single",
+   "wage": 18000000,
+   "property": 100000000,
+   "timing": "regular"
+  },
+  "expect": {
+   "total": 18000000,
+   "table_amount": 508000,
+   "amount": 508000,
+   "eligible": true
+  }
+ },
+ {
+  "why": "단독 400만 원, 재산 2억 원, 기한 후: 165만 × 50% × 95% = 783,750원 (제100조의5④, 제100조의7②)",
+  "input": {
+   "household": "single",
+   "wage": 4000000,
+   "property": 200000000,
+   "timing": "late"
+  },
+  "expect": {
+   "table_amount": 1650000,
+   "amount": 783750
+  },
+  "notes_include": [
+   "6개월 안에만"
+  ]
+ },
+ {
+  "why": "재산 1억 7,000만 원 딱: '이상'이라 50% → 맞벌이 3,000만 원 산정표 1,712,000원의 절반 856,000원",
+  "input": {
+   "household": "dual",
+   "wage": 30000000,
+   "property": 170000000,
+   "timing": "regular"
+  },
+  "expect": {
+   "table_amount": 1712000,
+   "amount": 856000
+  },
+  "boundary": true
+ },
+ {
+  "why": "재산 1억 6,999만 9,999원: 감액 없음 → 1,712,000원",
+  "input": {
+   "household": "dual",
+   "wage": 30000000,
+   "property": 169999999,
+   "timing": "regular"
+  },
+  "expect": {
+   "amount": 1712000
+  },
+  "boundary": true
+ },
+ {
+  "why": "재산 2억 4,000만 원 딱: '미만'이어야 신청 가능(제100조의3①4호) → 0원",
+  "input": {
+   "household": "single",
+   "wage": 6000000,
+   "property": 240000000,
+   "timing": "regular"
+  },
+  "expect": {
+   "amount": 0,
+   "eligible": false
+  },
+  "boundary": true,
+  "notes_include": [
+   "재산 합계가"
+  ]
+ },
+ {
+  "why": "단독 총급여 5만 원: 산정표 29,000원(4만~7만 구간), 늘어나는 구간에서 1만 5천 원 이상 10만 원 미만이면 10만 원(제100조의7③)",
+  "input": {
+   "household": "single",
+   "wage": 50000,
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "table_amount": 29000,
+   "amount": 100000
+  },
+  "boundary": true,
+  "notes_include": [
+   "100,000원을 줘요"
+  ]
+ },
+ {
+  "why": "같은 5만 원에 재산 2억: 29,000 × 50% = 14,500원 < 1만 5천 원 → 0원(제100조의7③)",
+  "input": {
+   "household": "single",
+   "wage": 50000,
+   "property": 200000000,
+   "timing": "regular"
+  },
+  "expect": {
+   "table_amount": 29000,
+   "amount": 0,
+   "eligible": false
+  },
+  "boundary": true,
+  "notes_include": [
+   "미만이면 지급하지"
+  ]
+ },
+ {
+  "why": "단독 총급여 3만 원: 산정표가 4만 원부터라 0원",
+  "input": {
+   "household": "single",
+   "wage": 30000,
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "table_amount": 0,
+   "amount": 0
+  }
+ },
+ {
+  "why": "단독 2,180만 원: 산정표 26,000원(2,180만~2,188만 1,900원 구간), 줄어드는 구간 3만 원 미만 → 3만 원",
+  "input": {
+   "household": "single",
+   "wage": 21800000,
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "table_amount": 26000,
+   "amount": 30000
+  },
+  "boundary": true,
+  "notes_include": [
+   "30,000원을 줘요"
+  ]
+ },
+ {
+  "why": "단독 2,200만 원 딱: 총소득기준 2,200만 원 '미만'(제100조의3①2호) → 0원",
+  "input": {
+   "household": "single",
+   "wage": 22000000,
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "amount": 0,
+   "eligible": false
+  },
+  "boundary": true,
+  "notes_include": [
+   "22,000,000원 미만이어야"
+  ]
+ },
+ {
+  "why": "홑벌이 2,400만 원: 산정표 1,267,000원 (2,400만~2,410만 구간)",
+  "input": {
+   "household": "one",
+   "wage": 24000000,
+   "property": 50000000,
+   "timing": "regular"
+  },
+  "expect": {
+   "table_amount": 1267000,
+   "amount": 1267000
+  }
+ },
+ {
+  "why": "프리랜서 인적용역 수입 1,000만 원 × 조정률 90% = 900만 원 → 단독 최대 165만 원 (시행령 제100조의3 차목)",
+  "input": {
+   "household": "single",
+   "biz": 10000000,
+   "biz_type": "r90",
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "biz_income": 9000000,
+   "total": 9000000,
+   "amount": 1650000
+  }
+ },
+ {
+  "why": "맞벌이 합계 500만 원: 부부 각각 300만 원 이상이 아니라 맞벌이가 아님 → 0원 안내",
+  "input": {
+   "household": "dual",
+   "wage": 5000000,
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "amount": 0
+  },
+  "notes_include": [
+   "맞벌이로 볼 수 없어요"
+  ]
+ },
+ {
+  "why": "부동산임대 수입 1,000만 원만 있는 단독: 총급여액 등에서 빠짐(시행령 제100조의6②5호) → 0원",
+  "input": {
+   "household": "single",
+   "biz": 10000000,
+   "biz_type": "rent",
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "total": 0,
+   "total_income": 9000000,
+   "amount": 0,
+   "eligible": false
+  },
+  "notes_include": [
+   "금액을 정하는 총급여액 등에서 빠지고"
+  ]
+ },
+ {
+  "why": "근로 2,000만 + 부동산임대 수입 300만(×90%=270만): 총소득 2,270만 ≥ 2,200만이라 단독 0원 (총소득 기준엔 들어감)",
+  "input": {
+   "household": "single",
+   "wage": 20000000,
+   "biz": 3000000,
+   "biz_type": "rent",
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect": {
+   "total": 20000000,
+   "total_income": 22700000,
+   "amount": 0
+  },
+  "notes_include": [
+   "22,000,000원 미만이어야"
+  ]
+ },
+ {
+  "why": "소득을 안 넣으면 안내 문장",
+  "input": {
+   "household": "single",
+   "property": 0,
+   "timing": "regular"
+  },
+  "expect_error": true
+ }
+]
