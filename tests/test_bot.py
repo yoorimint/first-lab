@@ -6403,6 +6403,10 @@ class PlainCheckTest(unittest.TestCase):
             # 그 파일을 만든 뒤에 생긴 패치(patches_upto 이후)는 다시 쓴 본문을 고치는 새 패치라 '다시 들어감'이 아님
             # (11/11 #1344: 다듬은 본문을 공개 직전 재검수가 고친 패치 4개가 이 검사에 걸림)
             upto = data.get("patches_upto")
+            if upto is None and stamp.group(1)[:8] == "20261110":
+                # patches_upto 가 생기기 전 다듬기 파일 18개(11/11 01:50 한 커밋, 그때 patches.json 1084개).
+                # 그 뒤 공개 직전 재검수 패치가 이 글들을 고치면 '다시 들어감'으로 잘못 걸림 (11/12 #1990)
+                upto = 1084
             patches = all_patches[:int(upto)] if upto is not None else all_patches
             if data.get("content_html") and patch_check.reintroduced(int(data["post_id"]), data["content_html"], patches):
                 bad.append(Path(f).name)
