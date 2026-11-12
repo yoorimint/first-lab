@@ -6271,6 +6271,17 @@ class PlusCheckTest(unittest.TestCase):
         wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
         self.assertLess(wf.index("python automation/common_errors.py"), wf.index("python -m unittest discover -s tests"))
 
+    def test_excerpt_keeps_group_alternative_value(self):
+        """11/13 #4220: 본문 '재산 4억 원(청년 5억 원) 이하' ↔ 요약·첫 문단 '재산 4억 원 이하' (시행령 제3조③ 단서) — 외부 검수가 찾음.
+        같은 숫자 뒤 괄호에 다른 집단의 값이 있으면 요약·첫 문단에도 넣게 막는다. '(월 120만 원)' 같은 설명 괄호는 빼고."""
+        from bot import condition_gate
+        body = "<p>1유형: 재산 4억 원 이하예요.</p><p>재산은 4억 원(청년 5억 원) 이하여야 해요.</p>"
+        self.assertTrue(condition_gate.group_alternatives("재산 4억 원 이하면 받아요.", body))
+        self.assertEqual(condition_gate.group_alternatives("재산 4억 원(청년 5억 원) 이하면 받아요.", body.replace("<p>1유형: 재산 4억 원 이하예요.</p>", "")), [])
+        explain = "<p>6개월 동안 360만 원(월 120만 원)을 받아요. 지방소득세 0.3%(소득세의 10%)도 내요.</p>"
+        self.assertEqual(condition_gate.group_alternatives("모두 360만 원, 지방소득세 0.3%예요.", explain), [])
+        self.assertIn("condition_gate.group_alternatives(excerpt, body_html)", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")

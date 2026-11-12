@@ -378,3 +378,9 @@ date,post,fixes,types
 2026-11-12,4160,2,missing_condition:1 wrong_fact:1
 2026-11-12,4271,0,
 2026-11-12,4263,1,missing_condition:1
+2026-11-12,4244,2,wrong_fact:2
+2026-11-12,4220,6,missing_condition:5 wrong_fact:1
+2026-11-12,4261,1,missing_condition:1
+2026-11-12,4233,0,
+2026-11-12,4235,0,
+2026-11-12,4246,0,
