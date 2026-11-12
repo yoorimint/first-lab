@@ -9,7 +9,7 @@
   - serp(상위 글 3곳·질문·더한 것)를 본문이 다 다루고, 상위 글 문장을 옮기지 않아야 함 (bot/serp_gate.py)
 통과하면 wordpress/queue/refresh-plus-<번호>-….json (kind "plus") → 서버 bot/refresh.apply_direct 가 serp 를 다시 보고 반영.
 
-사용: python3 automation/plus_check.py <글번호> <원본 JSON> <보강 본문 HTML> <보강 기록 JSON> [--write] [--fix=숫자|…:근거] [--excerpt=파일]
+사용: python3 automation/plus_check.py <글번호> <원본 JSON> <보강 본문 HTML> <보강 기록 JSON> [--write] [--fix=숫자|…:근거] [--excerpt=파일] [--title=파일 | --keep-title]
   보강 기록 JSON = {"serp": {...}, "review": [{"claim", "urls", "verdict", "action"}, ...],
                    "added": [{"type": "+질문|@계산예시|@상황판단|@최신개정|@조회방법", "for": "누구의 어떤 궁금증", "text": "더한 것 한 줄"}, ...]}
 """
@@ -181,6 +181,22 @@ def refresh_file(post_id: int, base_modified: str, new_html: str, record: dict, 
     return path
 
 
+def title_problems(old_title: str, new_title: str, new_html: str, allow: set[str], keep_title: bool = False) -> list[str]:
+    """제목 숫자 (11/12 #1297: 검수가 1박 요금을 18,000→33,000원으로 바로잡았는데 제목은 '1박 18,000원' 그대로 나갈 뻔함 —
+    18,000원은 체류 요금으로 본문에 남아 있어 '본문에 있나'로는 못 잡음).
+    --fix 로 원래 숫자를 바로잡았고 제목에 숫자가 있으면, 새 제목(--title=파일) 또는 그대로 둔다는 확인(--keep-title)을 요구한다.
+    새 제목의 숫자는 새 본문에 있어야 한다."""
+    from bot import review_gate
+    out = []
+    if allow and review_gate._headline_numbers(old_title) and not new_title and not keep_title:
+        out.append("원래 숫자를 바로잡았는데(--fix) 제목에 숫자가 있음 — 제목 숫자가 맞는지 보고 --title=파일 또는 --keep-title")
+    if new_title:
+        missing = review_gate._headline_numbers(new_title) - review_gate._numbers(re.sub(r"<[^>]+>", " ", new_html))
+        if missing:
+            out.append(f"새 제목 숫자 {', '.join(sorted(missing))} 가 본문에 없음")
+    return out
+
+
 def main(argv: list[str]) -> int:
     if len(argv) < 4:
         print(__doc__)
@@ -200,6 +216,9 @@ def main(argv: list[str]) -> int:
     excerpt_arg = next((a.split("=", 1)[1] for a in argv if a.startswith("--excerpt=")), "")
     new_excerpt = Path(excerpt_arg).read_text(encoding="utf-8").strip() if excerpt_arg else ""
     found += pc.excerpt_problems(original.get("excerpt", ""), original["content_html"], new_html, new_excerpt)
+    title_arg = next((a.split("=", 1)[1] for a in argv if a.startswith("--title=")), "")
+    new_title = Path(title_arg).read_text(encoding="utf-8").strip() if title_arg else ""
+    found += title_problems(original.get("title", ""), new_title, new_html, allow, "--keep-title" in argv)
     if found:
         print("통과 못 함:\n  " + "\n  ".join(found))
         return 1
@@ -209,7 +228,7 @@ def main(argv: list[str]) -> int:
             print("원본 JSON 에 base_modified 가 없음 — 그 사이 바뀐 글을 덮을 수 있어 갱신 파일을 만들지 않음")
             return 1
         print(refresh_file(post_id, base, new_html, record, fix.split(":", 1)[1] if fix else "",
-                           original.get("title", "") if new_excerpt else "", new_excerpt))
+                           new_title or (original.get("title", "") if new_excerpt else ""), new_excerpt))
     return 0
 
 
