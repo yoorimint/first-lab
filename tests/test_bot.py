@@ -6576,6 +6576,10 @@ class PlainCheckTest(unittest.TestCase):
         # 누락↔빠졌, '놓쳤거나' (11/12 #1750)
         tax = "<p>연말정산 때 공제가 빠졌다면 5월에 직접 반영해요. 그 기간을 놓쳤다면 경정청구를 해요.</p>"
         self.assertEqual(serp_gate.uncovered(["만약 연말정산 기간을 놓쳤거나 누락된 게 있다면?"], tax), [])
+        # 11/12 #1831 '어디서 신청하고' ↔ 본문 '세무서에 신청해요' (말끝만 다름)
+        refund = "<p>경정청구는 홈택스나 관할 세무서에 신청해요. 세무서는 2개월 안에 결과를 알려 줘야 해요.</p>"
+        self.assertEqual(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], refund), [])
+        self.assertTrue(serp_gate.uncovered(["경정청구는 어디서 신청하고 얼마나 걸리나요?"], "<p>연말정산은 2월에 해요.</p>"))
 
     def test_plus_fix_allows_link(self):
         """11/12 #176: --fix 로 옛 정보가 남은 링크를 뺄 때 주소의 'https:' 콜론을 근거 구분으로 잘못 읽음."""
