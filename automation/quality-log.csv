@@ -394,3 +394,5 @@ date,post,fixes,types
 2026-11-13,4306,22,unverified:22
 2026-11-13,4364,2,unverified:2
 2026-11-13,4372,0,
+2026-11-13,4334,2,missing_condition:1 wrong_fact:1
+2026-11-13,4356,0,
