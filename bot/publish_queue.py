@@ -147,9 +147,15 @@ def publish_file(path: Path, settings, allowed_links: set[str]) -> str:
             notes.append(failed[0][:120])
     if not failed:
         freshness.mark_verified(post_id)  # 공개 직전 확인(bot/freshness.py)의 기준일
-    # 근거 링크를 열어 주장 숫자 대조 — 지금은 기록만 (bot/source_check.py)
-    notes.append(source_check.record(post_id, data.get("review"),
-                                     lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val)))
+    # 근거 링크를 열어 주장 숫자 대조 — 숫자는 기록만, 근거를 못 읽는 숫자 없는 주장이 많으면 보류 (bot/source_check.unreadable_hold)
+    summary_note, checked = source_check.record_result(post_id, data.get("review"),
+                                                       lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
+    notes.append(summary_note)
+    unreadable = source_check.unreadable_hold(checked)
+    if unreadable and not failed:
+        failed = [unreadable]
+        wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, unreadable[:300])
+        notes.append(f"초안 보류: {unreadable[:100]}")
     _record_topic_done(data)
     with connect() as conn:
         exists = conn.execute("SELECT total FROM keywords WHERE norm=?", (norm(keyword),)).fetchone()
