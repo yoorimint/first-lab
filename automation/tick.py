@@ -136,7 +136,13 @@ def main() -> int:
     if bad:
         problems.append(bad)
     held = m.get("held_drafts") or []
-    print(f"보류 {len(held)}편" + (f": {[(x['post_id'], x['reason'][:40]) for x in held]}" if held else "") + f" · 쉬는 글 {len(m.get('gave_up') or [])}편")
+    gave_up = m.get("gave_up") or []
+    print(f"보류 {len(held)}편" + (f": {[(x['post_id'], x['reason'][:40]) for x in held]}" if held else "") + f" · 쉬는 글 {len(gave_up)}편")
+    for g in gave_up:
+        print(f"  쉬는 글 #{g.get('post_id')} {str(g.get('title', ''))[:30]} — {str(g.get('reason', ''))[:90]}")
+        if "OFFICIAL_HOSTS" in str(g.get("reason", "")) or "코드" in str(g.get("reason", "")):
+            # 11/13 #3211: 글쓰기 작업이 '코드에 주소 추가 필요'로 포기했는데 감시 보고엔 개수만 보여 아무도 안 고침
+            problems.append(f"쉬는 글 #{g.get('post_id')} 은 코드로 풀 일 (bot/sources.py OFFICIAL_HOSTS 등) — 고치면 배포 때 다시 검사해 풀림")
     print(login_line(m.get("logins") or {}, now))
     pp = m.get("publish_plan") or {}
     print("공개 계획: " + plan_line(pp.get("plan") or {}, pp.get("done") or {}))
