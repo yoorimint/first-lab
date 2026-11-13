@@ -6301,6 +6301,14 @@ class PlusCheckTest(unittest.TestCase):
             self.assertEqual(plus_audit.main(), 0)
         self.assertIn("못 읽음 1편", buf.getvalue())
 
+    def test_settings_page_counts_all_writer_slots(self):
+        """11/13 운영자 '글 작성 2개 해 놨는데 1편 완료': 설정 페이지가 1번 칸(continuous) 숫자만 보여 2번 칸 글이 빠졌음 → 칸마다 합침."""
+        page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
+        self.assertIn("'continuous_' . $slot", page)
+        self.assertIn("array_sum( $counts )", page)
+        from bot import run
+        self.assertEqual(run.slot_key(2), "continuous_2")  # 페이지가 읽는 키와 봇이 쓰는 키가 같아야 함
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
