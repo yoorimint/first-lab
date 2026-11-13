@@ -378,9 +378,20 @@ function firstlab_bot_render_status(): void {
 		<span class="description">
 			<?php
 			if ( $running ) {
+				// 칸(작성자)마다 따로 센 것을 합침 — 1번 칸(continuous)만 보여 2번이 쓴 글이 빠졌음 (11/13 운영자 '2개 해 놨는데 1편 완료')
+				$counts = array( (int) ( $continuous['count'] ?? 0 ) );
+				for ( $slot = 2; $slot <= 4; $slot++ ) {
+					if ( isset( $state[ 'continuous_' . $slot ] ) ) {
+						$counts[] = (int) ( ( (array) $state[ 'continuous_' . $slot ] )['count'] ?? 0 );
+					}
+				}
+				$by_slot = count( $counts ) > 1
+					? ' (' . implode( ' · ', array_map( fn( $n, $i ) => ( $i + 1 ) . '번 ' . $n . '편', $counts, array_keys( $counts ) ) ) . ')'
+					: '';
 				printf(
-					'진행 중 — 이번에 %d편 완료. 한 편씩 쓰고(20~40분), 올라오면 바로 다음 편. 정지를 누르면 쓰던 한 편까지만 마치고 멈춤.',
-					(int) ( $continuous['count'] ?? 0 )
+					'진행 중 — 이번에 %d편 완료%s. 한 편씩 쓰고(20~40분), 올라오면 바로 다음 편. 정지를 누르면 쓰던 한 편까지만 마치고 멈춤.',
+					array_sum( $counts ),
+					esc_html( $by_slot )
 				);
 			} else {
 				echo '멈춤. 시작을 누르면 Claude 가 정지할 때까지 한 편씩 계속 씁니다 (월정액: 구독 사용량, API 봇: API 키 요금·하루 비용 상한까지 — 한도에 닿거나 3번 연속 실패하면 스스로 멈춤).';
