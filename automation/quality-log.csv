@@ -398,3 +398,6 @@ date,post,fixes,types
 2026-11-13,4356,0,
 2026-11-13,4539,0,
 2026-11-13,4552,6,missing_condition:4 wrong_fact:2
+2026-11-13,3211,2,missing_condition:2
+2026-11-13,4489,0,
+2026-11-13,4492,4,wrong_fact:4
