@@ -64,6 +64,10 @@ def apply_fix(data: dict) -> str:
     wp_cli("post", "update", str(post_id), f"--post_content={to_blocks(new_html)}",
            f"--post_title={title}", f"--post_excerpt={excerpt}")
     failed = review_gate.problems(data.get("review"), title, excerpt, new_html)
+    if not failed:  # 근거를 못 읽는 숫자 없는 주장이 많으면 계속 보류 (새 검수 기록으로 다시 대조, bot/source_check.unreadable_hold)
+        _, checked = source_check.record_result(post_id, data.get("review"),
+                                                lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
+        failed = [x for x in [source_check.unreadable_hold(checked)] if x]
     if failed:
         wp_cli("post", "meta", "update", str(post_id), review_gate.HOLD_META, "; ".join(failed)[:300])
         tries = _bump_tries(post_id)
@@ -76,8 +80,6 @@ def apply_fix(data: dict) -> str:
         pass
     schedule.mark_ready(post_id)
     freshness.mark_verified(post_id)  # 다시 검수했으니 공개 직전 확인 기준일도 오늘
-    # 새 검수 기록으로 근거 대조도 다시 저장 (공개 직전 확인·법령 감시·공개 글 다시 보기가 이 근거를 봄)
-    source_check.record(post_id, data.get("review"), lambda pid, key, val: wp_cli("post", "meta", "update", pid, key, val))
     return f"'{title}' 재검사 통과 → 공개 대기열 ({str(data.get('changes', ''))[:80]})"
 
 
@@ -105,16 +107,28 @@ def latest_review(post_id: int, keyword: str, queue_dir: Path = QUEUE_DIR) -> li
     return None
 
 
-def regate(held: list[dict], review_of=latest_review, problems=None, release=None) -> list[str]:
-    """held: [{'post_id', 'keyword', 'title', 'excerpt', 'content'}]. 지금 코드로 통과하면 release(post_id, review)."""
+def _stored_unreadable(post_id: int) -> str | None:
+    """저장된 근거 대조(source_check.META)로 본 보류 이유 — 배포마다 페이지를 다시 열지 않음."""
+    from .settings import wp_meta
+    try:
+        return source_check.unreadable_hold(json.loads(wp_meta(post_id, source_check.META, wp_cli) or "null"))
+    except Exception:  # noqa: BLE001 - 기록을 못 읽으면 막지 않음 (다른 검사로 판단)
+        return None
+
+
+def regate(held: list[dict], review_of=latest_review, problems=None, release=None, unreadable=None) -> list[str]:
+    """held: [{'post_id', 'keyword', 'title', 'excerpt', 'content'}]. 지금 코드로 통과하면 release(post_id, review).
+    근거를 못 읽는 주장이 많아 막힌 글은 저장된 대조 결과가 그대로면 풀지 않는다 (글쓰기 작업이 고쳐 올려야 다시 대조)."""
     problems = problems or review_gate.problems
     release = release or _release
+    unreadable = unreadable or _stored_unreadable
     out = []
     for h in held:
         review = review_of(int(h["post_id"]), h.get("keyword", ""))
         if not review:
             continue
-        if not problems(review, h.get("title", ""), h.get("excerpt", ""), h.get("content", "")):
+        if not problems(review, h.get("title", ""), h.get("excerpt", ""), h.get("content", "")) \
+                and not unreadable(int(h["post_id"])):
             release(int(h["post_id"]), review)
             out.append(f"글 {h['post_id']} '{str(h.get('title', ''))[:30]}' 지금 검사로 통과 → 보류 해제·공개 대기열")
     return out

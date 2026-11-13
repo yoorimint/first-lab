@@ -662,14 +662,37 @@ def summary(result: dict) -> str:
             f" / 숫자 없는 주장 중 {UNREADABLE} {c[UNREADABLE]}")
 
 
-def record(post_id: int | str, review: list[dict] | None, save) -> str:
-    """대조해서 글 메타에 저장(save(post_id, META, json))하고 한 줄 요약을 돌려준다. 실패해도 공개에는 영향 없음."""
+# 근거를 못 읽는 숫자 없는 주장이 이만큼 넘으면 보류 (11/13 운영자 승인). #4306(건강보험 EDI 도움말)·#4528(복지로 모의계산 화면)은
+# 근거 페이지를 서버도 글쓰기 작업도 못 읽는데 메뉴 경로·입력 단위·결과 문구를 블로그대로 단정 → 외부 검수가 14·20곳을 확인불가로 냄.
+# 대기 글 460편 중 0~4개가 대부분(약 95%)이라 5개부터 막는다. 숫자 주장('페이지에 없음')은 여전히 기록만.
+UNREADABLE_LIMIT = 5
+
+
+def unreadable_hold(result: dict | None) -> str | None:
+    """근거 못 읽음이 UNREADABLE_LIMIT 개 이상이면 보류 이유 (없으면 None)."""
+    if not result:
+        return None
+    n = (result.get("counts") or {}).get(UNREADABLE, 0)
+    if n < UNREADABLE_LIMIT:
+        return None
+    eg = [c["claim"][:30] for c in result.get("claims") or [] if c.get("status") == UNREADABLE][:2]
+    return (f"근거 페이지를 읽을 수 없는 숫자 없는 주장 {n}개 (예: {' / '.join(eg)}) — 직접 열어 본 화면만 단정하고, "
+            f"못 본 메뉴·입력 방법·화면 문구는 '○○ 안내에서 확인'으로 바꾸기")
+
+
+def record_result(post_id: int | str, review: list[dict] | None, save) -> tuple[str, dict | None]:
+    """record 와 같고 대조 결과도 돌려준다 (보류 판단용). 대조 자체가 실패하면 (요약, None) — 막지 않음."""
     try:
         result = check(review)
         save(str(post_id), META, json.dumps(result, ensure_ascii=False))
-        return summary(result)
-    except Exception as e:  # noqa: BLE001 — 기록용 검사라 글 올리기를 막지 않는다
-        return f"근거 대조 실패(기록만): {e}"[:150]
+        return summary(result), result
+    except Exception as e:  # noqa: BLE001 — 대조가 실패한 것은 글 문제가 아니라 막지 않는다
+        return f"근거 대조 실패(기록만): {e}"[:150], None
+
+
+def record(post_id: int | str, review: list[dict] | None, save) -> str:
+    """대조해서 글 메타에 저장(save(post_id, META, json))하고 한 줄 요약을 돌려준다. 실패해도 공개에는 영향 없음."""
+    return record_result(post_id, review, save)[0]
 
 
 def main(argv: list[str]) -> None:
@@ -728,6 +751,7 @@ def main(argv: list[str]) -> None:
     from . import serp_gate
     gate += serp_gate.problems(data.get("serp"), data.get("content_html", ""))  # 상위 글 분석 (11/11)
     gate += serp_gate.copied(data.get("serp"), data.get("content_html", ""))
+    gate += [x for x in [unreadable_hold(result)] if x]  # 근거 못 읽음 5개 이상 → 서버가 보류 (11/13)
     for x in gate:
         print(f"- [관문] {x}")
     for a in amended(review):

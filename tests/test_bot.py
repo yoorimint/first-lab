@@ -6309,6 +6309,25 @@ class PlusCheckTest(unittest.TestCase):
         from bot import run
         self.assertEqual(run.slot_key(2), "continuous_2")  # 페이지가 읽는 키와 봇이 쓰는 키가 같아야 함
 
+    def test_unreadable_claims_hold_draft(self):
+        """11/13 운영자 승인: #4306·#4528 은 근거 페이지(EDI 도움말·복지로 화면)를 아무도 못 읽는데 메뉴·입력 단위·결과 문구를 단정 →
+        외부 검수가 14·20곳 확인불가. 근거 못 읽음이 5개 이상이면 새 글·보류 수정은 보류, 배포 때 다시 검사도 저장된 대조로 안 풂."""
+        from bot import hold, source_check
+        many = {"counts": {"근거 못 읽음": 5}, "claims": [{"claim": "만 원 단위로 입력", "status": "근거 못 읽음"}]}
+        few = {"counts": {"근거 못 읽음": 4}, "claims": []}
+        self.assertIn("만 원 단위로 입력", source_check.unreadable_hold(many))
+        self.assertIsNone(source_check.unreadable_hold(few))
+        self.assertIsNone(source_check.unreadable_hold(None))
+        released = []
+        held = [{"post_id": 4528, "keyword": "k", "title": "t"}, {"post_id": 1, "keyword": "k", "title": "t"}]
+        hold.regate(held, review_of=lambda pid, kw: [{"claim": "a"}], problems=lambda *a: [],
+                    release=lambda pid, review: released.append(pid),
+                    unreadable=lambda pid: "근거 못 읽음 15개" if pid == 4528 else None)
+        self.assertEqual(released, [1])
+        pq = (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8")
+        self.assertIn("source_check.unreadable_hold(checked)", pq)
+        self.assertIn("source_check.unreadable_hold(checked)", (ROOT / "bot" / "hold.py").read_text(encoding="utf-8"))
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
