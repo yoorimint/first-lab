@@ -1,0 +1,19 @@
+{
+ "type": "image_check",
+ "post_id": 1397,
+ "replace": [
+  {
+   "old": "ai-088cb25952",
+   "prompt": "a mechanic in work gloves inspecting the underside exhaust pipe of a diesel truck in a bright garage",
+   "alt": "밝은 정비소에서 경유 트럭 배기관을 점검하는 정비사",
+   "why": "대표 사진이 글자로 된 제목 카드라 사진으로 바꿈"
+  }
+ ],
+ "remove": [],
+ "add": [
+  {
+   "prompt": "a mechanic in work gloves inspecting the underside exhaust pipe of a diesel truck in a bright garage",
+   "alt": "밝은 정비소에서 경유 트럭 배기관을 점검하는 정비사"
+  }
+ ]
+}
