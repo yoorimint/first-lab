@@ -408,3 +408,5 @@ date,post,fixes,types
 2026-11-13,4625,2,missing_condition:1 wrong_fact:1
 2026-11-13,4633,1,missing_condition:1
 2026-11-13,4590,0,
+2026-11-13,4642,4,missing_condition:3 unverified:1
+2026-11-13,4650,1,missing_condition:1
