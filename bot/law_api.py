@@ -50,11 +50,18 @@ def fetch(kind: str, target: str = "law", **params) -> str | None:
         if oc:
             query = urllib.parse.urlencode({"OC": oc, "target": target, "type": "XML", **params})
             body = _get(DRF.format(page=PAGES[kind]) + "?" + query)
-            return None if not body or is_error(body) else body
+            return None if not body or is_error(body) or is_maintenance(body) else body
         got = via_site(kind, target, **params)
         return got.get("body") if got and got.get("status") == 200 else None
     except (OSError, ValueError):  # 연결 끊김·시간 초과·JSON 아님 → 화면 읽기로
         return None
+
+
+def is_maintenance(body: str) -> bool:
+    """법제처 시스템 점검 중에는 XML 대신 '시스템 점검' HTML 화면을 200 으로 돌려준다 (11/14 새벽: XML 로 읽다 'mismatched tag' —
+    새 법 감시·글 올리기 실패, 공개 직전 확인이 숫자를 '사라짐'으로 봐 08:56 공개 후보 3편을 모두 보류). 받은 것이 없는 것으로 본다."""
+    head = (body or "")[:3000]
+    return "<!doctype html" in head[:300].lower() or "시스템 점검" in head
 
 
 def is_error(body: str) -> bool:

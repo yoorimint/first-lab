@@ -235,6 +235,8 @@ def fetch(url: str) -> str | None:
     if "law.go.kr" in urllib.parse.unquote(url):
         from .condition_gate import _cached
         page = _cached("page", url, lambda: _fetch(url))
+        if page and law_down(page):  # 점검 화면이 하루 저장(_cached)돼 있어도 못 연 것으로 (11/14)
+            return None
         annex = law_annex(url)
         return f"{page} {annex}" if page and annex else page
     from .benefit_detail import detail_text, service_ids
@@ -244,6 +246,11 @@ def fetch(url: str) -> str | None:
     if official:
         return f"{page or ''} {official.replace(',', '')}".strip()
     return page
+
+
+def law_down(text: str) -> bool:
+    """법제처(law.go.kr) 시스템 점검 화면 — 본문이 아니므로 '못 엶' (숫자가 '사라짐'으로 보이면 공개 직전 확인이 글을 보류함, 11/14)."""
+    return "시스템 점검" in (text or "")[:3000] and ("법제처" in text or "국가법령정보" in text)
 
 
 def _fetch(url: str) -> str | None:
@@ -272,6 +279,8 @@ def _fetch(url: str) -> str | None:
             if "html" not in ctype and "text" not in ctype:
                 return doc_text(raw)  # PDF·hwpx 는 글자를 뽑아 대조 (못 읽으면 '' = 열리긴 함)
             text = page_text(raw, resp.headers.get_content_charset())
+            if law_down(text):
+                return None
             text += " " + attachment_text(raw.decode(resp.headers.get_content_charset() or "utf-8", "ignore"), url)
             return text if len(re.findall(r"[가-힣]", text)) >= MIN_KOREAN else None
     except (urllib.error.URLError, TimeoutError, ValueError, ConnectionError, OSError):
