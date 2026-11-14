@@ -6328,6 +6328,23 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("source_check.unreadable_hold(checked)", pq)
         self.assertIn("source_check.unreadable_hold(checked)", (ROOT / "bot" / "hold.py").read_text(encoding="utf-8"))
 
+    def test_law_maintenance_page_is_not_content(self):
+        """11/14 새벽 법제처 시스템 점검: API·화면이 '시스템 점검' HTML 을 200 으로 줌 → XML 로 읽다 'mismatched tag'(새 법 감시·글 올리기 실패),
+        공개 직전 확인은 법령 숫자가 '사라짐'으로 보여 08:56 공개 후보 3편을 모두 보류. 점검 화면은 못 받은 것으로 본다."""
+        from unittest import mock
+        from bot import freshness, law_api, source_check
+        page = '<!DOCTYPE html><html><head><title>시스템 점검</title><meta name="author" content="법제처"></head><body>국가법령정보센터 시스템 점검 안내</body></html>'
+        self.assertTrue(law_api.is_maintenance(page))
+        self.assertFalse(law_api.is_maintenance('<?xml version="1.0" encoding="UTF-8"?><LawSearch><law>'))
+        self.assertTrue(source_check.law_down("국가법령정보센터 시스템 점검 안내 법제처"))
+        self.assertFalse(source_check.law_down("제116조(과태료) ① 다음 각 호의 어느 하나에 해당하는 자에게는 500만원 이하의 과태료"))
+        with mock.patch.object(law_api, "_server_oc", return_value="x"), mock.patch.object(law_api, "_get", return_value=page):
+            self.assertIsNone(law_api.fetch("search", "law", query="근로기준법"))
+        # 근거 페이지를 못 열면 공개 직전 확인은 판단하지 않음 (보류 안 함)
+        record = {"found": [{"claim": "500만 원 이하 과태료", "numbers": ["500"], "urls": ["https://www.law.go.kr/법령/근로기준법"]}]}
+        import datetime as dt
+        self.assertEqual(freshness.problems(record, [], dt.date(2026, 11, 1), dt.date(2026, 11, 14), fetcher=lambda u: None), [])
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
