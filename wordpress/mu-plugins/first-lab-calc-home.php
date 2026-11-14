@@ -11,6 +11,11 @@ defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_CALC_PAGE_SUFFIX = '-calculator';
 
+// 계산기 단독 페이지를 검색에서 뺌 (11/14 운영자 '계산기 일단 안 보이게'): 애드센스 '가치가 별로 없는 콘텐츠' 판정 —
+// 사이트맵 97개 중 약 75개가 화면 글자 350자 남짓의 계산기 페이지(계산기는 자바스크립트)라 얇은 페이지가 사이트 대부분.
+// 페이지와 계산기는 그대로 열리고(글 안 계산기도 그대로), 검색엔진에만 noindex + 사이트맵 제외. 설명을 채운 뒤 false 로 되돌림.
+const FIRSTLAB_CALC_PAGES_NOINDEX = true;
+
 /** 계산기 단독 페이지 슬러그 → 계산기 id ('capital-gains-tax-calculator' → 'capital-gains-tax'). 계산기 페이지가 아니면 ''. */
 function firstlab_calc_id_of_slug( string $slug ): string {
 	$slug = urldecode( $slug );
@@ -80,15 +85,30 @@ add_action(
 	}
 );
 
-// 사이트맵(The SEO Framework): 넘어가는 단독 페이지는 빼고 대표 글만 남김
+// 사이트맵(The SEO Framework): 넘어가는 단독 페이지는 빼고 대표 글만 남김 (FIRSTLAB_CALC_PAGES_NOINDEX 면 계산기 단독 페이지 모두)
 add_filter(
 	'the_seo_framework_sitemap_exclude_ids',
 	static function ( $ids ): array {
 		foreach ( get_pages( array( 'post_status' => 'publish' ) ) as $page ) {
-			if ( firstlab_calc_page_target( $page ) ) {
+			$is_calc = '' !== firstlab_calc_id_of_slug( $page->post_name );
+			if ( firstlab_calc_page_target( $page ) || ( FIRSTLAB_CALC_PAGES_NOINDEX && $is_calc ) ) {
 				$ids[] = $page->ID;
 			}
 		}
 		return (array) $ids;
+	}
+);
+
+// 계산기 단독 페이지 noindex (FIRSTLAB_CALC_PAGES_NOINDEX)
+add_filter(
+	'the_seo_framework_robots_meta_array',
+	static function ( $meta ) {
+		if ( FIRSTLAB_CALC_PAGES_NOINDEX && is_page() ) {
+			$page = get_queried_object();
+			if ( $page instanceof WP_Post && '' !== firstlab_calc_id_of_slug( $page->post_name ) ) {
+				$meta['noindex'] = 'noindex';
+			}
+		}
+		return $meta;
 	}
 );

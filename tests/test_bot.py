@@ -1667,7 +1667,8 @@ echo json_encode(array(
         self.assertIsNone(r["none"])                               # 넣은 공개 글이 없으면 단독 페이지 그대로
         self.assertEqual((r["link_cg"], r["link_vat"]), ("/p11/", "/vat-calculator/"))
         self.assertIsNone(r["post_not_page"])                      # 글 자체는 넘기지 않음
-        self.assertEqual(r["sitemap_skip"], [99, 1])               # 넘어가는 페이지만 사이트맵에서 뺌
+        # 넘어가는 페이지(1) + 11/14 부터 계산기 단독 페이지 모두(2, FIRSTLAB_CALC_PAGES_NOINDEX) 사이트맵에서 뺌
+        self.assertEqual(r["sitemap_skip"], [99, 1, 2])
         self.assertEqual((r["pick_first"], r["pick_none"]), (5, None))
 
     def test_list_and_related_use_home_post(self):
@@ -6358,6 +6359,14 @@ class PlusCheckTest(unittest.TestCase):
                     release_prepublish=lambda pid: released.append(pid))
         self.assertEqual(released, [808])   # 다시 확인해 통과한 글만
         self.assertEqual(kept, [])           # 검수 기록 없는 일반 보류 글은 그대로
+
+    def test_calculator_pages_kept_out_of_search(self):
+        """11/14 운영자 '계산기 일단 안 보이게': 애드센스 '가치가 별로 없는 콘텐츠' — 사이트맵 대부분이 글자 350자 남짓의 계산기 단독 페이지.
+        단독 페이지는 noindex + 사이트맵 제외 (페이지·계산기는 그대로 열림). 되돌릴 때는 상수만 false."""
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-calc-home.php").read_text(encoding="utf-8")
+        self.assertIn("const FIRSTLAB_CALC_PAGES_NOINDEX = true;", php)
+        self.assertIn("the_seo_framework_robots_meta_array", php)
+        self.assertIn("FIRSTLAB_CALC_PAGES_NOINDEX && $is_calc", php)
 
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
