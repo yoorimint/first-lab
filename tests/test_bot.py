@@ -6345,6 +6345,20 @@ class PlusCheckTest(unittest.TestCase):
         import datetime as dt
         self.assertEqual(freshness.problems(record, [], dt.date(2026, 11, 1), dt.date(2026, 11, 14), fetcher=lambda u: None), [])
 
+    def test_prepublish_hold_is_rechecked_without_review(self):
+        """11/14: 법제처 점검 화면 탓에 공개 직전 확인이 808·817 을 보류 → 원인을 고쳐도 배포 재검사가 검수 기록을 못 찾아 안 풀림.
+        '공개 전 확인'으로 막힌 글은 그 확인을 다시 돌려 통과하면 푼다 (검수 기록 없어도)."""
+        from bot import hold
+        released, kept = [], []
+        held = [{"post_id": 808, "title": "a"}, {"post_id": 817, "title": "b"}, {"post_id": 1, "title": "c"}]
+        hold.regate(held, review_of=lambda pid, kw: None, problems=lambda *a: [],
+                    release=lambda pid, review: kept.append(pid), unreadable=lambda pid: None,
+                    reason_of=lambda pid: "공개 전 확인: 숫자 500 사라짐" if pid in (808, 817) else "검수 미통과",
+                    prepublish=lambda pid: ["여전히 바뀜"] if pid == 817 else [],
+                    release_prepublish=lambda pid: released.append(pid))
+        self.assertEqual(released, [808])   # 다시 확인해 통과한 글만
+        self.assertEqual(kept, [])           # 검수 기록 없는 일반 보류 글은 그대로
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")

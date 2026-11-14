@@ -116,14 +116,48 @@ def _stored_unreadable(post_id: int) -> str | None:
         return None
 
 
-def regate(held: list[dict], review_of=latest_review, problems=None, release=None, unreadable=None) -> list[str]:
+PREPUBLISH = "공개 전 확인"  # bot/schedule.py 가 공개 직전 확인(freshness)으로 보류할 때 붙이는 이유 앞머리
+
+
+def _hold_reason(post_id: int) -> str:
+    from .settings import wp_meta
+    try:
+        return wp_meta(post_id, review_gate.HOLD_META, wp_cli) or ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def _prepublish_problems(post_id: int) -> list[str]:
+    try:
+        return freshness.check_post(post_id)
+    except Exception as e:  # noqa: BLE001 — 확인이 실패하면 풀지 않음 (다음 배포에 다시)
+        return [f"확인 실패: {e}"]
+
+
+def _release_prepublish(post_id: int) -> None:
+    """공개 직전 확인으로만 보류된 글 풀기 — 검수 기록·근거 대조 기록은 그대로 둠."""
+    wp_cli("post", "meta", "delete", str(post_id), review_gate.HOLD_META)
+    schedule.mark_ready(post_id)
+
+
+def regate(held: list[dict], review_of=latest_review, problems=None, release=None, unreadable=None,
+           reason_of=None, prepublish=None, release_prepublish=None) -> list[str]:
     """held: [{'post_id', 'keyword', 'title', 'excerpt', 'content'}]. 지금 코드로 통과하면 release(post_id, review).
     근거를 못 읽는 주장이 많아 막힌 글은 저장된 대조 결과가 그대로면 풀지 않는다 (글쓰기 작업이 고쳐 올려야 다시 대조)."""
     problems = problems or review_gate.problems
     release = release or _release
     unreadable = unreadable or _stored_unreadable
+    reason_of, prepublish = reason_of or _hold_reason, prepublish or _prepublish_problems
+    release_prepublish = release_prepublish or _release_prepublish
     out = []
     for h in held:
+        if reason_of(int(h["post_id"])).startswith(PREPUBLISH):
+            # 공개 직전 확인으로 막힌 글은 그 확인을 다시 — 검수 기록을 못 찾는 옛 글도 풀림 (11/14: 법제처 점검 화면을
+            # 법령 본문으로 읽어 808·817 을 '숫자 사라짐'으로 보류, 원인을 고친 뒤에도 검수 기록이 없어 안 풀렸음)
+            if not prepublish(int(h["post_id"])):
+                release_prepublish(int(h["post_id"]))
+                out.append(f"글 {h['post_id']} '{str(h.get('title', ''))[:30]}' 공개 전 확인 다시 통과 → 보류 해제·공개 대기열")
+            continue
         review = review_of(int(h["post_id"]), h.get("keyword", ""))
         if not review:
             continue
