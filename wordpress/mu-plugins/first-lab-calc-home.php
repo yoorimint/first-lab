@@ -99,6 +99,24 @@ add_filter(
 	}
 );
 
+// 사이트맵은 The SEO Framework 가 저장본(transient)으로 내보내 제외 목록이 바뀌어도 바로 안 바뀜 (11/14: noindex 뒤에도 계산기 71개 남음)
+// → 설정(FIRSTLAB_CALC_PAGES_NOINDEX)이 바뀌면 한 번 저장본을 지움
+add_action(
+	'init',
+	static function (): void {
+		$want = FIRSTLAB_CALC_PAGES_NOINDEX ? 'noindex' : 'index';
+		if ( get_option( 'firstlab_calc_sitemap_mode' ) === $want ) {
+			return;
+		}
+		global $wpdb;
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient%tsf%sitemap%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		if ( function_exists( 'wp_cache_flush_group' ) ) {
+			wp_cache_flush_group( 'transient' );
+		}
+		update_option( 'firstlab_calc_sitemap_mode', $want, false );
+	}
+);
+
 // 계산기 단독 페이지 noindex (FIRSTLAB_CALC_PAGES_NOINDEX)
 add_filter(
 	'the_seo_framework_robots_meta_array',
