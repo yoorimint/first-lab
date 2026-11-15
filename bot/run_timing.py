@@ -136,27 +136,36 @@ def put_carry(key: str, value: float, path: str = CARRY_FILE, add: bool = False)
 
 
 def unit_stopped_at(unit: str = "firstlab-bot.service", run=None) -> float | None:
-    """앞 실행이 systemd 에서 완전히 끝난(inactive) 시각 (유닉스 초). 못 읽으면 None."""
+    """앞 실행이 systemd 에서 완전히 끝난(inactive) 시각 — time.monotonic() 과 같은 시계(초). 못 읽으면 None.
+    (11/15: 서버 systemd 가 --timestamp=unix 를 몰라 빈 값 → 부팅 기준 시계 값으로)"""
     import subprocess
     run = run or subprocess.run
     try:
-        out = run(["systemctl", "show", "-P", "InactiveEnterTimestamp", "--timestamp=unix", unit],
+        out = run(["systemctl", "show", "-p", "InactiveEnterTimestampMonotonic", "--value", unit],
                   capture_output=True, text=True, timeout=10).stdout.strip()
-        return float(out.lstrip("@")) if out.startswith("@") else None
+        return int(out) / 1_000_000 if out.isdigit() and int(out) > 0 else None
     except (OSError, ValueError, subprocess.SubprocessError):
         return None
 
 
-def exit_gaps(carry: dict, stopped_at: float | None, now: float) -> dict[str, float]:
-    """11/15: 실행 안 일은 10초인데 3분에 한 번만 시작 — 어디서 기다리는지.
-    앞 실행 main 끝 → systemd 완전 종료(남은 자식 프로세스 정리) / 완전 종료 → 이번 시작(타이머 대기)."""
+def exit_gaps(carry: dict, stopped_at: float | None, started_at: float) -> dict[str, float]:
+    """11/15: 실행 안 일은 10초인데 3~4분에 한 번만 시작 — 어디서 기다리는지 (시각은 모두 time.monotonic 기준).
+    main 끝 → 파이썬 종료(남은 스레드 대기) → systemd 완전 종료(남은 자식 프로세스 정리) → 이번 시작(타이머)."""
     gaps: dict[str, float] = {}
-    end = carry.get("main_end")
-    if stopped_at and end and stopped_at >= float(end):
-        gaps["끝난 뒤 종료 대기(앞 실행)"] = round(stopped_at - float(end), 1)
-    if stopped_at and now >= stopped_at:
-        gaps["종료 → 다음 시작"] = round(now - stopped_at, 1)
+    end, gone = carry.get("main_end"), carry.get("exit_at")
+    if end and gone and float(gone) >= float(end):
+        gaps["끝난 뒤 스레드 대기(앞 실행)"] = round(float(gone) - float(end), 1)
+    last = gone or end
+    if stopped_at and last and stopped_at >= float(last):
+        gaps["종료 뒤 정리 대기(앞 실행)"] = round(stopped_at - float(last), 1)
+    if stopped_at and started_at >= stopped_at:
+        gaps["종료 → 다음 시작"] = round(started_at - stopped_at, 1)
     return gaps
+
+
+def mark_exit() -> None:
+    """파이썬이 남은 스레드를 다 기다린 뒤 부르는 atexit — 종료 시각을 다음 실행에 넘김."""
+    put_carry("exit_at", time.monotonic())
 
 
 def summary(day: dict) -> str:

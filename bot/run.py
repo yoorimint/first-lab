@@ -271,7 +271,7 @@ def main() -> None:
     laps = run_timing.Laps(started_ago=run_timing.process_age())  # 단계별 걸린 시간 (bot/run_timing.py, 11/15 매분 실행이 3분씩 걸림)
     carry = run_timing.take_carry()
     laps.add_carry(carry)
-    laps.add_outside(run_timing.exit_gaps(carry, run_timing.unit_stopped_at(), time.time() - (run_timing.process_age() or 0)))
+    laps.add_outside(run_timing.exit_gaps(carry, run_timing.unit_stopped_at(), time.monotonic() - (run_timing.process_age() or 0)))
     settings = load_settings()
     state = load_state()
     laps.lap("설정·상태 읽기")
@@ -458,8 +458,10 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-        from .run_timing import put_carry
-        put_carry("main_end", time.time())  # 다음 실행이 systemd 종료 시각과 비교 (끝난 뒤 남은 프로세스 대기)
+        import atexit
+        from .run_timing import mark_exit, put_carry
+        put_carry("main_end", time.monotonic())  # 다음 실행이 파이썬 종료·systemd 종료 시각과 비교 (끝난 뒤 남은 스레드·프로세스 대기)
+        atexit.register(mark_exit)
     except BaseException as e:  # 오류 내용을 다음 실행이 /maintenance run_timing 에 남김 (bot/run_timing.note_error)
         from .run_timing import note_error
         note_error(e)
