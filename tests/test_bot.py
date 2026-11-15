@@ -6462,7 +6462,28 @@ firstlab_stats_render_page();
         self.assertEqual(sorted(state["run_timing"]), ["2026-11-14", "2026-11-15"])   # 이틀만 보관
         self.assertIn("예약 공개 합 68초", run_timing.summary(day))
         run_py = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
-        self.assertIn("record_timing(state", run_py)
+        self.assertIn("run_timing.record(state", run_py)
+        self.assertIn('put_carry("locked"', run_py)
+        # 파이썬 시작 시간·앞 실행 저장 시간·잠금으로 건너뛴 수도 (11/15: 단계 합은 10초인데 15분에 4번만 돎)
+        import tempfile, os
+        with tempfile.TemporaryDirectory() as d:
+            carry = os.path.join(d, "carry.json")
+            run_timing.put_carry("locked", 1, path=carry, add=True)
+            run_timing.put_carry("locked", 1, path=carry, add=True)
+            run_timing.put_carry("save", 40.04, path=carry)
+            got = run_timing.take_carry(carry)
+            self.assertEqual(got, {"locked": 2, "save": 40.0})
+            self.assertEqual(run_timing.take_carry(carry), {})   # 한 번 읽으면 지움
+        ticks = iter([100, 103])
+        laps = run_timing.Laps(clock=lambda: next(ticks), started_ago=90)
+        laps.add_carry(got)
+        laps.lap("예약 공개")
+        state = {}
+        run_timing.record(state, "2026-11-15 19:40", laps)
+        day = state["run_timing"]["2026-11-15"]
+        self.assertEqual((day["total_max"], day["locked"]), (93, 2))
+        self.assertIn("시작(파이썬·불러오기) 90초", day["slow_last"])
+        self.assertIsNotNone(run_timing.process_age())
         self.assertIn("'run_timing'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
 
     def test_site_stats_page_is_separate_menu(self):

@@ -18,6 +18,7 @@ import fcntl
 import json
 import re
 import subprocess
+import time
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -262,10 +263,13 @@ def main() -> None:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)  # 이전 실행이 아직 작업 중이면 건너뜀
     except BlockingIOError:
         print("[run] 이전 실행이 아직 진행 중 → 건너뜀", flush=True)
+        from .run_timing import put_carry
+        put_carry("locked", 1, add=True)
         return
 
-    from .run_timing import Laps, record as record_timing
-    laps = Laps()  # 단계별 걸린 시간 (bot/run_timing.py, 11/15 매분 실행이 3분씩 걸림)
+    from . import run_timing
+    laps = run_timing.Laps(started_ago=run_timing.process_age())  # 단계별 걸린 시간 (bot/run_timing.py, 11/15 매분 실행이 3분씩 걸림)
+    laps.add_carry(run_timing.take_carry())
     settings = load_settings()
     state = load_state()
     laps.lap("설정·상태 읽기")
@@ -440,10 +444,12 @@ def main() -> None:
         state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
 
     laps.lap("정리·대시보드")
-    record_timing(state, f"{now:%Y-%m-%d %H:%M}", laps)
+    run_timing.record(state, f"{now:%Y-%m-%d %H:%M}", laps)
 
     if json.dumps(state, sort_keys=True, ensure_ascii=False) != before:
+        saving = time.monotonic()
         save_state(state)
+        run_timing.put_carry("save", time.monotonic() - saving)
 
 
 if __name__ == "__main__":
