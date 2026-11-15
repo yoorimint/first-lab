@@ -31,11 +31,12 @@
       { name: 'night_break_min', label: '그중 밤 10시~아침 6시에 쉰 시간 (분)', type: 'number', min: 0, step: 1, default: 0 },
       { name: 'days', label: '이렇게 일하는 날 (주, 일)', type: 'number', min: 1, step: 1, default: 5 },
       {
-        name: 'size', label: '상시 근로자 수', type: 'select', default: 'five',
+        name: 'size', label: '직원이 몇 명인가요?', type: 'choice', default: 'five',
+        help: "평소 일하는 직원 수('상시 근로자 수')예요.",
         options: [['five', '5명 이상'], ['small', '4명 이하']],
       },
       {
-        name: 'age', label: '근로자 나이', type: 'select', default: 'adult',
+        name: 'age', label: '일하는 사람 나이는요?', type: 'choice', default: 'adult',
         options: [['adult', '18세 이상'], ['minor', '15세 이상 18세 미만']],
       },
     ],

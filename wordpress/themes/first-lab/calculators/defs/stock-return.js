@@ -16,18 +16,19 @@
       { name: 'qty', label: '수량 (주)', type: 'number', min: 0, step: 1 },
       { name: 'sell_price', label: '판 가격 또는 지금 가격 (원)', type: 'number', min: 0, step: 1 },
       {
-        name: 'market', label: '시장', type: 'select', default: 'kospi',
+        name: 'market', label: '어느 시장 주식인가요?', type: 'choice', default: 'kospi',
+        help: '팔 때 붙는 세금 비율이에요. 코스피는 유가증권시장이에요.',
         options: [
-          ['kospi', '유가증권시장(코스피) 0.20%'],
+          ['kospi', '코스피 0.20%'],
           ['kosdaq', '코스닥 0.20%'],
           ['konex', '코넥스 0.10%'],
           ['none', '세금 빼고 계산'],
         ],
       },
       { name: 'fee', label: '매매 수수료율 (%, 한 번 거래할 때)', type: 'number', min: 0, step: 0.001, default: 0, help: '내 증권사 수수료율을 넣어요. 살 때와 팔 때 같은 율로 계산해요.' },
-      { name: 'dividend', label: '받은 배당금 합계 (원, 세금 뗀 뒤, 선택)', type: 'number', min: 0, step: 1, default: 0 },
-      { name: 'days', label: '보유 기간 (일, 연환산 수익률용, 선택)', type: 'number', min: 0, step: 1, default: 0 },
-      { name: 'target', label: '목표 수익률 (%, 목표 매도가용, 선택)', type: 'number', step: 0.01, default: 0 },
+      { name: 'dividend', label: '받은 배당금 (원, 선택)', type: 'number', min: 0, step: 1, default: 0, help: '세금 뗀 뒤 받은 배당금을 모두 더한 금액이에요.' },
+      { name: 'days', label: '가지고 있던 기간 (일, 선택)', type: 'number', min: 0, step: 1, default: 0, help: '넣으면 1년 기준으로 바꾼 수익률(연환산)도 나와요.' },
+      { name: 'target', label: '목표 수익률 (%, 선택)', type: 'number', step: 0.01, default: 0, help: '넣으면 그 수익률이 되는 매도가가 나와요.' },
     ],
 
     compute(v, d, u) {

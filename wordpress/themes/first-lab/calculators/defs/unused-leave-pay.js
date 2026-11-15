@@ -14,18 +14,19 @@
     intro: '통상임금과 쓰지 못한 연차 일수를 넣으면 받을 연차수당이 나와요.',
     inputs: [
       {
-        name: 'pay_type', label: '임금 형태', type: 'select', default: 'monthly',
-        options: [['monthly', '월급 (월 통상임금)'], ['hourly', '시급']],
+        name: 'pay_type', label: '월급인가요, 시급인가요?', type: 'choice', default: 'monthly',
+        options: [['monthly', '월급'], ['hourly', '시급']],
       },
       { name: 'amount', label: '월 통상임금 또는 시급 (원)', type: 'number', min: 1, step: 1, default: 2508000, help: '연차를 쓸 수 있던 마지막 달 기준이에요. 기본급에 정기적·일률적으로 주는 수당을 더하고, 연장·야간·휴일근로수당은 빼요.' },
-      { name: 'base_hours', label: '월 통상임금 산정 기준시간 (월급일 때)', type: 'number', min: 1, step: 'any', default: 209, help: '주 40시간·주휴 8시간이면 209시간이에요. 단시간이면 (1주 소정근로시간 + 주휴시간) × 365 ÷ 7 ÷ 12.' },
-      { name: 'day_hours', label: '1일 소정근로시간 (시간)', type: 'number', min: 0.5, step: 0.5, default: 8, help: '근로계약서에 정한 하루 근로시간이에요. 8시간을 넘게 정했어도 법정 근로시간은 하루 8시간이에요.' },
-      { name: 'week_hours', label: '1주 소정근로시간 (시간)', type: 'number', min: 0, step: 0.5, default: 40, help: '근로계약서에 정한 1주 근로시간이에요 (연장근로는 빼고, 주마다 다르면 4주 평균). 15시간 미만이면 연차가 생기지 않아요.' },
+      { name: 'base_hours', label: '한 달 기준시간 (월급일 때)', type: 'number', min: 1, step: 'any', default: 209, help: '\'월 통상임금 산정 기준시간\'이에요. 주 40시간·주휴 8시간이면 209시간이에요. 단시간이면 (1주 소정근로시간 + 주휴시간) × 365 ÷ 7 ÷ 12.' },
+      { name: 'day_hours', label: '하루에 일하기로 한 시간', type: 'number', min: 0.5, step: 0.5, default: 8, help: '근로계약서에 정한 하루 근로시간(\'1일 소정근로시간\')이에요. 8시간을 넘게 정했어도 법정 근로시간은 하루 8시간이에요.' },
+      { name: 'week_hours', label: '일주일에 일하기로 한 시간', type: 'number', min: 0, step: 0.5, default: 40, help: '근로계약서에 정한 1주 근로시간(\'1주 소정근로시간\')이에요 (연장근로는 빼고, 주마다 다르면 4주 평균). 15시간 미만이면 연차가 생기지 않아요.' },
       { name: 'days', label: '쓰지 못한 연차 일수 (일)', type: 'number', min: 0, step: 0.5, default: 7 },
-      { name: 'employees', label: '상시 근로자 수 (명)', type: 'number', min: 1, step: 1, default: 5, help: '4명 이하 사업장은 연차 유급휴가 규정이 적용되지 않아요.' },
+      { name: 'employees', label: '평소 일하는 직원 수 (명)', type: 'number', min: 1, step: 1, default: 5, help: '\'상시 근로자 수\'예요. 4명 이하 사업장은 연차 유급휴가 규정이 적용되지 않아요.' },
       {
-        name: 'promoted', label: '회사가 법에서 정한 서면 사용 촉진을 했나요', type: 'select', default: 'no',
-        options: [['no', '아니요 (또는 모름)'], ['yes', '네, 서면 촉구와 사용 시기 지정 통보를 모두 받았어요']],
+        name: 'promoted', label: '회사가 연차 쓰라고 서면으로 재촉했나요?', type: 'choice', default: 'no',
+        help: "법에서 정한 '연차 사용 촉진'은 두 단계예요. ① 회사가 남은 연차를 알려 주며 쓸 날을 정하라고 서면으로 재촉하고(서면 촉구), ② 그래도 안 정하면 회사가 쓸 날을 정해 서면으로 알려 줘요(사용 시기 지정 통보). 둘 다 받았을 때만 '네'를 골라요.",
+        options: [['no', '아니요 / 몰라요'], ['yes', '네, 두 번 다 받았어요']],
       },
     ],
 

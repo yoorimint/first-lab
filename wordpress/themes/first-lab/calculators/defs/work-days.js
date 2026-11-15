@@ -13,12 +13,12 @@
       { name: 'start', label: '시작일 (입사일·첫 근무일)', type: 'date', default: '2026-01-01' },
       { name: 'end', label: '마지막 날 (퇴사일이면 마지막 근무일)', type: 'date', default: 'today' },
       {
-        name: 'pattern', label: '일하는 요일', type: 'select', default: 'mon-fri',
+        name: 'pattern', label: '어느 요일에 일하나요?', type: 'choice', default: 'mon-fri',
         options: [['mon-fri', '월~금 (주 5일)'], ['mon-sat', '월~토 (주 6일)']],
       },
       {
-        name: 'holidays', label: '공휴일', type: 'select', default: 'skip',
-        options: [['skip', '공휴일은 쉬는 날로 빼기'], ['keep', '공휴일도 일하는 날로 세기']],
+        name: 'holidays', label: '공휴일은 어떻게 셀까요?', type: 'choice', default: 'skip',
+        options: [['skip', '쉬는 날로 빼기'], ['keep', '일하는 날로 세기']],
         help: '빼는 공휴일은 2026~2027년 관공서 공휴일·대체공휴일이에요. 회사가 따로 정한 휴무일은 빠지지 않아요.',
       },
     ],

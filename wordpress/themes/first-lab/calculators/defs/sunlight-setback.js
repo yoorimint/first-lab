@@ -30,10 +30,10 @@
   FirstLabCalc.register({
     id: 'sunlight-setback',
     title: '일조권 이격거리 계산기',
-    intro: '전용·일반주거지역에서 정북방향 인접 대지경계선으로부터 띄어야 하는 법정 최소 거리를 높이별로 계산해요. 개정 전 기준과 같이 보여 줘요.',
+    intro: '전용·일반주거지역에서 건물 높이를 넣으면 정북쪽 이웃 땅 경계선에서 띄어야 할 최소 거리가, 거리를 넣으면 지을 수 있는 최대 높이가 나와요. 개정 전 기준도 같이 보여 줘요.',
     inputs: [
-      { name: 'mode', label: '무엇을 계산할까요', type: 'select', default: 'height', options: [['height', '건물 높이 → 띄울 거리'], ['distance', '경계선에서 거리 → 최대 높이']] },
-      { name: 'value', label: '건물 부분의 높이 또는 경계선에서 거리 (m)', type: 'number', min: 0, step: 'any', default: 15, help: '높이는 그 부분의 높이(지표면 기준), 거리는 정북방향 인접 대지경계선까지의 수평거리예요.' },
+      { name: 'mode', label: '무엇을 계산할까요?', type: 'choice', default: 'height', options: [['height', '건물 높이 → 띄울 거리'], ['distance', '경계선에서 거리 → 최대 높이']] },
+      { name: 'value', label: '높이 또는 거리 (m)', type: 'number', min: 0, step: 'any', default: 15, help: '위에서 고른 것에 따라 넣어요. 높이는 건물 그 부분의 높이(지표면 기준), 거리는 정북방향 인접 대지경계선까지의 수평거리예요.' },
       { name: 'apply', label: '건축허가 신청(또는 건축신고)일', type: 'date', default: 'today', help: '2026년 11월 12일 이후 신청분부터 새 기준이에요 (건축위원회 심의 신청 포함).' },
     ],
 
