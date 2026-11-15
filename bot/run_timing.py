@@ -37,6 +37,10 @@ class Laps:
         self.errors = int(carry.get("errors", 0))
         self.last_error = str(carry.get("last_error", ""))
 
+    def add_outside(self, gaps: dict[str, float]) -> None:
+        """실행 밖에서 흐른 시간 (총 시간에는 안 더함)."""
+        self.steps.update(gaps)
+
     def lap(self, name: str) -> None:
         now = self._clock()
         self.steps[name] = self.steps.get(name, 0.0) + (now - self.last)
@@ -129,6 +133,30 @@ def put_carry(key: str, value: float, path: str = CARRY_FILE, add: bool = False)
             json.dump(carry, f)
     except OSError:
         pass
+
+
+def unit_stopped_at(unit: str = "firstlab-bot.service", run=None) -> float | None:
+    """앞 실행이 systemd 에서 완전히 끝난(inactive) 시각 (유닉스 초). 못 읽으면 None."""
+    import subprocess
+    run = run or subprocess.run
+    try:
+        out = run(["systemctl", "show", "-P", "InactiveEnterTimestamp", "--timestamp=unix", unit],
+                  capture_output=True, text=True, timeout=10).stdout.strip()
+        return float(out.lstrip("@")) if out.startswith("@") else None
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+
+
+def exit_gaps(carry: dict, stopped_at: float | None, now: float) -> dict[str, float]:
+    """11/15: 실행 안 일은 10초인데 3분에 한 번만 시작 — 어디서 기다리는지.
+    앞 실행 main 끝 → systemd 완전 종료(남은 자식 프로세스 정리) / 완전 종료 → 이번 시작(타이머 대기)."""
+    gaps: dict[str, float] = {}
+    end = carry.get("main_end")
+    if stopped_at and end and stopped_at >= float(end):
+        gaps["끝난 뒤 종료 대기(앞 실행)"] = round(stopped_at - float(end), 1)
+    if stopped_at and now >= stopped_at:
+        gaps["종료 → 다음 시작"] = round(now - stopped_at, 1)
+    return gaps
 
 
 def summary(day: dict) -> str:
