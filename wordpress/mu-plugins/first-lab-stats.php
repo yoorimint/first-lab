@@ -41,6 +41,24 @@ function firstlab_stats_page_link( string $page, int $post_id = 0 ): string {
 	return esc_html( rawurldecode( $page ) );
 }
 
+/** 색인 안 된 글 한 줄: 전에 색인됐다가 빠졌는지, 구글이 다른 주소를 대표로 골랐는지 (bot/index_check.summarize). */
+function firstlab_stats_waiting_row( array $w ): array {
+	$note = array();
+	if ( ! empty( $w['was_indexed'] ) ) {
+		$note[] = esc_html( $w['was_indexed'] . ' 색인 확인 → 빠짐' );
+	}
+	if ( ! empty( $w['other_canonical'] ) ) {
+		$note[] = '구글이 대표로 고른 주소: ' . firstlab_stats_page_link( (string) $w['other_canonical'] );
+	}
+	return array(
+		firstlab_stats_page_link( (string) ( $w['url'] ?? '' ), (int) ( $w['post_id'] ?? 0 ) ),
+		esc_html( (string) ( $w['published'] ?? '' ) ),
+		esc_html( (string) ( $w['coverage'] ?? '' ) ),
+		esc_html( (string) ( $w['last_crawl'] ?? '' ) ),
+		implode( '<br>', $note ),
+	);
+}
+
 /** 표 하나. $rows 는 이미 이스케이프된 칸 배열들. */
 function firstlab_stats_table( array $head, array $rows ): void {
 	echo '<table class="widefat striped fl-table"><thead><tr>';
@@ -151,11 +169,8 @@ function firstlab_stats_render_page(): void {
 		if ( $waiting ) {
 			echo '<h3>색인 안 된 글</h3>';
 			firstlab_stats_table(
-				array( '글', '공개일', '상태' ),
-				array_map(
-					static fn( $w ) => array( firstlab_stats_page_link( (string) ( $w['url'] ?? '' ), (int) ( $w['post_id'] ?? 0 ) ), esc_html( (string) ( $w['published'] ?? '' ) ), esc_html( (string) ( $w['coverage'] ?? '' ) ) ),
-					$waiting
-				)
+				array( '글', '공개일', '상태', '구글이 마지막으로 읽은 날', '비고' ),
+				array_map( 'firstlab_stats_waiting_row', $waiting )
 			);
 		}
 		echo '<p class="description">\'구글이 아직 모름\'은 구글이 아직 안 읽은 글, \'읽어 갔지만 색인 안 함\'은 읽고도 검색에 안 넣은 글입니다. 검색 노출이 있는 글은 색인된 것입니다.</p>';

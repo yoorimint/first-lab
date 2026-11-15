@@ -179,8 +179,10 @@ def main() -> int:
     if ix:  # 공개 글 색인 (bot/index_check.record)
         from bot.index_check import summary_line as index_line  # noqa: E402
         print(index_line(ix))
-        for w in ix.get("waiting") or []:
-            print(f"  미색인 #{w['post_id']} {w['published']} 공개 · {w['coverage']}")
+        for w in (ix.get("waiting") or [])[:5]:
+            extra = "".join(f" · {label} {w[key]}" for key, label in (("last_crawl", "마지막 읽음"), ("was_indexed", "전에 색인"),
+                                                                    ("other_canonical", "구글 대표 주소")) if w.get(key))
+            print(f"  미색인 #{w['post_id']} {w['published']} 공개 · {w['coverage']}{extra}")
     try:  # 품질 한 줄 (automation/quality_report.py — 매일 점검 보고와 같은 숫자)
         import csv
         from quality_report import LOG, summary

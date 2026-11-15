@@ -21,7 +21,7 @@ CHECK_PER_DAY = 200     # API 한도(하루 2,000)보다 훨씬 적게
 RECHECK_DAYS = 14       # 색인된 글을 다시 볼 간격
 WINDOW_DAYS = 14        # 공개 후 이만큼 지난 글로 색인률을 셈
 GOOD_RATIO = 0.8        # 이 이상이면 공개 편수 늘려도 됨
-SHOW = 5                # 요약에 남길 미색인 글 수
+SHOW = 30               # 요약에 남길 미색인 글 수 (사이트 성과 페이지 표)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS index_status (
@@ -30,6 +30,9 @@ CREATE TABLE IF NOT EXISTS index_status (
     first_indexed TEXT, checked TEXT
 );
 """
+# 11/15 운영자 '첫 글이 색인돼 검색에도 나왔는데 지금은 안 나온다': 구글이 고른 대표 주소·마지막으로 읽은 날을 함께 남겨
+# 빠진 이유(다른 주소를 대표로 골랐는지, 언제 다시 읽었는지)를 볼 수 있게
+EXTRA_COLUMNS = ("google_canonical",)
 
 # 서치콘솔 coverageState → 쉬운 말
 COVERAGE_KO = {
@@ -86,7 +89,7 @@ def _inspect_once(url: str) -> dict:
         raise RuntimeError(f"URL 검사 API {resp.status_code}: {resp.text[:200]}")
     r = (resp.json().get("inspectionResult") or {}).get("indexStatusResult") or {}
     return {"verdict": r.get("verdict", ""), "coverage": r.get("coverageState", ""),
-            "last_crawl": str(r.get("lastCrawlTime", ""))[:10]}
+            "last_crawl": str(r.get("lastCrawlTime", ""))[:10], "google_canonical": r.get("googleCanonical", "")}
 
 
 def is_indexed(row: dict) -> bool:
@@ -135,9 +138,20 @@ def summarize(posts: list[dict], known: dict[str, dict], today: date) -> dict:
         "median_days": days[len(days) // 2] if days else None,
         "not_indexed": counts,
         "waiting": [{"post_id": r["post_id"], "url": r["url"], "published": r["published"],
-                     "coverage": COVERAGE_KO.get(r.get("coverage", ""), r.get("coverage", ""))} for r in waiting[:SHOW]],
+                     "coverage": COVERAGE_KO.get(r.get("coverage", ""), r.get("coverage", "")),
+                     "last_crawl": r.get("last_crawl") or "",
+                     "was_indexed": r.get("first_indexed") or "",   # 전에 색인 확인한 날 (있으면 '빠진 글')
+                     "other_canonical": _other_canonical(r)} for r in waiting[:SHOW]],
         "signal": ("늘려도 됨" if ratio is not None and ratio >= GOOD_RATIO else "유지" if ratio is not None else "아직 판단 못 함"),
     }
+
+
+def _other_canonical(row: dict) -> str:
+    """구글이 이 글 대신 다른 주소를 대표로 골랐으면 그 주소 (같은 주소의 표기 차이는 무시)."""
+    import urllib.parse
+    got = row.get("google_canonical") or ""
+    same = {urllib.parse.unquote(row.get("url", "")).lower(), urllib.parse.unquote(google_form(row.get("url", ""))).lower()}
+    return got if got and urllib.parse.unquote(got).lower() not in same else ""
 
 
 def summary_line(s: dict) -> str:
@@ -150,6 +164,10 @@ def summary_line(s: dict) -> str:
 
 def _load(conn) -> dict[str, dict]:
     conn.executescript(SCHEMA)
+    have = {r[1] for r in conn.execute("PRAGMA table_info(index_status)")}
+    for col in EXTRA_COLUMNS:
+        if col not in have:
+            conn.execute(f"ALTER TABLE index_status ADD COLUMN {col} TEXT")
     return {r["url"]: dict(r) for r in conn.execute("SELECT * FROM index_status")}
 
 
@@ -168,10 +186,11 @@ def run(conn, posts: list[dict], today: date, ask=None, limit: int = CHECK_PER_D
             continue
         prev = known.get(p["url"], {})
         first = prev.get("first_indexed") or (today.isoformat() if r["verdict"] == "PASS" else "")
-        row = {"url": p["url"], "post_id": p["post_id"], "published": p["published"], **r,
+        row = {"url": p["url"], "post_id": p["post_id"], "published": p["published"], "google_canonical": "", **r,
                "first_indexed": first, "checked": today.isoformat()}
-        conn.execute("INSERT OR REPLACE INTO index_status VALUES (:url,:post_id,:published,:verdict,:coverage,"
-                     ":last_crawl,:first_indexed,:checked)", row)
+        conn.execute("INSERT OR REPLACE INTO index_status (url, post_id, published, verdict, coverage, last_crawl,"
+                     " first_indexed, checked, google_canonical) VALUES (:url,:post_id,:published,:verdict,:coverage,"
+                     ":last_crawl,:first_indexed,:checked,:google_canonical)", row)
         known[p["url"]] = row
     conn.commit()
     return summarize(posts, known, today), errors

@@ -6486,6 +6486,32 @@ firstlab_stats_render_page();
         self.assertIsNotNone(run_timing.process_age())
         self.assertIn("'run_timing'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
 
+    def test_index_check_keeps_dropped_and_canonical(self):
+        """11/15 운영자 '첫 글이 색인돼 검색에도 나왔는데 지금은 안 나온다': 미색인 글에 전에 색인됐던 날·구글이 마지막으로
+        읽은 날·구글이 다른 주소를 대표로 골랐는지를 남김 (옛 표에도 열을 더해 그대로 이어 씀)."""
+        import sqlite3
+        from datetime import date
+        from bot import index_check
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.execute("CREATE TABLE index_status (url TEXT PRIMARY KEY, post_id INTEGER, published TEXT, verdict TEXT,"
+                     " coverage TEXT, last_crawl TEXT, first_indexed TEXT, checked TEXT)")   # 11/15 이전 표
+        a, b = "https://first-lab.kr/%ec%9e%90/", "https://first-lab.kr/b/"
+        conn.execute("INSERT INTO index_status VALUES (?,34,'2026-11-03','PASS','Submitted and indexed','2026-11-08','2026-11-05','2026-11-14')", (a,))
+        answers = {a: {"verdict": "NEUTRAL", "coverage": "Crawled - currently not indexed", "last_crawl": "2026-11-14",
+                       "google_canonical": "https://first-lab.kr/%EC%9E%90/"},
+                   b: {"verdict": "NEUTRAL", "coverage": "Crawled - currently not indexed", "last_crawl": "2026-11-13",
+                       "google_canonical": "https://first-lab.kr/other/"}}
+        posts = [{"url": a, "post_id": 34, "published": "2026-11-03"}, {"url": b, "post_id": 2, "published": "2026-11-06"}]
+        s, errors = index_check.run(conn, posts, date(2026, 11, 29), ask=lambda u: answers[u])
+        self.assertEqual(errors, [])
+        w = {x["post_id"]: x for x in s["waiting"]}
+        self.assertEqual((w[34]["was_indexed"], w[34]["last_crawl"], w[34]["other_canonical"]), ("2026-11-05", "2026-11-14", ""))
+        self.assertEqual(w[2]["other_canonical"], "https://first-lab.kr/other/")
+        html = self.render_stats({"index": {"date": "2026-11-29", "published": 2, "indexed": 0, "waiting": s["waiting"]}})
+        self.assertIn("2026-11-05 색인 확인 → 빠짐", html)
+        self.assertIn("구글이 대표로 고른 주소", html)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
