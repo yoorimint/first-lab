@@ -39,14 +39,14 @@
   FirstLabCalc.register({
     id: 'industrial-accident-insurance',
     title: '산재보험료 계산기',
-    intro: '업종과 보수를 넣으면 올해 사업종류별 산재보험료율에 출퇴근재해 요율을 더해 회사가 낼 산재보험료를 계산해요.',
+    intro: '업종과 직원 급여를 넣으면 회사가 낼 산재보험료가 나와요.',
     inputs: [
-      { name: 'industry', label: '사업 종류', type: 'select', default: 'retail_food', options: INDUSTRY, help: '사업종류 예시표에 따라 분류된 우리 사업장의 사업 종류예요. 사업자등록증 업종과 다를 수 있어서 근로복지공단에 확인해요.' },
-      { name: 'wage', label: '보수 (원)', type: 'number', min: 0, step: 1, default: 3000000, help: '비과세 소득을 뺀 근로자 보수예요. 한 달 치를 넣으면 월 보험료, 1년 치(보수총액)를 넣으면 1년 보험료가 나와요.' },
+      { name: 'industry', label: '어떤 업종인가요?', type: 'select', default: 'retail_food', options: INDUSTRY, help: '사업종류 예시표에 따라 분류된 우리 사업장의 사업 종류예요. 사업자등록증 업종과 다를 수 있어서 근로복지공단에 확인해요.' },
+      { name: 'wage', label: '직원 급여 (원, 세전)', type: 'number', min: 0, step: 1, default: 3000000, help: "비과세 소득을 뺀 근로자 '보수'예요. 한 달 치를 넣으면 월 보험료, 1년 치(보수총액)를 넣으면 1년 보험료가 나와요." },
       {
-        name: 'commute', label: '출퇴근재해 요율', type: 'select', default: 'yes',
-        options: [['yes', '더함 (대부분의 사업장)'], ['no', '빼기 (출퇴근재해 적용 제외 대상)']],
-        help: '출퇴근 경로가 일정하지 않은 직종으로 정해진 경우(산업재해보상보험법 제37조④)만 빼요.',
+        name: 'commute', label: '출퇴근 사고 보험료도 더하나요?', type: 'choice', default: 'yes',
+        options: [['yes', '네 (대부분 사업장)'], ['no', '아니요 (적용 제외 직종)']],
+        help: "정식 이름은 '출퇴근재해 요율'이에요. 출퇴근 경로가 일정하지 않은 직종으로 정해진 경우(산업재해보상보험법 제37조④)만 빼요.",
       },
     ],
 

@@ -37,12 +37,12 @@
     title: '음력 달력 계산기',
     intro: '양력 날짜를 음력으로, 음력 날짜를 양력으로 바꿔요. 윤달도 고를 수 있고, 같은 음력 날짜가 앞으로 몇 해 동안 양력 며칠인지도 보여 줘요.',
     inputs: [
-      { name: 'mode', label: '바꾸는 방향', type: 'select', default: 's2l', options: [['s2l', '양력 → 음력'], ['l2s', '음력 → 양력']] },
+      { name: 'mode', label: '어느 쪽으로 바꿀까요?', type: 'choice', default: 's2l', options: [['s2l', '양력 → 음력'], ['l2s', '음력 → 양력']] },
       { name: 'solar', label: '양력 날짜 (양력 → 음력일 때)', type: 'date', default: 'today' },
       { name: 'lyear', label: '음력 연도 (음력 → 양력일 때)', type: 'number', min: 1900, step: 1 },
       { name: 'lmonth', label: '음력 월', type: 'number', min: 1, step: 1 },
       { name: 'lday', label: '음력 일', type: 'number', min: 1, step: 1 },
-      { name: 'leap', label: '평달·윤달', type: 'select', default: '0', options: [['0', '평달'], ['1', '윤달']], help: '윤달 생일·제사처럼 음력 날짜가 윤달이면 윤달을 골라요.' },
+      { name: 'leap', label: '평달인가요, 윤달인가요?', type: 'choice', default: '0', options: [['0', '평달 (보통 달)'], ['1', '윤달']], help: '윤달 생일·제사처럼 음력 날짜가 윤달이면 윤달을 골라요.' },
     ],
 
     compute(v, d, u) {
