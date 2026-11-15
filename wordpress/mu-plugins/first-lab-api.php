@@ -295,7 +295,14 @@ function firstlab_api_maintenance(): array {
 		) ),
 		'rates'       => $state['rates'] ?? null, // 한국은행 최신 금리
 		// 오늘 공개 계획·완료 (설정 '예약 공개 시각' 줄 수 = 하루 공개 수, bot/run.py) — 운영자가 바꾼 설정이 계획에 들어갔는지 감시 세션이 확인 (11/6)
-		'publish_plan' => array( 'plan' => $state['plan'] ?? array(), 'done' => $state['done'] ?? array() ),
+		// from = 계획을 만든 설정 시각(봇), saved = 설정 페이지에 저장된 시각 — 둘이 다르면 반영 안 된 것 (11/14 운영자 '3개 넣었는데 계획은 2개')
+		'publish_plan' => array(
+			'plan'  => $state['plan'] ?? array(),
+			'done'  => $state['done'] ?? array(),
+			'from'  => $state['plan_from'] ?? array(),
+			'saved' => function_exists( 'firstlab_bot_schedule_times' ) && function_exists( 'firstlab_bot_get' )
+				? firstlab_bot_schedule_times( (string) ( firstlab_bot_get()['schedule_times'] ?? '' ) ) : null,
+		),
 		'server_stats' => $state['server_stats'] ?? null, // 서버 부하·메모리·사주데이 응답 (bot/server_stats.py, 서버 올릴지 판단용)
 		'calc_yearly' => $state['calc_yearly'] ?? null,
 		'deploy_alert' => $state['deploy_alert'] ?? null,
