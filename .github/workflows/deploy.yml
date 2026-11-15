@@ -170,7 +170,9 @@ jobs:
           echo "sha=$main" >> "$GITHUB_OUTPUT"
           deployed=$(curl -fsS --max-time 20 https://first-lab.kr/deployed-version.txt || echo none)
           echo "서버 버전: $deployed / main: $main"
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$deployed" = "$main" ]; then echo "need=false" >> "$GITHUB_OUTPUT"; else echo "need=true" >> "$GITHUB_OUTPUT"; fi
+          # 매일 새벽 3시대 첫 예약 실행은 바뀐 게 없어도 배포 — 하루 한 번 전체 배포(서버 설정·글 전체 보정)를 사람 없는 새벽에 (11/16 운영자 '새벽으로 옮겨라')
+          early=$(TZ=Asia/Seoul date +%H%M)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$deployed" = "$main" ] && ! { [ "$early" -ge 0300 ] && [ "$early" -lt 0315 ]; }; then echo "need=false" >> "$GITHUB_OUTPUT"; else echo "need=true" >> "$GITHUB_OUTPUT"; fi
 
   check:
     # 서버에 올리기 전 검사: 하나라도 실패하면 배포하지 않는다 (운영 중인 봇이 멈추는 것 방지)
@@ -235,11 +237,17 @@ jobs:
             # 서버 설정·워크플로·페이지·패키지가 바뀌었거나, 지난 버전을 모르거나, 그날 첫 배포면 전체 배포 (tests DeploySpeedTest)
             CHANGED=$(git -C "$REPO" diff --name-only "$PREV" HEAD 2>/dev/null || echo FULL)
             FULL_MARK=/var/lib/first-lab/bot/full-deploy-date
+            # 하루 한 번 전체 배포는 새벽(02~06시)에만 — 낮 배포마다 서버 설정·글 전체 보정이 돌아 부하 경보 (11/16 07:53·08:0x).
+            # 새벽에 못 했으면(어제도 안 함) 그다음 배포가 대신 함 — 하루 넘게 빠지지 않게
+            daily_full_due() {
+              mark=$(cat "$FULL_MARK" 2>/dev/null || echo none); hour=$(date +%H)
+              [ "$mark" != "$(date +%F)" ] && { [ "$hour" -ge 2 ] && [ "$hour" -lt 7 ] || [ "$mark" != "$(date -d yesterday +%F)" ]; }
+            }
             # 같은 서버의 사주데이 앱보다 낮은 몫으로 (11/6 10:06 배포 때 부하 5.14·사주데이 /healthz 응답 없음 1분)
             # cgroup v2 에선 Nice 는 서비스 사이에 안 먹음 → CPUWeight·IOWeight(기본 100)를 낮춘 범위에서 실행
             LOW="nice -n 10"
             if command -v systemd-run >/dev/null; then LOW="systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20 nice -n 10"; fi
-            if printf '%s\n' "$CHANGED" | grep -qE '^(FULL|server/|\.github/|bot/requirements\.txt|wordpress/pages/)' || [ "$(cat "$FULL_MARK" 2>/dev/null)" != "$(date +%F)" ]; then
+            if printf '%s\n' "$CHANGED" | grep -qE '^(FULL|server/|\.github/|bot/requirements\.txt|wordpress/pages/)' || daily_full_due; then
               echo "전체 배포"
               $LOW bash "$REPO/server/setup.sh"
               $LOW bash "$REPO/server/wp-setup.sh"
@@ -277,11 +285,17 @@ jobs:
             # 서버 설정·워크플로·페이지·패키지가 바뀌었거나, 지난 버전을 모르거나, 그날 첫 배포면 전체 배포 (tests DeploySpeedTest)
             CHANGED=$(git -C "$REPO" diff --name-only "$PREV" HEAD 2>/dev/null || echo FULL)
             FULL_MARK=/var/lib/first-lab/bot/full-deploy-date
+            # 하루 한 번 전체 배포는 새벽(02~06시)에만 — 낮 배포마다 서버 설정·글 전체 보정이 돌아 부하 경보 (11/16 07:53·08:0x).
+            # 새벽에 못 했으면(어제도 안 함) 그다음 배포가 대신 함 — 하루 넘게 빠지지 않게
+            daily_full_due() {
+              mark=$(cat "$FULL_MARK" 2>/dev/null || echo none); hour=$(date +%H)
+              [ "$mark" != "$(date +%F)" ] && { [ "$hour" -ge 2 ] && [ "$hour" -lt 7 ] || [ "$mark" != "$(date -d yesterday +%F)" ]; }
+            }
             # 같은 서버의 사주데이 앱보다 낮은 몫으로 (11/6 10:06 배포 때 부하 5.14·사주데이 /healthz 응답 없음 1분)
             # cgroup v2 에선 Nice 는 서비스 사이에 안 먹음 → CPUWeight·IOWeight(기본 100)를 낮춘 범위에서 실행
             LOW="nice -n 10"
             if command -v systemd-run >/dev/null; then LOW="systemd-run --scope --quiet -p CPUWeight=20 -p IOWeight=20 nice -n 10"; fi
-            if printf '%s\n' "$CHANGED" | grep -qE '^(FULL|server/|\.github/|bot/requirements\.txt|wordpress/pages/)' || [ "$(cat "$FULL_MARK" 2>/dev/null)" != "$(date +%F)" ]; then
+            if printf '%s\n' "$CHANGED" | grep -qE '^(FULL|server/|\.github/|bot/requirements\.txt|wordpress/pages/)' || daily_full_due; then
               echo "전체 배포"
               $LOW bash "$REPO/server/setup.sh"
               $LOW bash "$REPO/server/wp-setup.sh"
