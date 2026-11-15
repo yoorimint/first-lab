@@ -63,11 +63,16 @@ def google_form(url: str) -> str:
 def inspect(url: str) -> dict:
     """{verdict, coverage, last_crawl}. verdict: PASS(색인됨) / NEUTRAL / FAIL. 구글 표기(대문자 %XX)로 먼저 묻고,
     모른다고 하면 원래 표기로 한 번 더."""
+    import urllib.parse
     first = _inspect_once(google_form(url))
-    if first["coverage"] == "URL is unknown to Google" and google_form(url) != url:
-        second = _inspect_once(url)
-        if second["coverage"] != "URL is unknown to Google":
-            return second
+    # 11/15: 대문자로 물어도 검색 노출이 있는 글까지 '모름·색인 안 함' → 원래 표기·한글 그대로 표기도 물어 가장 나은 답
+    for other in dict.fromkeys([url, urllib.parse.unquote(url)]):
+        if first["verdict"] == "PASS" or other == google_form(url):
+            continue
+        again = _inspect_once(other)
+        if again["verdict"] == "PASS" or (first["coverage"] == "URL is unknown to Google"
+                                          and again["coverage"] != "URL is unknown to Google"):
+            first = again
     return first
 
 
