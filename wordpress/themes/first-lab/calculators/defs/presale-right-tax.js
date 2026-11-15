@@ -14,13 +14,13 @@
   FirstLabCalc.register({
     id: 'presale-right-tax',
     title: '분양권 양도소득세 계산기',
-    intro: '분양권을 판 금액·산 금액·비용과 보유기간을 넣으면 기본공제 250만 원을 뺀 과세표준과 양도소득세·지방소득세가 나와요.',
+    intro: '분양권을 판 금액·산 금액·비용과 가진 기간을 넣으면 양도소득세와 지방소득세가 나와요.',
     inputs: [
-      { name: 'sale', label: '판 금액 (양도가액, 원)', type: 'number', min: 0, step: 100000, help: '매수자에게 받은 돈 전체예요. 그동안 낸 계약금·중도금에 받은 프리미엄을 더한 금액이에요.' },
-      { name: 'acquire', label: '산 금액 (취득가액, 원)', type: 'number', min: 0, step: 100000, help: '분양받았다면 그동안 낸 계약금·중도금, 전매로 샀다면 그때 낸 돈 전체(프리미엄 포함)예요.' },
-      { name: 'expense', label: '팔 때 든 비용 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 10000, help: '중개수수료처럼 양도에 직접 든 비용이에요.' },
-      { name: 'used', label: '올해 다른 부동산 양도로 이미 쓴 기본공제 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 10000, help: '같은 해에 집·땅·다른 분양권을 먼저 팔았다면 250만 원 공제를 함께 써요.' },
-      { name: 'hold', label: '보유기간', type: 'select', default: 'short', options: [['short', '1년 미만 (70%)'], ['long', '1년 이상 (60%)']] },
+      { name: 'sale', label: '판 금액 (원)', type: 'number', min: 0, step: 100000, help: "'양도가액'이에요. 매수자에게 받은 돈 전체예요. 그동안 낸 계약금·중도금에 받은 프리미엄을 더한 금액이에요." },
+      { name: 'acquire', label: '산 금액 (원)', type: 'number', min: 0, step: 100000, help: "'취득가액'이에요. 분양받았다면 그동안 낸 계약금·중도금, 전매로 샀다면 그때 낸 돈 전체(프리미엄 포함)예요." },
+      { name: 'expense', label: '팔 때 든 비용 (원)', type: 'number', min: 0, step: 10000, help: '중개수수료처럼 양도에 직접 든 비용이에요. 없으면 비워 둬요.' },
+      { name: 'used', label: '올해 이미 쓴 기본공제 (원)', type: 'number', min: 0, step: 10000, help: '같은 해에 집·땅·다른 분양권을 먼저 팔았다면 250만 원 기본공제를 함께 써요. 그때 쓴 금액을 넣고, 없으면 비워 둬요.' },
+      { name: 'hold', label: '얼마나 갖고 있었나요?', type: 'choice', default: 'short', options: [['short', '1년 미만 (세율 70%)'], ['long', '1년 이상 (세율 60%)']], help: "'보유기간'이에요." },
     ],
 
     compute(v, d, u) {

@@ -16,14 +16,15 @@
   FirstLabCalc.register({
     id: 'car-transfer',
     title: '자동차 명의이전 계산기',
-    intro: '차종과 거래가격을 넣으면 명의이전 때 내는 취득세를, 신청 기한을 넘겼다면 지연 범칙금까지 계산해요.',
+    intro: '차종과 거래가격을 넣으면 명의이전 때 내는 취득세가 나와요. 신청 기한을 넘겼다면 늦은 벌금(범칙금)도 나와요.',
     inputs: [
       {
-        name: 'cause', label: '이전 사유', type: 'select', default: 'sale',
-        options: [['sale', '매매 (돈을 주고 삼)'], ['gift', '증여 (무상으로 받음)']],
+        name: 'cause', label: '차를 어떻게 받나요?', type: 'choice', default: 'sale',
+        options: [['sale', '샀어요 (매매)'], ['gift', '공짜로 받았어요 (증여)']],
       },
       {
-        name: 'kind', label: '차종 (개인 비영업용)', type: 'select', default: 'car',
+        name: 'kind', label: '차종 (개인 자가용)', type: 'choice', default: 'car',
+        help: '개인 비영업용 차 기준이에요.',
         options: [
           ['car', '승용차'],
           ['light_car', '경형 승용차'],
@@ -32,8 +33,8 @@
         ],
       },
       { name: 'price', label: '거래가격 (원)', type: 'number', min: 0, step: 10000, help: '매매계약서에 적은 실제 거래가격이에요. 증여면 비워 둬도 돼요.' },
-      { name: 'standard', label: '시가표준액 (원, 선택)', type: 'number', min: 0, step: 10000, help: '위택스나 자동차365 취득세 신고 화면에서 볼 수 있어요. 증여는 이 값이 필요해요.' },
-      { name: 'late_days', label: '신청 기한을 넘긴 날 수', type: 'number', min: 0, step: 1, default: 0, help: '기한 안이면 0. 매매는 매수한 날부터 15일, 증여는 받은 날부터 20일 안에 신청해요.' },
+      { name: 'standard', label: '정부가 정한 차값 (원, 선택)', type: 'number', min: 0, step: 10000, help: "'시가표준액'이에요. 위택스나 자동차365 취득세 신고 화면에서 볼 수 있어요. 증여는 이 값이 필요해요." },
+      { name: 'late_days', label: '신청 기한을 넘긴 날 (일)', type: 'number', min: 0, step: 1, default: 0, help: '기한 안이면 0. 매매는 매수한 날부터 15일, 증여는 받은 날부터 20일 안에 신청해요.' },
     ],
 
     compute(v, d, u) {

@@ -9,26 +9,29 @@
   FirstLabCalc.register({
     id: 'daily-worker-insurance',
     title: '일용직 4대보험·세금 계산기',
-    intro: '일당과 이번 달 일한 날수를 넣으면 일용근로소득세와 고용보험, 가입 기준에 해당할 때의 국민연금·건강보험까지 빼고 손에 쥐는 금액을 계산해요.',
+    intro: '일당과 이번 달 일한 날수를 넣으면 세금·보험료를 빼고 손에 쥐는 금액이 나와요.',
     inputs: [
-      { name: 'wage', label: '일당 (원, 세전)', type: 'number', min: 0, step: 1, default: 200000, help: '하루 일하고 받기로 한 금액이에요. 날마다 같다고 보고 계산해요.' },
+      { name: 'wage', label: '일당 (원)', type: 'number', min: 0, step: 1, default: 200000, help: '세금 떼기 전, 하루 일하고 받기로 한 금액이에요. 날마다 같다고 보고 계산해요.' },
       { name: 'days', label: '이번 달 일한 날수', type: 'number', min: 1, step: 1, default: 10, help: '같은 사업장에서 이번 달(1일~말일)에 일한 날이에요. 몇 시간만 일한 날도 하루로 세요.' },
-      { name: 'hours', label: '이번 달 일한 시간 합계', type: 'number', min: 0, step: 1, default: 80, help: '국민연금 월 60시간 기준을 볼 때만 써요.' },
+      { name: 'hours', label: '이번 달 일한 시간 합계', type: 'number', min: 0, step: 1, default: 80, help: '국민연금을 내는지(월 60시간 이상) 볼 때만 써요.' },
       {
-        name: 'month1', label: '같은 사업장에서 1개월 이상 이어서 일하나요', type: 'select', default: 'yes',
-        options: [['yes', '예 (1개월 이상)'], ['no', '아니요 (1개월 안 됨)']],
+        name: 'month1', label: '같은 곳에서 1개월 넘게 일하나요?', type: 'choice', default: 'yes',
+        options: [['yes', '네, 1개월 이상'], ['no', '아니요, 1개월 안 돼요']],
+        help: '같은 사업장에서 1개월 이상 이어서 일하는지예요.',
       },
       {
-        name: 'site', label: '일하는 곳', type: 'select', default: 'general',
+        name: 'site', label: '일하는 곳', type: 'choice', default: 'general',
         options: [['general', '건설현장이 아닌 곳'], ['construction', '건설현장']],
       },
       {
-        name: 'age60', label: '나이', type: 'select', default: 'no',
-        options: [['no', '18세 이상 60세 미만'], ['yes', '60세 이상 (국민연금 안 냄)']],
+        name: 'age60', label: '나이', type: 'choice', default: 'no',
+        options: [['no', '18세 이상 60세 미만'], ['yes', '60세 이상']],
+        help: '60세 이상이면 국민연금을 내지 않아요.',
       },
       {
-        name: 'age65', label: '65세 이후 새로 고용됐나요', type: 'select', default: 'no',
-        options: [['no', '아니요'], ['yes', '예 (실업급여 보험료 안 냄)']],
+        name: 'age65', label: '65세 이후에 새로 들어간 곳인가요?', type: 'choice', default: 'no',
+        options: [['no', '아니요'], ['yes', '네']],
+        help: '65세 이후 새로 고용됐으면 실업급여 보험료를 내지 않아요.',
       },
     ],
 

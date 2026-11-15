@@ -21,10 +21,10 @@
   FirstLabCalc.register({
     id: 'fiscal-annual-leave',
     title: '회계연도 연차 계산기',
-    intro: '입사일과 기준일을 넣으면 회계연도(1월 1일) 기준으로 받는 연차와 입사일 기준 연차를 나란히 비교해요.',
+    intro: '입사일과 기준일을 넣으면 1월 1일 기준(회계연도)으로 주는 연차와 입사일 기준 연차를 비교해요.',
     inputs: [
       { name: 'start', label: '입사일', type: 'date', default: '2025-07-01' },
-      { name: 'base', label: '기준일 (오늘, 퇴사한다면 근로관계가 끝나는 마지막 재직일)', type: 'date', default: 'today', help: '입사 다음다음 해 12월 31일까지 넣을 수 있어요 (둘째 1월 1일 연차까지 비교).' },
+      { name: 'base', label: '언제 기준으로 볼까요?', type: 'date', default: 'today', help: '보통 오늘이에요. 퇴사한다면 마지막으로 일한(재직한) 날을 넣어요. 입사 다음다음 해 12월 31일까지 넣을 수 있어요 (둘째 1월 1일 연차까지 비교).' },
     ],
 
     compute(v, d, u) {

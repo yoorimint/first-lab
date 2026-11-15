@@ -11,14 +11,14 @@
   FirstLabCalc.register({
     id: 'donation-tax-credit',
     title: '기부금 세액공제 계산기',
-    intro: '근로소득금액과 한 해 동안 낸 기부금을 종류별로 넣으면 한도를 적용한 기부금 세액공제액과 다음 해로 넘길 금액이 나와요.',
+    intro: '근로소득금액과 한 해 낸 기부금을 종류별로 넣으면 줄어드는 세금(세액공제)과 다음 해로 넘길 금액이 나와요.',
     inputs: [
-      { name: 'income', label: '근로소득금액 (원, 총급여에서 근로소득공제를 뺀 금액)', type: 'number', min: 0, step: 1, help: '원천징수영수증의 근로소득금액이에요. 특례·일반기부금 한도를 이 금액으로 계산해요.' },
-      { name: 'political', label: '정치자금 기부금 (원, 본인이 낸 것만)', type: 'number', min: 0, step: 1 },
-      { name: 'hometown', label: '고향사랑 기부금 (원, 본인이 낸 것만, 연 2,000만 원까지)', type: 'number', min: 0, step: 1 },
-      { name: 'special', label: '특례기부금 (원, 국가·지자체·이재민 구호금 등)', type: 'number', min: 0, step: 1, help: '본인과 기본공제대상자(나이 무관, 소득요건 충족)가 낸 금액을 더해요.' },
-      { name: 'general', label: '일반기부금 중 종교단체 외 (원, 사회복지법인 등)', type: 'number', min: 0, step: 1 },
-      { name: 'religious', label: '일반기부금 중 종교단체 (원)', type: 'number', min: 0, step: 1 },
+      { name: 'income', label: '근로소득금액 (원)', type: 'number', min: 0, step: 1, help: '총급여에서 근로소득공제를 뺀 금액이에요. 원천징수영수증의 근로소득금액이에요. 특례·일반기부금 한도를 이 금액으로 계산해요.' },
+      { name: 'political', label: '정치자금 기부금 (원)', type: 'number', min: 0, step: 1, help: '본인이 낸 것만 넣어요.' },
+      { name: 'hometown', label: '고향사랑 기부금 (원)', type: 'number', min: 0, step: 1, help: '본인이 낸 것만 넣어요. 1년 2,000만 원까지 낼 수 있어요.' },
+      { name: 'special', label: '나라·지자체·이재민 기부 (원)', type: 'number', min: 0, step: 1, help: '\'특례기부금\'이에요. 국가·지자체 기부, 이재민 구호금 등이에요. 본인과 기본공제대상자(나이 무관, 소득요건 충족)가 낸 금액을 더해요.' },
+      { name: 'general', label: '복지단체 등 기부 (원, 종교 빼고)', type: 'number', min: 0, step: 1, help: '\'일반기부금\' 중 종교단체가 아닌 곳(사회복지법인 등)에 낸 금액이에요.' },
+      { name: 'religious', label: '종교단체 기부 (원)', type: 'number', min: 0, step: 1, help: '\'일반기부금\' 중 종교단체에 낸 금액이에요.' },
     ],
 
     compute(v, d, u) {

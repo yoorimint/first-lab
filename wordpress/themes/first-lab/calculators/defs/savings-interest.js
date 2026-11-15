@@ -23,14 +23,14 @@
   FirstLabCalc.register({
     id: 'savings-interest',
     title: '예금·적금 이자 계산기 (이율 계산기)',
-    intro: '예금은 맡길 돈, 적금은 매달 넣을 돈과 연 이율·기간을 넣으면 세전 이자, 떼는 세금, 세후 이자와 만기에 받는 돈이 나와요.',
+    intro: '예금은 맡길 돈, 적금은 매달 넣을 돈과 이자율·기간을 넣으면 세금 뗀 이자와 만기에 받는 돈이 나와요.',
     inputs: [
-      { name: 'product', label: '상품', type: 'select', default: 'deposit', options: [['deposit', '정기예금 (한 번에 맡김)'], ['installment', '정기적금 (매달 같은 금액)']] },
+      { name: 'product', label: '어떤 상품인가요?', type: 'choice', default: 'deposit', options: [['deposit', '정기예금 (한 번에 맡김)'], ['installment', '정기적금 (매달 같은 금액)']] },
       { name: 'amount', label: '금액 (원)', type: 'number', min: 0, step: 10000, help: '예금은 맡기는 돈 전체, 적금은 한 달에 넣는 돈이에요.' },
-      { name: 'rate', label: '연 이율 (%)', type: 'number', min: 0, step: 0.01, help: '상품 설명서의 연 금리(세전). 우대금리를 받으면 더한 값을 넣어요.' },
+      { name: 'rate', label: '1년 이자율 (%)', type: 'number', min: 0, step: 0.01, help: "'연 이율'이에요. 상품 설명서의 연 금리(세전). 우대금리를 받으면 더한 값을 넣어요." },
       { name: 'months', label: '기간 (개월)', type: 'number', min: 1, step: 1 },
-      { name: 'compound', label: '이자 방식', type: 'select', default: 'simple', options: [['simple', '단리 (대부분의 예금·적금)'], ['monthly', '월복리']] },
-      { name: 'tax', label: '세금', type: 'select', default: 'normal', options: [['normal', '일반과세 15.4%'], ['none', '비과세 0%']] },
+      { name: 'compound', label: '이자는 어떻게 붙나요?', type: 'choice', default: 'simple', options: [['simple', '단리 (대부분의 예금·적금)'], ['monthly', '월복리']], help: "'단리'는 원금에만 이자가 붙고, '월복리'는 매달 붙은 이자에도 이자가 붙어요." },
+      { name: 'tax', label: '이자에서 세금을 떼나요?', type: 'choice', default: 'normal', options: [['normal', '네, 15.4% (일반)'], ['none', '아니요 (비과세)']], help: '대부분은 일반과세(15.4%)예요. 비과세 상품일 때만 비과세를 골라요.' },
     ],
 
     compute(v, d, u) {

@@ -15,19 +15,20 @@
   FirstLabCalc.register({
     id: 'school-grade',
     title: '내신 등급 계산기',
-    intro: '과목 석차와 수강자수를 넣으면 몇 등급인지, 과목별 등급과 학점을 넣으면 평균 등급을 보여줘요.',
+    intro: '내 등수와 들은 학생 수를 넣으면 몇 등급인지, 과목별 등급과 학점을 넣으면 평균 등급이 나와요.',
     inputs: [
       {
-        name: 'mode', label: '무엇을 계산할까요', type: 'select', default: 'rank',
-        options: [['rank', '석차로 과목 등급 찾기'], ['average', '과목 등급으로 평균 등급 내기']],
+        name: 'mode', label: '무엇을 계산할까요?', type: 'choice', default: 'rank',
+        options: [['rank', '등수로 과목 등급 찾기'], ['average', '과목 등급으로 평균 내기']],
       },
       {
-        name: 'system', label: '등급제', type: 'select', default: 'five',
-        options: [['five', '5등급제 (2025년 이후 고1 입학)'], ['nine', '9등급제 (2024년 이전 고1 입학)']],
+        name: 'system', label: '몇 등급제인가요?', type: 'choice', default: 'five',
+        options: [['five', '5등급제 (2025년부터)'], ['nine', '9등급제 (2024년까지)']],
+        help: '고1 입학 연도 기준이에요. 2025년 이후 고1 입학은 5등급제, 2024년 이전 고1 입학은 9등급제예요.',
       },
-      { name: 'total', label: '수강자수 (명)', type: 'number', min: 1, step: 1, help: '그 과목을 들은 전체 학생 수예요.' },
-      { name: 'rank', label: '내 석차 (등)', type: 'number', min: 1, step: 1, help: '동점자가 있으면 동점자 중 가장 높은 석차를 넣어요.' },
-      { name: 'ties', label: '동석차 인원수 (나 포함, 명)', type: 'number', min: 1, step: 1, default: 1, help: '학교 동점자 처리 규정을 적용한 뒤에도 같은 석차인 인원(나 포함)이에요. 없으면 1이에요.' },
+      { name: 'total', label: '그 과목 들은 학생 수 (명)', type: 'number', min: 1, step: 1, help: "'수강자수'예요. 그 과목을 들은 전체 학생 수예요." },
+      { name: 'rank', label: '내 등수 (석차)', type: 'number', min: 1, step: 1, help: '동점자가 있으면 동점자 중 가장 높은 석차를 넣어요.' },
+      { name: 'ties', label: '나와 같은 등수인 학생 (나 포함)', type: 'number', min: 1, step: 1, default: 1, help: "'동석차 인원수'예요. 학교 동점자 처리 규정을 적용한 뒤에도 같은 석차인 인원(나 포함)이에요. 없으면 1이에요." },
       ...subjectInputs,
     ],
 

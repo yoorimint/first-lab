@@ -7,18 +7,18 @@
   FirstLabCalc.register({
     id: 'card-deduction',
     title: '신용카드 소득공제 계산기',
-    intro: '총급여와 1년 동안 쓴 카드 금액을 결제 수단·사용처별로 넣으면 25% 문턱, 공제율, 한도까지 반영한 소득공제액이 나와요.',
+    intro: '1년 연봉과 카드로 쓴 돈을 넣으면 연말정산 때 빼 주는 카드 소득공제 금액이 나와요.',
     inputs: [
-      { name: 'salary', label: '총급여 (원, 1년)', type: 'number', min: 0, step: 10000, help: '연봉에서 비과세 소득(식대 등)을 뺀 금액이에요. 원천징수영수증의 총급여 칸 값이에요.' },
-      { name: 'credit', label: '신용카드 사용액 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '아래 전통시장·대중교통·문화체육 칸에 넣은 금액은 빼고 넣어요.' },
-      { name: 'debit', label: '체크카드·현금영수증 사용액 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '직불·체크카드, 기명식 선불카드, 현금영수증, 간편결제 직불 수단 금액이에요. 아래 칸에 넣은 금액은 빼고 넣어요.' },
-      { name: 'culture', label: '도서·공연·박물관·영화·수영장·헬스장 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '총급여 7,000만 원 이하만 30%로 따로 쳐요. 넘으면 이 칸은 비우고 결제한 수단 칸에 넣어요.' },
-      { name: 'market', label: '전통시장 사용액 (원)', type: 'number', min: 0, step: 10000, default: 0 },
-      { name: 'transit', label: '대중교통 이용액 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '버스·지하철·기차 등 대중교통 요금이에요 (택시·항공은 아님).' },
+      { name: 'salary', label: '1년 연봉 (원)', type: 'number', min: 0, step: 10000, help: "'총급여'예요. 연봉에서 비과세 소득(식대 등)을 뺀 금액이에요. 원천징수영수증의 총급여 칸 값이에요." },
+      { name: 'credit', label: '신용카드로 쓴 돈 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '아래 전통시장·대중교통·문화체육 칸에 넣은 금액은 빼고 넣어요.' },
+      { name: 'debit', label: '체크카드·현금영수증 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '직불·체크카드, 기명식 선불카드, 현금영수증, 간편결제 직불 수단 금액이에요. 아래 칸에 넣은 금액은 빼고 넣어요.' },
+      { name: 'culture', label: '책·공연·영화·헬스장 등 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '도서·공연·박물관·미술관·영화·수영장·헬스장 등에 쓴 돈이에요. 총급여 7,000만 원 이하만 30%로 따로 쳐요. 넘으면 이 칸은 비우고 결제한 수단 칸에 넣어요.' },
+      { name: 'market', label: '전통시장에서 쓴 돈 (원)', type: 'number', min: 0, step: 10000, default: 0 },
+      { name: 'transit', label: '버스·지하철 등 교통비 (원)', type: 'number', min: 0, step: 10000, default: 0, help: '버스·지하철·기차 등 대중교통 요금이에요 (택시·항공은 아님).' },
       {
-        name: 'children', label: '한도를 늘려 주는 자녀 (20세 이하 등)', type: 'select', default: '0',
+        name: 'children', label: '20세 이하 자녀 수', type: 'choice', default: '0',
         options: [['0', '없음'], ['1', '1명'], ['2', '2명 이상']],
-        help: '소득금액 100만 원 이하(근로소득만이면 총급여 500만 원 이하)이고 다른 사람의 기본공제를 받지 않는 20세 이하 자녀·손자녀(장애인은 나이 무관)예요. 2026년 사용분부터 적용돼요.',
+        help: '한도를 늘려 줘요. 소득금액 100만 원 이하(근로소득만이면 총급여 500만 원 이하)이고 다른 사람의 기본공제를 받지 않는 20세 이하 자녀·손자녀(장애인은 나이 무관)예요. 2026년 사용분부터 적용돼요.',
       },
     ],
 

@@ -14,22 +14,22 @@
 
   const family = (n) => [
     {
-      name: `kind${n}`, label: `가족 ${n} 학교 단계`, type: 'select', default: 'none', options: KINDS,
-      help: n === 1 ? '기본공제대상자인 배우자·자녀·형제자매 등이에요 (나이·소득은 안 봐요). 부모님(직계존속)의 일반 교육비는 공제 대상이 아니라 넣지 않아요.' : undefined,
+      name: `kind${n}`, label: `가족 ${n}은 어느 학교인가요?`, type: 'select', default: 'none', options: KINDS,
+      help: n === 1 ? '내가 기본공제를 받는 배우자·자녀·형제자매 등이에요. 나이는 안 보지만 연 소득금액이 100만 원 이하여야 해요. 부모님(직계존속)의 일반 교육비는 공제 대상이 아니라 넣지 않아요.' : undefined,
     },
-    { name: `amount${n}`, label: `가족 ${n} 교육비 (원, 1년, 장학금 뺀 금액)`, type: 'number', min: 0, step: 1 },
+    { name: `amount${n}`, label: `가족 ${n}의 1년 교육비 (원)`, type: 'number', min: 0, step: 1, help: '장학금은 빼고 넣어요.' },
   ];
 
   FirstLabCalc.register({
     id: 'education-tax-credit',
     title: '교육비 세액공제 계산기',
-    intro: '한 해 동안 낸 교육비를 사람별로 넣으면 한도를 적용한 공제 대상 금액과 소득세에서 빼 주는 금액(15%)이 나와요.',
+    intro: '한 해 동안 낸 교육비를 사람별로 넣으면 소득세에서 빼 주는 금액(15%)이 나와요.',
     inputs: [
-      { name: 'self', label: '본인 교육비 (원, 1년, 없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '본인 대학·대학원 등록금, 직업훈련 수강료(지원금 뺀 금액), 학자금 대출 원리금 상환액이에요. 한도가 없어요.' },
+      { name: 'self', label: '내 1년 교육비 (원)', type: 'number', min: 0, step: 1, help: '본인 대학·대학원 등록금, 직업훈련 수강료(지원금 뺀 금액), 학자금 대출 원리금 상환액이에요. 한도가 없어요. 없으면 비워 둬요.' },
       ...family(1),
       ...family(2),
       ...family(3),
-      { name: 'special', label: '장애인 특수교육비 (원, 1년, 없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '기본공제대상자인 장애인의 재활교육비예요. 부모님도 포함되고 한도가 없어요. 나라·지자체 지원금은 빼고, 발달재활서비스 기관 비용은 18세 미만만 넣어요.' },
+      { name: 'special', label: '장애인 재활교육비 (원, 1년)', type: 'number', min: 0, step: 1, help: '\'장애인 특수교육비\'예요. 없으면 비워 둬요. 기본공제대상자인 장애인의 재활교육비예요. 부모님도 포함되고 한도가 없어요. 나라·지자체 지원금은 빼고, 발달재활서비스 기관 비용은 18세 미만만 넣어요.' },
     ],
 
     compute(v, d, u) {

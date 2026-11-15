@@ -7,19 +7,19 @@
   FirstLabCalc.register({
     id: 'pension-tax-credit',
     title: '연금저축 세액공제 계산기',
-    intro: '한 해 동안 연금저축·IRP에 넣은 금액과 소득을 넣으면 공제 대상 금액과 돌려받는 세금(지방소득세 포함)이 나와요.',
+    intro: '한 해 동안 연금저축·IRP에 넣은 돈과 소득을 넣으면 돌려받는 세금(지방소득세 포함)이 나와요.',
     inputs: [
       {
-        name: 'income_type', label: '소득 종류', type: 'select', default: 'wage',
+        name: 'income_type', label: '어떤 소득이 있나요?', type: 'choice', default: 'wage',
         options: [
-          ['wage', '근로소득만 있어요 (직장인)'],
-          ['other', '사업·연금 등 다른 종합소득도 있어요'],
+          ['wage', '월급만 있어요 (직장인)'],
+          ['other', '사업·연금 소득도 있어요'],
         ],
-        help: '근로소득만 있으면 총급여 5,500만 원, 다른 종합소득이 있으면 종합소득금액 4,500만 원이 공제율 기준이에요.',
+        help: '근로소득만 있으면 총급여 5,500만 원, 사업·연금 등 다른 종합소득이 있으면 종합소득금액 4,500만 원이 공제율 기준이에요.',
       },
-      { name: 'income', label: '총급여 또는 종합소득금액 (원, 1년)', type: 'number', min: 0, step: 1, help: '총급여는 연봉에서 비과세 소득(식대 등)을 뺀 금액이에요. 원천징수영수증의 총급여 칸을 보면 돼요.' },
-      { name: 'savings', label: '연금저축 납입액 (원, 1년)', type: 'number', min: 0, step: 1 },
-      { name: 'retire', label: 'IRP·DC 본인 납입액 (원, 1년, 없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '회사가 넣어 주는 DC 부담금과 퇴직금이 IRP로 들어온 돈은 빼고 넣어요.' },
+      { name: 'income', label: '1년 소득 (원)', type: 'number', min: 0, step: 1, help: '월급만 있으면 총급여, 다른 소득도 있으면 종합소득금액을 넣어요. 총급여는 연봉에서 비과세 소득(식대 등)을 뺀 금액이에요. 원천징수영수증의 총급여 칸을 보면 돼요.' },
+      { name: 'savings', label: '연금저축에 넣은 돈 (원, 1년)', type: 'number', min: 0, step: 1 },
+      { name: 'retire', label: 'IRP·DC에 넣은 돈 (원, 1년)', type: 'number', min: 0, step: 1, help: '내가 직접 넣은 돈만이에요. 없으면 비워 둬요. 회사가 넣어 주는 DC 부담금과 퇴직금이 IRP로 들어온 돈은 빼고 넣어요.' },
     ],
 
     compute(v, d, u) {

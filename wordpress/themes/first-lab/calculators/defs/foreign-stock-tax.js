@@ -14,13 +14,13 @@
   FirstLabCalc.register({
     id: 'foreign-stock-tax',
     title: '해외주식 양도소득세 계산기',
-    intro: '한 해 동안 판 해외주식의 판 금액·산 금액·수수료 합계를 원화로 넣으면 기본공제 250만 원을 뺀 과세표준과 양도소득세·지방소득세가 나와요.',
+    intro: '한 해 동안 판 해외주식의 판 금액·산 금액을 원화로 넣으면 250만 원을 빼고 낼 세금이 나와요.',
     inputs: [
-      { name: 'sale', label: '판 금액 합계 (양도가액, 원화)', type: 'number', min: 0, step: 1, help: '그해 판 해외주식 전체를 원화로 바꾼 금액이에요. 손실 난 종목도 같이 넣어요.' },
-      { name: 'acquire', label: '그 주식을 산 금액 합계 (취득가액, 원화)', type: 'number', min: 0, step: 1, help: '판 주식의 산 가격에 살 때 낸 수수료까지 더해 넣어요. 아직 안 판 주식은 빼요.' },
-      { name: 'expense', label: '수수료 등 팔 때 든 비용 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 1 },
-      { name: 'used', label: '국내 과세대상 주식에서 이미 쓴 기본공제 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '대주주·비상장 주식처럼 양도세를 내는 국내 주식도 판 경우에만 넣어요. 250만 원 공제를 함께 써요.' },
-      { name: 'kind', label: '주식 종류', type: 'select', default: 'general', options: [['general', '일반 해외주식 (20%)'], ['sme', '중소기업 주식 (10%)']] },
+      { name: 'sale', label: '판 금액 합계 (원화)', type: 'number', min: 0, step: 1, help: '\'양도가액\'이에요. 그해 판 해외주식 전체를 원화로 바꾼 금액이에요. 손실 난 종목도 같이 넣어요.' },
+      { name: 'acquire', label: '그 주식을 산 금액 합계 (원화)', type: 'number', min: 0, step: 1, help: '\'취득가액\'이에요. 판 주식의 산 가격에 살 때 낸 수수료까지 더해 넣어요. 아직 안 판 주식은 빼요.' },
+      { name: 'expense', label: '팔 때 든 수수료 등 (원)', type: 'number', min: 0, step: 1, help: '없으면 비워 둬요.' },
+      { name: 'used', label: '국내 주식에서 이미 쓴 공제 (원)', type: 'number', min: 0, step: 1, help: '대주주·비상장 주식처럼 양도세를 내는 국내 주식도 판 경우에만, 거기서 이미 쓴 기본공제 금액을 넣어요. 1년 250만 원 공제를 함께 나눠 써요. 없으면 비워 둬요.' },
+      { name: 'kind', label: '주식 종류', type: 'choice', default: 'general', options: [['general', '일반 해외주식 (20%)'], ['sme', '중소기업 주식 (10%)']] },
     ],
 
     compute(v, d, u) {

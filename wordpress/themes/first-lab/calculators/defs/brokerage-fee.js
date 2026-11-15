@@ -7,17 +7,17 @@
   FirstLabCalc.register({
     id: 'brokerage-fee',
     title: '중개보수(복비) 계산기',
-    intro: '거래금액을 넣으면 공인중개사에게 줄 중개보수의 상한(최대 금액)을 계산해요. 월세는 보증금과 월세를 같이 넣어요.',
+    intro: '거래금액을 넣으면 부동산 중개사무소에 줄 복비(중개보수)의 최대 금액이 나와요. 월세는 보증금과 월세를 같이 넣어요.',
     inputs: [
       {
-        name: 'kind', label: '무엇을 거래하나요', type: 'select', default: 'house',
-        options: [['house', '주택 (아파트·빌라·단독 등)'], ['officetel', '주거용 오피스텔 (85㎡ 이하·부엌·화장실 등)'], ['other', '그 밖의 부동산 (토지·상가 등)']],
+        name: 'kind', label: '무엇을 거래하나요?', type: 'choice', default: 'house',
+        options: [['house', '주택 (아파트·빌라·단독 등)'], ['officetel', '주거용 오피스텔'], ['other', '그 밖의 부동산 (토지·상가 등)']],
         help: '오피스텔은 전용면적 85㎡ 이하에 전용 입식 부엌·수세식 화장실·목욕시설을 모두 갖춰야 오피스텔 요율이에요. 아니면 "그 밖의 부동산"을 골라요.',
       },
       {
-        name: 'deal', label: '거래 종류', type: 'select', default: 'sale',
-        options: [['sale', '매매·교환'], ['lease', '임대차 (전세·월세)']],
-        help: '교환은 두 부동산 중 비싼 쪽 금액을 넣어요.',
+        name: 'deal', label: '사고파나요, 빌리나요?', type: 'choice', default: 'sale',
+        options: [['sale', '매매·교환'], ['lease', '전세·월세']],
+        help: "전세·월세는 '임대차'예요. 교환은 두 부동산 중 비싼 쪽 금액을 넣어요.",
       },
       { name: 'price', label: '매매가 또는 보증금 (원)', type: 'number', min: 0, step: 1000000, help: '매매는 거래가격, 전세·월세는 보증금이에요.' },
       { name: 'rent', label: '월세 (원, 월세일 때만)', type: 'number', min: 0, step: 10000, default: 0 },

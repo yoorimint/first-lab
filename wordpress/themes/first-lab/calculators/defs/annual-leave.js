@@ -19,10 +19,10 @@
   FirstLabCalc.register({
     id: 'annual-leave',
     title: '연차 개수 계산기',
-    intro: '입사일과 기준일을 넣으면 입사일 기준으로 지금까지 생긴 연차와 다음 연차가 생기는 날이 나와요.',
+    intro: '입사일과 기준일을 넣으면 지금까지 생긴 연차와 다음 연차가 생기는 날이 나와요.',
     inputs: [
       { name: 'start', label: '입사일', type: 'date', default: '2024-03-04' },
-      { name: 'base', label: '기준일 (오늘, 퇴사한다면 근로관계가 끝나는 마지막 재직일)', type: 'date', default: 'today', help: '마지막으로 일한 날 뒤에 주말·휴일이 있어도 근로관계가 그날까지 이어지면 그 날짜를 넣어요 (연차가 생기는 날에 근로관계가 있어야 함).' },
+      { name: 'base', label: '기준일 (오늘 또는 퇴사일)', type: 'date', default: 'today', help: '퇴사한다면 근로관계가 끝나는 마지막 재직일을 넣어요. 마지막으로 일한 날 뒤에 주말·휴일이 있어도 근로관계가 그날까지 이어지면 그 날짜를 넣어요 (연차가 생기는 날에 근로관계가 있어야 함).' },
     ],
 
     compute(v, d, u) {

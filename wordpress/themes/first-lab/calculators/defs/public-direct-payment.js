@@ -15,14 +15,15 @@
   FirstLabCalc.register({
     id: 'public-direct-payment',
     title: '공익직불금 계산기 (면적직불금)',
-    intro: '농지 종류별 면적(㎡)을 넣으면 기본형 공익직불금 중 면적직불금이 얼마인지 나와요. 소농직불금 대상인지도 함께 알려 줘요.',
+    intro: '논·밭 면적(㎡)을 넣으면 공익직불금 중 면적직불금이 얼마인지 나와요. 소농직불금 대상인지도 알려 줘요.',
     inputs: [
       { name: 'zone', label: '농업진흥지역 안 논·밭 면적 (㎡)', type: 'number', min: 0, step: 1, default: 0, help: '농지대장이나 등록 면적 기준이에요. 1ha는 10,000㎡예요.' },
       { name: 'paddy', label: '농업진흥지역 밖 논 면적 (㎡)', type: 'number', min: 0, step: 1, default: 0 },
       { name: 'field', label: '농업진흥지역 밖 밭 면적 (㎡)', type: 'number', min: 0, step: 1, default: 0 },
       {
-        name: 'who', label: '받는 사람', type: 'select', default: 'farmer',
-        options: [['farmer', '농업인'], ['corp', '농업법인 (공동농업경영체 아님)']],
+        name: 'who', label: '누가 받나요?', type: 'choice', default: 'farmer',
+        options: [['farmer', '농업인'], ['corp', '농업법인']],
+        help: "'농업법인'은 공동농업경영체가 아닌 농업법인이에요.",
       },
     ],
 

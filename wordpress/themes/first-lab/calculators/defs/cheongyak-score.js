@@ -32,20 +32,21 @@
   FirstLabCalc.register({
     id: 'cheongyak-score',
     title: '청약가점 계산기',
-    intro: '생년월일·혼인신고일·주택 소유 이력·부양가족 수·청약통장 가입일을 넣으면 항목별 점수와 84점 만점 기준 총점이 나와요.',
+    intro: '나이·집 가진 이력·가족 수·청약통장 가입일을 넣으면 청약 가점(84점 만점)이 나와요.',
     inputs: [
       { name: 'announce', label: '입주자모집공고일 (모르면 오늘)', type: 'date', default: 'today' },
       { name: 'birth', label: '본인 생년월일', type: 'date', default: '1991-05-01' },
-      { name: 'married', label: '혼인 여부', type: 'select', default: 'no', options: [['no', '미혼'], ['yes', '기혼 (혼인신고 함)']] },
+      { name: 'married', label: '결혼했나요?', type: 'choice', default: 'no', options: [['no', '아니요 (미혼)'], ['yes', '네 (혼인신고 함)']] },
       { name: 'marriage', label: '혼인신고일 (기혼일 때)', type: 'date', default: '' },
       {
-        name: 'house', label: '본인·세대원 주택 소유 (분양권 포함)', type: 'select', default: 'never',
-        options: [['never', '세대원 모두 주택을 가진 적 없음'], ['past', '예전에 있었고 지금은 세대원 모두 무주택'], ['now', '지금 세대원 중 주택 소유자가 있음 (소형·저가주택 1채, 60세 이상 부모님 집 등 무주택으로 보는 경우 제외)']],
+        name: 'house', label: '집을 가진 적 있나요? (세대원 포함)', type: 'choice', default: 'never',
+        options: [['never', '한 번도 없었어요'], ['past', '예전에 있었어요 (지금은 없음)'], ['now', '지금 있어요']],
+        help: "나와 세대원 모두를 봐요. 분양권도 집으로 쳐요. 소형·저가주택 1채, 60세 이상 부모님 집 등 무주택으로 보는 경우는 '지금 있어요'에 넣지 않아요.",
       },
-      { name: 'nohouse_since', label: '마지막으로 무주택이 된 날 (예전에 주택이 있었을 때)', type: 'date', default: '' },
-      { name: 'dependents', label: '부양가족 수 (본인 제외)', type: 'number', min: 0, step: 1, default: 0, help: '같은 등본의 배우자, 미혼 자녀(만 30세 이상은 최근 1년 이상 같은 등본), 본인(배우자와 등본이 따로면 배우자)이 세대주일 때 3년 이상 같은 등본에 있는 부모·조부모 등. 주택을 가진 부모님은 두 분 모두 빠져요(소형·저가주택 등 무주택으로 보는 집이면 인정, 60세 이상 예외는 적용 안 됨).' },
-      { name: 'account', label: '본인 청약통장 최초 가입일', type: 'date', default: '2016-06-01' },
-      { name: 'spouse_account', label: '배우자 청약통장 최초 가입일 (없으면 비움)', type: 'date', default: '' },
+      { name: 'nohouse_since', label: '집이 없어진 날 (예전에 있었다면)', type: 'date', default: '', help: '마지막으로 무주택이 된 날이에요.' },
+      { name: 'dependents', label: '부양가족 수 (나 빼고)', type: 'number', min: 0, step: 1, default: 0, help: '같은 등본의 배우자, 미혼 자녀(만 30세 이상은 최근 1년 이상 같은 등본), 본인(배우자와 등본이 따로면 배우자)이 세대주일 때 3년 이상 같은 등본에 있는 부모·조부모 등. 주택을 가진 부모님은 두 분 모두 빠져요(소형·저가주택 등 무주택으로 보는 집이면 인정, 60세 이상 예외는 적용 안 됨).' },
+      { name: 'account', label: '내 청약통장 가입일', type: 'date', default: '2016-06-01' },
+      { name: 'spouse_account', label: '배우자 청약통장 가입일 (없으면 비움)', type: 'date', default: '' },
     ],
 
     compute(v, d, u) {

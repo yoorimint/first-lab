@@ -4,19 +4,19 @@
   'use strict';
 
   const REGION = [
-    ['capital', '서울·인천·경기 (수도권)'],
-    ['non_capital', '그 밖의 지역 (비수도권)'],
+    ['capital', '수도권 (서울·인천·경기)'],
+    ['non_capital', '그 밖의 지역'],
   ];
 
   FirstLabCalc.register({
     id: 'senior-continued-employment',
     title: '고령자 계속고용장려금 계산기',
-    intro: '사업장 위치, 분기 석 달의 매월 말 피보험자 수, 정년 뒤 계속 고용한 직원 수를 넣으면 이번 분기 지원 인원 한도와 장려금이 나와요. 석 달을 모두 근무한 기준이에요.',
+    intro: '회사 위치, 분기 석 달의 달마다 고용보험 가입자 수, 정년 뒤 계속 고용한 직원 수를 넣으면 이번 분기 지원 인원 한도와 장려금이 나와요. 석 달을 모두 근무한 기준이에요.',
     inputs: [
-      { name: 'region', label: '사업장 위치', type: 'select', default: 'capital', options: REGION },
-      { name: 'm1', label: '분기 첫째 달 말 피보험자 수 (명)', type: 'number', min: 0, step: 1, default: 20, help: '그달 말일 기준 고용보험 피보험자 수예요 (예: 1분기면 1월 31일).' },
-      { name: 'm2', label: '둘째 달 말 피보험자 수 (명)', type: 'number', min: 0, step: 1, default: 20 },
-      { name: 'm3', label: '셋째 달 말 피보험자 수 (명)', type: 'number', min: 0, step: 1, default: 20 },
+      { name: 'region', label: '회사는 어디에 있나요?', type: 'choice', default: 'capital', options: REGION },
+      { name: 'm1', label: '분기 첫째 달 말 고용보험 가입자 (명)', type: 'number', min: 0, step: 1, default: 20, help: "그달 말일 기준 고용보험 '피보험자 수'예요 (예: 1분기면 1월 31일)." },
+      { name: 'm2', label: '둘째 달 말 고용보험 가입자 (명)', type: 'number', min: 0, step: 1, default: 20 },
+      { name: 'm3', label: '셋째 달 말 고용보험 가입자 (명)', type: 'number', min: 0, step: 1, default: 20 },
       { name: 'workers', label: '정년 뒤 계속 고용한 직원 수 (명)', type: 'number', min: 0, step: 1, default: 8, help: '지원 대상 요건(정년 전 피보험기간 2년 이상, 월 보수 124만 원 이상 등)을 갖춘 사람만 세요.' },
     ],
 

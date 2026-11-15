@@ -14,16 +14,16 @@
   FirstLabCalc.register({
     id: 'capital-gains-tax',
     title: '부동산 양도소득세 계산기',
-    intro: '판 가격, 산 가격, 필요경비, 보유·거주 기간을 넣으면 장기보유특별공제, 과세표준, 양도소득세와 지방소득세를 계산해요.',
+    intro: '판 가격, 산 가격, 들어간 비용, 갖고 있던 기간을 넣으면 내야 할 양도소득세와 지방소득세가 나와요.',
     inputs: [
-      { name: 'asset', label: '파는 부동산', type: 'select', default: 'house', options: [['house', '주택 (아파트·빌라·단독주택)'], ['land', '토지·상가 등 주택 외 건물']] },
-      { name: 'status', label: '주택 상황', type: 'select', default: 'one', help: '토지·상가는 "일반"을 골라요.',
-        options: [['one', '1세대 1주택 비과세 요건 충족 (2년 보유 등)'], ['general', '일반 (비과세 아님, 중과 아님)'], ['heavy2', '조정대상지역 2주택 중과'], ['heavy3', '조정대상지역 3주택 이상 중과']] },
-      { name: 'sale', label: '양도가액 (판 가격, 원)', type: 'number', min: 0, step: 1000000 },
-      { name: 'acquire', label: '취득가액 (산 가격, 원)', type: 'number', min: 0, step: 1000000, help: '취득세 같은 취득 부대비용은 여기에 더해 넣어요.' },
-      { name: 'expense', label: '필요경비 (원)', type: 'number', min: 0, step: 100000, default: 0, help: '취득가액 말고 따로 든 자본적지출액과 양도비(중개수수료 등)예요.' },
-      { name: 'hold', label: '보유기간 (만 몇 년)', type: 'number', min: 0, step: 1, default: 0, help: '취득일부터 양도일까지 꽉 채운 햇수 (1년 미만이면 0)' },
-      { name: 'live', label: '거주기간 (만 몇 년)', type: 'number', min: 0, step: 1, default: 0, help: '1세대 1주택만 써요. 그 집에 실제로 산 기간이에요.' },
+      { name: 'asset', label: '무엇을 파나요?', type: 'choice', default: 'house', options: [['house', '주택 (아파트·빌라·단독)'], ['land', '토지·상가 등']], help: '토지·상가 등은 주택이 아닌 땅과 건물이에요.' },
+      { name: 'status', label: '어떤 경우인가요?', type: 'choice', default: 'one', help: '1주택 비과세는 1세대 1주택 비과세 요건(2년 보유 등)을 채운 경우예요. 비과세도 중과도 아니면 "일반"을, 토지·상가도 "일반"을 골라요. 중과는 조정대상지역 주택에 세금을 더 매기는 거예요.',
+        options: [['one', '1주택 비과세'], ['general', '일반'], ['heavy2', '조정지역 2주택 중과'], ['heavy3', '조정지역 3주택 이상 중과']] },
+      { name: 'sale', label: '판 가격 (원)', type: 'number', min: 0, step: 1000000, help: "'양도가액'이에요." },
+      { name: 'acquire', label: '산 가격 (원)', type: 'number', min: 0, step: 1000000, help: "'취득가액'이에요. 취득세 같은 취득 부대비용은 여기에 더해 넣어요." },
+      { name: 'expense', label: '그 밖에 든 비용 (원)', type: 'number', min: 0, step: 100000, default: 0, help: "'필요경비'예요. 산 가격 말고 따로 든 자본적지출액과 양도비(중개수수료 등)예요." },
+      { name: 'hold', label: '갖고 있던 기간 (만 몇 년)', type: 'number', min: 0, step: 1, default: 0, help: "'보유기간'이에요. 취득일부터 양도일까지 꽉 채운 햇수 (1년 미만이면 0)" },
+      { name: 'live', label: '그 집에 산 기간 (만 몇 년)', type: 'number', min: 0, step: 1, default: 0, help: "'거주기간'이에요. 1세대 1주택만 써요. 그 집에 실제로 산 기간이에요." },
     ],
 
     compute(v, d, u) {

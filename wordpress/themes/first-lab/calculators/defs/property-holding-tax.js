@@ -3,10 +3,10 @@
   'use strict';
 
   const KIND = [
-    ['one', '1세대 1주택자 (공제 12억 원)'],
-    ['joint', '부부 공동명의 1주택 (각자 지분, 공제 9억 원)'],
-    ['two', '2주택 이하 (공제 9억 원)'],
-    ['three', '3주택 이상 (공제 9억 원)'],
+    ['one', '1세대 1주택자'],
+    ['joint', '부부 공동명의 1주택'],
+    ['two', '2주택 이하'],
+    ['three', '3주택 이상'],
   ];
 
   // 누진 구간마다 천분율을 곱해 더한다 (법 제9조 표와 같은 값)
@@ -27,12 +27,12 @@
   FirstLabCalc.register({
     id: 'property-holding-tax',
     title: '종부세 계산기 (주택분)',
-    intro: '주택 공시가격 합계와 주택 수를 넣으면 과세표준, 재산세 공제, 1주택자 세액공제, 농어촌특별세까지 계산해요.',
+    intro: '집 공시가격 합계와 집이 몇 채인지 넣으면 종부세와 농어촌특별세가 나와요.',
     inputs: [
-      { name: 'price', label: '주택 공시가격 합계 (원)', type: 'number', min: 0, step: 10000000, help: '6월 1일 기준 내 명의 주택의 공시가격을 모두 더해요. 부부 공동명의 1주택은 기본이면 내 지분만큼, 특례(1세대 1주택자 계산)를 신청했다면 집 전체 공시가격을 1세대 1주택자로 넣어요.' },
-      { name: 'kind', label: '주택 수', type: 'select', default: 'one', options: KIND },
+      { name: 'price', label: '집 공시가격 합계 (원)', type: 'number', min: 0, step: 10000000, help: '6월 1일 기준 내 명의 주택의 공시가격을 모두 더해요. 부부 공동명의 1주택은 기본이면 내 지분만큼, 특례(1세대 1주택자 계산)를 신청했다면 집 전체 공시가격을 1세대 1주택자로 넣어요.' },
+      { name: 'kind', label: '집이 몇 채인가요?', type: 'choice', default: 'one', options: KIND, help: '빼 주는 금액(공제)은 1세대 1주택자 12억 원, 나머지는 9억 원이에요. 부부 공동명의 1주택은 각자 지분으로 계산해요.' },
       { name: 'age', label: '만 나이 (1세대 1주택자만)', type: 'number', min: 0, step: 1, default: 0, help: '6월 1일 기준 만 나이. 60세 미만이면 0 그대로 둬요.' },
-      { name: 'years', label: '보유 기간 (년, 1세대 1주택자만)', type: 'number', min: 0, step: 1, default: 0, help: '6월 1일까지 그 집을 가진 햇수예요.' },
+      { name: 'years', label: '가진 햇수 (1세대 1주택자만)', type: 'number', min: 0, step: 1, default: 0, help: "'보유 기간'이에요. 6월 1일까지 그 집을 가진 햇수예요." },
     ],
 
     compute(v, d, u) {
