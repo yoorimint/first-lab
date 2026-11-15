@@ -6367,6 +6367,8 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("const FIRSTLAB_CALC_PAGES_NOINDEX = true;", php)
         self.assertIn("the_seo_framework_robots_meta_array", php)
         self.assertIn("FIRSTLAB_CALC_PAGES_NOINDEX && $is_calc", php)
+        self.assertIn("'calculators' === $page->post_name", php)       # 계산기 모음 페이지도
+        self.assertIn("'/calculators/' === ( $block['attrs']['url']", php)  # 머리글 메뉴 '계산기' 링크 숨김 (11/14 운영자 '홈에서도')
 
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
