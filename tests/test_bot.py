@@ -6710,6 +6710,23 @@ firstlab_stats_render_page();
         run_py = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
         self.assertIn('side_jobs.launch("firstlab-links", "bot.links_job")', run_py)
 
+    def test_quick_deploy_runs_full_post_scan_only_when_needed(self):
+        """11/16 사주데이 'CPU 부하 급증' 경보(00:38·07:53): 배포마다 전체 글 약 470편을 읽는 보정(maint.sh)이 돌아 부하 4 넘음 →
+        패치(patches.json)·보정 코드가 바뀐 배포에서만. 나머지는 매일 첫 전체 배포(bot-setup.sh)가 한 번."""
+        import subprocess
+        sh = (ROOT / "server" / "quick-deploy.sh").read_text(encoding="utf-8")
+        start = sh.index("if changed '^wordpress/patches")
+        cond = sh[start:sh.index("\nfi\n", start)]
+        self.assertIn("maint.sh", cond)
+        self.assertIn("maint.sh", (ROOT / "server" / "bot-setup.sh").read_text(encoding="utf-8"))
+        line = cond.splitlines()[0][3:].rsplit("; then", 1)[0]
+        def runs(changed):
+            return subprocess.run(["bash", "-c", "changed() { printf '%s\\n' \"$CHANGED\" | grep -q \"$1\"; }; if " + line + "; then echo y; fi"],
+                                  env={"CHANGED": changed, "PATH": "/usr/bin:/bin"}, capture_output=True, text=True).stdout.strip()
+        self.assertEqual(runs("wordpress/patches.json"), "y")
+        self.assertEqual(runs("bot/fix_posts.py"), "y")
+        self.assertEqual(runs("wordpress/queue/refresh-plus-34.json\nwordpress/mu-plugins/first-lab-stats.php"), "")
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
