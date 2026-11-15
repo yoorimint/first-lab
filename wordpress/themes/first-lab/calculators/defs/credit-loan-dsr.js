@@ -24,23 +24,25 @@
   FirstLabCalc.register({
     id: 'credit-loan-dsr',
     title: '신용대출 DSR 계산기',
-    intro: '연소득과 신용대출 조건을 넣으면 DSR에 잡히는 1년 원리금과 DSR 비율을 계산해요.',
+    intro: '연봉과 신용대출 조건을 넣으면 1년에 갚을 돈이 소득의 몇 %인지(DSR) 나와요.',
     inputs: [
-      { name: 'income', label: '연소득 (원)', type: 'number', min: 0, step: 1000000, help: '1년 소득이에요. 은행이 소득 서류로 인정하는 금액으로 넣어요.' },
+      { name: 'income', label: '1년 소득 (원)', type: 'number', min: 0, step: 1000000, help: '1년 소득이에요. 은행이 소득 서류로 인정하는 금액으로 넣어요.' },
       {
-        name: 'sector', label: '대출받는 곳', type: 'select', default: 'bank',
-        options: [['bank', '은행 (DSR 40%)'], ['nonbank', '저축은행·카드사 등 제2금융권 (DSR 50%)']],
+        name: 'sector', label: '어디서 빌리나요?', type: 'choice', default: 'bank',
+        options: [['bank', '은행 (DSR 40%)'], ['nonbank', '저축은행·카드사 등 (DSR 50%)']],
+        help: '저축은행·카드사 등은 제2금융권이에요.',
       },
-      { name: 'loan', label: '새 신용대출 금액 (원)', type: 'number', min: 0, step: 1000000, help: '마이너스통장은 쓴 돈이 아니라 한도를 넣어요.' },
-      { name: 'rate', label: '새 신용대출 연 금리 (%)', type: 'number', min: 0, step: 0.01 },
+      { name: 'loan', label: '새로 빌릴 돈 (원)', type: 'number', min: 0, step: 1000000, help: '마이너스통장은 쓴 돈이 아니라 한도를 넣어요.' },
+      { name: 'rate', label: '새 대출 금리 (연 %)', type: 'number', min: 0, step: 0.01 },
       {
-        name: 'method', label: '상환 방식', type: 'select', default: 'bullet',
-        options: [['bullet', '만기일시·마이너스통장 (5년에 나눠 갚는다고 봄)'], ['installment', '분할상환 (원리금균등, 약정만기 5~10년으로 봄)']],
+        name: 'method', label: '어떻게 갚나요?', type: 'choice', default: 'bullet',
+        options: [['bullet', '만기에 한 번에·마이너스통장'], ['installment', '매달 나눠 갚기']],
+        help: "만기일시·마이너스통장은 DSR에서 5년에 나눠 갚는다고 봐요. 매달 나눠 갚기는 '분할상환(원리금균등)'으로, 약정만기를 5~10년으로 봐요.",
       },
-      { name: 'years', label: '분할상환 만기 (년)', type: 'number', min: 1, step: 1, default: 5, help: '분할상환일 때만 써요. DSR은 만기가 5년보다 짧아도 5년, 10년보다 길어도 10년으로 봐요.' },
-      { name: 'credit_now', label: '이미 있는 신용대출 잔액 (원)', type: 'number', min: 0, step: 1000000, default: 0, help: '마이너스통장은 한도로 넣어요. 만기일시로 보고 계산해요.' },
-      { name: 'credit_now_rate', label: '이미 있는 신용대출 연 금리 (%)', type: 'number', min: 0, step: 0.01, default: 0 },
-      { name: 'other_yearly', label: '다른 대출의 1년 원리금 (원)', type: 'number', min: 0, step: 100000, default: 0, help: '주택담보대출·자동차 할부·카드론 등 1년에 갚는 원금과 이자 합계예요.' },
+      { name: 'years', label: '나눠 갚는 기간 (년)', type: 'number', min: 1, step: 1, default: 5, help: '분할상환일 때만 써요. DSR은 만기가 5년보다 짧아도 5년, 10년보다 길어도 10년으로 봐요.' },
+      { name: 'credit_now', label: '이미 있는 신용대출 (원)', type: 'number', min: 0, step: 1000000, default: 0, help: '남은 돈(잔액)을 넣어요. 마이너스통장은 한도로 넣어요. 만기일시로 보고 계산해요.' },
+      { name: 'credit_now_rate', label: '그 신용대출 금리 (연 %)', type: 'number', min: 0, step: 0.01, default: 0 },
+      { name: 'other_yearly', label: '다른 대출로 1년에 갚는 돈 (원)', type: 'number', min: 0, step: 100000, default: 0, help: '주택담보대출·자동차 할부·카드론 등 1년에 갚는 원금과 이자 합계예요.' },
     ],
 
     compute(v, d, u) {

@@ -8,13 +8,13 @@
   FirstLabCalc.register({
     id: 'daily-income-tax',
     title: '일용직 소득세 계산기',
-    intro: '일당과 일한 날수, 일당을 받는 방식을 넣으면 떼는 소득세·지방소득세와 세금을 뺀 금액을 계산해요.',
+    intro: '일당과 일한 날수를 넣으면 떼는 세금과 실제로 받는 금액이 나와요.',
     inputs: [
-      { name: 'wage', label: '일당 (원, 비과세 제외)', type: 'number', min: 0, step: 1, default: 200000, help: '하루 일하고 받기로 한 금액이에요. 식대 같은 비과세 금액은 빼고 넣어요.' },
+      { name: 'wage', label: '일당 (원)', type: 'number', min: 0, step: 1, default: 200000, help: '하루 일하고 받기로 한 금액이에요. 식대 같은 비과세 금액은 빼고 넣어요.' },
       { name: 'days', label: '일한 날수', type: 'number', min: 1, step: 1, default: 5, help: '같은 사업장에서 일한 날이에요. 날마다 일당이 같다고 보고 계산해요.' },
       {
-        name: 'pay', label: '일당을 받는 방식', type: 'select', default: 'lump',
-        options: [['daily', '날마다 그날 일당을 받음'], ['lump', '여러 날 치를 한 번에 받음']],
+        name: 'pay', label: '일당은 어떻게 받나요?', type: 'choice', default: 'lump',
+        options: [['daily', '날마다 받아요'], ['lump', '며칠 치를 한 번에']],
       },
     ],
 
