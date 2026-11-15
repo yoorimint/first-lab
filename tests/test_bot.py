@@ -6727,6 +6727,29 @@ firstlab_stats_render_page();
         self.assertEqual(runs("bot/fix_posts.py"), "y")
         self.assertEqual(runs("wordpress/queue/refresh-plus-34.json\nwordpress/mu-plugins/first-lab-stats.php"), "")
 
+    def test_daily_full_deploy_runs_at_dawn(self):
+        """11/16 운영자 '새벽으로 옮겨라': 하루 한 번 전체 배포(서버 설정·글 전체 보정)가 그날 첫 배포(보통 아침 글쓰기 08시)에
+        붙어 사주데이 부하 경보 → 새벽 2~6시에만, 그때 못 했으면(어제도 안 함) 다음 배포가 대신. 예약 배포는 3시대 첫 회차에 꼭 돎."""
+        import re, subprocess, tempfile, os
+        yml = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        func = re.search(r"daily_full_due\(\) \{.*?\n\s*\}", yml, re.S).group(0)
+        self.assertIn("|| daily_full_due; then", yml)
+        self.assertIn('[ "$early" -ge 0300 ] && [ "$early" -lt 0315 ]', yml)
+        def due(mark, now_date, hour):
+            with tempfile.TemporaryDirectory() as d:
+                mf = os.path.join(d, "mark")
+                if mark:
+                    open(mf, "w").write(mark)
+                stub = (f'date() {{ case "$*" in "+%F") echo {now_date};; "+%H") echo {hour};; '
+                        f'"-d yesterday +%F") python3 -c "import datetime;print(datetime.date.fromisoformat(\'{now_date}\')-datetime.timedelta(1))";; esac; }}; ')
+                cmd = f'FULL_MARK={mf}; {stub}{func}; daily_full_due && echo yes || echo no'
+                return subprocess.run(["bash", "-c", cmd], capture_output=True, text=True).stdout.strip()
+        self.assertEqual(due("2026-11-15", "2026-11-16", "03"), "yes")   # 새벽: 전체 배포
+        self.assertEqual(due("2026-11-15", "2026-11-16", "08"), "no")    # 아침 글쓰기 배포: 어제 했으니 가볍게
+        self.assertEqual(due("2026-11-16", "2026-11-16", "03"), "no")    # 오늘 이미 함
+        self.assertEqual(due("2026-11-14", "2026-11-16", "15"), "yes")   # 어제 새벽도 놓침 → 낮이라도 대신
+        self.assertEqual(due("", "2026-11-16", "15"), "yes")             # 기록 없음
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
@@ -7406,8 +7429,10 @@ class DeployQuickTest(unittest.TestCase):
         self.assertEqual(wf.count('bash "$REPO/server/quick-deploy.sh" "$CHANGED"'), 2)  # 다시 시도 단계도 같게
         cond = next(x.strip() for x in wf.splitlines() if "grep -qE '^(FULL|server/" in x)
         test = cond.replace("if ", "", 1).rsplit("; then", 1)[0]
+        import re
+        func = re.search(r"daily_full_due\(\) \{.*?\n\s*\}", wf, re.S).group(0)  # 하루 한 번 전체 배포 판단 (11/16 새벽으로 — test_daily_full_deploy_runs_at_dawn)
         def full(changed, mark_today=True):
-            script = (f'FULL_MARK=$(mktemp); {"date +%F > $FULL_MARK" if mark_today else ":"}; CHANGED={changed!r}; '
+            script = (f'FULL_MARK=$(mktemp); {"date +%F > $FULL_MARK" if mark_today else ":"}; CHANGED={changed!r}; {func}; '
                       f'if {test}; then echo full; else echo quick; fi')
             return subprocess.run(["bash", "-c", script], capture_output=True, text=True).stdout.strip()
         self.assertEqual(full("wordpress/queue/a.json\nbot/run.py"), "quick")
@@ -7415,7 +7440,7 @@ class DeployQuickTest(unittest.TestCase):
         self.assertEqual(full("server/setup.sh"), "full")
         self.assertEqual(full("wordpress/pages/about.html"), "full")
         self.assertEqual(full("FULL"), "full")
-        self.assertEqual(full("bot/run.py", mark_today=False), "full")  # 그날 첫 배포
+        self.assertEqual(full("bot/run.py", mark_today=False), "full")  # 기록 없음(어제도 안 함) → 시간 상관없이 전체
 
 
 class TestFileHygieneTest(unittest.TestCase):
