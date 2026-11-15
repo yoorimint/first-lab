@@ -6370,6 +6370,15 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("'calculators' === $page->post_name", php)       # 계산기 모음 페이지도
         self.assertIn("'/calculators/' === ( $block['attrs']['url']", php)  # 머리글 메뉴 '계산기' 링크 숨김 (11/14 운영자 '홈에서도')
 
+    def test_settings_warns_unread_publish_times(self):
+        """11/14 운영자 '예약 공개 3개 넣었는데 공개 계획은 2개': 저장값엔 09:00·18:00 두 개만 — 못 읽은 줄이 조용히 빠졌음.
+        저장할 때 줄 수보다 읽힌 시각이 적으면 설정 페이지에 경고."""
+        page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
+        self.assertIn("count( $lines ) > count( $times )", page)
+        self.assertIn("add_settings_error", page)
+        from bot import settings
+        self.assertEqual(settings._times("09:00\n13.30\n18:00"), ["09:00", "18:00"])   # '13.30' 은 못 읽음 → 경고 대상
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
