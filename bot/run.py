@@ -258,16 +258,16 @@ def main() -> None:
     parser.add_argument("--now", action="store_true", help="글쓰기 작업 1번 바로 시작 (설정의 방식대로)")
     args = parser.parse_args()
 
+    from . import run_timing
+    run_timing.put_carry("started", 1, add=True)  # 시작 수 (저장에 실패해 기록이 빠진 실행도 세려고, 11/15)
     lock = open(LOCK_FILE, "w")
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)  # 이전 실행이 아직 작업 중이면 건너뜀
     except BlockingIOError:
         print("[run] 이전 실행이 아직 진행 중 → 건너뜀", flush=True)
-        from .run_timing import put_carry
-        put_carry("locked", 1, add=True)
+        run_timing.put_carry("locked", 1, add=True)
         return
 
-    from . import run_timing
     laps = run_timing.Laps(started_ago=run_timing.process_age())  # 단계별 걸린 시간 (bot/run_timing.py, 11/15 매분 실행이 3분씩 걸림)
     laps.add_carry(run_timing.take_carry())
     settings = load_settings()
@@ -449,8 +449,14 @@ def main() -> None:
     if json.dumps(state, sort_keys=True, ensure_ascii=False) != before:
         saving = time.monotonic()
         save_state(state)
+        run_timing.clear_carry()  # 넘겨받은 값이 state 에 들어감
         run_timing.put_carry("save", time.monotonic() - saving)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except BaseException as e:  # 오류 내용을 다음 실행이 /maintenance run_timing 에 남김 (bot/run_timing.note_error)
+        from .run_timing import note_error
+        note_error(e)
+        raise

@@ -23,7 +23,8 @@ class Laps:
         self.last = clock()
         self.start = self.last - (started_ago or 0.0)
         self.steps: dict[str, float] = {}
-        self.locked = 0
+        self.locked = self.started = self.errors = 0
+        self.last_error = ""
         if started_ago:
             self.steps["시작(파이썬·불러오기)"] = started_ago
 
@@ -32,6 +33,9 @@ class Laps:
         if carry.get("save"):
             self.steps["저장(앞 실행)"] = float(carry["save"])
         self.locked = int(carry.get("locked", 0))
+        self.started = int(carry.get("started", 0))
+        self.errors = int(carry.get("errors", 0))
+        self.last_error = str(carry.get("last_error", ""))
 
     def lap(self, name: str) -> None:
         now = self._clock()
@@ -50,6 +54,10 @@ def record(state: dict, stamp: str, laps: Laps) -> None:
     total = laps.total()
     day["runs"] = int(day.get("runs", 0)) + 1
     day["locked"] = int(day.get("locked", 0)) + laps.locked
+    day["started"] = int(day.get("started", 0)) + laps.started   # 시작한 실행 (중간에 죽은 실행 포함 — runs 와 차이 = 죽은 수)
+    day["errors"] = int(day.get("errors", 0)) + laps.errors
+    if laps.last_error:
+        day["last_error"] = laps.last_error
     day["total_sum"] = round(float(day.get("total_sum", 0)) + total, 1)
     if total > float(day.get("total_max", 0)):
         day["total_max"], day["total_max_at"] = round(total, 1), stamp[11:16]
@@ -79,13 +87,33 @@ def process_age() -> float | None:
 
 
 def take_carry(path: str = CARRY_FILE) -> dict:
+    """앞 실행들이 남긴 값을 읽음. 지우지는 않음 — 이번 실행이 저장까지 마친 뒤 clear_carry (중간에 죽으면 다음 실행이 다시 읽게)."""
     try:
         with open(path) as f:
             carry = json.load(f)
-        os.remove(path)
         return carry if isinstance(carry, dict) else {}
     except (OSError, ValueError):
         return {}
+
+
+def clear_carry(path: str = CARRY_FILE) -> None:
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
+
+def note_error(exc: BaseException, path: str = CARRY_FILE) -> None:
+    """실행이 오류로 끝남 → 다음 실행이 state 에 넣게 (11/15: 실행은 매분 시작하는데 기록이 1/3 만 남음 — 저장 실패 의심)."""
+    put_carry("errors", 1, path=path, add=True)
+    try:
+        with open(path) as f:
+            carry = json.load(f)
+        carry["last_error"] = f"{time.strftime('%H:%M')} {type(exc).__name__}: {str(getattr(exc, 'stderr', '') or exc)[:200]}"
+        with open(path, "w") as f:
+            json.dump(carry, f, ensure_ascii=False)
+    except (OSError, ValueError):
+        pass
 
 
 def put_carry(key: str, value: float, path: str = CARRY_FILE, add: bool = False) -> None:
@@ -96,7 +124,7 @@ def put_carry(key: str, value: float, path: str = CARRY_FILE, add: bool = False)
                 carry = json.load(f)
         except (OSError, ValueError):
             carry = {}
-        carry[key] = round(float(carry.get(key, 0)) + value, 1) if add else round(value, 1)
+        carry[key] = round(float(carry.get(key, 0) or 0) + value, 1) if add else round(value, 1)
         with open(path, "w") as f:
             json.dump(carry, f)
     except OSError:
@@ -109,5 +137,6 @@ def summary(day: dict) -> str:
     top = sorted((day.get("step_sum") or {}).items(), key=lambda kv: -kv[1])[:3]
     return (f"봇 실행 {day.get('runs', 0)}회 · 평균 {float(day.get('total_sum', 0)) / runs:.1f}초 · "
             f"최대 {day.get('total_max', 0)}초({day.get('total_max_at', '-')}) · 1분 넘김 {day.get('slow_runs', 0)}회 · "
-            f"잠금으로 건너뜀 {day.get('locked', 0)}회 · "
-            "오래 걸린 단계: " + ", ".join(f"{k} 합 {round(v)}초(최대 {(day.get('step_max') or {}).get(k, 0)}초)" for k, v in top))
+            f"시작 {day.get('started', 0)}회 · 오류로 끝남 {day.get('errors', 0)}회 · 잠금으로 건너뜀 {day.get('locked', 0)}회 · "
+            + (f"마지막 오류 {day['last_error'][:80]} · " if day.get("last_error") else "")
+            + "오래 걸린 단계: " + ", ".join(f"{k} 합 {round(v)}초(최대 {(day.get('step_max') or {}).get(k, 0)}초)" for k, v in top))
