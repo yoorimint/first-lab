@@ -6553,8 +6553,15 @@ firstlab_stats_render_page();
         import plus_queue
         m = {"index": {"waiting": [{"post_id": 34, "coverage": "읽어 갔지만 색인 안 함"},
                                    {"post_id": 469, "coverage": "구글이 아직 모름"}]}}
-        self.assertEqual(plus_queue.dropped_published(m), [34])
-        self.assertEqual(plus_queue.dropped_published({}), [])
+        self.assertEqual(plus_queue.dropped_published(m), {34: ""})
+        self.assertEqual(plus_queue.dropped_published({}), {})
+        m2 = {"index": {"posts": [{"post_id": 34, "state": "crawled", "last_crawl": "2026-11-20"},
+                                  {"post_id": 65, "state": "indexed", "last_crawl": "2026-11-20"}]}}
+        self.assertEqual(plus_queue.dropped_published(m2), {34: "2026-11-20"})
+        # 보강한 뒤 구글이 다시 읽고도 안 넣었을 때만 다시 보강 (무한 반복 금지)
+        self.assertTrue(plus_queue.needs_plus_again({"plus_at": ""}, "2026-11-14"))
+        self.assertFalse(plus_queue.needs_plus_again({"plus_at": "2026-11-15"}, "2026-11-14"))
+        self.assertTrue(plus_queue.needs_plus_again({"plus_at": "2026-11-15"}, "2026-11-20"))
 
     def test_crawler_files_skip_page_cache(self):
         """11/15 운영자가 본 카페 글 '구글 방문 급감 → 사이트맵·피드·robots.txt 캐시 예외': 셋 다 nginx 페이지 캐시에서 뺌
@@ -6574,6 +6581,30 @@ firstlab_stats_render_page();
         for q in ("퇴사시 연차수당도 받을 수 있나요?", "퇴사하면 연차수당도 받을 수 있나요?", "퇴사때 연차수당도 받나요?"):
             self.assertEqual(serp_gate.uncovered([q], body), [], q)
         self.assertEqual(serp_gate.uncovered(["입사시 건강검진 서류는?"], body), ["입사시 건강검진 서류는?"])  # 다른 주제는 그대로 걸림
+
+    def test_index_stage_for_each_post(self):
+        """11/15 운영자 '아직 신청 안 된 거, 색인 중인 거, 됐다가 빠진 거 — 빠진 거 다시 보강해서 신청': 글마다 단계를 나눔."""
+        import shutil, subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("define('ABSPATH','/'); function add_action(){} require '" + str(ROOT / "wordpress" / "mu-plugins" / "first-lab-stats.php") + "';"
+                "$c=array("
+                "firstlab_index_stage(array('state'=>'indexed'),'',''),"
+                "firstlab_index_stage(array('state'=>'crawled','last_crawl'=>'2026-11-14'),'',''),"
+                "firstlab_index_stage(array('state'=>'crawled','last_crawl'=>'2026-11-14'),'2026-11-15',''),"
+                "firstlab_index_stage(array('state'=>'crawled','last_crawl'=>'2026-11-14'),'2026-11-15','2026-11-16'),"
+                "firstlab_index_stage(array('state'=>'crawled','last_crawl'=>'2026-11-20'),'2026-11-15','2026-11-16'),"
+                "firstlab_index_stage(array('state'=>'unknown'),'',''),"
+                "firstlab_index_stage(array('state'=>'unknown'),'','2026-11-16'));"
+                "echo json_encode($c);")
+        got = json.loads(subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout)
+        self.assertEqual(got, ["indexed", "improve", "request", "requested", "improve", "waiting", "requested"])
+        # 서버 요약에 글별 상태 (검색 노출 기록이 있으면 '전에 색인됨')
+        from bot import index_check
+        rows = [{"post_id": 34, "url": "https://first-lab.kr/%ec%9e%90/", "published": "2026-11-03", "verdict": "NEUTRAL",
+                 "coverage": "Crawled - currently not indexed", "last_crawl": "2026-11-14", "first_indexed": ""}]
+        got = index_check.post_rows(rows, {"https://first-lab.kr/자"})
+        self.assertEqual((got[0]["state"], got[0]["was_indexed"]), ("crawled", "검색 노출 기록"))
 
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
