@@ -70,6 +70,8 @@ add_action(
 						'calc_yearly'   => $side ? (array) ( $state['calc_yearly'] ?? array() ) : array(),
 						// 공개 대기 글이 많으면 새 글 대신 외부 검수할 대기 글 (bot/review_queue.py, daily-writer.md 0단계)
 						'review_target' => $side ? ( $state['review_target'] ?? null ) : null,
+						// 구글이 읽고도 색인 안 한 공개 글 — 새 글보다 먼저 +@ (11/15 운영자 '글 계속 올리는 것보다 색인이 더 중요', daily-writer.md 6-1)
+						'plus_target'   => $side ? firstlab_api_plus_target( (array) ( $state['index']['posts'] ?? array() ) ) : null,
 						// 배포가 막힘(대개 검사 실패) — 글쓰기 작업이 먼저 고침 (bot/deploy_watch.py)
 						'deploy_alert'  => $side ? ( $state['deploy_alert'] ?? null ) : null,
 						// 고친 내용이 서버 글에 안 들어간 패치 (bot/patch_check.py) — 글쓰기 작업이 갱신 파일로 고침
@@ -132,6 +134,32 @@ add_action(
  * 오늘 갱신할 글 (월정액 방식에서 봇이 새벽에 골라 둔 것) + 현재 본문.
  * base_modified 는 반영할 때 그 사이 글이 수정됐는지 확인하는 값 (bot/refresh.py apply_direct).
  */
+/**
+ * +@ 할 공개 글 1편: 구글이 읽고도 색인 안 함(crawled) + (보강한 적 없음 또는 보강한 뒤 구글이 다시 읽고도 또 안 넣음).
+ * 보강한 날이 오늘이면(이미 함) 건너뜀. 공개 오래된 글부터 (bot/index_check.post_rows, automation/plus_queue.needs_plus_again 과 같은 기준).
+ */
+function firstlab_api_plus_target( array $posts, ?callable $plus_at_of = null ): ?array {
+	$plus_at_of = $plus_at_of ?? static fn( int $id ) => (string) get_post_meta( $id, '_firstlab_plus_at', true );
+	foreach ( $posts as $p ) {
+		$id = (int) ( $p['post_id'] ?? 0 );
+		if ( ! $id || 'crawled' !== ( $p['state'] ?? '' ) ) {
+			continue;
+		}
+		$plus_at = $plus_at_of( $id );
+		$crawl   = (string) ( $p['last_crawl'] ?? '' );
+		if ( '' === $plus_at || ( '' !== $crawl && $crawl > $plus_at ) ) {
+			return array(
+				'post_id'    => $id,
+				'url'        => (string) ( $p['url'] ?? '' ),
+				'last_crawl' => $crawl,
+				'plus_at'    => $plus_at,
+				'why'        => '구글이 읽고도 색인 안 함' . ( ! empty( $p['was_indexed'] ) ? ' (전에 색인됨 → 빠짐)' : '' ) . ( $plus_at ? ' — 보강한 뒤 다시 읽고도 안 넣음' : '' ),
+			);
+		}
+	}
+	return null;
+}
+
 function firstlab_api_refresh_target( array $state ): ?array {
 	$target = (array) ( $state['refresh_target'] ?? array() );
 	$post   = empty( $target['id'] ) ? null : get_post( (int) $target['id'] );

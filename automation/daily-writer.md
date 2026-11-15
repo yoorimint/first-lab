@@ -13,7 +13,7 @@ Claude 예약 작업으로 시작되는 세션이 이 문서대로 **새 글 1�
    실행 메시지가 `slot-N`(동시 실행 칸 번호)이면 `/next` 주소에 `?slot=N` 을 붙여 받고(후보를 칸마다 나눠 줌, 2번 칸은 곁일 없이 새 글만), 끝 표시 done 파일에 `"slot": N` 을 넣는다.
 2. 급한 일: `deploy_alert` → `patch_problems` (1단계 설명). 있으면 그것을 하고 3번으로.
 3. 무거운 일 — 위에서부터 **처음 해당하는 1개만**:
-   ① `held_drafts` 첫 글 고치기(5-1) ② `review_target` 대기 글 검수(1단계) ③ `calc_yearly` 3건까지(4-2) ④ 새 글 1편(1~5단계)
+   ① `held_drafts` 첫 글 고치기(5-1) ② `plus_target` 색인 안 된 공개 글 +@(6-1) ③ `review_target` 대기 글 검수(1단계) ④ `calc_yearly` 3건까지(4-2) ⑤ 새 글 1편(1~5단계)
 4. 가벼운 일(사용량이 남으면): `image_checks`(5-2), `refresh_target`(6).
 5. 건너뛴 후보 skip 파일은 새 글을 안 써도 올린다.
 6. 끝에 `wordpress/queue/done-<날짜시각>.json` = `{"type": "run_done", "summary": "<이번에 한 일 한 줄>"}` 을 **항상** 만들고 (`slot-N` 실행이면 이름 끝에 `-s<N>` 을 붙이고 JSON 에 `"slot": N` — 동시 실행끼리 파일 이름이 겹치지 않게, skip 파일도 같은 규칙) (서버가 이걸 보고 다음 실행을 시작 — 없으면 60분을 기다림), **검사 1번 → 커밋 1개 → push 1번** (5단계 명령). 단계마다 따로 push 하지 않는다 (다음 실행과 겹침).
@@ -89,7 +89,7 @@ EOF
 - **상위 글 분석 (먼저)**: `python3 automation/naver_top.py "<키워드>" > 상위글.txt` 로 **네이버** 블로그 탭·통합검색 상위 글을 열어(운영자 11/11 승인, 글마다 웹 검색 1번으로 셈) **다루는 질문·목차만** 메모한다. 안 열리면 WebSearch 로 상위 글 5~10개.
   사실·숫자는 여기서 가져오지 않는다 (틀리거나 낡은 경우가 많음). 문장도 옮기지 않는다 — 서버가 serp 의 상위 글을 다시 열어 같은 문장이 한 글과 3개 이상이면 초안 보류 (serp_gate.copied).
   우리 글은 이 질문들을 모두 다루고, 상위 글에 없는 것(계산 예시·계산기·상황별 판단·최신 개정 반영)을 하나 이상 더한다.
-  5단계 JSON 에 `"serp": {"urls": [열어 본 상위 글 주소, 서로 다른 사이트 3곳 이상], "questions": [그 글들이 다루는 질문 3개 이상], "added": "상위 글에 없는데 더한 것"}` — 서버가 질문을 본문이 다 다뤘는지 확인하고, 없으면 초안 보류 (bot/serp_gate.py). 검색이 안 되면 `{"unavailable": "이유"}`.
+  5단계 JSON 에 `"serp": {"urls": [열어 본 상위 글 주소, 서로 다른 사이트 3곳 이상], "questions": [그 글들이 다루는 질문 3개 이상], "added": [{"type": "@계산예시|@상황판단|@최신개정|@조회방법|@계산기", "text": "상위 글에 없는데 더한 것 한 줄"}]}` — 서버가 질문을 본문이 다 다뤘는지, 더한 것이 본문에 정말 있는지 확인하고, 없으면 초안 보류 (bot/serp_gate.py). 검색이 안 되면 `{"unavailable": "이유"}`.
 - 사실 조사: WebSearch·WebFetch 합쳐 10번 안팎. 공식 출처(정부·공공기관·해당 기관 공식 사이트) 먼저.
 - 공식 값과 블로그 값이 다르면 공식 값을 쓴다. 확인 못 한 것은 단정하지 않거나 뺀다.
 - **근거 장부**를 만든다: 글에 쓸 수치·기준·조건·절차 하나하나를 스크래치 폴더 `claims.json` 에 적는다.
@@ -202,6 +202,13 @@ python3 -c "import json;from bot.writer import parse_article,align_with_body;a=p
 - `wordpress/queue/imgcheck-<post_id>-<날짜시각>.json` 으로 저장 (이상 없으면 replace·remove·add 를 빈 목록으로 → 검사 끝 표시):
   `{"type": "image_check", "post_id": <id>, "replace": [{"old": "<name>", "prompt": "...", "alt": "한국어 대체 텍스트", "why": "한 줄"}], "remove": [], "add": []}`
 - 실행 끝 커밋에 같이 넣는다.
+
+## 6-1. 색인 안 된 공개 글 +@ (`plus_target` 이 있을 때 — 새 글보다 먼저, 11/15 운영자 '글 계속 올리는 것보다 색인이 더 중요')
+구글이 읽고도 검색에 안 넣은 공개 글이다. 이 글을 찾는 사람에게 상위 글보다 나은 답이 되게 보강한다.
+1. `python3 automation/plus_queue.py --id=<post_id>` — 아무것도 안 뽑히면(이미 보강함·패치 대기) 다음 무거운 일로.
+2. `automation/plus-prompt.md` 순서 그대로: ① 하위 에이전트 1개가 보강 ② 다른 하위 에이전트 1개가 새로 더한 사실만 공식 출처로 검수
+   ③ 내가 `python3 automation/plain_diff.py …` 로 더한 곳을 끝까지 읽고 숫자를 다시 계산한 뒤 `python3 automation/plus_check.py … --write`.
+3. 만들어진 `wordpress/queue/refresh-plus-<id>-….json` 을 실행 끝 커밋에 넣는다. 보고에 "+@ <글 번호>: 더한 것 한 줄".
 
 ## 6. 글 갱신 (있는 날만)
 1단계 응답의 `refresh_target` 이 `null` 이면 건너뛴다. 있으면 그 글 1개를 고친다 (새 글이 실패했어도 따로 진행).
