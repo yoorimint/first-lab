@@ -114,7 +114,40 @@ def due(posts: list[dict], known: dict[str, dict], today: date, limit: int = CHE
             + [p for _, p in sorted(recheck, key=lambda x: x[0])])[:limit]
 
 
-def summarize(posts: list[dict], known: dict[str, dict], today: date) -> dict:
+def _key(url: str) -> str:
+    import urllib.parse
+    return urllib.parse.unquote(url or "").lower().rstrip("/")
+
+
+def seen_in_search(conn) -> set[str]:
+    """검색 노출이 한 번이라도 있었던 주소 (gsc_page_history) — 노출됐다면 그때는 색인돼 있었던 것.
+    11/15: 첫 글은 색인 점검이 고쳐지기 전에 색인됐다가 빠져, first_indexed 가 비어 '빠진 글'로 안 보였음."""
+    import sqlite3
+    try:
+        return {_key(r[0]) for r in conn.execute("SELECT DISTINCT page FROM gsc_page_history WHERE impressions > 0")}
+    except sqlite3.OperationalError:
+        return set()
+
+
+STATE_OF = {"Submitted and indexed": "indexed", "Indexed, not submitted in sitemap": "indexed",
+            "Crawled - currently not indexed": "crawled", "Discovered - currently not indexed": "discovered",
+            "URL is unknown to Google": "unknown"}
+
+
+def post_rows(rows: list[dict], seen: set[str]) -> list[dict]:
+    """글별 상태 (사이트 성과 '글별 색인 상태' — 11/15 운영자 '신청 안 된 거, 색인 중인 거, 됐다가 빠진 거').
+    state: indexed / crawled(읽고도 안 넣음) / discovered(발견만) / unknown(구글이 모름) / other."""
+    out = []
+    for r in sorted(rows, key=lambda r: r["published"]):
+        state = "indexed" if is_indexed(r) else STATE_OF.get(r.get("coverage", ""), "other")
+        was = r.get("first_indexed") or ("검색 노출 기록" if _key(r["url"]) in seen else "")
+        out.append({"post_id": r["post_id"], "url": r["url"], "published": r["published"], "state": state,
+                    "coverage": COVERAGE_KO.get(r.get("coverage", ""), r.get("coverage", "")),
+                    "last_crawl": r.get("last_crawl") or "", "was_indexed": was if state != "indexed" else ""})
+    return out
+
+
+def summarize(posts: list[dict], known: dict[str, dict], today: date, seen: set[str] | None = None) -> dict:
     rows = [dict(p, **known.get(p["url"], {})) for p in posts]
     checked = [r for r in rows if r.get("checked")]
     indexed = [r for r in checked if is_indexed(r)]
@@ -142,6 +175,7 @@ def summarize(posts: list[dict], known: dict[str, dict], today: date) -> dict:
                      "last_crawl": r.get("last_crawl") or "",
                      "was_indexed": r.get("first_indexed") or "",   # 전에 색인 확인한 날 (있으면 '빠진 글')
                      "other_canonical": _other_canonical(r)} for r in waiting[:SHOW]],
+        "posts": post_rows(checked, seen or set()),
         "signal": ("늘려도 됨" if ratio is not None and ratio >= GOOD_RATIO else "유지" if ratio is not None else "아직 판단 못 함"),
     }
 
@@ -193,7 +227,7 @@ def run(conn, posts: list[dict], today: date, ask=None, limit: int = CHECK_PER_D
                      ":last_crawl,:first_indexed,:checked,:google_canonical)", row)
         known[p["url"]] = row
     conn.commit()
-    return summarize(posts, known, today), errors
+    return summarize(posts, known, today, seen_in_search(conn)), errors
 
 
 def record(state: dict, today: str | None = None, force: bool = False) -> str:

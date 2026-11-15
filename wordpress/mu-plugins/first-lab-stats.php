@@ -10,7 +10,97 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const FIRSTLAB_STATS_SLUG = 'firstlab-stats';
+const FIRSTLAB_STATS_SLUG      = 'firstlab-stats';
+const FIRSTLAB_INDEX_REQ_META  = '_firstlab_index_requested';   // 운영자가 서치콘솔에서 색인 생성을 요청한 날 (구글이 알려 주지 않아 직접 표시)
+const FIRSTLAB_PLUS_META       = '_firstlab_plus_at';           // +@ 보강한 날 (bot/refresh.PLUS_META)
+
+/**
+ * 글 하나의 색인 단계 (11/15 운영자 '아직 신청 안 된 거, 색인 중인 거, 됐다가 빠진 거 — 빠진 거 다시 보강해서 신청하면 되는 거 아닌가').
+ *  indexed   : 색인됨
+ *  improve   : 구글이 읽고도 안 넣음(빠진 글 포함) + 그 뒤 보강 전 → +@ 차례 맨 앞 (automation/plus_queue.dropped_published)
+ *  request   : 구글이 마지막으로 읽은 뒤 보강함 → 운영자가 서치콘솔에서 '색인 생성 요청'
+ *  requested : 요청함 → 구글 결과 기다림 (색인 점검이 매일 다시 봄)
+ *  waiting   : 구글이 아직 안 읽음(모름·발견만) → 기다림 (사이트맵·글끼리 링크로 찾아옴)
+ */
+function firstlab_index_stage( array $p, string $plus_at, string $requested ): string {
+	$state = (string) ( $p['state'] ?? '' );
+	if ( 'indexed' === $state ) {
+		return 'indexed';
+	}
+	if ( 'crawled' === $state || ( 'other' === $state && ! empty( $p['was_indexed'] ) ) ) {
+		if ( '' === $plus_at || $plus_at < (string) ( $p['last_crawl'] ?? '' ) ) {
+			return 'improve';
+		}
+		return ( '' !== $requested && $requested >= $plus_at ) ? 'requested' : 'request';
+	}
+	return '' !== $requested ? 'requested' : 'waiting';
+}
+
+add_action(
+	'admin_post_firstlab_index_requested',
+	static function () {
+		$id = (int) ( $_POST['post_id'] ?? 0 );
+		if ( ! current_user_can( 'manage_options' ) || ! $id ) {
+			wp_die( '권한 없음' );
+		}
+		check_admin_referer( 'firstlab_index_requested_' . $id );
+		update_post_meta( $id, FIRSTLAB_INDEX_REQ_META, current_time( 'Y-m-d' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=' . FIRSTLAB_STATS_SLUG . '#index-stages' ) );
+		exit;
+	}
+);
+
+/** '요청했어요' 단추 (이 글을 서치콘솔에서 색인 생성 요청했다고 표시). */
+function firstlab_stats_request_button( int $post_id ): string {
+	return '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline">'
+		. '<input type="hidden" name="action" value="firstlab_index_requested"><input type="hidden" name="post_id" value="' . (int) $post_id . '">'
+		. wp_nonce_field( 'firstlab_index_requested_' . $post_id, '_wpnonce', true, false )
+		. '<button class="button button-small">요청했어요</button></form>';
+}
+
+/** 글별 색인 상태 — 단계마다 표 하나 (할 일이 있는 단계부터). */
+function firstlab_stats_index_groups( array $posts ): void {
+	$titles = array(
+		'request'   => array( '보강 끝 — 색인 생성 요청하세요', '서치콘솔 맨 위 검색창에 주소를 넣고 \'색인 생성 요청\'을 누른 뒤 \'요청했어요\'를 눌러 주세요. (하루 요청 수 한도가 있어요)' ),
+		'improve'   => array( '구글이 읽고도 안 넣은 글 — 보강 차례', '+@ 보강 차례 맨 앞에 자동으로 들어가요. 보강이 끝나면 위 \'요청하세요\'로 올라와요.' ),
+		'requested' => array( '요청함 — 구글 결과 기다리는 중', '색인 점검이 매일 다시 봐요. 보통 며칠~2주 걸려요.' ),
+		'waiting'   => array( '구글이 아직 안 읽은 글', '사이트맵과 글끼리 링크로 구글이 찾아와요. 공개한 지 2주가 지나도 그대로면 요청해 보세요.' ),
+		'indexed'   => array( '색인된 글', '' ),
+	);
+	$groups = array_fill_keys( array_keys( $titles ), array() );
+	foreach ( $posts as $p ) {
+		$id        = (int) ( $p['post_id'] ?? 0 );
+		$plus_at   = (string) get_post_meta( $id, FIRSTLAB_PLUS_META, true );
+		$requested = (string) get_post_meta( $id, FIRSTLAB_INDEX_REQ_META, true );
+		$stage     = firstlab_index_stage( (array) $p, $plus_at, $requested );
+		$note      = ! empty( $p['was_indexed'] ) ? '전에 색인됨 → 빠짐' : '';
+		$groups[ $stage ][] = array(
+			firstlab_stats_page_link( (string) ( $p['url'] ?? '' ), $id ),
+			esc_html( (string) ( $p['published'] ?? '' ) ),
+			esc_html( (string) ( $p['last_crawl'] ?? '' ) ),
+			esc_html( $plus_at ),
+			esc_html( $requested ),
+			esc_html( $note ) . ( 'request' === $stage ? ' ' . firstlab_stats_request_button( $id ) : '' ),
+		);
+	}
+	echo '<h3 id="index-stages">글별 색인 상태</h3>';
+	foreach ( $titles as $stage => list( $title, $help ) ) {
+		if ( ! $groups[ $stage ] ) {
+			continue;
+		}
+		printf( '<h4>%s (%d편)</h4>', esc_html( $title ), count( $groups[ $stage ] ) );
+		if ( $help ) {
+			echo '<p class="description">' . esc_html( $help ) . '</p>';
+		}
+		if ( 'indexed' === $stage ) {
+			echo '<details><summary>목록 보기</summary>';
+		}
+		firstlab_stats_table( array( '글', '공개일', '구글이 마지막으로 읽은 날', '보강한 날', '요청한 날', '비고' ), $groups[ $stage ] );
+		if ( 'indexed' === $stage ) {
+			echo '</details>';
+		}
+	}
+}
 
 add_action(
 	'admin_menu',
@@ -166,7 +256,9 @@ function firstlab_stats_render_page(): void {
 		}
 		echo '</div>';
 		$waiting = (array) ( $index['waiting'] ?? array() );
-		if ( $waiting ) {
+		if ( ! empty( $index['posts'] ) ) {
+			firstlab_stats_index_groups( (array) $index['posts'] );
+		} elseif ( $waiting ) {
 			echo '<h3>색인 안 된 글</h3>';
 			firstlab_stats_table(
 				array( '글', '공개일', '상태', '구글이 마지막으로 읽은 날', '비고' ),

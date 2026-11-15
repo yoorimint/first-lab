@@ -72,11 +72,20 @@ def wanted(post: dict, written: set[str] | None = None) -> bool:
     return plain_queue.is_done(post.get("content_html", "")) and not post.get("plus_at")
 
 
-def dropped_published(maintenance: dict) -> list[int]:
-    """구글이 읽고도 색인하지 않은 공개 글 (11/15 운영자 '+@ 진행해라' — 공개 전 +@ 가 생기기 전에 나간 글 7편이 전부 이 상태).
-    초안보다 먼저 보강한다. 공개 글은 이미 검수를 거쳐 나갔으므로 reviewed.txt 확인을 건너뜀."""
-    waiting = (maintenance.get("index") or {}).get("waiting") or []
-    return [int(w["post_id"]) for w in waiting if w.get("coverage") == "읽어 갔지만 색인 안 함" and w.get("post_id")]
+def dropped_published(maintenance: dict) -> dict[int, str]:
+    """구글이 읽고도 색인하지 않은 공개 글 {글 번호: 구글이 마지막으로 읽은 날} (11/15 운영자 '+@ 진행해라' — 공개 전 +@ 가
+    생기기 전에 나간 글 7편이 전부 이 상태). 초안보다 먼저 보강한다. 공개 글은 이미 검수를 거쳐 나갔으므로 reviewed.txt 확인을 건너뜀."""
+    index = maintenance.get("index") or {}
+    rows = index.get("posts") or index.get("waiting") or []
+    return {int(w["post_id"]): str(w.get("last_crawl") or "") for w in rows
+            if w.get("post_id") and (w.get("state") == "crawled" or w.get("coverage") == "읽어 갔지만 색인 안 함")}
+
+
+def needs_plus_again(post: dict, last_crawl: str) -> bool:
+    """빠진 공개 글: 보강한 적 없거나, 보강한 뒤 구글이 다시 읽고도 또 안 넣었으면 다시 보강 (11/15 운영자 '빠진 거 다시 보강해서 신청').
+    보강한 날 뒤로 구글이 다시 읽기 전에는 다시 뽑지 않음 — 같은 글 무한 반복 금지."""
+    plus_at = str(post.get("plus_at") or "")
+    return not plus_at or (bool(last_crawl) and last_crawl > plus_at)
 
 
 def main(n: int = 4) -> int:
@@ -86,7 +95,7 @@ def main(n: int = 4) -> int:
     done_review = reviewed_ids()
     written = written_plus_keywords()
     first = dropped_published(tick.get(f"{tick.SITE}/wp-json/firstlab/v1/maintenance", token=True))
-    for pid in first + [i for i in plain_queue.order() if i not in first]:
+    for pid in list(first) + [i for i in plain_queue.order() if i not in first]:
         if len(picked) >= n:
             break
         # 외부 검수 전인 새 초안은 건너뜀 (11/11 #3140: 검수 중인 글이 보강에 뽑혀 검수 패치와 부딪칠 뻔함). 검수 끝나면 reviewed.txt 에 들어가 다음 차례에 뽑힘
@@ -100,7 +109,10 @@ def main(n: int = 4) -> int:
         if not plain_queue.is_done(post.get("content_html", "")):
             not_plain += 1
             continue
-        if not wanted(post, written) or patch_pending(post):
+        if pid in first:
+            if not needs_plus_again(post, first[pid]) or patch_pending(post):
+                continue
+        elif not wanted(post, written) or patch_pending(post):
             continue
         (OUT / f"plus-{pid}.json").write_text(json.dumps(post, ensure_ascii=False), encoding="utf-8")
         keyword = post.get("keyword") or post.get("title", "").split(":")[0]
