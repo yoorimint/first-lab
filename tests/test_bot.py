@@ -6526,6 +6526,35 @@ firstlab_stats_render_page();
         self.assertIn("2026-11-05 색인 확인 → 빠짐", html)
         self.assertIn("구글이 대표로 고른 주소", html)
 
+    def test_every_post_gets_links_from_category_neighbors(self):
+        """11/15: 구글이 '읽어 갔지만 색인 안 함'으로 뺀 7편이 모두 사이트 안에서 들어오는 링크 1~5개 (서치콘솔 '참조 페이지 없음').
+        글마다 같은 분류의 앞뒤 글 4편을 이어 → 분류 안 모든 글이 이웃 4편에서 링크를 받음 (오래된 첫 글 포함)."""
+        import shutil, subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("define('ABSPATH','/'); function add_filter(){} require '" + str(ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php") + "';"
+                "$ids=range(1,10); $in=array_fill_keys($ids,0); $out=array();"
+                "foreach($ids as $i){ $n=firstlab_category_neighbors($ids,$i,4); $out[$i]=$n; foreach($n as $t){ $in[$t]++; } }"
+                "echo json_encode(array('in'=>$in,'out'=>$out,'skip'=>firstlab_category_neighbors($ids,5,4,array(4,6)),"
+                "'alone'=>firstlab_category_neighbors(array(7),7,4),'missing'=>firstlab_category_neighbors($ids,99,4)));")
+        got = json.loads(subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout)
+        self.assertEqual(got["out"]["5"], [4, 6, 3, 7])          # 가까운 앞뒤 글을 번갈아
+        self.assertEqual(got["out"]["1"], [10, 2, 9, 3])         # 첫 글은 목록 끝과 이어짐 (원형)
+        self.assertEqual(set(got["in"].values()), {4})           # 모든 글이 똑같이 4편에서 링크를 받음 (첫 글도)
+        self.assertEqual(got["skip"], [3, 7, 2, 8])              # 위 '함께 보면 좋은 글'에 이미 있는 글은 뺌
+        self.assertEqual((got["alone"], got["missing"]), ([], []))
+        php = (ROOT / "wordpress" / "mu-plugins" / "first-lab-related.php").read_text(encoding="utf-8")
+        self.assertIn("' 분류의 다른 글'", php)
+
+    def test_plus_queue_takes_dropped_published_posts_first(self):
+        """11/15: 구글이 읽고도 색인 안 한 공개 글(+@ 전에 나간 글)을 +@ 차례 맨 앞에."""
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_queue
+        m = {"index": {"waiting": [{"post_id": 34, "coverage": "읽어 갔지만 색인 안 함"},
+                                   {"post_id": 469, "coverage": "구글이 아직 모름"}]}}
+        self.assertEqual(plus_queue.dropped_published(m), [34])
+        self.assertEqual(plus_queue.dropped_published({}), [])
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
