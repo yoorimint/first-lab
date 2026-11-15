@@ -6382,6 +6382,22 @@ class PlusCheckTest(unittest.TestCase):
         self.assertEqual(settings._times("09:00\n18:00\n24:00"), ["00:00", "09:00", "18:00"])
         self.assertIn("24 === $h && 0 === $i", page)
 
+    def test_index_check_asks_google_url_form(self):
+        """11/14 운영자 '색인돼 있는데?': 워드프레스 주소의 한글이 소문자 %xx 라 URL 검사 API 가 전부 '구글이 아직 모름' → 대문자로 물음."""
+        from unittest import mock
+        from bot import index_check
+        url = "https://first-lab.kr/%ec%9c%a1%ec%95%84/"
+        self.assertEqual(index_check.google_form(url), "https://first-lab.kr/%EC%9C%A1%EC%95%84/")
+        asked = []
+
+        def once(u):
+            asked.append(u)
+            return {"verdict": "PASS", "coverage": "Submitted and indexed", "last_crawl": ""} if u.isupper() or "%EC" in u else \
+                {"verdict": "NEUTRAL", "coverage": "URL is unknown to Google", "last_crawl": ""}
+        with mock.patch.object(index_check, "_inspect_once", side_effect=once):
+            self.assertEqual(index_check.inspect(url)["verdict"], "PASS")
+        self.assertEqual(asked[0], "https://first-lab.kr/%EC%9C%A1%EC%95%84/")
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")

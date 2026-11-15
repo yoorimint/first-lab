@@ -53,8 +53,25 @@ def published_posts(wp=None) -> list[dict]:
     return [{"post_id": int(p["ID"]), "url": p["url"], "published": str(p["post_date"])[:10]} for p in json.loads(out or "[]")]
 
 
+def google_form(url: str) -> str:
+    """워드프레스 주소는 한글을 소문자 %xx 로 적는데(%ec%9c…), 구글은 대문자(%EC%9C…)로 기억함 → 그대로 물으면
+    'URL is unknown to Google' (11/14 운영자 '색인돼 있는데?': 색인 점검이 공개 글 전부를 '구글이 아직 모름'으로 셈)."""
+    import re
+    return re.sub(r"%[0-9a-fA-F]{2}", lambda m: m.group(0).upper(), url)
+
+
 def inspect(url: str) -> dict:
-    """{verdict, coverage, last_crawl}. verdict: PASS(색인됨) / NEUTRAL / FAIL."""
+    """{verdict, coverage, last_crawl}. verdict: PASS(색인됨) / NEUTRAL / FAIL. 구글 표기(대문자 %XX)로 먼저 묻고,
+    모른다고 하면 원래 표기로 한 번 더."""
+    first = _inspect_once(google_form(url))
+    if first["coverage"] == "URL is unknown to Google" and google_form(url) != url:
+        second = _inspect_once(url)
+        if second["coverage"] != "URL is unknown to Google":
+            return second
+    return first
+
+
+def _inspect_once(url: str) -> dict:
     from google.auth.transport.requests import AuthorizedSession
     from google.oauth2 import service_account
 
