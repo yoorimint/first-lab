@@ -114,6 +114,17 @@
   function field(input, uid, data) {
     const id = `${uid}-${input.name}`;
     let control;
+    if (input.type === 'choice') {
+      // 누르는 단추로 고르기 (11/16 운영자 '가독성 갖다 버렸나 — 처음 보는 사람이 알아서 넣을 수 있나': 긴 드롭다운 대신 짧은 단추)
+      const chosen = input.default || input.options[0][0];
+      control = el('div', { class: 'firstlab-calc__choices', role: 'radiogroup', id },
+        input.options.map(([value, label]) => el('label', { class: 'firstlab-calc__choice' },
+          el('input', Object.assign({ type: 'radio', name: input.name, value }, value === chosen ? { checked: '' } : {})), el('span', null, label))));
+      return el('div', { class: 'firstlab-calc__field', 'data-show': input.show ? JSON.stringify(input.show) : null },
+        el('p', { class: 'firstlab-calc__label' }, input.label),
+        control,
+        input.help ? el('p', { class: 'firstlab-calc__help' }, input.help) : null);
+    }
     if (input.type === 'select') {
       control = el('select', { id, name: input.name },
         input.options.map(([value, label]) => el('option', { value }, label)));
@@ -125,7 +136,7 @@
       const fromData = typeof input.default === 'string' && input.default.startsWith('data:') ? (data || {})[input.default.slice(5)] : undefined;
       control.value = input.default === 'today' ? util.todayIso() : (fromData ?? input.default ?? '');
     }
-    return el('div', { class: 'firstlab-calc__field' },
+    return el('div', { class: 'firstlab-calc__field', 'data-show': input.show ? JSON.stringify(input.show) : null },
       el('label', { for: id }, input.label),
       control,
       input.help ? el('p', { class: 'firstlab-calc__help' }, input.help) : null);
@@ -133,6 +144,7 @@
 
   function render(out, result) {
     out.replaceChildren(
+      result.headline ? el('p', { class: 'firstlab-calc__headline' }, result.headline) : null,  // 판별 결과 한 줄 (11/16)
       el('table', { class: 'firstlab-calc__table' },
         el('tbody', null, result.rows.map(([k, v, href]) => el('tr', null, el('th', { scope: 'row' }, k),
           el('td', null, v, href ? [' ', el('a', { href }, '관련 글 보기')] : null))))),
@@ -164,7 +176,19 @@
     const form = el('form', { class: 'firstlab-calc__form', novalidate: '' }, def.inputs.map((i) => field(i, uid, data)));
     const out = el('div', { class: 'firstlab-calc__result', 'aria-live': 'polite' });
 
+    /** show: {항목: [값, ...]} — 앞 답에 따라 필요한 질문만 보이게. 숨긴 질문은 값에서 빠짐 (disabled) */
+    const applyShow = () => {
+      const now = Object.fromEntries(new FormData(form).entries());
+      form.querySelectorAll('[data-show]').forEach((f) => {
+        const cond = JSON.parse(f.dataset.show);
+        const visible = Object.entries(cond).every(([k, vals]) => vals.includes(now[k]));
+        f.hidden = !visible;
+        f.querySelectorAll('input,select').forEach((c) => { c.disabled = !visible; });
+      });
+    };
     const update = () => {
+      applyShow();
+      applyShow(); // 숨김이 다른 질문 조건을 바꿀 수 있어 한 번 더
       const values = Object.fromEntries(new FormData(form).entries());
       try {
         render(out, def.compute(values, data, util));

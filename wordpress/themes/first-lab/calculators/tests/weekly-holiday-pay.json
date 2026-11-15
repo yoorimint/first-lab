@@ -265,5 +265,42 @@
     "expect": {
       "included_floor": 12155
     }
+  },
+  {
+    "why": "단추 답: 아니요 → 아팠어요 → 규칙 없음/모름 = 병가 결근 (근로개선정책과-3833)",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "came": "no",
+      "why": "sick",
+      "rule": "unknown"
+    },
+    "expect": {
+      "pay": 0
+    }
+  },
+  {
+    "why": "단추 답: 아니요 → 허락받고 쉼 → 규칙 있음 = 무급휴가 규정 → 발생",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "came": "no",
+      "why": "leave",
+      "rule": "yes"
+    },
+    "expect": {
+      "pay": 41280
+    }
+  },
+  {
+    "why": "단추 답: 네, 다 나왔어요 → 발생",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "came": "yes"
+    },
+    "expect": {
+      "pay": 41280
+    }
   }
 ]
