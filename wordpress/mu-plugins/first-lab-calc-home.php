@@ -117,16 +117,30 @@ add_action(
 	}
 );
 
-// 계산기 단독 페이지 noindex (FIRSTLAB_CALC_PAGES_NOINDEX)
+// 계산기 단독 페이지·계산기 모음(/calculators/) noindex (FIRSTLAB_CALC_PAGES_NOINDEX)
 add_filter(
 	'the_seo_framework_robots_meta_array',
 	static function ( $meta ) {
 		if ( FIRSTLAB_CALC_PAGES_NOINDEX && is_page() ) {
 			$page = get_queried_object();
-			if ( $page instanceof WP_Post && '' !== firstlab_calc_id_of_slug( $page->post_name ) ) {
+			if ( $page instanceof WP_Post && ( '' !== firstlab_calc_id_of_slug( $page->post_name ) || 'calculators' === $page->post_name ) ) {
 				$meta['noindex'] = 'noindex';
 			}
 		}
 		return $meta;
 	}
+);
+
+// 머리글 메뉴의 '계산기'(→ /calculators/) 링크도 숨김 (11/14 운영자 '계산기 페이지를 홈에서도 안 보이게') — 글 안 계산기는 그대로
+add_filter(
+	'render_block',
+	static function ( string $html, array $block ): string {
+		if ( FIRSTLAB_CALC_PAGES_NOINDEX && 'core/navigation-link' === ( $block['blockName'] ?? '' )
+			&& '/calculators/' === ( $block['attrs']['url'] ?? '' ) ) {
+			return '';
+		}
+		return $html;
+	},
+	10,
+	2
 );
