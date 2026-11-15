@@ -6606,6 +6606,14 @@ firstlab_stats_render_page();
         got = index_check.post_rows(rows, {"https://first-lab.kr/자"})
         self.assertEqual((got[0]["state"], got[0]["was_indexed"]), ("crawled", "검색 노출 기록"))
 
+    def test_refresh_log_reason_is_this_posts(self):
+        """11/15: +@ 7편 반영 기록마다 갱신 차례였던 다른 글의 '근거 변경: 승급교육은 80시간…'이 붙음 → 그 글일 때만."""
+        from bot import refresh
+        other = {"id": 4279, "why": "근거 변경: 승급교육은 80시간"}
+        self.assertEqual(refresh.log_reason(other, 583, {"kind": "plus"}), "+@ 보강")
+        self.assertEqual(refresh.log_reason(other, 4279, {}), "근거 변경: 승급교육은 80시간")
+        self.assertEqual(refresh.log_reason({}, 1, {}), "직접 갱신")
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
