@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import { problems as readability } from '../automation/calc_readability.mjs';
 
 // 안내 문장 조사: 받침 없는 말 뒤 '은·이', 받침 있는 말 뒤 '는·가' (입력 이름을 `${name}은` 에 끼워 넣다 틀림 — 11/8 비상장주식 계산기)
 function josaProblem(msg) {
@@ -77,6 +78,8 @@ for (const id of ids) {
 
   // 소수 오차 버림 금지: Math.floor/Math.trunc 대신 util.floor/trunc (3,800,000÷209×11×1.5 = 299,999.99… → 1원 빠짐, 11/5 두 번)
   const src = fs.readFileSync(path.join(DIR, 'defs', `${id}.js`), 'utf8');
+  // 처음 보는 사람도 바로 알게: 질문 24자·선택지 20자·4개 이하는 단추 (11/16 운영자 '계산기도 간단하게', automation/calc_readability.mjs)
+  for (const p of readability(def)) fail(id, `읽기 쉬움: ${p}`);
   if (/Math\.(floor|trunc)\(/.test(src)) fail(id, 'Math.floor/Math.trunc 대신 FirstLabCalc.util.floor/trunc 를 써야 함 (소수 오차로 1원 빠짐)');
   // 입력 이름을 `${name}은`·`${name}이` 안내에 끼워 넣는 계산기: 이름 끝 글자에 받침이 있어야 함 (11/8·11/9 '이미 쓴 기본공제은' 두 번 —
   // 잘못된 입력 사례가 없는 칸은 josaProblem 이 못 봄 → 정의에서 바로 확인)
