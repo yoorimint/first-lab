@@ -264,8 +264,11 @@ def main() -> None:
         print("[run] 이전 실행이 아직 진행 중 → 건너뜀", flush=True)
         return
 
+    from .run_timing import Laps, record as record_timing
+    laps = Laps()  # 단계별 걸린 시간 (bot/run_timing.py, 11/15 매분 실행이 3분씩 걸림)
     settings = load_settings()
     state = load_state()
+    laps.lap("설정·상태 읽기")
     before = json.dumps(state, sort_keys=True, ensure_ascii=False)
     now = datetime.now(KST)
     today = now.strftime("%Y-%m-%d")
@@ -273,6 +276,8 @@ def main() -> None:
     # 예약 글 공개 → 글이 발행·수정되면 페이지 캐시 비우기 (앱·관리자 화면에서 발행해도 1분 안에 반영)
     run_due_wp_cron()
     purge_cache_if_changed(state)
+
+    laps.lap("워드프레스 예약·캐시")
 
     # 관리자 '제외' 반영
     excluded = pop_excluded()
@@ -282,6 +287,8 @@ def main() -> None:
                 set_status(conn, kw, "excluded", "관리자 제외")
 
     daily_review(state, settings, now)
+
+    laps.lap("제외·후보 검토")
 
     # 예약 발행: 오늘의 공개 시각(설정 ± 랜덤)마다 가장 오래된 대기 초안 1편 공개
     if settings.post_status == "schedule":
@@ -301,6 +308,8 @@ def main() -> None:
     else:
         state["plan"], state["done"] = {}, {}
 
+    laps.lap("예약 공개")
+
     # 서버 상태 기록 (bot/server_stats.py) — 서버를 올릴지 숫자로 정하려고 (11/6 운영자). 사주데이 응답은 5분마다
     try:
         from . import server_stats
@@ -310,6 +319,8 @@ def main() -> None:
     except Exception:  # noqa: BLE001 - 기록 실패가 봇을 멈추지 않게
         pass
 
+    laps.lap("서버 상태")
+
     # 한도 소진으로 못 만든 대표 사진 채우기 (5분마다, 한도 초기화 후 공개 대기열 글부터)
     if now.minute % 5 == 0:
         try:
@@ -317,6 +328,8 @@ def main() -> None:
                 add_log(state, True, f"사진 채우기: {msg}")
         except Exception as e:  # noqa: BLE001 - 사진 실패가 글 작성·공개를 막지 않게
             add_log(state, False, f"사진 채우기 실패: {str(e)[:150]}")
+
+    laps.lap("사진 채우기")
 
     # 이미 올린 대표 사진의 화면용 크기를 WebP 로 (bot/webp.py, 11/6 운영자) — 10분마다 몇 장
     if now.minute % 10 == 3:
@@ -327,6 +340,8 @@ def main() -> None:
                 add_log(state, "WebP 아님" not in line, line)  # 서버가 WebP 를 못 만들면 ❌ (매일 점검이 봄)
         except Exception as e:  # noqa: BLE001 - 사진 변환 실패가 봇을 멈추지 않게
             add_log(state, False, f"사진 WebP 변환 실패: {str(e)[:150]}")
+
+    laps.lap("WebP")
 
     # 본문에 적힌 공식 사이트 주소를 열어 보고 열리는 것만 링크 가능으로 기록 (bot/official_links.py, 11/6 운영자) — 10분마다 몇 편
     if now.minute % 10 == 5:
@@ -366,6 +381,8 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001 - 링크 확인 실패가 봇을 멈추지 않게
             add_log(state, False, f"공식 사이트 링크 확인 실패: {str(e)[:150]}")
 
+    laps.lap("링크·공개 순서·관련 글")
+
     # 근거 기록 없는 공개 대기 글 다시 대조 (bot/hold.missing_evidence) — 10분마다 1편. 배포 때 10편씩 하던 것을 옮김
     # (11/6: 공식 페이지를 여는 일이라 배포 '서버 적용'이 7분 넘게 걸리고, 그동안 다음 배포·글쓰기 끝 처리가 밀림)
     if now.minute % 10 == 7:
@@ -376,6 +393,8 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001
             add_log(state, False, f"근거 기록 채우기 실패: {str(e)[:150]}")
 
+    laps.lap("근거 기록 채우기")
+
     # 매일 점검: 서버 기록 점검 (글쓰기 작업을 점검 모드로 실행, automation/maintenance.md) — 두 방식 모두
     if settings.maint_times and not writer_busy(settings):
         fired = state.get("maint_fired", {}).get(today, [])
@@ -384,6 +403,8 @@ def main() -> None:
             state["maint_fired"] = {today: fired + [due]}
             save_state(state)  # 실행 전에 저장 (중간에 죽으면 매분 다시 실행하던 경로, 11/5 검토)
             fire_routine(state, settings, f"매일 점검 {due}", routine.MAINT_TEXT)
+
+    laps.lap("매일 점검 시작")
 
     # 글쓰기: 수동 요청, 연속 작성, 글 작성 시각 → fire_routine (방식은 그 안에서). API 봇이 쓰는 중이면 끝날 때까지 미룸
     # (수동 요청은 지우지 않고 남겨 둠, 시각은 3시간 안에 다시)
@@ -398,6 +419,8 @@ def main() -> None:
             state["direct_fired"] = {today: fired + [due]}  # 지난 날짜 기록은 버림, 실패해도 같은 시각은 다시 안 함
             save_state(state)  # 실행 전에 저장 (11/5 검토)
             fire_routine(state, settings, f"글 작성 {due}")
+
+    laps.lap("글쓰기 시작")
 
     if now.minute % 10 == 9:  # API 봇 저장소 반영 묶음 정리 (GitHub 가 오래 안 가져가면 실패로 — 영원히 안 남게, 방식과 상관없이)
         try:
@@ -415,6 +438,9 @@ def main() -> None:
     if excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
         refresh_dashboard(state, settings)  # 변화가 있거나 1시간마다
         state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
+
+    laps.lap("정리·대시보드")
+    record_timing(state, f"{now:%Y-%m-%d %H:%M}", laps)
 
     if json.dumps(state, sort_keys=True, ensure_ascii=False) != before:
         save_state(state)

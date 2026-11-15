@@ -151,6 +151,10 @@ def main() -> int:
         from bot.server_stats import summary  # noqa: E402
         day = max(stats)
         print("  " + summary(day, stats[day]))
+    timing = m.get("run_timing") or {}
+    if timing:  # 매분 봇 실행 단계별 시간 (bot/run_timing.py — 1분 넘으면 매분 실행이 건너뛰어져 예약 공개가 늦음)
+        from bot.run_timing import summary as timing_summary  # noqa: E402
+        print("  " + timing_summary(timing[max(timing)]))
     reviews = [l for l in m["log"] if "대기 글 검수(직접)" in str(l.get("msg", ""))][:3]
     for l in reviews:
         print(f"  검수(글쓰기 작업): {l['time']} {str(l['msg'])[:100]}")
