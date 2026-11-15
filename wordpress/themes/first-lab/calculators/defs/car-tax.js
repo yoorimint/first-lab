@@ -5,10 +5,10 @@
   'use strict';
 
   const KIND = [
-    ['private', '비영업용 승용 (자가용, 휘발유·경유·LPG·하이브리드)'],
-    ['business', '영업용 승용 (택시·렌터카 등)'],
-    ['ev_private', '비영업용 전기차 등 (전기·태양열·알코올)'],
-    ['ev_business', '영업용 전기차 등 (전기·태양열·알코올)'],
+    ['private', '자가용 승용차'],
+    ['business', '영업용 (택시·렌터카 등)'],
+    ['ev_private', '자가용 전기차 등'],
+    ['ev_business', '영업용 전기차 등'],
   ];
 
   const floor10 = (n) => FirstLabCalc.util.floor(n / 10) * 10;
@@ -17,11 +17,11 @@
   FirstLabCalc.register({
     id: 'car-tax',
     title: '자동차세 계산기 (승용차)',
-    intro: '배기량과 최초 등록일을 넣으면 차령 경감을 반영한 6월·12월 자동차세와 지방교육세, 1월·6월 연납 때 내는 금액까지 계산해요.',
+    intro: '배기량과 처음 등록한 날을 넣으면 6월·12월에 내는 자동차세와, 1월·6월에 한꺼번에 낼(연납) 때 금액이 나와요.',
     inputs: [
-      { name: 'kind', label: '차 종류', type: 'select', default: 'private', options: KIND },
+      { name: 'kind', label: '차 종류', type: 'choice', default: 'private', options: KIND, help: "자가용은 '비영업용'이에요. 승용차는 휘발유·경유·LPG·하이브리드, 전기차 등은 전기·태양열·알코올 차예요. 영업용은 택시·렌터카 등 영업용 승용차예요." },
       { name: 'cc', label: '배기량 (cc)', type: 'number', min: 0, step: 1, default: 2500, help: '자동차등록증의 배기량 숫자 그대로 넣어요 (예: 2,497). 전기차 등은 배기량과 상관없이 계산돼요.' },
-      { name: 'first_date', label: '최초 등록일', type: 'date', default: '2025-03-10', help: '차령은 최초 신규등록일부터 세요. 만든 해에 등록하지 않은 차는 제작연도 12월 31일을 넣어요.' },
+      { name: 'first_date', label: '처음 등록한 날', type: 'date', default: '2025-03-10', help: "자동차등록증의 '최초 등록일'이에요. 차령은 최초 신규등록일부터 세요. 만든 해에 등록하지 않은 차는 제작연도 12월 31일을 넣어요." },
       { name: 'year', label: '세금을 내는 해 (비우면 올해)', type: 'number', min: 2000, step: 1, help: '내년 1월 연납 금액이 궁금하면 내년 연도를 넣어요.' },
     ],
 

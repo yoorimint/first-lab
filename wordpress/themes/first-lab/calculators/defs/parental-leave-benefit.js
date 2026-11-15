@@ -8,17 +8,18 @@
   FirstLabCalc.register({
     id: 'parental-leave-benefit',
     title: '육아휴직 급여 계산기',
-    intro: '휴직을 시작한 날 기준 월 통상임금과 휴직 개월 수를 넣으면, 달마다 받는 육아휴직 급여와 합계가 나와요.',
+    intro: '월급과 쉬는 개월 수를 넣으면 달마다 받는 육아휴직 급여와 합계가 나와요.',
     inputs: [
-      { name: 'wage', label: '월 통상임금 (원)', type: 'number', min: 1, step: 1, default: 3000000, help: '휴직을 시작한 날 기준 월 통상임금이에요. 정기적으로, 같은 기준으로 주기로 정한 임금이에요.' },
-      { name: 'months', label: '휴직 개월 수', type: 'number', min: 1, max: 18, step: 1, default: 12, help: '나눠 쓰면 모두 더한 개월 수를 넣어요. 1년이 넘는 기간(최대 18개월)은 추가 사용 대상일 때만이에요.' },
+      { name: 'wage', label: '월급 (원)', type: 'number', min: 1, step: 1, default: 3000000, help: "휴직을 시작한 날 기준 '월 통상임금'이에요. 정기적으로, 같은 기준으로 주기로 정한 임금이에요." },
+      { name: 'months', label: '쉬는 개월 수', type: 'number', min: 1, max: 18, step: 1, default: 12, help: '나눠 쓰면 모두 더한 개월 수를 넣어요. 1년이 넘는 기간(최대 18개월)은 추가 사용 대상일 때만이에요.' },
       {
-        name: 'kind', label: '어떤 경우인가요', type: 'select', default: 'general',
+        name: 'kind', label: '어떤 경우인가요?', type: 'choice', default: 'general',
         options: [
           ['general', '일반 육아휴직'],
-          ['single', '한부모 근로자'],
-          ['both', '6+6: 생후 18개월 안에 부모 모두 휴직 (둘이 같은 개월 수)'],
+          ['single', '한부모'],
+          ['both', '엄마·아빠 둘 다 휴직 (6+6)'],
         ],
+        help: "'6+6'은 아이가 태어난 지 18개월 안에 부모가 모두 육아휴직을 하는 경우예요 (둘이 같은 개월 수). '한부모'는 한부모 근로자예요.",
       },
     ],
 

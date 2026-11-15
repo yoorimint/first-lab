@@ -11,15 +11,16 @@
   FirstLabCalc.register({
     id: 'part-time-pay',
     title: '알바 급여 계산기',
-    intro: '시급과 1주에 일하기로 정한 시간을 넣으면 주휴수당을 더한 한 주·한 달 세전 급여가 나와요.',
+    intro: '시급과 일주일에 일하기로 한 시간을 넣으면 주휴수당을 더한 한 주·한 달 세전 급여가 나와요.',
     inputs: [
       { name: 'wage', label: '시급 (원)', type: 'number', min: 1, step: 1, default: 'data:min_wage', help: '처음 값은 올해 최저임금이에요. 내 시급으로 바꿔 넣어요.' },
-      { name: 'hours', label: '1주 소정근로시간 (시간)', type: 'number', min: 0, step: 0.5, default: 20, help: '근로계약서에 정한 1주 근로시간이에요 (휴게시간 빼고). 주마다 다르면 4주 평균을 넣어요.' },
-      { name: 'extra', label: '1주 소정근로시간을 넘겨 더 일한 시간 (시간)', type: 'number', min: 0, step: 0.5, default: 0, help: '계약한 시간보다 더 일한 시간이에요. 없으면 0.' },
-      { name: 'night', label: '그중 밤 10시~아침 6시에 일한 시간 (시간)', type: 'number', min: 0, step: 0.5, default: 0, help: '위 두 칸에 넣은 시간 중 야간에 일한 시간이에요. 없으면 0.' },
+      { name: 'hours', label: '일주일에 일하기로 한 시간', type: 'number', min: 0, step: 0.5, default: 20, help: "계약서의 '1주 소정근로시간'이에요 (휴게시간 빼고). 주마다 다르면 4주 평균을 넣어요." },
+      { name: 'extra', label: '계약보다 더 일한 시간 (1주)', type: 'number', min: 0, step: 0.5, default: 0, help: '1주 소정근로시간을 넘겨 더 일한 시간이에요. 없으면 0.' },
+      { name: 'night', label: '그중 밤 10시~아침 6시 시간', type: 'number', min: 0, step: 0.5, default: 0, help: '위 두 칸에 넣은 시간 중 밤 10시~아침 6시(야간)에 일한 시간이에요. 없으면 0.' },
       {
-        name: 'size', label: '사업장 상시 근로자 수', type: 'select', default: 'five',
+        name: 'size', label: '직원 수는요?', type: 'choice', default: 'five',
         options: [['five', '5명 이상'], ['small', '4명 이하']],
+        help: "사업장의 '상시 근로자 수'예요.",
       },
     ],
 

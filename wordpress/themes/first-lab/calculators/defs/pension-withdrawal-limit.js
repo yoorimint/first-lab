@@ -7,17 +7,18 @@
   FirstLabCalc.register({
     id: 'pension-withdrawal-limit',
     title: 'IRP 연금수령한도 계산기',
-    intro: '연금계좌 평가액, 연금수령연차, 나이를 넣으면 올해 연금으로 꺼낼 수 있는 한도와 연금소득세율이 나와요.',
+    intro: '연금계좌에 있는 돈, 몇 년째 받는지, 나이를 넣으면 올해 꺼낼 수 있는 한도와 세율이 나와요.',
     inputs: [
-      { name: 'balance', label: '연금계좌 평가액 (원)', type: 'number', min: 0, step: 1, help: '1월 1일(연금 개시를 신청한 해는 신청한 날) 현재 계좌 평가액이에요.' },
-      { name: 'year', label: '연금수령연차 (년차)', type: 'number', min: 1, step: 1, default: 1, help: '연금을 처음 받을 수 있게 된 해가 1년차예요. 2013년 3월 1일 전에 가입한 계좌는 6년차부터 시작해요.' },
+      { name: 'balance', label: '연금계좌에 있는 돈 (원)', type: 'number', min: 0, step: 1, help: "'연금계좌 평가액'이에요. 1월 1일(연금 개시를 신청한 해는 신청한 날) 현재 계좌 평가액이에요." },
+      { name: 'year', label: '연금 받는 몇 년째인가요?', type: 'number', min: 1, step: 1, default: 1, help: "'연금수령연차'예요. 연금을 처음 받을 수 있게 된 해가 1년차예요. 2013년 3월 1일 전에 가입한 계좌는 6년차부터 시작해요." },
       { name: 'age', label: '연금 받는 날 나이 (만)', type: 'number', min: 55, step: 1 },
       {
-        name: 'life', label: '연금 받는 방식', type: 'select', default: 'no',
+        name: 'life', label: '어떻게 받나요?', type: 'choice', default: 'no',
         options: [
           ['no', '기간·금액을 정해 받아요'],
-          ['yes', '사망할 때까지 받는 종신계약이에요'],
+          ['yes', '평생 받아요 (종신계약)'],
         ],
+        help: "'종신계약'은 사망할 때까지 연금을 받는 계약이에요.",
       },
     ],
 

@@ -20,9 +20,9 @@
   FirstLabCalc.register({
     id: 'cbm',
     title: 'CBM 계산기',
-    intro: '상자 크기와 수량을 넣으면 전체 CBM(㎥)과 세제곱피트, 우체국 EMS 부피중량을 계산해요.',
+    intro: '상자 크기와 수량을 넣으면 전체 부피 CBM(㎥)과 세제곱피트, 우체국 EMS 부피중량이 나와요.',
     inputs: [
-      { name: 'unit', label: '길이 단위', type: 'select', default: 'cm', options: UNITS },
+      { name: 'unit', label: '길이 단위', type: 'choice', default: 'cm', options: UNITS },
       { name: 'length', label: '가로', type: 'number', min: 0, step: 'any' },
       { name: 'width', label: '세로', type: 'number', min: 0, step: 'any' },
       { name: 'height', label: '높이', type: 'number', min: 0, step: 'any' },

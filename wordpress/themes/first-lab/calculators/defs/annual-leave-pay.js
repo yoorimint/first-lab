@@ -10,17 +10,17 @@
   FirstLabCalc.register({
     id: 'annual-leave-pay',
     title: '연차수당 계산기',
-    intro: '월 통상임금(또는 시급)과 쓰지 못한 연차 일수를 넣으면 미사용 연차수당이 나와요.',
+    intro: '월급(또는 시급)과 못 쓴 연차 일수를 넣으면 받을 연차수당이 나와요.',
     inputs: [
       {
-        name: 'pay_type', label: '임금 형태', type: 'select', default: 'monthly',
-        options: [['monthly', '월급 (월 통상임금)'], ['hourly', '시급']],
+        name: 'pay_type', label: '월급인가요, 시급인가요?', type: 'choice', default: 'monthly',
+        options: [['monthly', '월급'], ['hourly', '시급']],
       },
-      { name: 'amount', label: '월 통상임금 또는 시급 (원)', type: 'number', min: 1, step: 1, default: 2500000, help: '기본급에 정기적·일률적으로 주는 고정 수당을 더한 금액이에요. 연장·야간·휴일근로수당은 빼요.' },
-      { name: 'base_hours', label: '월 통상임금 산정 기준시간 (월급일 때)', type: 'number', min: 1, step: 'any', default: 209, help: '주 40시간·주휴 8시간이면 209시간이에요. 단시간이면 (1주 소정근로시간 + 주휴시간) × 365 ÷ 7 ÷ 12.' },
-      { name: 'day_hours', label: '1일 소정근로시간 (시간)', type: 'number', min: 0.5, step: 0.5, default: 8, help: '근로계약서에 정한 하루 근로시간이에요 (연장근로 제외).' },
-      { name: 'days', label: '쓰지 못한 연차 일수 (일)', type: 'number', min: 0, step: 0.5, default: 5, help: '반차를 썼다면 0.5일 단위로 넣어요.' },
-      { name: 'employees', label: '상시 근로자 수 (명)', type: 'number', min: 1, step: 1, default: 5, help: '4명 이하 사업장은 법정 연차 규정이 적용되지 않아요.' },
+      { name: 'amount', label: '월급 또는 시급 (원)', type: 'number', min: 1, step: 1, default: 2500000, help: "'통상임금'이에요. 기본급에 정기적·일률적으로 주는 고정 수당을 더한 금액이에요. 연장·야간·휴일근로수당은 빼요." },
+      { name: 'base_hours', label: '한 달 기준 시간 (월급일 때)', type: 'number', min: 1, step: 'any', default: 209, help: "'월 통상임금 산정 기준시간'이에요. 주 40시간·주휴 8시간이면 209시간이에요. 단시간이면 (1주 소정근로시간 + 주휴시간) × 365 ÷ 7 ÷ 12." },
+      { name: 'day_hours', label: '하루에 일하기로 한 시간', type: 'number', min: 0.5, step: 0.5, default: 8, help: "계약서의 '1일 소정근로시간'이에요. 더 일한 시간(연장근로)은 빼요." },
+      { name: 'days', label: '못 쓴 연차 (일)', type: 'number', min: 0, step: 0.5, default: 5, help: '반차를 썼다면 0.5일 단위로 넣어요.' },
+      { name: 'employees', label: '회사 직원 수 (명)', type: 'number', min: 1, step: 1, default: 5, help: "평소 일하는 사람 수('상시 근로자 수')예요. 4명 이하 사업장은 법정 연차 규정이 적용되지 않아요." },
     ],
 
     compute(v, d, u) {

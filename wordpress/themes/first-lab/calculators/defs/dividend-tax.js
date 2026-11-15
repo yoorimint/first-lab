@@ -7,13 +7,13 @@
   FirstLabCalc.register({
     id: 'dividend-tax',
     title: '배당금 계산기 (세후 배당금·배당수익률)',
-    intro: '가진 주식 수와 1주당 배당금을 넣으면 한 번 받을 때와 1년 동안 받는 세전 배당금, 떼는 세금, 세후 배당금이 나와요. 주가를 넣으면 배당수익률도 나와요.',
+    intro: '가진 주식 수와 1주당 배당금을 넣으면 세금 떼고 받는 배당금이 나와요. 주가를 넣으면 배당수익률도 나와요.',
     inputs: [
-      { name: 'shares', label: '보유 주식 수 (주)', type: 'number', min: 0, step: 1 },
-      { name: 'dps', label: '1주당 배당금 (원, 1회분)', type: 'number', min: 0, step: 1, help: '회사가 공시한 1주당 배당금이에요. 분기·월 배당이면 한 번에 주는 금액을 넣어요.' },
-      { name: 'times', label: '1년 지급 횟수', type: 'select', default: '1', options: [['1', '연 1회 (결산배당)'], ['2', '연 2회 (반기배당)'], ['4', '연 4회 (분기배당)'], ['12', '연 12회 (월배당)']] },
+      { name: 'shares', label: '가진 주식 수 (주)', type: 'number', min: 0, step: 1 },
+      { name: 'dps', label: '1주당 배당금 (원, 한 번에)', type: 'number', min: 0, step: 1, help: '회사가 공시한 1주당 배당금이에요. 분기·월 배당이면 한 번에 주는 금액을 넣어요.' },
+      { name: 'times', label: '1년에 몇 번 주나요?', type: 'choice', default: '1', options: [['1', '1년에 1번'], ['2', '1년에 2번'], ['4', '1년에 4번 (분기)'], ['12', '매달']], help: '1번은 결산배당, 2번은 반기배당, 4번은 분기배당, 매달은 월배당이에요.' },
       { name: 'price', label: '주가 (원, 선택)', type: 'number', min: 0, step: 1, help: '넣으면 1년 배당금 기준 배당수익률을 계산해요.' },
-      { name: 'tax', label: '세금', type: 'select', default: 'normal', options: [['normal', '일반과세 15.4%'], ['none', '세금 없이 (비과세 계좌 등)']] },
+      { name: 'tax', label: '세금을 떼나요?', type: 'choice', default: 'normal', options: [['normal', '네, 15.4% 떼요'], ['none', '아니요 (비과세 계좌)']], help: '보통은 15.4%를 떼요. 비과세 계좌 등에서 세금 없이 받으면 \'아니요\'예요.' },
     ],
 
     compute(v, d, u) {

@@ -16,7 +16,7 @@
   FirstLabCalc.register({
     id: 'car-inspection',
     title: '자동차검사 계산기',
-    intro: '검사 유효기간 만료일을 넣으면 검사 받을 수 있는 기간, 공단 검사소 수수료, 늦었을 때 과태료를 계산합니다.',
+    intro: '검사 유효기간 만료일을 넣으면 검사 받을 수 있는 기간, 공단 검사소 수수료, 늦었을 때 과태료가 나와요.',
     inputs: [
       {
         name: 'expiry', label: '검사 유효기간 만료일', type: 'date',
@@ -24,7 +24,7 @@
       },
       { name: 'on', label: '검사 받을 날', type: 'date', default: 'today' },
       {
-        name: 'kind', label: '검사 종류', type: 'select', default: 'periodic',
+        name: 'kind', label: '검사 종류', type: 'choice', default: 'periodic',
         options: [['periodic', '정기검사'], ['comp_no_load', '종합검사 (무부하)'], ['comp_load', '종합검사 (부하)']],
         help: '검사 안내문에 적힌 종류를 고르세요. 종합검사의 부하·무부하 방식은 검사소에서 차에 맞춰 정해요.',
       },

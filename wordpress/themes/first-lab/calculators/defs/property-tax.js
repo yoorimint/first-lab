@@ -4,11 +4,11 @@
 
   const KIND = [
     ['one', '1세대 1주택'],
-    ['other', '그 밖의 주택 (2주택 이상인 집 등)'],
+    ['other', '그 밖의 집 (2주택 이상 등)'],
   ];
   const URBAN = [
-    ['yes', '도시지역분 붙음 (지자체가 고시한 도시지역)'],
-    ['no', '도시지역분 없음'],
+    ['yes', '네 (도시지역분 붙음)'],
+    ['no', '아니요 (도시지역분 없음)'],
   ];
 
   // 누진 구간마다 천분율을 곱해 더한다 (지방세법 제111조①3호나목·제111조의2① 표와 같은 값)
@@ -27,11 +27,11 @@
   FirstLabCalc.register({
     id: 'property-tax',
     title: '재산세 계산기 (주택분)',
-    intro: '주택 공시가격과 1세대 1주택 여부를 넣으면 과세표준, 재산세, 지방교육세, 도시지역분과 합계를 계산해요.',
+    intro: '집 공시가격과 1세대 1주택인지 넣으면 재산세·지방교육세·도시지역분과 합계가 나와요.',
     inputs: [
-      { name: 'price', label: '올해 주택 공시가격 (원)', type: 'number', min: 0, step: 10000000, help: '6월 1일 현재 공시된 그해 그 집의 공시가격이에요. 공동명의여도 집 전체 공시가격을 넣어요.' },
-      { name: 'kind', label: '주택 구분', type: 'select', default: 'one', options: KIND },
-      { name: 'urban', label: '도시지역분', type: 'select', default: 'yes', options: URBAN },
+      { name: 'price', label: '올해 집 공시가격 (원)', type: 'number', min: 0, step: 10000000, help: '6월 1일 현재 공시된 그해 그 집의 공시가격이에요. 공동명의여도 집 전체 공시가격을 넣어요.' },
+      { name: 'kind', label: '어떤 집인가요?', type: 'choice', default: 'one', options: KIND },
+      { name: 'urban', label: '도시지역에 있나요?', type: 'choice', default: 'yes', options: URBAN, help: "지자체가 고시한 도시지역이면 '도시지역분'이 붙어요. 작년 재산세 고지서에 도시지역분이 있었는지 보면 돼요." },
       { name: 'prev', label: '작년 공시가격 (원, 모르면 0)', type: 'number', min: 0, step: 10000000, default: 0, help: '넣으면 과세표준 상한(올해 과세표준이 너무 오르지 않게 막는 장치)을 함께 계산해요.' },
     ],
 

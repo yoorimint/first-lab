@@ -25,20 +25,21 @@
     intro: '세전 금액을 넣으면 떼는 소득세 3%·지방소득세 0.3%와 실수령액이 나와요. 받고 싶은 실수령액으로 세전 금액도 거꾸로 구해요.',
     inputs: [
       {
-        name: 'mode', label: '무엇을 계산할까요', type: 'select', default: 'gross',
+        name: 'mode', label: '무엇을 계산할까요?', type: 'choice', default: 'gross',
         options: [
           ['gross', '세전 금액 → 실수령액'],
-          ['net', '받고 싶은 실수령액 → 세전 금액 (역산)'],
+          ['net', '실수령액 → 세전 금액'],
         ],
+        help: '아래쪽은 받고 싶은 실수령액을 넣으면 세전 금액을 거꾸로 구해요.',
       },
       { name: 'amount', label: '금액 (원)', type: 'number', min: 0, step: 1, help: '한 번에 지급받는 금액(1건)을 넣어요.' },
       {
-        name: 'kind', label: '소득 종류', type: 'select', default: 'repeat',
+        name: 'kind', label: '어떤 일로 받은 돈인가요?', type: 'choice', default: 'repeat',
         options: [
-          ['repeat', '계속·반복하는 인적용역 (일반 프리랜서)'],
-          ['other', '그 밖의 원천징수대상 사업소득'],
+          ['repeat', '일반 프리랜서 일'],
+          ['other', '그 밖의 사업소득'],
         ],
-        help: '고용관계 없이 같은 일을 계속 해 주고 받는 돈이면 위쪽이에요.',
+        help: '고용관계 없이 같은 일을 계속·반복해 주고 받는 돈(인적용역)이면 \'일반 프리랜서 일\'이에요. 그 밖에 3%를 떼는 원천징수대상 사업소득이면 아래쪽이에요.',
       },
     ],
 

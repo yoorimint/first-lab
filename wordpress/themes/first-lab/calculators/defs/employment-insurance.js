@@ -10,22 +10,24 @@
   FirstLabCalc.register({
     id: 'employment-insurance',
     title: '고용보험료 계산기',
-    intro: '이번 달 세전 월급과 비과세 금액, 회사 규모를 넣으면 근로자가 내는 고용보험료와 회사가 내는 몫을 나눠서 계산해요.',
+    intro: '이번 달 월급과 회사 규모를 넣으면 내가 내는 고용보험료와 회사가 내는 몫이 나와요.',
     inputs: [
-      { name: 'pay', label: '이번 달 세전 월급 합계 (원)', type: 'number', min: 0, step: 1, default: 3200000, help: '기본급·수당을 모두 더한, 세금 떼기 전 금액이에요.' },
-      { name: 'nontax', label: '그중 비과세 금액 (원)', type: 'number', min: 0, step: 1, default: 200000, help: '급여명세서에 비과세로 적힌 식대 등이에요. 보험료 계산에서 빠져요.' },
+      { name: 'pay', label: '이번 달 월급 (원)', type: 'number', min: 0, step: 1, default: 3200000, help: '기본급·수당을 모두 더한, 세금 떼기 전 금액이에요.' },
+      { name: 'nontax', label: '그중 세금 안 붙는 돈 (원)', type: 'number', min: 0, step: 1, default: 200000, help: '급여명세서에 \'비과세\'로 적힌 식대 등이에요. 보험료 계산에서 빠져요.' },
       {
-        name: 'size', label: '회사 규모 (상시근로자 수)', type: 'select', default: 'under150',
+        name: 'size', label: '회사 직원 수', type: 'choice', default: 'under150',
         options: [
           ['under150', '150명 미만'],
-          ['priority', '150명 이상 + 우선지원대상기업'],
+          ['priority', '150명 이상 중소기업'],
           ['under1000', '150명 이상 1,000명 미만'],
-          ['over1000', '1,000명 이상 · 국가·지자체'],
+          ['over1000', '1,000명 이상·나라·지자체'],
         ],
+        help: '평소 일하는 직원 수(상시근로자 수)예요. \'150명 이상 중소기업\'은 150명 이상이면서 우선지원대상기업인 곳이에요. 나라·지자체는 직원 수와 상관없이 \'1,000명 이상\'을 골라요.',
       },
       {
-        name: 'age65', label: '65세 이후 새로 고용됐나요', type: 'select', default: 'no',
-        options: [['no', '아니요'], ['yes', '예 (실업급여 보험료 안 냄)']],
+        name: 'age65', label: '65세 이후에 새로 들어간 회사인가요?', type: 'choice', default: 'no',
+        options: [['no', '아니요'], ['yes', '네']],
+        help: '65세 이후 새로 고용됐으면 실업급여 보험료를 내지 않아요.',
       },
     ],
 

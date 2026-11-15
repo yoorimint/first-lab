@@ -10,11 +10,11 @@
     intro: '과목별 점수(100점 만점)를 넣으면 과락 여부와 평균, 합격 여부를 바로 보여줘요.',
     inputs: [
       {
-        name: 'stage', label: '어떤 시험을 봤나요', type: 'select', default: 'both',
+        name: 'stage', label: '어떤 시험을 봤나요?', type: 'choice', default: 'both',
         options: [
-          ['both', '1·2차 함께 응시'],
-          ['first', '1차만 응시'],
-          ['second', '2차만 응시 (1차 면제)'],
+          ['both', '1·2차 함께'],
+          ['first', '1차만'],
+          ['second', '2차만 (1차 면제)'],
         ],
       },
       { name: 's1', label: '1차 부동산학개론 점수', type: 'number', min: 0, step: 0.5, help: '1차를 봤다면 넣어요.' },
