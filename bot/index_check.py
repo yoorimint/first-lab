@@ -89,7 +89,18 @@ def _inspect_once(url: str) -> dict:
         raise RuntimeError(f"URL 검사 API {resp.status_code}: {resp.text[:200]}")
     r = (resp.json().get("inspectionResult") or {}).get("indexStatusResult") or {}
     return {"verdict": r.get("verdict", ""), "coverage": r.get("coverageState", ""),
-            "last_crawl": str(r.get("lastCrawlTime", ""))[:10], "google_canonical": r.get("googleCanonical", "")}
+            "last_crawl": crawl_kst(r.get("lastCrawlTime", "")), "google_canonical": r.get("googleCanonical", "")}
+
+
+def crawl_kst(stamp: str) -> str:
+    """구글이 마지막으로 읽은 때 (한국 시각 'YYYY-MM-DD HH:MM'). 11/16 운영자 '자동차는 (구글이) 돌고 나서 내가 요청한 것 같은데' —
+    날짜만으로는 색인 요청 전에 읽었는지 뒤에 읽었는지 알 수 없었음. 보강일(날짜)과 비교할 땐 앞 10자만 쓴다."""
+    from zoneinfo import ZoneInfo
+    try:
+        t = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+    except ValueError:
+        return str(stamp or "")[:10]
+    return t.astimezone(ZoneInfo("Asia/Seoul")).strftime("%Y-%m-%d %H:%M") if t.tzinfo else t.strftime("%Y-%m-%d %H:%M")
 
 
 def is_indexed(row: dict) -> bool:
