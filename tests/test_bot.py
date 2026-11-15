@@ -6556,6 +6556,16 @@ firstlab_stats_render_page();
         self.assertEqual(plus_queue.dropped_published(m), [34])
         self.assertEqual(plus_queue.dropped_published({}), [])
 
+    def test_crawler_files_skip_page_cache(self):
+        """11/15 운영자가 본 카페 글 '구글 방문 급감 → 사이트맵·피드·robots.txt 캐시 예외': 셋 다 nginx 페이지 캐시에서 뺌
+        (사이트맵·피드는 이미 BYPASS, robots.txt 만 10분 저장되던 것)."""
+        import re
+        conf = (ROOT / "server" / "nginx" / "first-lab.conf").read_text(encoding="utf-8")
+        rule = re.search(r'if \(\$request_uri ~\* "([^"]+)"\) \{\s*(?:#[^\n]*)?\s*set \$skip_cache 1;', conf)
+        self.assertIsNotNone(rule)
+        for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
+            self.assertRegex(uri, rule.group(1))
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
