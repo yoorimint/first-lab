@@ -34,8 +34,14 @@ fi
 log "직접 작성한 글·갱신 파일 올리기"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.publish_queue) || echo "직접 작성 글 올리기 실패 (봇 동작에는 영향 없음)"
 
-log "기존 글 보정·패치 반영 확인 (따로 실행 → /var/lib/first-lab/bot/maint.log)"
-setsid nohup flock /var/lib/first-lab/bot/maint.lock bash "$REPO_DIR/server/maint.sh" > /var/lib/first-lab/bot/maint.log 2>&1 < /dev/null &
+# 전체 글(약 470편)을 한 편씩 읽는 보정은 무거워(배포마다 부하 4 넘음 — 11/16 사주데이 'CPU 부하 급증' 경보 07:53) 패치·보정 코드가
+# 바뀐 배포에서만. 그 밖에는 매일 첫 배포(전체 배포, bot-setup.sh)가 한 번 돌린다.
+if changed '^wordpress/patches\.json$' || changed '^bot/\(fix_posts\|patch_check\|migrate_photos\|pending_images\)\.py$'; then
+  log "기존 글 보정·패치 반영 확인 (따로 실행 → /var/lib/first-lab/bot/maint.log)"
+  setsid nohup flock /var/lib/first-lab/bot/maint.lock bash "$REPO_DIR/server/maint.sh" > /var/lib/first-lab/bot/maint.log 2>&1 < /dev/null &
+else
+  log "기존 글 보정 건너뜀 (패치·보정 코드 안 바뀜 — 매일 첫 전체 배포 때 함)"
+fi
 
 log "보류 글 다시 검사"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.hold) || echo "보류 다시 검사 실패 (봇 동작에는 영향 없음)"
