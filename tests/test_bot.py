@@ -6599,6 +6599,8 @@ firstlab_stats_render_page();
                 "echo json_encode($c);")
         got = json.loads(subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout)
         self.assertEqual(got, ["indexed", "improve", "request", "requested", "improve", "waiting", "requested"])
+        stats = (ROOT / "wordpress" / "mu-plugins" / "first-lab-stats.php").read_text(encoding="utf-8")
+        self.assertIn("FIRSTLAB_REQUESTABLE     = array( 'request', 'waiting' )", stats)   # 아직 안 읽은 글도 '요청했어요' (11/15 운영자)
         # 서버 요약에 글별 상태 (검색 노출 기록이 있으면 '전에 색인됨')
         from bot import index_check
         rows = [{"post_id": 34, "url": "https://first-lab.kr/%ec%9e%90/", "published": "2026-11-03", "verdict": "NEUTRAL",

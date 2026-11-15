@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 const FIRSTLAB_STATS_SLUG      = 'firstlab-stats';
 const FIRSTLAB_INDEX_REQ_META  = '_firstlab_index_requested';   // 운영자가 서치콘솔에서 색인 생성을 요청한 날 (구글이 알려 주지 않아 직접 표시)
 const FIRSTLAB_PLUS_META       = '_firstlab_plus_at';           // +@ 보강한 날 (bot/refresh.PLUS_META)
+const FIRSTLAB_REQUESTABLE     = array( 'request', 'waiting' );   // '요청했어요' 단추를 보일 단계 — 아직 안 읽은 글도 운영자가 요청함 (11/15 운영자)
 
 /**
  * 글 하나의 색인 단계 (11/15 운영자 '아직 신청 안 된 거, 색인 중인 거, 됐다가 빠진 거 — 빠진 거 다시 보강해서 신청하면 되는 거 아닌가').
@@ -64,7 +65,7 @@ function firstlab_stats_index_groups( array $posts ): void {
 		'request'   => array( '보강 끝 — 색인 생성 요청하세요', '서치콘솔 맨 위 검색창에 주소를 넣고 \'색인 생성 요청\'을 누른 뒤 \'요청했어요\'를 눌러 주세요. (하루 요청 수 한도가 있어요)' ),
 		'improve'   => array( '구글이 읽고도 안 넣은 글 — 보강 차례', '+@ 보강 차례 맨 앞에 자동으로 들어가요. 보강이 끝나면 위 \'요청하세요\'로 올라와요.' ),
 		'requested' => array( '요청함 — 구글 결과 기다리는 중', '색인 점검이 매일 다시 봐요. 보통 며칠~2주 걸려요.' ),
-		'waiting'   => array( '구글이 아직 안 읽은 글', '사이트맵과 글끼리 링크로 구글이 찾아와요. 공개한 지 2주가 지나도 그대로면 요청해 보세요.' ),
+		'waiting'   => array( '구글이 아직 안 읽은 글', '서치콘솔에서 \'색인 생성 요청\'을 했으면 \'요청했어요\'를 눌러 주세요. 요청 안 해도 사이트맵·글끼리 링크로 구글이 찾아와요.' ),
 		'indexed'   => array( '색인된 글', '' ),
 	);
 	$groups = array_fill_keys( array_keys( $titles ), array() );
@@ -80,7 +81,7 @@ function firstlab_stats_index_groups( array $posts ): void {
 			esc_html( (string) ( $p['last_crawl'] ?? '' ) ),
 			esc_html( $plus_at ),
 			esc_html( $requested ),
-			esc_html( $note ) . ( 'request' === $stage ? ' ' . firstlab_stats_request_button( $id ) : '' ),
+			esc_html( $note ) . ( in_array( $stage, FIRSTLAB_REQUESTABLE, true ) ? ' ' . firstlab_stats_request_button( $id ) : '' ),
 		);
 	}
 	echo '<h3 id="index-stages">글별 색인 상태</h3>';
