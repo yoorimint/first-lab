@@ -6397,6 +6397,13 @@ class PlusCheckTest(unittest.TestCase):
         with mock.patch.object(index_check, "_inspect_once", side_effect=once):
             self.assertEqual(index_check.inspect(url)["verdict"], "PASS")
         self.assertEqual(asked[0], "https://first-lab.kr/%EC%9C%A1%EC%95%84/")
+        # 대문자 표기가 '모름'이면 한글 그대로 표기도 물음 (검색 노출이 있는 글이 '모름'으로 나왔음, 11/15)
+        asked.clear()
+        with mock.patch.object(index_check, "_inspect_once", side_effect=lambda u: (asked.append(u), {
+                "verdict": "PASS" if "육아" in u else "NEUTRAL",
+                "coverage": "Submitted and indexed" if "육아" in u else "URL is unknown to Google", "last_crawl": ""})[1]):
+            self.assertEqual(index_check.inspect(url)["verdict"], "PASS")
+        self.assertIn("https://first-lab.kr/육아/", asked)
 
     def test_index_recheck_forces_unindexed_today(self):
         """11/15 운영자 '지금 한번 점검 돌려 봐': 오늘 이미 본 미색인 글도 force 면 다시 물음 (색인된 글은 그대로)."""
@@ -6408,6 +6415,13 @@ class PlusCheckTest(unittest.TestCase):
         self.assertEqual(index_check.due(posts, known, today), [])
         self.assertEqual([p["url"] for p in index_check.due(posts, known, today, force=True)], ["a"])
         self.assertIn('"index_recheck"', (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
+
+    def test_settings_page_shows_site_stats(self):
+        """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게': 설정 페이지에 검색 노출·방문·색인 (서버가 모은 state 그대로)."""
+        page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
+        self.assertIn("firstlab_bot_render_stats( $state );", page)
+        for key in ("$state['search']", "$state['ga4']", "$state['index']"):
+            self.assertIn(key, page)
 
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
