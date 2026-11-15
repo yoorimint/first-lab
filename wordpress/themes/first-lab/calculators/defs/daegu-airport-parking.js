@@ -28,16 +28,16 @@
   FirstLabCalc.register({
     id: 'daegu-airport-parking',
     title: '대구공항 주차요금 계산기',
-    intro: '차종과 입차·출차 일시를 넣으면 대구공항 공식 요금표로 예상 주차요금을 계산해요.',
+    intro: '차종과 들어간·나온 시각을 넣으면 대구공항 공식 요금표로 예상 주차요금이 나와요.',
     inputs: [
-      { name: 'size', label: '차종', type: 'select', default: 'small', options: [['small', '소형 (승용차 전부, 15인승 이하 승합 등)'], ['large', '대형 (16인승 이상 승합 등)']] },
+      { name: 'size', label: '차종', type: 'choice', default: 'small', options: [['small', '소형 (승용차 등)'], ['large', '대형 (16인승 이상 등)']], help: '소형은 승용차 전부와 15인승 이하 승합 등, 대형은 16인승 이상 승합 등이에요.' },
       { name: 'in_date', label: '입차 날짜', type: 'date', default: 'today' },
       { name: 'in_time', label: '입차 시각', type: 'select', default: '09:00', options: TIMES },
       { name: 'out_date', label: '출차 날짜', type: 'date', default: 'today' },
       { name: 'out_time', label: '출차 시각', type: 'select', default: '18:00', options: TIMES },
-      { name: 'discount', label: '할인', type: 'select', default: 'none', options: [
+      { name: 'discount', label: '할인', type: 'choice', default: 'none', help: '50%는 경차·장애인·상이 국가유공자·다자녀·저공해 1·2종 등, 20%는 저공해 3종이에요.', options: [
         ['none', '할인 없음'],
-        ['half', '50% (경차·장애인·상이 국가유공자·다자녀·저공해 1·2종 등)'],
+        ['half', '50% (경차·장애인 등)'],
         ['low3', '20% (저공해 3종)'],
       ] },
     ],
