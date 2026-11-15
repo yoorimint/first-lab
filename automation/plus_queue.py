@@ -88,14 +88,16 @@ def needs_plus_again(post: dict, last_crawl: str) -> bool:
     return not plus_at or (bool(last_crawl) and last_crawl > plus_at)
 
 
-def main(n: int = 4) -> int:
+def main(n: int = 4, only: int | None = None) -> int:
     OUT.mkdir(exist_ok=True)
     picked, not_plain = [], 0
     from unreviewed import reviewed_ids
     done_review = reviewed_ids()
     written = written_plus_keywords()
     first = dropped_published(tick.get(f"{tick.SITE}/wp-json/firstlab/v1/maintenance", token=True))
-    for pid in list(first) + [i for i in plain_queue.order() if i not in first]:
+    if only is not None:  # 글쓰기 작업의 plus_target 1편 (daily-writer.md 6-1)
+        first = {only: first.get(only, "")}
+    for pid in list(first) + ([] if only is not None else [i for i in plain_queue.order() if i not in first]):
         if len(picked) >= n:
             break
         # 외부 검수 전인 새 초안은 건너뜀 (11/11 #3140: 검수 중인 글이 보강에 뽑혀 검수 패치와 부딪칠 뻔함). 검수 끝나면 reviewed.txt 에 들어가 다음 차례에 뽑힘
@@ -131,4 +133,7 @@ def main(n: int = 4) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(int(sys.argv[1]) if len(sys.argv) > 1 else 4))
+    # python3 automation/plus_queue.py [n]  /  python3 automation/plus_queue.py --id=<글 번호>  (글쓰기 작업의 plus_target)
+    ids = [int(a.split("=", 1)[1]) for a in sys.argv[1:] if a.startswith("--id=")]
+    nums = [int(a) for a in sys.argv[1:] if a.isdigit()]
+    sys.exit(main(1, ids[0]) if ids else main(nums[0] if nums else 4))

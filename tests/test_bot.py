@@ -6614,6 +6614,41 @@ firstlab_stats_render_page();
         self.assertEqual(refresh.log_reason(other, 4279, {}), "근거 변경: 승급교육은 80시간")
         self.assertEqual(refresh.log_reason({}, 1, {}), "직접 갱신")
 
+    def test_claimed_insight_must_be_in_body(self):
+        """11/15 운영자 '상위 사이트에 없는 우리만의 인사이트': 기록에 적은 @(계산 예시 등)가 본문에 없으면 막음."""
+        from bot import serp_gate
+        body = "<p>예를 들어 월급 2,508,000원이면 통상시급은 2,508,000원 ÷ 209시간 = 12,000원이에요.</p>"
+        ok = [{"type": "@계산예시", "text": "월급 2,508,000원 통상시급 12,000원 계산"}]
+        self.assertEqual(serp_gate.insight_problems(ok, body), [])
+        gone = [{"type": "@상황판단", "text": "주말 아르바이트 주휴수당 판단"}]
+        self.assertTrue(serp_gate.insight_problems(gone, body))                        # 적어 놓고 본문에 없음
+        self.assertTrue(serp_gate.insight_problems([{"type": "기타", "text": "x"}], body))  # @ 유형이 아님
+        self.assertEqual(serp_gate.insight_problems("계산 예시와 조회 경로를 더함", body), [])  # 옛 형식
+        self.assertTrue(serp_gate.insight_problems("", body))
+
+    def test_writer_gets_plus_target_before_new_posts(self):
+        """11/15 운영자 '+@ 작업도 예약 글쓰기에 넣어라 / 글 계속 올리는 것보다 색인이 더 중요': /next 의 plus_target 이
+        읽고도 색인 안 한 공개 글을 주고, 글쓰기 지시서가 새 글보다 먼저 한다. 보강한 뒤 구글이 다시 읽기 전엔 다시 안 줌."""
+        import shutil, subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        api = ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php"
+        code = ("define('ABSPATH','/'); function add_action(){} function add_filter(){} function register_rest_route(){} require '" + str(api) + "';"
+                "$posts=array(array('post_id'=>1,'state'=>'indexed'),array('post_id'=>34,'state'=>'crawled','last_crawl'=>'2026-11-14','was_indexed'=>'검색 노출 기록'),"
+                "array('post_id'=>885,'state'=>'crawled','last_crawl'=>'2026-11-20'));"
+                "$plus=function($at){ return function($id) use ($at){ return $at[$id] ?? ''; }; };"
+                "echo json_encode(array("
+                "firstlab_api_plus_target($posts,$plus(array()))['post_id'],"
+                "firstlab_api_plus_target($posts,$plus(array(34=>'2026-11-15')))['post_id'],"
+                "firstlab_api_plus_target($posts,$plus(array(34=>'2026-11-15',885=>'2026-11-21'))),"
+                "firstlab_api_plus_target($posts,$plus(array()))['why']));")
+        got = json.loads(subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout)
+        self.assertEqual(got[:3], [34, 885, None])
+        self.assertIn("전에 색인됨", got[3])
+        writer = (ROOT / "automation" / "daily-writer.md").read_text(encoding="utf-8")
+        self.assertIn("② `plus_target`", writer)
+        self.assertLess(writer.index("plus_target"), writer.index("⑤ 새 글"))
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""

@@ -129,9 +129,28 @@ def problems(serp, body_html: str) -> list[str]:
     missing = uncovered(questions, body_html)
     if missing:
         out.append(f"상위 글이 다루는데 본문에 없는 질문 {len(missing)}개: {' / '.join(m[:30] for m in missing[:3])} — 본문에 답을 넣기")
-    if len(str(serp.get("added") or "").strip()) < 10:
-        out.append("상위 글 분석: 상위 글에 없는데 우리가 더한 것(added)을 적기 — 계산 예시·계산기·상황별 판단·최신 개정 중 하나 이상")
+    out += insight_problems(serp.get("added"), body_html)
     return out
+
+
+INSIGHT_TYPES = ("@계산예시", "@상황판단", "@최신개정", "@조회방법", "@계산기")
+
+
+def insight_problems(added, body_html: str) -> list[str]:
+    """상위 글에 없는데 우리가 더한 것(@)이 본문에 정말 있는지 (11/15 운영자 '다른 상위 사이트에 없는 우리만의 인사이트를 가지고').
+    added: [{"type": "@계산예시", "text": "…"}] — 적어 놓고 본문에 없으면 막음. 옛 형식(글 한 줄)은 길이만 봄."""
+    hint = "계산 예시·상황별 판단·최신 개정·조회 방법·계산기 중 하나 이상"
+    if isinstance(added, list):
+        items = [a for a in added if isinstance(a, dict) and str(a.get("type", "")).strip() in INSIGHT_TYPES and str(a.get("text", "")).strip()]
+        if not items:
+            return [f"상위 글 분석: 상위 글에 없는데 우리가 더한 것(added)을 {{type, text}} 로 적기 — {hint}"]
+        missing = [a["text"] for a in items if uncovered([a["text"]], body_html)]
+        if len(missing) == len(items):
+            return [f"상위 글 분석: 더한 것(added)이 본문에 안 보임: {' / '.join(m[:30] for m in missing[:3])} — 본문에 넣거나 기록을 바로잡기"]
+        return []
+    if len(str(added or "").strip()) < 10:
+        return [f"상위 글 분석: 상위 글에 없는데 우리가 더한 것(added)을 적기 — {hint}"]
+    return []
 
 
 def _norm(text: str) -> str:
