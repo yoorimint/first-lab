@@ -13,19 +13,19 @@
   FirstLabCalc.register({
     id: 'legal-interest',
     title: '법정이자 계산기 (지연이자·지연손해금)',
-    intro: '받을 돈(원금), 이율 종류, 이자가 붙는 첫날과 마지막 날을 넣으면 일수와 이자가 나와요. 소송을 냈다면 소장 송달일을 넣어 그다음 날부터 연 12%로 나눠 계산해요.',
+    intro: '받을 돈, 이자 종류, 이자가 붙는 기간을 넣으면 일수와 이자가 나와요. 소송을 냈다면 상대가 소장을 받은 다음 날부터 연 12%로 나눠 계산해요.',
     inputs: [
       { name: 'principal', label: '원금 (원)', type: 'number', min: 0, step: 10000, help: '받지 못한 돈이에요. 이자는 빼고 넣어요.' },
-      { name: 'kind', label: '이율 종류', type: 'select', default: 'civil', options: [
-        ['civil', '민사 법정이율 연 5% (개인끼리 빌린 돈 등)'],
-        ['commercial', '상사 법정이율 연 6% (상행위로 생긴 빚)'],
-        ['wage', '임금·퇴직금 지연이자 연 20% (근로기준법)'],
-        ['custom', '약정 이율 직접 넣기'],
-      ] },
-      { name: 'rate', label: '약정 이율 (연 %, 직접 넣기일 때만)', type: 'number', min: 0, step: 0.01, help: '계약서에 적은 연 이율(연체 이율)이에요.' },
+      { name: 'kind', label: '어떤 이자인가요?', type: 'choice', default: 'civil', options: [
+        ['civil', '연 5% (개인끼리 빌린 돈 등)'],
+        ['commercial', '연 6% (상거래로 생긴 빚)'],
+        ['wage', '연 20% (밀린 임금·퇴직금)'],
+        ['custom', '계약한 이율 직접 넣기'],
+      ], help: '연 5%는 민사 법정이율, 연 6%는 상사 법정이율(상행위로 생긴 빚), 연 20%는 근로기준법의 임금·퇴직금 지연이자예요.' },
+      { name: 'rate', label: '계약한 이율 (연 %)', type: 'number', min: 0, step: 0.01, help: "'직접 넣기'를 골랐을 때만 써요. 계약서에 적은 연 이율(연체 이율, '약정 이율')이에요." },
       { name: 'start', label: '이자가 붙는 첫날', type: 'date', default: '', help: '판결문·지급명령에 적힌 "○○부터"의 날짜예요. 이 날도 일수에 넣어요.' },
       { name: 'end', label: '마지막 날 (갚는 날)', type: 'date', default: 'today', help: '다 갚는 날(완제일)이에요. 이 날도 일수에 넣어요.' },
-      { name: 'served', label: '소장 송달일 (소송을 냈을 때만)', type: 'date', default: '', help: '소장이 상대에게 도착한 날이에요. 그다음 날부터 연 12%로 계산해요. 소송 전이면 비워 두세요.' },
+      { name: 'served', label: '상대가 소장 받은 날 (소송 때만)', type: 'date', default: '', help: "소장이 상대에게 도착한 날('소장 송달일')이에요. 그다음 날부터 연 12%로 계산해요. 소송 전이면 비워 두세요." },
     ],
 
     compute(v, d, u) {

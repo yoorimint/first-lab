@@ -3,14 +3,14 @@
   'use strict';
 
   const RELATION = [
-    ['parent_adult', '부모(직계존속) → 성년 자녀'],
-    ['parent_minor', '부모(직계존속) → 미성년 자녀'],
+    ['parent_adult', '부모 → 성년 자녀'],
+    ['parent_minor', '부모 → 미성년 자녀'],
     ['spouse', '배우자'],
     ['grandparent_adult', '조부모 → 성년 손자녀 (할증)'],
     ['grandparent_minor', '조부모 → 미성년 손자녀 (할증)'],
-    ['child', '자녀(직계비속) → 부모'],
-    ['relative', '4촌 이내 혈족·3촌 이내 인척'],
-    ['other', '그 밖의 사람 (5촌 이상 친척 포함)'],
+    ['child', '자녀 → 부모'],
+    ['relative', '가까운 친척 (4촌 이내 등)'],
+    ['other', '그 밖의 사람'],
   ];
   const ASCENDANT = ['parent_adult', 'parent_minor', 'grandparent_adult', 'grandparent_minor'];
 
@@ -22,13 +22,13 @@
   FirstLabCalc.register({
     id: 'gift-tax',
     title: '아파트 증여세 계산기',
-    intro: '아파트 시가와 누구에게 받는지 고르면 증여재산공제, 과세표준, 세율, 신고하면 낼 증여세를 계산해요.',
+    intro: '아파트 시가와 누구에게 받는지 넣으면 신고할 때 낼 증여세가 나와요.',
     inputs: [
       { name: 'price', label: '아파트 시가 (원)', type: 'number', min: 0, step: 1000000, help: '증여일 전 6개월~후 3개월 사이 같은 단지·비슷한 면적의 매매가나 감정가를 넣어요.' },
-      { name: 'relation', label: '누구에게 받나요', type: 'select', default: 'parent_adult', options: RELATION },
-      { name: 'used', label: '10년 안에 같은 쪽에서 이미 쓴 공제 (원)', type: 'number', min: 0, step: 1000000, default: 0, help: '예: 3년 전 부모님께 현금 3,000만 원을 받아 공제받았다면 30000000' },
-      { name: 'marriage', label: '혼인·출산 공제로 뺄 금액 (원, 최대 1억)', type: 'number', min: 0, step: 1000000, default: 0, help: '부모·조부모에게 혼인신고일 전후 2년, 출생일부터 2년 안에 받을 때만 넣어요.' },
-      { name: 'on_time', label: '기한 안에 신고하나요', type: 'select', default: 'yes', options: [['yes', '네 (신고세액공제 3%)'], ['no', '아니요']] },
+      { name: 'relation', label: '누구에게 받나요?', type: 'select', default: 'parent_adult', options: RELATION, help: "'부모'는 직계존속, '자녀'는 직계비속이에요. '가까운 친척'은 4촌 이내 혈족·3촌 이내 인척이고, 5촌 이상 친척은 '그 밖의 사람'이에요. 조부모에게 받으면 세금이 더 붙어요(세대생략 할증)." },
+      { name: 'used', label: '10년 안에 이미 쓴 공제 (원)', type: 'number', min: 0, step: 1000000, default: 0, help: '같은 쪽(예: 부모님 두 분)에게 10년 안에 받으면서 이미 쓴 증여재산공제예요. 예: 3년 전 부모님께 현금 3,000만 원을 받아 공제받았다면 30000000' },
+      { name: 'marriage', label: '혼인·출산 공제 (원, 최대 1억)', type: 'number', min: 0, step: 1000000, default: 0, help: '부모·조부모에게 혼인신고일 전후 2년, 출생일부터 2년 안에 받을 때만 넣어요.' },
+      { name: 'on_time', label: '기한 안에 신고하나요?', type: 'choice', default: 'yes', options: [['yes', '네 (세금 3% 빼 줘요)'], ['no', '아니요']], help: "기한은 받은 달의 말일부터 3개월 안이에요. 기한 안에 신고하면 '신고세액공제' 3%를 빼 줘요." },
     ],
 
     compute(v, d, u) {

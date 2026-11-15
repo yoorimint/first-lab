@@ -28,17 +28,17 @@
   FirstLabCalc.register({
     id: 'gimhae-airport-parking',
     title: '김해공항 주차요금 계산기',
-    intro: '주차장과 차종, 입차·출차 일시를 넣으면 김해공항 공식 요금표로 예상 주차요금을 계산해요.',
+    intro: '주차장·차종과 입차·출차 일시를 넣으면 김해공항 요금표로 예상 주차요금이 나와요.',
     inputs: [
-      { name: 'lot', label: '주차장', type: 'select', default: 'p12', options: [['p12', 'P1·P2 여객주차장'], ['p3', 'P3 여객(화물)주차장']] },
-      { name: 'size', label: '차종', type: 'select', default: 'small', options: [['small', '소형 (승용차 전부, 15인승 이하 승합 등)'], ['large', '대형 (16인승 이상 승합 등)']] },
+      { name: 'lot', label: '어느 주차장인가요?', type: 'choice', default: 'p12', options: [['p12', 'P1·P2 여객주차장'], ['p3', 'P3 여객(화물)주차장']] },
+      { name: 'size', label: '차종', type: 'choice', default: 'small', options: [['small', '소형 (승용차 등)'], ['large', '대형 (16인승 이상 승합 등)']], help: '승용차는 모두 소형이고, 15인승 이하 승합차 등도 소형이에요.' },
       { name: 'in_date', label: '입차 날짜', type: 'date', default: 'today' },
       { name: 'in_time', label: '입차 시각', type: 'select', default: '09:00', options: TIMES },
       { name: 'out_date', label: '출차 날짜', type: 'date', default: 'today' },
       { name: 'out_time', label: '출차 시각', type: 'select', default: '18:00', options: TIMES },
-      { name: 'discount', label: '할인', type: 'select', default: 'none', options: [
+      { name: 'discount', label: '할인', type: 'choice', default: 'none', help: '50%는 경차·장애인·상이 국가유공자·다자녀·저공해 1·2종 차량 등이에요.', options: [
         ['none', '할인 없음'],
-        ['half', '50% (경차·장애인·상이 국가유공자·다자녀·저공해 1·2종 등)'],
+        ['half', '50% (경차·장애인 등)'],
         ['low3', '20% (저공해 3종)'],
       ] },
     ],

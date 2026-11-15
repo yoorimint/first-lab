@@ -9,24 +9,24 @@
   FirstLabCalc.register({
     id: 'graduation-year',
     title: '졸업년도 계산기',
-    intro: '태어난 연도와 달을 넣으면 초등학교·중학교·고등학교·대학교 입학 연도와 졸업 연도를 보여줘요. 빠른년생·조기입학·입학 연기·재수·휴학도 반영돼요.',
+    intro: '태어난 연도와 달을 넣으면 초·중·고·대학교 입학·졸업 연도가 나와요. 빠른년생·재수·휴학도 넣을 수 있어요.',
     inputs: [
       {
-        name: 'mode', label: '무엇으로 계산할까요', type: 'select', default: 'birth',
+        name: 'mode', label: '무엇으로 계산할까요?', type: 'choice', default: 'birth',
         options: [['birth', '태어난 연도·달로'], ['entry', '초등학교 입학 연도로']],
       },
       { name: 'year', label: '태어난 연도', type: 'number', min: 1970, step: 1, help: '예: 1995' },
       { name: 'month', label: '태어난 달', type: 'select', default: '3', options: MONTHS, help: '2002년까지의 1·2월생(빠른년생)은 한 해 일찍 입학한 것으로 계산해요.' },
       {
-        name: 'entry_type', label: '초등학교 입학', type: 'select', default: '0',
-        options: [['0', '제때 입학'], ['-1', '1년 일찍 입학 (조기입학)'], ['1', '1년 늦게 입학 (입학 연기)']],
+        name: 'entry_type', label: '초등학교는 제때 들어갔나요?', type: 'choice', default: '0',
+        options: [['0', '제때 입학'], ['-1', '1년 일찍 (조기입학)'], ['1', '1년 늦게 (입학 연기)']],
       },
-      { name: 'entry_year', label: '초등학교 입학 연도 (입학 연도로 계산할 때)', type: 'number', min: 1976, step: 1 },
+      { name: 'entry_year', label: '초등학교 입학 연도', type: 'number', min: 1976, step: 1, help: "'초등학교 입학 연도로'를 골랐을 때만 써요." },
       {
         name: 'college', label: '대학 과정', type: 'select', default: '4',
         options: [['4', '4년제 대학'], ['2', '2년제 전문대학'], ['3', '3년제 전문대학'], ['6', '6년제 (의학·약학 등)'], ['0', '대학 안 감']],
       },
-      { name: 'gap', label: '고교 졸업 뒤 대학 입학까지 쉰 해 (재수 등)', type: 'number', min: 0, step: 1, default: 0 },
+      { name: 'gap', label: '고교 졸업 뒤 쉰 해 (재수 등)', type: 'number', min: 0, step: 1, default: 0, help: '고등학교를 졸업하고 대학에 들어가기까지 쉰 햇수예요.' },
       { name: 'leave', label: '대학 휴학·군 복무로 늦어진 해', type: 'number', min: 0, step: 1, default: 0, help: '학기 단위 휴학은 졸업 학기가 바뀔 수 있어 대학 학사 일정으로 확인해요.' },
     ],
 

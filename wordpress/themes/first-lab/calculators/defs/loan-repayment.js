@@ -28,13 +28,13 @@
     title: '할부·대출 상환 계산기',
     intro: '빌리는 금액, 연 금리, 기간을 넣으면 매달 낼 돈과 이자 총액을 계산합니다.',
     inputs: [
-      { name: 'principal', label: '할부·대출 원금 (원)', type: 'number', min: 0, step: 10000, help: '차값이라면 선수금을 뺀 금액이에요.' },
+      { name: 'principal', label: '빌리는 금액 (원)', type: 'number', min: 0, step: 10000, help: '할부·대출 원금이에요. 차값이라면 선수금을 뺀 금액이에요.' },
       { name: 'rate', label: '연 금리 (%)', type: 'number', min: 0, step: 0.1, help: '계약서·견적서에 적힌 연 이율' },
       { name: 'months', label: '기간 (개월)', type: 'number', min: 1, step: 1 },
       {
-        name: 'method', label: '상환 방식', type: 'select', default: 'equal_payment',
-        options: [['equal_payment', '원리금균등 (매달 같은 금액)'], ['equal_principal', '원금균등 (점점 줄어듦)'], ['bullet', '만기일시 (이자만 내다가 마지막에 원금)']],
-        help: '자동차 할부는 대부분 원리금균등이에요.',
+        name: 'method', label: '어떻게 갚나요?', type: 'choice', default: 'equal_payment',
+        options: [['equal_payment', '원리금균등 (매달 같은 금액)'], ['equal_principal', '원금균등 (점점 줄어듦)'], ['bullet', '만기일시 (끝에 원금 한 번에)']],
+        help: "정식 이름은 '상환 방식'이에요. 만기일시는 매달 이자만 내다가 마지막에 원금을 한 번에 갚아요. 자동차 할부는 대부분 원리금균등이에요.",
       },
     ],
 
