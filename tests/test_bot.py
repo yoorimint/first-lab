@@ -6416,12 +6416,78 @@ class PlusCheckTest(unittest.TestCase):
         self.assertEqual([p["url"] for p in index_check.due(posts, known, today, force=True)], ["a"])
         self.assertIn('"index_recheck"', (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
 
-    def test_settings_page_shows_site_stats(self):
-        """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게': 설정 페이지에 검색 노출·방문·색인 (서버가 모은 state 그대로)."""
-        page = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
-        self.assertIn("firstlab_bot_render_stats( $state );", page)
-        for key in ("$state['search']", "$state['ga4']", "$state['index']"):
-            self.assertIn(key, page)
+    STATS_STUB = r"""<?php
+define('ABSPATH', '/');
+function add_action($h, $f) {}
+function esc_html($t) { return htmlspecialchars((string) $t); }
+function esc_url($t) { return (string) $t; }
+function home_url($p) { return 'https://first-lab.kr' . $p; }
+function url_to_postid($u) { return str_contains($u, '%EC%9E%90') || str_contains($u, '자동차') ? 34 : 0; }
+function get_permalink($id) { return "https://first-lab.kr/?p=$id"; }
+function get_the_title($id) { return "글$id 제목"; }
+function get_option($k, $d) { return json_decode(getenv('FL_STATE'), true); }
+require getenv('FL_PLUGIN');
+firstlab_stats_render_page();
+"""
+
+    def render_stats(self, state: dict) -> str:
+        import os
+        import shutil
+        import subprocess
+        import tempfile
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        with tempfile.NamedTemporaryFile("w", suffix=".php", delete=False, encoding="utf-8") as f:
+            f.write(self.STATS_STUB)
+        try:
+            env = {**os.environ, "FL_PLUGIN": str(ROOT / "wordpress" / "mu-plugins" / "first-lab-stats.php"),
+                   "FL_STATE": json.dumps(state, ensure_ascii=False)}
+            return subprocess.run(["php", f.name], capture_output=True, text=True, env=env, check=True).stdout
+        finally:
+            os.unlink(f.name)
+
+    def test_run_timing_records_slow_steps(self):
+        """11/15: 매분 봇 실행이 11/12 부터 하루 1,340 → 450 회 (한 번에 3분씩 걸려 예약 공개가 늦음) — 단계별 시간을 기록해 원인을 숫자로."""
+        from bot import run_timing
+        ticks = iter([0, 2, 70, 71])
+        laps = run_timing.Laps(clock=lambda: next(ticks))
+        laps.lap("설정·상태 읽기")
+        laps.lap("예약 공개")
+        laps.lap("정리·대시보드")
+        state = {"run_timing": {"2026-11-12": {"runs": 1}, "2026-11-13": {"runs": 1}, "2026-11-14": {"runs": 1}}}
+        run_timing.record(state, "2026-11-15 19:20", laps)
+        day = state["run_timing"]["2026-11-15"]
+        self.assertEqual((day["runs"], day["total_max"], day["total_max_at"], day["slow_runs"]), (1, 71, "19:20", 1))
+        self.assertTrue(day["slow_last"].startswith("19:20 71초: 예약 공개 68초"))
+        self.assertEqual(sorted(state["run_timing"]), ["2026-11-14", "2026-11-15"])   # 이틀만 보관
+        self.assertIn("예약 공개 합 68초", run_timing.summary(day))
+        run_py = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        self.assertIn("record_timing(state", run_py)
+        self.assertIn("'run_timing'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+
+    def test_site_stats_page_is_separate_menu(self):
+        """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
+        관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
+        settings = (ROOT / "wordpress" / "mu-plugins" / "first-lab-bot-settings.php").read_text(encoding="utf-8")
+        self.assertNotIn("$state['search']", settings)
+        self.assertIn("page=firstlab-stats", settings)
+        stats = (ROOT / "wordpress" / "mu-plugins" / "first-lab-stats.php").read_text(encoding="utf-8")
+        self.assertIn("add_menu_page(", stats)
+        html = self.render_stats({
+            "search": {"date": "2026-11-15", "days": 28, "impressions": 130, "clicks": 3, "position": 14.3,
+                       "last7": {"impressions": 115}, "prev7": {"impressions": 15}, "pages_seen": 9, "published": 20,
+                       "top": [{"page": "/자동차보험료계산/", "impressions": 78, "clicks": 2, "position": 7.8}],
+                       "queries": [{"query": "알바 이력서 양식", "page": "/없는글/", "impressions": 2, "clicks": 0, "position": 34}]},
+            "ga4": {"days": 28, "sessions": 42, "avg_seconds": 12, "internal_moves": 6,
+                    "top": [{"page": "/자동차보험료계산/", "sessions": 10, "avg_seconds": 20}]},
+            "index": {"date": "2026-11-15", "published": 21, "indexed": 2, "not_indexed": {"읽어 갔지만 색인 안 함": 7},
+                      "waiting": [{"post_id": 885, "url": "https://first-lab.kr/x/", "published": "2026-11-06",
+                                   "coverage": "읽어 갔지만 색인 안 함"}]},
+        })
+        for want in (">130<", ">14.3위<", ">115<", "그 전 7일 15", ">42<", ">12초<", ">2편<", "공개 21편 중", ">7편<",
+                     "글34 제목", "글885 제목", "/없는글/", "알바 이력서 양식", "애드센스 수익"):
+            self.assertIn(want, html)
+        self.assertIn("아직 모은 값이 없습니다", self.render_stats({}))
 
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""

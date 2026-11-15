@@ -287,76 +287,6 @@ add_action(
 	}
 );
 
-/**
- * 사이트 성과 한눈에 (11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게 — 노출·유입·색인, 승인 뒤 광고 수익').
- * 서버가 매일 모으는 값(state: search·ga4·index — bot/search_console, ga4, index_check)을 보여 주기만 함. 새 요청 없음.
- */
-function firstlab_bot_render_stats( array $state ): void {
-	$search = (array) ( $state['search'] ?? array() );
-	$ga4    = (array) ( $state['ga4'] ?? array() );
-	$index  = (array) ( $state['index'] ?? array() );
-	$num    = static fn( $v ) => number_format( (float) $v );
-	echo '<h2>사이트 성과</h2>';
-	if ( ! $search && ! $ga4 && ! $index ) {
-		echo '<p>아직 모은 값이 없습니다 (매일 새벽 수집).</p>';
-		return;
-	}
-	echo '<table class="widefat striped" style="max-width:720px"><tbody>';
-	if ( $search ) {
-		$l7 = (array) ( $search['last7'] ?? array() );
-		$p7 = (array) ( $search['prev7'] ?? array() );
-		printf(
-			'<tr><th>구글 검색 (%d일, %s 기준)</th><td>노출 <b>%s</b> · 클릭 <b>%s</b> · 평균 %s위<br>최근 7일 노출 %s (그 전 7일 %s) · 노출된 글 %d / 공개 %d편</td></tr>',
-			(int) ( $search['days'] ?? 28 ), esc_html( (string) ( $search['date'] ?? '' ) ),
-			$num( $search['impressions'] ?? 0 ), $num( $search['clicks'] ?? 0 ), esc_html( (string) ( $search['position'] ?? '-' ) ),
-			$num( $l7['impressions'] ?? 0 ), $num( $p7['impressions'] ?? 0 ),
-			(int) ( $search['pages_seen'] ?? 0 ), (int) ( $search['published'] ?? 0 )
-		);
-	}
-	if ( $ga4 ) {
-		printf(
-			'<tr><th>방문 (GA4 %d일)</th><td>세션 <b>%s</b> · 평균 머문 시간 %d초 · 사이트 안 이동 %s회</td></tr>',
-			(int) ( $ga4['days'] ?? 28 ), $num( $ga4['sessions'] ?? 0 ), (int) ( $ga4['avg_seconds'] ?? 0 ), $num( $ga4['internal_moves'] ?? 0 )
-		);
-	}
-	if ( $index ) {
-		$why = array();
-		foreach ( (array) ( $index['not_indexed'] ?? array() ) as $k => $v ) {
-			$why[] = esc_html( (string) $k ) . ' ' . (int) $v;
-		}
-		printf(
-			'<tr><th>구글 색인 (%s)</th><td>공개 %d편 중 <b>%d편</b> 색인%s<br><small>URL 검사 기준 — 검색 노출이 있는 글은 색인된 것이니 위 노출 글 수와 함께 보세요.</small></td></tr>',
-			esc_html( (string) ( $index['date'] ?? '' ) ), (int) ( $index['published'] ?? 0 ), (int) ( $index['indexed'] ?? 0 ),
-			$why ? ' · 미색인: ' . implode( ', ', $why ) : ''
-		);
-	}
-	echo '<tr><th>애드센스 수익</th><td>승인 뒤 연결 (애드센스 보고서 API — 운영자 구글 계정 허가 필요)</td></tr>';
-	echo '</tbody></table>';
-
-	// 많이 보인 글 (검색 노출·방문)
-	$top_search = array_slice( (array) ( $search['top'] ?? array() ), 0, 5 );
-	$top_visit  = array_slice( (array) ( $ga4['top'] ?? array() ), 0, 5 );
-	if ( $top_search || $top_visit ) {
-		echo '<table class="widefat striped" style="max-width:720px;margin-top:8px"><thead><tr><th>검색 노출 많은 글</th><th>노출 · 클릭 · 순위</th><th>방문 많은 글</th><th>세션 · 머문 시간</th></tr></thead><tbody>';
-		for ( $i = 0; $i < max( count( $top_search ), count( $top_visit ) ); $i++ ) {
-			$a = (array) ( $top_search[ $i ] ?? array() );
-			$b = (array) ( $top_visit[ $i ] ?? array() );
-			printf(
-				'<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>',
-				esc_html( (string) ( $a['page'] ?? '' ) ),
-				$a ? esc_html( $num( $a['impressions'] ?? 0 ) . ' · ' . $num( $a['clicks'] ?? 0 ) . ' · ' . ( $a['position'] ?? '-' ) . '위' ) : '',
-				esc_html( (string) ( $b['page'] ?? '' ) ),
-				$b ? esc_html( $num( $b['sessions'] ?? 0 ) . ' · ' . (int) ( $b['avg_seconds'] ?? 0 ) . '초' ) : ''
-			);
-		}
-		echo '</tbody></table>';
-	}
-	$queries = array_slice( (array) ( $search['queries'] ?? array() ), 0, 5 );
-	if ( $queries ) {
-		echo '<p style="max-width:720px"><b>들어온 검색어</b>: ' . implode( ' · ', array_map( static fn( $q ) => esc_html( (string) ( $q['query'] ?? '' ) ) . ' (' . (int) ( $q['impressions'] ?? 0 ) . '회)', $queries ) ) . '</p>';
-	}
-}
-
 function firstlab_bot_render_keywords( array $state ): void {
 	$kw       = (array) ( $state['keywords'] ?? array() );
 	$by       = (array) ( $kw['by_status'] ?? array() );
@@ -536,7 +466,7 @@ function firstlab_bot_render_status(): void {
 		?>
 	</p>
 
-	<?php firstlab_bot_render_stats( $state ); ?>
+	<p>검색 노출·방문·색인은 왼쪽 메뉴 <a href="<?php echo esc_url( admin_url( 'admin.php?page=firstlab-stats' ) ); ?>">사이트 성과</a>에서 봅니다.</p>
 
 	<?php firstlab_bot_render_keywords( $state ); ?>
 
