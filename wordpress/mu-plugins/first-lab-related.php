@@ -11,6 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_RELATED_COUNT = 4;
+const FIRSTLAB_SIBLING_COUNT = 4;   // 같은 분류의 다른 글 (11/15)
 
 /** 기록된 관련 글 id (JSON {"ids":[…]}) 중 지금 공개 상태인 것. */
 function firstlab_related_from_meta( string $raw, callable $is_public ): array {
@@ -32,6 +33,56 @@ function firstlab_related_ids( int $post_id, int $count = FIRSTLAB_RELATED_COUNT
 	return array_slice( $cache[ $post_id ], 0, $count );
 }
 
+/**
+ * 같은 분류 글 목록(공개 날짜 순)에서 이 글의 앞뒤 글을 번갈아 n 개 (끝에 닿으면 반대쪽에서 더).
+ * 11/15: 구글이 '읽어 갔지만 색인 안 함'으로 뺀 글 7편이 모두 사이트 안에서 들어오는 링크가 1~5개 (서치콘솔 '참조 페이지 없음')
+ * → 글마다 같은 분류의 가까운 글로 이어 주면, 오래된 글도 이웃 글 n 편에서 링크를 받는다 (앞 글만 몰리지 않게 앞뒤 고르게).
+ */
+function firstlab_category_neighbors( array $ids_by_date, int $current, int $n, array $skip = array() ): array {
+	$pos = array_search( $current, $ids_by_date, true );
+	if ( false === $pos ) {
+		return array();
+	}
+	$len = count( $ids_by_date );
+	$out = array();
+	for ( $k = 1; $k < $len && count( $out ) < $n; $k++ ) {   // 처음·끝 글도 고르게 받게 목록을 원형으로 (끝 다음 = 처음)
+		foreach ( array( $ids_by_date[ ( $pos - $k + $len ) % $len ], $ids_by_date[ ( $pos + $k ) % $len ] ) as $id ) {
+			if ( $id !== $current && ! in_array( $id, $out, true ) && ! in_array( $id, $skip, true ) && count( $out ) < $n ) {
+				$out[] = $id;
+			}
+		}
+	}
+	return $out;
+}
+
+/** 이 글의 첫 분류와, 그 분류의 공개 글 id (공개 날짜 순). */
+function firstlab_category_siblings( int $post_id ): array {
+	$cats = get_the_category( $post_id );
+	if ( ! $cats ) {
+		return array( null, array() );
+	}
+	$ids = get_posts(
+		array(
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			'category'    => $cats[0]->term_id,
+			'numberposts' => 200,
+			'orderby'     => 'date',
+			'order'       => 'ASC',
+			'fields'      => 'ids',
+		)
+	);
+	return array( $cats[0], array_map( 'intval', $ids ) );
+}
+
+function firstlab_related_list( string $heading, array $ids ): string {
+	$items = '';
+	foreach ( $ids as $id ) {
+		$items .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( get_permalink( $id ) ), esc_html( get_the_title( $id ) ) );
+	}
+	return '<section class="firstlab-related"><h2>' . esc_html( $heading ) . '</h2><ul>' . $items . '</ul></section>';
+}
+
 add_filter(
 	'the_content',
 	static function ( $content ) {
@@ -41,14 +92,16 @@ add_filter(
 		// 본문 중간 '이어서 보면 좋은 글'에 이미 보여 준 글은 빼고 4개 (first-lab-flow.php)
 		$shown = $GLOBALS['firstlab_flow_shown'] ?? array();
 		$ids   = array_slice( array_values( array_diff( firstlab_related_ids( get_the_ID() ), $shown ) ), 0, FIRSTLAB_RELATED_COUNT );
-		if ( ! $ids ) {
-			return $content; // 관련 글이 없으면 엉뚱한 글을 채우지 않음
+		if ( $ids ) { // 내용이 비슷한 글이 없으면 엉뚱한 글을 채우지 않음
+			$content .= firstlab_related_list( '함께 보면 좋은 글', $ids );
 		}
-		$items = '';
-		foreach ( $ids as $id ) {
-			$items .= sprintf( '<li><a href="%s">%s</a></li>', esc_url( get_permalink( $id ) ), esc_html( get_the_title( $id ) ) );
+		// 같은 분류의 가까운 글 (위에 이미 보인 글은 빼고) — 분류 이름을 붙여 '관련 글'로 오해하지 않게
+		list( $cat, $siblings ) = firstlab_category_siblings( get_the_ID() );
+		$near = firstlab_category_neighbors( $siblings, get_the_ID(), FIRSTLAB_SIBLING_COUNT, array_merge( $ids, $shown ) );
+		if ( $cat && $near ) {
+			$content .= firstlab_related_list( $cat->name . ' 분류의 다른 글', $near );
 		}
-		return $content . '<section class="firstlab-related"><h2>함께 보면 좋은 글</h2><ul>' . $items . '</ul></section>';
+		return $content;
 	},
 	20
 );
