@@ -81,6 +81,9 @@ function firstlab_bot_schedule_times( string $text ): array {
 	foreach ( $m as $x ) {
 		$h = (int) $x[1];
 		$i = (int) ( $x[2] ?? 0 );
+		if ( 24 === $h && 0 === $i ) { // '24:00' = 자정 → 00:00 (11/14 운영자 입력이 말없이 빠졌음, bot/settings._times 와 같게)
+			$h = 0;
+		}
 		if ( $h < 24 && $i < 60 ) {
 			$times[ sprintf( '%02d:%02d', $h, $i ) ] = true;
 		}

@@ -6378,6 +6378,9 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("add_settings_error", page)
         from bot import settings
         self.assertEqual(settings._times("09:00\n13.30\n18:00"), ["09:00", "18:00"])   # '13.30' 은 못 읽음 → 경고 대상
+        # 운영자가 실제로 넣은 값: '24:00'(자정)이 0~23시 검사에 걸려 말없이 빠졌음 → 00:00 으로 받음
+        self.assertEqual(settings._times("09:00\n18:00\n24:00"), ["00:00", "09:00", "18:00"])
+        self.assertIn("24 === $h && 0 === $i", page)
 
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""

@@ -33,6 +33,8 @@ def _times(text: str) -> list[str]:
     times = set()
     for h, m in re.findall(r"(\d{1,2})\s*[:시]\s*(\d{1,2})?", text or ""):
         h, m = int(h), int(m or 0)
+        if h == 24 and m == 0:  # '24:00' = 자정 (11/14 운영자 입력이 말없이 빠졌음) → 00:00
+            h = 0
         if 0 <= h < 24 and 0 <= m < 60:
             times.add(f"{h:02d}:{m:02d}")
     return sorted(times)
