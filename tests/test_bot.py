@@ -6566,6 +6566,15 @@ firstlab_stats_render_page();
         for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
             self.assertRegex(uri, rule.group(1))
 
+    def test_serp_question_with_when_ending_is_covered(self):
+        """11/15 #630: 질문 '퇴사시 연차수당도 받을 수 있나요?'를 본문 '퇴사할 때 … 연차수당으로 받아요'가 답하는데 검사가 못 알아봐,
+        작성자가 새 문장을 '퇴사 시에는'으로 바꿔 통과시킴 → '…시·…하면·…때'는 같은 말로."""
+        from bot import serp_gate
+        body = "<p>퇴사할 때 아직 없어지지 않은 연차가 남아 있으면, 그 일수만큼 미사용 연차수당으로 받아요.</p>"
+        for q in ("퇴사시 연차수당도 받을 수 있나요?", "퇴사하면 연차수당도 받을 수 있나요?", "퇴사때 연차수당도 받나요?"):
+            self.assertEqual(serp_gate.uncovered([q], body), [], q)
+        self.assertEqual(serp_gate.uncovered(["입사시 건강검진 서류는?"], body), ["입사시 건강검진 서류는?"])  # 다른 주제는 그대로 걸림
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
