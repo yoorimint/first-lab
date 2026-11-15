@@ -125,6 +125,19 @@ function firstlab_bot_sanitize( $input ): array {
 				$clean[ $key ] = sanitize_text_field( $value );
 		}
 	}
+	// 공개 시각 줄 중 시각으로 못 읽은 줄·겹친 줄 알림 (11/14 운영자 '3개 넣었는데 공개 계획은 2개' — 저장값엔 09:00·18:00 두 개만)
+	$lines = array_values( array_filter( array_map( 'trim', preg_split( '/[\r\n,]+/', (string) ( $clean['schedule_times'] ?? '' ) ) ) ) );
+	$times = firstlab_bot_schedule_times( (string) ( $clean['schedule_times'] ?? '' ) );
+	if ( count( $lines ) > count( $times ) && function_exists( 'add_settings_error' ) ) {
+		$bad = array_filter( $lines, static fn( $l ) => ! firstlab_bot_schedule_times( $l ) );
+		add_settings_error(
+			FIRSTLAB_BOT_OPTION,
+			'schedule_times',
+			sprintf( '예약 공개 시각 %d줄 중 %d개만 시각으로 읽혔어요 (하루 %d편).%s 같은 시각을 두 번 썼거나 형식이 다르면 빠져요 — 한 줄에 09:00 처럼 적어 주세요.',
+				count( $lines ), count( $times ), count( $times ), $bad ? ' 못 읽은 줄: ' . implode( ', ', $bad ) . '.' : '' ),
+			'warning'
+		);
+	}
 	return $clean;
 }
 
