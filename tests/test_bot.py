@@ -6471,9 +6471,14 @@ firstlab_stats_render_page();
             run_timing.put_carry("locked", 1, path=carry, add=True)
             run_timing.put_carry("locked", 1, path=carry, add=True)
             run_timing.put_carry("save", 40.04, path=carry)
+            run_timing.put_carry("started", 1, path=carry, add=True)
+            run_timing.note_error(RuntimeError("database is locked"), path=carry)
             got = run_timing.take_carry(carry)
-            self.assertEqual(got, {"locked": 2, "save": 40.0})
-            self.assertEqual(run_timing.take_carry(carry), {})   # 한 번 읽으면 지움
+            self.assertEqual(run_timing.take_carry(carry), got)   # 저장을 마치기 전엔 지우지 않음 (중간에 죽어도 다음 실행이 셈)
+            run_timing.clear_carry(carry)
+            self.assertEqual(run_timing.take_carry(carry), {})
+        self.assertEqual((got["locked"], got["save"], got["started"], got["errors"]), (2, 40.0, 1, 1))
+        self.assertIn("RuntimeError: database is locked", got["last_error"])
         ticks = iter([100, 103])
         laps = run_timing.Laps(clock=lambda: next(ticks), started_ago=90)
         laps.add_carry(got)
@@ -6481,7 +6486,9 @@ firstlab_stats_render_page();
         state = {}
         run_timing.record(state, "2026-11-15 19:40", laps)
         day = state["run_timing"]["2026-11-15"]
-        self.assertEqual((day["total_max"], day["locked"]), (93, 2))
+        self.assertEqual((day["total_max"], day["locked"], day["started"], day["errors"]), (93, 2, 1, 1))
+        self.assertIn("database is locked", run_timing.summary(day))
+        self.assertIn("note_error(e)", run_py)
         self.assertIn("시작(파이썬·불러오기) 90초", day["slow_last"])
         self.assertIsNotNone(run_timing.process_age())
         self.assertIn("'run_timing'", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
