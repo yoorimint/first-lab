@@ -88,7 +88,7 @@ def is_indexed(row: dict) -> bool:
     return row.get("verdict") == "PASS"
 
 
-def due(posts: list[dict], known: dict[str, dict], today: date, limit: int = CHECK_PER_DAY) -> list[dict]:
+def due(posts: list[dict], known: dict[str, dict], today: date, limit: int = CHECK_PER_DAY, force: bool = False) -> list[dict]:
     """오늘 물어볼 글: 처음 보는 글 → 미색인 글(오래 안 본 순) → 색인 후 RECHECK_DAYS 지난 글."""
     cutoff = (today - timedelta(days=RECHECK_DAYS)).isoformat()
     first, waiting, recheck = [], [], []
@@ -96,7 +96,7 @@ def due(posts: list[dict], known: dict[str, dict], today: date, limit: int = CHE
         k = known.get(p["url"])
         if not k:
             first.append(p)
-        elif k.get("checked") == today.isoformat():
+        elif k.get("checked") == today.isoformat() and not (force and not is_indexed(k)):
             continue
         elif not is_indexed(k):
             waiting.append((k.get("checked") or "", p))
@@ -148,12 +148,12 @@ def _load(conn) -> dict[str, dict]:
     return {r["url"]: dict(r) for r in conn.execute("SELECT * FROM index_status")}
 
 
-def run(conn, posts: list[dict], today: date, ask=None, limit: int = CHECK_PER_DAY) -> tuple[dict, list[str]]:
+def run(conn, posts: list[dict], today: date, ask=None, limit: int = CHECK_PER_DAY, force: bool = False) -> tuple[dict, list[str]]:
     """오늘 몫을 물어보고 저장한 뒤 (요약, 실패 목록). 한 글이 실패해도 나머지는 계속."""
     ask = ask or inspect
     known = _load(conn)
     errors: list[str] = []
-    for p in due(posts, known, today, limit):
+    for p in due(posts, known, today, limit, force):
         try:
             r = ask(p["url"])
         except Exception as e:  # noqa: BLE001 - 권한·한도 문제는 기록하고 다음 날 다시
@@ -172,17 +172,18 @@ def run(conn, posts: list[dict], today: date, ask=None, limit: int = CHECK_PER_D
     return summarize(posts, known, today), errors
 
 
-def record(state: dict, today: str | None = None) -> str:
-    """하루 한 번 state['index'] 에 요약 (새벽 수집이 부름). 실패하면 기록하지 않아 다음 수집 때 다시."""
+def record(state: dict, today: str | None = None, force: bool = False) -> str:
+    """하루 한 번 state['index'] 에 요약 (새벽 수집이 부름). 실패하면 기록하지 않아 다음 수집 때 다시.
+    force: 오늘 이미 했어도 미색인 글을 다시 물음 (대기 폴더 {"type": "index_recheck"} — bot/publish_queue)."""
     today = today or datetime.now().strftime("%Y-%m-%d")
-    if (state.get("index") or {}).get("date") == today:
+    if (state.get("index") or {}).get("date") == today and not force:
         return ""
     if not available():
         return "색인: 서치콘솔 키 없음"
     from .keyword_db import connect
     posts = published_posts()
     with connect() as conn:
-        s, errors = run(conn, posts, date.fromisoformat(today))
+        s, errors = run(conn, posts, date.fromisoformat(today), force=force)
     if errors and not s["checked"]:
         return f"색인 확인 실패: {errors[0]} — 서치콘솔 속성에 서비스 계정 사용자 권한이 있는지 확인"
     state["index"] = s

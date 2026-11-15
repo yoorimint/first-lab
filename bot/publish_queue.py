@@ -297,6 +297,10 @@ def _main() -> None:
             elif data.get("type") == "evidence":
                 label = "근거 기록"
                 msg = save_evidence(data)
+            elif data.get("type") == "index_recheck":  # 색인 점검 지금 다시 (11/15 운영자 '지금 한번 점검 돌려 봐')
+                label = "색인 다시 점검"
+                from .index_check import record as record_index
+                msg = record_index(state, force=True) or "-"
             elif data.get("type") == "image_check":
                 label = "사진 검사"
                 msg = image_check.apply_check(data)

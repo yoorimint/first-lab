@@ -6398,6 +6398,17 @@ class PlusCheckTest(unittest.TestCase):
             self.assertEqual(index_check.inspect(url)["verdict"], "PASS")
         self.assertEqual(asked[0], "https://first-lab.kr/%EC%9C%A1%EC%95%84/")
 
+    def test_index_recheck_forces_unindexed_today(self):
+        """11/15 운영자 '지금 한번 점검 돌려 봐': 오늘 이미 본 미색인 글도 force 면 다시 물음 (색인된 글은 그대로)."""
+        import datetime as dt
+        from bot import index_check
+        today = dt.date(2026, 11, 15)
+        posts = [{"url": "a", "post_id": 1, "published": "2026-11-10"}, {"url": "b", "post_id": 2, "published": "2026-11-10"}]
+        known = {"a": {"verdict": "NEUTRAL", "checked": "2026-11-15"}, "b": {"verdict": "PASS", "checked": "2026-11-15"}}
+        self.assertEqual(index_check.due(posts, known, today), [])
+        self.assertEqual([p["url"] for p in index_check.due(posts, known, today, force=True)], ["a"])
+        self.assertIn('"index_recheck"', (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
+
     def test_plus_queue_skips_unreviewed_drafts(self):
         """11/11 #3140: 외부 검수 중인 새 초안이 보강에 뽑혀 검수 패치와 부딪칠 뻔함 → reviewed.txt 에 없는 글은 건너뜀."""
         src = (ROOT / "automation" / "plus_queue.py").read_text(encoding="utf-8")
