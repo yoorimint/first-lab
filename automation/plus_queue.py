@@ -85,7 +85,7 @@ def needs_plus_again(post: dict, last_crawl: str) -> bool:
     """빠진 공개 글: 보강한 적 없거나, 보강한 뒤 구글이 다시 읽고도 또 안 넣었으면 다시 보강 (11/15 운영자 '빠진 거 다시 보강해서 신청').
     보강한 날 뒤로 구글이 다시 읽기 전에는 다시 뽑지 않음 — 같은 글 무한 반복 금지."""
     plus_at = str(post.get("plus_at") or "")
-    return not plus_at or (bool(last_crawl) and last_crawl > plus_at)
+    return not plus_at or (bool(last_crawl) and last_crawl[:10] > plus_at[:10])  # 날짜끼리 (읽은 때는 시각까지 있음)
 
 
 def main(n: int = 4, only: int | None = None) -> int:

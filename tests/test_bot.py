@@ -6750,6 +6750,17 @@ firstlab_stats_render_page();
         self.assertEqual(due("2026-11-14", "2026-11-16", "15"), "yes")   # 어제 새벽도 놓침 → 낮이라도 대신
         self.assertEqual(due("", "2026-11-16", "15"), "yes")             # 기록 없음
 
+    def test_last_crawl_keeps_time_but_compares_dates(self):
+        """11/16 운영자 '구글이 읽고 나서 내가 요청한 것 같은데': 마지막으로 읽은 때를 한국 시각까지 남김.
+        보강일(날짜)과 비교는 날짜끼리 — 같은 날 읽고 그 뒤에 보강한 글을 '보강 뒤 또 안 넣음'으로 잘못 보지 않게."""
+        from bot import index_check
+        sys.path.insert(0, str(ROOT / "automation"))
+        import plus_queue
+        self.assertEqual(index_check.crawl_kst("2026-11-14T17:01:58Z"), "2026-11-15 02:01")
+        self.assertEqual(index_check.crawl_kst(""), "")
+        self.assertFalse(plus_queue.needs_plus_again({"plus_at": "2026-11-15"}, "2026-11-15 02:01"))
+        self.assertTrue(plus_queue.needs_plus_again({"plus_at": "2026-11-15"}, "2026-11-16 09:00"))
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""

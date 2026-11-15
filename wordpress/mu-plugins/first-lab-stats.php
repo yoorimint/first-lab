@@ -29,7 +29,7 @@ function firstlab_index_stage( array $p, string $plus_at, string $requested ): s
 		return 'indexed';
 	}
 	if ( 'crawled' === $state || ( 'other' === $state && ! empty( $p['was_indexed'] ) ) ) {
-		if ( '' === $plus_at || $plus_at < (string) ( $p['last_crawl'] ?? '' ) ) {
+		if ( '' === $plus_at || $plus_at < substr( (string) ( $p['last_crawl'] ?? '' ), 0, 10 ) ) {  // 날짜끼리
 			return 'improve';
 		}
 		return ( '' !== $requested && $requested >= $plus_at ) ? 'requested' : 'request';

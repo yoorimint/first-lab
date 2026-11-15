@@ -146,7 +146,7 @@ function firstlab_api_plus_target( array $posts, ?callable $plus_at_of = null ):
 			continue;
 		}
 		$plus_at = $plus_at_of( $id );
-		$crawl   = (string) ( $p['last_crawl'] ?? '' );
+		$crawl   = substr( (string) ( $p['last_crawl'] ?? '' ), 0, 10 ); // 날짜끼리 비교 (읽은 때는 시각까지 있음)
 		if ( '' === $plus_at || ( '' !== $crawl && $crawl > $plus_at ) ) {
 			return array(
 				'post_id'    => $id,
