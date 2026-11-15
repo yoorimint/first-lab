@@ -253,6 +253,55 @@ def refresh_dashboard(state: dict, settings: BotSettings) -> None:
         state["review_target"] = None
 
 
+def link_maintenance(state: dict, now: datetime, step=lambda name: None) -> None:
+    """10분마다(매 5분): 공식 사이트 링크 확인·공개 순서·검색량·관련 글 등 공개와 직접 관계없는 정리.
+    11/15: 이 묶음 어딘가에서 실행이 멈춰 12분 시간 제한에 걸림(하루 4번, 그동안 매분 봇 전체가 멈춤) →
+    bot/links_job.py 가 systemd 별도 실행으로 돌림. step(이름) 으로 어디까지 했는지 남겨, 멈추면 다음 실행이 기록."""
+    today = now.strftime("%Y-%m-%d")
+    try:
+        from . import official_links
+        step("공식 사이트 링크 확인")
+        official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
+        if now.minute < 10:  # 한 시간마다: 다음 공개 순서 기록 — 공개 전 쉬운 말 다듬기용 (/maintenance publish_next, 11/10)
+            try:
+                step("다음 공개 순서")
+                from .schedule import upcoming
+                state["publish_next"] = {"at": f"{now:%Y-%m-%d %H:%M}", "ids": upcoming(now)}
+                from .schedule import publish_order, ready_drafts  # 대기 글 전체 공개 순서 (11/10 '초안 전부 쉬운 말로' — 이 순서대로 다듬기)
+                state["publish_order_all"] = publish_order(ready_drafts(), now)
+                step("대기 글 검색량")
+                from .schedule import draft_signals  # 대기 글별 검색량·블로그 글 수·황금지수 (11/11 운영자 질문)
+                state["draft_signals"] = {str(k): v for k, v in draft_signals(state["publish_order_all"]).items()}
+            except Exception as e:  # noqa: BLE001
+                add_log(state, False, f"다음 공개 순서 계산 실패: {str(e)[:150]}")
+        if now.minute < 10:  # 한 시간마다: 주소 연결 안 됨 보류 다시 열어 보기 (일시 장애로 평생 보류 안 되게, 11/10)
+            step("주소 안 열림 보류 다시 보기")
+            for line in official_links.recheck_dead():
+                add_log(state, True, f"보류 다시 검사: {line}")
+        if state.get("known_watch_date") != today:  # 하루 한 번: 확인된 틀린 문구가 남은 글에 다시 확인 표시 (bot/known_watch.py, 11/10)
+            try:
+                step("틀린 문구 감시")
+                from . import known_watch
+                add_log(state, True, known_watch.run())
+                state["known_watch_date"] = today
+            except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
+                add_log(state, False, f"틀린 문구 감시 실패: {str(e)[:150]}")
+        from . import related_posts
+        stamp = f"{now:%Y-%m-%d}/v{related_posts.VERSION}"  # 계산 방식이 바뀌면(VERSION) 그날 바로 다시
+        if state.get("related_posts_date") != stamp:  # 관련 글·계산기(내용 기준) 하루 한 번 다시 계산 (공개 때도 함)
+            try:
+                step("관련 글 계산")
+                add_log(state, True, related_posts.run())
+                state["related_posts_date"] = stamp
+            except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
+                add_log(state, False, f"관련 글 계산 실패: {str(e)[:150]}")
+        from . import source_check
+        step("검수 확인 사이트 채우기")
+        source_check.backfill_reviewed()  # 예전 글의 '검수로 확인한 공식 사이트' 채우기 (글 끝 확인 줄, 다 채우면 할 일 없음)
+    except Exception as e:  # noqa: BLE001 - 링크 확인 실패가 봇을 멈추지 않게
+        add_log(state, False, f"공식 사이트 링크 확인 실패: {str(e)[:150]}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--now", action="store_true", help="글쓰기 작업 1번 바로 시작 (설정의 방식대로)")
@@ -352,43 +401,11 @@ def main() -> None:
 
     laps.lap("WebP")
 
-    # 본문에 적힌 공식 사이트 주소를 열어 보고 열리는 것만 링크 가능으로 기록 (bot/official_links.py, 11/6 운영자) — 10분마다 몇 편
+    # 공식 사이트 링크 확인·공개 순서·관련 글 (10분마다) — 멈추면 12분 동안 매분 봇이 서서 별도 실행으로 (bot/links_job.py, 11/15)
     if now.minute % 10 == 5:
-        try:
-            from . import official_links
-            official_links.run()  # 결과는 글 메타에 (성공 줄은 봇 기록에 안 남김 — 10분마다 쌓여 중요한 기록을 밀어냄)
-            if now.minute < 10:  # 한 시간마다: 다음 공개 순서 기록 — 공개 전 쉬운 말 다듬기용 (/maintenance publish_next, 11/10)
-                try:
-                    from .schedule import upcoming
-                    state["publish_next"] = {"at": f"{now:%Y-%m-%d %H:%M}", "ids": upcoming(now)}
-                    from .schedule import publish_order, ready_drafts  # 대기 글 전체 공개 순서 (11/10 '초안 전부 쉬운 말로' — 이 순서대로 다듬기)
-                    state["publish_order_all"] = publish_order(ready_drafts(), now)
-                    from .schedule import draft_signals  # 대기 글별 검색량·블로그 글 수·황금지수 (11/11 운영자 질문)
-                    state["draft_signals"] = {str(k): v for k, v in draft_signals(state["publish_order_all"]).items()}
-                except Exception as e:  # noqa: BLE001
-                    add_log(state, False, f"다음 공개 순서 계산 실패: {str(e)[:150]}")
-            if now.minute < 10:  # 한 시간마다: 주소 연결 안 됨 보류 다시 열어 보기 (일시 장애로 평생 보류 안 되게, 11/10)
-                for line in official_links.recheck_dead():
-                    add_log(state, True, f"보류 다시 검사: {line}")
-            if state.get("known_watch_date") != today:  # 하루 한 번: 확인된 틀린 문구가 남은 글에 다시 확인 표시 (bot/known_watch.py, 11/10)
-                try:
-                    from . import known_watch
-                    add_log(state, True, known_watch.run())
-                    state["known_watch_date"] = today
-                except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
-                    add_log(state, False, f"틀린 문구 감시 실패: {str(e)[:150]}")
-            from . import related_posts
-            stamp = f"{now:%Y-%m-%d}/v{related_posts.VERSION}"  # 계산 방식이 바뀌면(VERSION) 그날 바로 다시
-            if state.get("related_posts_date") != stamp:  # 관련 글·계산기(내용 기준) 하루 한 번 다시 계산 (공개 때도 함)
-                try:
-                    add_log(state, True, related_posts.run())
-                    state["related_posts_date"] = stamp
-                except Exception as e:  # noqa: BLE001 - 실패하면 다음 차례에 다시
-                    add_log(state, False, f"관련 글 계산 실패: {str(e)[:150]}")
-            from . import source_check
-            source_check.backfill_reviewed()  # 예전 글의 '검수로 확인한 공식 사이트' 채우기 (글 끝 확인 줄, 다 채우면 할 일 없음)
-        except Exception as e:  # noqa: BLE001 - 링크 확인 실패가 봇을 멈추지 않게
-            add_log(state, False, f"공식 사이트 링크 확인 실패: {str(e)[:150]}")
+        from . import side_jobs
+        if not side_jobs.launch("firstlab-links", "bot.links_job"):
+            link_maintenance(state, now)
 
     laps.lap("링크·공개 순서·관련 글")
 
