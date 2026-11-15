@@ -13,21 +13,22 @@
     intro: '지금 평단가·수량에 추가로 살 가격을 넣으면 새 평단가, 목표 평단가까지 더 사야 할 수량, 본전이 되는 매도 가격을 계산해요.',
     inputs: [
       {
-        name: 'mode', label: '무엇을 계산할까요', type: 'select', default: 'add',
+        name: 'mode', label: '무엇을 계산할까요?', type: 'choice', default: 'add',
         options: [
-          ['add', '추가로 사면 평단가가 얼마가 되나'],
-          ['target', '목표 평단가까지 몇 주를 더 사야 하나'],
+          ['add', '더 사면 평단가는?'],
+          ['target', '목표 평단가까지 몇 주?'],
         ],
       },
       { name: 'held_price', label: '지금 평단가 (원)', type: 'number', min: 0, step: 0.01 },
       { name: 'held_qty', label: '지금 보유 수량 (주)', type: 'number', min: 0, step: 1 },
       { name: 'buy_price', label: '추가로 살 가격 (원)', type: 'number', min: 0, step: 1 },
-      { name: 'buy_qty', label: '추가로 살 수량 (주, 평단가 계산용)', type: 'number', min: 0, step: 1 },
-      { name: 'target_price', label: '목표 평단가 (원, 수량 계산용)', type: 'number', min: 0, step: 0.01 },
+      { name: 'buy_qty', label: '추가로 살 수량 (주)', type: 'number', min: 0, step: 1, help: '새 평단가 계산에 써요.' },
+      { name: 'target_price', label: '목표 평단가 (원)', type: 'number', min: 0, step: 0.01, help: '몇 주를 더 사야 하는지 계산할 때 써요.' },
       {
-        name: 'market', label: '팔 시장 (본전 매도가 계산용)', type: 'select', default: 'kospi',
+        name: 'market', label: '어느 시장에서 파나요?', type: 'choice', default: 'kospi',
+        help: '팔 때 붙는 세금 비율이에요. 본전 매도가 계산에 써요. 코스피는 유가증권시장이에요.',
         options: [
-          ['kospi', '유가증권시장(코스피) 0.20%'],
+          ['kospi', '코스피 0.20%'],
           ['kosdaq', '코스닥 0.20%'],
           ['konex', '코넥스 0.10%'],
           ['none', '세금 빼고 계산'],

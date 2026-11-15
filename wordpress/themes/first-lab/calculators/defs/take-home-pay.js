@@ -46,12 +46,13 @@
       { name: 'family', label: '공제대상가족 수 (본인 포함)', type: 'number', min: 1, step: 1, default: 1, help: '본인과 기본공제를 받는 배우자·부양가족을 각각 1명으로 세요.' },
       { name: 'children', label: '그중 8세 이상 20세 이하 자녀 수', type: 'number', min: 0, step: 1, default: 0 },
       {
-        name: 'ratio', label: '소득세 원천징수 비율', type: 'select', default: '100',
+        name: 'ratio', label: '월급에서 떼는 소득세 비율', type: 'choice', default: '100',
+        help: "회사에 따로 신청하지 않았으면 100%예요 ('소득세 원천징수 비율').",
         options: [['100', '100% (기본)'], ['80', '80% (신청한 경우)'], ['120', '120% (신청한 경우)']],
       },
       {
-        name: 'pension', label: '국민연금', type: 'select', default: 'yes',
-        options: [['yes', '낸다'], ['no', '안 낸다 (만 60세 이상 등)']],
+        name: 'pension', label: '국민연금을 내나요?', type: 'choice', default: 'yes',
+        options: [['yes', '네, 내요'], ['no', '안 내요 (만 60세 이상 등)']],
       },
     ],
 

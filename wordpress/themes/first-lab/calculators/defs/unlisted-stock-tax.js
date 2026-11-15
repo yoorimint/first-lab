@@ -20,13 +20,13 @@
     inputs: [
       { name: 'sale', label: '판 금액 (양도가액)', type: 'number', min: 0, step: 1, help: '실제로 받은 금액이에요. 가족 등 특수관계인에게 시가보다 싸게 팔면 시가로 다시 계산될 수 있어요.' },
       { name: 'acquire', label: '그 주식을 산 금액 (취득가액)', type: 'number', min: 0, step: 1 },
-      { name: 'expense', label: '증권거래세 말고 팔 때 든 비용 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 1, help: '중개 수수료, 계약서 작성비 같은 비용이에요. 증권거래세는 자동으로 빼요.' },
-      { name: 'used', label: '같은 해 다른 주식에서 이미 쓴 기본공제 (원, 없으면 비워 둬요)', type: 'number', min: 0, step: 1 },
-      { name: 'kind', label: '주주 구분·주식 종류', type: 'select', default: 'sme', options: [
-        ['sme', '대주주 아님 · 중소기업 주식 (10%)'],
-        ['general', '대주주 아님 · 중소기업 외 주식 (20%)'],
-        ['major', '대주주 (3억 이하 20%, 초과 25%)'],
-        ['major_short', '대주주 · 중소기업 외 · 1년 미만 보유 (30%)'],
+      { name: 'expense', label: '팔 때 든 비용 (원)', type: 'number', min: 0, step: 1, help: '중개 수수료, 계약서 작성비 같은 비용이에요. 증권거래세는 자동으로 빼니 넣지 않아요. 없으면 비워 둬요.' },
+      { name: 'used', label: '올해 이미 쓴 기본공제 (원)', type: 'number', min: 0, step: 1, help: '같은 해 다른 주식을 팔 때 이미 쓴 기본공제(250만 원 중) 금액이에요. 없으면 비워 둬요.' },
+      { name: 'kind', label: '대주주인가요, 어떤 주식인가요?', type: 'choice', default: 'sme', help: '대주주는 3억 원 이하 20%, 3억 원 넘는 부분 25%예요. \'1년 미만\'은 대주주가 중소기업 외 주식을 1년이 안 돼서 판 경우예요.', options: [
+        ['sme', '대주주 아님·중소기업 (10%)'],
+        ['general', '대주주 아님·그 외 (20%)'],
+        ['major', '대주주 (20~25%)'],
+        ['major_short', '대주주·1년 미만 보유 (30%)'],
       ] },
     ],
 

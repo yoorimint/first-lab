@@ -23,10 +23,10 @@
         options: [['sick', '아팠어요'], ['leave', '허락받고 쉬었어요'], ['absent', '그냥 빠졌어요']],
       },
       {
-        name: 'rule', label: '회사 규칙(취업규칙)에 그런 날을 따로 정해 뒀나요?', type: 'choice', default: 'unknown',
+        name: 'rule', label: '회사 규칙에 따로 정해 뒀나요?', type: 'choice', default: 'unknown',
         show: { came: ['no'], why: ['sick', 'leave'] },
         options: [['yes', '네'], ['unknown', '없어요 / 몰라요']],
-        help: '아팠으면 \'병가는 출근으로 본다\', 허락받고 쉬었으면 \'무급휴가\'가 적혀 있는지 보세요.',
+        help: '회사 규칙은 \'취업규칙\'이에요. 아팠으면 \'병가는 출근으로 본다\', 허락받고 쉬었으면 \'무급휴가\'가 적혀 있는지 보세요.',
       },
       {
         name: 'wage_type', label: '시급에 주휴수당이 들어 있다고 했나요?', type: 'choice', default: 'separate',
