@@ -348,7 +348,15 @@ def apply_direct(data: dict, state: dict) -> str:
             set_status(conn, gold, "used", f"글 {post_id} 보강으로 답함")
             conn.commit()
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
-    return f"'{title}' - {target.get('why', '')} → 수정 - {str(data.get('changes', ''))[:80]}"
+    return f"'{title}' - {log_reason(target, post_id, data)} → 수정 - {str(data.get('changes', ''))[:80]}"
+
+
+def log_reason(target: dict, post_id: int, data: dict) -> str:
+    """봇 기록에 남길 갱신 이유 — 지금 갱신 차례(refresh_target)인 글일 때만 그 이유를 씀.
+    11/15: +@ 보강한 7편의 기록마다 갱신 차례였던 다른 글(보육교사)의 '근거 변경' 이유가 붙어 나옴."""
+    if target.get("id") == post_id and target.get("why"):
+        return str(target["why"])
+    return {"plus": "+@ 보강", "plain": "쉬운 말 다듬기"}.get(str(data.get("kind") or ""), "직접 갱신")
 
 
 def _renew_evidence(post_id: int, review: list | None) -> None:
