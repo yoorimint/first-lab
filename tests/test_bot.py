@@ -6687,6 +6687,29 @@ firstlab_stats_render_page();
         self.assertIn("dashboard_job.launch()", run_py)
         self.assertIn("signal.SIGTERM", run_py)
 
+    def test_link_maintenance_runs_apart_with_steps(self):
+        """11/15: 매분 봇이 'WebP' 다음 묶음(공식 사이트 링크·공개 순서·관련 글)에서 멈춰 12분 시간 제한에 4번 걸림 →
+        그 묶음은 systemd 별도 실행(bot/links_job.py)으로, 단계마다 이름을 남겨 멈춘 곳을 다음 실행이 기록."""
+        from datetime import datetime
+        from unittest import mock
+        from bot import run, official_links, related_posts, source_check, known_watch, schedule
+        steps = []
+        with mock.patch.object(official_links, "run", lambda: None), \
+             mock.patch.object(official_links, "recheck_dead", lambda: []), \
+             mock.patch.object(related_posts, "run", lambda: "관련 글"), \
+             mock.patch.object(source_check, "backfill_reviewed", lambda: None), \
+             mock.patch.object(known_watch, "run", lambda: "감시"), \
+             mock.patch.object(schedule, "upcoming", lambda now: [1]), \
+             mock.patch.object(schedule, "ready_drafts", lambda: [1]), \
+             mock.patch.object(schedule, "publish_order", lambda ids, now: ids), \
+             mock.patch.object(schedule, "draft_signals", lambda ids: {}):
+            state = {"log": []}
+            run.link_maintenance(state, datetime(2026, 11, 15, 23, 5), step=steps.append)
+        self.assertEqual(steps, ["공식 사이트 링크 확인", "다음 공개 순서", "대기 글 검색량", "주소 안 열림 보류 다시 보기",
+                                 "틀린 문구 감시", "관련 글 계산", "검수 확인 사이트 채우기"])
+        run_py = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        self.assertIn('side_jobs.launch("firstlab-links", "bot.links_job")', run_py)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""

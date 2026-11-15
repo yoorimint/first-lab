@@ -7,27 +7,14 @@
 """
 from __future__ import annotations
 
-import shutil
-import subprocess
-from pathlib import Path
 
 UNIT = "firstlab-dashboard"
-ROOT = Path(__file__).resolve().parent.parent
-TIMEOUT_SEC = 15 * 60
 
 
-def launch(run=subprocess.run) -> bool:
-    """별도 실행으로 띄움. 이미 도는 중이면(같은 이름 실행이 있음) 띄우지 않음. systemd-run 이 없으면 False (부르는 쪽이 직접 함)."""
-    if not shutil.which("systemd-run"):
-        return False
-    import sys
-    try:
-        r = run(["systemd-run", f"--unit={UNIT}", "--collect", "--quiet", f"--working-directory={ROOT}",
-                 "-p", f"RuntimeMaxSec={TIMEOUT_SEC}", "-p", "Nice=10", "-p", "CPUWeight=20", "-p", "IOWeight=20",
-                 sys.executable, "-m", "bot.dashboard_job"], capture_output=True, text=True, timeout=30)
-    except (OSError, subprocess.SubprocessError):
-        return False
-    return r.returncode == 0 or "already" in (r.stderr or "")  # 앞 계산이 아직 도는 중이면 그대로 둠
+def launch(run=None) -> bool:
+    """별도 실행으로 띄움 (bot/side_jobs.launch). 못 띄우면 False — 부르는 쪽이 직접 함."""
+    from . import side_jobs
+    return side_jobs.launch(UNIT, "bot.dashboard_job", **({"run": run} if run else {}))
 
 
 def main() -> None:
