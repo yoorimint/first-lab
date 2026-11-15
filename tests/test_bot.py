@@ -6649,6 +6649,42 @@ firstlab_stats_render_page();
         self.assertIn("② `plus_target`", writer)
         self.assertLess(writer.index("plus_target"), writer.index("⑤ 새 글"))
 
+    def test_slow_dashboard_runs_apart_and_hung_step_is_recorded(self):
+        """11/15: 매분 봇 안의 후보 순위 계산이 200초 넘게 걸리고(정리·대시보드 최대 230초), 가끔 실행이 12분 시간 제한에
+        걸려 죽음('종료 뒤 대기 770초') → 후보 계산은 systemd 별도 실행으로, 죽은 실행은 마지막으로 마친 단계를 다음 실행이 기록."""
+        import tempfile, os
+        from bot import dashboard_job, run_timing
+        calls = []
+        ok = lambda cmd, **k: calls.append(cmd) or type("R", (), {"returncode": 0, "stderr": ""})()
+        busy = lambda cmd, **k: type("R", (), {"returncode": 1, "stderr": "Unit firstlab-dashboard.service already exists."})()
+        fail = lambda cmd, **k: type("R", (), {"returncode": 1, "stderr": "Failed to connect to bus"})()
+        import shutil
+        real = shutil.which
+        shutil.which = lambda name: "/usr/bin/systemd-run"
+        try:
+            self.assertTrue(dashboard_job.launch(run=ok))
+            self.assertIn("bot.dashboard_job", calls[0])
+            self.assertTrue(dashboard_job.launch(run=busy))     # 앞 계산이 아직 도는 중 → 그대로 둠
+            self.assertFalse(dashboard_job.launch(run=fail))    # 못 띄우면 봇이 직접 계산
+        finally:
+            shutil.which = real
+        with tempfile.TemporaryDirectory() as d:
+            step = os.path.join(d, "step")
+            ticks = iter([0, 1, 2])
+            laps = run_timing.Laps(clock=lambda: next(ticks))
+            laps.lap("설정·상태 읽기", step_file=step)
+            laps.lap("워드프레스 예약·캐시", step_file=step)
+            self.assertEqual(run_timing.take_step(step), "워드프레스 예약·캐시")   # 앞 실행이 여기까지 하고 죽음
+            self.assertEqual(run_timing.take_step(step), "")                     # 읽으면 지움
+        laps = run_timing.Laps(clock=lambda: 0)
+        laps.killed_after = "워드프레스 예약·캐시"
+        state = {}
+        run_timing.record(state, "2026-11-15 22:30", laps)
+        self.assertEqual(state["run_timing"]["2026-11-15"]["killed_after"], {"워드프레스 예약·캐시": 1})
+        run_py = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        self.assertIn("dashboard_job.launch()", run_py)
+        self.assertIn("signal.SIGTERM", run_py)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""

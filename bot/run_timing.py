@@ -11,6 +11,7 @@ import os
 import time
 
 CARRY_FILE = "/var/lib/first-lab/bot/run-timing-carry.json"  # 이번 실행이 state 에 못 넣는 값 → 다음 실행이 더함
+STEP_FILE = "/var/lib/first-lab/bot/run-step"                 # 지금 실행이 마지막으로 마친 단계 (끝까지 마치면 지움)
 SLOW_SECONDS = 50   # 한 번 실행이 이보다 길면 다음 매분 실행을 건너뛰게 됨 (타이머 1분)
 KEEP_DAYS = 2
 
@@ -25,6 +26,7 @@ class Laps:
         self.steps: dict[str, float] = {}
         self.locked = self.started = self.errors = 0
         self.last_error = ""
+        self.killed_after = ""
         if started_ago:
             self.steps["시작(파이썬·불러오기)"] = started_ago
 
@@ -41,10 +43,16 @@ class Laps:
         """실행 밖에서 흐른 시간 (총 시간에는 안 더함)."""
         self.steps.update(gaps)
 
-    def lap(self, name: str) -> None:
+    def lap(self, name: str, step_file: str | None = STEP_FILE) -> None:
         now = self._clock()
         self.steps[name] = self.steps.get(name, 0.0) + (now - self.last)
         self.last = now
+        if step_file:
+            try:
+                with open(step_file, "w") as f:
+                    f.write(name)
+            except OSError:
+                pass
 
     def total(self) -> float:
         return self.last - self.start
@@ -62,6 +70,10 @@ def record(state: dict, stamp: str, laps: Laps) -> None:
     day["errors"] = int(day.get("errors", 0)) + laps.errors
     if laps.last_error:
         day["last_error"] = laps.last_error
+    if laps.killed_after:  # 앞 실행이 이 단계 다음에서 멈춰 끝나지 못함 (11/15 '종료 뒤 대기 770초' = 12분 시간 제한에 걸린 실행)
+        killed = dict(day.get("killed_after") or {})
+        killed[laps.killed_after] = int(killed.get(laps.killed_after, 0)) + 1
+        day["killed_after"] = killed
     day["total_sum"] = round(float(day.get("total_sum", 0)) + total, 1)
     if total > float(day.get("total_max", 0)):
         day["total_max"], day["total_max_at"] = round(total, 1), stamp[11:16]
@@ -98,6 +110,32 @@ def take_carry(path: str = CARRY_FILE) -> dict:
         return carry if isinstance(carry, dict) else {}
     except (OSError, ValueError):
         return {}
+
+
+def take_step(path: str = STEP_FILE) -> str:
+    """앞 실행이 남긴 '마지막으로 마친 단계' (있으면 앞 실행이 끝까지 못 감). 읽고 지움."""
+    try:
+        with open(path) as f:
+            name = f.read().strip()
+        os.remove(path)
+        return name or "(시작 직후)"
+    except OSError:
+        return ""
+
+
+def mark_step(name: str, path: str = STEP_FILE) -> None:
+    try:
+        with open(path, "w") as f:
+            f.write(name)
+    except OSError:
+        pass
+
+
+def clear_step(path: str = STEP_FILE) -> None:
+    try:
+        os.remove(path)
+    except OSError:
+        pass
 
 
 def clear_carry(path: str = CARRY_FILE) -> None:
@@ -176,4 +214,5 @@ def summary(day: dict) -> str:
             f"최대 {day.get('total_max', 0)}초({day.get('total_max_at', '-')}) · 1분 넘김 {day.get('slow_runs', 0)}회 · "
             f"시작 {day.get('started', 0)}회 · 오류로 끝남 {day.get('errors', 0)}회 · 잠금으로 건너뜀 {day.get('locked', 0)}회 · "
             + (f"마지막 오류 {day['last_error'][:80]} · " if day.get("last_error") else "")
+            + (f"끝나지 못한 실행(마지막으로 마친 단계) {day['killed_after']} · " if day.get("killed_after") else "")
             + "오래 걸린 단계: " + ", ".join(f"{k} 합 {round(v)}초(최대 {(day.get('step_max') or {}).get(k, 0)}초)" for k, v in top))

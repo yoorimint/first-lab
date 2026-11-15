@@ -268,9 +268,12 @@ def main() -> None:
         run_timing.put_carry("locked", 1, add=True)
         return
 
+    killed_after = run_timing.take_step()  # 앞 실행이 끝나지 못하고 죽었으면 마지막으로 마친 단계 (시간 제한 12분)
+    run_timing.mark_step("(시작 직후)")
     laps = run_timing.Laps(started_ago=run_timing.process_age())  # 단계별 걸린 시간 (bot/run_timing.py, 11/15 매분 실행이 3분씩 걸림)
     carry = run_timing.take_carry()
     laps.add_carry(carry)
+    laps.killed_after = killed_after
     laps.add_outside(run_timing.exit_gaps(carry, run_timing.unit_stopped_at(), time.monotonic() - (run_timing.process_age() or 0)))
     settings = load_settings()
     state = load_state()
@@ -442,7 +445,10 @@ def main() -> None:
             pass
 
     if excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
-        refresh_dashboard(state, settings)  # 변화가 있거나 1시간마다
+        # 변화가 있거나 1시간마다 — 200초 넘게 걸려 따로 실행 (bot/dashboard_job.py, 11/15). systemd-run 이 없으면 여기서
+        from . import dashboard_job
+        if not dashboard_job.launch():
+            refresh_dashboard(state, settings)
         state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
 
     laps.lap("정리·대시보드")
@@ -456,8 +462,13 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    import signal
+    import sys
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # systemd 가 시간 제한으로 끝낼 때도 오류 기록이 남게 (아래 note_error)
     try:
         main()
+        from .run_timing import clear_step
+        clear_step()  # 끝까지 마침 — 다음 실행이 '죽은 실행'으로 세지 않게
         import atexit
         from .run_timing import mark_exit, put_carry
         put_carry("main_end", time.monotonic())  # 다음 실행이 파이썬 종료·systemd 종료 시각과 비교 (끝난 뒤 남은 스레드·프로세스 대기)
