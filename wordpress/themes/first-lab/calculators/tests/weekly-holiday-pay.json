@@ -194,5 +194,76 @@
       "pay": 84000
     },
     "boundary": true
+  },
+  {
+    "why": "병가(회사 규칙 없음)는 결근으로 봄 — 고용노동부 근로개선정책과-3833: 특약 없으면 유급주휴 없음",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "attended": "sick"
+    },
+    "expect": {
+      "pay": 0,
+      "eligible": false
+    }
+  },
+  {
+    "why": "병가를 출근으로 본다는 회사 규칙 있음 → 나머지 소정근로일 개근이면 주휴 발생 (같은 해석 단서)",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "attended": "sick_rule"
+    },
+    "expect": {
+      "pay": 41280,
+      "eligible": true
+    }
+  },
+  {
+    "why": "무급휴가 규정 있음 → 그날 빼고 개근이면 발생 (고용노동부 상담 2026.8.10.)",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "attended": "unpaid_rule"
+    },
+    "expect": {
+      "pay": 41280
+    }
+  },
+  {
+    "why": "무급휴가 규정 없음 → 결근으로 볼 수 있어 주휴 없음으로 안내",
+    "input": {
+      "wage": 10320,
+      "hours": 20,
+      "attended": "unpaid"
+    },
+    "expect": {
+      "pay": 0
+    }
+  },
+  {
+    "why": "주휴수당 포함 시급(주 20시간): 최저임금 10,320 × (20+4)/20 = 12,384원 이상 (고용노동부 상담 2025.2.21. '최저시급+주휴수당 이상')",
+    "input": {
+      "wage": 12384,
+      "hours": 20,
+      "attended": "yes",
+      "wage_type": "included"
+    },
+    "expect": {
+      "included_floor": 12384
+    },
+    "boundary": true
+  },
+  {
+    "why": "주휴수당 포함 시급(주 45시간): 10,320 × (45+8)/45 = 12,154.67 → 12,155원 이상 (주휴시간은 8시간 상한)",
+    "input": {
+      "wage": 12000,
+      "hours": 45,
+      "attended": "yes",
+      "wage_type": "included"
+    },
+    "expect": {
+      "included_floor": 12155
+    }
   }
 ]
