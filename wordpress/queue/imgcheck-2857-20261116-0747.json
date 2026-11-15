@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2857,
+ "replace": [
+  {
+   "old": "ai-c83e0e6649",
+   "prompt": "A quiet hillside covered with tall green pine trees under a soft morning sky, gentle mist in the valley, no people, no stones, no signs.",
+   "alt": "아침 하늘 아래 소나무가 늘어선 조용한 언덕",
+   "why": "묘비 표면에 엉터리 글자처럼 보이는 무늬가 많음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
