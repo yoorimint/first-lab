@@ -1140,6 +1140,26 @@ class SourceCheckTest(unittest.TestCase):
         self.assertEqual(sc.law_body_url(shell),
                          "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=284381&chrClsCd=010202&urlMode=lsInfoP&efYd=20260918")
 
+    def test_law_shell_with_hidden_inputs_is_not_read_as_body(self):
+        """11/16: 법제처 화면이 본문 주소를 숨은 입력칸에만 둠 → 껍데기(메뉴 글자)를 본문으로 읽어 조문 번호가 '사라짐'으로
+        #1019·#808·#817 공개 직전 보류. 입력칸에서 본문 주소를 찾고, 그래도 조문이 없는 화면은 '못 엶'으로."""
+        from unittest import mock
+        from bot import source_check as sc
+        shell = ('<input type="hidden" id="frm_lsiSeq" name="lsiSeq" value="280405" />'
+                 '<input type="hidden" id="frm_efYd" name="efYd" value="20260701" />')
+        self.assertEqual(sc.law_body_url(shell), "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq=280405&efYd=20260701")
+        menu = "소득세법 > 법령 > 본문 | 국가법령정보센터 바로가기 메뉴 " * 50
+        url = "https://www.law.go.kr/법령/소득세법"
+        self.assertTrue(sc.law_shell(url, menu))
+        self.assertFalse(sc.law_shell(url, "제1조(목적) 이 법은 ... 제77조(분할납부)"))
+        self.assertFalse(sc.law_shell("https://www.nts.go.kr/a", menu))
+        with mock.patch("bot.condition_gate._cached", lambda kind, key, make: menu), \
+                mock.patch.object(sc, "_fetch", lambda u: menu), mock.patch.object(sc, "law_annex", lambda u: ""):
+            self.assertIsNone(sc.fetch(url))   # '사라짐' 이 아니라 '못 엶' → 공개 직전 확인이 판단하지 않음
+        with mock.patch("bot.condition_gate._cached", lambda kind, key, make: menu), \
+                mock.patch.object(sc, "_fetch", lambda u: "제1조(목적) 제77조 300만 원"), mock.patch.object(sc, "law_annex", lambda u: ""):
+            self.assertIn("제77조", sc.fetch(url))   # 저장된 껍데기는 한 번 새로 받음
+
     def test_recent_amendment_flag(self):
         """11/5 #512: 납부지연 가산세 조문이 2026.7.1 개정됐는데 개정 전 방식으로 계산 → 최근 개정 조문을 알려 준다."""
         import datetime as dt
