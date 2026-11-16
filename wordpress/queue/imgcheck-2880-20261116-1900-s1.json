@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2880,
+ "replace": [
+  {
+   "old": "ai-6934f07fc2",
+   "prompt": "A bright, tidy university dormitory room with a made bed, a wooden desk and a window showing autumn trees on campus, no people.",
+   "alt": "햇살이 드는 깔끔한 대학 기숙사 방",
+   "why": "앞서 바꾸라고 했으나 아직 제목 글자 카드 그대로라 다시 요청"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

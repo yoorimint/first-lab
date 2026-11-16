@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2857,
+ "replace": [
+  {
+   "old": "ai-c83e0e6649",
+   "prompt": "A dense forest of tall green pine trees on a gentle hill at sunrise, soft golden light through the branches, a narrow dirt path, nature only, no graves, no monuments, no people.",
+   "alt": "해 뜰 무렵 소나무 숲 사이로 난 오솔길",
+   "why": "바꾼 사진에도 묘비가 줄지어 있고 몇 개에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
