@@ -2,7 +2,7 @@
 # 빠른 배포 (11/9 운영자 '이렇게 비효율적으로 해야 돼?'): 글·화면·봇 코드만 바뀐 배포는 서버 설치 전체(15~20분)를 다시 돌리지 않는다.
 #   - 바뀐 화면 파일만 설치 (mu-plugins, 테마)
 #   - 새 글·갱신 파일 반영 (bot.publish_queue)
-#   - 전체 글 보정·패치 확인은 따로 (server/maint.sh, 잠금)
+#   - 전체 글 보정·패치 확인은 따로 (server/maint-start.sh → firstlab-maint 실행)
 #   - 보류 글 다시 검사, 페이지 캐시 비우기
 # 서버 설정(server/·워크플로)·페이지·패키지가 바뀌었거나 그날 첫 배포면 전체 배포(setup → wp-setup → bot-setup → bot-check)를 쓴다 (deploy.yml).
 # 사용: quick-deploy.sh "<바뀐 파일 목록(줄마다 하나)>"
@@ -38,7 +38,7 @@ log "직접 작성한 글·갱신 파일 올리기"
 # 바뀐 배포에서만. 그 밖에는 매일 첫 배포(전체 배포, bot-setup.sh)가 한 번 돌린다.
 if changed '^wordpress/patches\.json$' || changed '^bot/\(fix_posts\|patch_check\|migrate_photos\|pending_images\)\.py$'; then
   log "기존 글 보정·패치 반영 확인 (따로 실행 → /var/lib/first-lab/bot/maint.log)"
-  setsid nohup flock /var/lib/first-lab/bot/maint.lock bash "$REPO_DIR/server/maint.sh" > /var/lib/first-lab/bot/maint.log 2>&1 < /dev/null &
+  bash "$REPO_DIR/server/maint-start.sh"   # 이름 붙은 별도 실행 firstlab-maint (도는 중이면 끝난 뒤 한 번 더)
 else
   log "기존 글 보정 건너뜀 (패치·보정 코드 안 바뀜 — 매일 첫 전체 배포 때 함)"
 fi

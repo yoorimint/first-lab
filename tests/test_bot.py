@@ -6786,8 +6786,8 @@ firstlab_stats_render_page();
         sh = (ROOT / "server" / "quick-deploy.sh").read_text(encoding="utf-8")
         start = sh.index("if changed '^wordpress/patches")
         cond = sh[start:sh.index("\nfi\n", start)]
-        self.assertIn("maint.sh", cond)
-        self.assertIn("maint.sh", (ROOT / "server" / "bot-setup.sh").read_text(encoding="utf-8"))
+        self.assertIn("maint-start.sh", cond)
+        self.assertIn("maint-start.sh", (ROOT / "server" / "bot-setup.sh").read_text(encoding="utf-8"))
         line = cond.splitlines()[0][3:].rsplit("; then", 1)[0]
         def runs(changed):
             return subprocess.run(["bash", "-c", "changed() { printf '%s\\n' \"$CHANGED\" | grep -q \"$1\"; }; if " + line + "; then echo y; fi"],
@@ -7590,9 +7590,23 @@ class DeployQuickTest(unittest.TestCase):
             self.assertIn(mod, maint)
         for f in ("bot-setup.sh", "quick-deploy.sh"):
             sh = (ROOT / "server" / f).read_text(encoding="utf-8")
-            self.assertIn('setsid nohup flock /var/lib/first-lab/bot/maint.lock bash "$REPO_DIR/server/maint.sh"', sh)
+            self.assertIn('bash "$REPO_DIR/server/maint-start.sh"', sh)
             self.assertNotIn('-m bot.fix_posts)', sh)  # 배포 안에서 직접 돌리지 않음
-            self.assertLess(sh.index("bot.publish_queue"), sh.index("maint.sh"))  # 새 글·갱신 파일은 배포 안에서 먼저
+            self.assertLess(sh.index("bot.publish_queue"), sh.index("maint-start.sh"))  # 새 글·갱신 파일은 배포 안에서 먼저
+
+    def test_full_scan_has_own_unit_and_reports_time(self):
+        """11/16 운영자 '왜 부하 생기냐': 보정이 배포 안 setsid 로 돌아 CPU 기록에 '임시 실행'으로만 보였고, 배포가 겹치면 줄줄이 연달아 돎
+        → 이름 붙은 별도 실행(firstlab-maint), 도는 중이면 '한 번 더' 표시만, 단계별 걸린 시간을 봇 기록에."""
+        import subprocess
+        start = (ROOT / "server" / "maint-start.sh").read_text(encoding="utf-8")
+        self.assertIn("--unit=firstlab-maint", start)
+        self.assertIn("CPUWeight=20", start)
+        self.assertIn("maint-again", start)
+        maint = (ROOT / "server" / "maint.sh").read_text(encoding="utf-8")
+        self.assertIn("bot.maint_report", maint)
+        self.assertIn('[ -f "$AGAIN" ] || break', maint)
+        for f in ("maint.sh", "maint-start.sh"):
+            self.assertEqual(subprocess.run(["bash", "-n", str(ROOT / "server" / f)]).returncode, 0)
 
     def test_quick_deploy_only_when_safe(self):
         """11/9 운영자 '이렇게 비효율적으로 해야 돼?': 글·화면·봇 코드만 바뀌면 빠른 배포, 서버 설정·워크플로·페이지·패키지·그날 첫 배포는 전체."""
