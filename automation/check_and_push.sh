@@ -27,7 +27,10 @@ git diff --cached --quiet && { echo "바뀐 것 없음"; exit 0; }
 git commit -q -m "$msg"
 git fetch -q origin main
 if ! git diff --name-only origin/main...HEAD | bash automation/full_deploy_guard.sh; then
-  git push -q origin "HEAD:$(git rev-parse --abbrev-ref HEAD)" || echo "!! 작업 브랜치 올리기도 실패 — git status 로 확인"
+  b=$(git rev-parse --abbrev-ref HEAD)
+  if git ls-remote --exit-code --heads origin "$b" >/dev/null 2>&1; then
+    git push -q origin "HEAD:$b" || echo "!! 작업 브랜치 올리기도 실패 — git status 로 확인"
+  fi
   exit 1
 fi
 pushed=""
@@ -41,7 +44,8 @@ done
 [ -n "$pushed" ] || { echo "!! main 에 올리기 실패 (커밋은 이 컴퓨터에만 있음) — 다음 차례에 git push origin HEAD:main 다시"; exit 1; }
 branch=$(git rev-parse --abbrev-ref HEAD)
 # 작업 브랜치도 같은 커밋으로 (main 위에 다시 쌓았으니 일반 push 로 충분 — 11/6 '-f' 가 권한에 막히고 '|| true' 가 숨겨 브랜치가 계속 뒤처짐)
-if [ "$branch" != "main" ]; then
+# 원격에 이미 있는 작업 브랜치만 (로컬 임시 브랜치 이름으로 새 원격 브랜치를 만들지 않게 — 11/17 'work' 가 생김)
+if [ "$branch" != "main" ] && git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
   git push -q origin "HEAD:$branch" || echo "!! 작업 브랜치 $branch 올리기 실패 (main 은 올라감) — git status 로 확인"
 fi
 git log --oneline -1 | cut -c1-80

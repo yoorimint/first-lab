@@ -6680,6 +6680,8 @@ firstlab_stats_render_page();
         self.assertFalse(ok("wordpress/pages/about.html\n", "23"))
         self.assertTrue(ok("bot/run.py\nwordpress/mu-plugins/x.php\n", "14"))
         self.assertIn("full_deploy_guard.sh", (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8"))
+        # 로컬 임시 브랜치 이름으로 원격 브랜치를 새로 만들지 않음 (11/17 'work' 가 생김)
+        self.assertIn('git ls-remote --exit-code --heads origin "$branch"', (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8"))
         wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
         self.assertIn("^(FULL|server/|\\.github/|bot/requirements\\.txt|wordpress/pages/)", wf)   # 같은 조건
 
