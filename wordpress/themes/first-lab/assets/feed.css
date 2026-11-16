@@ -42,4 +42,4 @@
 .fl-hub-lead { font-weight: 700; margin: 0 0 .6em; }
 .fl-hub-calcs, .fl-hub-list { margin: .4em 0; padding-left: 1.2em; }
 .fl-hub-list li, .fl-hub-calcs li { margin: .2em 0; }
-.fl-home-title { font-size: clamp(1.15rem, 1rem + 0.8vw, 1.5rem); line-height: 1.4; margin: 0 0 1.25rem; font-weight: 700; }
+.fl-home-title { font-size: 0.95rem; line-height: 1.5; margin: 0 0 1rem; font-weight: 600; color: var(--fl-muted, #666); }
