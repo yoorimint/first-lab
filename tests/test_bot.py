@@ -5193,6 +5193,33 @@ class ServerStatsTest(unittest.TestCase):
             ss.record(state, start + timedelta(days=i), False, self.reader(0.5))
         self.assertLessEqual(len(state["server_stats"]), ss.KEEP_DAYS + 1)
 
+    def test_cpu_by_service_and_hour(self):
+        """11/16 운영자 '왜 부하 생기냐': 높은 부하 322분인데 무엇 때문인지 기록이 없었음 → 서비스별 CPU·시간대별 부하."""
+        import tempfile
+        from datetime import datetime
+        from pathlib import Path
+        from bot import server_stats as ss
+        root = Path(tempfile.mkdtemp())
+
+        def put(unit, sec, parent="system.slice"):
+            (root / parent / unit).mkdir(parents=True, exist_ok=True)
+            (root / parent / unit / "cpu.stat").write_text(f"usage_usec {int(sec * 1e6)}\nuser_usec 1\n")
+        put("mariadb.service", 100); put("php8.3-fpm.service", 50); put("run-r1a2b.scope", 0)
+        reader = dict(self.reader(4.0), cpu=lambda: ss.read_cpu(str(root)))
+        state = {}
+        ss.record(state, datetime(2026, 11, 16, 18, 30), False, reader)        # 첫 실행: 비교할 앞 값 없음
+        put("mariadb.service", 110); put("php8.3-fpm.service", 52); put("run-r1a2b.scope", 40); put("run-r9z.scope", 5)
+        ss.record(state, datetime(2026, 11, 16, 18, 31), False, reader)
+        day = state["server_stats"]["2026-11-16"]
+        self.assertEqual(day["cpu_by_unit"], {"mariadb.service": 10.0, "php8.3-fpm.service": 2.0, "임시 실행(배포 등 systemd-run)": 45.0})
+        self.assertEqual(day["high_units"], {"임시 실행(배포 등 systemd-run)": 1})
+        self.assertEqual(day["load_by_hour"]["18"], [8.0, 2])
+        line = ss.summary("2026-11-16", day)
+        self.assertIn("높은 부하 때 CPU 가장 많이 쓴 곳 임시 실행(배포 등 systemd-run) 1분", line)
+        self.assertIn("18시 평균 4.0", line)
+        self.assertEqual(ss.read_cpu(str(root / "없음")), {})                 # cgroup 못 읽어도 봇은 계속
+        self.assertEqual(ss.cpu_delta({"a": 50}, {"a": 3}), {"a": 3})          # 다시 시작한 서비스
+
     def test_proc_readers(self):
         import tempfile
         from bot import server_stats as ss
