@@ -121,7 +121,9 @@ if ( function_exists( 'add_filter' ) ) {
 	add_filter(
 		'the_seo_framework_robots_meta_array',
 		static function ( $meta ) {
-			if ( is_tag() && (int) get_queried_object()->count < FIRSTLAB_HUB_MIN ) {
+			// 11/16: 색인된 글이 0편이 됨 — 사이트 전체 평가를 깎는 얇은 페이지를 모두 뺌 (운영자 '찾아라').
+			// 태그 페이지는 전부 (글 3편 넘는 '/tag/근로기준법/'도 본문 660자 목록뿐), 분류는 공개 글 3편 미만이면 (자동차·여행 150자대).
+			if ( is_tag() || ( is_category() && (int) get_queried_object()->count < FIRSTLAB_HUB_MIN ) ) {
 				$meta['noindex'] = 'noindex';
 			}
 			return $meta;

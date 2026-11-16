@@ -6770,6 +6770,14 @@ firstlab_stats_render_page();
         self.assertIn("add_filter( 'the_seo_framework_use_archive_prefix', '__return_false' );", site)
         self.assertIn("add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );", site)
 
+    def test_thin_archives_and_broken_author_link_fixed(self):
+        """11/16 색인 0편 — 사이트 전체 점검(126쪽): 태그 88쪽(1쪽은 색인 허용), 글 1편짜리 분류(자동차·여행 150자대),
+        모든 글의 작성자 링크가 404 → 태그 전부·글 3편 미만 분류 noindex, 작성자 링크는 소개 페이지로."""
+        flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
+        self.assertIn("if ( is_tag() || ( is_category() && (int) get_queried_object()->count < FIRSTLAB_HUB_MIN ) ) {", flow)
+        site = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        self.assertIn("add_filter( 'author_link', static fn() => home_url( '/about/' ) );", site)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""

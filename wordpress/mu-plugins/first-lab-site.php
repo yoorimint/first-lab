@@ -55,3 +55,7 @@ add_filter(
 // 관리 안 된 사이트처럼 보임 (11/16 운영자 캡처, 애드센스 '구조적 유지관리'). SEO 플러그인(The SEO Framework) 제목과 화면 제목 둘 다.
 add_filter( 'the_seo_framework_use_archive_prefix', '__return_false' );
 add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
+
+// 글의 작성자 이름 링크가 /author/firstlab-1/ (404 — 작성자 목록 페이지는 막혀 있음)로 가던 것 → '소개' 페이지로 (11/16 사이트 전체 점검).
+// 깨진 링크가 모든 글에 하나씩 있으면 관리 안 된 사이트로 보임 (애드센스 '구조적 유지관리').
+add_filter( 'author_link', static fn() => home_url( '/about/' ) );
