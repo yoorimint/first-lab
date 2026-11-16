@@ -66,7 +66,9 @@ def unit_name(name: str) -> str:
 
 
 def read_cpu(root: str = CGROUP) -> dict[str, float]:
-    """서비스별 누적 CPU 초 (cgroup v2 cpu.stat usage_usec) — 끝난 짧은 프로세스(wp-cli 등)도 그 서비스에 남음. 못 읽으면 {}."""
+    """cgroup 마다 누적 CPU 초 (cgroup v2 cpu.stat usage_usec) — 끝난 짧은 프로세스(wp-cli 등)도 그 서비스에 남음. 못 읽으면 {}.
+    키는 cgroup 경로 이름 그대로 (이름별로 차이를 낸 뒤 unit_name 으로 묶음 — 묶은 합으로 차이를 내면 임시 실행 하나가
+    끝날 때 합이 줄어 '다시 시작'으로 보고 전체를 더했음, 11/16 첫 기록 2시간에 9만 초)."""
     out: dict[str, float] = {}
     for parent in ("system.slice", "user.slice"):
         base = Path(root) / parent
@@ -80,19 +82,19 @@ def read_cpu(root: str = CGROUP) -> dict[str, float]:
                             if line.startswith("usage_usec"))
             except (OSError, StopIteration, ValueError, IndexError):
                 continue
-            key = unit_name(d.name)
-            out[key] = round(out.get(key, 0.0) + usec / 1e6, 1)
+            out[d.name] = round(usec / 1e6, 1)
     return out
 
 
 def cpu_delta(prev: dict, now: dict) -> dict[str, float]:
-    """앞 실행 뒤 서비스별로 쓴 CPU 초. 새로 생긴 서비스는 지금 값 전부, 줄어든 것(다시 시작)은 지금 값."""
-    out = {}
+    """앞 실행 뒤 쓴 CPU 초를 보기 쉬운 이름별로. 새로 생긴 cgroup 은 지금 값 전부, 줄어든 것(다시 시작)은 지금 값."""
+    out: dict[str, float] = {}
     for k, v in now.items():
-        d = v - float(prev.get(k, 0)) if v >= float(prev.get(k, 0)) else v
-        if d >= 1:
-            out[k] = round(d, 1)
-    return out
+        before = float(prev.get(k, 0))
+        d = v - before if v >= before else v
+        name = unit_name(k)
+        out[name] = round(out.get(name, 0.0) + d, 1)
+    return {k: v for k, v in out.items() if v >= 1}
 
 
 def add_sample(day: dict, stamp: str, load: float, cores: int, mem: dict, saju: int | None | str = "skip",
@@ -165,9 +167,9 @@ def record(state: dict, now: datetime, check_saju: bool, reader=None) -> str | N
     saju = reader["saju"]() if check_saju else "skip"
     cpu_now = (reader.get("cpu") or (lambda: {}))()
     prev = state.get(CPU_PREV) or {}
-    cpu = cpu_delta(prev.get("units") or {}, cpu_now) if prev else {}
+    cpu = cpu_delta(prev.get("units") or {}, cpu_now) if prev.get("v") == 2 else {}  # v1(묶은 합)은 버림
     if cpu_now:
-        state[CPU_PREV] = {"units": cpu_now}
+        state[CPU_PREV] = {"units": cpu_now, "v": 2}
     stats[today] = add_sample(stats.get(today, {}), stamp, reader["load"](), reader["cores"]() or 1, reader["mem"](), saju, cpu)
     done = sorted(d for d in stats if d < today)
     report = None

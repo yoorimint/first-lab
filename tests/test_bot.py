@@ -5219,6 +5219,25 @@ class ServerStatsTest(unittest.TestCase):
         self.assertIn("18시 평균 4.0", line)
         self.assertEqual(ss.read_cpu(str(root / "없음")), {})                 # cgroup 못 읽어도 봇은 계속
         self.assertEqual(ss.cpu_delta({"a": 50}, {"a": 3}), {"a": 3})          # 다시 시작한 서비스
+        # 임시 실행 하나가 끝나 사라져도 남은 것만 차이 (묶은 합으로 빼면 줄어든 것으로 보고 전부 더했음)
+        self.assertEqual(ss.cpu_delta({"run-a.scope": 500, "run-b.scope": 10}, {"run-b.scope": 12}),
+                         {"임시 실행(배포 등 systemd-run)": 2.0})
+
+    def test_links_job_records_cpu_per_step(self):
+        """11/16: 높은 부하 때 CPU 를 가장 많이 쓴 곳이 링크·관련 글 정리(firstlab-links) → 어느 단계인지 CPU 초로."""
+        from bot import links_job
+        cpu, clock = iter([0, 1, 31, 32]), iter([0, 2, 40, 41])
+        timer = links_job.StepCpu(cpu=lambda: next(cpu), clock=lambda: next(clock))
+        timer("공식 사이트 링크 확인")
+        timer("관련 글 계산")
+        timer.finish()
+        state = {"links_timing": {"2026-11-14": {}, "2026-11-15": {"관련 글 계산": [5, 6, 1]}}}
+        links_job.record(state, "2026-11-15", timer.steps)
+        links_job.record(state, "2026-11-16", timer.steps)
+        self.assertEqual(state["links_timing"]["2026-11-15"]["관련 글 계산"], [6, 7, 2])
+        self.assertEqual(state["links_timing"]["2026-11-16"]["공식 사이트 링크 확인"], [30, 38, 1])
+        self.assertEqual(sorted(state["links_timing"]), ["2026-11-15", "2026-11-16"])
+        self.assertIn("links_timing", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
 
     def test_proc_readers(self):
         import tempfile
