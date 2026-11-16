@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3097,
+ "replace": [
+  {
+   "old": "ai-83a2e7a0a9",
+   "prompt": "an office worker in a light shirt typing on a laptop at a sunny window desk with a potted plant, seen from the side",
+   "alt": "햇살 드는 창가 책상에서 노트북을 쓰는 직장인",
+   "why": "사람 머리가 없는 일그러진 모습"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
