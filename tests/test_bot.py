@@ -6666,6 +6666,23 @@ firstlab_stats_render_page();
         for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
             self.assertRegex(uri, rule.group(1))
 
+    def test_indexnow_on_published_post_updates(self):
+        """11/17 운영자 '색인 계속 요청하는 것 못 만드나': 구글은 자동 요청 길이 없음 → IndexNow(네이버·빙)에 새 글뿐 아니라
+        공개 글 보강·갱신 때도 알림. 알리는 주소는 대표 표기(대문자 %XX). 초안은 안 알림."""
+        from bot import indexnow, refresh
+        self.assertEqual(indexnow.canonical("https://first-lab.kr/%ec%a3%bc%ed%9c%b4/"), "https://first-lab.kr/%EC%A3%BC%ED%9C%B4/")
+        sent = []
+
+        def wp(*args):
+            if args[-1] == "--field=post_status":
+                return "publish" if args[2] == "7" else "draft"
+            return "https://first-lab.kr/%ec%a3%bc/"
+        note = refresh.ping_changed(7, wp=wp, notify=lambda urls: sent.append(urls) or "IndexNow 알림 200 (1개)")
+        self.assertEqual((note, sent), ("IndexNow 알림 200 (1개)", [["https://first-lab.kr/%ec%a3%bc/"]]))
+        self.assertEqual(refresh.ping_changed(8, wp=wp, notify=lambda urls: sent.append(urls)), "")
+        self.assertEqual(len(sent), 1)
+        self.assertIn("ping_changed(post_id)", (ROOT / "bot" / "refresh.py").read_text(encoding="utf-8"))
+
     def test_full_deploy_changes_wait_for_dawn(self):
         """11/17 감시 세션이 server/ 변경을 08:22 에 main 에 올려 낮 전체 배포 → 전체 배포가 되는 변경은 새벽 2~6시에만."""
         import os

@@ -348,7 +348,23 @@ def apply_direct(data: dict, state: dict) -> str:
             set_status(conn, gold, "used", f"글 {post_id} 보강으로 답함")
             conn.commit()
     title = wp_cli("post", "get", str(post_id), "--field=post_title").strip()
-    return f"'{title}' - {log_reason(target, post_id, data)} → 수정 - {str(data.get('changes', ''))[:80]}"
+    pinged = ping_changed(post_id) if (new_html is not None or title and data.get("title")) else ""
+    return f"'{title}' - {log_reason(target, post_id, data)} → 수정 - {str(data.get('changes', ''))[:80]}" + (f" · {pinged}" if pinged else "")
+
+
+def ping_changed(post_id: int, wp=None, notify=None) -> str:
+    """공개 글 본문·제목을 고쳤으면 IndexNow(네이버·빙 등)에 '바뀌었다'고 알림 — 새 글 공개 때만 알리던 것을 보강·갱신 때도
+    (11/17 운영자 '색인 계속 요청하는 것 못 만드나': 구글은 자동 요청 길이 없음(색인 API 는 채용·라이브 영상 전용) → 사이트맵 lastmod,
+    IndexNow 참여 엔진은 바뀔 때마다 알림). 초안·예약 글은 알리지 않음. 실패해도 갱신에는 영향 없음."""
+    from . import indexnow
+    wp, notify = wp or wp_cli, notify or indexnow.notify
+    try:
+        if wp("post", "get", str(post_id), "--field=post_status").strip() != "publish":
+            return ""
+        url = wp("eval", f"echo get_permalink({int(post_id)});").strip()
+        return notify([url]) if url else ""
+    except Exception as e:  # noqa: BLE001
+        return f"IndexNow 알림 실패: {e}"[:80]
 
 
 def log_reason(target: dict, post_id: int, data: dict) -> str:
