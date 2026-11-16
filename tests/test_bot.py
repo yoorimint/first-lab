@@ -6827,6 +6827,16 @@ firstlab_stats_render_page();
             out = subprocess.run(["php", "-r", code], capture_output=True, text=True).stdout
             self.assertIn('href="https://www.law.go.kr/법령/소득세법/제65조" target="_blank">국가법령정보센터 소득세법 제65조', out)
 
+    def test_calc_choice_radio_stays_inside_label(self):
+        """11/16 구글 문서 대조: 계산기 단추의 숨긴 라디오(position:absolute)가 label 밖으로 나가 휴대폰(412px)에서
+        문서 폭 618px — 옆으로 밀림. label 을 기준(relative)으로, 라디오는 inset:0 으로 그 안에."""
+        import re
+        css = (ROOT / "wordpress" / "themes" / "first-lab" / "calculators" / "calc.css").read_text(encoding="utf-8")
+        label = re.search(r"\.firstlab-calc__choice \{([^}]*)\}", css).group(1)
+        radio = re.search(r"\.firstlab-calc__choice input \{([^}]*)\}", css).group(1)
+        self.assertIn("position: relative", label)
+        self.assertIn("inset: 0", radio)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
