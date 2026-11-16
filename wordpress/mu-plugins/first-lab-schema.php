@@ -59,13 +59,20 @@ function firstlab_article_schema( WP_Post $post ): array {
 		'datePublished'    => get_the_date( 'c', $post ),
 		'dateModified'     => get_the_modified_date( 'c', $post ),
 		'inLanguage'       => 'ko-KR',
-		'author'           => array(
-			'@type' => ( $author === $site ) ? 'Organization' : 'Person',
+		// 작성자·발행처는 사이트 단체 하나(@id)로 — SEO 플러그인의 WebPage 와 같은 실체 (11/17 구글 구조화 데이터 문서 점검)
+		'author'           => ( $author === $site ) ? array(
+			'@type' => 'Organization',
+			'@id'   => home_url( '/#/schema/Organization' ),
 			'name'  => $author,
-			'url'   => home_url( '/' ),
+			'url'   => home_url( '/about/' ),
+		) : array(
+			'@type' => 'Person',
+			'name'  => $author,
+			'url'   => home_url( '/about/' ),
 		),
 		'publisher'        => array(
 			'@type' => 'Organization',
+			'@id'   => home_url( '/#/schema/Organization' ),
 			'name'  => $site,
 			'url'   => home_url( '/' ),
 			'logo'  => array(
@@ -120,4 +127,46 @@ add_filter(
 		return $line . $content;
 	},
 	5
+);
+
+/**
+ * SEO 플러그인(The SEO Framework) 구조화 데이터 보정 (11/17 구글 구조화 데이터 문서 전체 점검):
+ * ① 글 WebPage 작성자가 Person '퍼스트랩' — 우리 Article·소개 페이지는 단체(편집팀) → 사이트 단체(@id)로 (Article 문서 '적합한 유형')
+ * ② 사이트 단체에 로고 없음 → 로고 추가 ③ 홈 탐색경로가 1단계뿐(문서: ListItem 2개 이상) → 뺌.
+ */
+function firstlab_fix_tsf_graph( array $graph, string $home, string $logo ): array {
+	$org = $home . '#/schema/Organization';
+	$out = array();
+	foreach ( $graph as $node ) {
+		if ( ! is_array( $node ) ) {
+			$out[] = $node;
+			continue;
+		}
+		$type = $node['@type'] ?? '';
+		if ( 'BreadcrumbList' === $type ) {
+			$items = $node['itemListElement'] ?? array();
+			if ( ! is_array( $items ) || isset( $items['@type'] ) || count( $items ) < 2 ) {
+				continue;
+			}
+		}
+		if ( isset( $node['author']['@type'] ) && 'Person' === $node['author']['@type'] ) {
+			$node['author'] = array( '@id' => $org );
+		}
+		foreach ( array( 'publisher', 'author' ) as $key ) {
+			if ( isset( $node[ $key ]['@id'] ) && $org === $node[ $key ]['@id'] && isset( $node[ $key ]['@type'] ) && empty( $node[ $key ]['logo'] ) ) {
+				$node[ $key ]['logo'] = array( '@type' => 'ImageObject', 'url' => $logo );
+			}
+		}
+		if ( 'Organization' === $type && ( $node['@id'] ?? '' ) === $org && empty( $node['logo'] ) ) {
+			$node['logo'] = array( '@type' => 'ImageObject', 'url' => $logo );
+		}
+		$out[] = $node;
+	}
+	return $out;
+}
+add_filter(
+	'the_seo_framework_schema_graph_data',
+	static fn( $graph ) => is_array( $graph )
+		? firstlab_fix_tsf_graph( $graph, home_url( '/' ), get_stylesheet_directory_uri() . '/assets/icons/icon-192.png' )
+		: $graph
 );
