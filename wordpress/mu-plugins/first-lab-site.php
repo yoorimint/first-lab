@@ -50,3 +50,8 @@ add_filter(
 	2
 );
 
+
+// 분류·태그 페이지 제목의 '[카테고리:]'·'[태그:]' 머리말 빼기 — 구글 검색 결과에 '[카테고리:] 생활정보 - 퍼스트랩'으로 나와
+// 관리 안 된 사이트처럼 보임 (11/16 운영자 캡처, 애드센스 '구조적 유지관리'). SEO 플러그인(The SEO Framework) 제목과 화면 제목 둘 다.
+add_filter( 'the_seo_framework_use_archive_prefix', '__return_false' );
+add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );

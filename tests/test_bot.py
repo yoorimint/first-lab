@@ -6761,6 +6761,12 @@ firstlab_stats_render_page();
         self.assertFalse(plus_queue.needs_plus_again({"plus_at": "2026-11-15"}, "2026-11-15 02:01"))
         self.assertTrue(plus_queue.needs_plus_again({"plus_at": "2026-11-15"}, "2026-11-16 09:00"))
 
+    def test_archive_titles_have_no_prefix(self):
+        """11/16 운영자 캡처: 구글 검색 결과에 '[카테고리:] 생활정보 - 퍼스트랩' → 분류·태그 제목 머리말 빼기."""
+        site = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        self.assertIn("add_filter( 'the_seo_framework_use_archive_prefix', '__return_false' );", site)
+        self.assertIn("add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );", site)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
