@@ -90,7 +90,8 @@ add_filter(
 	'the_seo_framework_sitemap_exclude_ids',
 	static function ( $ids ): array {
 		foreach ( get_pages( array( 'post_status' => 'publish' ) ) as $page ) {
-			$is_calc = '' !== firstlab_calc_id_of_slug( $page->post_name );
+			// 계산기 모음(/calculators/)도 noindex 라 사이트맵에서 뺌 (11/16 점검: 'noindex 인데 사이트맵에 있음' — robots 필터와 같은 조건)
+			$is_calc = '' !== firstlab_calc_id_of_slug( $page->post_name ) || 'calculators' === $page->post_name;
 			if ( firstlab_calc_page_target( $page ) || ( FIRSTLAB_CALC_PAGES_NOINDEX && $is_calc ) ) {
 				$ids[] = $page->ID;
 			}
@@ -105,7 +106,7 @@ add_action(
 	'init',
 	static function (): void {
 		// '-upper': 11/16 주소를 대문자 %XX 로 바꿈 (first-lab-site.php firstlab_upper_pct) → 사이트맵 저장본도 한 번 새로
-		$want = ( FIRSTLAB_CALC_PAGES_NOINDEX ? 'noindex' : 'index' ) . '-upper';
+		$want = ( FIRSTLAB_CALC_PAGES_NOINDEX ? 'noindex' : 'index' ) . '-upper2';  // -upper2: 계산기 모음도 뺀 사이트맵으로 다시
 		if ( get_option( 'firstlab_calc_sitemap_mode' ) === $want ) {
 			return;
 		}

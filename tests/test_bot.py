@@ -1631,7 +1631,7 @@ $wpdb = new FakeDb();
 function get_post($id) { return new WP_Post($id, 'post', "p$id"); }
 function get_permalink($p) { return "/{$p->post_name}/"; }
 function get_pages($a) { return array(new WP_Post(1, 'page', 'capital-gains-tax-calculator'), new WP_Post(2, 'page', 'vat-calculator'),
-                                      new WP_Post(3, 'page', 'about')); }
+                                      new WP_Post(3, 'page', 'about'), new WP_Post(4, 'page', 'calculators')); }
 require getenv('FL_PLUGIN');
 $cg = new WP_Post(1, 'page', 'capital-gains-tax-calculator'); $vat = new WP_Post(2, 'page', 'vat-calculator');
 echo json_encode(array(
@@ -1668,7 +1668,7 @@ echo json_encode(array(
         self.assertEqual((r["link_cg"], r["link_vat"]), ("/p11/", "/vat-calculator/"))
         self.assertIsNone(r["post_not_page"])                      # 글 자체는 넘기지 않음
         # 넘어가는 페이지(1) + 11/14 부터 계산기 단독 페이지 모두(2, FIRSTLAB_CALC_PAGES_NOINDEX) 사이트맵에서 뺌
-        self.assertEqual(r["sitemap_skip"], [99, 1, 2])
+        self.assertEqual(r["sitemap_skip"], [99, 1, 2, 4])   # 계산기 모음(/calculators/)도 noindex 라 사이트맵에서 뺌 (11/16 점검)
         self.assertEqual((r["pick_first"], r["pick_none"]), (5, None))
 
     def test_list_and_related_use_home_post(self):
@@ -6807,6 +6807,25 @@ firstlab_stats_render_page();
         site = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
         for hook in ("post_link", "page_link", "term_link"):
             self.assertIn(f"'{hook}'", site)
+
+    def test_dead_law_popup_links_become_article_urls(self):
+        """11/16 사이트 점검: 종합소득세 글 '공식 안내 바로가기'의 법제처 lsSideInfoP 주소 2개가 404 → '/법령/소득세법/제65조' 로.
+        새 글은 저장할 때(bot/sources.section), 이미 올린 글은 화면에서(first-lab-schema.php) 바꿈."""
+        from bot import sources
+        side = "https://www.law.go.kr/LSW//lsSideInfoP.do?lsiSeq=280405&joNo=0065&joBrNo=00&docCls=jo&urlMode=lsScJoRltInfoR"
+        self.assertEqual(sources.law_article_url(side, "국가법령정보센터 소득세법 제65조 (중간예납)"), "https://www.law.go.kr/법령/소득세법/제65조")
+        self.assertEqual(sources.law_article_url(side, "소득세법 시행령 제108조의4"), "https://www.law.go.kr/법령/소득세법시행령/제108조의4")
+        self.assertEqual(sources.law_article_url("https://www.nts.go.kr/x", "국세청"), "https://www.nts.go.kr/x")
+        html, dropped = sources.section([{"url": side, "name": "소득세법 제70조"}], check=lambda u: "lsSideInfoP" not in u)
+        self.assertIn("/법령/소득세법/제70조", html)
+        import shutil, subprocess, re
+        if shutil.which("php"):
+            src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-schema.php").read_text(encoding="utf-8")
+            func = re.search(r"function firstlab_fix_law_links\(.*?\n\}", src, re.S).group(0)
+            code = ("function esc_url($u){return $u;} " + func +
+                    " echo firstlab_fix_law_links('<a href=\"https://www.law.go.kr/LSW//lsSideInfoP.do?lsiSeq=1&amp;joNo=0065\" target=\"_blank\">국가법령정보센터 소득세법 제65조 (중간예납)</a>');")
+            out = subprocess.run(["php", "-r", code], capture_output=True, text=True).stdout
+            self.assertIn('href="https://www.law.go.kr/법령/소득세법/제65조" target="_blank">국가법령정보센터 소득세법 제65조', out)
 
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':

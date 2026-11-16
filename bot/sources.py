@@ -52,11 +52,28 @@ def reachable(url: str) -> bool:
         return False
 
 
+_LAW_SIDE = re.compile(r"law\.go\.kr/LSW/+lsSideInfoP\.do", re.I)
+_LAW_ARTICLE = re.compile(r"([가-힣A-Za-z0-9·]+(?:\s?시행령|\s?시행규칙)?)\s*제(\d+)조(?:의(\d+))?")
+
+
+def law_article_url(url: str, name: str) -> str:
+    """법제처 옛 조문 팝업 주소(…/LSW//lsSideInfoP.do?lsiSeq=…&joNo=…)는 404 (11/16 사이트 점검: 종합소득세 글 공식 링크 2개) →
+    링크 이름의 '소득세법 제65조'로 '/법령/소득세법/제65조' 주소를 만든다. 이름에서 못 찾으면 그대로 (그 뒤 열어 보기에서 빠짐)."""
+    if not _LAW_SIDE.search(url or ""):
+        return url
+    m = _LAW_ARTICLE.search(name or "")
+    if not m:
+        return url
+    law = re.sub(r"\s+", "", m.group(1))
+    return f"https://www.law.go.kr/법령/{law}/제{m.group(2)}조" + (f"의{m.group(3)}" if m.group(3) else "")
+
+
 def section(sources: list[dict], check=reachable) -> tuple[str, list[str]]:
     """(글 끝에 붙일 HTML, 뺀 링크와 이유). 쓸 링크가 없으면 HTML 은 빈 문자열."""
     links, dropped, seen = [], [], set()
     for s in sources or []:
         url, name = str(s.get("url", "")).strip(), str(s.get("name", "")).strip()
+        url = law_article_url(url, name)
         if not url or not name or url in seen:
             continue
         seen.add(url)
