@@ -6666,6 +6666,23 @@ firstlab_stats_render_page();
         for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
             self.assertRegex(uri, rule.group(1))
 
+    def test_full_deploy_changes_wait_for_dawn(self):
+        """11/17 감시 세션이 server/ 변경을 08:22 에 main 에 올려 낮 전체 배포 → 전체 배포가 되는 변경은 새벽 2~6시에만."""
+        import os
+        import subprocess
+        guard = str(ROOT / "automation" / "full_deploy_guard.sh")
+
+        def ok(files, hour):
+            env = {k: v for k, v in os.environ.items() if k != "FULL_DEPLOY_OK"}
+            return subprocess.run(["bash", guard, hour], input=files, text=True, capture_output=True, env=env).returncode == 0
+        self.assertFalse(ok("server/robots-static.sh\n", "08"))
+        self.assertTrue(ok("server/robots-static.sh\n", "03"))
+        self.assertFalse(ok("wordpress/pages/about.html\n", "23"))
+        self.assertTrue(ok("bot/run.py\nwordpress/mu-plugins/x.php\n", "14"))
+        self.assertIn("full_deploy_guard.sh", (ROOT / "automation" / "check_and_push.sh").read_text(encoding="utf-8"))
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        self.assertIn("^(FULL|server/|\\.github/|bot/requirements\\.txt|wordpress/pages/)", wf)   # 같은 조건
+
     def test_robots_txt_served_as_static_file(self):
         """11/17 구글 robots.txt 문서: robots.txt 가 5xx 면 12시간 크롤링 중단 → 배포마다 정적 파일로 만들어 PHP 와 무관하게.
         만들기 실패면 파일을 지워 워드프레스가 직접 (빈 파일·옛 파일로 남지 않게)."""
