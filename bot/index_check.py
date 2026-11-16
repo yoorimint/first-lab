@@ -18,7 +18,7 @@ from .search_console import KEY_FILE, SCOPES, SITE_URL
 
 API = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect"
 CHECK_PER_DAY = 200     # API 한도(하루 2,000)보다 훨씬 적게
-RECHECK_DAYS = 14       # 색인된 글을 다시 볼 간격
+RECHECK_DAYS = 2        # 색인된 글을 다시 볼 간격 (11/16: 14일이면 빠진 걸 2주 동안 모름 — 운영자가 검색에서 먼저 발견)
 WINDOW_DAYS = 14        # 공개 후 이만큼 지난 글로 색인률을 셈
 GOOD_RATIO = 0.8        # 이 이상이면 공개 편수 늘려도 됨
 SHOW = 30               # 요약에 남길 미색인 글 수 (사이트 성과 페이지 표)
@@ -115,11 +115,11 @@ def due(posts: list[dict], known: dict[str, dict], today: date, limit: int = CHE
         k = known.get(p["url"])
         if not k:
             first.append(p)
-        elif k.get("checked") == today.isoformat() and not (force and not is_indexed(k)):
+        elif k.get("checked") == today.isoformat() and not force:
             continue
         elif not is_indexed(k):
             waiting.append((k.get("checked") or "", p))
-        elif (k.get("checked") or "") <= cutoff:
+        elif force or (k.get("checked") or "") <= cutoff:  # 지금 다시 점검이면 색인된 글도 (11/16 운영자 '유럽 글도 아예 안 나오네')
             recheck.append((k.get("checked") or "", p))
     return (first + [p for _, p in sorted(waiting, key=lambda x: x[0])]
             + [p for _, p in sorted(recheck, key=lambda x: x[0])])[:limit]

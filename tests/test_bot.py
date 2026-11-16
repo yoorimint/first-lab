@@ -6406,14 +6406,17 @@ class PlusCheckTest(unittest.TestCase):
         self.assertIn("https://first-lab.kr/육아/", asked)
 
     def test_index_recheck_forces_unindexed_today(self):
-        """11/15 운영자 '지금 한번 점검 돌려 봐': 오늘 이미 본 미색인 글도 force 면 다시 물음 (색인된 글은 그대로)."""
+        """11/15 운영자 '지금 한번 점검 돌려 봐': 오늘 이미 본 글도 force 면 다시 물음.
+        11/16 운영자 '유럽 글도 아예 안 나오네': 색인된 글도 다시 물음 (14일마다만 보던 것 → 빠진 걸 2주 동안 모름), 평소엔 2일마다."""
         import datetime as dt
         from bot import index_check
         today = dt.date(2026, 11, 15)
         posts = [{"url": "a", "post_id": 1, "published": "2026-11-10"}, {"url": "b", "post_id": 2, "published": "2026-11-10"}]
         known = {"a": {"verdict": "NEUTRAL", "checked": "2026-11-15"}, "b": {"verdict": "PASS", "checked": "2026-11-15"}}
         self.assertEqual(index_check.due(posts, known, today), [])
-        self.assertEqual([p["url"] for p in index_check.due(posts, known, today, force=True)], ["a"])
+        self.assertEqual([p["url"] for p in index_check.due(posts, known, today, force=True)], ["a", "b"])
+        old = {"a": {"verdict": "NEUTRAL", "checked": "2026-11-14"}, "b": {"verdict": "PASS", "checked": "2026-11-13"}}
+        self.assertEqual([p["url"] for p in index_check.due(posts, old, today)], ["a", "b"])    # 색인된 글도 2일 지나면 다시
         self.assertIn('"index_recheck"', (ROOT / "bot" / "publish_queue.py").read_text(encoding="utf-8"))
 
     STATS_STUB = r"""<?php
