@@ -59,3 +59,16 @@ add_filter( 'get_the_archive_title_prefix', '__return_empty_string' );
 // 글의 작성자 이름 링크가 /author/firstlab-1/ (404 — 작성자 목록 페이지는 막혀 있음)로 가던 것 → '소개' 페이지로 (11/16 사이트 전체 점검).
 // 깨진 링크가 모든 글에 하나씩 있으면 관리 안 된 사이트로 보임 (애드센스 '구조적 유지관리').
 add_filter( 'author_link', static fn() => home_url( '/about/' ) );
+
+/**
+ * 한글 주소의 %xx 를 대문자로 (11/16 서치콘솔 'Sitemaps: 감지된 참조 사이트맵 없음 / 참조 페이지 없음').
+ * 워드프레스는 한글 주소를 소문자(%ec%9e%90…)로 내보내는데, 구글은 대문자(%EC%9E%90…)로 기억함 (URL 검사 API 도 대문자로만 찾음 —
+ * bot/index_check.google_form). 사이트맵·대표 주소(canonical)·글끼리 링크가 구글이 아는 주소와 글자가 달라 연결이 안 됐을 수 있음.
+ * 대문자가 표준 표기(RFC 3986 6.2.2.1)라 모든 주소를 대문자로 맞춘다. 소문자 주소로 들어와도 같은 글이 열림.
+ */
+function firstlab_upper_pct( string $url ): string {
+	return (string) preg_replace_callback( '/%[0-9a-f]{2}/i', static fn( $m ) => strtoupper( $m[0] ), $url );
+}
+foreach ( array( 'post_link', 'page_link', 'post_type_link', 'term_link', 'attachment_link' ) as $firstlab_link_hook ) {
+	add_filter( $firstlab_link_hook, 'firstlab_upper_pct', 99 );
+}

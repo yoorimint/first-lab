@@ -6792,6 +6792,22 @@ firstlab_stats_render_page();
         src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-calc-home.php").read_text(encoding="utf-8")
         self.assertIn("const FIRSTLAB_CALC_REMOVAL_UNTIL   = '2027-01-31';", src)
 
+    def test_site_urls_use_uppercase_percent_encoding(self):
+        """11/16 서치콘솔 '참조 사이트맵 없음·참조 페이지 없음': 사이트맵·canonical·링크가 소문자 %ec.., 구글은 대문자 %EC.. 로 기억
+        → 워드프레스가 내보내는 주소를 대문자 표기로 (RFC 3986 표준 표기)."""
+        import shutil, subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        import re
+        site_src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        func = re.search(r"function firstlab_upper_pct\(.*?\n\}", site_src, re.S).group(0)
+        code = func + " echo firstlab_upper_pct('https://first-lab.kr/%ec%9e%90%eb%8f%99/?a=b');"
+        r = subprocess.run(["php", "-r", code], capture_output=True, text=True)
+        self.assertEqual(r.stdout, "https://first-lab.kr/%EC%9E%90%EB%8F%99/?a=b", r.stderr)
+        site = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        for hook in ("post_link", "page_link", "term_link"):
+            self.assertIn(f"'{hook}'", site)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
