@@ -6898,6 +6898,25 @@ firstlab_stats_render_page();
         for hook in ("post_link", "page_link", "term_link"):
             self.assertIn(f"'{hook}'", site)
 
+    def test_meta_description_is_whole_excerpt(self):
+        """11/17 구글 문서 점검: 검색 설명이 '합계 최대 1…'처럼 문장 중간에서 잘림(23편 중 21편) → 글은 요약문 전체."""
+        import re
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        site_src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        func = re.search(r"function firstlab_full_excerpt_description\(.*?\n\}", site_src, re.S).group(0)
+        stubs = ("function is_singular($t=null){return false;} function get_queried_object_id(){return 0;}"
+                 "function get_post_type($id){return $id==7?'post':'page';} function wp_strip_all_tags($s){return strip_tags($s);}"
+                 "function get_post_field($f,$id){return $id==7?'합계 최대 1,000만 원이고, 재직자는 임금만 받아요.':'';}")
+        code = stubs + func + (" echo firstlab_full_excerpt_description('합계 최대 1…', array('id'=>7)), '|',"
+                               " firstlab_full_excerpt_description('홈 설명', array('id'=>3)), '|',"
+                               " firstlab_full_excerpt_description('분류', array('id'=>7,'tax'=>'category'));")
+        r = subprocess.run(["php", "-r", code], capture_output=True, text=True)
+        self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
+        self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
+
     def test_internal_links_use_canonical_form(self):
         """11/17 구글 '중복 URL 통합' 문서 점검: 내부 링크는 대표 주소로 — 본문의 한글 그대로·소문자 %xx 링크를 대문자 %XX 로."""
         import re

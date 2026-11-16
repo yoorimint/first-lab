@@ -51,6 +51,23 @@ add_filter(
 );
 
 
+/**
+ * 글의 검색 설명(meta description)은 요약문 전체 그대로 (11/17 구글 문서 점검: 23편 중 21편이 '합계 최대 1…'처럼
+ * 문장 중간에서 잘림 — The SEO Framework 가 영어 기준 글자 수로 자름. 요약문은 봇이 120자 이내 완결 문장으로 씀).
+ * 요약문이 없는 글·분류·홈은 플러그인 그대로.
+ */
+function firstlab_full_excerpt_description( $desc, $args = null, $type = 'search' ) {
+	$id = is_array( $args ) && isset( $args['id'] ) && empty( $args['tax'] ) && empty( $args['pta'] ) && empty( $args['uid'] )
+		? (int) $args['id']
+		: ( null === $args && is_singular( 'post' ) ? (int) get_queried_object_id() : 0 );
+	if ( ! $id || 'post' !== get_post_type( $id ) ) {
+		return $desc;
+	}
+	$excerpt = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) get_post_field( 'post_excerpt', $id ) ) ) );
+	return '' !== $excerpt ? $excerpt : $desc;
+}
+add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description', 10, 3 );
+
 // 분류·태그 페이지 제목의 '[카테고리:]'·'[태그:]' 머리말 빼기 — 구글 검색 결과에 '[카테고리:] 생활정보 - 퍼스트랩'으로 나와
 // 관리 안 된 사이트처럼 보임 (11/16 운영자 캡처, 애드센스 '구조적 유지관리'). SEO 플러그인(The SEO Framework) 제목과 화면 제목 둘 다.
 add_filter( 'the_seo_framework_use_archive_prefix', '__return_false' );
