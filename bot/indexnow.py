@@ -20,9 +20,16 @@ def payload(urls: list[str]) -> dict:
     return {"host": SITE.split("//", 1)[1], "key": KEY, "keyLocation": f"{SITE}/{KEY}.txt", "urlList": urls}
 
 
+def canonical(url: str) -> str:
+    """사이트 대표 주소 표기 (% 인코딩 대문자 — first-lab-site.php firstlab_upper_pct 와 같게). 워드프레스 post_name 은 소문자 %ec.. 라
+    그대로 알리면 사이트맵·canonical 과 다른 표기가 됨 (11/17 구글 '중복 URL 통합' 문서 점검)."""
+    import re
+    return re.sub(r"%[0-9a-fA-F]{2}", lambda m: m.group(0).upper(), url)
+
+
 def notify(urls: list[str]) -> str:
     """알리고 결과 한 줄 (200·202 = 접수)."""
-    urls = [u for u in urls if u.startswith(SITE)]
+    urls = [canonical(u) for u in urls if u.startswith(SITE)]
     if not urls:
         return "IndexNow: 알릴 주소 없음"
     req = urllib.request.Request(ENDPOINT, data=json.dumps(payload(urls)).encode(), method="POST",
