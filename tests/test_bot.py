@@ -6666,6 +6666,21 @@ firstlab_stats_render_page();
         for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
             self.assertRegex(uri, rule.group(1))
 
+    def test_robots_txt_served_as_static_file(self):
+        """11/17 구글 robots.txt 문서: robots.txt 가 5xx 면 12시간 크롤링 중단 → 배포마다 정적 파일로 만들어 PHP 와 무관하게.
+        만들기 실패면 파일을 지워 워드프레스가 직접 (빈 파일·옛 파일로 남지 않게)."""
+        import subprocess
+        sh = (ROOT / "server" / "robots-static.sh").read_text(encoding="utf-8")
+        self.assertIn("do_robots()", sh)
+        self.assertIn("^Sitemap: https://first-lab.kr/sitemap.xml", sh)
+        self.assertIn('rm -f "$WEB_ROOT/robots.txt"', sh)
+        self.assertEqual(subprocess.run(["bash", "-n", str(ROOT / "server" / "robots-static.sh")]).returncode, 0)
+        for f in ("quick-deploy.sh", "wp-setup.sh"):
+            src = (ROOT / "server" / f).read_text(encoding="utf-8")
+            self.assertLess(src.index("robots-static.sh"), src.index("rm -rf /var/cache/nginx"))
+        conf = (ROOT / "server" / "nginx" / "first-lab.conf").read_text(encoding="utf-8")
+        self.assertIn("try_files $uri $uri/ /index.php?$args;", conf)   # 파일이 있으면 nginx 가 바로 줌
+
     def test_serp_question_with_when_ending_is_covered(self):
         """11/15 #630: 질문 '퇴사시 연차수당도 받을 수 있나요?'를 본문 '퇴사할 때 … 연차수당으로 받아요'가 답하는데 검사가 못 알아봐,
         작성자가 새 문장을 '퇴사 시에는'으로 바꿔 통과시킴 → '…시·…하면·…때'는 같은 말로."""
