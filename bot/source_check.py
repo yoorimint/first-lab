@@ -191,8 +191,19 @@ def attachment_text(page_html: str, page_url: str, raw_of=None) -> str:
 
 def law_body_url(shell_html: str) -> str | None:
     """law.go.kr '/법령/이름' 껍데기 페이지 → 조문 본문 주소 (lsInfoR.do + 시행일 포함 값). 11/5 확인한 방법."""
-    m = re.search(r"lsiSeq=\d+[^\"'<>\s]*?efYd=\d+", html.unescape(shell_html))
-    return f"https://www.law.go.kr/LSW/lsInfoR.do?{m.group(0)}" if m else None
+    page = html.unescape(shell_html)
+    m = re.search(r"lsiSeq=\d+[^\"'<>\s]*?efYd=\d+", page)
+    if m:
+        return f"https://www.law.go.kr/LSW/lsInfoR.do?{m.group(0)}"
+    # 11/16: 화면이 바뀌어 주소 대신 숨은 입력칸에만 값이 있음 → 못 찾아 껍데기(메뉴 글자)를 본문으로 읽고
+    # 조문 번호를 '사라짐'으로 셈 (#1019·#808·#817 공개 직전 보류)
+    seq, ef = (re.search(rf'<input[^>]*name="{k}"[^>]*value="(\d+)"', page) for k in ("lsiSeq", "efYd"))
+    return f"https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq={seq.group(1)}&efYd={ef.group(1)}" if seq and ef else None
+
+
+def law_shell(url: str, text: str | None) -> bool:
+    """'/법령/이름' 근거인데 'N조'가 하나도 없는 글자 = 본문을 못 연 껍데기 화면 (본문으로 읽으면 모든 숫자가 '사라짐')."""
+    return bool(text) and "law.go.kr/법령/" in urllib.parse.unquote(url) and not re.search(r"제\s*\d+\s*조", text)
 
 
 def _raw(url: str) -> tuple[bytes, str | None, str] | None:
@@ -235,7 +246,9 @@ def fetch(url: str) -> str | None:
     if "law.go.kr" in urllib.parse.unquote(url):
         from .condition_gate import _cached
         page = _cached("page", url, lambda: _fetch(url))
-        if page and law_down(page):  # 점검 화면이 하루 저장(_cached)돼 있어도 못 연 것으로 (11/14)
+        if law_shell(url, page):  # 그날 저장(_cached)된 것이 껍데기 화면이면 한 번 새로 받음 (11/16)
+            page = _fetch(url)
+        if page and (law_down(page) or law_shell(url, page)):  # 점검·껍데기 화면은 못 연 것으로 — 숫자 '사라짐' 오탐 방지 (11/14, 11/16)
             return None
         annex = law_annex(url)
         return f"{page} {annex}" if page and annex else page
