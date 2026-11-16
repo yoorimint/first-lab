@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1371,
+ "replace": [
+  {
+   "old": "ai-5f971220e5",
+   "prompt": "two people standing beside a silver sedan in an autumn highway rest area parking lot, one handing a car key to the other, trees with yellow leaves in soft afternoon light",
+   "alt": "가을 휴게소 주차장에서 승용차 옆에 서서 차 키를 건네는 두 사람",
+   "why": "뒤쪽 도로 표지판에 엉터리 글자·숫자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
