@@ -6917,6 +6917,35 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_structured_data_author_is_one_organization(self):
+        """11/17 구글 구조화 데이터 문서 점검: SEO 플러그인 WebPage 작성자 Person '퍼스트랩' vs 우리 Article Organization,
+        사이트 단체 로고 없음, 홈 탐색경로 1단계 → 하나의 단체(@id)·로고·탐색경로 2단계 이상만."""
+        import json
+        import re
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-schema.php").read_text(encoding="utf-8")
+        func = re.search(r"function firstlab_fix_tsf_graph\(.*?\n\}", src, re.S).group(0)
+        home = "https://first-lab.kr/"
+        graph = [
+            {"@type": "WebSite", "publisher": {"@type": "Organization", "@id": home + "#/schema/Organization", "name": "퍼스트랩"}},
+            {"@type": "WebPage", "author": {"@type": "Person", "@id": home + "#/schema/Person/x", "name": "퍼스트랩"}},
+            {"@type": "BreadcrumbList", "itemListElement": {"@type": "ListItem", "position": 1}},
+            {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem"}, {"@type": "ListItem"}]},
+        ]
+        code = func + " echo json_encode(firstlab_fix_tsf_graph(json_decode($argv[1], true), $argv[2], 'L'));"
+        r = subprocess.run(["php", "-r", code, json.dumps(graph), home], capture_output=True, text=True)
+        out = json.loads(r.stdout or "null")
+        self.assertIsNotNone(out, r.stderr)
+        self.assertEqual(out[1]["author"], {"@id": home + "#/schema/Organization"})
+        self.assertEqual(out[0]["publisher"]["logo"]["url"], "L")
+        self.assertEqual([n["@type"] for n in out], ["WebSite", "WebPage", "BreadcrumbList"])
+        self.assertIn("'@id'   => home_url( '/#/schema/Organization' )", src)
+        self.assertNotIn("'@type' => ( $author === $site ) ? 'Organization' : 'Person'", src)
+        self.assertIn("add_filter(\n\t'the_seo_framework_schema_graph_data'", src)
+
     def test_internal_links_use_canonical_form(self):
         """11/17 구글 '중복 URL 통합' 문서 점검: 내부 링크는 대표 주소로 — 본문의 한글 그대로·소문자 %xx 링크를 대문자 %XX 로."""
         import re
