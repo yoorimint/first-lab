@@ -164,7 +164,6 @@ done
 wp plugin auto-updates enable --all >/dev/null 2>&1 || true
 
 # ---------- 페이지 캐시 비우기 (변경 즉시 반영) ----------
-bash "$REPO_DIR/server/robots-static.sh" || true   # robots.txt 정적 파일 (PHP 가 바빠도 5xx 없게, 11/17)
 rm -rf /var/cache/nginx/$SITE/*
 
 # ---------- 확인 ----------

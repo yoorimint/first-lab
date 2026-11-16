@@ -46,6 +46,5 @@ fi
 log "보류 글 다시 검사"
 (cd "$REPO_DIR" && "$VENV/bin/python" -m bot.hold) || echo "보류 다시 검사 실패 (봇 동작에는 영향 없음)"
 
-bash "$REPO_DIR/server/robots-static.sh" || true   # robots.txt 정적 파일 (PHP 가 바빠도 5xx 없게)
 rm -rf /var/cache/nginx/$SITE/*
 echo "빠른 배포 끝"
