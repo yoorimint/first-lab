@@ -12,8 +12,29 @@ defined( 'ABSPATH' ) || exit;
 
 const FIRSTLAB_SOURCES_HEADING = '공식 안내 바로가기';
 
+/**
+ * 법제처 옛 조문 팝업 주소(lsSideInfoP — 404)를 링크 이름의 '소득세법 제65조'로 '/법령/소득세법/제65조' 로 바꿈 (bot/sources.law_article_url 과 같은 규칙).
+ * 11/16 사이트 점검: 종합소득세 글의 공식 링크 2개가 404 — 이미 올린 글도 화면·구조화 데이터에서 바로 고쳐 보이게.
+ */
+function firstlab_fix_law_links( string $html ): string {
+	return (string) preg_replace_callback(
+		'#<a\s([^>]*?)href="https://www\.law\.go\.kr/LSW/+lsSideInfoP\.do[^"]*"([^>]*)>([^<]*)#iu',
+		static function ( $m ) {
+			if ( ! preg_match( '/([가-힣A-Za-z0-9·]+(?:\s?시행령|\s?시행규칙)?)\s*제(\d+)조(?:의(\d+))?/u', $m[3], $a ) ) {
+				return $m[0];
+			}
+			$law = preg_replace( '/\s+/u', '', $a[1] );
+			$url = 'https://www.law.go.kr/법령/' . $law . '/제' . $a[2] . '조' . ( ! empty( $a[3] ) ? '의' . $a[3] : '' );
+			return '<a ' . $m[1] . 'href="' . esc_url( $url ) . '"' . $m[2] . '>' . $m[3];
+		},
+		$html
+	);
+}
+add_filter( 'the_content', 'firstlab_fix_law_links', 30 );
+
 /** 글 끝 '공식 안내 바로가기' 목록의 링크 주소. */
 function firstlab_official_links( string $content ): array {
+	$content = firstlab_fix_law_links( $content );
 	$at = strpos( $content, FIRSTLAB_SOURCES_HEADING );
 	if ( false === $at ) {
 		return array();
