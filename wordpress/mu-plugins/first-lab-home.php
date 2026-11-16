@@ -95,6 +95,34 @@ function firstlab_feed_item( WP_Post $post, bool $hero ): string {
 	);
 }
 
+/**
+ * 홈 화면 H1 (11/17 구글 문서 점검: 홈에 H1 이 없어 무엇을 다루는 사이트인지 제목으로 안 보임).
+ * 첫 쪽은 사이트 설명(설정 > 일반 > 태그라인), 2쪽부터는 '퍼스트랩 글 목록 N쪽'.
+ */
+function firstlab_home_h1(): string {
+	if ( ! is_home() ) {
+		return '';
+	}
+	$text = is_paged()
+		? sprintf( '%s 글 목록 %d쪽', get_bloginfo( 'name' ), (int) get_query_var( 'paged' ) )
+		: get_bloginfo( 'description' );
+	return '' !== trim( $text ) ? '<h1 class="fl-home-title">' . esc_html( $text ) . '</h1>' : '';
+}
+
+/**
+ * 홈 공유용 대표 사진 (11/17 구글 문서 점검: 홈에 og:image 가 없어 공유·검색 미리보기에 사진이 안 나옴).
+ * SEO 플러그인(The SEO Framework) 설정의 홈 공유 사진이 비어 있을 때만 테마 그림(1200×630)을 씀.
+ */
+add_filter(
+	'the_seo_framework_get_options',
+	static function ( $options ) {
+		if ( is_array( $options ) && empty( $options['homepage_social_image_url'] ) ) {
+			$options['homepage_social_image_url'] = get_stylesheet_directory_uri() . '/assets/og-home.png';
+		}
+		return $options;
+	}
+);
+
 add_shortcode(
 	'firstlab_feed',
 	static function (): string {
@@ -103,7 +131,7 @@ add_shortcode(
 		if ( ! $posts ) {
 			return '<p>아직 글이 없습니다.</p>';
 		}
-		$out = '';
+		$out = firstlab_home_h1();
 		if ( is_home() && ! is_paged() ) {
 			$hero  = firstlab_home_hero() ?? $posts[0];
 			$posts = array_filter( $posts, static fn( $p ) => $p->ID !== $hero->ID );

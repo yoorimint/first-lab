@@ -6666,6 +6666,16 @@ firstlab_stats_render_page();
         for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
             self.assertRegex(uri, rule.group(1))
 
+    def test_home_has_h1_and_share_image(self):
+        """11/17 구글 문서 점검: 홈에 H1·공유용 대표 사진(og:image)이 없음 → 첫 쪽 H1 은 사이트 설명, 공유 사진은 테마 그림."""
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-home.php").read_text(encoding="utf-8")
+        self.assertIn("$out = firstlab_home_h1();", src)
+        self.assertIn("'<h1 class=\"fl-home-title\">'", src)
+        self.assertIn("'homepage_social_image_url'", src)
+        img = ROOT / "wordpress" / "themes" / "first-lab" / "assets" / "og-home.png"
+        from PIL import Image
+        self.assertEqual(Image.open(img).size, (1200, 630))   # 구글·SNS 권장 1.91:1
+
     def test_indexnow_on_published_post_updates(self):
         """11/17 운영자 '색인 계속 요청하는 것 못 만드나': 구글은 자동 요청 길이 없음 → IndexNow(네이버·빙)에 새 글뿐 아니라
         공개 글 보강·갱신 때도 알림. 알리는 주소는 대표 표기(대문자 %XX). 초안은 안 알림."""
