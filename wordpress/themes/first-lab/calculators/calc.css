@@ -36,8 +36,9 @@
 /* 누르는 단추 고르기 (type: 'choice', 11/16) */
 .firstlab-calc__label { font-weight: 600; margin: 0 0 .4rem; }
 .firstlab-calc__choices { display: flex; flex-wrap: wrap; gap: .5rem; }
-.firstlab-calc__choice { display: inline-flex; cursor: pointer; }
-.firstlab-calc__choice input { position: absolute; opacity: 0; pointer-events: none; }
+.firstlab-calc__choice { display: inline-flex; cursor: pointer; position: relative; }
+/* 숨긴 라디오가 label 밖으로 나가 휴대폰 화면이 옆으로 밀림 (11/16 점검: 412px 화면에 문서 폭 618px) → label 안에 가둠 */
+.firstlab-calc__choice input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
 .firstlab-calc__choice span { display: inline-block; padding: .55rem 1rem; border: 1px solid #c9ced6; border-radius: 999px; background: #fff; font-size: 1rem; line-height: 1.3; }
 .firstlab-calc__choice input:checked + span { background: #1d4ed8; border-color: #1d4ed8; color: #fff; font-weight: 600; }
 .firstlab-calc__choice input:focus-visible + span { outline: 2px solid #1d4ed8; outline-offset: 2px; }
