@@ -6,6 +6,8 @@
 기록 (state["server_stats"][날짜], 최근 KEEP_DAYS 일):
   부하(1분 평균) 평균·최고·최고 시각, 높은 부하(코어당 1.5 넘음) 분 수와 시각들, 메모리 여유 최저·전체, 스왑 사용 최대,
   사주데이 응답(5분마다 /healthz) 최대 시간·실패 수.
+  서비스별 CPU 사용 초(cpu_by_unit)·높은 부하 때 가장 많이 쓴 서비스(high_units), 시간대별 부하(load_by_hour) —
+  11/16 운영자 '왜 부하 생기냐': 높은 부하가 322분인데 무엇 때문인지 기록이 없어 답을 못 함.
 하루가 바뀌면 어제 요약 한 줄을 봇 기록(/maintenance)에 남긴다.
 """
 from __future__ import annotations
@@ -14,12 +16,15 @@ import os
 import time
 import urllib.request
 from datetime import datetime
+from pathlib import Path
 
 KEEP_DAYS = 14
 HIGH_PER_CORE = 1.5          # 코어당 이 값을 넘으면 '높은 부하' 분으로 셈
 SAJU_URL = "https://sajuday.kr/healthz"
 SAJU_TIMEOUT = 10
 MAX_HIGH_TIMES = 30          # 하루에 남길 높은 부하 시각 수 (배포 시각과 맞춰 보려고)
+CGROUP = "/sys/fs/cgroup"
+CPU_PREV = "server_cpu_prev"  # state: 앞 실행 때 서비스별 누적 CPU 초 (차이 = 그 사이 쓴 CPU)
 
 
 def read_load(path: str = "/proc/loadavg") -> float:
@@ -51,9 +56,64 @@ def saju_ms(url: str = SAJU_URL) -> int | None:
     return int((time.monotonic() - start) * 1000)
 
 
-def add_sample(day: dict, stamp: str, load: float, cores: int, mem: dict, saju: int | None | str = "skip") -> dict:
-    """하루 집계에 한 번 잰 값을 더함 (saju='skip' 이면 이번엔 안 잼)."""
+def unit_name(name: str) -> str:
+    """cgroup 이름 → 보기 쉬운 이름. 이름이 매번 바뀌는 임시 실행은 한 줄로 묶음."""
+    if name.startswith("run-") and name.endswith(".scope"):
+        return "임시 실행(배포 등 systemd-run)"
+    if name.startswith("session-") or name.startswith("user-"):
+        return "접속 세션(배포 ssh)"
+    return name
+
+
+def read_cpu(root: str = CGROUP) -> dict[str, float]:
+    """서비스별 누적 CPU 초 (cgroup v2 cpu.stat usage_usec) — 끝난 짧은 프로세스(wp-cli 등)도 그 서비스에 남음. 못 읽으면 {}."""
+    out: dict[str, float] = {}
+    for parent in ("system.slice", "user.slice"):
+        base = Path(root) / parent
+        try:
+            dirs = [d for d in base.iterdir() if d.is_dir()]
+        except OSError:
+            continue
+        for d in dirs:
+            try:
+                usec = next(int(line.split()[1]) for line in (d / "cpu.stat").read_text().splitlines()
+                            if line.startswith("usage_usec"))
+            except (OSError, StopIteration, ValueError, IndexError):
+                continue
+            key = unit_name(d.name)
+            out[key] = round(out.get(key, 0.0) + usec / 1e6, 1)
+    return out
+
+
+def cpu_delta(prev: dict, now: dict) -> dict[str, float]:
+    """앞 실행 뒤 서비스별로 쓴 CPU 초. 새로 생긴 서비스는 지금 값 전부, 줄어든 것(다시 시작)은 지금 값."""
+    out = {}
+    for k, v in now.items():
+        d = v - float(prev.get(k, 0)) if v >= float(prev.get(k, 0)) else v
+        if d >= 1:
+            out[k] = round(d, 1)
+    return out
+
+
+def add_sample(day: dict, stamp: str, load: float, cores: int, mem: dict, saju: int | None | str = "skip",
+               cpu: dict | None = None) -> dict:
+    """하루 집계에 한 번 잰 값을 더함 (saju='skip' 이면 이번엔 안 잼). cpu: 앞 실행 뒤 서비스별로 쓴 CPU 초."""
     day = dict(day)
+    hour = stamp[11:13]
+    by_hour = dict(day.get("load_by_hour") or {})
+    s, n = (by_hour.get(hour) or [0, 0])
+    by_hour[hour] = [round(s + load, 2), n + 1]
+    day["load_by_hour"] = by_hour
+    if cpu:
+        units = dict(day.get("cpu_by_unit") or {})
+        for k, v in cpu.items():
+            units[k] = round(float(units.get(k, 0)) + v, 1)
+        day["cpu_by_unit"] = units
+        if load > cores * HIGH_PER_CORE:
+            top = max(cpu, key=cpu.get)
+            high = dict(day.get("high_units") or {})
+            high[top] = int(high.get(top, 0)) + 1
+            day["high_units"] = high
     day["samples"] = day.get("samples", 0) + 1
     day["load_sum"] = round(day.get("load_sum", 0.0) + load, 2)
     if load > day.get("load_max", -1):
@@ -84,16 +144,31 @@ def summary(date: str, day: dict) -> str:
              f"스왑 최대 {day.get('swap_max', 0)}MB",
              f"사주데이 응답 최대 {day.get('saju_ms_max', 0)}ms·실패 {day.get('saju_fail', 0)}/{day.get('saju_checks', 0)}"
              + (f"({', '.join(day['saju_fail_at'][:8])})" if day.get("saju_fail_at") else "")]
+    if day.get("high_units"):
+        parts.append("높은 부하 때 CPU 가장 많이 쓴 곳 " + ", ".join(
+            f"{k} {v}분" for k, v in sorted(day["high_units"].items(), key=lambda kv: -kv[1])[:4]))
+    if day.get("cpu_by_unit"):
+        parts.append("CPU 많이 쓴 곳 " + ", ".join(
+            f"{k} {round(v / 60)}분" for k, v in sorted(day["cpu_by_unit"].items(), key=lambda kv: -kv[1])[:5]))
+    hours = {h: s / n for h, (s, n) in (day.get("load_by_hour") or {}).items() if n}
+    if hours:
+        busy = sorted(hours.items(), key=lambda kv: -kv[1])[:3]
+        parts.append("부하 높은 시간대 " + ", ".join(f"{h}시 평균 {v:.1f}" for h, v in sorted(busy)))
     return " / ".join(parts)
 
 
 def record(state: dict, now: datetime, check_saju: bool, reader=None) -> str | None:
     """한 번 재서 state 에 더함. 날짜가 바뀌었으면 어제 요약 문장을 돌려줌 (부르는 쪽이 봇 기록에 남김)."""
-    reader = reader or {"load": read_load, "mem": read_mem, "saju": saju_ms, "cores": os.cpu_count}
+    reader = reader or {"load": read_load, "mem": read_mem, "saju": saju_ms, "cores": os.cpu_count, "cpu": read_cpu}
     stats = dict(state.get("server_stats") or {})
     today, stamp = now.strftime("%Y-%m-%d"), now.strftime("%Y-%m-%d %H:%M")
     saju = reader["saju"]() if check_saju else "skip"
-    stats[today] = add_sample(stats.get(today, {}), stamp, reader["load"](), reader["cores"]() or 1, reader["mem"](), saju)
+    cpu_now = (reader.get("cpu") or (lambda: {}))()
+    prev = state.get(CPU_PREV) or {}
+    cpu = cpu_delta(prev.get("units") or {}, cpu_now) if prev else {}
+    if cpu_now:
+        state[CPU_PREV] = {"units": cpu_now}
+    stats[today] = add_sample(stats.get(today, {}), stamp, reader["load"](), reader["cores"]() or 1, reader["mem"](), saju, cpu)
     done = sorted(d for d in stats if d < today)
     report = None
     last = state.get("server_stats_reported", "")
