@@ -51,6 +51,14 @@ add_action(
 	}
 );
 
+/** 네이버 칸: 나옴(처음 나온 날) / 아직 / 확인 전. */
+function firstlab_naver_cell( array $row ): string {
+	if ( empty( $row['checked'] ) ) {
+		return '확인 전';
+	}
+	return ! empty( $row['found'] ) ? esc_html( '나옴' . ( ! empty( $row['first_seen'] ) ? ' (' . $row['first_seen'] . '부터)' : '' ) ) : '아직';
+}
+
 /** '요청했어요' 단추 (이 글을 서치콘솔에서 색인 생성 요청했다고 표시). */
 function firstlab_stats_request_button( int $post_id ): string {
 	return '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" style="display:inline">'
@@ -60,7 +68,7 @@ function firstlab_stats_request_button( int $post_id ): string {
 }
 
 /** 글별 색인 상태 — 단계마다 표 하나 (할 일이 있는 단계부터). */
-function firstlab_stats_index_groups( array $posts ): void {
+function firstlab_stats_index_groups( array $posts, array $naver = array() ): void {
 	$titles = array(
 		'request'   => array( '보강 끝 — 색인 생성 요청하세요', '서치콘솔 맨 위 검색창에 주소를 넣고 \'색인 생성 요청\'을 누른 뒤 \'요청했어요\'를 눌러 주세요. (하루 요청 수 한도가 있어요)' ),
 		'improve'   => array( '구글이 읽고도 안 넣은 글 — 보강 차례', '+@ 보강 차례 맨 앞에 자동으로 들어가요. 보강이 끝나면 위 \'요청하세요\'로 올라와요.' ),
@@ -81,6 +89,7 @@ function firstlab_stats_index_groups( array $posts ): void {
 			esc_html( (string) ( $p['last_crawl'] ?? '' ) ),
 			esc_html( $plus_at ),
 			esc_html( $requested ),
+			firstlab_naver_cell( (array) ( $naver[ (string) $id ] ?? array() ) ),
 			esc_html( $note ) . ( in_array( $stage, FIRSTLAB_REQUESTABLE, true ) ? ' ' . firstlab_stats_request_button( $id ) : '' ),
 		);
 	}
@@ -96,7 +105,7 @@ function firstlab_stats_index_groups( array $posts ): void {
 		if ( 'indexed' === $stage ) {
 			echo '<details><summary>목록 보기</summary>';
 		}
-		firstlab_stats_table( array( '글', '공개일', '구글이 마지막으로 읽은 날', '보강한 날', '요청한 날', '비고' ), $groups[ $stage ] );
+		firstlab_stats_table( array( '글', '공개일', '구글이 마지막으로 읽은 날', '보강한 날', '요청한 날', '네이버', '비고' ), $groups[ $stage ] );
 		if ( 'indexed' === $stage ) {
 			echo '</details>';
 		}
@@ -255,10 +264,14 @@ function firstlab_stats_render_page(): void {
 		foreach ( (array) ( $index['not_indexed'] ?? array() ) as $why => $count ) {
 			echo firstlab_stats_card( (string) $why, (int) $count . '편', '색인 안 됨' ); // phpcs:ignore WordPress.Security.EscapeOutput
 		}
+		$naver = (array) ( $state['naver'] ?? array() );
+		if ( $naver ) {  // 네이버 검색 노출 (bot/naver_presence.record, 11/16 운영자 '넣어라')
+			echo firstlab_stats_card( '네이버 검색에 나옴', (int) ( $naver['found'] ?? 0 ) . '편', '공개 ' . (int) ( $naver['published'] ?? 0 ) . '편 중 · ' . ( $naver['date'] ?? '' ) . ' 확인' ); // phpcs:ignore WordPress.Security.EscapeOutput
+		}
 		echo '</div>';
 		$waiting = (array) ( $index['waiting'] ?? array() );
 		if ( ! empty( $index['posts'] ) ) {
-			firstlab_stats_index_groups( (array) $index['posts'] );
+			firstlab_stats_index_groups( (array) $index['posts'], (array) ( $state['naver']['posts'] ?? array() ) );
 		} elseif ( $waiting ) {
 			echo '<h3>색인 안 된 글</h3>';
 			firstlab_stats_table(

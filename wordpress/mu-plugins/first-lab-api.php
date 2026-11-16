@@ -338,6 +338,7 @@ function firstlab_api_maintenance(): array {
 		'search'      => $state['search'] ?? null, // 구글 검색 성과 28일 요약 (bot/search_console.record, 하루 한 번)
 		'ga4'         => $state['ga4'] ?? null, // GA4 방문 28일 요약 (bot/ga4.record, 하루 한 번)
 		'index'       => $state['index'] ?? null, // 공개 글 구글 색인 요약 (bot/index_check.record, 하루 한 번)
+		'naver'       => $state['naver'] ?? null, // 공개 글 네이버 검색 노출 (bot/naver_presence.record, 11/16)
 		'run_timing'  => $state['run_timing'] ?? null, // 매분 봇 실행 단계별 걸린 시간 (bot/run_timing.record, 11/15)
 		'publish_order_all' => $state['publish_order_all'] ?? null, // 대기 글 전체 공개 순서 (쉬운 말 다듬기 순서)
 		'logins'      => get_option( 'firstlab_login_log', null ), // 관리자 로그인 성공(시각·IP·기기)·날짜별 실패·잠금 수 (first-lab-security.php) — 모르는 로그인 감시

@@ -279,6 +279,13 @@ def main() -> None:
             add_log(state, "실패" not in line, line)
     except Exception as e:  # noqa: BLE001
         failures.append(f"색인 기록 실패: {str(e)[:150]}")
+    try:  # 공개 글 네이버 노출 (/maintenance 'naver', bot/naver_presence.record — 11/16 운영자 '넣어라')
+        from .naver_presence import record as record_naver
+        line = record_naver(state)
+        if line:
+            add_log(state, "실패" not in line, line)
+    except Exception as e:  # noqa: BLE001
+        failures.append(f"네이버 노출 확인 실패: {str(e)[:150]}")
     for line in failures:
         add_log(state, False, line)
     expiring = secrets_expiring()  # 비밀값 이름_EXPIRES=YYYY-MM-DD 를 set-secrets.sh 로 넣어 두면 30일 전부터 알림 (/health → 메일)
