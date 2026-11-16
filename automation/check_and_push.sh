@@ -25,6 +25,11 @@ edited=$(git diff --cached --name-status | awk '$1=="M" && $2 ~ /^wordpress\/que
 [ -z "$edited" ] || { echo "!! 이미 올린 갱신 파일을 고침 — 올리지 않음: $edited (apply_review.py 패치로 고치기)"; git reset -q; exit 1; }
 git diff --cached --quiet && { echo "바뀐 것 없음"; exit 0; }
 git commit -q -m "$msg"
+git fetch -q origin main
+if ! git diff --name-only origin/main...HEAD | bash automation/full_deploy_guard.sh; then
+  git push -q origin "HEAD:$(git rev-parse --abbrev-ref HEAD)" || echo "!! 작업 브랜치 올리기도 실패 — git status 로 확인"
+  exit 1
+fi
 pushed=""
 for wait in 2 4 8 16; do
   git fetch -q origin main && { git rebase -q origin/main || { git rebase --abort 2>/dev/null; false; }; } \
