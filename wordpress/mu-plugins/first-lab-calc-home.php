@@ -144,3 +144,62 @@ add_filter(
 	10,
 	2
 );
+
+/*
+ * 계산기 단독 페이지를 구글이 빨리 다시 읽게 하는 임시 사이트맵 (11/16 색인 0편 — 사이트 전체 점검).
+ * 단독 페이지(약 75개, 본문 350자 남짓)는 11/15 부터 noindex·사이트맵 제외·링크 없음 → 구글이 다시 올 계기가 없어
+ * 몇 달 동안 '얇은 페이지 많은 사이트'로 남을 수 있음. 이 주소들만 담은 사이트맵을 robots.txt 에 알려
+ * 구글이 다시 읽고 noindex(또는 대표 글로 301)를 보게 한다. FIRSTLAB_CALC_REMOVAL_UNTIL 이 지나면 저절로 사라짐.
+ */
+const FIRSTLAB_CALC_REMOVAL_UNTIL   = '2027-01-31';
+const FIRSTLAB_CALC_REMOVAL_SITEMAP = '/calc-removed-sitemap.xml';
+
+function firstlab_calc_removal_active(): bool {
+	return FIRSTLAB_CALC_PAGES_NOINDEX && current_time( 'Y-m-d' ) <= FIRSTLAB_CALC_REMOVAL_UNTIL;
+}
+
+/** 임시 사이트맵에 넣을 주소: 계산기 단독 페이지 전부와 계산기 모음(/calculators/). */
+function firstlab_calc_removal_urls(): array {
+	$urls = array();
+	foreach ( get_pages( array( 'post_status' => 'publish' ) ) as $page ) {
+		if ( '' !== firstlab_calc_id_of_slug( urldecode( $page->post_name ) ) || 'calculators' === $page->post_name ) {
+			$urls[] = get_permalink( $page );
+		}
+	}
+	return $urls;
+}
+
+function firstlab_calc_removal_xml( array $urls, string $lastmod ): string {
+	$items = '';
+	foreach ( $urls as $u ) {
+		$items .= '<url><loc>' . esc_url( $u ) . '</loc><lastmod>' . esc_html( $lastmod ) . '</lastmod></url>';
+	}
+	return '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . $items . '</urlset>';
+}
+
+add_action(
+	'template_redirect',
+	static function () {
+		$path = strtok( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), '?' );
+		if ( FIRSTLAB_CALC_REMOVAL_SITEMAP !== $path || ! firstlab_calc_removal_active() ) {
+			return;
+		}
+		status_header( 200 );
+		header( 'Content-Type: application/xml; charset=UTF-8' );
+		header( 'X-Robots-Tag: noindex' );
+		echo firstlab_calc_removal_xml( firstlab_calc_removal_urls(), '2026-11-15' ); // phpcs:ignore WordPress.Security.EscapeOutput -- 위에서 이스케이프
+		exit;
+	},
+	0
+);
+
+add_filter(
+	'robots_txt',
+	static function ( $output ) {
+		if ( ! firstlab_calc_removal_active() || false !== strpos( $output, FIRSTLAB_CALC_REMOVAL_SITEMAP ) ) {
+			return $output;
+		}
+		return rtrim( $output ) . "\nSitemap: " . home_url( FIRSTLAB_CALC_REMOVAL_SITEMAP ) . "\n";
+	},
+	100
+);

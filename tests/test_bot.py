@@ -6778,6 +6778,20 @@ firstlab_stats_render_page();
         site = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
         self.assertIn("add_filter( 'author_link', static fn() => home_url( '/about/' ) );", site)
 
+    def test_calc_pages_listed_for_quick_removal(self):
+        """11/16 색인 0편: 계산기 단독 페이지(noindex·사이트맵 제외·링크 없음)는 구글이 다시 올 계기가 없어 오래 남음 →
+        그 주소만 담은 임시 사이트맵을 robots.txt 에 알림 (2027-01-31 지나면 저절로 사라짐)."""
+        import shutil, subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        code = ("define('ABSPATH','/'); function add_action(){} function add_filter(){} function esc_url($u){return $u;} function esc_html($t){return $t;}"
+                " require '" + str(ROOT / "wordpress" / "mu-plugins" / "first-lab-calc-home.php") + "';"
+                " echo firstlab_calc_removal_xml(array('https://first-lab.kr/vat-calculator/'), '2026-11-15');")
+        xml = subprocess.run(["php", "-r", code], capture_output=True, text=True, check=True).stdout
+        self.assertIn("<loc>https://first-lab.kr/vat-calculator/</loc><lastmod>2026-11-15</lastmod>", xml)
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-calc-home.php").read_text(encoding="utf-8")
+        self.assertIn("const FIRSTLAB_CALC_REMOVAL_UNTIL   = '2027-01-31';", src)
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""
