@@ -1443,11 +1443,14 @@ def known_wrong(body_html: str, today: dt.date | None = None) -> list[str]:
     today = today or dt.date.today()
     out = []
     whole = _plain(body_html or "")
+    # 주제 앞에 '본문:' 이 붙으면 글 전체에서 주제를 봄 (뜻풀이 문장엔 주제어가 없을 때 — 조정대상지역). 글 전체 검사는 글마다 한 번만
+    # (11/17: 문장마다 글 전체를 다시 훑어 '(?=.*경정청구)' 같은 앞보기가 글 하나에 수백 번 → 하루 한 번 감시가 15분 제한에 걸려
+    # 10분마다 처음부터 다시, 코어 절반을 계속 씀 — 사주데이 'CPU 부하 급증' 경보)
+    in_whole = {topic: bool(re.search(topic.removeprefix("본문:"), whole)) for topic, _, _ in KNOWN_WRONG if topic.startswith("본문:")}
     for sent in _sentences(body_html):
         for topic, wrong, fix in KNOWN_WRONG:
-            # 주제 앞에 '본문:' 이 붙으면 글 전체에서 주제를 봄 (뜻풀이 문장엔 주제어가 없을 때 — 조정대상지역)
-            where = whole if topic.startswith("본문:") else sent
-            if re.search(topic.removeprefix("본문:"), where) and re.search(wrong, sent):
+            topic_hit = in_whole[topic] if topic in in_whole else re.search(topic, sent)
+            if topic_hit and re.search(wrong, sent):
                 out.append(f"확인된 틀린 문구: '{sent[:50]}' — {fix}")
         for since, wrong, ok, fix in DATED_WRONG:
             if today >= since and re.search(wrong, sent) and not re.search(ok, sent):
