@@ -5650,7 +5650,7 @@ class FlowTest(unittest.TestCase):
         import subprocess
         if not shutil.which("php"):
             self.skipTest("php 없음")
-        boot = ("define('ABSPATH','/');function add_filter(){} function add_shortcode(){} "
+        boot = ("define('ABSPATH','/');function add_filter(){} function add_action(){} function add_shortcode(){} "
                 "require 'wordpress/mu-plugins/first-lab-related.php';require 'wordpress/mu-plugins/first-lab-flow.php';")
         return subprocess.run(["php", "-r", boot + code], cwd=ROOT, capture_output=True, text=True).stdout
 
@@ -6665,6 +6665,15 @@ firstlab_stats_render_page();
         self.assertIsNotNone(rule)
         for uri in ("/sitemap.xml", "/post-sitemap.xml", "/feed/", "/robots.txt"):
             self.assertRegex(uri, rule.group(1))
+
+    def test_empty_category_404_and_stable_form_urls(self):
+        """11/17 구글 문서 점검: 글 0편 분류가 200 '글 없음'(soft 404) → 404. 양식 파일 ?v= 가 배포 시각이라 주소가 계속 늘어남 → 내용 값."""
+        flow = (ROOT / "wordpress" / "mu-plugins" / "first-lab-flow.php").read_text(encoding="utf-8")
+        self.assertIn("is_category() && ! is_paged() && 0 === (int) get_queried_object()->count", flow)
+        self.assertIn("$wp_query->set_404();", flow)
+        forms = (ROOT / "wordpress" / "mu-plugins" / "first-lab-forms.php").read_text(encoding="utf-8")
+        self.assertIn("md5_file( $path )", forms)
+        self.assertNotIn("filemtime( $path )", forms)
 
     def test_home_has_h1_and_share_image(self):
         """11/17 구글 문서 점검: 홈에 H1·공유용 대표 사진(og:image)이 없음 → 첫 쪽 H1 은 사이트 설명, 공유 사진은 테마 그림."""

@@ -130,6 +130,21 @@ if ( function_exists( 'add_filter' ) ) {
 		}
 	);
 
+	// 공개 글이 0편인 분류(it·hobby·pet·미분류)는 '글 없음' 화면을 200 으로 주던 것 → 404 (11/17 구글 크롤링 오류 문서 'soft 404':
+	// 없는 페이지는 404 로). 글이 생기면 저절로 다시 열림.
+	add_action(
+		'template_redirect',
+		static function () {
+			global $wp_query;
+			if ( is_category() && ! is_paged() && 0 === (int) get_queried_object()->count ) {
+				$wp_query->set_404();
+				status_header( 404 );
+				nocache_headers();
+			}
+		},
+		1
+	);
+
 	// 주제 모음 페이지(태그 페이지) 위: 계산기와 전체 글 목록 — templates/archive.html 의 [firstlab_hub_intro]
 	add_shortcode(
 		'firstlab_hub_intro',

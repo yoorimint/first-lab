@@ -34,7 +34,8 @@ function firstlab_forms_box( array $spec ): string {
 	foreach ( array( 'docx' => 'Word 파일 (.docx)', 'pdf' => 'PDF (인쇄용)' ) as $ext => $label ) {
 		$path = $dir . $spec['id'] . '.' . $ext;
 		if ( is_file( $path ) ) {
-			$href    = $url . rawurlencode( $spec['id'] ) . '.' . $ext . '?v=' . filemtime( $path );
+			// ?v= 는 파일 내용 값 — 배포 시각(filemtime)이면 배포마다 같은 파일 주소가 새로 생겨 구글이 계속 다시 받음 (11/17 구글 문서 점검)
+			$href    = $url . rawurlencode( $spec['id'] ) . '.' . $ext . '?v=' . substr( (string) md5_file( $path ), 0, 8 );
 			$links[] = '<a class="fl-form-btn" href="' . esc_url( $href ) . '" download>' . esc_html( $label ) . '</a>';
 		}
 	}
