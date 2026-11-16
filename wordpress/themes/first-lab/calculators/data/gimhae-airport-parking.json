@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-05", "yearly_checked": 2026,
+  "basis_date": "2026-11-05", "yearly_checked": 2026, "yearly_recheck": "2027-01-05", "yearly_pending": "2027년 김해공항 주차요금이 그대로인지 (11/16 공사 요금표 P1·P2·P3 값 data 와 같음·변경 공지 없음)",
   "sources": [
     {"name": "한국공항공사 김해국제공항 주차요금 안내 (요금 체계·할인·서비스 타임)", "url": "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190&CONTENTS_NO=2"},
     {"name": "한국공항공사 김해국제공항 주차장 안내", "url": "https://www.airport.co.kr/gimhae/cms/frCon/index.do?MENU_ID=190"}
