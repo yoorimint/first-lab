@@ -155,6 +155,9 @@ add_filter(
  */
 const FIRSTLAB_CALC_REMOVAL_UNTIL   = '2027-01-31';
 const FIRSTLAB_CALC_REMOVAL_SITEMAP = '/calc-removed-sitemap.xml';
+// 이 날 이후 만든 계산기 페이지는 처음부터 noindex 라 구글이 모름 → 임시 사이트맵에 넣지 않음 (11/17 구글 사이트맵 문서 점검:
+// '검색에 표시하고 싶지 않은 URL 을 사이트맵에 넣지 말 것' — 빼는 목적의 주소만 최소로, 11/16 새 계산기 2개가 들어가 있었음)
+const FIRSTLAB_CALC_NOINDEX_SINCE = '2026-11-15 23:59:59';
 
 function firstlab_calc_removal_active(): bool {
 	return FIRSTLAB_CALC_PAGES_NOINDEX && current_time( 'Y-m-d' ) <= FIRSTLAB_CALC_REMOVAL_UNTIL;
@@ -164,6 +167,9 @@ function firstlab_calc_removal_active(): bool {
 function firstlab_calc_removal_urls(): array {
 	$urls = array();
 	foreach ( get_pages( array( 'post_status' => 'publish' ) ) as $page ) {
+		if ( $page->post_date > FIRSTLAB_CALC_NOINDEX_SINCE ) {
+			continue;
+		}
 		if ( '' !== firstlab_calc_id_of_slug( urldecode( $page->post_name ) ) || 'calculators' === $page->post_name ) {
 			$urls[] = get_permalink( $page );
 		}

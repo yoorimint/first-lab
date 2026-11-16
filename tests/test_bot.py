@@ -6881,6 +6881,9 @@ firstlab_stats_render_page();
         self.assertIn("<loc>https://first-lab.kr/vat-calculator/</loc><lastmod>2026-11-15</lastmod>", xml)
         src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-calc-home.php").read_text(encoding="utf-8")
         self.assertIn("const FIRSTLAB_CALC_REMOVAL_UNTIL   = '2027-01-31';", src)
+        # 11/17 구글 사이트맵 문서: noindex 뒤에 만든(구글이 모르는) 계산기는 넣지 않음
+        self.assertIn("if ( $page->post_date > FIRSTLAB_CALC_NOINDEX_SINCE ) {", src)
+        self.assertIn("const FIRSTLAB_CALC_NOINDEX_SINCE = '2026-11-15 23:59:59';", src)
 
     def test_site_urls_use_uppercase_percent_encoding(self):
         """11/16 서치콘솔 '참조 사이트맵 없음·참조 페이지 없음': 사이트맵·canonical·링크가 소문자 %ec.., 구글은 대문자 %EC.. 로 기억
