@@ -1,6 +1,6 @@
 {
  "basis_date": "2026-11-11",
- "yearly_checked": 2026,
+ "yearly_checked": 2026, "yearly_recheck": "2027-01-02", "yearly_pending": "2027년 기초연금 선정기준액(단독·부부)·근로소득 공제액 고시 (보건복지부, 12월 말 예상)",
  "year": 2026,
  "max_input": 1000000000000,
  "sources": [
