@@ -72,3 +72,20 @@ function firstlab_upper_pct( string $url ): string {
 foreach ( array( 'post_link', 'page_link', 'post_type_link', 'term_link', 'attachment_link' ) as $firstlab_link_hook ) {
 	add_filter( $firstlab_link_hook, 'firstlab_upper_pct', 99 );
 }
+
+/**
+ * 본문 속 우리 사이트 링크를 대표 주소(canonical) 표기로: 한글 그대로·소문자 %xx → 대문자 %XX.
+ * 11/17 구글 '중복 URL 통합' 문서 점검: 내부 링크는 대표 주소로 일관되게 — 856개 중 1개가 한글 그대로였음
+ * (글쓰기 작업이 본문에 'https://first-lab.kr/건물등기부등본발급/' 처럼 씀).
+ */
+function firstlab_canonical_hrefs( string $html ): string {
+	return (string) preg_replace_callback(
+		'~href="((?:https://first-lab\.kr)?/)([^"?#]*)~u',
+		static function ( $m ) {
+			$path = implode( '/', array_map( static fn( $seg ) => rawurlencode( rawurldecode( $seg ) ), explode( '/', $m[2] ) ) );
+			return 'href="' . $m[1] . $path;
+		},
+		$html
+	);
+}
+add_filter( 'the_content', 'firstlab_canonical_hrefs', 99 );

@@ -6898,6 +6898,24 @@ firstlab_stats_render_page();
         for hook in ("post_link", "page_link", "term_link"):
             self.assertIn(f"'{hook}'", site)
 
+    def test_internal_links_use_canonical_form(self):
+        """11/17 구글 '중복 URL 통합' 문서 점검: 내부 링크는 대표 주소로 — 본문의 한글 그대로·소문자 %xx 링크를 대문자 %XX 로."""
+        import re
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        site_src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        func = re.search(r"function firstlab_canonical_hrefs\(.*?\n\}", site_src, re.S).group(0)
+        html = ('<a href="https://first-lab.kr/건물등기부등본발급/">a</a> <a href="/%ec%a3%bc%ed%9c%b4/?x=1#h">b</a> '
+                '<a href="https://first-lab.kr/%EC%9E%90/">c</a> <a href="https://www.gov.kr/한글">d</a>')
+        r = subprocess.run(["php", "-r", func + " echo firstlab_canonical_hrefs($argv[1]);", html], capture_output=True, text=True)
+        self.assertIn('href="https://first-lab.kr/%EA%B1%B4%EB%AC%BC%EB%93%B1%EA%B8%B0%EB%B6%80%EB%93%B1%EB%B3%B8%EB%B0%9C%EA%B8%89/"', r.stdout, r.stderr)
+        self.assertIn('href="/%EC%A3%BC%ED%9C%B4/?x=1#h"', r.stdout)
+        self.assertIn('href="https://first-lab.kr/%EC%9E%90/"', r.stdout)
+        self.assertIn('href="https://www.gov.kr/한글"', r.stdout)   # 다른 사이트는 그대로
+        self.assertIn("add_filter( 'the_content', 'firstlab_canonical_hrefs'", site_src)
+
     def test_dead_law_popup_links_become_article_urls(self):
         """11/16 사이트 점검: 종합소득세 글 '공식 안내 바로가기'의 법제처 lsSideInfoP 주소 2개가 404 → '/법령/소득세법/제65조' 로.
         새 글은 저장할 때(bot/sources.section), 이미 올린 글은 화면에서(first-lab-schema.php) 바꿈."""
