@@ -7133,6 +7133,27 @@ class PlainCheckTest(unittest.TestCase):
         self.assertEqual(cg.faq_answer_flip("<h3>전자카드를 쓰면 신고는 안 해도 되나요?</h3><p>아니요. 전자카드 현장도 매달 신고해야 해요.</p>"), [])
         self.assertEqual(cg.faq_answer_flip("<h3>매달 신고해야 하나요?</h3><p>아니요. 분기마다 신고해야 해요.</p>"), [])
 
+    def test_known_wrong_scans_whole_post_once(self):
+        """11/17: '본문:' 주제를 문장마다 글 전체에서 다시 찾아 글 하나에 수백 번 → 하루 한 번 감시(bot/known_watch)가 15분 제한에
+        걸려 10분마다 다시 돌며 코어 절반을 계속 씀. 글 전체 검사는 글마다 주제당 한 번."""
+        import datetime as dt
+        import re
+        from unittest import mock
+        from bot import condition_gate as cg
+        body = "".join(f"<p>문장 {i} 은 그냥 설명이에요.</p>" for i in range(200))
+        whole = cg._plain(body)
+        calls = []
+        real = re.search
+
+        def counting(pattern, string, *a, **k):
+            if string == whole:
+                calls.append(pattern)
+            return real(pattern, string, *a, **k)
+        with mock.patch.object(cg.re, "search", side_effect=counting):
+            cg.known_wrong(body, dt.date(2026, 11, 17))
+        whole_topics = [t for t, _, _ in cg.KNOWN_WRONG if t.startswith("본문:")]
+        self.assertLessEqual(len(calls), len(whole_topics))
+
     def test_dated_wrong_koroad_name(self):
         """11/12 #1245: 정식 이름 '한국도로교통공단'(2024.7.31 한국도로교통공단법)을 '도로교통공단'으로 잘못 고친 일 → 옛 이름은 막고 정식 이름은 통과."""
         import datetime as dt
