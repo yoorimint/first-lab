@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 828,
+ "replace": [
+  {
+   "old": "ai-7318b0642b",
+   "prompt": "A young part-time worker wiping a wooden counter with a cloth in a small bright cafe with potted plants and a plain white wall.",
+   "alt": "밝은 카페에서 나무 카운터를 닦는 아르바이트생",
+   "why": "벽시계 숫자판과 병 라벨이 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

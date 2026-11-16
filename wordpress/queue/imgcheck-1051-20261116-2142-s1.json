@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1051,
+ "replace": [
+  {
+   "old": "ai-97208835e9",
+   "prompt": "A quiet modern office building hallway with a red fire hose cabinet door closed on a plain white wall, soft daylight, no text or labels anywhere",
+   "alt": "밝은 건물 복도 흰 벽에 설치된 빨간 소화전함",
+   "why": "소화기 몸체에 엉터리 영문 글자(FINGG)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

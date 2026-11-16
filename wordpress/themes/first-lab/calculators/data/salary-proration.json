@@ -1,0 +1,23 @@
+{
+  "basis_date": "2026-11-16",
+  "yearly": false,
+  "sources": [
+    {
+      "name": "고용노동부 빠른인터넷상담 '중도퇴사자의 급여계산 방법' (행정해석 근기 1455-24422, 1981.8.11. — 역일수·소정근로일 방식)",
+      "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202408210326456840345"
+    },
+    {
+      "name": "고용노동부 빠른인터넷상담 '1개월 미만 근무 중도퇴사자의 급여 계산' (2026 — 노사가 정한 방식이어도 시간급 최저임금 이상)",
+      "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202608280601124820685"
+    },
+    {
+      "name": "고용노동부 빠른인터넷상담 '월 중도 퇴사 일할 계산' (근기 68207-690, 1999.3.24. — 전액 지급 규정이 없으면 일할 지급)",
+      "url": "https://www.moel.go.kr/minwon/fastcounsel/fastcounselView.do?inetDcssMngId=202207271258535691000"
+    },
+    {
+      "name": "국가법령정보센터 근로기준법 제17조(임금 계산방법 서면 교부)·제93조(취업규칙)",
+      "url": "https://www.law.go.kr/법령/근로기준법"
+    }
+  ],
+  "max_monthly": 1000000000
+}
