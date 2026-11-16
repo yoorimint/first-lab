@@ -6674,6 +6674,11 @@ firstlab_stats_render_page();
         forms = (ROOT / "wordpress" / "mu-plugins" / "first-lab-forms.php").read_text(encoding="utf-8")
         self.assertIn("md5_file( $path )", forms)
         self.assertNotIn("filemtime( $path )", forms)
+        conf = (ROOT / "server" / "nginx" / "first-lab.conf").read_text(encoding="utf-8")
+        block = conf[conf.index("location ~* /wp-content/themes/first-lab/forms/"):]
+        block = block[:block.index("}")]
+        self.assertIn('add_header X-Robots-Tag "noindex" always;', block)
+        self.assertIn("include /etc/nginx/snippets/first-lab-headers.conf;", block)   # location 안 add_header 는 바깥 헤더를 덮음
 
     def test_home_has_h1_and_share_image(self):
         """11/17 구글 문서 점검: 홈에 H1·공유용 대표 사진(og:image)이 없음 → 첫 쪽 H1 은 사이트 설명, 공유 사진은 테마 그림."""
