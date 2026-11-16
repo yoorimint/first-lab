@@ -57,21 +57,36 @@ def main() -> None:
     from . import run_timing
     from .run import link_maintenance
     from .state import add_log, load_state, save_state
+    import signal
+    import sys
     state = load_state()
     stuck = run_timing.take_step(STEP)
     if stuck:
         add_log(state, False, f"앞 링크·관련 글 정리가 '{stuck}' 단계에서 멈춰 끝나지 못함 (시간 제한) — 이번에 다시 함")
+        save_state(state)  # 이번 실행도 못 끝나면 이 줄이 영영 안 남았음 (11/16: 3시간 넘게 기록 0)
     now = datetime.now(ZoneInfo("Asia/Seoul"))
     timer = StepCpu()
 
     def step(name: str) -> None:
         timer(name)
         run_timing.mark_step(name, STEP)
-    link_maintenance(state, now, step=step)
-    timer.finish()
-    run_timing.clear_step(STEP)
-    record(state, f"{now:%Y-%m-%d}", timer.steps)
-    save_state(state)
+
+    # 시간 제한(systemd RuntimeMaxSec)에 걸리면 SIGTERM → 여기까지 단계별 CPU·멈춘 단계를 남기고 끝 (11/16 '왜 부하 생기냐':
+    # 10분마다 코어 절반을 쓰는데 한 번도 끝나지 못해 어느 단계인지 기록이 없었음)
+    signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(143))
+    finished = False
+    try:
+        link_maintenance(state, now, step=step)
+        finished = True
+    finally:
+        last = timer.name
+        timer.finish()
+        if finished:
+            run_timing.clear_step(STEP)
+        else:
+            add_log(state, False, f"링크·관련 글 정리가 '{last}' 단계에서 시간 제한으로 끝남 (단계별 CPU: links_timing)")
+        record(state, f"{now:%Y-%m-%d}", timer.steps)
+        save_state(state)
 
 
 if __name__ == "__main__":

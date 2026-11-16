@@ -5239,6 +5239,30 @@ class ServerStatsTest(unittest.TestCase):
         self.assertEqual(sorted(state["links_timing"]), ["2026-11-15", "2026-11-16"])
         self.assertIn("links_timing", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
 
+    def test_links_job_leaves_record_when_killed(self):
+        """11/16: 링크·관련 글 정리가 10분마다 코어 절반을 쓰는데 시간 제한에 걸려 한 번도 저장 못 함 → 기록 0.
+        시간 제한(SIGTERM)에도 멈춘 단계·단계별 CPU 를 남김."""
+        from unittest import mock
+        from bot import links_job
+        saved = []
+
+        def slow(state, now, step):
+            step("공식 사이트 링크 확인")
+            step("관련 글 계산")
+            raise SystemExit(143)   # SIGTERM 처리기가 하는 일
+        with mock.patch("bot.state.load_state", return_value={"log": []}), \
+                mock.patch("bot.state.save_state", side_effect=lambda s: saved.append(dict(s))), \
+                mock.patch("bot.state.add_log", side_effect=lambda s, ok, msg: s["log"].append(msg)), \
+                mock.patch("bot.run.link_maintenance", side_effect=slow), \
+                mock.patch("bot.run_timing.take_step", return_value=""), \
+                mock.patch("bot.run_timing.mark_step"), mock.patch("bot.run_timing.clear_step") as clear, \
+                mock.patch("signal.signal"):
+            with self.assertRaises(SystemExit):
+                links_job.main()
+        self.assertIn("'관련 글 계산' 단계에서 시간 제한", saved[-1]["log"][-1])
+        self.assertIn("관련 글 계산", list(saved[-1]["links_timing"].values())[0])
+        clear.assert_not_called()   # 다음 실행도 멈춘 단계를 알게
+
     def test_proc_readers(self):
         import tempfile
         from bot import server_stats as ss
