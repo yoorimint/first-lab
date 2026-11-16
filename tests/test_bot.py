@@ -6837,6 +6837,25 @@ firstlab_stats_render_page();
         self.assertIn("position: relative", label)
         self.assertIn("inset: 0", radio)
 
+    def test_naver_presence_checked_daily(self):
+        """11/16 운영자 '넣어라': 공개 글이 네이버 검색(제목 그대로)에 나오는지 하루 한 번 — 사이트 성과에 네이버 칸."""
+        from bot import naver_presence
+        pages = {"주휴수당 뜻": "<a href='https://first-lab.kr/x/'>", "HS코드 조회": "<a href='https://blog.naver.com/a/1'>"}
+        get = lambda url: next((v for k, v in pages.items() if __import__("urllib.parse").parse.quote_plus(k) in url), "")
+        posts = [{"post_id": 1419, "title": "주휴수당 뜻"}, {"post_id": 746, "title": "HS코드 조회"}]
+        state = {}
+        line = naver_presence.record(state, today="2026-11-16", posts=posts, get=get)
+        self.assertIn("공개 2편 중 1편", line)
+        self.assertEqual(state["naver"]["posts"]["1419"], {"found": True, "checked": "2026-11-16", "first_seen": "2026-11-16"})
+        self.assertFalse(state["naver"]["posts"]["746"]["found"])
+        self.assertEqual(naver_presence.record(state, today="2026-11-16", posts=posts, get=get), "")   # 하루 한 번
+        # 다음 날은 안 나온 글부터 다시 봄
+        order = naver_presence.due(posts, state["naver"]["posts"], "2026-11-17")
+        self.assertEqual([p["post_id"] for p in order], [746, 1419])
+        stats = (ROOT / "wordpress" / "mu-plugins" / "first-lab-stats.php").read_text(encoding="utf-8")
+        self.assertIn("'네이버'", stats)
+        self.assertIn("'naver'       => $state['naver'] ?? null", (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8"))
+
     def test_site_stats_page_is_separate_menu(self):
         """11/15 운영자 '서치콘솔 안 들어가도 대충 볼 수 있게' + '자동발행에 넣지 말고 따로, 보기 편하게':
         관리자 왼쪽 메뉴 '사이트 성과' 따로 (봇 설정 페이지엔 링크만). 서버가 모은 state 그대로 보여 줌."""

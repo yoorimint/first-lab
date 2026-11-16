@@ -301,6 +301,11 @@ def _main() -> None:
                 label = "색인 다시 점검"
                 from .index_check import record as record_index
                 msg = record_index(state, force=True) or "-"
+                try:  # 네이버 노출도 (하루 한 번 — 오늘 아직이면)
+                    from .naver_presence import record as record_naver
+                    msg += " / " + (record_naver(state) or "네이버는 오늘 이미 확인함")
+                except Exception as e:  # noqa: BLE001
+                    msg += f" / 네이버 노출 확인 실패: {str(e)[:80]}"
             elif data.get("type") == "image_check":
                 label = "사진 검사"
                 msg = image_check.apply_check(data)
