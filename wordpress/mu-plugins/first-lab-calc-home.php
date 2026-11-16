@@ -104,7 +104,8 @@ add_filter(
 add_action(
 	'init',
 	static function (): void {
-		$want = FIRSTLAB_CALC_PAGES_NOINDEX ? 'noindex' : 'index';
+		// '-upper': 11/16 주소를 대문자 %XX 로 바꿈 (first-lab-site.php firstlab_upper_pct) → 사이트맵 저장본도 한 번 새로
+		$want = ( FIRSTLAB_CALC_PAGES_NOINDEX ? 'noindex' : 'index' ) . '-upper';
 		if ( get_option( 'firstlab_calc_sitemap_mode' ) === $want ) {
 			return;
 		}
