@@ -7778,6 +7778,24 @@ class DeployQuickTest(unittest.TestCase):
             self.assertNotIn('-m bot.fix_posts)', sh)  # 배포 안에서 직접 돌리지 않음
             self.assertLess(sh.index("bot.publish_queue"), sh.index("maint-start.sh"))  # 새 글·갱신 파일은 배포 안에서 먼저
 
+    def test_stale_maint_queue_skips_heavy_steps(self):
+        """11/17: 11/16 밤 배포들이 줄 세운 옛 보정(15분짜리)이 하루 종일 연달아 돎 → maint.sh 에서 불렸는데 firstlab-maint 실행 밖이면
+        무거운 단계(fix_posts·pending_images)를 건너뜀. 새 방식(firstlab-maint)·다른 데서 부른 것은 그대로."""
+        import tempfile
+        from unittest import mock
+        from bot import side_jobs
+        with tempfile.NamedTemporaryFile("w", delete=False) as old, tempfile.NamedTemporaryFile("w", delete=False) as new:
+            old.write("0::/system.slice/run-r1a2b.scope\n")
+            new.write("0::/system.slice/firstlab-maint.service\n")
+        with mock.patch("shutil.which", return_value="/usr/bin/systemd-run"):
+            self.assertTrue(side_jobs.stale_maint_launch(old.name, "bash /opt/first-lab/server/maint.sh"))
+            self.assertFalse(side_jobs.stale_maint_launch(new.name, "bash /opt/first-lab/server/maint.sh"))
+            self.assertFalse(side_jobs.stale_maint_launch(old.name, "bash quick-deploy.sh"))
+        with mock.patch("shutil.which", return_value=None):
+            self.assertFalse(side_jobs.stale_maint_launch(old.name, "bash /opt/first-lab/server/maint.sh"))
+        for f in ("fix_posts.py", "pending_images.py"):
+            self.assertIn("stale_maint_launch()", (ROOT / "bot" / f).read_text(encoding="utf-8"))
+
     def test_full_scan_has_own_unit_and_reports_time(self):
         """11/16 운영자 '왜 부하 생기냐': 보정이 배포 안 setsid 로 돌아 CPU 기록에 '임시 실행'으로만 보였고, 배포가 겹치면 줄줄이 연달아 돎
         → 이름 붙은 별도 실행(firstlab-maint), 도는 중이면 '한 번 더' 표시만, 단계별 걸린 시간을 봇 기록에."""
