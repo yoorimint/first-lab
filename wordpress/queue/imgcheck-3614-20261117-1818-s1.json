@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3614,
+ "replace": [
+  {
+   "old": "ai-c40cbb40ca",
+   "prompt": "an empty baby stroller parked on a quiet sunlit park path lined with green trees, soft morning light",
+   "alt": "햇살 드는 공원 산책길에 세워 둔 유모차",
+   "why": "대표 사진이 AI 사진이 아니라 제목 글자 카드(글자가 들어간 이미지)"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

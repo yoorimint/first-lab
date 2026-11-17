@@ -1,0 +1,12 @@
+{
+ "type": "skip",
+ "slot": 1,
+ "keywords": [
+  {
+   "keyword": "주유계산기",
+   "why": "날마다 바뀌는 유가 시세가 핵심이라 글이 금방 틀린 정보가 됨"
+  }
+ ],
+ "law_changes": [],
+ "new_benefits": []
+}

@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1471,
+ "replace": [
+  {
+   "old": "ai-44c6cdb11b",
+   "prompt": "a bright empty office desk by a large window with a small potted plant and a white coffee mug, soft morning light, no objects with writing",
+   "alt": "아침 햇살이 드는 창가 사무실 책상과 화분, 커피잔",
+   "why": "책 표지에 엉터리 글자(MATGELL)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
