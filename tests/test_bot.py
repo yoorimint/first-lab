@@ -7812,6 +7812,9 @@ class DeployQuickTest(unittest.TestCase):
         maint = (ROOT / "server" / "maint.sh").read_text(encoding="utf-8")
         self.assertIn("bot.maint_report", maint)
         self.assertIn('[ -f "$AGAIN" ] || break', maint)
+        # 11/17: 20분짜리 보정 3개가 겹쳐 돎 → maint.sh 안에서 잠금(겹치면 '한 번 더'만 남기고 끝)
+        self.assertIn("flock -n 9", maint)
+        self.assertLess(maint.index("flock -n 9"), maint.index("for round in"))
         for f in ("maint.sh", "maint-start.sh"):
             self.assertEqual(subprocess.run(["bash", "-n", str(ROOT / "server" / f)]).returncode, 0)
 
