@@ -452,3 +452,7 @@ date,post,fixes,types
 2026-11-17,6621,0,
 2026-11-17,6824,0,
 2026-11-17,6826,0,
+2026-11-17,6512,1,missing_condition:1
+2026-11-17,6533,1,missing_condition:1
+2026-11-17,6593,1,unverified:1
+2026-11-17,6559,1,unverified:1
