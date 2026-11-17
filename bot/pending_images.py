@@ -102,6 +102,10 @@ def backfill_from_queue() -> list[str]:
 
 
 if __name__ == "__main__":
+    from .side_jobs import stale_maint_launch
+    if stale_maint_launch():
+        print("[사진 채우기] 옛 방식으로 줄 선 실행 — 건너뜀 (firstlab-maint 가 함)", flush=True)
+        raise SystemExit(0)
     # 배포 때: 대표 사진 없이 저장된 글 표시 (한도 초기화 후 봇이 채움)
     done = backfill_from_queue()
     print(f"[사진 채우기] 대표 사진 기다리는 글 표시: {', '.join(done) if done else '없음'}", flush=True)

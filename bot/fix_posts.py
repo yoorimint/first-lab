@@ -212,6 +212,10 @@ def fill_missing_author() -> None:
 
 
 def main() -> None:
+    from .side_jobs import stale_maint_launch
+    if stale_maint_launch():
+        print("[보정] 옛 방식으로 줄 선 실행 — 건너뜀 (firstlab-maint 가 함)", flush=True)
+        return
     bulk = wpbulk.posts()  # 글 본문·메타를 한 번에 (글마다 wp-cli 를 부르면 배포가 10분을 넘김)
     apply_patches(bulk)
     fill_missing_author()

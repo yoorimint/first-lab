@@ -1,0 +1,29 @@
+{
+  "basis_date": "2026-11-17", "yearly_checked": 2026, "year": 2026,
+  "yearly_recheck": "2027-01-02",
+  "yearly_pending": "2027년 최고·최저 보상기준 금액 고용노동부 고시(매년 12월 말) 확인",
+  "sources": [
+    {"name": "산업재해보상보험법 (제36조⑦ 최고·최저 보상기준 금액, 제57조 장해급여, 별표 2 장해급여표)", "url": "https://www.law.go.kr/법령/산업재해보상보험법"},
+    {"name": "산업재해보상보험법 시행령 제53조 (제1~3급 연금만, 가중 장해)", "url": "https://www.law.go.kr/법령/산업재해보상보험법시행령/제53조"},
+    {"name": "고용노동부 고시 최고·최저 보상기준 금액 (2026년 1일 268,299원·82,560원)", "url": "https://www.law.go.kr/행정규칙/최고·최저보상기준금액"}
+  ],
+  "max_comp": 268299,
+  "min_comp": 82560,
+  "grades": {
+    "1":  {"pension_days": 329, "lump_days": 1474},
+    "2":  {"pension_days": 291, "lump_days": 1309},
+    "3":  {"pension_days": 257, "lump_days": 1155},
+    "4":  {"pension_days": 224, "lump_days": 1012},
+    "5":  {"pension_days": 193, "lump_days": 869},
+    "6":  {"pension_days": 164, "lump_days": 737},
+    "7":  {"pension_days": 138, "lump_days": 616},
+    "8":  {"lump_days": 495},
+    "9":  {"lump_days": 385},
+    "10": {"lump_days": 297},
+    "11": {"lump_days": 220},
+    "12": {"lump_days": 154},
+    "13": {"lump_days": 99},
+    "14": {"lump_days": 55}
+  },
+  "pension_only_max_grade": 3
+}

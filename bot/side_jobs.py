@@ -25,3 +25,26 @@ def launch(unit: str, module: str, run=subprocess.run, timeout_sec: int = TIMEOU
     except (OSError, subprocess.SubprocessError):
         return False
     return r.returncode == 0 or "already" in (r.stderr or "")
+
+
+def stale_maint_launch(cgroup_path: str = "/proc/self/cgroup", parent_cmd: str | None = None) -> bool:
+    """전체 글 보정(server/maint.sh)이 옛 방식(배포 안 setsid·flock 줄서기)으로 띄워진 것인지.
+    11/17: 이미 반영된 보정이 15분짜리로 하루 종일 연달아 돎(13:23·13:39·… 패치는 13시 뒤 안 바뀜) — 11/16 밤 배포들이 줄 세운 것.
+    지금은 server/maint-start.sh 가 firstlab-maint 실행으로 띄우므로, maint.sh 에서 불렸는데 그 실행 밖이면 옛 줄 → 무거운 단계 건너뜀."""
+    import os
+    if not shutil.which("systemd-run"):
+        return False
+    if parent_cmd is None:
+        try:
+            with open(f"/proc/{os.getppid()}/cmdline", "rb") as f:
+                parent_cmd = f.read().replace(b"\0", b" ").decode("utf-8", "ignore")
+        except OSError:
+            return False
+    if "server/maint.sh" not in parent_cmd:
+        return False
+    try:
+        with open(cgroup_path) as f:
+            return "firstlab-maint.service" not in f.read()
+    except OSError:
+        return False
+
