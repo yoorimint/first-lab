@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1445,
+ "replace": [
+  {
+   "old": "ai-d6da93f6c5",
+   "prompt": "an old grey naval warship moored at a calm harbor pier in autumn with golden trees and distant hills, no buildings with signs",
+   "alt": "가을 항구 부두에 정박해 전시된 옛 군함",
+   "why": "왼쪽 건물 간판과 배 옆면에 글자처럼 보이는 표시가 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

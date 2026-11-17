@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1084,
+ "replace": [
+  {
+   "old": "ai-ae9537ffcf",
+   "prompt": "a row of empty city buses parked in a quiet depot at sunrise, seen from the side at a distance, plain white bodies with no markings",
+   "alt": "해 뜰 무렵 차고지에 나란히 서 있는 빈 시내버스",
+   "why": "버스 뒷면에 엉터리 글자(CKTSNS)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
