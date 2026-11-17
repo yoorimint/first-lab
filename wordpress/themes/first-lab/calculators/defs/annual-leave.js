@@ -42,12 +42,16 @@
       const current = years >= 1 ? daysFor(years) : 0;
       const total = monthly + annualTotal;
 
+      // 화면의 '근속 기간'은 기준일 근무를 마친 것으로 셈 (11/17 외부 검수: 2025-01-01 입사·2025-12-31 마지막 재직이 '0년 11개월'로 보였음).
+      // 연차 계산(months)은 그대로 — 1년 근로를 마친 다음 날 재직해야 15일이 생김 (대법원 2021다227100)
+      let served = 0;
+      while (plusMonths(start, served + 1) <= base + 86400000) served += 1;
       const nextMonths = years >= 1 ? (years + 1) * 12 : months + 1;
       const nextDate = plusMonths(start, nextMonths);
       const nextDays = nextMonths % 12 === 0 ? daysFor(nextMonths / 12) : 1;
 
       const rows = [
-        ['근속 기간', `${years}년 ${months % 12}개월`],
+        ['근속 기간 (기준일 근무 포함)', `${FirstLabCalc.util.floor(served / 12)}년 ${served % 12}개월`],
         ['1년 미만 때 생긴 연차 (1개월 개근마다 1일)', `${monthly}일`],
         ['올해 연차 (가장 최근 입사 기념일에 생긴 것)', years >= 1 ? `${current}일 (${u.korDate(plusMonths(start, years * 12))} 발생)` : '아직 없음 (1년이 지난 다음 날 15일)'],
         ['입사 후 생긴 연차 합계', `${total}일`],
@@ -59,7 +63,7 @@
         '연차는 생긴 날부터 1년 안에 쓰지 않으면 없어지고, 1년 미만 때 생긴 연차는 최초 1년의 근로가 끝나는 날(입사일 1년 뒤의 전날)까지 써야 해요. 쓰지 못하고 없어진 연차는 사용 촉진을 안 했다면 수당으로 받아요.',
       ];
       if (months < 12 && months >= d.first_year_max) notes.unshift(`입사 1년을 채우고 다음 날(${u.korDate(plusMonths(start, 12))})에도 재직하면 15일이 더 생겨요. 1년 계약이 끝나 그 전에 퇴사하면 11일까지만이에요.`);
-      return { values: { months, years, monthly, current, total, next_date: u.isoDate(nextDate), next_days: nextDays }, rows, notes };
+      return { values: { months, served_months: served, years, monthly, current, total, next_date: u.isoDate(nextDate), next_days: nextDays }, rows, notes };
     },
   });
 })();
