@@ -7,6 +7,13 @@ REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 P=/opt/first-lab-venv/bin/python
 AGAIN=/var/lib/first-lab/bot/maint-again
 cd "$REPO_DIR"
+# 한 번에 하나만 (11/17 09:04·09:17·09:22 에 20분짜리 보정 3개가 겹쳐 끝남 — 어디서 겹쳐 띄웠든 여기서 막음).
+# 이미 도는 중이면 '한 번 더' 표시만 남기고 끝 → 도는 쪽이 끝날 때 한 번 더 함 (바뀐 패치를 놓치지 않게)
+exec 9>/var/lib/first-lab/bot/maint-run.lock
+if ! flock -n 9; then
+  touch "$AGAIN"; echo "보정이 이미 도는 중 → 끝나면 한 번 더"; exit 0
+fi
+started=$(date '+%H:%M')
 for round in 1 2 3; do
   rm -f "$AGAIN"
   times=""
@@ -17,6 +24,6 @@ for round in 1 2 3; do
     times="$times ${mod#bot.} $(( $(date +%s) - start ))초"
   done
   echo "== 끝 $(date '+%H:%M:%S')"
-  "$P" -m bot.maint_report "기존 글 보정 끝 ($round 번째):$times" || true
+  "$P" -m bot.maint_report "기존 글 보정 끝 ($round 번째, $started 시작):$times" || true
   [ -f "$AGAIN" ] || break   # 도는 동안 새 배포가 '한 번 더'를 남겼으면 다시 (최대 3번)
 done
