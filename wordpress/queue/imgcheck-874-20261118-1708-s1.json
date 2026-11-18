@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 874,
+ "replace": [
+  {
+   "old": "ai-84b641c696",
+   "prompt": "Commuters in warm autumn coats waiting calmly at a tree-lined suburban roadside in soft morning light, a plain blue bus approaching in the blurred background, no signs, no text, no screens.",
+   "alt": "가을 아침 가로수길에서 다가오는 버스를 기다리는 출근길 사람들",
+   "why": "버스 행선지 전광판·정류장 표지판·스티커에 엉터리 글자"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

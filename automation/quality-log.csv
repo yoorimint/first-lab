@@ -456,3 +456,40 @@ date,post,fixes,types
 2026-11-17,6533,1,missing_condition:1
 2026-11-17,6593,1,unverified:1
 2026-11-17,6559,1,unverified:1
+2026-11-18,6326,0,
+2026-11-18,6876,1,missing_condition:1
+2026-11-18,6878,1,unverified:1
+2026-11-18,6873,0,
+2026-11-18,6890,0,
+2026-11-18,6976,0,
+2026-11-18,6980,1,wrong_fact:1
+2026-11-18,6978,1,missing_condition:1
+2026-11-18,6905,2,missing_condition:1 unverified:1
+2026-11-18,6927,0,
+2026-11-18,6946,0,
+2026-11-18,6935,2,missing_condition:1 wrong_fact:1
+2026-11-18,6955,3,missing_condition:3
+2026-11-18,6966,22,missing_condition:1 unverified:21
+2026-11-18,6953,0,
+2026-11-18,7059,1,missing_condition:1
+2026-11-18,7061,0,
+2026-11-18,7065,1,unverified:1
+2026-11-18,7063,2,missing_condition:2
+2026-11-18,7045,0,
+2026-11-18,7050,18,unverified:18
+2026-11-18,7048,1,wrong_fact:1
+2026-11-18,7055,0,
+2026-11-18,7057,0,
+2026-11-18,7052,2,missing_condition:2
+2026-11-18,7050,3,unverified:3
+2026-11-18,6966,13,missing_condition:1 unverified:12
+2026-11-18,7074,2,missing_condition:2
+2026-11-18,7106,4,missing_condition:4
+2026-11-18,7117,0,
+2026-11-18,7119,2,missing_condition:2
+2026-11-18,7142,1,missing_condition:1
+2026-11-18,7174,3,missing_condition:2 unverified:1
+2026-11-18,7154,5,missing_condition:4 unverified:1
+2026-11-18,7144,0,
+2026-11-18,7152,0,
+2026-11-18,7156,0,

@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 4263,
+ "replace": [
+  {
+   "old": "ai-1cf50b0338",
+   "prompt": "A bright, empty living room with warm sunlight on a wooden floor, a small potted plant by the window and a set of house keys resting on the floor, no boxes, no text.",
+   "alt": "햇살 드는 빈 거실 바닥에 놓인 집 열쇠와 창가 화분",
+   "why": "상자에 바코드·엉터리 글자 라벨이 여러 개 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

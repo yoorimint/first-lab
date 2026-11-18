@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3941,
+ "replace": [
+  {
+   "old": "ai-394b33b182",
+   "prompt": "a quiet small neighborhood cafe after closing time with warm lights, wooden counter, espresso machine and potted plants, no signs or menus",
+   "alt": "영업을 마친 동네 카페 계산대",
+   "why": "칠판 메뉴판에 엉터리 영어 글자가 여러 줄 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

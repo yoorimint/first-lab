@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 1408,
+ "replace": [
+  {
+   "old": "ai-750881c498",
+   "prompt": "Close-up side view of a plain unbranded matte grey bicycle on a riverside bike path in autumn, focusing on the front and rear rim brake calipers, no text, no logos, no decals.",
+   "alt": "앞바퀴와 뒷바퀴에 브레이크가 달린 자전거가 강변 자전거도로에 서 있는 모습",
+   "why": "자전거 프레임에 엉터리 글자(브랜드 문구처럼 보이는 글자)가 크게 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

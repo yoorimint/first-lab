@@ -1,0 +1,478 @@
+{
+ "title": "보험나이 계산기: 생일 뒤 6개월이면 한 살 더, 상령일 계산",
+ "excerpt": "보험나이는 계약일 만 나이에서 6개월 이상 끝수를 1년으로 올려요. 1983년 3월 1일생이 2023년 1월 1일 가입하면 40세, 상령일 전날까지 가입하면 한 살 적게 계약해요.",
+ "content_html": "<p>보험나이는 계약일의 만 나이에, 마지막 생일에서 6개월이 지났으면 1세를 더한 나이예요.<br>보험료와 가입 가능 나이가 이 나이로 정해져요.<br>✔ 6개월 미만은 만 나이<br>✔ 6개월 이상은 만 나이+1<br>✔ 가입 뒤엔 계약일마다 +1</p>\n<p>그래서 만 나이는 같아도 가입하는 날에 따라 보험나이가 1세 차이 날 수 있어요. 아래 계산기에 생년월일과 가입할 날만 넣으면 바로 나와요.</p>\n<h2>보험나이 계산기</h2>\n<p>[firstlab_calc id=\"insurance-age\"]</p>\n<p>결과의 '다음 상령일'은 보험나이가 1세 오르는 날이에요. 그 전날까지 가입하면 지금 보험나이로 계약해요.</p>\n<h2>보험나이 계산법: 6개월 기준</h2>\n<p>예를 들어 1983년 3월 1일생이 2023년 1월 1일에 가입한다고 해 볼게요. 만 나이는 39세 10개월이에요.</p>\n<p>끝수 10개월이 6개월 이상이라 1년으로 올려요. 그래서 보험나이는 40세예요.</p>\n<p>같은 사람이 2022년 8월 1일에 가입했다면 만 39세 5개월이에요. 5개월은 버리니 보험나이는 39세예요.</p>\n<p>규칙은 한 줄이에요. 계약일의 만 나이에서 6개월 미만 끝수는 버리고, 6개월 이상 끝수는 1년으로 셈해요.</p>\n<table>\n<thead><tr><th>가입일</th><th>만 나이</th><th>보험나이</th></tr></thead>\n<tbody>\n<tr><td>2022년 8월 1일</td><td>39세 5개월</td><td>39세</td></tr>\n<tr><td>2022년 8월 31일</td><td>39세 5개월</td><td>39세</td></tr>\n<tr><td>2022년 9월 1일</td><td>39세 6개월</td><td>40세</td></tr>\n<tr><td>2023년 1월 1일</td><td>39세 10개월</td><td>40세</td></tr>\n</tbody>\n</table>\n<p>표는 1983년 3월 1일생 기준이에요. 이 기준은 생명보험, 질병·상해보험, 실손보험 표준약관에 들어 있어요.</p>\n<p class=\"fl-basis\">근거: 생명보험·질병상해보험·실손보험 표준약관, 민법 제158조</p>\n<h2>상령일: 보험나이가 오르는 날</h2>\n<p>상령일은 보험나이가 1세 오르는 날이에요. 생일에서 6개월 뒤 같은 날짜예요.</p>\n<p>3월 1일생이면 매년 9월 1일이 상령일이에요. 그래서 8월 31일까지 가입하면 한 살 적은 보험나이로 계약해요.</p>\n<p>8월 31일생처럼 6개월 뒤 같은 날짜가 없는 달도 있어요. 계산기는 이때 그다음 날인 3월 1일을 상령일로 봐요.</p>\n<p>이런 날 앞뒤로 가입한다면 설계 화면에 나온 나이를 한 번 더 보세요.</p>\n<p class=\"fl-basis\">근거: 민법 제160조</p>\n<h2>가입한 뒤에는 계약해당일마다 1세</h2>\n<p>가입한 뒤에는 생일과 상관없이 매년 계약해당일에 보험나이가 1세 늘어요. 계약해당일은 처음 계약한 날에서 1년마다 돌아오는 날이에요.</p>\n<p>예를 들어 2023년 1월 1일에 40세로 가입했다면, 2024년 1월 1일에 41세가 돼요.</p>\n<p>만기도 이 날로 정해져요. 1983년 3월 1일생이 2023년 1월 1일에 가입한 80세 만기 상품은 2063년 1월 1일이 만기일이에요.</p>\n<p>생일로 따진 보험나이 80세 마지막 날인 2063년 8월 31일이 아니에요.</p>\n<h2>보험나이로 정해지는 것 3가지</h2>\n<ul>\n<li><strong>보험료</strong>: 만 나이가 39세라도 보험나이가 40세면 40세 보험료로 계산해요.</li>\n<li><strong>가입나이</strong>: 가입나이가 40세~80세인 상품이면 보험나이 40세라서 가입할 수 있어요.</li>\n<li><strong>만기</strong>: 80세 만기는 보험나이 80세가 되는 계약해당일까지 보장해요.</li>\n</ul>\n<p>금융감독원이 든 종신보험 예시를 보면 보험료 차이가 보여요. 남자, 20년납, 월납, 가입금액 1억 원 기준이에요.</p>\n<table>\n<thead><tr><th>구분</th><th>보험나이 39세</th><th>보험나이 40세</th></tr></thead>\n<tbody>\n<tr><td>월 보험료</td><td>266,000원</td><td>271,000원</td></tr>\n<tr><td>총납입보험료</td><td>6,384만원</td><td>6,504만원</td></tr>\n</tbody>\n</table>\n<p>한 살 차이로 월 보험료가 약 1.9% 올랐어요. 20년 동안 내면 120만원 차이예요.</p>\n<p>가입나이 제한도 보험나이로 봐요. 가입나이가 0~30세인 어린이보험은 만 30세 6개월 미만인 사람까지만 가입할 수 있어요.</p>\n<h2>보험나이를 쓰지 않는 경우</h2>\n<p>법에서 나이를 정했거나, 약관에서 나이를 따로 정했으면 보험나이를 쓰지 않아요. 그때는 그 기준을 따라요.</p>\n<p>예를 들어 15세 미만인 사람의 사망을 보험사고로 한 보험계약은 무효예요. 이 15세는 법에서 정한 나이라 보험나이로 바꾸지 않아요.</p>\n<p>만 나이로 정한 개별 약관이 있는 상품도 있어요. 가입 전에 약관의 '보험나이' 조항을 한 번 보세요.</p>\n<p class=\"fl-basis\">근거: 상법 제732조</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>가입할 날이 상령일 전인지</li>\n<li>가입나이 상한에 보험나이로 걸리지 않는지</li>\n<li>약관이 만 나이로 정한 상품인지</li>\n<li>청약서에 적힌 생년월일이 맞는지</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 보험나이 계산은 만 나이에서 6개월 이상 끝수만 1년으로 올리면 되고, 상령일 전날까지 가입하면 한 살 적게 계약해요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>만 나이로 통일됐는데 보험은 왜 따로 셈하나요?</h3>\n<p>법령과 계약의 나이는 2023년 6월 28일부터 원칙적으로 만 나이로 통일됐어요. 다른 법령에 특별한 규정이 있으면 그 기준을 따라요.</p>\n<p>보험은 표준약관이 보험나이를 정하고 있어 지금도 따로 셈해요.</p>\n<h3>상령일 전에 가입하면 늘 유리한가요?</h3>\n<p>일반적으로 나이가 많을수록 질병·사고 확률이 높아 보험료가 비싸져요. 그래서 보험나이가 오르기 전에 가입하는 편이 대체로 유리해요.</p>\n<h3>청약서에 나이를 잘못 적었으면 계약이 해지되나요?</h3>\n<p>대개는 해지하지 않고 나이를 정정할 수 있어요. 이때 보험료를 더 내거나 돌려받는 금액이 생길 수 있어요.</p>\n<p>다만 실제 나이가 그 상품의 가입나이에 못 미치거나 넘었다면 계약이 무효가 되고, 낸 보험료를 돌려받아요. 회사가 잘못을 발견했을 때 이미 가입나이에 도달했다면 유효한 계약으로 봐요.</p>\n<p>15세 미만인 사람의 사망을 보장하는 계약에는 이 예외가 적용되지 않아요.</p>\n<p>금융감독원 예시에서는 20년 뒤 정정할 때 1,062,000원을 더 내거나, 가입금액을 약 1.8% 줄이는 방법이 있었어요.</p>\n",
+ "tags": [
+  "보험나이",
+  "상령일",
+  "보험나이 계산기",
+  "만 나이",
+  "표준약관"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a young couple sitting together on a sofa in a bright living room, seen from behind, talking over cups of tea",
+   "alt": "밝은 거실 소파에 앉아 이야기하는 부부의 뒷모습"
+  }
+ ],
+ "keyword": "보험나이계산기",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "보험나이는 계약일 만 나이에서 6개월 이상 끝수를 1년으로 올리고 6개월 미만은 버림",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "생일에서 6개월 지나면 만 나이에 1세 더함",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "1983년 3월 1일생이 2023년 1월 1일 가입하면 만 39세 10개월, 보험나이 40세",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상령일 전날까지 가입하면 한 살 적은 보험나이로 계약",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보험료와 가입 가능 나이가 보험나이로 정해짐",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "6개월 미만은 만 나이 그대로, 6개월 이상은 만 나이+1",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "가입 뒤엔 매년 계약해당일에 보험나이가 1세 늘어남",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만 나이가 같아도 가입하는 날에 따라 보험나이가 1세 차이 날 수 있음",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "같은 사람이 2022년 8월 1일 가입하면 만 39세 5개월, 보험나이 39세",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2022년 8월 31일 가입은 39세 5개월로 보험나이 39세 (보험나이 40세 마지막 전일 기준) (민법 제160조)",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf",
+    "https://www.law.go.kr/법령/민법/제160조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2022년 9월 1일 가입은 39세 6개월로 보험나이 40세 (민법 제158조)",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf",
+    "https://www.law.go.kr/법령/민법/제158조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보험나이 기준은 생명보험, 질병·상해보험, 실손보험 표준약관에 들어 있음",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만 나이는 출생일을 산입해 계산 (민법 제158조)",
+   "urls": [
+    "https://www.law.go.kr/법령/민법/제158조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상령일은 생일에서 6개월 뒤 같은 날짜, 3월 1일생이면 9월 1일",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "3월 1일생은 8월 31일까지 가입하면 한 살 적은 보험나이로 계약",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "8월 31일생은 6개월 뒤 같은 날짜가 없어 그 달 말일로 기간이 끝나 다음 날 3월 1일이 상령일 (민법 제160조)",
+   "urls": [
+    "https://www.law.go.kr/법령/민법/제160조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계약해당일은 처음 계약한 날에서 1년마다 돌아오는 날",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2023년 1월 1일에 40세로 가입하면 2024년 1월 1일에 41세 (보험업감독업무시행세칙 별표15 생명보험 표준약관 제21조)",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf",
+    "https://www.law.go.kr/행정규칙/보험업감독업무시행세칙"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "1983년 3월 1일생이 2023년 1월 1일 가입한 80세 만기 상품의 만기일은 2063년 1월 1일",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만기일은 보험나이 80세 마지막 날인 2063년 8월 31일이 아님",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만 나이 39세라도 보험나이 40세면 40세 보험료로 계산",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "가입나이 40세~80세 상품은 보험나이 40세라 가입 가능",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "80세 만기는 보험나이 80세가 되는 계약해당일까지 보장",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융감독원 종신보험 예시: 남자, 20년납, 월납, 가입금액 1억 원 기준",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "월 보험료 보험나이 39세 266,000원, 40세 271,000원",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "총납입보험료 6,384만원과 6,504만원",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한 살 차이로 월 보험료 약 1.9% 상승, 20년 동안 120만원 차이",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "가입나이 0~30세 어린이보험은 만 30세 6개월 미만까지만 가입",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "법에서 나이를 정했거나 약관에서 나이를 따로 정했으면 보험나이를 쓰지 않음",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "15세 미만인 사람의 사망을 보험사고로 한 보험계약은 무효 (상법 제732조)",
+   "urls": [
+    "https://www.law.go.kr/법령/상법/제732조",
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "15세 미만 사망보험의 15세는 법에서 정한 나이라 보험나이로 바꾸지 않고 실제 만 나이 적용 (보험업감독업무시행세칙 별표15 생명보험 표준약관 제21조)",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf",
+    "https://www.law.go.kr/행정규칙/보험업감독업무시행세칙"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만 나이로 정한 개별 약관이 있는 상품도 있음",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일반적으로 나이가 많을수록 보험료가 비싸져 보험나이가 오르기 전 가입이 대체로 유리",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정정할 때 보험료를 더 내거나 돌려받는 금액이 생길 수 있음",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융감독원 예시: 20년 뒤 정정할 때 1,062,000원을 더 내거나 가입금액을 약 1.8% 줄임",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "법령과 계약의 나이는 2023년 6월 28일부터 원칙적으로 만 나이로 통일, 다른 법령에 특별한 규정이 있으면 그 기준 (행정기본법 제7조의2)",
+   "urls": [
+    "https://www.law.go.kr/법령/행정기본법/제7조의2",
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "보험은 표준약관이 보험나이를 정하고 있어 지금도 따로 셈 (보험업감독업무시행세칙 별표15 생명보험 표준약관 제21조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/보험업감독업무시행세칙",
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "대개는 해지하지 않고 나이를 정정할 수 있음 (보험업감독업무시행세칙 별표15 생명보험 표준약관 제21조)",
+   "urls": [
+    "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf",
+    "https://www.law.go.kr/행정규칙/보험업감독업무시행세칙"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "실제 나이가 가입나이에 못 미치거나 넘었으면 계약이 무효가 되고 낸 보험료를 돌려받으며, 회사가 착오를 발견했을 때 이미 가입나이에 도달했으면 유효한 계약 (보험업감독업무시행세칙 별표15 생명보험 표준약관 제19조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/보험업감독업무시행세칙"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "15세 미만인 사람의 사망을 보장하는 계약에는 나이 착오 유효 예외가 적용되지 않음 (보험업감독업무시행세칙 별표15 생명보험 표준약관 제19조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/보험업감독업무시행세칙"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "민법 제158조 단서1 해당 없음 — 1세 미만 월수 표시 규정으로 보험나이 계산 규칙과 관계없음 (계산기도 0세 ○개월로 표시)",
+   "urls": [
+    "https://www.law.go.kr/법령/민법/제158조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "행정기본법 제7조의2 단서1 반영 — 자주 묻는 질문 '다른 법령에 특별한 규정이 있으면 그 기준을 따라요'",
+   "urls": [
+    "https://www.law.go.kr/법령/행정기본법/제7조의2"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "행정기본법 제7조의2 단서2 해당 없음 — 1세 미만 월수 표시 규정으로 이 글 내용과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/행정기본법/제7조의2"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "상법 제732조 단서1 해당 없음 — 심신박약자 의사능력 예외로 15세 미만자 무효와 관계없고 글은 15세 미만만 다룸",
+   "urls": [
+    "https://www.law.go.kr/법령/상법/제732조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  }
+ ],
+ "sources": [
+  {
+   "name": "금융감독원 보도참고자료: 보험 가입시 만 나이가 아닌 보험나이 적용 (보험연구원 게재)",
+   "url": "https://kiri.or.kr/PDF/weeklytrend/20230130/trend20230130_3.pdf"
+  },
+  {
+   "name": "국가법령정보센터 상법 제732조 (15세 미만자 등에 대한 계약의 금지)",
+   "url": "https://www.law.go.kr/법령/상법/제732조"
+  },
+  {
+   "name": "국가법령정보센터 민법 제158조 (나이의 계산과 표시)",
+   "url": "https://www.law.go.kr/법령/민법/제158조"
+  }
+ ],
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/wldnd5299/224393227690",
+   "https://blog.naver.com/22nnn22/224419486726",
+   "https://blog.naver.com/youngilgo/224401929016",
+   "https://thebarunbohum.com/insurance-tools/insurance-age/",
+   "https://insurancebridge.co.kr/age/"
+  ],
+  "questions": [
+   "보험나이는 어떻게 계산하나요",
+   "상령일은 언제인가요",
+   "보험나이와 만 나이는 어떻게 다른가요",
+   "보험나이가 보험료와 가입 가능 여부에 어떤 영향을 주나요"
+  ],
+  "added": [
+   {
+    "type": "@계산기",
+    "text": "생년월일·가입할 날로 보험나이, 다음 상령일, 지금 나이로 가입할 수 있는 마지막 날을 계산하는 계산기"
+   },
+   {
+    "type": "@상황판단",
+    "text": "가입 뒤에는 생일이 아니라 계약해당일마다 1세 늘고 80세 만기일이 2063년 1월 1일이 되는 예시"
+   },
+   {
+    "type": "@계산예시",
+    "text": "보험나이 39세와 40세의 월 보험료 266,000원·271,000원, 20년 120만원 차이 예시"
+   },
+   {
+    "type": "@상황판단",
+    "text": "청약서에 나이를 잘못 적었을 때 정정과 계약 무효가 갈리는 경우"
+   }
+  ]
+ }
+}

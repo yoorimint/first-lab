@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2151,
+ "replace": [
+  {
+   "old": "ai-d01fd2cbfe",
+   "prompt": "a bright open office with wide aisles, a wheelchair user working at a height-adjustable desk seen from behind, plants and soft daylight, no signs or lettering anywhere",
+   "alt": "넓은 통로와 높이 조절 책상이 있는 밝은 사무실에서 일하는 휠체어 사용자",
+   "why": "칸막이에 엉터리 영어 글자(BRONG·EREMIT)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

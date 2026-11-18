@@ -504,3 +504,99 @@ function firstlab_api_benefits( WP_REST_Request $request ) {
 	}
 	return $out;
 }
+
+/*
+ * 공공데이터포털 공식 API 통로 (정해 둔 API 만 — 아무 주소나 받는 통로가 아님):
+ * GET /wp-json/firstlab/v1/opendata?api=loan_basic|loan_search&<그 API 의 조회 변수>…  (헤더 X-Firstlab-Token)
+ * 11/18 운영자 '연결해라': 서민금융진흥원 누리집이 검수 환경 접속을 받지 않아 햇살론 글(#7050) 확인불가 18곳 →
+ * 같은 기관이 공공데이터포털로 공식 개방한 상품 정보(대출기간·상환방식·금리·한도·대상)를 받는다 (bot/opendata.py).
+ * 인증키는 정부24 혜택 API 와 같은 DATA_GO_KR_KEY (서버에만).
+ */
+const FIRSTLAB_OPENDATA_APIS = array(
+	// 금융위원회_서민금융상품기본정보 (data.go.kr 15094787): 상품명·지원대상·금리·한도·상환방식·취급기관
+	'loan_basic'  => 'https://apis.data.go.kr/1160100/service/GetSmallLoanFinanceInstituteInfoService/getOrdinaryFinanceInfo',
+	// 서민금융진흥원_대출상품한눈에 정보 서비스 (data.go.kr 15106208): 대출한도·금리구분·용도·총 대출기간·취급기관
+	'loan_search' => 'https://apis.data.go.kr/B553701/LoanProductSearchingInfo/getLoanProductSearchingInfo',
+	// 11/18 운영자 활용신청 6개 — 지역 지원사업·복지·창업 공고·주택 대출 금리
+	// 한국사회보장정보원_지자체복지서비스 목록 (data.go.kr 15108347): searchWrd·ctpvNm·sggNm
+	'welfare_local_list' => 'https://apis.data.go.kr/B554287/LocalGovernmentWelfareInformations/LcgvWelfarelist',
+	// 지자체복지서비스 상세 (servId): 지원대상·선정기준·서류·신청방법
+	'welfare_local_detail' => 'https://apis.data.go.kr/B554287/LocalGovernmentWelfareInformations/LcgvWelfaredetailed',
+	// 한국사회보장정보원_중앙부처복지서비스 목록 (15090532): callTp=L·searchWrd
+	'welfare_nat_list' => 'https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfarelistV001',
+	// 중앙부처복지서비스 상세 (callTp=D·servId)
+	'welfare_nat_detail' => 'https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfaredetailedV001',
+	// 중소벤처기업부_중소기업 지원사업 공고(기업마당) (15157820)
+	'bizinfo' => 'https://apis.data.go.kr/1421000/bizinfo/pblancBsnsService',
+	// 창업진흥원_K-Startup 사업공고 (15125364)
+	'kstartup_notice' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01',
+	// K-Startup 사업소개
+	'kstartup_business' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getBusinessInformation01',
+	// 한국주택금융공사_디딤돌대출금리정보 (15082028)
+	'didimdol_rate' => 'https://apis.data.go.kr/B551408/didimdol-loan-rate/didimdol-info',
+	// 한국주택금융공사_전세자금대출 금리 정보 (15082033)
+	'rent_loan_rate' => 'https://apis.data.go.kr/B551408/rent-loan-rate-info/rate-list',
+);
+
+/** 공식 API 주소 (인증키 포함, 밖으로 내보내지 않음). 정해 둔 API 가 아니면 null. */
+function firstlab_opendata_url( array $args, string $key ): ?string {
+	$api = (string) ( $args['api'] ?? '' );
+	if ( ! isset( FIRSTLAB_OPENDATA_APIS[ $api ] ) ) {
+		return null;
+	}
+	$query = array( 'resultType' => 'json', 'type' => 'json', 'dataType' => 'json', 'returnType' => 'json', 'pageNo' => '1', 'numOfRows' => '100', 'page' => '1', 'perPage' => '100' );
+	foreach ( $args as $name => $value ) {
+		if ( 'api' === $name || 'serviceKey' === $name || ! is_scalar( $value ) || ! preg_match( '/^[A-Za-z_]{1,30}$/', (string) $name ) ) {
+			continue;
+		}
+		$query[ $name ] = mb_substr( (string) $value, 0, 200 );
+	}
+	$encoded = false !== strpos( $key, '%' ) ? $key : rawurlencode( $key );
+	return FIRSTLAB_OPENDATA_APIS[ $api ] . '?' . http_build_query( $query ) . '&serviceKey=' . $encoded;
+}
+
+function firstlab_api_opendata( WP_REST_Request $request ) {
+	$key = (string) get_option( 'firstlab_data_key', '' );
+	if ( '' === $key ) {
+		return new WP_Error( 'no_key', '서버에 공공데이터 인증키(DATA_GO_KR_KEY)가 없음', array( 'status' => 503 ) );
+	}
+	$url = firstlab_opendata_url( $request->get_query_params(), $key );
+	if ( null === $url ) {
+		return new WP_Error( 'bad_args', 'api 는 ' . implode( '|', array_keys( FIRSTLAB_OPENDATA_APIS ) ), array( 'status' => 400 ) );
+	}
+	$cache = 'firstlab_opendata_' . md5( $url );
+	$hit   = get_transient( $cache );
+	if ( false !== $hit ) {
+		return $hit;
+	}
+	$res = wp_remote_get( $url, array( 'timeout' => 30 ) );
+	if ( is_wp_error( $res ) ) {
+		return new WP_Error( 'opendata_fetch', $res->get_error_message(), array( 'status' => 502 ) );
+	}
+	$hide = static fn( string $text ): string => str_replace( array( $key, rawurlencode( $key ), rawurldecode( $key ) ), '***', $text );
+	$out  = array(
+		'status'  => (int) wp_remote_retrieve_response_code( $res ),
+		'body'    => $hide( (string) wp_remote_retrieve_body( $res ) ),
+		'request' => $hide( $url ),
+	);
+	if ( 200 === $out['status'] ) {
+		set_transient( $cache, $out, 6 * HOUR_IN_SECONDS );
+	}
+	return $out;
+}
+
+add_action(
+	'rest_api_init',
+	static function () {
+		register_rest_route(
+			'firstlab/v1',
+			'/opendata',
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => 'firstlab_api_allowed',
+				'callback'            => 'firstlab_api_opendata',
+			)
+		);
+	}
+);
+

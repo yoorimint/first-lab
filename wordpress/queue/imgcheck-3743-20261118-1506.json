@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3743,
+ "replace": [
+  {
+   "old": "ai-a59c4a04f5",
+   "prompt": "A pregnant woman sitting on a sofa by a bright window, resting her hand on her belly while her partner brings a cup of tea, soft natural light",
+   "alt": "창가 소파에 앉아 쉬는 임신부와 차를 건네는 배우자",
+   "why": "AI 사진 대신 글자 있는 제목 카드가 대표 사진"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

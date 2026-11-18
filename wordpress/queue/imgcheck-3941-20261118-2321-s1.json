@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3941,
+ "replace": [
+  {
+   "old": "ai-394b33b182",
+   "prompt": "warm pendant lights glowing over an empty wooden counter with plain white ceramic cups and a small potted plant in a quiet closed shop at night",
+   "alt": "영업을 마친 가게의 빈 나무 계산대와 조명",
+   "why": "칠판 메뉴판에 엉터리 영어 글자가 여러 줄 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
