@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 4263,
+ "replace": [
+  {
+   "old": "ai-1cf50b0338",
+   "prompt": "Sunlit empty living room with plain unmarked cardboard moving boxes stacked near a window and a potted plant on the sill, warm morning light, no labels or text anywhere",
+   "alt": "햇살 드는 빈 거실에 쌓인 무늬 없는 이삿짐 상자",
+   "why": "상자 라벨에 엉터리 글자·바코드가 보임"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}

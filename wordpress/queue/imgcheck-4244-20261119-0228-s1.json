@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 4244,
+ "replace": [
+  {
+   "old": "ai-5bcd0cb0cc",
+   "prompt": "Calm harbor at sunrise with silhouettes of cargo cranes and calm water reflecting orange light, distant ships too small to show any markings, no text",
+   "alt": "해 뜰 무렵 크레인 실루엣이 비치는 조용한 항구",
+   "why": "배 옆면에 엉터리 영문 글자(LAFRGON EPRICS)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}
