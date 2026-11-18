@@ -475,3 +475,6 @@ date,post,fixes,types
 2026-11-18,7061,0,
 2026-11-18,7065,1,unverified:1
 2026-11-18,7063,2,missing_condition:2
+2026-11-18,7045,0,
+2026-11-18,7050,18,unverified:18
+2026-11-18,7048,1,wrong_fact:1
