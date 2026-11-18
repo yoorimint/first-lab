@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 3816,
+ "replace": [
+  {
+   "old": "ai-623bca0248",
+   "prompt": "A small cafe owner in a plain dark apron wiping a wooden counter in warm morning sunlight, potted plants and ceramic cups nearby",
+   "alt": "아침 햇살 속에서 카운터를 닦으며 가게를 준비하는 작은 카페 사장님",
+   "why": "옷 등판에 엉터리 영문 글자(LUCC)"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
