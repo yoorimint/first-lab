@@ -12339,5 +12339,32 @@
     "tag": "li",
     "replace_paragraph": "39세 이하 창업자: 청년창업사관학교(창업 3년 이내), 청년전용창업자금(업력 3년 미만)",
     "prevention": "review_only:여러 사업을 한 줄로 묶으며 기준선(이내/미만)이 섞인 경우 — 글 안 같은 사업의 다른 표기와 대조하는 검사 후보"
+  },
+  {
+    "post": 7050,
+    "type": "unverified",
+    "why": "공식 API(금융위원회_서민금융상품기본정보 data.go.kr 15094787, 2026년 10월 기준) 햇살론일반 maxTotLnTrm '5(1년 단위 선택 가능)' — 어제 확인처로 낮춘 칸을 공식 값으로 되살림",
+    "find": "<td>대출기간</td><td>서민금융진흥원 햇살론일반 안내에서 확인</td>",
+    "tag": "tr",
+    "replace_paragraph": "<td>대출기간</td><td>5년 이내, 1년 단위로 선택</td>",
+    "prevention": "review_only:누리집이 검수 환경을 받지 않던 서민금융 상품은 이제 bot.opendata(공식 개방 데이터)로 확인 — 검수 지시문·글쓰기 지시에 반영"
+  },
+  {
+    "post": 7050,
+    "type": "unverified",
+    "why": "공식 API(금융위원회_서민금융상품기본정보, 2026년 10월 기준) 햇살론일반 rdptMthd '원리금균등분할상환' — 되살림",
+    "find": "<td>갚는 방법</td><td>서민금융진흥원 햇살론일반 안내에서 확인</td>",
+    "tag": "tr",
+    "replace_paragraph": "<td>갚는 방법</td><td>원리금균등분할상환</td>",
+    "prevention": "review_only:위와 같음 — bot.opendata 로 확인"
+  },
+  {
+    "post": 7050,
+    "type": "unverified",
+    "why": "공식 API: 햇살론일반 대출기간 '5(1년 단위 선택 가능)' — 특례는 API 에 총 대출기간 값이 없어 그대로 확인처",
+    "find": "<td>기간</td><td colspan=\"2\">서민금융진흥원 상품 안내에서 확인</td>",
+    "tag": "tr",
+    "replace_paragraph": "<td>기간</td><td>5년 이내</td><td>상품 안내에서 확인</td>",
+    "prevention": "review_only:위와 같음 — bot.opendata 로 확인"
   }
 ]
