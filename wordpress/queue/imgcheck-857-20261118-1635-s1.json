@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 857,
+ "replace": [
+  {
+   "old": "ai-8d599daa92",
+   "prompt": "High aerial view of a wide city road at dusk where cars have pulled over to both edges leaving an open center lane, a soft red and blue emergency light glow approaching in the distance, vehicles too small to show any plates or text.",
+   "alt": "멀리서 다가오는 경광등 불빛에 차들이 양옆으로 비켜 길을 터 준 모습",
+   "why": "번호판에 엉터리 글자·숫자가 보이고 차들이 길을 비켜 주는 장면이 아님"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
