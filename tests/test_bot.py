@@ -6976,6 +6976,38 @@ firstlab_stats_render_page();
         for hook in ("post_link", "page_link", "term_link"):
             self.assertIn(f"'{hook}'", site)
 
+    def test_opendata_only_named_apis_and_key_hidden(self):
+        """11/18 운영자 '연결해라': 서민금융진흥원 누리집이 검수 환경을 받지 않음 → 공공데이터포털 공식 API(정해 둔 2개만)로 상품 정보.
+        아무 주소나 받는 통로가 아니고, 인증키는 서버에만."""
+        import re
+        import shutil
+        import subprocess
+        from bot import opendata
+        url = opendata.direct_url("loan_basic", "a+b/c==", {"likeFinPrdNm": "햇살론", "serviceKey": "x"})
+        self.assertTrue(url.startswith(opendata.APIS["loan_basic"] + "?"))
+        self.assertTrue(url.endswith("&serviceKey=a%2Bb%2Fc%3D%3D"))
+        self.assertEqual(url.count("serviceKey"), 1)
+        with self.assertRaises(ValueError):
+            opendata.fetch("https://evil.example/")
+        self.assertEqual(opendata.items({"response": {"body": {"items": {"item": [{"a": 1}]}}}}), [{"a": 1}])
+        self.assertEqual(opendata.items({"response": {"body": {"items": {"item": {"a": 1}}}}}), [{"a": 1}])
+        self.assertEqual(opendata.items({"data": [{"b": 2}]}), [{"b": 2}])
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")
+        const = re.search(r"const FIRSTLAB_OPENDATA_APIS = array\(.*?\n\);", src, re.S).group(0)
+        func = re.search(r"function firstlab_opendata_url\(.*?\n\}", src, re.S).group(0)
+        code = const + func + (" var_dump(firstlab_opendata_url(array('api'=>'x'), 'K'));"
+                               " echo firstlab_opendata_url(array('api'=>'loan_search','PRD_CTG'=>'1','serviceKey'=>'bad','a b'=>'z'), 'K');")
+        out = subprocess.run(["php", "-r", code], capture_output=True, text=True).stdout
+        self.assertIn("NULL", out)
+        self.assertIn("LoanProductSearchingInfo/getLoanProductSearchingInfo?", out)
+        self.assertIn("PRD_CTG=1", out)
+        self.assertNotIn("bad", out)
+        self.assertTrue(out.endswith("&serviceKey=K"))
+        for k in opendata.APIS.values():   # 두 쪽 목록이 같게
+            self.assertIn(k, src)
+
     def test_meta_description_is_whole_excerpt(self):
         """11/17 구글 문서 점검: 검색 설명이 '합계 최대 1…'처럼 문장 중간에서 잘림(23편 중 21편) → 글은 요약문 전체."""
         import re
