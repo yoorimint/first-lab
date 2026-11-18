@@ -68,6 +68,39 @@ function firstlab_full_excerpt_description( $desc, $args = null, $type = 'search
 }
 add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description', 10, 3 );
 
+/**
+ * 분류·태그 목록의 검색 설명 — 설명을 따로 안 적어 비어 있었음 (11/19 빙 사이트 검사 'Meta Description 누락' 104쪽).
+ * '퍼스트랩 <이름> 글 N편: 최근 글 제목 2개 등' 으로 만든다. 설명을 직접 적은 분류는 그대로.
+ */
+function firstlab_term_description( $desc, $args = null, $type = 'search' ) {
+	if ( '' !== trim( (string) $desc ) ) {
+		return $desc;
+	}
+	if ( is_array( $args ) && ! empty( $args['tax'] ) ) {
+		$term = get_term( (int) ( $args['id'] ?? 0 ), (string) $args['tax'] );
+	} elseif ( null === $args && ( is_category() || is_tag() ) ) {
+		$term = get_queried_object();
+	} else {
+		return $desc;
+	}
+	if ( ! $term instanceof WP_Term ) {
+		return $desc;
+	}
+	$titles = get_posts(
+		array(
+			'post_type'   => 'post',
+			'post_status' => 'publish',
+			'numberposts' => 2,
+			'fields'      => 'ids',
+			'tax_query'   => array( array( 'taxonomy' => $term->taxonomy, 'terms' => $term->term_id ) ),
+		)
+	);
+	$titles = array_map( static fn( $id ) => wp_strip_all_tags( get_the_title( $id ) ), $titles );
+	$text   = sprintf( '퍼스트랩 %s 글 %d편', $term->name, (int) $term->count );
+	return $titles ? $text . ': ' . implode( ', ', $titles ) . ' 등.' : $text . '.';
+}
+add_filter( 'the_seo_framework_generated_description', 'firstlab_term_description', 11, 3 );
+
 // 분류·태그 페이지 제목의 '[카테고리:]'·'[태그:]' 머리말 빼기 — 구글 검색 결과에 '[카테고리:] 생활정보 - 퍼스트랩'으로 나와
 // 관리 안 된 사이트처럼 보임 (11/16 운영자 캡처, 애드센스 '구조적 유지관리'). SEO 플러그인(The SEO Framework) 제목과 화면 제목 둘 다.
 add_filter( 'the_seo_framework_use_archive_prefix', '__return_false' );

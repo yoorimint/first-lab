@@ -56,9 +56,15 @@ function firstlab_home_hero(): ?WP_Post {
 	return '' === $popular ? null : firstlab_published_post( url_to_postid( $popular ) );
 }
 
-/** 글 사진 = 대표 이미지 (AI 사진 1장, 없으면 제목 카드 — bot/photo.py). */
+/**
+ * 글 사진 = 대표 이미지 (AI 사진 1장, 없으면 제목 카드 — bot/photo.py).
+ * 사진 설명(alt)은 사진에 붙은 설명, 없으면 글 제목 (11/19 빙 사이트 검사 '이미지 Alt 누락' 107쪽 — 목록 사진이 alt="" 였음).
+ */
 function firstlab_post_photo( WP_Post $post, string $size, array $attr = array() ): string {
-	return get_the_post_thumbnail( $post, $size, $attr + array( 'alt' => '', 'loading' => 'lazy', 'decoding' => 'async' ) );
+	$thumb = (int) get_post_thumbnail_id( $post );
+	$alt   = trim( (string) get_post_meta( $thumb, '_wp_attachment_image_alt', true ) );
+	$alt   = '' !== $alt ? $alt : wp_strip_all_tags( get_the_title( $post ) );
+	return get_the_post_thumbnail( $post, $size, $attr + array( 'alt' => $alt, 'loading' => 'lazy', 'decoding' => 'async' ) );
 }
 
 // 글 화면 맨 위: AI 대표 사진만 보인다 (운영자 결정 11/4). 사진이 아직 없어 제목 카드인 글은 제목과 겹치니 숨김.

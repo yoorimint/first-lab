@@ -7036,6 +7036,30 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_archive_description_and_list_photo_alt(self):
+        """11/19 빙 사이트 검사: 분류·태그 목록 'Meta Description 누락' 104쪽, 목록 사진 'Alt 누락' 107쪽 (alt="")."""
+        import re
+        import shutil
+        import subprocess
+        if not shutil.which("php"):
+            self.skipTest("php 없음")
+        site_src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-site.php").read_text(encoding="utf-8")
+        func = re.search(r"function firstlab_term_description\(.*?\n\}", site_src, re.S).group(0)
+        stubs = ("class WP_Term { public $taxonomy='category'; public $term_id=5; public $name='생활정보'; public $count=12; }"
+                 "function get_term($id,$tax){return $id==5?new WP_Term():null;} function is_category(){return false;} function is_tag(){return false;}"
+                 "function get_queried_object(){return null;} function get_posts($a){return array(1,2);}"
+                 "function get_the_title($id){return $id==1?'첫 글':'둘째 글';} function wp_strip_all_tags($s){return strip_tags($s);}")
+        code = stubs + func + (" echo firstlab_term_description('', array('id'=>5,'tax'=>'category')), '|',"
+                               " firstlab_term_description('직접 쓴 설명', array('id'=>5,'tax'=>'category')), '|',"
+                               " firstlab_term_description('', array('id'=>7));")
+        r = subprocess.run(["php", "-r", code], capture_output=True, text=True)
+        self.assertEqual(r.stdout, "퍼스트랩 생활정보 글 12편: 첫 글, 둘째 글 등.|직접 쓴 설명|", r.stderr)
+        self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_term_description'", site_src)
+        home_src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-home.php").read_text(encoding="utf-8")
+        photo = re.search(r"function firstlab_post_photo\(.*?\n\}", home_src, re.S).group(0)
+        self.assertNotIn("'alt' => ''", photo)
+        self.assertIn("_wp_attachment_image_alt", photo)
+
     def test_structured_data_author_is_one_organization(self):
         """11/17 구글 구조화 데이터 문서 점검: SEO 플러그인 WebPage 작성자 Person '퍼스트랩' vs 우리 Article Organization,
         사이트 단체 로고 없음, 홈 탐색경로 1단계 → 하나의 단체(@id)·로고·탐색경로 2단계 이상만."""
