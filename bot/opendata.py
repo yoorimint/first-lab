@@ -8,6 +8,12 @@
 
 확인용: python3 -m bot.opendata loan_basic likeFinPrdNm=햇살론
         python3 -m bot.opendata loan_search numOfRows=50
+        python3 -m bot.opendata welfare_local_list srchKeyCode=001 searchWrd=해녀      (지자체 복지사업 목록, servId)
+        python3 -m bot.opendata welfare_local_detail servId=<servId>                     (대상·선정기준·서류·신청방법)
+        python3 -m bot.opendata welfare_nat_list callTp=L srchKeyCode=001 searchWrd=청년 (중앙부처)
+        python3 -m bot.opendata welfare_nat_detail callTp=D servId=<servId>
+        python3 -m bot.opendata kstartup_notice perPage=50                               (K-Startup 공고)
+        python3 -m bot.opendata didimdol_rate  /  rent_loan_rate                         (주택금융공사 금리)
 """
 from __future__ import annotations
 
@@ -107,11 +113,18 @@ def items(resp: dict | None) -> list[dict]:
     """두 API 의 응답 모양(response.body.items.item / data 등)에서 항목 목록만."""
     if not isinstance(resp, dict):
         return []
+    if isinstance(resp.get("wantedList"), dict):  # 복지서비스 목록·상세 (XML: wantedList/servList)
+        got = resp["wantedList"].get("servList", resp["wantedList"])
+        return [got] if isinstance(got, dict) else [g for g in (got or []) if isinstance(g, dict)]
+    if isinstance(resp.get("wantedDtl"), dict):
+        return [resp["wantedDtl"]]
     node = resp.get("response", resp)
     body = node.get("body", node) if isinstance(node, dict) else {}
     got = body.get("items", body.get("data", [])) if isinstance(body, dict) else []
     if isinstance(got, dict):
         got = got.get("item", [])
+    if not got and isinstance(body, dict) and isinstance(body.get("item"), dict):  # 디딤돌 금리: body.item 하나
+        got = [body["item"]]
     return [got] if isinstance(got, dict) else [g for g in (got or []) if isinstance(g, dict)]
 
 

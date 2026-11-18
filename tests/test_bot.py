@@ -6996,6 +6996,9 @@ firstlab_stats_render_page();
         xml = "<response><header><resultCode>00</resultCode></header><body><items><item><a>1</a></item><item><a>2</a></item></items></body></response>"
         self.assertEqual(opendata.items(opendata.parse(xml)), [{"a": "1"}, {"a": "2"}])
         self.assertEqual(opendata.parse('{"x": 1}'), {"x": 1})
+        wl = opendata.parse("<wantedList><totalCount>2</totalCount><servList><servId>A</servId></servList><servList><servId>B</servId></servList></wantedList>")
+        self.assertEqual([i["servId"] for i in opendata.items(wl)], ["A", "B"])
+        self.assertEqual(opendata.items({"header": {}, "body": {"item": {"r": "3.4"}}}), [{"r": "3.4"}])
         for name in ("welfare_local_detail", "welfare_nat_detail", "bizinfo", "kstartup_notice", "didimdol_rate", "rent_loan_rate"):
             self.assertIn(name, opendata.APIS)
         if not shutil.which("php"):
