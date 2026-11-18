@@ -461,3 +461,10 @@ date,post,fixes,types
 2026-11-18,6878,1,unverified:1
 2026-11-18,6873,0,
 2026-11-18,6890,0,
+2026-11-18,6976,0,
+2026-11-18,6980,1,wrong_fact:1
+2026-11-18,6978,1,missing_condition:1
+2026-11-18,6905,2,missing_condition:1 unverified:1
+2026-11-18,6927,0,
+2026-11-18,6946,0,
+2026-11-18,6935,2,missing_condition:1 wrong_fact:1
