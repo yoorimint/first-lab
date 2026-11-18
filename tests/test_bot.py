@@ -6992,6 +6992,12 @@ firstlab_stats_render_page();
         self.assertEqual(opendata.items({"response": {"body": {"items": {"item": [{"a": 1}]}}}}), [{"a": 1}])
         self.assertEqual(opendata.items({"response": {"body": {"items": {"item": {"a": 1}}}}}), [{"a": 1}])
         self.assertEqual(opendata.items({"data": [{"b": 2}]}), [{"b": 2}])
+        # 복지서비스 API 는 XML 만 줌 → 같은 모양 사전으로 (11/18 6개 추가)
+        xml = "<response><header><resultCode>00</resultCode></header><body><items><item><a>1</a></item><item><a>2</a></item></items></body></response>"
+        self.assertEqual(opendata.items(opendata.parse(xml)), [{"a": "1"}, {"a": "2"}])
+        self.assertEqual(opendata.parse('{"x": 1}'), {"x": 1})
+        for name in ("welfare_local_detail", "welfare_nat_detail", "bizinfo", "kstartup_notice", "didimdol_rate", "rent_loan_rate"):
+            self.assertIn(name, opendata.APIS)
         if not shutil.which("php"):
             self.skipTest("php 없음")
         src = (ROOT / "wordpress" / "mu-plugins" / "first-lab-api.php").read_text(encoding="utf-8")

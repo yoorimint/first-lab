@@ -25,9 +25,29 @@ APIS = {
     "loan_basic": "https://apis.data.go.kr/1160100/service/GetSmallLoanFinanceInstituteInfoService/getOrdinaryFinanceInfo",
     # 서민금융진흥원_대출상품한눈에 정보 서비스 (data.go.kr 15106208): 대출한도·금리구분·용도·총 대출기간·취급기관
     "loan_search": "https://apis.data.go.kr/B553701/LoanProductSearchingInfo/getLoanProductSearchingInfo",
+    # 11/18 운영자 활용신청 6개 — 지역 지원사업·복지·창업 공고·주택 대출 금리
+    # 한국사회보장정보원_지자체복지서비스 목록 (data.go.kr 15108347): searchWrd·ctpvNm·sggNm
+    "welfare_local_list": "https://apis.data.go.kr/B554287/LocalGovernmentWelfareInformations/LcgvWelfarelist",
+    # 지자체복지서비스 상세 (servId): 지원대상·선정기준·서류·신청방법
+    "welfare_local_detail": "https://apis.data.go.kr/B554287/LocalGovernmentWelfareInformations/LcgvWelfaredetailed",
+    # 한국사회보장정보원_중앙부처복지서비스 목록 (15090532): callTp=L·searchWrd
+    "welfare_nat_list": "https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfarelistV001",
+    # 중앙부처복지서비스 상세 (callTp=D·servId)
+    "welfare_nat_detail": "https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfaredetailedV001",
+    # 중소벤처기업부_중소기업 지원사업 공고(기업마당) (15157820)
+    "bizinfo": "https://apis.data.go.kr/1421000/bizinfo/pblancBsnsService",
+    # 창업진흥원_K-Startup 사업공고 (15125364)
+    "kstartup_notice": "https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01",
+    # K-Startup 사업소개
+    "kstartup_business": "https://apis.data.go.kr/B552735/kisedKstartupService01/getBusinessInformation01",
+    # 한국주택금융공사_디딤돌대출금리정보 (15082028)
+    "didimdol_rate": "https://apis.data.go.kr/B551408/didimdol-loan-rate/didimdol-info",
+    # 한국주택금융공사_전세자금대출 금리 정보 (15082033)
+    "rent_loan_rate": "https://apis.data.go.kr/B551408/rent-loan-rate-info/rate-list",
 }
 PROXY = "https://first-lab.kr/wp-json/firstlab/v1/opendata"
-DEFAULTS = {"resultType": "json", "type": "json", "pageNo": "1", "numOfRows": "100"}
+DEFAULTS = {"resultType": "json", "type": "json", "dataType": "json", "returnType": "json", "pageNo": "1", "numOfRows": "100",
+            "page": "1", "perPage": "100"}
 
 
 def direct_url(api: str, key: str, params: dict) -> str:
@@ -45,17 +65,41 @@ def via_site(api: str, **params) -> dict | None:
     return json.loads(_get(PROXY + "?" + query, {"X-Firstlab-Token": token}))
 
 
+def parse(text: str) -> dict:
+    """JSON 이면 그대로, XML(복지서비스 API 등 JSON 을 안 주는 곳)이면 같은 모양의 사전으로."""
+    text = text.strip()
+    if not text.startswith("<"):
+        return json.loads(text)
+    import xml.etree.ElementTree as ET
+
+    def conv(el):
+        kids = list(el)
+        if not kids:
+            return (el.text or "").strip()
+        out: dict = {}
+        for k in kids:
+            v = conv(k)
+            if k.tag in out:
+                out[k.tag] = out[k.tag] if isinstance(out[k.tag], list) else [out[k.tag]]
+                out[k.tag].append(v)
+            else:
+                out[k.tag] = v
+        return out
+    root = ET.fromstring(text)
+    return {root.tag: conv(root)}
+
+
 def fetch(api: str, **params) -> dict | None:
-    """API 응답 JSON. 못 받으면 None."""
+    """API 응답 (JSON·XML 모두 사전으로). 못 받으면 None."""
     if api not in APIS:
         raise ValueError(f"api 는 {'/'.join(APIS)}")
     try:
         key = _server_key()
         if key:
-            return json.loads(_get(direct_url(api, key, params)))
+            return parse(_get(direct_url(api, key, params)))
         got = via_site(api, **params)
-        return json.loads(got["body"]) if got and got.get("status") == 200 else None
-    except (OSError, ValueError, KeyError):
+        return parse(got["body"]) if got and got.get("status") == 200 else None
+    except (OSError, ValueError, KeyError, SyntaxError):
         return None
 
 

@@ -517,6 +517,25 @@ const FIRSTLAB_OPENDATA_APIS = array(
 	'loan_basic'  => 'https://apis.data.go.kr/1160100/service/GetSmallLoanFinanceInstituteInfoService/getOrdinaryFinanceInfo',
 	// 서민금융진흥원_대출상품한눈에 정보 서비스 (data.go.kr 15106208): 대출한도·금리구분·용도·총 대출기간·취급기관
 	'loan_search' => 'https://apis.data.go.kr/B553701/LoanProductSearchingInfo/getLoanProductSearchingInfo',
+	// 11/18 운영자 활용신청 6개 — 지역 지원사업·복지·창업 공고·주택 대출 금리
+	// 한국사회보장정보원_지자체복지서비스 목록 (data.go.kr 15108347): searchWrd·ctpvNm·sggNm
+	'welfare_local_list' => 'https://apis.data.go.kr/B554287/LocalGovernmentWelfareInformations/LcgvWelfarelist',
+	// 지자체복지서비스 상세 (servId): 지원대상·선정기준·서류·신청방법
+	'welfare_local_detail' => 'https://apis.data.go.kr/B554287/LocalGovernmentWelfareInformations/LcgvWelfaredetailed',
+	// 한국사회보장정보원_중앙부처복지서비스 목록 (15090532): callTp=L·searchWrd
+	'welfare_nat_list' => 'https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfarelistV001',
+	// 중앙부처복지서비스 상세 (callTp=D·servId)
+	'welfare_nat_detail' => 'https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfaredetailedV001',
+	// 중소벤처기업부_중소기업 지원사업 공고(기업마당) (15157820)
+	'bizinfo' => 'https://apis.data.go.kr/1421000/bizinfo/pblancBsnsService',
+	// 창업진흥원_K-Startup 사업공고 (15125364)
+	'kstartup_notice' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01',
+	// K-Startup 사업소개
+	'kstartup_business' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getBusinessInformation01',
+	// 한국주택금융공사_디딤돌대출금리정보 (15082028)
+	'didimdol_rate' => 'https://apis.data.go.kr/B551408/didimdol-loan-rate/didimdol-info',
+	// 한국주택금융공사_전세자금대출 금리 정보 (15082033)
+	'rent_loan_rate' => 'https://apis.data.go.kr/B551408/rent-loan-rate-info/rate-list',
 );
 
 /** 공식 API 주소 (인증키 포함, 밖으로 내보내지 않음). 정해 둔 API 가 아니면 null. */
@@ -525,7 +544,7 @@ function firstlab_opendata_url( array $args, string $key ): ?string {
 	if ( ! isset( FIRSTLAB_OPENDATA_APIS[ $api ] ) ) {
 		return null;
 	}
-	$query = array( 'resultType' => 'json', 'type' => 'json', 'pageNo' => '1', 'numOfRows' => '100' );
+	$query = array( 'resultType' => 'json', 'type' => 'json', 'dataType' => 'json', 'returnType' => 'json', 'pageNo' => '1', 'numOfRows' => '100', 'page' => '1', 'perPage' => '100' );
 	foreach ( $args as $name => $value ) {
 		if ( 'api' === $name || 'serviceKey' === $name || ! is_scalar( $value ) || ! preg_match( '/^[A-Za-z_]{1,30}$/', (string) $name ) ) {
 			continue;
