@@ -187,6 +187,11 @@ def check(post: dict, items: list[dict]) -> list[str]:
             from bot.condition_gate import readability_element
             errors += [f"{i}번: 읽기 — {x}" for x in readability_element(tag, p["replace_paragraph"])]
             errors += [f"{i}번: 쉬운 말 — {x}" for x in plain_patch_problems(element_around(body, find, tag), p["replace_paragraph"])]
+        if "insert_after" in p and ("replace_paragraph" in p or p.get("remove_element")):
+            # 11/19: 한 패치에 바꾸기+넣기 → 서버가 넣기만 하고 바꾸기를 건너뜀 (8곳 미반영). 둘로 나눠 적는다
+            errors.append(f"{i}번: 바꾸기(replace_paragraph·remove_element)와 넣기(insert_after)는 패치를 둘로 나누기")
+        if "insert_after" in p and not p["insert_after"].lstrip().startswith("["):  # 계산기 단축코드 말고 문장이면 쉬운 말 기준도
+            errors += [f"{i}번: 넣는 문단 쉬운 말 — {x}" for x in plain_patch_problems("", p["insert_after"])]
         if find and find in p.get("replace_paragraph", ""):
             errors.append(f"{i}번: 고친 문구 안에 찾을 문구가 그대로 있음 (고친 뒤에도 다시 걸림): {find[:40]}")
         # 조건 추가·완화가 공식 페이지에서 확인된 사실까지 지우지 않게 (11/5 #673: 공단 원문 그대로인 200원·230원을 지우고 '확인하세요'로만 바꿈)

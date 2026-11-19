@@ -7036,6 +7036,25 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_replace_and_insert_in_one_patch(self):
+        """11/19 verify_patches: 바꾸기+넣기를 한 패치에 적으면 서버가 넣기만 함(29개 중 8곳 고치기 전 문장 남음)
+        → 서버는 둘 다 하고, 앞으로는 apply_review 가 나눠 적게 막음."""
+        import sys
+        from bot.fix_posts import patch_content
+        body = "<p>앞 문단.</p>\n<p>틀린 문장이에요.</p>\n<p>뒤 문단.</p>"
+        p = {"find": "틀린 문장이에요.", "tag": "p", "replace_paragraph": "맞는 문장이에요.", "insert_after": "덧붙인 문장이에요."}
+        out = patch_content(body, p)
+        self.assertNotIn("틀린 문장", out)
+        self.assertLess(out.index("맞는 문장이에요."), out.index("덧붙인 문장이에요."))
+        self.assertIsNone(patch_content(out, p))   # 다시 돌려도 그대로
+        half = patch_content(body, {k: v for k, v in p.items() if k != "replace_paragraph"})   # 예전처럼 넣기만 된 글
+        self.assertNotIn("틀린 문장", patch_content(half, p))
+        sys.path.insert(0, str(ROOT / "automation"))
+        import apply_review
+        post = {"content_html": body, "title": "t", "excerpt": "", "id": 1}
+        errs = apply_review.check(post, [dict(p, type="wrong_fact", why="w", prevention="review_only:" + "x" * 40)])
+        self.assertTrue(any("둘로 나누기" in e for e in errs), errs)
+
     def test_pending_maint_request_is_relaunched(self):
         """11/19: 보정 3회차 중 온 '한 번 더' 요청이 버려져 #7365 패치가 1시간 넘게 안 들어감 → 매분 봇이 남은 요청을 다시 띄움."""
         import os
