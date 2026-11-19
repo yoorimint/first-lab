@@ -10,7 +10,7 @@ import json
 from .settings import wp_cli
 
 META_KEYS = ("_thumbnail_id", "_firstlab_card", "_firstlab_photo", "_firstlab_img_pending", "_firstlab_img_checked",
-             "_firstlab_patches_upto", "_firstlab_refreshed")
+             "_firstlab_patches_upto", "_firstlab_refreshed", "_firstlab_card_title")
 
 _PHP = r"""
 $out = array();
@@ -18,7 +18,8 @@ foreach ( get_posts( array( 'post_type' => 'post', 'post_status' => 'any', 'numb
     $meta = array();
     foreach ( %s as $k ) { $meta[ $k ] = (string) get_post_meta( $p->ID, $k, true ); }
     $out[ $p->ID ] = array( 'content' => $p->post_content, 'title' => $p->post_title, 'excerpt' => $p->post_excerpt,
-                            'name' => $p->post_name, 'status' => $p->post_status, 'date' => $p->post_date, 'meta' => $meta );
+                            'name' => $p->post_name, 'status' => $p->post_status, 'date' => $p->post_date, 'meta' => $meta,
+                            'thumb_url' => (string) wp_get_attachment_url( (int) get_post_thumbnail_id( $p ) ) );
 }
 echo wp_json_encode( $out );
 """
