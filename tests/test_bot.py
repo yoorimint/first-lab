@@ -7036,6 +7036,15 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_farm_small_business_employment_insurance_known_wrong(self):
+        """11/20 #7680·#2120·#4334: '법인 아닌 농림어업 4명 이하는 고용보험 제외'는 2024.7.1 삭제된 규정 → 관문이 막음 (산재 5명 미만은 그대로)."""
+        from bot.condition_gate import known_wrong
+        bad = "<p>고용보험 안내예요.</p><p>다만 법인이 아닌 농업·임업·어업 사업에서 상시 4명 이하를 쓰는 곳은 고용보험이 적용되지 않아요.</p>"
+        self.assertTrue(known_wrong(bad))
+        ok = ("<p>고용보험 안내예요.</p><p>법인이 아닌 농업·어업 4명 이하 사업은 2024년 7월부터 적용돼요.</p>"
+              "<p>산재보험: 법인이 아닌 농업·임업·어업 중 상시근로자 5명 미만은 빠져요.</p>")
+        self.assertEqual(known_wrong(ok), [])
+
     def test_calculator_year_labels_follow_yearly_check(self):
         """11/19 외부 검수: 연말정산 계산기 안내 '2026년분은 … 9세 이상'처럼 연도를 박은 문구는 값 확인 연도(yearly_checked)가
         올라가도 그대로 남을 수 있음 → 안내 속 'N년분'이 확인 연도보다 2년 이상 뒤처지면 실패 (값을 새로 확인할 때 문구도 같이)."""
