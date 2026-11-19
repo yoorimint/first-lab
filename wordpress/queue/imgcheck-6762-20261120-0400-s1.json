@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6762,
+ "replace": [
+  {
+   "old": "ai-02e8cfbfbd",
+   "prompt": "Warm morning sunlight on fresh round loaves of bread cooling on a wooden counter in a small neighborhood bakery, close-up, soft focus background, no people.",
+   "alt": "아침 햇살 아래 나무 진열대에 놓인 갓 구운 빵",
+   "why": "왼쪽 위 액자 속 종이에 글자처럼 보이는 낙서가 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
