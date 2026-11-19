@@ -219,7 +219,8 @@ def main() -> None:
     bulk = wpbulk.posts()  # 글 본문·메타를 한 번에 (글마다 wp-cli 를 부르면 배포가 10분을 넘김)
     apply_patches(bulk)
     fill_missing_author()
-    posts = [{"ID": int(pid), "post_title": b["title"], "post_name": b["name"], "meta": b["meta"]} for pid, b in bulk.items()]
+    posts = [{"ID": int(pid), "post_title": b["title"], "post_name": b["name"], "meta": b["meta"], "thumb_url": b.get("thumb_url")}
+             for pid, b in bulk.items()]
     for p in posts:
         pid = str(p["ID"])
         content = bulk[pid]["content"]
@@ -249,8 +250,11 @@ def sync_card(p: dict) -> bool:
     pid = str(p["ID"])
     meta = p.get("meta")
     thumb, card = (meta["_thumbnail_id"], meta["_firstlab_card"]) if meta else (_meta(pid, "_thumbnail_id"), _meta(pid, "_firstlab_card"))
-    bot_card = bool(card) or (bool(thumb) and _is_bot_card(thumb))
-    title_changed = bot_card and _meta(pid, "_firstlab_card_title") != p["post_title"]
+    # 사진 주소·카드 제목도 한 번에 읽은 값으로 (11/19: 글마다 WP-CLI 를 불러 보정 fix_posts 가 배포마다 600초)
+    url = p.get("thumb_url")
+    bot_card = bool(card) or (bool(thumb) and ("/card-" in url if url is not None else _is_bot_card(thumb)))
+    card_title = meta["_firstlab_card_title"] if meta and "_firstlab_card_title" in meta else _meta(pid, "_firstlab_card_title")
+    title_changed = bot_card and card_title != p["post_title"]
     if not thumb or (bot_card and (card != CARD_VERSION or title_changed)):
         keyword = urllib.parse.unquote(p["post_name"]) or p["post_title"]
         set_featured_card(int(pid), p["post_title"], keyword)

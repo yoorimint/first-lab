@@ -7036,6 +7036,23 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_card_sync_uses_bulk_values(self):
+        """11/19 보정 fix_posts 600초: 글마다 사진 주소(WP-CLI eval)를 물어봄 → 한 번에 읽은 thumb_url·카드 제목으로."""
+        from bot import fix_posts as fp, wpbulk
+        self.assertIn("_firstlab_card_title", wpbulk.META_KEYS)
+        self.assertIn("'thumb_url'", wpbulk._PHP)
+        meta = {"_thumbnail_id": "9", "_firstlab_card": "", "_firstlab_card_title": ""}
+        photo_post = {"ID": 1, "post_title": "글", "post_name": "k", "meta": meta, "thumb_url": "https://x/ai-abc.webp"}
+        card_meta = {"_thumbnail_id": "8", "_firstlab_card": str(fp.CARD_VERSION), "_firstlab_card_title": "옛 제목"}
+        card_post = {"ID": 2, "post_title": "새 제목", "post_name": "k2", "meta": card_meta, "thumb_url": "https://x/card-2.png"}
+        with mock.patch.object(fp, "wp_cli", side_effect=AssertionError("WP-CLI 를 부르면 안 됨")), \
+             mock.patch.object(fp, "set_featured_card") as card:
+            self.assertFalse(fp.sync_card(photo_post))
+            self.assertTrue(fp.sync_card(card_post))   # 제목이 바뀐 제목 카드는 다시 만듦
+            card_meta["_firstlab_card_title"] = "새 제목"
+            self.assertFalse(fp.sync_card(card_post))
+        self.assertEqual(card.call_count, 1)
+
     def test_photo_backfill_looks_up_posts_in_bulk(self):
         """11/19 보정 작업 pending_images 574초: 큐 파일 3천여 개마다 WP-CLI 3번 → 150개씩 묶어 한 번에, 결과는 같게."""
         import base64
