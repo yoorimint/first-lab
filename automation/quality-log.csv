@@ -526,3 +526,5 @@ date,post,fixes,types
 2026-11-19,7521,2,missing_condition:2
 2026-11-19,7561,4,missing_condition:4
 2026-11-19,7583,0,
+2026-11-19,7587,0,
+2026-11-19,7585,2,missing_condition:1 wrong_fact:1
