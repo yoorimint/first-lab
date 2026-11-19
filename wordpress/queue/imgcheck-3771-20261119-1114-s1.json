@@ -1,0 +1,10 @@
+{
+ "type": "image_check",
+ "post_id": 3771,
+ "replace": [],
+ "remove": [
+  "ai-4792409374"
+ ],
+ "add": [],
+ "why": "표지판에 엉터리 글자가 보임"
+}

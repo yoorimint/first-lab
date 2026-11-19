@@ -454,6 +454,14 @@ def main() -> None:
         except Exception as e:  # noqa: BLE001
             add_log(state, False, f"API 봇 반영 묶음 정리 실패: {str(e)[:150]}")
 
+    if now.minute % 10 == 1:  # 남은 '한 번 더' 보정 요청 다시 띄우기 (bot/side_jobs.relaunch_pending_maint, 11/19)
+        try:
+            from . import side_jobs
+            if side_jobs.relaunch_pending_maint():
+                add_log(state, True, "기존 글 보정: 남아 있던 '한 번 더' 요청으로 다시 시작")
+        except Exception as e:  # noqa: BLE001
+            add_log(state, False, f"보정 다시 시작 실패: {str(e)[:150]}")
+
     if now.minute % 10 == 0:  # 배포 밀림 감지 (bot/deploy_watch.py) — 어떤 오류도 봇을 멈추지 않게
         try:
             from .deploy_watch import run as watch_deploy

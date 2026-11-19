@@ -48,3 +48,23 @@ def stale_maint_launch(cgroup_path: str = "/proc/self/cgroup", parent_cmd: str |
     except OSError:
         return False
 
+
+
+MAINT_AGAIN = Path("/var/lib/first-lab/bot/maint-again")
+
+
+def relaunch_pending_maint(again: Path = MAINT_AGAIN, run=subprocess.run, now: float | None = None) -> bool:
+    """전체 글 보정의 '한 번 더' 요청이 남았는데 보정이 안 돌고 있으면 다시 띄움 (매분 봇이 10분마다).
+    11/19: 보정은 한 번에 최대 3회차까지만 이어서 돎 — 3회차 중에 온 요청(10:07 패치·코드)이 표시만 남고 버려져,
+    그 뒤 배포는 '패치 안 바뀜'으로 건너뛰어 #7365 패치·보정 개선이 1시간 넘게 서버에 안 들어감."""
+    import time
+    if not again.exists() or not shutil.which("systemctl"):
+        return False
+    if (now or time.time()) - again.stat().st_mtime < 180:  # 방금 남긴 표시는 도는 보정이 끝날 때 가져감
+        return False
+    try:
+        if run(["systemctl", "is-active", "--quiet", "firstlab-maint"], timeout=30).returncode == 0:
+            return False
+        return run(["bash", str(ROOT / "server" / "maint-start.sh")], capture_output=True, text=True, timeout=60).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
