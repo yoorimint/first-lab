@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6905,
+ "replace": [
+  {
+   "old": "ai-2f2b140859",
+   "prompt": "a small unmarked fishing boat moored in a calm harbor surrounded by black volcanic rocks on Jeju island at soft morning light",
+   "alt": "검은 현무암으로 둘러싸인 제주 포구의 작은 어선",
+   "why": "뱃머리에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

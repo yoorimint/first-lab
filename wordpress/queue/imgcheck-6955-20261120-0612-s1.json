@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6955,
+ "replace": [
+  {
+   "old": "ai-b324c60c3f",
+   "prompt": "a young adult seen from behind studying at a bright wooden desk by a window with a notebook and pencil, plain unbranded objects",
+   "alt": "밝은 창가 나무 책상에서 공부하는 청년의 뒷모습",
+   "why": "노트북에 로고처럼 보이는 표시, 의자·팔 자세가 어색함"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
