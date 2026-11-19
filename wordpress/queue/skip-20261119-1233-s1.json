@@ -1,0 +1,12 @@
+{
+ "type": "skip",
+ "keywords": [
+  {
+   "keyword": "복지센터",
+   "why": "특정 기관(동네 복지센터) 위치·연락처를 찾는 검색어라 정보 글 주제가 안 됨"
+  }
+ ],
+ "law_changes": [],
+ "new_benefits": [],
+ "slot": 1
+}
