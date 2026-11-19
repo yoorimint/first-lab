@@ -7036,6 +7036,30 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_pending_maint_request_is_relaunched(self):
+        """11/19: 보정 3회차 중 온 '한 번 더' 요청이 버려져 #7365 패치가 1시간 넘게 안 들어감 → 매분 봇이 남은 요청을 다시 띄움."""
+        import os
+        import tempfile
+        from bot import side_jobs as sj
+        with tempfile.TemporaryDirectory() as d:
+            again = Path(d, "maint-again")
+            calls = []
+
+            def run(cmd, **kw):
+                calls.append(cmd[:2])
+                return mock.Mock(returncode=3 if cmd[0] == "systemctl" else 0)   # 3 = 안 도는 중
+            with mock.patch.object(sj.shutil, "which", return_value="/bin/x"):
+                self.assertFalse(sj.relaunch_pending_maint(again, run))          # 요청 없음
+                again.touch()
+                self.assertFalse(sj.relaunch_pending_maint(again, run))          # 방금 남긴 요청은 도는 쪽이 가져감
+                os.utime(again, (0, 0))
+                self.assertTrue(sj.relaunch_pending_maint(again, run))
+                self.assertEqual(calls[-1][0], "bash")
+                busy = lambda cmd, **kw: mock.Mock(returncode=0)                 # 보정이 도는 중이면 안 띄움
+                self.assertFalse(sj.relaunch_pending_maint(again, busy))
+        run_src = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        self.assertIn("side_jobs.relaunch_pending_maint()", run_src)
+
     def test_card_sync_uses_bulk_values(self):
         """11/19 보정 fix_posts 600초: 글마다 사진 주소(WP-CLI eval)를 물어봄 → 한 번에 읽은 thumb_url·카드 제목으로."""
         from bot import fix_posts as fp, wpbulk
