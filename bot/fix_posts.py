@@ -91,6 +91,12 @@ def patch_content(content: str, patch: dict) -> str | None:
     remove_block: true 면 find 가 든 블록(<!-- wp:… --> … <!-- /wp:… -->) 통째로 삭제 (근거 없는 표 등)
     remove_element: true 면 find 가 든 요소(tag, 예: 표의 한 줄 tr)만 삭제
     """
+    if "insert_after" in patch and ("replace_paragraph" in patch or patch.get("remove_element")):
+        # 바꾸기+넣기가 한 패치에 함께 있으면: 뒤에 넣고 나서 그 문단을 바꿈 (11/19: 넣기만 하고 바꾸기는 건너뛰어
+        # 패치 29개 중 8곳에 고치기 전 문장이 남음 — #6935·#6955·#6966·#7063·#7065)
+        ins = patch_content(content, {k: v for k, v in patch.items() if k not in ("replace_paragraph", "remove_element")})
+        rep = patch_content(ins if ins is not None else content, {k: v for k, v in patch.items() if k != "insert_after"})
+        return rep if rep is not None else ins
     if patch.get("remove_block"):
         block = re.search(r"<!-- wp:(?P<kind>[a-z/-]+)\b[^>]*-->(?:(?!<!-- /wp:(?P=kind) -->).)*?"
                           + re.escape(patch["find"]) + r".*?<!-- /wp:(?P=kind) -->\s*", content, flags=re.S)
@@ -157,6 +163,8 @@ def apply_patches(bulk: dict[str, dict] | None = None) -> None:
             updated = unnest(content)
         elif updated is not None:
             updated = unnest(updated)
+        if updated == content:  # 바꿔도 같은 글 — 매번 저장하지 않게
+            updated = None
         if updated is None:
             if "insert_after" in patch:  # 넣은 블록이 그대로 있는지 확인용 (편집기 저장으로 지워지면 다시 넣음)
                 print(f"[확인] {pid} '{patch['insert_after']}' {content.count(patch['insert_after'])}개", flush=True)
