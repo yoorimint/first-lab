@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7048,
+ "replace": [
+  {
+   "old": "ai-55429af040",
+   "prompt": "a small cozy cafe counter in warm evening light with white ceramic cups and potted plants, no machines with labels",
+   "alt": "저녁 조명 아래 하얀 컵과 화분이 놓인 작은 카페 계산대",
+   "why": "커피 머신에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

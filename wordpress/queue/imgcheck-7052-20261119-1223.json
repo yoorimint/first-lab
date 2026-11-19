@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7052,
+ "replace": [
+  {
+   "old": "ai-e71d839b7a",
+   "prompt": "a young person seen from behind working at a plain wooden desk in a bright small studio with green plants, unbranded laptop",
+   "alt": "밝은 작은 작업실에서 일하는 청년의 뒷모습",
+   "why": "노트북에 회사 로고가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
