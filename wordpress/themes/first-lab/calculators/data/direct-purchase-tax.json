@@ -1,0 +1,16 @@
+{
+  "basis_date": "2026-11-18", "yearly": false,
+  "max_usd": 2000,
+  "won10_keys": ["duty", "vat", "total"],
+  "sources": [
+    {"name": "국가법령정보센터 관세법 (제30조 과세가격, 제40조 징수금액의 최저한, 제94조 소액물품 면세)", "url": "https://www.law.go.kr/법령/관세법"},
+    {"name": "국가법령정보센터 관세법 시행령 (제37조 1만 원)", "url": "https://www.law.go.kr/법령/관세법시행령"},
+    {"name": "국가법령정보센터 관세법 시행규칙 (제45조② 물품가격 미화 150달러)", "url": "https://www.law.go.kr/법령/관세법시행규칙"},
+    {"name": "국가법령정보센터 특송물품 수입통관 사무처리에 관한 고시 (제9조 목록통관 150·200달러)", "url": "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"},
+    {"name": "국가법령정보센터 부가가치세법 (제27조 소액물품 면세, 제29조 수입 과세표준)", "url": "https://www.law.go.kr/법령/부가가치세법"},
+    {"name": "관세청 특송물품 통관", "url": "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"}
+  ],
+  "exempt_usd": {"us_list": 200, "other": 150},
+  "duty_min": 10000,
+  "vat_pct": 10
+}

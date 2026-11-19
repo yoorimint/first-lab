@@ -13,7 +13,6 @@ from zoneinfo import ZoneInfo
 
 from . import images, photo, schedule
 from .image_check import CHECKED_META
-from .publisher import existing_post_id
 from .schedule import QUEUE_META, READY
 from .settings import wp_cli
 
@@ -81,9 +80,30 @@ def _bump_fail(post_id: str) -> int:
     return n
 
 
+# 키워드 묶음 → 대표 사진도 대기 표시도 없는 글 번호 {키워드: ID} (WP-CLI 한 번에 여러 글)
+_BULK_PHP = ('$out = array(); foreach ( json_decode( base64_decode( "%s" ), true ) as $k ) { '
+             '$p = get_page_by_path( sanitize_title( $k ), OBJECT, "post" ); if ( ! $p ) { continue; } '
+             'if ( "" !== (string) get_post_meta( $p->ID, "' + photo.PHOTO_META + '", true ) '
+             '|| "" !== (string) get_post_meta( $p->ID, "' + photo.PENDING_META + '", true ) ) { continue; } '
+             '$out[ $k ] = (string) $p->ID; } echo wp_json_encode( (object) $out );')
+BULK = 150  # 한 번에 보낼 키워드 수 (명령줄 길이 한도 128KB 안)
+
+
+def posts_without_photo(keywords: list[str]) -> dict[str, str]:
+    """대표 사진·대기 표시가 둘 다 없는 글 {키워드: 글 번호}.
+    11/19: 큐 파일 3천여 개마다 WP-CLI 를 3번씩 불러 배포마다 10분(574초) 걸림 → 150개씩 묶어 한 번에."""
+    import base64
+
+    found: dict[str, str] = {}
+    for i in range(0, len(keywords), BULK):
+        chunk = base64.b64encode(json.dumps(keywords[i:i + BULK], ensure_ascii=False).encode()).decode()
+        found.update(json.loads(wp_cli("eval", _BULK_PHP % chunk) or "{}"))
+    return found
+
+
 def backfill_from_queue() -> list[str]:
     """대표 사진 없이(제목 카드로) 저장된 직접 작성 글: 큐 파일의 장면 설명으로 대기 표시."""
-    out = []
+    scenes: dict[str, dict] = {}
     for path in sorted(QUEUE_DIR.glob("*.json")):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
@@ -91,13 +111,13 @@ def backfill_from_queue() -> list[str]:
             continue
         if data.get("type") or not data.get("images") or not data.get("keyword"):
             continue
-        post_id = existing_post_id(str(data["keyword"]))
-        if not post_id or photo.meta(post_id, photo.PHOTO_META) or photo.meta(post_id, photo.PENDING_META):
-            continue
         scene = photo.first_scene([i.get("prompt", "") for i in data["images"]], [i.get("alt", "") for i in data["images"]])
         if scene:
-            wp_cli("post", "meta", "update", post_id, photo.PENDING_META, json.dumps([scene], ensure_ascii=False))
-            out.append(post_id)
+            scenes.setdefault(str(data["keyword"]).strip(), scene)
+    out = []
+    for keyword, post_id in posts_without_photo(list(scenes)).items():
+        wp_cli("post", "meta", "update", post_id, photo.PENDING_META, json.dumps([scenes[keyword]], ensure_ascii=False))
+        out.append(post_id)
     return out
 
 

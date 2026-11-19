@@ -1,0 +1,764 @@
+{
+ "title": "관부가세 계산: 해외직구 150달러 넘으면 전체에 과세",
+ "excerpt": "해외직구 관부가세는 물품가격이 미화 150달러(미국발 목록통관은 200달러)를 넘으면 붙어요. 관세·부가세 10% 계산 순서, 합산과세, 관세 1만 원 미만 기준을 정리했어요.",
+ "content_html": "<p>해외직구 <strong>관부가세</strong>는 물품가격이 면세 기준을 넘을 때 내는 관세와 부가세예요.<br>블랙프라이데이 직구 전에 알아 두면 좋아요.<br>✔ 기준 미화 150달러<br>✔ 미국발 목록통관은 200달러<br>✔ 넘으면 전체 금액에 과세</p>\n<p>기준을 1달러만 넘어도 넘은 부분이 아니라 전체에 세금이 붙어요. 그래서 결제 전에 계산해 보는 게 좋아요.</p>\n<h2>관부가세 뜻: 관세와 부가세</h2>\n<p>관부가세는 관세와 부가가치세(부가세)를 합쳐 부르는 말이에요. 관세는 외국 물건이 들어올 때 붙는 세금이에요.</p>\n<p>부가세는 국내에서 물건을 살 때처럼 10%가 붙어요. 수입할 때는 과세가격에 관세까지 더한 금액에 10%를 매겨요.</p>\n<p>개별소비세·주세 같은 세금이 붙는 물건은 그 세금도 더해서 부가세를 매겨요. 도서처럼 수입 부가세가 면제되는 물건도 있어요.</p>\n<p class=\"fl-basis\">근거: 부가가치세법 제27조·제29조·제30조</p>\n<h2>면세 기준: 150달러, 미국발 200달러</h2>\n<p>예를 들어 미국 쇼핑몰에서 옷을 180달러에 사서 특송으로 받으면 면세예요. 같은 180달러라도 일본에서 오면 세금을 내요.</p>\n<p>개인이 쓸 물건(자가사용 물품)은 물품가격이 미화 150달러 이하면 관세와 부가세가 면제돼요. 미국에서 특송으로 오는 목록통관 물건만 200달러 이하까지 면세예요.</p>\n<p>다만 품목마다 자가사용으로 인정되는 양이 정해져 있어요. 예를 들어 건강기능식품은 총 6병까지라서, 그 양을 넘으면 면세가 안 될 수 있어요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>경우</th><th>면세 기준</th></tr></thead>\n<tbody>\n<tr><td>미국발 특송, 목록통관 물건</td><td>200달러 이하</td></tr>\n<tr><td>미국발이지만 목록통관 안 되는 물건</td><td>150달러 이하</td></tr>\n<tr><td>미국 외 나라에서 오는 물건</td><td>150달러 이하</td></tr>\n</tbody>\n</table></figure>\n<p>목록통관은 수입신고를 따로 하지 않고 특송업체가 낸 목록으로 통관하는 방식이에요. 의약품·건강기능식품·식품·주류·담배 등은 목록통관이 안 돼서 수입신고를 해야 해요.</p>\n<p>면세를 판단하는 물품가격에는 실제 결제한 물건값, 현지 세금, 현지 배송료가 들어가요. 한국까지 오는 국제배송료·보험료는 따로 구분되면 빼고 봐요.</p>\n<p>다만 기준을 넘으면 국제배송료까지 더한 과세가격 전체에 세금이 붙어요. 또 면세 기준 안이라도 개별소비세·담배소비세 같은 세금은 붙을 수 있어요.</p>\n<p class=\"fl-basis\">근거: 관세법 제94조, 같은 법 시행규칙 제45조, 수입통관 사무처리에 관한 고시 제67조, 특송물품 수입통관 사무처리에 관한 고시 제9조, 부가가치세법 제27조</p>\n<h2>관부가세 계산 방법</h2>\n<p>순서는 세 단계예요. 과세가격을 원화로 바꾸고, 관세를 구한 뒤, 부가세를 더해요.</p>\n<ol>\n<li>과세가격 = (물품가격 + 국제배송료·보험료) × 과세환율</li>\n<li>관세 = 과세가격 × 품목별 관세율</li>\n<li>부가세 = (과세가격 + 관세) × 10%</li>\n</ol>\n<p>다만 일부 물건은 운임을 실제 배송료와 다르게 계산하거나 빼기도 해요. 그래서 실제 세액이 계산과 조금 다를 수 있어요.</p>\n<p>과세환율은 관세청이 주마다 정하는 환율이에요. 신고하는 주의 바로 전 주 환율 평균으로 정해요.</p>\n<p>관세율은 물건 종류마다 달라요. 품목별 세율은 관세청 누리집(customs.go.kr)의 해외직구물품 예상세액 조회 안내에서 확인하세요.</p>\n<p>아래는 1달러 1,338.8원(2026년 11월 18일 원/달러 환율)으로 가정한 예시예요. 실제 세금은 그 주 관세청 과세환율로 계산해요.</p>\n<p>관세율도 가정한 값이고, 세금은 10원 미만을 버렸어요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>항목</th><th>예시 1</th><th>예시 2</th></tr></thead>\n<tbody>\n<tr><td>물품가격</td><td>180달러</td><td>160달러</td></tr>\n<tr><td>국제배송료</td><td>20달러</td><td>10달러</td></tr>\n<tr><td>관세율(가정)</td><td>8%</td><td>13%</td></tr>\n<tr><td>과세가격</td><td>267,760원</td><td>227,596원</td></tr>\n<tr><td>관세</td><td>21,420원</td><td>29,580원</td></tr>\n<tr><td>부가세</td><td>28,910원</td><td>25,710원</td></tr>\n<tr><td>합계</td><td>50,330원</td><td>55,290원</td></tr>\n</tbody>\n</table></figure>\n<p>예시 1은 미국발이지만 목록통관이 안 되는 물건이라 150달러 기준을 넘은 경우예요. 목록통관 되는 물건이었다면 180달러라서 면세예요.</p>\n<p>내 물건값과 관세율을 넣어 바로 계산해 보세요.</p>\n<p>[firstlab_calc id=\"direct-purchase-tax\"]</p>\n<p class=\"fl-basis\">근거: 관세법 제18조·제30조, 같은 법 시행규칙 제1조의2</p>\n<h2>나눠 사도 합쳐서 과세되는 경우</h2>\n<p>예를 들어 같은 해외 판매자에게 같은 날 100달러짜리 두 개를 사서 나눠 들여와도, 합계 200달러로 봐요. 이렇게 합쳐서 면세를 판단하는 것을 합산과세라고 해요.</p>\n<p>합산과세 대상은 아래 두 경우예요. 합친 물품가격이 면세 기준을 넘으면 전체에 세금이 붙어요.</p>\n<ul>\n<li>운송장 하나로 들어온 물건을 면세 범위로 나눠 통관하는 경우</li>\n<li>같은 해외 판매자에게 같은 날 산 물건을 나눠 들여오는 경우</li>\n</ul>\n<p>입항일이 같다는 이유만으로는 합치지 않아요. 판매자가 다르거나 산 날짜가 다르면 따로 판단해요.</p>\n<p class=\"fl-basis\">근거: 수입통관 사무처리에 관한 고시 제68조</p>\n<h2>관세가 1만 원 미만이면</h2>\n<p>계산한 관세가 1만 원 미만이면 세관은 그 관세를 걷지 않아요. 예를 들어 관세가 8,320원으로 나오면 관세는 내지 않아요.</p>\n<p>부가세에도 같은 기준이 적용되는지는 세관이나 배송업체가 알려 주는 세액으로 확인하세요.</p>\n<p class=\"fl-basis\">근거: 관세법 제40조, 같은 법 시행령 제37조</p>\n<h2>통관 방식과 관부가세 내는 법</h2>\n<p>특송으로 오는 물건은 금액에 따라 통관 방식이 나뉘어요. 목록통관이 안 되는 물건은 금액과 상관없이 수입신고를 해요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>물품가격</th><th>통관 방식</th></tr></thead>\n<tbody>\n<tr><td>150달러 이하(미국 200달러)</td><td>목록통관</td></tr>\n<tr><td>그 초과 ~ 2,000달러 이하</td><td>간이 수입신고</td></tr>\n<tr><td>2,000달러 초과</td><td>일반 수입신고</td></tr>\n</tbody>\n</table></figure>\n<p>개인이 받는 특송 물건은 받는 사람의 개인통관고유부호를 정확히 내야 해요. 다른 사람 이름을 도용하는 것을 막기 위해서예요.</p>\n<p>세금 금액과 내는 방법은 통관을 맡은 특송업체나 관세사에게 물어볼 수 있어요. 안내받은 금액이 계산과 크게 다르면 품목 분류와 환율도 함께 물어보세요.</p>\n<p class=\"fl-basis\">근거: 특송물품 수입통관 사무처리에 관한 고시 제9조·제10조</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>미국발이라도 목록통관 안 되는 물건은 150달러 기준</li>\n<li>같은 판매자·같은 날 구매는 합쳐서 판단</li>\n<li>기준을 넘으면 국제배송료까지 전체 과세</li>\n<li>개인통관고유부호를 정확히 적었는지</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 관부가세는 물품가격이 150달러(미국발 목록통관은 200달러)를 넘으면 전체 과세가격에 관세와 부가세 10%가 붙는 세금이에요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>할인 쿠폰을 쓰면 할인된 금액이 기준인가요?</h3>\n<p>과세가격은 실제로 낸 가격을 기준으로 해요. 그래서 할인 뒤 실제 결제한 금액으로 보면 돼요.</p>\n<h3>직구한 물건을 반품하면 관세를 돌려받나요?</h3>\n<p>수입신고가 수리된 개인 물건을 쓰지 않은 상태 그대로 6개월 안에 다시 내보내면, 낸 관세를 돌려받을 수 있어요. 세관 확인 등 절차를 거쳐야 해요.</p>\n<h3>면세 기준 안인데 세금이 나왔어요.</h3>\n<p>같은 판매자에게 같은 날 산 물건이 합산됐거나, 목록통관이 안 되는 물건이라 150달러 기준이 적용됐을 수 있어요. 관세청 고객지원센터(125)에 물어볼 수 있어요.</p>\n<p class=\"fl-basis\">근거: 관세법 제30조·제106조의2</p>\n",
+ "tags": [
+  "관부가세",
+  "해외직구 관세",
+  "면세 한도",
+  "합산과세",
+  "관부가세 계산기"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a cardboard delivery box resting on a wooden floor near a sunny apartment entrance with a potted plant",
+   "alt": "햇살이 드는 현관 앞 나무 바닥에 놓인 택배 상자"
+  }
+ ],
+ "keyword": "관부가세",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "관부가세는 물품가격이 면세 기준을 넘을 때 내는 관세와 부가세, 기준 미화 150달러 (관세법 시행규칙 제45조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "미국발 목록통관은 200달러 이하 면세 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "기준을 넘으면 넘은 부분이 아니라 전체 금액에 과세, 기준을 1달러만 넘어도 전체에 세금",
+   "urls": [
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가세는 10%가 붙음 (부가가치세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "수입할 때는 과세가격에 관세까지 더한 금액에 10%를 매김 (부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법",
+    "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "개별소비세·주세 같은 세금이 붙는 물건은 그 세금도 더해서 부가세를 매김 (부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법",
+    "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "도서처럼 수입 부가세가 면제되는 물건도 있음 (부가가치세법 제27조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "미국 쇼핑몰에서 옷을 180달러에 사서 특송으로 받으면 면세, 같은 180달러라도 일본에서 오면 세금 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "자가사용 물품은 물품가격이 미화 150달러 이하면 관세와 부가세가 면제 (관세법 시행규칙 제45조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "소액물품 관세 면제 근거 (관세법 제94조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세가 면제되는 소액물품은 부가세도 면제 (부가가치세법 제27조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "미국에서 특송으로 오는 목록통관 물건만 200달러 이하까지 면세 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "품목마다 자가사용 인정 양이 정해져 있고 건강기능식품은 총 6병까지, 넘으면 면세가 안 될 수 있음 (수입통관 사무처리에 관한 고시 제67조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "표: 미국발 특송 목록통관 물건 200달러 이하, 미국발 목록통관 안 되는 물건 150달러 이하, 미국 외 150달러 이하 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "목록통관은 수입신고를 따로 하지 않고 특송업체가 낸 목록으로 통관하는 방식 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "의약품·건강기능식품·식품·주류·담배 등은 목록통관이 안 돼서 수입신고 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "면세 판단 물품가격에는 결제한 물건값, 현지 세금, 현지 배송료가 들어가고 국제배송료·보험료는 따로 구분되면 뺌 (관세법 시행규칙 제45조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "기준을 넘으면 국제배송료까지 더한 과세가격 전체에 세금 (관세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "면세 기준 안이라도 개별소비세·담배소비세 같은 세금은 붙을 수 있음",
+   "urls": [
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "과세가격 = (물품가격 + 국제배송료·보험료) × 과세환율 (관세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세 = 과세가격 × 품목별 관세율, 관세율은 물건 종류마다 다름 (관세법 제50조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법",
+    "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가세 = (과세가격 + 관세) × 10% (부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법",
+    "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "과세환율은 관세청이 주마다 정하고 신고하는 주의 바로 전 주 환율 평균 (관세법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "과세환율은 전주 월~금 기준환율 평균 (관세법 시행규칙 제1조의2)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "품목별 세율은 관세청 누리집 customs.go.kr 해외직구물품 예상세액 조회 안내에서 확인 (완화)",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853"
+   ],
+   "verdict": "확인불가",
+   "action": "완화",
+   "round": 2
+  },
+  {
+   "claim": "예시 환율 1달러 1,338.8원(2026년 11월 18일 원/달러 환율, 한국은행 ECOS), 실제 세금은 그 주 관세청 과세환율 (관세법 제18조)",
+   "urls": [
+    "https://ecos.bok.or.kr",
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "예시 1: 180달러+20달러, 관세율 8% → 과세가격 267,760원, 관세 21,420원, 부가세 28,910원, 합계 50,330원, 10원 미만 버림 (관세법 제30조, 부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법",
+    "https://www.law.go.kr/법령/부가가치세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시 2: 160달러+10달러, 관세율 13% → 과세가격 227,596원, 관세 29,580원, 부가세 25,710원, 합계 55,290원 (관세법 제30조, 부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법",
+    "https://www.law.go.kr/법령/부가가치세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "예시 1은 미국발이지만 목록통관이 안 되는 물건이라 150달러 기준, 목록통관 되는 물건이면 180달러라서 면세 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "같은 해외 판매자에게 같은 날 100달러짜리 두 개를 사서 나눠 들여와도 합계 200달러로 봄, 합산과세 (수입통관 사무처리에 관한 고시 제68조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "합산과세 대상: 운송장 하나로 들어온 물건을 나눠 통관, 같은 해외 판매자에게 같은 날 산 물건을 나눠 들여옴 (수입통관 사무처리에 관한 고시 제68조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "입항일이 같다는 이유만으로는 합치지 않고, 판매자나 산 날짜가 다르면 따로 판단 (수입통관 사무처리에 관한 고시 제68조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/na/ntt/selectNttInfo.do?mi=2891&nttSn=10069842"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계산한 관세가 1만 원 미만이면 세관은 그 관세를 걷지 않음 (관세법 제40조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "징수하지 않는 금액은 1만원, 관세 8,320원이면 관세는 내지 않음 (관세법 시행령 제37조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "특송 통관 방식: 150달러(미국 200달러) 이하 목록통관, 그 초과 2,000달러 이하 간이 수입신고, 2,000달러 초과 일반 수입신고 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "목록통관이 안 되는 물건은 금액과 상관없이 수입신고 (특송물품 수입통관 사무처리에 관한 고시 제9조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "개인이 받는 특송 물건은 받는 사람의 개인통관고유부호를 정확히 내야 하고 이유는 명의 도용 방지",
+   "urls": [
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "통관목록 제출 방식 (특송물품 수입통관 사무처리에 관한 고시 제10조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "세금 금액과 내는 방법은 특송업체나 관세사에게 물어볼 수 있음 (완화)",
+   "urls": [
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+   ],
+   "verdict": "확인불가",
+   "action": "완화",
+   "round": 2
+  },
+  {
+   "claim": "할인 쿠폰을 쓰면 실제로 낸 가격 기준 (관세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "반품: 수입신고가 수리된 개인 물건을 쓰지 않은 상태 그대로 6개월 안에 다시 내보내면 관세 환급, 세관 확인 절차 (관세법 제106조의2)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세청 고객지원센터 125에 물어볼 수 있음",
+   "urls": [
+    "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853",
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2895&cntntsId=844"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "면세 기준 안인데 세금이 나오면 합산됐거나 목록통관이 안 되는 물건이라 150달러 기준일 수 있음 (수입통관 사무처리에 관한 고시 제68조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시",
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한 줄 정리: 물품가격이 150달러(미국발 목록통관은 200달러)를 넘으면 전체 과세가격에 관세와 부가세 10% (부가가치세법 제30조)",
+   "urls": [
+    "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819",
+    "https://www.law.go.kr/법령/부가가치세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계산기 direct-purchase-tax 공식·사례 독립 검수 불일치 0건 (관세법 제30조·제40조)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시",
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "일부 물건은 운임을 실제 배송료와 다르게 계산하거나 뺌 (관세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "관세법시행규칙 제45조 단서1 반영 — 국제배송료 구분 시 제외는 '면세를 판단하는 물품가격' 문단, 반복·분할 수입 제외는 '나눠 사도 합쳐서 과세되는 경우' 절",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙/제45조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법시행규칙 제45조 단서2 해당 없음 — 박람회 관람자 무상 제공 물품이라 개인 직구와 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행규칙/제45조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "특송물품수입통관사무처리에관한고시 제9조 단서1 반영 — 목록통관 배제 품목은 수입신고(면세 기준 절, 통관 방식 절)",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제29조 단서1 해당 없음 — 국내 특수관계인 공급가액 특례라 수입 부가세와 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제29조 단서2 해당 없음 — 토지·건물 함께 공급 시 안분계산이라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제29조 단서3 해당 없음 — 토지·건물 가액 구분 불분명 경우라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제29조 단서4 해당 없음 — 간주공급 감가상각자산이라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제27조 단서1 해당 없음 — 수출 후 재수입 재화라 개인 직구와 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제27조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제27조 단서2 해당 없음 — 재수출 조건 일시 수입 재화라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제27조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제27조 단서3 해당 없음 — 저가 담배·관세 감면 재화 특례, 글은 담배를 계산 대상에서 뺌",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제27조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제30조 단서1 해당 없음 — 가산 금액 자료가 없을 때 다른 방법으로 과세가격 결정, 개인 직구 결제액 기준 글과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제30조 단서2 해당 없음 — 구매수수료 제외 규정, 글은 쇼핑몰에 직접 결제한 금액 기준",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제30조 단서3 반영 — '일부 물건은 운임을 실제 배송료와 다르게 계산하거나 빼기도 해요' 문단",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제30조 단서4 반영 — 할인 뒤 실제 결제 금액 기준(FAQ), 수입 후 비용 공제는 개인 직구와 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제30조 단서5 해당 없음 — 처분·사용 제한이 있는 거래가격 부인 사유라 개인 직구와 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제30조 단서6 해당 없음 — 특수관계·조건부 거래가격 부인 사유라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "수입통관사무처리에관한고시 제68조 단서1 반영 — 합산과세 두 경우와 합친 물품가격이 기준을 넘으면 전체 과세",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "특송물품수입통관사무처리에관한고시 제10조 단서1 해당 없음 — 특송업체가 낼 통관목록 서식 규정이라 독자 행동과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "특송물품수입통관사무처리에관한고시 제10조 단서2 해당 없음 — 간이신고 검사대상 첨부서류, 업체·관세사 업무",
+   "urls": [
+    "https://www.law.go.kr/행정규칙/특송물품수입통관사무처리에관한고시"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제21조 해당 없음 — 재화의 수출 영세율이라 수입과 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제21조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제22조 해당 없음 — 용역의 국외공급 영세율이라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제22조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제23조 해당 없음 — 외국항행용역 영세율이라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제23조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제24조 해당 없음 — 외화 획득 재화·용역 영세율이라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제24조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제210조 해당 없음 — 체화 물품 매각방법이라 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제210조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제119조 해당 없음 — 불복 신청 절차라 글 범위 밖",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제119조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제50조 단서1 해당 없음 — 덤핑방지·FTA 등 세율 우선순위 예외라 글은 품목별 관세율을 조회해 넣도록만 안내",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제50조 단서2 해당 없음 — 국제협상 양허세율 예외라 개인 직구 세율 안내와 관계없음",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제50조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세법 제120조 해당 없음 — 행정소송법과의 관계라 글 범위 밖",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제120조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  }
+ ],
+ "sources": [
+  {
+   "name": "관세청 특송물품 통관 안내 (면세 150달러·미국 200달러)",
+   "url": "https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?mi=2821&cntntsId=819"
+  },
+  {
+   "name": "관세청 해외직구물품 예상세액 조회",
+   "url": "https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853"
+  },
+  {
+   "name": "국가법령정보센터 수입통관 사무처리에 관한 고시 (합산과세 기준)",
+   "url": "https://www.law.go.kr/행정규칙/수입통관사무처리에관한고시"
+  }
+ ],
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/vivius/224471581347",
+   "https://blog.naver.com/acornsecret/224476693932",
+   "https://blog.naver.com/report060/224472215516",
+   "https://blog.naver.com/mattia9205/224477165272",
+   "https://blog.naver.com/hsj2463/224474818183"
+  ],
+  "questions": [
+   "해외직구 면세 한도는 150달러인가, 미국은 200달러인가",
+   "면세 기준 금액에 배송비가 들어가나",
+   "관부가세는 어떻게 계산하나",
+   "같은 날 여러 개를 사면 합산과세되나",
+   "관세가 1만 원 미만이면 안 내도 되나"
+  ],
+  "added": [
+   {
+    "type": "@계산기",
+    "text": "물건값·배송료·환율·관세율로 면세 여부와 관세·부가세를 계산하는 계산기"
+   },
+   {
+    "type": "@상황판단",
+    "text": "미국발이라도 목록통관 안 되는 물건(건강기능식품 등)은 150달러 기준이라 같은 180달러가 과세되는 경우"
+   },
+   {
+    "type": "@최신개정",
+    "text": "입항일이 같다는 이유만으로는 합산하지 않는 현행 합산과세 기준"
+   }
+  ]
+ }
+}
