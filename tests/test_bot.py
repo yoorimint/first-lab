@@ -7036,6 +7036,42 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_photo_backfill_looks_up_posts_in_bulk(self):
+        """11/19 보정 작업 pending_images 574초: 큐 파일 3천여 개마다 WP-CLI 3번 → 150개씩 묶어 한 번에, 결과는 같게."""
+        import base64
+        import json
+        import re
+        import shutil
+        import subprocess
+        import tempfile
+        from bot import pending_images as pi
+        with tempfile.TemporaryDirectory() as d:
+            for n in range(400):
+                Path(d, f"q{n:03}.json").write_text(json.dumps({"keyword": f"키워드{n % 300}", "images": [{"prompt": "a desk", "alt": "책상"}]}, ensure_ascii=False), encoding="utf-8")
+            Path(d, "refresh-x.json").write_text(json.dumps({"type": "refresh", "keyword": "k", "images": [{}]}), encoding="utf-8")
+            calls = []
+
+            def wp(*args, **kw):
+                calls.append(args)
+                if args[0] == "eval":
+                    keys = json.loads(base64.b64decode(re.search(r'base64_decode\( "([^"]+)"', args[1]).group(1)))
+                    return json.dumps({k: "5" for k in keys if k == "키워드7"})
+                return ""
+            with mock.patch.object(pi, "QUEUE_DIR", Path(d)), mock.patch.object(pi, "wp_cli", side_effect=wp), \
+                 mock.patch.object(pi.photo, "first_scene", side_effect=lambda p, a: {"prompt": p[0], "alt": a[0]}):
+                self.assertEqual(pi.backfill_from_queue(), ["5"])
+        evals = [c for c in calls if c[0] == "eval"]
+        self.assertEqual(len(evals), 2)  # 키워드 300개 → 150개씩 2번 (예전: 400파일 × 3번)
+        self.assertEqual([c[:3] for c in calls if c[0] == "post"], [("post", "meta", "update")])
+        if shutil.which("php"):  # PHP 쪽: 사진·대기 표시가 있는 글은 빼고, 없는 글만
+            stubs = ("const OBJECT='OBJECT'; class P{public $ID;function __construct($i){$this->ID=$i;}} function sanitize_title($s){return $s;}"
+                     "function get_page_by_path($s,$o,$t){return array('a'=>new P(1),'b'=>new P(2),'c'=>new P(3))[$s]??null;}"
+                     "function get_post_meta($id,$k,$s){return ($id==1&&$k=='_firstlab_photo')||($id==2&&$k=='_firstlab_img_pending')?'x':'';}"
+                     "function wp_json_encode($v){return json_encode($v);}")
+            code = stubs + pi._BULK_PHP % base64.b64encode(json.dumps(["a", "b", "c", "d"]).encode()).decode()
+            r = subprocess.run(["php", "-r", code], capture_output=True, text=True)
+            self.assertEqual(json.loads(r.stdout), {"c": "3"}, r.stderr)
+
     def test_archive_description_and_list_photo_alt(self):
         """11/19 빙 사이트 검사: 분류·태그 목록 'Meta Description 누락' 104쪽, 목록 사진 'Alt 누락' 107쪽 (alt="")."""
         import re
