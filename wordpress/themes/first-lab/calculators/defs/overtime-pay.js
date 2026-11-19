@@ -22,7 +22,7 @@
       { name: 'ot_hours', label: '평일에 더 일한 시간', type: 'number', min: 0, step: 0.5, default: 10, help: "'연장근로'예요. 하루 8시간·주 40시간을 넘은 시간이에요. 단시간근로자는 계약한 시간을 넘은 시간." },
       { name: 'ot_night_hours', label: '그중 밤 10시~아침 6시 시간', type: 'number', min: 0, step: 0.5, default: 0 },
       { name: 'night_hours', label: '원래 근무 중 밤 시간', type: 'number', min: 0, step: 0.5, default: 0, help: "더 일한 시간이 아닌 '야간근로'예요. 원래 근무시간 안에 들어 있는 밤 10시~아침 6시 근무예요. 기본 임금은 이미 받으니 가산분(50%)만 더해요." },
-      { name: 'holiday_hours', label: '쉬는 날 일한 하루 시간', type: 'number', min: 0, step: 0.5, default: 0, help: "'휴일근로'예요. 주휴일·약정휴일에 일한 하루 시간이에요. 8시간까지 50%, 넘은 시간은 100% 가산." },
+      { name: 'holiday_hours', label: '쉬는 날 일한 하루 시간', type: 'number', min: 0, step: 0.5, default: 0, help: "'휴일근로'예요. 주휴일·약정휴일·공휴일(노동절 포함)에 일한 하루 시간이에요. 8시간까지 50%, 넘은 시간은 100% 가산." },
       { name: 'holiday_days', label: '쉬는 날 일한 날 수', type: 'number', min: 0, step: 1, default: 0 },
       {
         name: 'public_parttime', label: '나라·지자체 기관의 단시간 근로자?', type: 'choice', default: 'no',
