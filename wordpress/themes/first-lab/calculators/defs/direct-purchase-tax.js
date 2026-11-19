@@ -54,6 +54,8 @@
       const dutyCalc = f((taxable * dutyPct) / 100 / 10) * 10;
       const dutyWaived = dutyCalc > 0 && dutyCalc < d.duty_min;
       const duty = dutyWaived ? 0 : dutyCalc;
+      // 관세를 걷지 않아도(1만 원 미만) 부가세 과세표준에는 관세 계산액을 넣는다 — 관세법 시행령 제37조②('수입신고수리일을 납부일로 본다')로 본 가정.
+      // 관세청 공식 계산 규칙은 못 찾음 (11/19 외부 검수: 빼면 부가세가 조금 낮아짐) → 화면 안내(notes)에 '세관 안내로 확인'을 남김.
       const vat = f(((taxable + dutyCalc) * d.vat_pct) / 100 / 10) * 10;
       const total = duty + vat;
       rows.push([`과세가격 (${usd(taxableC / 100)} × ${rate.toLocaleString('ko-KR')}원)`, u.won(taxable)]);
