@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6454,
+ "replace": [
+  {
+   "old": "ai-8dca261996",
+   "prompt": "warm afternoon sunlight falling on wooden shelves of fresh bread loaves in a small neighborhood bakery, no signs or labels",
+   "alt": "오후 햇살이 드는 동네 빵집의 빵 진열 선반",
+   "why": "유리 진열장에 엉터리 글자가 적힌 종이 표지가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
