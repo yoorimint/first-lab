@@ -7036,6 +7036,23 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_calculator_year_labels_follow_yearly_check(self):
+        """11/19 외부 검수: 연말정산 계산기 안내 '2026년분은 … 9세 이상'처럼 연도를 박은 문구는 값 확인 연도(yearly_checked)가
+        올라가도 그대로 남을 수 있음 → 안내 속 'N년분'이 확인 연도보다 2년 이상 뒤처지면 실패 (값을 새로 확인할 때 문구도 같이)."""
+        import json
+        import re
+        calc = ROOT / "wordpress" / "themes" / "first-lab" / "calculators"
+        stale = []
+        for data_file in sorted((calc / "data").glob("*.json")):
+            checked = json.loads(data_file.read_text(encoding="utf-8")).get("yearly_checked")
+            defs = calc / "defs" / f"{data_file.stem}.js"
+            if not isinstance(checked, int) or not defs.exists():
+                continue
+            for year in re.findall(r"(20\d\d)년분", defs.read_text(encoding="utf-8")):
+                if int(year) < checked - 1:
+                    stale.append(f"{data_file.stem}: '{year}년분' (확인 연도 {checked})")
+        self.assertEqual(stale, [])
+
     def test_replace_and_insert_in_one_patch(self):
         """11/19 verify_patches: 바꾸기+넣기를 한 패치에 적으면 서버가 넣기만 함(29개 중 8곳 고치기 전 문장 남음)
         → 서버는 둘 다 하고, 앞으로는 apply_review 가 나눠 적게 막음."""
