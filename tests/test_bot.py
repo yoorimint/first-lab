@@ -7044,6 +7044,18 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_calc_input_guide(self):
+        """11/20 같은 꼴 2번(#7615·#7901): 글에 넣은 계산기의 입력 칸을 하나도 안내하지 않으면 새 글 관문이 막음 —
+        처음 값(세전 300만·비과세 20만)이 예시와 달라 독자가 11,110원 대신 4,350원을 봄. 다른 문단의 '세전 월급'은 안내가 아님."""
+        from bot import condition_gate as cg, review_gate
+        calc = '<p>[firstlab_calc id="take-home-pay"]</p>'
+        bad = "<p>세전 월급 300만 원이면 소득세는 이래요.</p><p>실수령액은 아래 계산기로 볼 수 있어요.</p>" + calc
+        self.assertTrue(cg.calc_input_guide(bad))
+        good = bad + "<p>계산기에는 '세전 월급'과 '비과세 금액'을 따로 넣어요.</p>"
+        self.assertEqual(cg.calc_input_guide(good), [])
+        self.assertEqual(cg.calc_input_guide("<p>계산기 없음</p>"), [])
+        self.assertIn("calc_input_guide", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
+
     def test_farm_small_business_employment_insurance_known_wrong(self):
         """11/20 #7680·#2120·#4334: '법인 아닌 농림어업 4명 이하는 고용보험 제외'는 2024.7.1 삭제된 규정 → 관문이 막음 (산재 5명 미만은 그대로)."""
         from bot.condition_gate import known_wrong

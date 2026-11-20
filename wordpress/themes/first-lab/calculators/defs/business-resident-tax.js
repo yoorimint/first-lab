@@ -7,7 +7,7 @@
   FirstLabCalc.register({
     id: 'business-resident-tax',
     title: '주민세 사업소분 계산기',
-    intro: '사업장을 가진 사업자가 8월에 내는 주민세 사업소분을 계산해요. 사업자 종류와 사업장 넓이만 넣으면 지방교육세까지 나와요.',
+    intro: '사업장을 가진 사업자가 8월에 내는 주민세 사업소분을 계산해요. 사업자 종류, 작년 매출, 사업장 넓이, 지역을 넣으면 지방교육세까지 나와요.',
     inputs: [
       {
         name: 'owner', label: '사업자는 누구인가요?', type: 'choice', default: 'person',
@@ -36,6 +36,8 @@
       const area = Number(v.area);
       if (!(area >= 0) || v.area === '' || v.area === undefined) throw new u.InputError('사업장 연면적을 넣으면 결과가 나와요. 모르면 0을 넣어요.');
       if (area > d.max_area) throw new u.InputError('연면적이 너무 커요. 1천만 ㎡ 이하로 넣어 주세요.');
+      // 시행령 제82조: 연면적 중 1㎡ 미만은 계산하지 않음 (11/20 외부 검수 — 330.01㎡ 를 330㎡ 넘는 것으로 봐 연면적분을 매겼음)
+      const taxArea = u.floor(area);
       const person = v.owner === 'person';
       const exempt = person && v.sales === 'no';
 
@@ -45,7 +47,7 @@
       if (!exempt) {
         base = d.base[v.owner];
         if (base === undefined) throw new u.InputError('사업자 종류를 골라 주세요.');
-        if (area > d.area_free_max) areaTax = u.floor10(area * (v.pollution === 'yes' ? d.area_rate_pollution : d.area_rate));
+        if (taxArea > d.area_free_max) areaTax = u.floor10(taxArea * (v.pollution === 'yes' ? d.area_rate_pollution : d.area_rate));
         eduTax = u.floor10((base * (v.city === 'small' ? d.edu_pct_small : d.edu_pct_big)) / 100);
       }
       const total = base + areaTax + eduTax;
@@ -55,7 +57,7 @@
         ? [['주민세 사업소분', '내지 않아요 (작년 매출 8천만 원 미만 개인사업자)']]
         : [
             ['기본세율분', u.won(base)],
-            ['연면적분', area > d.area_free_max ? `${u.won(areaTax)} (${area.toLocaleString('ko-KR')}㎡ × ${v.pollution === 'yes' ? d.area_rate_pollution : d.area_rate}원)` : '0원 (330㎡ 이하)'],
+            ['연면적분', taxArea > d.area_free_max ? `${u.won(areaTax)} (${taxArea.toLocaleString('ko-KR')}㎡ × ${v.pollution === 'yes' ? d.area_rate_pollution : d.area_rate}원)` : '0원 (330㎡ 이하)'],
             [`지방교육세 (기본세율분의 ${v.city === 'small' ? d.edu_pct_small : d.edu_pct_big}%)`, u.won(eduTax)],
             ['8월에 낼 금액 (합계)', u.won(total)],
           ];
@@ -64,7 +66,7 @@
         notes.push('개인사업자는 작년 매출(부가가치세 과세표준)이 8천만 원 이상일 때만 사업소분을 내요.');
       } else {
         notes.push('8월 1일부터 31일까지 사업장이 있는 지방자치단체에 신고하고 내요. 위택스(wetax.go.kr)에서 할 수 있어요.');
-        if (area <= d.area_free_max) notes.push('연면적이 330㎡ 이하라 연면적분은 붙지 않아요.');
+        if (taxArea <= d.area_free_max) notes.push('연면적이 330㎡ 이하라 연면적분은 붙지 않아요.');
         else notes.push('연면적이 330㎡를 넘으면 넘는 부분만이 아니라 연면적 전체에 붙어요.');
         notes.push('지방교육세는 기본세율분에만 붙고 연면적분에는 붙지 않아요.');
       }
