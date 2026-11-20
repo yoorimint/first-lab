@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 5479,
+ "replace": [
+  {
+   "old": "ai-a6bf2b616c",
+   "prompt": "a large plain white multi-axle cargo truck parked inside a clean maintenance garage with tools on a rolling cart, side view, no lettering",
+   "alt": "정비소 안에 세워진 바퀴 축이 여러 개인 흰색 대형 화물차",
+   "why": "차 앞부분에 엉터리 글자 로고(TISUT)가 보임"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}
