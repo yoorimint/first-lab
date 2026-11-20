@@ -183,7 +183,12 @@ def slot_done_log(state: dict, slot: int) -> str:
 def continuous_step(state: dict, settings: BotSettings, now: datetime) -> None:
     """연속 작성 (설정 페이지 시작·정지): 칸(WRITERS 개)마다 한 편이 끝나면 바로 다음 편을 실행.
     한 편이 CONTINUOUS_TIMEOUT_MIN 안에 안 끝나면 실패로 세고, 한 칸이라도 3번 연속 실패하면 스스로 멈춘다 (사용량 한도·후보 소진 대비)."""
-    if not continuous_on():
+    on = continuous_on()
+    if on != state.get("continuous_was", on):
+        # 설정 화면에서 켜고 끈 것도 기록 (11/20: 15:40쯤 꺼졌는데 기록이 없어 누가·왜 껐는지 몰랐음). 자동 정지는 아래에서 따로 남김
+        add_log(state, True, f"연속 작성 {'시작' if on else '정지'} (설정 화면)")
+    state["continuous_was"] = on
+    if not on:
         for slot in range(1, WRITERS + 1):
             state.pop(slot_key(slot), None)
         return
@@ -220,6 +225,7 @@ def _slot_step(state: dict, settings: BotSettings, now: datetime, slot: int) -> 
         fails, count = (0, count + 1) if arrived else (fails + 1, count)
     if fails >= CONTINUOUS_MAX_FAILS:
         set_continuous(False)
+        state["continuous_was"] = False  # 다음 분에 '설정 화면에서 정지'로 또 남기지 않게
         for s_ in range(1, WRITERS + 1):
             state.pop(slot_key(s_), None)
         add_log(state, False, f"연속 작성 자동 정지: {slot}번 실행이 {fails}번 연속으로 끝나지 않음 (사용량 한도·후보 소진·오류 확인 필요)")
