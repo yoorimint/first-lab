@@ -1,4 +1,5 @@
 {
+  "law_checked": ["관세법 시행규칙|2027-01-01"],
   "basis_date": "2026-11-18", "yearly": false,
   "max_usd": 2000,
   "won10_keys": ["duty", "vat", "total"],
