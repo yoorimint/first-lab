@@ -489,6 +489,19 @@ class ContinuousTest(unittest.TestCase):
             run.continuous_step(state, settings, now)
         return fire, stop
 
+    def test_settings_toggle_is_logged(self):
+        """11/20: 연속 작성이 15:40쯤 꺼졌는데 기록이 없어 누가 껐는지 몰랐음 → 켜고 끈 것을 봇 기록에 남김 (자동 정지는 따로)."""
+        state = {"log": []}
+        self.run_step(state, 0, on=True)
+        self.assertFalse(any("설정 화면" in e["msg"] for e in state["log"]))
+        self.run_step(state, 1, on=False)
+        self.assertTrue(any("연속 작성 정지 (설정 화면)" in e["msg"] for e in state["log"]))
+        n = len(state["log"])
+        self.run_step(state, 2, on=False)
+        self.assertEqual(len(state["log"]), n)          # 한 번만
+        self.run_step(state, 3, on=True)
+        self.assertTrue(any("연속 작성 시작 (설정 화면)" in e["msg"] for e in state["log"]))
+
     def test_one_at_a_time_then_next(self):
         state = {"log": []}
         fire, _ = self.run_step(state, 0)
