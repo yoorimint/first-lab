@@ -89,8 +89,13 @@ def login_line(logins: dict, now: datetime) -> str:
     day = now.strftime("%Y-%m-%d")
     ok = logins.get("ok") or []
     recent = ", ".join(f"{x['time'][5:]} {x['user']} {_mask(x['ip'])}" for x in ok[:3]) or "기록 없음"
+    by = (logins.get("fail_by") or {}).get(day) or {}
+    top = ", ".join(f"{net} {n}회" for net, n in sorted(by.items(), key=lambda x: -x[1])[:3])
+    known = (logins.get("known_user") or {}).get(day, 0)
     return (f"로그인: 최근 {recent} · 오늘 실패 {(logins.get('fails') or {}).get(day, 0)}회"
-            f" · 잠금 {(logins.get('locks') or {}).get(day, 0)}회")
+            f" · 잠금 {(logins.get('locks') or {}).get(day, 0)}회"
+            + (f" · 실패 많은 곳 {top}" if top else "")
+            + (f" · ⚠ 있는 아이디로 시도 {known}회" if known else ""))
 
 
 def main() -> int:

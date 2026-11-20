@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 6311,
+ "replace": [
+  {
+   "old": "ai-e793f0e37f",
+   "prompt": "a covered traditional market alley seen from above the stalls, crates of apples, cabbages and peppers under plain canvas awnings, no signs or lettering",
+   "alt": "천막 지붕 아래 과일·채소 상자가 놓인 전통시장 골목",
+   "why": "간판·등에 엉터리 한자·글자가 많이 보임"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}

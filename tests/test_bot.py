@@ -6071,6 +6071,14 @@ class AttackSurfaceTest(unittest.TestCase):
         self.assertIn("실패 7회", line)
         self.assertIn("잠금 1회", line)
         self.assertIn("기록 없음", tick.login_line({}, datetime(2026, 11, 11)))
+        # 11/20 실패 67회: 어디서·있는 아이디로 시도했는지 (아이디 글자는 안 남김)
+        line = tick.login_line({"fails": {"2026-11-20": 67}, "fail_by": {"2026-11-20": {"45.12.*": 60, "103.4.*": 7}},
+                                "known_user": {"2026-11-20": 3}}, datetime(2026, 11, 20, 15))
+        self.assertIn("45.12.* 60회", line)
+        self.assertIn("있는 아이디로 시도 3회", line)
+        self.assertIn("'fail_by'", sec)
+        self.assertIn("username_exists", sec)
+        self.assertNotRegex(sec, r"\$log\[[^\]]*\]\[[^\]]*\]\s*=\s*\(?string\)?\s*\$username")
 
 
     def test_two_factor(self):
