@@ -190,6 +190,7 @@ def problems(review: list[dict] | None, title: str = "", excerpt: str = "", body
     out += condition_gate.approx_rounding(body_html)
     out += condition_gate.ordinary_wage_rule(body_html)
     out += condition_gate.small_workplace_items(body_html)
+    out += condition_gate.calc_input_guide(body_html)
     out += condition_gate.headline_from_price(title, excerpt, body_html)
     out += expiry.round_headline(title, excerpt, " ".join(expiry.blocks(body_html)))
     out += condition_gate.holiday_attendance(excerpt, body_html)

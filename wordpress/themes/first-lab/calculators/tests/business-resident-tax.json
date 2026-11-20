@@ -1,38 +1,159 @@
 [
   {
     "why": "본문 예시: 서울 개인사업자(작년 매출 8천만 원 이상), 100㎡ → 기본 5만 원(제81조①1가) + 연면적분 0원(제82조 330㎡ 이하) + 지방교육세 5만 원의 25% 12,500원(제151조①5 단서) = 62,500원",
-    "input": {"owner": "person", "sales": "yes", "area": 100, "pollution": "no", "city": "big"},
-    "expect": {"exempt": false, "base": 50000, "area_tax": 0, "edu_tax": 12500, "total": 62500},
-    "notes_include": ["330㎡ 이하라"]
+    "input": {
+      "owner": "person",
+      "sales": "yes",
+      "area": 100,
+      "pollution": "no",
+      "city": "big"
+    },
+    "expect": {
+      "exempt": false,
+      "base": 50000,
+      "area_tax": 0,
+      "edu_tax": 12500,
+      "total": 62500
+    },
+    "notes_include": [
+      "330㎡ 이하라"
+    ]
   },
   {
     "why": "면세점에 딱 맞음: 법인 자본금 30억 이하, 330㎡, 군(10%) → 연면적분 없음(제82조 단서 '330제곱미터 이하') → 50,000 + 5,000 = 55,000원",
-    "input": {"owner": "corp_s", "sales": "yes", "area": 330, "pollution": "no", "city": "small"},
-    "expect": {"base": 50000, "area_tax": 0, "edu_tax": 5000, "total": 55000},
+    "input": {
+      "owner": "corp_s",
+      "sales": "yes",
+      "area": 330,
+      "pollution": "no",
+      "city": "small"
+    },
+    "expect": {
+      "base": 50000,
+      "area_tax": 0,
+      "edu_tax": 5000,
+      "total": 55000
+    },
     "boundary": true
   },
   {
-    "why": "면세점 바로 위: 330.01㎡ → 연면적 전체 × 250원 = 82,502.5 → 10원 미만 버림 82,500원, 합계 50,000 + 82,500 + 5,000 = 137,500원",
-    "input": {"owner": "corp_s", "sales": "yes", "area": 330.01, "pollution": "no", "city": "small"},
-    "expect": {"base": 50000, "area_tax": 82500, "edu_tax": 5000, "total": 137500},
+    "why": "330.01㎡ → 1㎡ 미만은 계산하지 않아(지방세법 시행령 제82조) 330㎡ → 연면적분 없음, 50,000 + 5,000 = 55,000원 (11/20 외부 검수: 예전 기대값 137,500원은 틀림)",
+    "input": {
+      "owner": "corp_s",
+      "sales": "yes",
+      "area": 330.01,
+      "pollution": "no",
+      "city": "small"
+    },
+    "expect": {
+      "base": 50000,
+      "area_tax": 0,
+      "edu_tax": 5000,
+      "total": 55000
+    },
     "boundary": true,
-    "notes_include": ["연면적 전체에 붙어요"]
+    "notes_include": [
+      "330㎡ 이하라"
+    ]
   },
   {
     "why": "작년 매출 8천만 원 미만 개인사업자는 납세의무자 아님 (지방세법 제75조②1, 시행령 제79조② '8천만원 이상인 개인') → 0원",
-    "input": {"owner": "person", "sales": "no", "area": 500, "pollution": "no", "city": "big"},
-    "expect": {"exempt": true, "base": 0, "area_tax": 0, "edu_tax": 0, "total": 0},
+    "input": {
+      "owner": "person",
+      "sales": "no",
+      "area": 500,
+      "pollution": "no",
+      "city": "big"
+    },
+    "expect": {
+      "exempt": true,
+      "base": 0,
+      "area_tax": 0,
+      "edu_tax": 0,
+      "total": 0
+    },
     "boundary": true,
-    "notes_include": ["8천만 원 이상일 때만"]
+    "notes_include": [
+      "8천만 원 이상일 때만"
+    ]
   },
   {
     "why": "법인 자본금 50억 초과, 1,000㎡ 오염물질 배출 사업소, 인구 50만 이상 시 → 200,000 + 1,000×500 = 500,000 + 교육세 200,000×25% = 50,000 → 750,000원 (제81조①1나3)·2 단서)",
-    "input": {"owner": "corp_l", "sales": "yes", "area": 1000, "pollution": "yes", "city": "big"},
-    "expect": {"base": 200000, "area_tax": 500000, "edu_tax": 50000, "total": 750000}
+    "input": {
+      "owner": "corp_l",
+      "sales": "yes",
+      "area": 1000,
+      "pollution": "yes",
+      "city": "big"
+    },
+    "expect": {
+      "base": 200000,
+      "area_tax": 500000,
+      "edu_tax": 50000,
+      "total": 750000
+    }
   },
   {
     "why": "법인 자본금 30억 초과 50억 이하, 400㎡, 10% → 100,000 + 400×250 = 100,000 + 교육세 10,000 = 210,000원 (제81조①1나2))",
-    "input": {"owner": "corp_m", "sales": "yes", "area": 400, "pollution": "no", "city": "small"},
-    "expect": {"base": 100000, "area_tax": 100000, "edu_tax": 10000, "total": 210000}
+    "input": {
+      "owner": "corp_m",
+      "sales": "yes",
+      "area": 400,
+      "pollution": "no",
+      "city": "small"
+    },
+    "expect": {
+      "base": 100000,
+      "area_tax": 100000,
+      "edu_tax": 10000,
+      "total": 210000
+    }
+  },
+  {
+    "why": "330.99㎡ → 1㎡ 미만 버려 330㎡ → 연면적분 0원, 55,000원 (시행령 제82조)",
+    "input": {
+      "owner": "corp_s",
+      "sales": "yes",
+      "area": 330.99,
+      "pollution": "no",
+      "city": "small"
+    },
+    "expect": {
+      "area_tax": 0,
+      "total": 55000
+    },
+    "boundary": true
+  },
+  {
+    "why": "331㎡ → 330㎡ 넘음 → 331×250 = 82,750원, 50,000 + 82,750 + 5,000 = 137,750원 (제82조·시행령 제82조)",
+    "input": {
+      "owner": "corp_s",
+      "sales": "yes",
+      "area": 331,
+      "pollution": "no",
+      "city": "small"
+    },
+    "expect": {
+      "area_tax": 82750,
+      "total": 137750
+    },
+    "boundary": true,
+    "notes_include": [
+      "연면적 전체에 붙어요"
+    ]
+  },
+  {
+    "why": "400.7㎡ → 400㎡ × 250 = 100,000원, 100,000 + 100,000 + 10,000 = 210,000원 (시행령 제82조 1㎡ 미만 버림)",
+    "input": {
+      "owner": "corp_m",
+      "sales": "yes",
+      "area": 400.7,
+      "pollution": "no",
+      "city": "small"
+    },
+    "expect": {
+      "area_tax": 100000,
+      "total": 210000
+    }
   }
 ]

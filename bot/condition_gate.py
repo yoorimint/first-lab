@@ -720,6 +720,33 @@ def small_workplace_items(body_html: str) -> list[str]:
     return out[:3]
 
 
+# 글에 넣은 계산기의 입력 칸을 하나도 안내하지 않음 (같은 꼴 2번 → 검사, 11/20): #7901 '아래 계산기로 볼 수 있어요'만 —
+# 처음 값이 세전 300만·비과세 20만이라 독자가 본문 예시 '월 300만 원'을 세전 칸에 넣으면 비과세가 두 번 빠짐(11,110원 → 4,350원),
+# #7615 처음 값 월급 250만 원·5명. 칸 이름을 적어야 독자가 처음 값을 바꿔야 하는 걸 앎. 새 글·보류 글만 (review_gate).
+_CALC_DEFS = Path(__file__).resolve().parent.parent / "wordpress" / "themes" / "first-lab" / "calculators" / "defs"
+
+
+def calc_input_labels(calc_id: str) -> list[str]:
+    path = _CALC_DEFS / f"{calc_id}.js"
+    if not re.fullmatch(r"[a-z0-9-]+", calc_id) or not path.exists():
+        return []
+    labels = re.findall(r"label:\s*'([^']+)'", path.read_text(encoding="utf-8"))
+    return [s for s in (re.sub(r"\s*\([^)]*\)|[?？]", "", lab).strip() for lab in labels) if len(s) >= 3]
+
+
+def calc_input_guide(body_html: str) -> list[str]:
+    html_ = body_html or ""
+    # 칸 이름이 '계산기'를 말하는 문장 안에 있어야 안내로 봄 (본문 다른 곳의 '세전 월급' 같은 말은 안내가 아님 — #7901)
+    guide = " ".join(s for s in re.split(r"(?<=[.?!])\s+|\n", _plain(html_)) if "계산기" in s or "넣" in s)
+    out = []
+    for calc_id in dict.fromkeys(re.findall(r'firstlab_calc id=\\?"([a-z0-9-]+)', html_)):
+        labels = calc_input_labels(calc_id)
+        if labels and not any(lab[:6] in guide for lab in labels):
+            out.append(f"계산기 '{calc_id}' 의 입력 칸 이름을 하나도 안내하지 않음 — 본문 예시대로 넣을 칸과 값을 적기 "
+                       f"(칸: {', '.join(labels[:4])} … 처음 값이 예시와 다르면 독자가 틀린 결과를 봄, 11/20 #7901)")
+    return out
+
+
 # 통상임금: 대법원 2024. 12. 19. 전원합의체(2020다247190)로 '고정성' 요건이 빠졌다 — 재직 조건이 붙거나 한 달을 넘는 주기로 나와도
 # 정기적·일률적이면 통상임금 (11/7 #1232 해고예고수당 '기본급과 매달 정해진 금액으로 나오는 수당이 중심' → 정기상여금이 빠져 적게 계산).
 OLD_WAGE_RULE = re.compile(r"고정성|고정적으로|고정적인|매달 정해진|매월 정해진|매달 나오는|매월 나오는|재직자에게만 주는")

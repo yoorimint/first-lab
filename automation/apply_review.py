@@ -113,6 +113,7 @@ def _prevention_problem(post: dict, p: dict) -> str | None:
               "round_headline": lambda: expiry.round_headline(post["title"], post["excerpt"], " ".join(expiry.blocks(post["content_html"]))),
               "headline_from_price": lambda: condition_gate.headline_from_price(post["title"], post["excerpt"], post["content_html"]),
               "small_workplace_items": lambda: condition_gate.small_workplace_items(post["content_html"]),
+              "calc_input_guide": lambda: condition_gate.calc_input_guide(post["content_html"]),
               "ordinary_wage_rule": lambda: condition_gate.ordinary_wage_rule(post["content_html"]),
               "approx_rounding": lambda: condition_gate.approx_rounding(post["content_html"]),
               "retention_start": lambda: condition_gate.retention_start(post["content_html"]),
