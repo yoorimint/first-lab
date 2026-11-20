@@ -554,3 +554,9 @@ date,post,fixes,types
 2026-11-20,7760,1,missing_condition:1
 2026-11-20,7756,0,
 2026-11-20,7758,1,missing_condition:1
+2026-11-20,7746,1,unverified:1
+2026-11-20,7750,1,missing_condition:1
+2026-11-20,7752,2,wrong_fact:2
+2026-11-20,7754,1,unverified:1
+2026-11-20,7744,0,
+2026-11-20,7748,3,missing_condition:3
