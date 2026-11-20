@@ -7057,6 +7057,18 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_deploy_uses_ssh_key_when_set(self):
+        """11/20 12:39Z 부터 배포 실패: 서버가 비밀번호 SSH 를 막음('allowed types: publickey') →
+        저장소 비밀값 SERVER_SSH_KEY 를 배포(ssh-action 두 단계)·API 봇 동기화(paramiko) 모두 씀 (없으면 비밀번호 그대로)."""
+        wf = (ROOT / ".github" / "workflows" / "deploy.yml").read_text(encoding="utf-8")
+        self.assertEqual(wf.count("key: ${{ secrets.SERVER_SSH_KEY }}"), 2)
+        self.assertEqual(wf.count("SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}"), wf.count("SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}"))
+        health = (ROOT / ".github" / "workflows" / "health.yml").read_text(encoding="utf-8")
+        self.assertIn("SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}", health)
+        src = (ROOT / "automation" / "api_sync.py").read_text(encoding="utf-8")
+        self.assertIn('key=os.environ.get("SERVER_SSH_KEY", "")', src)
+        self.assertIn("pkey=load_key(key)", src)
+
     def test_calc_input_guide(self):
         """11/20 같은 꼴 2번(#7615·#7901): 글에 넣은 계산기의 입력 칸을 하나도 안내하지 않으면 새 글 관문이 막음 —
         처음 값(세전 300만·비과세 20만)이 예시와 달라 독자가 11,110원 대신 4,350원을 봄. 다른 문단의 '세전 월급'은 안내가 아님."""

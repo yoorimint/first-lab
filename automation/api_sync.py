@@ -40,12 +40,13 @@ GIT_ENV = {"GIT_AUTHOR_NAME": "first-lab API 봇", "GIT_AUTHOR_EMAIL": "api-writ
 class Remote:
     """배포와 같은 SSH 계정 (저장소 비밀값 SERVER_HOST·SERVER_USER·SERVER_PASSWORD)."""
 
-    def __init__(self, host: str, user: str, password: str, port: int = 22):
+    def __init__(self, host: str, user: str, password: str, port: int = 22, key: str = ""):
         import paramiko
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())   # 배포(appleboy/ssh-action)와 같게 지문 고정 없음
-        self.client.connect(host, port=port, username=user, password=password, timeout=30, allow_agent=False,
-                            look_for_keys=False)
+        # 11/20 서버가 비밀번호 SSH 를 막음('allowed types: publickey') → 저장소 비밀값 SERVER_SSH_KEY 가 있으면 키로 (없으면 비밀번호)
+        self.client.connect(host, port=port, username=user, password=password or None, pkey=load_key(key),
+                            timeout=30, allow_agent=False, look_for_keys=False)
 
     def outbox(self, *args: str) -> dict:
         """서버 bot.api_writer outbox <args> → 마지막 줄 JSON."""
@@ -65,8 +66,24 @@ class Remote:
             sftp.close()
 
 
+def load_key(text: str):
+    """PEM/OpenSSH 개인키 글자 → paramiko 키 (없으면 None). ed25519·ECDSA·RSA 순서로 시도."""
+    import io
+    import paramiko
+    text = (text or "").strip()
+    if not text:
+        return None
+    for cls in (paramiko.Ed25519Key, paramiko.ECDSAKey, paramiko.RSAKey):
+        try:
+            return cls.from_private_key(io.StringIO(text + "\n"))
+        except (paramiko.SSHException, ValueError):
+            continue
+    raise ValueError("SERVER_SSH_KEY 를 읽지 못함 (ed25519·ECDSA·RSA 개인키 전체를 넣었는지)")
+
+
 def remote_from_env() -> Remote:
-    return Remote(os.environ["SERVER_HOST"], os.environ["SERVER_USER"], os.environ["SERVER_PASSWORD"])
+    return Remote(os.environ["SERVER_HOST"], os.environ["SERVER_USER"], os.environ.get("SERVER_PASSWORD", ""),
+                  key=os.environ.get("SERVER_SSH_KEY", ""))
 
 
 def set_output(**values) -> None:

@@ -67,4 +67,5 @@ jobs:
           SERVER_HOST: ${{ secrets.SERVER_HOST }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
         run: python automation/api_sync.py maint
