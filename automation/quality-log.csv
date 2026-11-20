@@ -567,3 +567,4 @@ date,post,fixes,types
 2026-11-20,7901,1,missing_condition:1
 2026-11-20,7877,2,missing_condition:2
 2026-11-20,7895,0,
+2026-11-20,7903,10,missing_condition:9 wrong_fact:1
