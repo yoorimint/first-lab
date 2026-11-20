@@ -60,9 +60,11 @@ add_filter(
 );
 
 // 실패: IP 별로 세고(15분 창), 한도에 닿으면 잠금 시간으로 늘림. 날짜별 실패·잠금 수는 /maintenance 로 봄
+// 11/20 하루 실패 67회·잠금 1회인데 어디서·실제 아이디로 시도했는지 몰라 판단 못 함 → IP 앞 두 자리별 횟수와
+// '있는 아이디로 시도한 횟수'만 남김 (입력한 아이디 글자는 남기지 않음 — 비밀번호를 아이디 칸에 잘못 넣는 경우가 있어서)
 add_action(
 	'wp_login_failed',
-	static function () {
+	static function ( $username = '' ) {
 		$key = firstlab_login_fail_key( firstlab_login_ip() );
 		$n   = (int) get_transient( $key ) + 1;
 		set_transient( $key, $n, ( $n >= FIRSTLAB_LOGIN_MAX_FAILS ? FIRSTLAB_LOGIN_LOCK_MIN : 15 ) * MINUTE_IN_SECONDS );
@@ -72,11 +74,23 @@ add_action(
 		if ( FIRSTLAB_LOGIN_MAX_FAILS === $n ) {
 			$log['locks'][ $day ] = (int) ( $log['locks'][ $day ] ?? 0 ) + 1;
 		}
-		foreach ( array( 'fails', 'locks' ) as $k ) {  // 최근 14일만
+		$parts = explode( '.', firstlab_login_ip() );
+		$net   = count( $parts ) === 4 ? $parts[0] . '.' . $parts[1] . '.*' : substr( firstlab_login_ip(), 0, 9 ) . '*';
+		$by    = (array) ( $log['fail_by'][ $day ] ?? array() );
+		if ( isset( $by[ $net ] ) || count( $by ) < 20 ) {
+			$by[ $net ] = (int) ( $by[ $net ] ?? 0 ) + 1;
+		}
+		$log['fail_by'][ $day ] = $by;
+		if ( '' !== (string) $username && ( username_exists( (string) $username ) || email_exists( (string) $username ) ) ) {
+			$log['known_user'][ $day ] = (int) ( $log['known_user'][ $day ] ?? 0 ) + 1;
+		}
+		foreach ( array( 'fails', 'locks', 'fail_by', 'known_user' ) as $k ) {  // 최근 14일만
 			$log[ $k ] = array_slice( (array) ( $log[ $k ] ?? array() ), -14, null, true );
 		}
 		update_option( 'firstlab_login_log', $log, false );
-	}
+	},
+	10,
+	1
 );
 
 // 성공: 언제·어느 IP·어떤 기기로 들어왔는지 남김 → 모르는 로그인을 감시 기록에서 바로 알아봄
