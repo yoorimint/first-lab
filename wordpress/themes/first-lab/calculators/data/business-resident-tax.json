@@ -1,0 +1,17 @@
+{
+  "basis_date": "2026-11-20", "yearly": false,
+  "won10_keys": ["area_tax", "edu_tax", "total"],
+  "max_area": 10000000,
+  "sources": [
+    {"name": "국가법령정보센터 지방세법 (제75조 납세의무자, 제81조 사업소분 세율, 제82조 330㎡ 이하 연면적분 없음, 제83조 8월 신고납부, 제151조 지방교육세)", "url": "https://www.law.go.kr/법령/지방세법"},
+    {"name": "국가법령정보센터 지방세법 시행령 (제79조② 개인사업자 직전 연도 과세표준 8천만 원 이상)", "url": "https://www.law.go.kr/법령/지방세법시행령"},
+    {"name": "서울특별시 주민세 안내 (사업소분 5만~20만 원, ㎡당 250원·공용면적 포함, 지방교육세 25%)", "url": "https://news.seoul.go.kr/gov/archives/200096"},
+    {"name": "국가법령정보센터 국고금관리법 (제47조 10원 미만 끝수, ③ 지방자치단체 준용)", "url": "https://www.law.go.kr/법령/국고금관리법"}
+  ],
+  "base": {"person": 50000, "corp_s": 50000, "corp_m": 100000, "corp_l": 200000},
+  "area_free_max": 330,
+  "area_rate": 250,
+  "area_rate_pollution": 500,
+  "edu_pct_small": 10,
+  "edu_pct_big": 25
+}
