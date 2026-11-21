@@ -194,3 +194,4 @@
 - 11/17 운영자 '점검 때 봇이 작성한 글 퀄리티 검사하나 → 넣어라, 새 글은 무조건 검수해라': 6시간 점검마다 `python3 automation/unreviewed.py` 의 '검수 필요' 새 글을 **전부** 외부 검수(automation/monitor.md 0~2번: review-prompt.md, 서브에이전트 model opus, 3~4편씩 병렬 → 틀림은 근거 원문을 직접 열어 확인 → apply_review.py 로만 반영(prevention 필수) → reviewed.txt). 11/16 2시간 감시를 6시간 점검으로 바꾸면서 이 일이 빠져 35편이 밀렸음(11/17).
 - 11/20 운영자: 관리자 계정 2단계 인증(OTP) 사용 중 — 로그인 실패(봇 대입)는 잠금·OTP로 막힘. 점검 때 '있는 아이디로 시도' 표시가 늘면 운영자에게 비밀번호 변경만 권함.
 - 11/20 21:39(KST)부터 배포 실패: 서버가 비밀번호 SSH 로그인을 막고 키만 받음('Bad authentication type; allowed types: publickey', 우리 코드는 sshd 설정을 안 바꿈). 배포·API 봇 동기화가 저장소 비밀값 SERVER_SSH_KEY(개인키)를 쓰게 고침(없으면 비밀번호). 키 만들기·등록은 운영자가 서버 콘솔과 GitHub 설정에서 (비밀값은 채팅으로 받지 않음).
+- 11/21 16:18(KST) 운영자 '점검 일시정지해봐': 6시간 점검 예약 작업(trig_01TGfWiiohsNBPk34R93VgpV)을 일시정지(삭제 아님). 다시 하라고 하면 enabled=true 로 켬. 11/25 색인 확인 예약(trig_01ST5dbRGn9xvdM4CixkEQTy)은 그대로.
