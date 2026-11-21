@@ -1276,6 +1276,17 @@ class VerifyPatchesTest(unittest.TestCase):
                     "replace_paragraph": "<td>궐련</td><td>200개비(확인)</td>", "tag": "tr"}]
         self.assertEqual(self.v.problems(patches, {1: self.post("<tr><td>궐련</td><td>200개비(확인)</td></tr>")}), [])
 
+    def test_rewritten_post_is_not_failure(self):
+        """11/21 571개 '문제' 중 562개: 고친 뒤 보강·쉬운 말로 다시 써서 문장이 바뀜(고치기 전 문구도 없음) → 실패로 안 셈.
+        요약문도 고치기 전 값 그대로일 때만 '안 바뀜'."""
+        patches = [{"post": 1, "find": "옛 문장", "replace_paragraph": "새 문장이에요"},
+                   {"post": 1, "find": "e", "set_excerpt": "고친 요약", "from_excerpt": "옛 요약"}]
+        rewritten = dict(self.post("<p>다시 쓴 문장이에요</p>"), excerpt="다시 쓴 요약")
+        self.assertEqual(self.v.problems(patches, {1: rewritten}), [])
+        self.assertEqual(self.v.rewritten(patches, {1: rewritten}), 1)
+        stale = dict(self.post("<p>새 문장이에요</p>"), excerpt="옛 요약")
+        self.assertEqual(self.v.problems(patches, {1: stale}), ["글 1 요약문 안 바뀜"])
+
     def test_later_patch_supersedes(self):
         patches = [{"post": 1, "find": "A 문장", "replace_paragraph": "B 문장이에요"},
                    {"post": 1, "find": "B 문장이에요", "replace_paragraph": "C 문장이에요"}]

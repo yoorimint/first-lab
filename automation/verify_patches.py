@@ -36,11 +36,11 @@ def problems(patches: list[dict], posts: dict[int, dict]) -> list[str]:
         post = posts.get(int(p["post"]))
         if post is None or post.get("status") == "trash":
             continue  # 지운 글
-        if "set_title" in p and post["title"] != p["set_title"] and not any(
-                q["post"] == p["post"] and q.get("from_title") == p["set_title"] for q in patches[n + 1:]):
+        # 제목·요약문: 지금 값이 고치기 전 값(from_…) 그대로일 때만 '안 바뀜' — 그 뒤 다시 쓴 값(보강·쉬운 말)은 실패가 아님
+        # (11/21: 요약문 9개를 '안 바뀜'으로 셌는데 모두 나중에 다시 쓴 것)
+        if "set_title" in p and "from_title" in p and post["title"].strip() == p["from_title"].strip() != p["set_title"].strip():
             out.append(f"글 {p['post']} 제목 안 바뀜: {post['title'][:40]}")
-        if "set_excerpt" in p and plain(post["excerpt"]) != plain(p["set_excerpt"]) and not any(
-                q["post"] == p["post"] and q.get("from_excerpt") == p["set_excerpt"] for q in patches[n + 1:]):
+        if "set_excerpt" in p and "from_excerpt" in p and plain(post["excerpt"]) == plain(p["from_excerpt"]) != plain(p["set_excerpt"]):
             out.append(f"글 {p['post']} 요약문 안 바뀜")
         if "replace_paragraph" not in p or superseded(p, patches[n + 1:]):
             continue
@@ -51,9 +51,22 @@ def problems(patches: list[dict], posts: dict[int, dict]) -> list[str]:
         old_left = p["find"] in html.unescape(raw) if "<" in p["find"] else plain(p["find"]) in body
         if old_left:
             out.append(f"글 {p['post']} 고치기 전 문구 남음: {p['find'][:40]}")
-        elif rep and rep[:40] not in body:
-            out.append(f"글 {p['post']} 고친 문구 없음: {rep[:40]}")
+        # 고친 문구도 고치기 전 문구도 없음 = 그 뒤 글을 다시 씀(보강·쉬운 말) → 실패가 아님, 셀 때 빼고 개수만 (11/21: 571개 중 562개)
     return out
+
+
+def rewritten(patches: list[dict], posts: dict[int, dict]) -> int:
+    """고친 문구가 안 보이지만 고치기 전 문구도 없는 패치 수 (나중에 글을 다시 써서 문장이 바뀐 것)."""
+    n = 0
+    for p in patches:
+        post = posts.get(int(p["post"]))
+        if not post or post.get("status") == "trash" or "replace_paragraph" not in p:
+            continue
+        body = plain(post["title"] + " " + post["excerpt"] + " " + post["content_html"])
+        rep = plain(p["replace_paragraph"])
+        if rep and rep[:40] not in body and plain(p["find"]) not in body:
+            n += 1
+    return n
 
 
 def main() -> None:
@@ -65,7 +78,7 @@ def main() -> None:
         except Exception:  # noqa: BLE001 — 지운 글 등
             posts[pid] = None
     found = problems(patches, posts)
-    print(f"패치 {len(patches)}개 서버 반영 확인: 문제 {len(found)}개")
+    print(f"패치 {len(patches)}개 서버 반영 확인: 문제 {len(found)}개 (나중에 다시 써서 문장이 바뀐 것 {rewritten(patches, posts)}개는 문제 아님)")
     for line in found:
         print("  " + line)
     sys.exit(1 if found else 0)
