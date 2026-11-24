@@ -7068,6 +7068,20 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_upcoming_law_number_not_gone(self):
+        """11/24 #4244 보류: '법률 제21714호(2026.6.2 공포, 12.3 시행)'가 법제처 기본 화면(현행 판)에 안 보여 '사라짐' →
+        시행 예정 판 원문(법제처 API)에 있으면 사라진 게 아님. 정말 없는 숫자는 그대로 잡음."""
+        import datetime as dt
+        from bot import freshness as f, law_api
+        rec = {"found": [{"claim": "법률 제21714호", "numbers": ["21714"], "urls": ["https://www.law.go.kr/법령/외국환거래법"]}]}
+        page = lambda u: "<p>외국환거래법 [시행 2026.1.2.] [법률 제21065호]</p>"
+        vers = [{"mst": "1", "date": dt.date(2026, 1, 2), "status": "현행"}, {"mst": "2", "date": dt.date(2026, 12, 3), "status": "시행예정"}]
+        with mock.patch.object(law_api, "versions", return_value=vers), \
+             mock.patch.object(law_api, "fetch", side_effect=lambda k, t, MST: "<공포번호>21714</공포번호>" if MST == "2" else ""):
+            self.assertEqual(f.problems(rec, [], dt.date(2026, 11, 1), dt.date(2026, 11, 24), fetcher=page), [])
+            rec["found"][0]["numbers"] = ["99999"]
+            self.assertTrue(f.problems(rec, [], dt.date(2026, 11, 1), dt.date(2026, 11, 24), fetcher=page))
+
     def test_deploy_uses_ssh_key_when_set(self):
         """11/20 12:39Z 부터 배포 실패: 서버가 비밀번호 SSH 를 막음('allowed types: publickey') →
         저장소 비밀값 SERVER_SSH_KEY 를 배포(ssh-action 두 단계)·API 봇 동기화(paramiko) 모두 씀 (없으면 비밀번호 그대로)."""
