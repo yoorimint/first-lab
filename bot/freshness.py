@@ -74,6 +74,22 @@ def status_gone(headline: str, record: dict, review: list[dict], page) -> list[s
     return [f"제목·요약의 임시 상태 '{w}' 가 근거 공식 페이지에서 사라짐 — 다시 열었는지 확인해 고치기" for w in gone]
 
 
+def upcoming_law_texts(urls: list, today: dt.date) -> list[str]:
+    """근거가 law.go.kr 법령이면 그 법령의 시행 예정 판 원문(법제처 API) — 11/24 #4244: '법률 제21714호(2026.6.2 공포, 12.3 시행)'가
+    법제처 기본 화면(현행 제21065호)에 안 보여 '숫자가 사라짐'으로 공개 직전 보류됨. 못 받으면 빈 목록(지금처럼 판단)."""
+    from . import law_api
+    out = []
+    for u in urls:
+        if "law.go.kr/법령/" not in urllib.parse.unquote(str(u)):
+            continue
+        name = source_check.law_page(str(u)).rsplit("/", 1)[-1]
+        try:
+            out += [law_api.fetch("service", "law", MST=v["mst"]) or "" for v in law_api.versions(name) if v["date"] > today]
+        except Exception:  # noqa: BLE001 - 법제처 API 장애면 예전처럼 판단
+            continue
+    return out
+
+
 def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, fetcher=source_check.fetch,
              headline: str = "") -> list[str]:
     out, cache = [], {}
@@ -102,6 +118,9 @@ def problems(record: dict, review: list[dict], since: dt.date, today: dt.date, f
         if not texts:
             continue  # 지금 못 열면 판단하지 않음
         gone = [n for n in item.get("numbers", []) if not any(source_check.has_number(t, n) for t in texts)]
+        if gone:  # 법제처 기본 화면은 지금 시행 중인 판만 보여 줌 → 시행 예정 판(공포번호·조문)에 있으면 사라진 게 아님
+            upcoming = upcoming_law_texts(item.get("urls", []), today)
+            gone = [n for n in gone if not any(source_check.has_number(t, n) for t in upcoming)]
         if gone:
             out.append(f"'{item['claim'][:30]}' 숫자 {', '.join(gone)} 가 공식 페이지에서 사라짐")
     out += status_gone(headline, record, review, page)
