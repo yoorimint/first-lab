@@ -1,5 +1,5 @@
 {
-  "basis_date": "2026-11-20", "yearly": false,
+  "basis_date": "2026-11-20", "yearly": false, "law_checked": ["지방세법|2027-01-01"],
   "won10_keys": ["area_tax", "edu_tax", "total"],
   "max_area": 10000000,
   "sources": [
