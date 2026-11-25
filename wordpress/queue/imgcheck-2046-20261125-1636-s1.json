@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 2046,
+ "replace": [
+  {
+   "old": "ai-0320c9616f",
+   "prompt": "a small cozy shop counter with a potted plant and a ceramic cup in warm afternoon sunlight, plain walls, no signs",
+   "alt": "따뜻한 햇살이 드는 작은 가게 계산대와 화분",
+   "why": "오른쪽 간판에 글자(KIX)와 상자 라벨처럼 보이는 글자가 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
