@@ -528,10 +528,13 @@ const FIRSTLAB_OPENDATA_APIS = array(
 	'welfare_nat_detail' => 'https://apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfaredetailedV001',
 	// 중소벤처기업부_중소기업 지원사업 공고(기업마당) (15157820)
 	'bizinfo' => 'https://apis.data.go.kr/1421000/bizinfo/pblancBsnsService',
-	// 창업진흥원_K-Startup 사업공고 (15125364)
-	'kstartup_notice' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01',
+	// 창업진흥원_K-Startup 사업공고 (15125364) — 11/25 창업진흥원 안내: kisedKstartupService02 로 바뀜(지원내용 support_ctnt·
+	// 선정절차 eval_method 추가), Service01 은 90일 뒤(2026-02 하순) 중지 → 새 주소를 기본, 옛 주소는 _v1 로 남겨 비교
+	'kstartup_notice' => 'https://apis.data.go.kr/B552735/kisedKstartupService02/getAnnouncementInformation02',
+	'kstartup_notice_v1' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getAnnouncementInformation01',
 	// K-Startup 사업소개
-	'kstartup_business' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getBusinessInformation01',
+	'kstartup_business' => 'https://apis.data.go.kr/B552735/kisedKstartupService02/getBusinessInformation02',
+	'kstartup_business_v1' => 'https://apis.data.go.kr/B552735/kisedKstartupService01/getBusinessInformation01',
 	// 한국주택금융공사_디딤돌대출금리정보 (15082028)
 	'didimdol_rate' => 'https://apis.data.go.kr/B551408/didimdol-loan-rate/didimdol-info',
 	// 한국주택금융공사_전세자금대출 금리 정보 (15082033)
