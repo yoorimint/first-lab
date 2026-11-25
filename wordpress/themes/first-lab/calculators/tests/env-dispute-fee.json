@@ -1,0 +1,13 @@
+[
+  {"why": "서울시 위원회 수수료 조건표: 조정 1,000만 원 17,500원 (별표1: 1만 + 500×15)", "input": {"kind": "mediation", "amount_man": 1000, "people": 1}, "expect": {"fee": 17500}},
+  {"why": "서울시 조건표: 책임재정·중재 1,000만 원 35,000원 (2만 + 500×30)", "input": {"kind": "liability", "amount_man": 1000, "people": 1}, "expect": {"fee": 35000}, "notes_exclude": ["1억 원을 넘는"]},
+  {"why": "경계: 500만 원 이하 정액 — 조정 500만 원 1만 원 (서울시 조건표 '500만원 이하 10,000')", "input": {"kind": "mediation", "amount_man": 500, "people": 1}, "expect": {"fee": 10000}, "boundary": true},
+  {"why": "경계 바로 위: 조정 501만 원 → 1만 원 + 1×15 = 10,015원 (별표1 제2호)", "input": {"kind": "mediation", "amount_man": 501, "people": 1}, "expect": {"fee": 10015}, "boundary": true},
+  {"why": "경계: 5,000만 원 — 조정 77,500원, 책임재정 155,000원 (서울시 조건표)", "input": {"kind": "liability", "amount_man": 5000, "people": 1}, "expect": {"fee": 155000}, "boundary": true},
+  {"why": "서울시 조건표: 조정 1억 원 127,500원", "input": {"kind": "mediation", "amount_man": 10000, "people": 1}, "expect": {"fee": 127500}},
+  {"why": "서울시 조건표: 책임재정·중재 1억 원 255,000원 — 1억 원 이하라 중앙 안내 없음", "input": {"kind": "liability", "amount_man": 10000, "people": 1}, "expect": {"fee": 255000}, "boundary": true, "notes_exclude": ["1억 원을 넘는"]},
+  {"why": "책임재정 1억 1만 원: 255,000 + 1×20 = 255,020원, 1억 원 초과라 중앙위원회 안내", "input": {"kind": "liability", "amount_man": 10001, "people": 1}, "expect": {"fee": 255020}, "boundary": true, "notes_include": ["1억 원을 넘는"]},
+  {"why": "서울시 조건표: 조정 2억 원 227,500원 (5,000만 초과분 1만 원마다 10원)", "input": {"kind": "mediation", "amount_man": 20000, "people": 1}, "expect": {"fee": 227500}},
+  {"why": "알선은 조정가액과 관계없이 1만 원 (별표1)", "input": {"kind": "conciliation", "amount_man": 30000, "people": 1}, "expect": {"fee": 10000}},
+  {"why": "원인재정: 신청인 수 × 2만 원 — 3명 6만 원 (별표1)", "input": {"kind": "cause", "amount_man": 1000, "people": 3}, "expect": {"fee": 60000}, "notes_include": ["원인재정은 중앙위원회만"]}
+]

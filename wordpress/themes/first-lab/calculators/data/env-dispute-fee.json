@@ -1,0 +1,15 @@
+{
+  "basis_date": "2026-11-25", "yearly": false,
+  "won10": "수수료는 별표 1의 정액·1만 원당 금액을 더한 값이라 버릴 끝수가 없음",
+  "sources": [
+    {"name": "국가법령정보센터 환경분쟁 조정 및 환경피해 구제 등에 관한 법률 시행령 (제28조 수수료, 별표 1)", "url": "https://www.law.go.kr/법령/환경분쟁조정및환경피해구제등에관한법률시행령"},
+    {"name": "국가법령정보센터 환경분쟁 조정 및 환경피해 구제 등에 관한 법률 (제6조 관할, 제41조 수수료)", "url": "https://www.law.go.kr/법령/환경분쟁조정및환경피해구제등에관한법률"},
+    {"name": "서울특별시 환경분쟁조정위원회 수수료 조건표", "url": "https://edc.seoul.go.kr/index.do?nMenuCode=22"}
+  ],
+  "max_amount_man": 100000000, "max_people": 100000,
+  "conciliation_fee": 10000,
+  "cause_fee_per_person": 20000,
+  "base_upto_man": 500, "tier2_upto_man": 5000, "local_limit_man": 10000,
+  "mediation": {"base": 10000, "per_10k_mid": 15, "per_10k_high": 10},
+  "liability": {"base": 20000, "per_10k_mid": 30, "per_10k_high": 20}
+}
