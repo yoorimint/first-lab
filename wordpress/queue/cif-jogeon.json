@@ -1,0 +1,578 @@
+{
+ "title": "CIF 조건 뜻: 운임·보험은 판매자, 위험은 선적항에서 구매자로",
+ "excerpt": "CIF 조건은 판매자가 도착항까지 운임·보험료를 내고, 위험은 선적항 배 위에서 넘어가요. 보험 최소 ICC(C)·110% 이상, FOB·CIP 차이와 수입 관세 계산 예시까지 정리했어요.",
+ "content_html": "<p>CIF 조건은 판매자가 도착항까지 운임·보험료를 내지만, 위험은 배에 실을 때 구매자에게 넘어가요.<br>무역 견적서에 CIF가 적혀 있다면 꼭 알아 둘 내용이에요.<br>✔ 운임·보험료: 판매자<br>✔ 위험: 선적항 배 위에서 이전<br>✔ 보험: 최소 ICC(C), 110%<br>✔ 바다·내수로 운송에만</p>\n<p>'운임을 냈으니 도착까지 책임진다'고 생각하기 쉬운데, 그렇지 않아요. 돈을 내는 범위와 사고를 책임지는 범위가 달라서 헷갈리는 조건이에요.</p>\n<h2>CIF 뜻: 운임·보험료 포함 인도조건</h2>\n<p>CIF는 Cost, Insurance and Freight의 줄임말이에요. 우리말로는 '운임·보험료 포함 인도조건'이라고 해요.</p>\n<p>국제상업회의소(ICC)가 정한 무역 거래 규칙인 인코텀즈에 들어 있는 조건이에요. 지금 쓰는 판은 인코텀즈 2020이에요.</p>\n<p>계약서에는 'CIF 부산'처럼 뒤에 도착항 이름을 붙여 써요. 판매자는 그 항구까지 가는 배를 잡고 운임을 내요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>할 일</th><th>누가</th></tr></thead>\n<tbody>\n<tr><td>수출 통관</td><td>판매자</td></tr>\n<tr><td>배에 싣기</td><td>판매자</td></tr>\n<tr><td>도착항까지 운임</td><td>판매자</td></tr>\n<tr><td>화물 보험 가입</td><td>판매자</td></tr>\n<tr><td>배에 실은 뒤 사고 위험</td><td>구매자</td></tr>\n<tr><td>수입 통관·관세</td><td>구매자</td></tr>\n</tbody>\n</table></figure>\n<p class=\"fl-basis\">근거: 인코텀즈 2020 CIF 규칙</p>\n<h2>위험은 언제 넘어가나요</h2>\n<p>예를 들어 중국 상하이항에서 'CIF 부산'으로 물건을 샀다고 해 볼게요. 바다 한가운데서 사고가 나 화물이 젖었다면, 손해는 구매자 몫이에요.</p>\n<p>물건이 선적항에서 배 위에 놓이는 순간 위험이 구매자에게 넘어가기 때문이에요. 물건이 부산에 실제로 도착하지 않아도 판매자는 인도 의무를 다한 것으로 봐요.</p>\n<p>그래서 판매자가 드는 보험은 사실상 구매자를 위한 보험이에요. 사고가 나면 구매자가 보험 서류를 받아 보험사에 청구해요.</p>\n<p>정리하면 CIF에는 기준점이 두 곳이에요. 위험은 선적항에서, 운임 부담은 도착항에서 끝나요.</p>\n<p>다만 계약서에는 보통 도착항만 적고 선적항은 안 적어요. 위험이 넘어가는 곳을 분명히 하려면 선적항도 계약서에 적어 두는 게 좋아요.</p>\n<p class=\"fl-basis\">근거: 인코텀즈 2020 CIF 규칙</p>\n<h2>CIF 보험 조건: 최소 담보와 110%</h2>\n<p>판매자는 적어도 선적항부터 도착항까지 화물 손해를 보상하는 보험을 들어야 해요. 기본은 협회적하약관 C 조건, 줄여서 ICC(C)예요.</p>\n<p>ICC(C)는 보상 범위가 가장 좁은 편인 기본형이에요. 더 넓은 A 조건으로 하려면 계약할 때 따로 합의하면 돼요.</p>\n<p>보험 금액은 계약 금액에 10%를 더한 110% 이상이고, 계약에서 쓴 통화로 들어요. 예를 들어 계약 금액이 10,825달러면 보험 금액은 11,907.5달러 이상이에요.</p>\n<p>수입하는 나라가 자기 나라 보험사 가입을 요구하면 판매자가 보험을 들기 어려워요. 이때는 보험이 빠진 CFR 조건으로 거래하는 방법이 있어요.</p>\n<p class=\"fl-basis\">근거: 인코텀즈 2020 CIF 규칙</p>\n<h2>FOB·CFR·CIP와 비교</h2>\n<p>같은 물건인데 CIF 견적이 FOB 견적보다 비싼 건, 운임과 보험료가 물건값에 들어 있어서예요. 비교하려면 FOB 값에 내가 따로 낼 운임·보험료를 더해 봐야 해요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>조건</th><th>운임</th><th>보험</th><th>위험 이전</th></tr></thead>\n<tbody>\n<tr><td>FOB</td><td>구매자</td><td>구매자 선택</td><td>선적항 배 위</td></tr>\n<tr><td>CFR</td><td>판매자</td><td>구매자 선택</td><td>선적항 배 위</td></tr>\n<tr><td>CIF</td><td>판매자</td><td>판매자, ICC(C)</td><td>선적항 배 위</td></tr>\n<tr><td>CIP</td><td>판매자</td><td>판매자, ICC(A)</td><td>첫 운송인에게 인도</td></tr>\n</tbody>\n</table></figure>\n<p>FOB·CFR·CIF는 배로 보내는 화물에만 쓰는 조건이에요. 컨테이너 터미널에서 운송인에게 넘기는 화물이나 여러 운송 수단을 쓰는 거래에는 CIP가 더 맞아요.</p>\n<p>CIP는 2020년 판부터 보험 기본 수준이 A 조건으로 올라갔어요. CIF는 그대로 C 조건이 기본이에요.</p>\n<p>그럼 수입할 때 어느 쪽이 나을까요? 운송·보험을 내가 직접 고르고 싶으면 FOB, 도착항까지 드는 돈을 한 번에 알고 싶으면 CIF가 편해요.</p>\n<p>다만 CIF 보험은 기본이 좁은 C 조건이에요. 비싸거나 잘 깨지는 물건이면 A 조건으로 합의하거나 따로 보험을 더 드는 걸 따져 보세요.</p>\n<p class=\"fl-basis\">근거: 인코텀즈 2020 CIF·CIP 규칙</p>\n<h2>수입하면 관세는 CIF 가격으로 매겨요</h2>\n<p>우리나라는 수입품 관세를 매길 때 원칙적으로 수입항까지의 운임·보험료를 물건값에 더해요. 그래서 FOB로 사도 관세를 매기는 가격(과세가격)은 결국 CIF 가격을 기준으로 해요.</p>\n<p>여기서 운임·보험료는 수입항에 도착해 배에서 내릴 준비가 끝날 때까지 든 비용이에요. 도착 뒤 국내에서 옮기는 비용은 빼요.</p>\n<p>다만 정해진 물품은 운임·보험료의 전부나 일부를 빼거나, 항공으로 와도 배편 같은 일반 운송으로 온 것처럼 운임·보험료를 계산하는 예외가 있어요.</p>\n<p>달러 가격을 원화로 바꿀 때는 관세청장이 정한 과세환율을 써요. 수입신고한 날이 속한 주의 전주 기준환율을 평균한 값이에요.</p>\n<p>예를 들어 물건값 10,000달러, 운임 800달러, 보험료 25달러인 물건을 수입한다고 해 볼게요. 환율은 1달러에 1,343.6원, 관세율은 8%로 가정했어요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>항목</th><th>계산</th><th>금액</th></tr></thead>\n<tbody>\n<tr><td>CIF 가격</td><td>10,000+800+25달러</td><td>10,825달러</td></tr>\n<tr><td>과세가격</td><td>10,825달러×1,343.6원</td><td>14,544,470원</td></tr>\n<tr><td>관세</td><td>과세가격×8%</td><td>약 116만 원</td></tr>\n<tr><td>부가가치세</td><td>(과세가격+관세)×10%</td><td>약 157만 원</td></tr>\n<tr><td>세금 합계</td><td>관세+부가가치세</td><td>약 273만 원</td></tr>\n</tbody>\n</table></figure>\n<p>수입 부가가치세는 과세가격에 관세를 더한 금액의 10%예요. 개별소비세 같은 다른 세금이 붙는 물건이면 그 세금도 더한 뒤 10%를 매겨요.</p>\n<p>관세율은 물건 종류마다 달라요. 실제 세율은 품목번호인 HS 코드로 관세청 관세법령정보포털(unipass.customs.go.kr)에서 찾아봐야 해요.</p>\n<p class=\"fl-basis\">근거: 관세법 제18조·제30조, 관세법 시행령 제20조, 부가가치세법 제29조·제30조</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>위험은 선적항에서 배 위에 놓일 때 구매자에게 넘어가요.</li>\n<li>기본 보험은 ICC(C)라 보상 범위가 좁아요.</li>\n<li>컨테이너·여러 운송 수단 거래면 CIP가 더 맞아요.</li>\n<li>수입 관세는 FOB로 사도 원칙적으로 운임·보험료를 더해 매겨요.</li>\n</ul>\n<p><strong>한 줄 정리:</strong> CIF 조건은 판매자가 도착항까지 운임·보험료를 내고, 위험은 선적항 배 위에서 구매자에게 넘어가는 조건이에요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>CIF면 판매자가 수입 관세도 내나요?</h3>\n<p>아니요. 판매자는 수출 통관까지만 하고, 수입 통관과 관세·부가가치세는 구매자가 내요.</p>\n<h3>도착항에서 배에서 내리는 비용은 누가 내나요?</h3>\n<p>판매자가 맺은 운송 계약에 도착항 하역비가 들어 있으면 판매자 부담이에요. 이 경우 따로 합의하지 않았다면 판매자가 그 비용을 구매자에게 다시 받을 수 없어요.</p>\n<h3>항공 화물에도 CIF를 쓸 수 있나요?</h3>\n<p>인코텀즈 2020 기준으로 CIF는 해상과 내수로 운송에만 쓰는 조건이에요. 항공 화물처럼 배가 아닌 운송이면 CIP를 써요.</p>\n<h3>운임 견적을 받기 전에 뭘 알아 두면 좋나요?</h3>\n<p>짐의 무게와 부피(CBM)를 먼저 알아 두면 견적을 비교하기 쉬워요. 부피는 <a href=\"https://first-lab.kr/cbm계산기/\">CBM 계산하는 방법</a>에서 상자 크기로 구해 볼 수 있어요.</p>\n",
+ "tags": [
+  "CIF",
+  "인코텀즈",
+  "FOB",
+  "무역조건",
+  "관세"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a large cargo ship sailing on a calm blue sea at sunrise, seen from far away",
+   "alt": "해 뜨는 바다를 지나는 큰 화물선"
+  }
+ ],
+ "keyword": "CIF조건",
+ "status": "auto",
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/ch_prosunho/224476938931",
+   "https://blog.naver.com/all_labs/224485003948",
+   "https://blog.naver.com/choyulcustoms/224451447442",
+   "https://blog.naver.com/mk85392006/224451285596",
+   "https://blog.naver.com/nanologi/224488537914"
+  ],
+  "questions": [
+   "CIF와 FOB 견적 금액이 다른 이유",
+   "CIF와 FOB의 위험 이전 지점",
+   "CIF 보험은 누가 드나",
+   "CFR·CIP와 CIF 차이",
+   "FOB와 CIF 중 어느 조건이 유리한가"
+  ],
+  "added": [
+   {
+    "type": "@계산예시",
+    "text": "CIF 가격으로 수입 관세·부가가치세를 계산한 예시(과세가격 14,544,470원)"
+   },
+   {
+    "type": "@상황판단",
+    "text": "수입국이 자국 보험을 요구하면 CFR, 컨테이너·복합운송이면 CIP로 고르는 기준"
+   },
+   {
+    "type": "@최신개정",
+    "text": "인코텀즈 2020에서 CIP 보험은 A 조건으로 올라갔고 CIF는 C 조건 그대로"
+   }
+  ]
+ },
+ "review": [
+  {
+   "claim": "CIF 조건은 판매자가 도착항까지 운임·보험료를 냄 (제목·요약·첫 문단)",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CIF 위험은 선적항에서 물건이 배 위에 놓일 때 구매자에게 넘어감 (제목·요약·첫 문단)",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CIF 보험은 최소 ICC(C) 협회적하약관 C 조건",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf",
+    "https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보험 금액은 계약 금액의 110% 이상, 계약 통화로",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CIF는 바다·내수로 운송에만 씀",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CIF는 Cost, Insurance and Freight, ICC가 정한 인코텀즈 규칙, 현행 인코텀즈 2020",
+   "urls": [
+    "https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/",
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계약서에 'CIF 부산'처럼 도착항 이름을 붙여 씀",
+   "urls": [
+    "https://www.jetro.go.jp/world/qa/J-200309.html",
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "수출 통관은 판매자, 수입 통관·관세는 구매자",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "배에 싣기·도착항까지 운임·화물 보험 가입은 판매자",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "배에 실은 뒤 사고 위험은 구매자",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "물건이 도착하지 않아도 판매자는 인도 의무를 다한 것으로 봄",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "판매자 보험은 구매자 위험을 보상하고, 구매자가 보험사에 청구",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf",
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/back_number/131trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "기준점이 두 곳: 위험은 선적항, 운임 부담은 도착항",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계약서에는 보통 도착항만 적어 선적항도 적어 두는 게 좋음",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보험은 적어도 선적항부터 도착항까지",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "A 조건으로 하려면 따로 합의",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계약 금액 10,825달러면 보험 금액 11,907.5달러 이상",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "수입국이 자국 보험 가입을 요구하면 CFR로 거래",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FOB: 운임 구매자, 판매자 보험 의무 없음, 선적항 배 위에서 위험 이전",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/136/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CFR: 운임 판매자, 판매자 보험 의무 없음, 선적항 배 위에서 위험 이전",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/136/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CIP: 판매자 ICC(A) 보험, 첫 운송인에게 인도할 때 위험 이전",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/back_number/133trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "컨테이너 터미널 인도·여러 운송 수단이면 CIP가 더 맞음",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "CIP는 2020년 판부터 A 조건, CIF는 C 조건 그대로",
+   "urls": [
+    "https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/",
+    "https://www.jetro.go.jp/world/qa/J-200309.html",
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/back_number/131trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FOB·CFR·CIF는 배로 보내는 화물에만 쓰는 조건",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/136/trade_y.pdf",
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "항공 화물처럼 배가 아닌 운송이면 CIP",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/back_number/133trade_y.pdf",
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세 과세가격에 원칙적으로 수입항까지의 운임·보험료를 더함 (관세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "수입항 도착 후 본선하역준비 완료까지의 비용, 도착 뒤 국내 운송비는 뺌 (관세법 시행령 제20조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령/제20조",
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "과세환율은 관세청장이 정하며 수입신고한 주의 전주 기준환율 평균 (관세법 제18조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제18조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "계산 예시: CIF 가격 10,000+800+25=10,825달러, 환율 1,343.6원 가정 시 과세가격 14,544,470원 (관세법 제30조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "관세 8% 가정 시 약 116만 원",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세 (과세가격+관세)×10% 약 157만 원 (부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조",
+    "https://www.law.go.kr/법령/부가가치세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "세금 합계 약 273만 원",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "수입 부가가치세 과세표준에 개별소비세 등 다른 세금도 더함, 세율 10% (부가가치세법 제29조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조",
+    "https://www.law.go.kr/법령/부가가치세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "관세율은 HS 코드로 관세청 관세법령정보포털(unipass.customs.go.kr)에서 확인",
+   "urls": [
+    "https://unipass.customs.go.kr/clip/index.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FAQ: 판매자는 수출 통관까지, 수입 관세·부가가치세는 구매자",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "FAQ: 운송 계약에 도착항 하역비가 있으면 판매자 부담, 따로 합의 없으면 구매자에게 다시 못 받음",
+   "urls": [
+    "https://www.jetro.go.jp/ext_images/jetro/japan/oita/magazine/137/trade_y.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "무역 견적서에서 가장 많이 보는 조건 중 하나",
+   "urls": [
+    "https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/"
+   ],
+   "verdict": "확인불가",
+   "action": "삭제"
+  },
+  {
+   "claim": "관세법 제30조 단서1 해당 없음 — 가산 금액의 객관적 자료 요건·다른 평가방법은 세관 평가 절차로, 본문은 일반 계산 예시만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ]
+  },
+  {
+   "claim": "관세법 제30조 단서2 해당 없음 — 구매수수료 제외는 수수료 가산 규정으로, 본문은 운임·보험료만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ]
+  },
+  {
+   "claim": "관세법 제30조 단서3 반영 — '원칙적으로' 및 '정해진 물품은 운임·보험료 일부를 빼거나' 문장",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ]
+  },
+  {
+   "claim": "관세법 제30조 단서4 반영 — '도착 뒤 국내에서 옮기는 비용은 빼요' 문장",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ]
+  },
+  {
+   "claim": "관세법 제30조 단서5 해당 없음 — 거래가격 불인정 사유(처분 제한 등)로 CIF 조건 설명과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ]
+  },
+  {
+   "claim": "관세법 제30조 단서6 해당 없음 — 거래가격 불인정 사유(수익 귀속 등)로 CIF 조건 설명과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ]
+  },
+  {
+   "claim": "관세법시행령 제20조 단서1 반영 — '항공으로 와도 배로 온 것처럼 운임을 계산하는 예외' 문장",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령/제20조"
+   ]
+  },
+  {
+   "claim": "관세법시행령 제20조 단서2 해당 없음 — 특수관계 선박·용선계약 등 통상 운임 적용 특례로 일반 독자 거래와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령/제20조"
+   ]
+  },
+  {
+   "claim": "관세법시행령 제20조 단서3 해당 없음 — 특례 적용 증명자료 제출 면제 규정으로 본문이 다루지 않음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령/제20조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제29조 단서1 해당 없음 — 특수관계인 국내 공급 시가 규정, 수입 과세표준과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제29조 단서2 해당 없음 — 토지·건물 안분계산 규정, 수입과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제29조 단서3 해당 없음 — 토지·건물 가액 구분 규정, 수입과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제29조 단서4 해당 없음 — 감가상각자산 간주공급 규정, 수입과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제29조"
+   ]
+  },
+  {
+   "claim": "정해진 물품은 운임·보험료 전부나 일부를 빼거나, 항공 운송이어도 일반 운송으로 본 운임·보험료로 계산하는 예외 (관세법 시행령 제20조)",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법시행령/제20조",
+    "https://www.law.go.kr/법령/관세법/제30조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "관세법 제210조 해당 없음 — 매각방법(체화물품 공매 등) 규정으로 과세가격·CIF 설명과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제210조"
+   ]
+  },
+  {
+   "claim": "관세법 제119조 해당 없음 — 불복 신청 절차로 과세환율 설명과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제119조"
+   ]
+  },
+  {
+   "claim": "관세법 제120조 해당 없음 — 행정소송법과의 관계 규정으로 과세환율 설명과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/관세법/제120조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제21조 해당 없음 — 재화 수출 영세율로 수입 부가가치세 10% 계산과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제21조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제22조 해당 없음 — 용역의 국외공급 영세율로 수입과 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제22조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제23조 해당 없음 — 외국항행용역 영세율로 수입 재화와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제23조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제24조 해당 없음 — 외화 획득 재화·용역 영세율로 수입 재화와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제24조"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "국가법령정보센터 관세법 제30조(과세가격 결정의 원칙)",
+   "url": "https://www.law.go.kr/법령/관세법/제30조"
+  },
+  {
+   "name": "관세청 관세법령정보포털 CLIP",
+   "url": "https://unipass.customs.go.kr/clip/index.do"
+  }
+ ]
+}
