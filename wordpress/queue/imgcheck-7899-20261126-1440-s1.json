@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7899,
+ "replace": [
+  {
+   "old": "ai-591e7a8ab6",
+   "prompt": "a calm late autumn office window view with a ceramic coffee mug and a small potted plant on an empty wooden desk, golden ginkgo trees outside, soft light",
+   "alt": "늦가을 은행나무가 보이는 사무실 창가 책상 위 커피잔과 화분",
+   "why": "책상 위 서류·계산기에 엉터리 글자·숫자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7951,
+ "replace": [
+  {
+   "old": "ai-e3b03f5c04",
+   "prompt": "warm morning sunlight falling on fresh round loaves of bread in wicker baskets on a wooden counter of a small neighborhood bakery, close view, no signs or labels",
+   "alt": "아침 햇살이 드는 동네 빵집 나무 진열대 위 갓 구운 빵",
+   "why": "칠판 간판·냉장고에 엉터리 영문 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
