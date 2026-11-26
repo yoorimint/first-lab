@@ -669,3 +669,4 @@ date,post,fixes,types
 2026-11-26,8926,0,
 2026-11-26,8944,0,
 2026-11-26,8946,1,wrong_fact:1
+2026-11-26,8963,5,missing_condition:4 wrong_fact:1
