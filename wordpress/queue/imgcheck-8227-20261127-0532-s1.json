@@ -1,0 +1,3 @@
+{"type": "image_check", "post_id": 8227, "slot": 1,
+ "replace": [{"old": "ai-f9f074a470", "prompt": "A folded yellow umbrella leaning against an empty wooden chair in a quiet, softly lit small shop interior at dusk, plain walls, no signs", "alt": "저녁 무렵 조용한 작은 가게 안 빈 나무 의자에 기대 놓은 접힌 노란 우산", "why": "뒤 유리창 너머 둥근 간판에 로고·글자처럼 보이는 것이 있음"}],
+ "remove": [], "add": []}
