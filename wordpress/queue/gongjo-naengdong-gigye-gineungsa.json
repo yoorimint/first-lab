@@ -449,6 +449,16 @@
     "https://www.law.go.kr/법령/고압가스안전관리법시행령/제4조"
    ],
    "round": 2
+  },
+  {
+   "claim": "국가기술자격법시행령 제22조 해당 없음 — 취득자가 현저히 부족한 종목의 합격인원 예정 선발 예외로, 이 종목은 큐넷 안내대로 100점 만점 60점 이상 기준을 적용",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/국가기술자격법시행령/제22조",
+    "https://www.q-net.or.kr/crf005.do?id=crf00503s02&gSite=Q&gId=&jmCd=6320&jmInfoDivCcd=B0"
+   ],
+   "round": 2
   }
  ],
  "keyword": "공조냉동기계기능사",
