@@ -1,0 +1,6 @@
+{
+ "type": "fix_hold",
+ "post_id": 8712,
+ "give_up": true,
+ "why": "근거 54개가 모두 한국관광공사 두루누비(durunubi.kr)인데 공식 기관 주소 목록(bot/sources.py OFFICIAL_HOSTS)에 없어 보류 — 글쓰기 작업은 bot/ 수정 범위 밖, durunubi.kr 추가 필요"
+}
