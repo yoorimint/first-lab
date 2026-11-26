@@ -2114,6 +2114,14 @@ class ImageAltTextTest(unittest.TestCase):
         self.assertIn("500킬로바이트", page_text(raw, "utf-8"))
         self.assertNotIn("로고", page_text('<img alt="로고">'.encode(), "utf-8"))  # 짧은 alt 는 뺌
 
+    def test_source_page_ignores_html_comments(self):
+        # 11/26 #8431: 고용24가 주석으로 숨긴 옛 안내를 근거로 셈 → 주석은 빼고 대조
+        from bot.source_check import page_text
+        raw = "<p>대상 : 40세 이상 중장년</p><!-- <p>증명사진 무료촬영</p> -->".encode()
+        text = page_text(raw, "utf-8")
+        self.assertIn("40세 이상", text)
+        self.assertNotIn("증명사진", text)
+
 
 class MillionthRateTest(unittest.TestCase):
     """11/6 #1228: 노인장기요양보험법 시행령 '100만분의 9,448'(0.9448%)을 같은 값으로 못 봐 '페이지에 없음'."""

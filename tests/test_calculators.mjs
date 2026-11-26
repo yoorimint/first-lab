@@ -191,6 +191,12 @@ for (const id of ids) {
     for (const want of c.notes_include || []) if (!notes.includes(want)) fail(id, `사례 ${i + 1} (${c.why}): 안내에 '${want}' 가 없음`);
     for (const bad of c.notes_exclude || []) if (notes.includes(bad)) fail(id, `사례 ${i + 1} (${c.why}): 안내에 '${bad}' 가 나오면 안 됨`);
     if (!Array.isArray(out.rows) || !out.rows.length) fail(id, `사례 ${i + 1}: 화면에 보여줄 rows 가 없음`);
+    // 결과 줄 문구도 사례로 확인 (11/26 무이자 차용 계산기: 차이가 딱 1,000만 원인데 '넘어요'로 나옴 — 법은 '미만'만 제외)
+    for (const [label, want] of Object.entries(c.rows_include || {})) {
+      const row = (out.rows || []).find((r) => r[0] === label);
+      if (!row) fail(id, `사례 ${i + 1} (${c.why}): 결과 줄 '${label}' 이 없음`);
+      else if (!String(row[1]).includes(want)) fail(id, `사례 ${i + 1} (${c.why}): '${label}' = '${row[1]}', '${want}' 가 들어가야 함`);
+    }
     checked += 1;
   }
 }
