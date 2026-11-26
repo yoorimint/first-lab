@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7525,
+ "replace": [
+  {
+   "old": "ai-0f01db3707",
+   "prompt": "a quiet residential alley in a Korean neighborhood in autumn sunlight, low houses with tiled roofs and yellow ginkgo trees, no signs, no posters, no people",
+   "alt": "가을 햇살이 드는 동네 주택가 골목",
+   "why": "오른쪽 표지판에 엉터리 글자·그림이 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
