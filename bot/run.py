@@ -259,6 +259,25 @@ def refresh_dashboard(state: dict, settings: BotSettings) -> None:
         state["review_target"] = None
 
 
+def prune_candidates(state: dict, conn_factory=None) -> int:
+    """후보 목록에서 이제 후보가 아닌 키워드(쓴 것·제외된 것: 상태가 new·ok 가 아님)만 빼고, 대기 글 검수 대상을 다시 구함.
+    전체 순위 계산(ranked_candidates, 7만여 개·200초)은 하지 않음. 뺀 개수 반환."""
+    cands = list(state.get("candidates") or [])
+    if cands:
+        kws = [str(c.get("keyword", "")) for c in cands]
+        with (conn_factory or connect)() as conn:
+            rows = {r["keyword"]: r["status"] for r in conn.execute(
+                f"SELECT keyword, status FROM keywords WHERE keyword IN ({','.join('?' * len(kws))})", kws)}
+        state["candidates"] = [c for c in cands if rows.get(str(c.get("keyword", "")), "new") in ("new", "ok")]
+    try:
+        from .review_queue import target
+        settings = load_settings()
+        state["review_target"] = target(ahead=len(settings.schedule_times) if settings.post_status == "schedule" else 1)
+    except Exception:  # noqa: BLE001 - 못 구하면 다음 정시 전체 계산 때
+        pass
+    return len(cands) - len(state.get("candidates") or [])
+
+
 def link_maintenance(state: dict, now: datetime, step=lambda name: None) -> None:
     """10분마다(매 5분): 공식 사이트 링크 확인·공개 순서·검색량·관련 글 등 공개와 직접 관계없는 정리.
     11/15: 이 묶음 어딘가에서 실행이 멈춰 12분 시간 제한에 걸림(하루 4번, 그동안 매분 봇 전체가 멈춤) →
@@ -475,11 +494,20 @@ def main() -> None:
         except Exception:  # noqa: BLE001
             pass
 
-    if excluded or state.get("dashboard_at", "")[:13] != now.strftime("%Y-%m-%d %H"):
-        # 변화가 있거나 1시간마다 — 200초 넘게 걸려 따로 실행 (bot/dashboard_job.py, 11/15). systemd-run 이 없으면 여기서
+    stamp = state.get("dashboard_at", "")
+    if stamp and stamp[:13] != now.strftime("%Y-%m-%d %H"):
+        # 1시간마다 전체 다시 계산 — 200초 넘게 걸려 따로 실행 (bot/dashboard_job.py, 11/15). systemd-run 이 없으면 여기서
         from . import dashboard_job
         if not dashboard_job.launch():
             refresh_dashboard(state, settings)
+        state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
+    elif excluded or stamp == "":
+        # 새 글·제외가 반영됨 → 쓴·뺀 키워드만 후보에서 지우고 검수 대상만 다시 (11/26: 결과마다 전체 계산을 돌려
+        # 대시보드가 하루 CPU 172분 — 연속 작성 하루 수십 편 × 200초). 전체 계산은 위에서 1시간마다
+        try:
+            prune_candidates(state)
+        except Exception as e:  # noqa: BLE001 - 못 하면 다음 정시 전체 계산이 바로잡음
+            add_log(state, False, f"후보 가볍게 정리 실패: {str(e)[:120]}")
         state["dashboard_at"] = now.strftime("%Y-%m-%d %H:%M")
 
     laps.lap("정리·대시보드")
