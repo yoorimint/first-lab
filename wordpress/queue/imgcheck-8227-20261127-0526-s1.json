@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 8227,
+ "slot": 1,
+ "replace": [
+  {
+   "old": "ai-f9f074a470",
+   "prompt": "A folded yellow umbrella leaning against a plain empty wooden counter in a small quiet cafe at dusk, warm pendant lights, blank walls, no signs, no text, no logos",
+   "alt": "저녁 무렵 빈 작은 카페 나무 계산대에 기대 놓은 접힌 노란 우산",
+   "why": "뒤쪽 둥근 간판과 벽 표지판에 글자처럼 보이는 무늬"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

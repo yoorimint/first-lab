@@ -1,0 +1,10 @@
+{
+ "type": "image_check",
+ "post_id": 8197,
+ "slot": 1,
+ "replace": [],
+ "remove": [
+  "ai-284a03f5db"
+ ],
+ "add": []
+}
