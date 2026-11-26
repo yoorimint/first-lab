@@ -1,0 +1,497 @@
+{
+ "title": "사업자 휴폐업 조회 방법: 홈택스에서 등록번호 10자리 입력",
+ "excerpt": "사업자 휴폐업 조회는 홈택스에서 사업자등록번호 10자리로 해요. 휴업·폐업 여부와 과세유형 읽는 법, 여러 건을 100건씩 조회하는 API, 폐업 신고까지 정리했어요.",
+ "content_html": "<p>사업자 휴폐업 조회는 홈택스에서 사업자등록번호 10자리만 넣으면 돼요.<br>거래 전에 상대 업체가 지금도 영업 중인지 보는 방법이에요.<br>✔ 휴업·폐업 여부가 나와요<br>✔ 과세유형도 같이 나와요<br>✔ 여러 건은 API로 100건씩</p>\n<p>사업자등록증을 받았어도 그 뒤에 폐업했을 수 있어요. 그래서 돈을 보내거나 세금계산서를 받기 직전에 한 번 더 보는 게 좋아요.</p>\n<h2>사업자 휴폐업 조회 방법</h2>\n<p>홈택스(hometax.go.kr)의 사업자상태 조회 화면에서 해요. 로그인하지 않아도 되는지, 휴대폰 손택스 앱 화면은 어떤지는 들어가서 확인해요.</p>\n<ol>\n<li>홈택스에 들어가 조회/발급 메뉴에서 사업자상태를 눌러요.</li>\n<li>상대 업체의 사업자등록번호 10자리를 넣고 조회해요.</li>\n</ol>\n<p>메뉴 위치는 화면 개편 때 바뀔 수 있어요. 메뉴가 안 보이면 국세상담센터(126, 유료)에 물어보면 돼요.</p>\n<h2>조회 결과 읽는 법</h2>\n<p>결과에는 사업자 상태와 부가가치세 과세유형이 나와요. 국세청 상태조회 API는 폐업자면 폐업일자도 알려 줘요.</p>\n<table>\n<thead><tr><th>상태</th><th>뜻</th></tr></thead>\n<tbody>\n<tr><td>휴·폐업 아님</td><td>사업자등록이 살아 있는 상태</td></tr>\n<tr><td>휴업</td><td>휴업 신고를 한 상태</td></tr>\n<tr><td>폐업</td><td>폐업해 등록이 말소된 상태</td></tr>\n</tbody>\n</table>\n<p>과세유형은 일반과세자, 간이과세자, 면세사업자 등으로 나뉘어요. 이 값으로 세금계산서를 받을 수 있는 상대인지 짐작할 수 있어요.</p>\n<p>화면에 나오는 정확한 이름은 조회 결과에서 확인해요. 다만 휴·폐업이 아니라는 결과는 등록이 살아 있다는 뜻일 뿐이에요.</p><p>실제로 장사를 잘하고 있는지, 믿을 만한지까지 알려 주지는 않아요.</p>\n<p class=\"fl-basis\">근거: 부가가치세법 제8조</p>\n<h2>세금계산서 받을 때 볼 점</h2>\n<p>예를 들어 상대가 간이과세자로 나오면 세금계산서 대신 영수증을 줄 수도 있어요. 직전 연도 공급대가가 4,800만 원 미만인 간이과세자가 그래요.</p>\n<p>막 사업을 시작한 간이과세자도 첫 과세기간에는 영수증을 줘요. 면세사업자는 부가가치세가 없어 세금계산서 대신 계산서(또는 영수증)를 써요.</p>\n<p>폐업자로 나오면 폐업일자와 실제 거래한 날을 비교해요. 폐업한 뒤 날짜로 받은 세금계산서는 매입세액을 공제받지 못할 수 있어요.</p>\n<p>이런 거래라면 대금을 보내기 전에 세무서나 국세상담센터(126)에 먼저 물어보는 게 안전해요.</p>\n<p class=\"fl-basis\">근거: 부가가치세법 제36조, 제39조</p>\n<h2>거래처가 많을 때: 한 번에 여러 건 조회</h2>\n<p>거래처가 수십 곳이면 공공데이터포털(data.go.kr)의 국세청 사업자등록정보 상태조회 API를 쓸 수 있어요. 무료이고, 공공데이터포털에서 받은 인증키가 있어야 해요.</p>\n<table>\n<thead><tr><th>항목</th><th>기준</th></tr></thead>\n<tbody>\n<tr><td>한 번 요청</td><td>최대 100건</td></tr>\n<tr><td>하루 한도</td><td>100만 건</td></tr>\n<tr><td>정보 갱신</td><td>30분 주기</td></tr>\n<tr><td>새로 연 사업자</td><td>반영까지 1~2일</td></tr>\n</tbody>\n</table>\n<p>그래서 방금 문을 연 업체는 API에서 바로 안 나올 수 있어요. 이때는 며칠 뒤 다시 보거나 홈택스 화면으로 확인해요.</p>\n<h2>상호만 알 때는 어떻게 하나요</h2>\n<p>홈택스 상태 조회는 사업자등록번호를 넣어야 해요. 그래서 번호를 모르면 먼저 상대에게 사업자등록증 사본을 달라고 하는 게 가장 확실해요.</p>\n<p>온라인 쇼핑몰이라면 공정거래위원회(ftc.go.kr)의 통신판매사업자 등록현황에서 회사명이나 대표자로 찾을 수 있어요. 목록에서 그 업체의 운영상태와 신고일자를 볼 수 있어요.</p>\n<h2>내가 휴업·폐업할 때 신고 방법</h2>\n<p>사업자는 휴업이나 폐업을 하면 지체 없이 관할 세무서에 신고해야 해요. 휴업(폐업)신고서를 내고, 폐업이면 사업자등록증을 붙여 내요.</p>\n<ul>\n<li>세무서: 사업장 관할 세무서나 가까운 세무서 민원봉사실</li>\n<li>홈택스: 신청/제출 메뉴의 휴폐업신고</li>\n<li>허가가 필요한 업종: 시·군·구에 폐업신고한 것을 확인할 서류를 함께 내요</li>\n</ul>\n<p>폐업일은 보통 사업장별로 사업을 실제로 그만둔 날이에요. 그날이 분명하지 않으면 폐업신고서가 접수된 날로 봐요.</p>\n<p>폐업하면 부가가치세 확정신고는 폐업일이 속한 달의 다음 달 25일까지 해요. 예를 들어 12월 10일에 폐업하면 다음 해 1월 25일까지예요.</p>\n<p class=\"fl-basis\">근거: 부가가치세법 제8조, 제49조, 같은 법 시행령 제7조</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>조회는 사업자등록번호 10자리로 해요</li>\n<li>폐업자면 폐업일자와 거래한 날을 비교해요</li>\n<li>4,800만 원 미만·첫 과세기간 간이과세자는 대개 영수증을 줘요</li>\n<li>API는 새 사업자 반영에 1~2일 걸려요</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 사업자 휴폐업 조회는 거래 직전에 홈택스에서 번호로 하고, 폐업자면 폐업일자부터 봐요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>휴업자와 거래해도 되나요?</h3>\n<p>휴업자는 사업을 잠시 멈춘 상태예요. 거래 전에 영업을 다시 시작했는지 상대에게 물어보고, 재개업 신고를 했는지 다시 조회해 보는 게 좋아요.</p>\n<h3>부가가치세 신고서로 폐업신고를 대신할 수 있나요?</h3>\n<p>네, 확정신고서에 폐업연월일과 폐업사유를 적고 사업자등록증을 붙여 내면 폐업신고서를 낸 것으로 봐요.</p>\n<h3>사업자등록번호를 넣었는데 결과가 안 나와요</h3>\n<p>먼저 10자리 숫자를 잘못 넣지 않았는지 봐요. 방금 등록하거나 상태를 바꾼 업체라면 반영이 늦을 수 있어 하루쯤 뒤 다시 조회해요.</p>\n",
+ "tags": [
+  "사업자휴폐업조회",
+  "사업자상태조회",
+  "홈택스",
+  "폐업신고"
+ ],
+ "category": "금융·세금",
+ "images": [
+  {
+   "prompt": "a small business owner and a client shaking hands across a wooden counter in a bright neighborhood shop, viewed from the side",
+   "alt": "동네 가게 계산대에서 악수하는 사장님과 거래처 손님"
+  }
+ ],
+ "keyword": "사업자휴폐업조회",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "사업자등록번호는 10자리, 홈택스 사업자상태 조회는 사업자등록번호 10자리로 해요",
+   "urls": [
+    "https://www.nts.go.kr/nts/na/ntt/selectNttInfo.do?nttSn=1386&mi=2448",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=11446&cntntsId=8815"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "홈택스 조회/발급 메뉴에서 사업자상태를 눌러요",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=11446&cntntsId=8815"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "메뉴가 안 보이면 국세상담센터(126, 유료)에 물어보면 돼요",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=11446&cntntsId=8815"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "결과에 휴업·폐업 여부가 나와요",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=11446&cntntsId=8815"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "결과에 부가가치세 과세유형이 나와요 (일반과세자·간이과세자·면세사업자 등)",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "국세청 상태조회 API는 폐업자면 폐업일자도 알려 줘요",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "폐업하면 사업자등록이 말소돼요 (부가가치세법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴업 신고를 하면 휴업 상태가 돼요 (부가가치세법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조",
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "직전 연도 공급대가가 4,800만 원 미만인 간이과세자는 세금계산서 대신 영수증을 발급해요 (부가가치세법 제36조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제36조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "신규로 사업을 시작한 간이과세자도 첫 과세기간에는 영수증을 발급해요 (부가가치세법 제36조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제36조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "면세사업자는 세금계산서 대신 계산서(또는 영수증)를 발급해요 (소득세법 제163조)",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제163조"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "폐업한 뒤 날짜로 받은 세금계산서는 매입세액을 공제받지 못할 수 있어요 (부가가치세법 제39조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제39조"
+   ],
+   "verdict": "맞음",
+   "action": "완화",
+   "round": 2
+  },
+  {
+   "claim": "국세 상담은 국세상담센터 126",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=11446&cntntsId=8815",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공공데이터포털 국세청 사업자등록정보 상태조회 API는 무료",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "API는 공공데이터포털에서 받은 인증키가 있어야 해요",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "API 한 번 요청 최대 100건",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "API 하루 한도 100만 건",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "API 정보 갱신 30분 주기",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "API에서 새로 연 사업자는 반영까지 1~2일",
+   "urls": [
+    "https://www.data.go.kr/data/15081808/openapi.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공정거래위원회 통신판매사업자 등록현황에서 회사명이나 대표자로 찾을 수 있어요",
+   "urls": [
+    "https://www.ftc.go.kr/www/selectBizCommList.do?key=255"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "통신판매사업자 등록현황 목록에서 운영상태와 신고일자를 볼 수 있어요",
+   "urls": [
+    "https://www.ftc.go.kr/www/selectBizCommList.do?key=255"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴업이나 폐업을 하면 지체 없이 관할 세무서에 신고해야 해요 (부가가치세법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴업(폐업)신고서를 내고, 폐업이면 사업자등록증을 붙여 내요 (부가가치세법 시행령 제13조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제13조",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "신고는 사업장 관할 세무서나 가까운 세무서 민원봉사실에 내요 (부가가치세법 시행령 제13조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제13조",
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "홈택스 신청/제출 메뉴의 휴폐업신고로도 신고할 수 있어요",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "허가가 필요한 업종은 시·군·구에 폐업신고한 것을 확인할 서류를 함께 내요",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "폐업하면 부가가치세 확정신고는 폐업일이 속한 달의 다음 달 25일까지 (부가가치세법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "12월 10일에 폐업하면 다음 해 1월 25일까지 확정신고 (부가가치세법 제49조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제49조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "확정신고서에 폐업연월일과 폐업사유를 적고 사업자등록증을 붙여 내면 폐업신고서를 낸 것으로 봐요 (부가가치세법 시행령 제13조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제13조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴업자는 재개업 신고를 할 수 있어요 (홈택스 (휴업자)재개업신고)",
+   "urls": [
+    "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "사업자등록증을 받은 뒤 폐업할 수 있어, 거래 전에 다시 조회하는 게 좋아요 (부가가치세법 제8조)",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "부가가치세법 제8조 단서1 해당 없음 — 사업 개시 전 등록 신청 허용 규정으로, 글은 등록된 사업자의 상태 조회와 휴·폐업 신고만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제8조 단서2 해당 없음 — 사업자 단위 과세 등록 규정, 상태 조회·휴폐업 신고와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제8조 단서3 해당 없음 — 사업장 추가 개설 시 사업자 단위 변경등록 규정, 글 주제와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제8조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제36조 단서1 반영 — 제36조①2호 간이과세자(4,800만 원 미만·첫 과세기간) 영수증 발급을 '세금계산서 받을 때 볼 점' 절에 씀, 면세 공급 제외는 면세사업자 계산서 문장으로",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제36조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제36조 단서2 해당 없음 — 전기사업자 등 영수증 선택 발급 특례, 글 주제와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제36조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제36조 단서3 해당 없음 — 요구 시 세금계산서 발급은 시행령 제73조③⑤의 업종 사업자(제36조①1호)에 해당하고 글이 다룬 ①2호 간이과세자에는 적용되지 않음, 본문은 '줄 수도 있어요·대개'로 씀",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제36조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제36조 단서4 해당 없음 — 금전등록기 계산서 특례, 상태 조회 독자와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제36조"
+   ]
+  },
+  {
+   "claim": "소득세법 제163조 단서1 해당 없음 — 계산서 발급 시기 특례, 글은 면세사업자가 계산서(또는 영수증)를 쓴다는 것만 씀",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제163조"
+   ]
+  },
+  {
+   "claim": "소득세법 제163조 단서2 해당 없음 — 부동산 매각 등 계산서 발급 제외, 글 주제와 무관",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제163조"
+   ]
+  },
+  {
+   "claim": "소득세법 제163조 단서3 해당 없음 — 계산서 합계표 제출 면제, 글에 합계표 내용 없음",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제163조"
+   ]
+  },
+  {
+   "claim": "부가가치세법시행령 제13조 단서1 반영 — 자주 묻는 질문 '부가가치세 신고서로 폐업신고를 대신할 수 있나요?'에 씀",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제13조"
+   ]
+  },
+  {
+   "claim": "부가가치세법 제49조 단서1 해당 없음 — 예정신고·조기환급 신고분 제외 규정, 글은 폐업 시 확정신고 기한만 씀",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법/제49조"
+   ]
+  },
+  {
+   "claim": "제163조의3 해당 없음 — 매입자발행계산서 특례, 글은 면세사업자가 계산서(또는 영수증)를 쓴다는 것만 다룸 (소득세법 제163조의3)",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/소득세법/제163조의3"
+   ]
+  },
+  {
+   "claim": "폐업일은 보통 사업장별로 사업을 실제로 그만둔 날이고, 분명하지 않으면 폐업신고서 접수일 (부가가치세법 시행령 제7조)",
+   "verdict": "맞음",
+   "action": "수정",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제7조"
+   ],
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "부가가치세법시행령 제7조 단서1 반영 — 폐업일이 분명하지 않으면 폐업신고서 접수일로 본다는 문장을 '내가 휴업·폐업할 때 신고 방법' 절에 씀, 합병·분할 법인은 '보통'으로 둠",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제7조"
+   ]
+  },
+  {
+   "claim": "부가가치세법시행령 제7조 단서2 해당 없음 — 해산으로 청산 중인 법인·회생계획 법인의 특례로, 글은 일반 사업자의 폐업 신고만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제7조"
+   ]
+  },
+  {
+   "claim": "부가가치세법시행령 제7조 단서3 해당 없음 — 사업 개시 전 등록한 사업자의 폐업일 특례로, 글은 영업하던 사업자의 폐업만 다룸",
+   "verdict": "맞음",
+   "action": "유지",
+   "urls": [
+    "https://www.law.go.kr/법령/부가가치세법시행령/제7조"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "name": "국세청 개인사업자 안내 (홈택스 사업자상태 조회)",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?mi=11446&cntntsId=8815"
+  },
+  {
+   "name": "국세청 휴·폐업 신고 안내",
+   "url": "https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7780&mi=2447"
+  },
+  {
+   "name": "공공데이터포털 국세청 사업자등록정보 진위확인 및 상태조회 서비스",
+   "url": "https://www.data.go.kr/data/15081808/openapi.do"
+  }
+ ],
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/bongtudio/224488139759",
+   "https://blog.naver.com/mythboys/224474530518",
+   "https://blog.naver.com/ddalkkakoffice/224478301097",
+   "https://blog.naver.com/musunaigo/224492557974",
+   "https://lifekeep.kr/business-status/"
+  ],
+  "questions": [
+   "사업자 휴폐업 조회는 어떻게 하나요",
+   "조회 결과에서 무엇을 확인할 수 있나요",
+   "폐업자로 나오면 거래해도 되나요",
+   "여러 건을 한 번에 조회할 수 있나요",
+   "상호로도 조회할 수 있나요"
+  ],
+  "added": [
+   {
+    "type": "@상황판단",
+    "text": "간이과세자가 영수증만 주는 기준(직전 연도 4,800만 원 미만·첫 과세기간)과 면세사업자는 계산서를 쓴다는 구분"
+   },
+   {
+    "type": "@조회방법",
+    "text": "상호만 알 때 공정거래위원회 통신판매사업자 등록현황에서 회사명·대표자로 찾는 법"
+   },
+   {
+    "type": "@계산예시",
+    "text": "12월 10일 폐업이면 다음 해 1월 25일까지 부가가치세 확정신고"
+   }
+  ]
+ }
+}
