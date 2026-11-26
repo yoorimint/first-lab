@@ -1,0 +1,12 @@
+{
+ "type": "skip",
+ "keywords": [
+  {"keyword": "내장산국립공원숙소", "why": "숙소 추천·업체 나열형 — 정보 글로 답할 공식 기준이 없음"},
+  {"keyword": "포터서류가방", "why": "특정 브랜드 상품", "brand": "포터"},
+  {"keyword": "풍무동미용실", "why": "지역 업체 추천"},
+  {"keyword": "오토바이유상종합보험", "why": "보험 상품 비교·추천형"}
+ ],
+ "law_changes": [],
+ "new_benefits": [],
+ "slot": 2
+}
