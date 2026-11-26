@@ -1,0 +1,426 @@
+{
+ "title": "공인인증서 복사 방법: PC·휴대폰·USB, 인증번호 12자리 입력",
+ "excerpt": "공인인증서 복사는 지금 공동인증서 기준으로 해요. 휴대폰은 인증번호 12자리, USB는 인증서 복사 메뉴로 옮기고, 갱신하면 다시 복사해야 해요.",
+ "content_html": "<p>공인인증서 복사는 PC에 있는 인증서를 휴대폰·USB에 하나 더 저장하는 거예요.<br>지금 이름은 공동인증서예요.<br>✔ 휴대폰은 인증번호 12자리로<br>✔ USB는 인증서 복사 메뉴로<br>✔ PC 원본은 그대로 남아요</p>\n<p>회사 PC에만 인증서가 있어 집에서 쓰기 어려울 때 필요해요. 방향마다 쓰는 메뉴가 달라서 아래 순서대로 보면 쉬워요.</p>\n\n<h2>공인인증서와 공동인증서, 같은 건가요?</h2>\n<p>네, 같은 인증서예요. 2020년 12월 10일 공인인증 제도가 없어지면서, 쓰던 공인인증서는 '공동인증서'라는 이름으로 그대로 쓰고 있어요.</p>\n<p>공동인증서는 PC·스마트폰·USB처럼 내가 고른 곳에 파일로 저장돼요. 그래서 다른 기기에서 쓰려면 복사가 필요해요.</p>\n<p>한 번 받은 공동인증서는 1년 동안 써요. 만료일 한 달 전부터 갱신할 수 있고, 기간을 놓치면 새로 발급받아야 해요.</p>\n\n<h2>PC에서 휴대폰으로 복사하기</h2>\n<p>예를 들어 정부24 앱에서 공동인증서로 로그인하려면, 먼저 PC의 인증서를 앱으로 가져와야 해요. 정부24 안내 순서는 이래요.</p>\n<ol>\n<li>정부24 앱에서 공동인증서 등록 → '공동인증서 가져오기'를 눌러요.</li>\n<li>휴대폰 화면 아래에 나온 인증번호 12자리를 확인해요.</li>\n<li>인증서가 있는 PC에서 smart.mobile.go.kr에 들어가 '스마트폰으로 인증서 보내기'를 눌러요.</li>\n<li>복사할 인증서를 고르고, 인증서 암호와 인증번호 12자리를 넣은 뒤 내보내기를 눌러요.</li>\n<li>휴대폰에 인증서가 저장됐는지 확인해요.</li>\n</ol>\n<p>금융결제원 앱(인터넷지로·어카운트인포 등)은 PC에서 smart.yessign.or.kr에 들어가 '인증서 보내기'로 시작해요. 휴대폰 앱의 인증센터에서 '인증서 가져오기' → '인증번호 생성'을 누르고, 나온 12자리를 PC에 4자리씩 넣으면 돼요.</p>\n<p>휴대폰 운영체제 정책 때문에 다른 앱에 가져온 인증서를 그대로 못 쓸 수 있어요. 이럴 때는 쓰려는 앱마다 한 번씩 가져오기를 해요.</p>\n\n<h2>PC에서 USB로 복사하기</h2>\n<p>금융결제원 YESKEY 누리집의 공동인증서 관리에는 '인증서 복사' 메뉴가 있어요. 지금 쓰는 인증서를 USB 같은 다른 저장매체로 복사하는 메뉴이고, 기존 인증서는 지워지지 않아요.</p>\n<p>복사 화면 순서나 은행 인증센터에서 복사하는 방법은 각 누리집 안내에서 확인해요.</p>\n<p>안드로이드폰은 USB 케이블로 PC에 연결해 이동식 디스크로 잡히게 한 뒤, 같은 방법으로 복사할 수도 있어요. 복사 뒤에는 케이블 연결을 풀어야 휴대폰에서 인증서를 읽어요.</p>\n\n<h2>휴대폰에서 PC로 옮기기</h2>\n<p>휴대폰에만 인증서가 있다면 반대로도 옮길 수 있어요. 금융결제원 앱에서는 공동인증센터의 '인증서 PC로 내보내기'로 시작해요.</p>\n<ul>\n<li>휴대폰에서 인증서를 고르고 암호를 넣어요.</li>\n<li>PC에서 smart.yessign.or.kr/s2pc에 들어가 '인증서 가져오기(복사하기)'를 눌러요.</li>\n<li>인증번호 12자리를 확인한 뒤, 휴대폰의 인증번호 입력창에 4자리씩 넣고 [다음]을 눌러요.</li>\n<li>PC에서 쓸 인증서 암호를 새로 정하면 끝나요.</li>\n</ul>\n<p>다만 모든 앱이 되는 건 아니에요. 국민건강보험공단은 앱으로 복사한 인증서를 다시 PC로 옮길 수 없다고 안내해요.</p>\n\n<h2>복사가 안 될 때</h2>\n<p>휴대폰 복사는 금융결제원 서버를 거쳐요. 휴대폰은 TCP 9800 포트, PC는 4512 포트, 둘 다 389 포트를 써요.</p>\n<ul>\n<li>회사 PC: 보안 정책으로 포트가 막혀 있을 수 있어요. 같은 인증서는 한 번만 옮기면 되니 집 PC에서 해 보세요.</li>\n<li>와이파이: 공유기 정책으로 막힐 수 있어요. 모바일 데이터로 다시 해 봐요.</li>\n<li>PC 시간: 날짜·시간·표준시간대가 틀리면 오류가 나요. 윈도우 설정에서 맞춰요.</li>\n<li>안드로이드 저장 실패: 휴대폰이 USB로 PC에 이동식 디스크로 연결돼 있으면 실패할 수 있어요. 케이블을 빼고 다시 해요.</li>\n</ul>\n\n<h2>복사한 뒤 꼭 챙길 것</h2>\n<p>예를 들어 PC 인증서를 갱신해도, USB에 복사해 둔 인증서는 저절로 바뀌지 않아요. 그래서 갱신한 인증서를 USB에 다시 복사해야 해요.</p>\n<p>휴대폰에 복사한 인증서도 같아요. 만료일이 지나면 PC에서 다시 발급받은 뒤 휴대폰에 새로 복사해요.</p>\n\n<h2>금융인증서는 복사가 필요 없어요</h2>\n<p>금융인증서는 파일이 아니라 금융결제원 클라우드에 보관돼요. 그래서 기기를 바꿔도 인증서를 옮기거나 복사하지 않아요.</p>\n<table>\n<thead><tr><th>구분</th><th>공동인증서</th><th>금융인증서</th></tr></thead>\n<tbody>\n<tr><td>보관 위치</td><td>PC·휴대폰·USB</td><td>금융결제원 클라우드</td></tr>\n<tr><td>유효기간</td><td>1년</td><td>3년</td></tr>\n<tr><td>기기 바꿀 때</td><td>직접 복사</td><td>복사 없음</td></tr>\n<tr><td>비밀번호</td><td>직접 정한 암호</td><td>숫자 6자리</td></tr>\n</tbody>\n</table>\n<p>복사가 번거롭다면 은행 누리집·앱에서 금융인증서를 받아 두는 것도 방법이에요. 다만 다른 금융회사에서 새로 발급하면 기존 금융인증서는 폐지돼요.</p>\n\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>휴대폰으로 옮길 땐 앱에 나온 인증번호 12자리를 PC에 넣어요.</li>\n<li>휴대폰에서는 앱마다 따로 가져와야 할 수 있어요.</li>\n<li>갱신하면 USB·휴대폰의 복사본은 다시 복사해야 해요.</li>\n<li>회사 PC에서 막히면 집 PC나 모바일 데이터로 해 봐요.</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 공인인증서 복사는 휴대폰이면 인증번호 12자리, USB면 인증서 복사 메뉴로 하고, 갱신 뒤엔 다시 복사해요.</p>\n\n<h2>자주 묻는 질문</h2>\n<h3>은행에서 받은 공동인증서를 다른 은행에서도 쓸 수 있나요?</h3>\n<p>네, 쓸 수 있어요. 자주 쓰는 은행에서 받은 인증서를 다른 은행·보험·카드사에도 등록해서 써요.</p>\n<h3>공동인증서 발급에 돈이 드나요?</h3>\n<p>금융결제원 기준으로 개인 은행·신용카드·보험용은 무료예요. 용도 제한이 없는 개인 범용은 연 4,400원인데, 기존 고객의 갱신만 되고 새로 발급받을 수는 없어요.</p>\n<h3>갱신은 몇 번까지 할 수 있나요?</h3>\n<p>갱신 횟수에는 제한이 없어요. 인증서를 발급한 금융회사의 누리집이나 앱에서 갱신해요.</p>\n",
+ "tags": [
+  "공인인증서복사",
+  "공동인증서",
+  "인증서 내보내기"
+ ],
+ "category": "IT·디지털",
+ "images": [
+  {
+   "prompt": "a laptop and a smartphone lying side by side on a clean wooden desk near a bright window, with a small USB flash drive beside them",
+   "alt": "밝은 창가 책상 위에 나란히 놓인 노트북과 스마트폰, USB 메모리"
+  }
+ ],
+ "keyword": "공인인증서복사",
+ "status": "auto",
+ "review": [
+  {
+   "claim": "휴대폰으로 복사할 때는 앱에 나온 인증번호 12자리를 PC에 입력해요",
+   "urls": [
+    "https://m.gov.kr/portal/faq/3069",
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy3"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공인인증서와 공동인증서는 같은 인증서로, 이름만 공동인증서로 바뀌었어요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common",
+    "https://www.korea.kr/news/cardnewsView.do?newsId=148880842"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2020년 12월 10일 공인인증 제도가 없어지면서 공인인증서는 공동인증서로 그대로 써요",
+   "urls": [
+    "https://www.korea.kr/news/cardnewsView.do?newsId=148880842"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "PC에서 USB로는 인증서 복사 메뉴로 옮겨요",
+   "urls": [
+    "https://www.yeskey.or.kr/resources/instFiles/android_usb.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴대폰으로 복사해도 PC 원본 인증서는 그대로 남아요",
+   "urls": [
+    "https://www.nhis.or.kr/nhis/etc/retrieveSignMove.do",
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공동인증서는 PC·스마트폰·USB 등 원하는 저장소에 저장해요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공동인증서 유효기간은 1년이에요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "만료일 한 달 전부터 갱신할 수 있고, 기간을 놓치면 새로 발급받아야 해요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common",
+    "https://www.korea.kr/news/cardnewsView.do?newsId=148880842"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "정부24 앱에서 공동인증서 등록 → 공동인증서 가져오기를 눌러요",
+   "urls": [
+    "https://m.gov.kr/portal/faq/3069",
+    "https://www.gov.kr/portal/faq/1251"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정부24 앱 화면 아래에 인증번호 12자리가 나와요",
+   "urls": [
+    "https://m.gov.kr/portal/faq/3069"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "PC에서 smart.mobile.go.kr에 들어가 '스마트폰으로 인증서 보내기'를 눌러요",
+   "urls": [
+    "https://www.gov.kr/portal/ntcItm/79666",
+    "https://www.gov.kr/portal/faq/1251"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "복사할 인증서를 고르고 인증서 암호와 인증번호 12자리를 넣은 뒤 내보내기를 눌러요",
+   "urls": [
+    "https://m.gov.kr/portal/faq/3069",
+    "https://www.gov.kr/portal/faq/1251"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융결제원 앱(인터넷지로·어카운트인포 등)은 PC에서 smart.yessign.or.kr의 '인증서 보내기'로 시작해요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy3"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴대폰 앱 인증센터에서 인증서 가져오기 → 인증번호 생성, 나온 12자리를 PC에 4자리씩 넣어요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy3"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴대폰 운영체제 정책 때문에 다른 앱에 가져온 인증서를 못 쓸 수 있어 앱마다 가져오기를 해요",
+   "urls": [
+    "https://www.gov.kr/portal/faq/1251",
+    "https://ma.nps.or.kr/moba/UM_1J0003_01_test.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "안드로이드폰은 USB 케이블로 이동식 디스크로 연결해 복사하고, 복사 뒤 연결을 풀어야 해요",
+   "urls": [
+    "https://www.yeskey.or.kr/resources/instFiles/android_usb.pdf"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융결제원 앱에서는 공동인증센터의 인증서 PC로 내보내기로 휴대폰에서 PC로 옮겨요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy5"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴대폰에서 인증서를 고르고 암호를 넣어요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy5"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "휴대폰에서 PC로 옮길 때 PC에서 smart.yessign.or.kr/s2pc에 들어가 '인증서 가져오기(복사하기)'를 눌러요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy6"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "PC에서 쓸 인증서 암호를 새로 정하면 끝나요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy5"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "국민건강보험공단은 앱으로 복사한 인증서를 다시 PC로 옮길 수 없다고 안내해요",
+   "urls": [
+    "https://www.nhis.or.kr/nhis/etc/retrieveSignMove.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "휴대폰은 TCP 9800 포트, PC는 4512 포트, 둘 다 389 포트를 써요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "회사 PC는 보안 정책으로 포트가 막힐 수 있고, 같은 인증서는 한 번만 옮기면 돼요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "와이파이는 공유기 정책으로 막힐 수 있어 모바일 데이터로 다시 해요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "PC 날짜·시간·표준시간대가 틀리면 오류가 나요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "안드로이드폰이 USB 이동식 디스크로 연결돼 있으면 저장에 실패할 수 있어요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy4"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "PC 인증서를 갱신해도 USB 복사본은 저절로 안 바뀌어 갱신한 인증서를 다시 복사해야 해요",
+   "urls": [
+    "https://www.nhis.or.kr/static/html/wbdh/a/wbdha0711.html"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "만료일이 지나면 PC에서 다시 발급받은 뒤 휴대폰에 새로 복사해요",
+   "urls": [
+    "https://www.nhis.or.kr/nhis/etc/retrieveSignMove.do",
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융인증서는 금융결제원 클라우드에 보관돼 옮기거나 복사하지 않아요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/finance"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융인증서 유효기간은 3년이에요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/finance"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융인증서 비밀번호는 숫자 6자리예요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/finance"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "공동인증서 암호는 발급할 때 직접 정해요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "다른 금융회사에서 새로 발급하면 기존 금융인증서는 폐지돼요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/finance"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "은행에서 받은 공동인증서를 다른 은행·보험·카드사에도 등록해서 써요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융결제원 기준 개인 은행·신용카드·보험용은 무료, 개인 범용은 연 4,400원이고 기존 고객 갱신만 돼요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "갱신 횟수에는 제한이 없고, 발급한 금융회사의 누리집이나 앱에서 갱신해요",
+   "urls": [
+    "https://www.korea.kr/news/cardnewsView.do?newsId=148880842"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "휴대폰에서 PC로 옮길 때 인증번호 12자리를 휴대폰의 인증번호 입력창에 4자리씩 넣고 다음을 눌러요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy6"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "YESKEY 누리집 공동인증서 관리의 인증서 복사 메뉴로 지금 쓰는 인증서를 USB 같은 다른 저장매체로 복사하고, 기존 인증서는 지워지지 않아요",
+   "urls": [
+    "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy",
+    "https://www.yeskey.or.kr/yeskey/yessign/certificate/common"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  }
+ ],
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/ahfpcm1231/224484642407",
+   "https://blog.naver.com/dailytopick/224468577807",
+   "https://blog.naver.com/graperjsrkd1/224485173963",
+   "https://blog.naver.com/taeuk330/224488910520",
+   "https://blog.naver.com/najii99/224464710024"
+  ],
+  "questions": [
+   "PC에서 휴대폰으로 복사는 어떻게 하나요?",
+   "USB로 복사하는 방법은?",
+   "복사하면 원본은 없어지나요?",
+   "금융인증서도 복사해야 하나요?",
+   "인증서를 갱신하면 다시 복사해야 하나요?",
+   "아이폰으로는 어떻게 옮기나요?",
+   "공인인증서와 공동인증서는 뭐가 다른가요?"
+  ],
+  "added": [
+   {
+    "type": "@상황판단",
+    "text": "복사가 안 될 때 원인별 해결(회사 PC 포트 9800·4512·389, 와이파이, PC 시간, 안드로이드 USB 연결)"
+   },
+   {
+    "type": "@상황판단",
+    "text": "휴대폰에서 PC로 옮길 때 앱마다 되는지 다름(국민건강보험공단 앱은 불가)"
+   }
+  ]
+ },
+ "sources": [
+  {
+   "name": "금융결제원 YESKEY 공동인증서 복사절차 안내(PC→스마트폰)",
+   "url": "https://www.yeskey.or.kr/yeskey/yessign/myCert/common/manage/copy3"
+  },
+  {
+   "name": "정부24 모바일 공동인증서 가져오기 자주 묻는 질문",
+   "url": "https://www.gov.kr/portal/faq/1251"
+  },
+  {
+   "name": "국민건강보험공단 공동인증서 안내(갱신·복사)",
+   "url": "https://www.nhis.or.kr/static/html/wbdh/a/wbdha0711.html"
+  }
+ ]
+}
