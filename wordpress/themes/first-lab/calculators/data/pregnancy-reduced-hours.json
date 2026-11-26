@@ -1,0 +1,16 @@
+{
+  "basis_date": "2026-11-26", "yearly": false, "law_checked": [],
+  "sources": [
+    {"name": "근로기준법 제74조 (임신 후 12주 이내 또는 32주 이후 1일 2시간 단축, 임금 삭감 금지)", "url": "https://www.law.go.kr/법령/근로기준법/제74조"},
+    {"name": "근로기준법 시행령 제43조의2 (단축 개시 예정일 3일 전까지 문서와 진단서 제출)", "url": "https://www.law.go.kr/법령/근로기준법시행령/제43조의2"},
+    {"name": "근로기준법 시행규칙 제12조의3·별표 3 (유산·조산 위험 질환)", "url": "https://www.law.go.kr/법령/근로기준법시행규칙/제12조의3"},
+    {"name": "고용노동부 1350 상담 (12주 이내 = 임신 후 84일까지, 32주 이후 = 임신 후 218일부터)", "url": "https://1350.moel.go.kr/rtmview.do?id=1000324383"}
+  ],
+  "days_to_due": 280,
+  "early_last_day": 84,
+  "late_first_day": 218,
+  "daily_max": 8,
+  "cut_hours": 2,
+  "floor_hours": 6,
+  "apply_days_before": 3
+}
