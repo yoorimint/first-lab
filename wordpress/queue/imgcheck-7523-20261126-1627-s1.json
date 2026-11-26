@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7523,
+ "replace": [
+  {
+   "old": "ai-b1502a9905",
+   "prompt": "an apartment complex entrance at dusk with a small plain white guard booth with blank windows, warm street lamps and trees, no signs or posters",
+   "alt": "해 질 녘 아파트 단지 입구의 경비실",
+   "why": "경비실 창에 엉터리 글자가 든 안내문이 붙어 있음"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

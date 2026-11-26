@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6978,
+ "replace": [
+  {
+   "old": "ai-9387c50bca",
+   "prompt": "a bright, empty waiting area of a community health center with two grey chairs and a potted plant by a large sunny window, no signs",
+   "alt": "햇살이 드는 보건소 대기 공간",
+   "why": "출입문 위 표지판에 'LIFE' 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
