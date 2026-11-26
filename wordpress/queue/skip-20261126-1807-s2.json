@@ -1,0 +1,8 @@
+{"type": "skip", "slot": 2, "keywords": [
+ {"keyword": "스토케유모차", "why": "특정 브랜드 상품", "brand": "스토케"},
+ {"keyword": "보자기코리아", "why": "특정 업체", "brand": "보자기코리아"},
+ {"keyword": "스포츠양말단목", "why": "상품 구매·추천 검색어"},
+ {"keyword": "울산산후도우미", "why": "지역판 같은 틀 글(수원산후도우미)과 반복, 검색 성과 안 되는 주제"},
+ {"keyword": "MOS자격증", "why": "특정 회사(마이크로소프트) 민간 자격, 공식 근거가 업체 사이트뿐", "brand": "MOS"},
+ {"keyword": "BOOKKEEPING", "why": "영어 일반 단어, 검색 의도 불분명"}
+], "law_changes": [], "new_benefits": []}
