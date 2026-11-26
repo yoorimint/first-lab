@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7673,
+ "replace": [
+  {
+   "old": "ai-dcdc0b19c1",
+   "prompt": "A tidy empty office desk by a window at dusk with a potted plant and a plain cardboard box holding a folded sweater and a mug, no electronics, no writing anywhere.",
+   "alt": "해 질 무렵 창가 빈 책상 위 화분과 짐을 담은 상자",
+   "why": "상자 속 태블릿에 로고 모양, 노트북에 글자처럼 보이는 표시"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
