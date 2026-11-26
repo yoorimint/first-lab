@@ -654,3 +654,4 @@ date,post,fixes,types
 2026-11-26,8695,0,
 2026-11-26,8697,4,missing_condition:3 unverified:1
 2026-11-26,8747,3,missing_condition:2 wrong_fact:1
+2026-11-26,8749,1,missing_condition:1
