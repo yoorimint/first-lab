@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6658,
+ "replace": [
+  {
+   "old": "ai-0458d551e4",
+   "prompt": "a small neighborhood shop counter at dusk with a plain card payment terminal and a potted plant, warm light, no signs or text anywhere",
+   "alt": "해 질 녘 카드 단말기가 놓인 동네 가게 계산대",
+   "why": "간판·안내판에 엉터리 글자와 숫자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
