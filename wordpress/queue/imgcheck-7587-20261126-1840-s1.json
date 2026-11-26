@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7587,
+ "replace": [
+  {
+   "old": "ai-d841cee3e7",
+   "prompt": "an empty construction site at early morning with stacked red bricks, a wheelbarrow and wooden planks under soft sunlight",
+   "alt": "이른 아침 벽돌과 손수레가 놓인 조용한 공사 현장",
+   "why": "안전모에 엉터리 글자·라벨이 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
