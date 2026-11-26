@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7744,
+ "replace": [
+  {
+   "old": "ai-845045513d",
+   "prompt": "close-up of empty wooden dining tables and chairs in warm evening light with a softly blurred background, no walls with pictures, no boards",
+   "alt": "저녁 햇살이 드는 빈 나무 식탁과 의자",
+   "why": "칠판에 엉터리 영어 글자와 벽 액자 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

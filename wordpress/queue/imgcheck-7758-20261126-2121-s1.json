@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7758,
+ "replace": [
+  {
+   "old": "ai-6c82f244fe",
+   "prompt": "a sunny small cafe counter with an espresso machine and potted plants against a plain white wall",
+   "alt": "아침 햇살이 드는 작은 카페 계산대",
+   "why": "오른쪽 칠판에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
