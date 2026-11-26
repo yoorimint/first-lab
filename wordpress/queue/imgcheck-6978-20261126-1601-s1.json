@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 6978,
+ "replace": [
+  {
+   "old": "ai-9387c50bca",
+   "prompt": "a bright quiet clinic waiting area with two gray chairs and a green potted plant near a sunny window, no signs",
+   "alt": "햇살이 드는 조용한 대기 공간의 의자와 화분",
+   "why": "출입문 위 표지판에 'LIFE' 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
