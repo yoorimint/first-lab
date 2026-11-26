@@ -14868,5 +14868,32 @@
     "tag": "h3",
     "replace_paragraph": "D·G·H·I: 텐트 없이 묵는 숙박형 구역",
     "prevention": "review_only:숫자 없는 소제목 표현이라 근거 대조(숫자 검사)로 못 잡음"
+  },
+  {
+    "post": 8747,
+    "type": "missing_condition",
+    "why": "CBP ESTA FAQ: 괌/CNMI 국제 여행은 VWP(ESTA, 최대 90일)로도 가능 — 45일 초과 시 비자만 있는 것이 아님 (esta.cbp.dhs.gov)",
+    "find": "다만 45일보다 오래 머물거나, 관광·짧은 출장이 아닌 목적이면",
+    "replace_paragraph": "다만 45일보다 오래 머물 계획이면 ESTA(최대 90일)나 비자를 받아야 해요. 다른 목적, 서명 안 한 항공사, 미국 입국 금지 사유가 있으면 비자가 필요해요.",
+    "tag": "p",
+    "prevention": "review_only:미국 ESTA FAQ 의 괌 적용 규정은 외국 기관 안내라 국내 법령 조문 대조 검사로 잡을 수 없음"
+  },
+  {
+    "post": 8747,
+    "type": "missing_condition",
+    "why": "같은 근거: 45일 초과는 ESTA(최대 90일)도 가능 (esta.cbp.dhs.gov FAQ)",
+    "find": "45일을 넘겨 머물 계획이면 비자를 받아야 해요.",
+    "replace_paragraph": "45일을 넘겨 머물 계획이면 ETA 대신 ESTA(최대 90일)나 비자를 받아야 해요.",
+    "tag": "li",
+    "prevention": "review_only:미국 ESTA FAQ 의 괌 적용 규정은 외국 기관 안내라 국내 법령 조문 대조 검사로 잡을 수 없음"
+  },
+  {
+    "post": 8747,
+    "type": "wrong_fact",
+    "why": "G-CNMI ETA 신청 단계 이름은 Eligibility Questions(예·아니요 9개), 보안 질문 아님 (g-cnmi-eta.cbp.dhs.gov en.json)",
+    "find": "보안 질문 9개에 답해요.",
+    "replace_paragraph": "자격 질문(예·아니요) 9개에 답해요.",
+    "tag": "li",
+    "prevention": "review_only:외국 신청 화면의 단계 명칭은 화면 문구를 직접 봐야 해서 코드 검사로 못 막음"
   }
 ]
