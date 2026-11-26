@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 8136,
+ "replace": [
+  {
+   "old": "ai-3ac540a7df",
+   "prompt": "a bright quiet public office waiting area with rows of empty chairs, potted plants and soft morning light through tall windows, no signs or screens",
+   "alt": "햇빛이 드는 조용한 공공기관 상담 대기 공간",
+   "why": "안내판에 엉터리 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

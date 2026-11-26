@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 8144,
+ "replace": [
+  {
+   "old": "ai-40bdef5902",
+   "prompt": "an elderly person walking slowly with a plain grey walking frame in a bright living room with plants, seen from the side at a distance",
+   "alt": "밝은 거실에서 보행기를 밀며 걷는 어르신",
+   "why": "보행기 좌석 가방에 로고 같은 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
