@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 6905,
+ "replace": [
+  {
+   "old": "ai-a5e4fe470a",
+   "prompt": "black volcanic basalt rocks along a calm Jeju harbor at sunrise with gentle waves and distant hills",
+   "alt": "해 뜰 무렵 검은 현무암이 둘러싼 제주 포구",
+   "why": "어선 뱃머리에 번호 같은 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}
