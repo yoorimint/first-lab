@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 1885,
+ "replace": [
+  {
+   "old": "ai-81dfff67c8",
+   "prompt": "Two construction workers in plain orange safety vests and white helmets standing still with arms lowered at a quiet building site, seen from behind, soft daylight",
+   "alt": "작업을 멈추고 서 있는 건설 현장 근로자 두 명",
+   "why": "노란 조끼에 로고처럼 보이는 삼각형 무늬"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}

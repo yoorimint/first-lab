@@ -1,0 +1,9 @@
+{"type": "skip", "slot": 2, "keywords": [
+ {"keyword": "TEXTBOOK와인", "why": "특정 브랜드 상품", "brand": "TEXTBOOK"},
+ {"keyword": "튤립닭발차이", "why": "음식 상품 비교 — 제도·생활 정보 아님"},
+ {"keyword": "청주의료원장례식장", "why": "특정 시설 업체 정보"},
+ {"keyword": "크리스탈코트플러스", "why": "특정 브랜드 상품", "brand": "크리스탈코트플러스"},
+ {"keyword": "부산학폭변호사", "why": "업체 추천"},
+ {"keyword": "임산부칼마디", "why": "의료·건강"},
+ {"keyword": "임산부바디필로우", "why": "상품 추천"}
+], "law_changes": [], "new_benefits": []}

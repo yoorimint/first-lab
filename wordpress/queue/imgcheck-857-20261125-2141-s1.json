@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 857,
+ "replace": [
+  {
+   "old": "ai-29c12530b9",
+   "prompt": "an ambulance with flashing lights driving through a city road at dusk while cars move aside to the edges of the lanes, wide view from above",
+   "alt": "경광등을 켠 구급차가 지나가도록 차들이 양옆으로 비켜 선 도로",
+   "why": "구급차 등 긴급자동차가 안 보이고 건물 간판에 엉터리 글자"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

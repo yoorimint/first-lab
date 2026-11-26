@@ -1,0 +1,143 @@
+[
+  {
+    "why": "1억 원 무이자: 1억 × 연 4.6% = 460만 원 < 기준금액 1천만 원 → 증여 아님 (상증법 제41조의4① 단서, 시행령 제31조의4②, 법인세법 시행규칙 제43조②)",
+    "input": {
+      "amount": 100000000,
+      "rate": 0
+    },
+    "expect": {
+      "proper_interest": 4600000,
+      "actual_interest": 0,
+      "benefit": 4600000,
+      "taxable": false,
+      "gift_value": 0,
+      "free_limit": 217391304,
+      "min_rate": 0
+    }
+  },
+  {
+    "why": "기준선: 217,391,304원 무이자 → × 4.6% = 9,999,999.98원 < 1천만 원 → 제외 (기준 '미만'이면 제외)",
+    "input": {
+      "amount": 217391304,
+      "rate": 0
+    },
+    "expect": {
+      "proper_interest": 9999999,
+      "actual_interest": 0,
+      "benefit": 9999999,
+      "taxable": false,
+      "gift_value": 0,
+      "free_limit": 217391304,
+      "min_rate": 0
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선 바로 위: 217,391,305원 무이자 → 10,000,000.03원 ≥ 1천만 원 → 차이 전체(원 미만 버림 1,000만 원)가 증여재산가액, 최저 이율 0.01%",
+    "input": {
+      "amount": 217391305,
+      "rate": 0
+    },
+    "expect": {
+      "proper_interest": 10000000,
+      "actual_interest": 0,
+      "benefit": 10000000,
+      "taxable": true,
+      "gift_value": 10000000,
+      "free_limit": 217391304,
+      "min_rate": 0.01
+    },
+    "boundary": true
+  },
+  {
+    "why": "3억 원 무이자: 1,380만 원 ≥ 1천만 원 → 증여재산가액 1,380만 원, 기준 안 넘는 최저 이율 연 1.27% (300,000,000 × (4.6% − 1.27%) = 999만 원)",
+    "input": {
+      "amount": 300000000,
+      "rate": 0
+    },
+    "expect": {
+      "proper_interest": 13800000,
+      "actual_interest": 0,
+      "benefit": 13800000,
+      "taxable": true,
+      "gift_value": 13800000,
+      "free_limit": 217391304,
+      "min_rate": 1.27
+    }
+  },
+  {
+    "why": "3억 원 연 1.27%: 실제 이자 381만 원, 차이 999만 원 < 1천만 원 → 제외",
+    "input": {
+      "amount": 300000000,
+      "rate": 1.27
+    },
+    "expect": {
+      "proper_interest": 13800000,
+      "actual_interest": 3810000,
+      "benefit": 9990000,
+      "taxable": false,
+      "gift_value": 0,
+      "free_limit": 217391304,
+      "min_rate": 1.27
+    },
+    "boundary": true
+  },
+  {
+    "why": "3억 원 연 1.26%: 실제 이자 378만 원, 차이 1,002만 원 ≥ 1천만 원 → 증여재산가액 1,002만 원",
+    "input": {
+      "amount": 300000000,
+      "rate": 1.26
+    },
+    "expect": {
+      "proper_interest": 13800000,
+      "actual_interest": 3780000,
+      "benefit": 10020000,
+      "taxable": true,
+      "gift_value": 10020000,
+      "free_limit": 217391304,
+      "min_rate": 1.27
+    },
+    "boundary": true
+  },
+  {
+    "why": "기준선 딱 그 값: 5억 원 연 2.6% → 차이 정확히 1,000만 원은 '미만'이 아니라 증여 (상증법 제41조의4① 단서 '기준금액 미만인 경우는 제외')",
+    "input": {
+      "amount": 500000000,
+      "rate": 2.6
+    },
+    "expect": {
+      "proper_interest": 23000000,
+      "actual_interest": 13000000,
+      "benefit": 10000000,
+      "taxable": true,
+      "gift_value": 10000000,
+      "free_limit": 217391304,
+      "min_rate": 2.61
+    },
+    "boundary": true
+  },
+  {
+    "why": "적정 이자율보다 높은 연 5%: 차이 없음 → 0원",
+    "input": {
+      "amount": 100000000,
+      "rate": 5
+    },
+    "expect": {
+      "proper_interest": 4600000,
+      "actual_interest": 5000000,
+      "benefit": 0,
+      "taxable": false,
+      "gift_value": 0,
+      "free_limit": 217391304,
+      "min_rate": 0
+    }
+  },
+  {
+    "why": "빌린 돈을 안 넣으면 안내",
+    "input": {
+      "amount": 0,
+      "rate": 0
+    },
+    "expect_error": true
+  }
+]

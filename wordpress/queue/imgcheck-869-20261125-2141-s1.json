@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 869,
+ "replace": [
+  {
+   "old": "ai-e97ff710a5",
+   "prompt": "a middle-aged man in a work jacket resting in a wooden chair on a lakeside deck in autumn, holding a single cup of tea, seen from the side",
+   "alt": "가을 호숫가 휴양소 데크에서 차를 마시며 쉬는 건설노동자",
+   "why": "한 손에 컵과 맥주잔처럼 보이는 잔이 겹쳐 손 모양이 어색함"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

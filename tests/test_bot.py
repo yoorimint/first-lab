@@ -7068,6 +7068,29 @@ firstlab_stats_render_page();
         self.assertEqual(r.stdout, "합계 최대 1,000만 원이고, 재직자는 임금만 받아요.|홈 설명|분류", r.stderr)
         self.assertIn("add_filter( 'the_seo_framework_generated_description', 'firstlab_full_excerpt_description'", site_src)
 
+    def test_dashboard_prunes_instead_of_full_recompute(self):
+        """11/26 대시보드 하루 CPU 172분: 글쓰기 결과마다 후보 7만여 개를 다시 계산(200초) → 결과 뒤엔 쓴·제외된 키워드만 빼고,
+        전체 계산은 1시간마다만."""
+        import sqlite3
+        from contextlib import contextmanager
+        from bot import run
+        db = sqlite3.connect(":memory:")
+        db.row_factory = sqlite3.Row
+        db.execute("CREATE TABLE keywords (keyword TEXT, status TEXT)")
+        db.executemany("INSERT INTO keywords VALUES (?, ?)", [("주휴수당", "used"), ("연차수당", "ok"), ("퇴직금", "excluded")])
+
+        @contextmanager
+        def conn():
+            yield db
+        state = {"candidates": [{"keyword": "주휴수당"}, {"keyword": "연차수당"}, {"keyword": "퇴직금"}, {"keyword": "새키워드"}]}
+        with mock.patch("bot.review_queue.target", return_value={"post_id": 1}):
+            self.assertEqual(run.prune_candidates(state, conn), 2)
+        self.assertEqual([c["keyword"] for c in state["candidates"]], ["연차수당", "새키워드"])
+        src = (ROOT / "bot" / "run.py").read_text(encoding="utf-8")
+        block = src[src.index('stamp = state.get("dashboard_at", "")'):src.index('laps.lap("정리·대시보드")')]
+        self.assertIn("prune_candidates(state)", block)
+        self.assertNotIn("excluded or state.get", block)   # 결과마다 전체 계산으로 돌아가지 않게
+
     def test_upcoming_law_number_not_gone(self):
         """11/24 #4244 보류: '법률 제21714호(2026.6.2 공포, 12.3 시행)'가 법제처 기본 화면(현행 판)에 안 보여 '사라짐' →
         시행 예정 판 원문(법제처 API)에 있으면 사라진 게 아님. 정말 없는 숫자는 그대로 잡음."""

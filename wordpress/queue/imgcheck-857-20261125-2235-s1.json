@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 857,
+ "replace": [
+  {
+   "old": "ai-4846f0c37f",
+   "prompt": "a wide road at dusk seen from a high distance, cars pulled over to both edges of the lanes leaving an open center lane, blurred red and blue emergency light glow in the far distance, long exposure light trails",
+   "alt": "긴급차량이 지나가도록 차들이 양옆으로 비켜 선 저녁 도로",
+   "why": "구급차 차체에 'AMBULANCE' 글자와 번호판 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}

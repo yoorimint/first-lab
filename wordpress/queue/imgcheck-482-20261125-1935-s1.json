@@ -1,0 +1,15 @@
+{
+ "type": "image_check",
+ "post_id": 482,
+ "replace": [
+  {
+   "old": "ai-8037a64906",
+   "prompt": "Close-up of a gas stove burner with a steady blue flame in a bright clean kitchen, plain tiled wall, shallow depth of field",
+   "alt": "파란 불꽃이 켜진 가스레인지 화구",
+   "why": "가스 배관 위쪽에 엉터리 글자가 적힌 표찰"
+  }
+ ],
+ "remove": [],
+ "add": [],
+ "slot": 1
+}

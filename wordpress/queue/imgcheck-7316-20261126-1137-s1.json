@@ -1,0 +1,14 @@
+{
+ "type": "image_check",
+ "post_id": 7316,
+ "replace": [
+  {
+   "old": "ai-45240f1f89",
+   "prompt": "fresh vegetables and fruits piled in plain wooden crates at a small neighborhood grocery in soft morning light, no signs or labels",
+   "alt": "아침 햇살 속 나무 상자에 담긴 채소와 과일",
+   "why": "왼쪽 천 가방과 오른쪽 유리창에 엉터리 영어 글자가 보임"
+  }
+ ],
+ "remove": [],
+ "add": []
+}
