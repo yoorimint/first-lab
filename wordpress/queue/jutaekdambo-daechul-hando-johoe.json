@@ -1,0 +1,464 @@
+{
+ "title": "주택담보대출 한도 조회: 규제지역 LTV 40%·DSR 40%, 가장 작은 값",
+ "excerpt": "주택담보대출 한도는 LTV·DSR·주택가격별 상한 중 가장 작은 금액이에요. 연소득 5,000만 원 계산 예시와 스트레스 DSR, 보금자리론 기준까지 정리했어요.",
+ "content_html": "<p>주택담보대출 한도는 LTV·DSR·주택가격별 상한 중 가장 작은 금액이에요.<br>앱에서 본 숫자가 그대로 나올지, 계약 전에 꼭 따져 보세요.<br>✔ 규제지역 LTV 40%<br>✔ 은행권 DSR 40%<br>✔ 수도권·규제지역 최대 6억 원<br>(무주택자·주택 구입 기준)</p>\n<p>은행 앱이나 창구에서 조회한 금액은 예상 한도예요. 실제 금액은 서류를 내고 심사를 받은 뒤에 정해져요.</p>\n<h2>주택담보대출 한도 조회 방법</h2>\n<p>조회할 곳은 크게 두 가지예요. 은행 같은 금융회사와, 정책 상품을 파는 한국주택금융공사예요.</p>\n<ul>\n<li>은행 앱·창구: 집 정보와 소득 등을 넣으면 예상 한도와 금리를 볼 수 있어요. 넣는 항목은 은행 앱에서 확인해요.</li>\n<li>한국주택금융공사 누리집(hf.go.kr): 보금자리론을 온라인으로 신청할 수 있어요. 은행 창구에서 신청하는 방법도 있어요.</li>\n</ul>\n<p>한도를 조회만 해서는 신용점수가 떨어지지 않아요. 금융감독원은 2011년 10월부터 신용 조회 사실을 신용평가에 반영하지 않는다고 안내해요.</p>\n<p>금융위원회도 앱에서 대출 조건을 여러 번 조회해도 신용점수에 영향이 없다고 안내했어요. 다만 실제로 대출을 받으면, 그 대출 내용은 점수에 반영될 수 있어요.</p>\n<h2>한도를 정하는 기준 3가지</h2>\n<p>세 기준으로 각각 금액을 낸 뒤, 그중 가장 작은 금액이 한도가 돼요. 아래 표는 집을 사려는 무주택자 기준이에요.</p>\n<table>\n<thead><tr><th>기준</th><th>뜻</th><th>숫자</th></tr></thead>\n<tbody>\n<tr><td>LTV</td><td>집값에 비해 빌릴 수 있는 비율</td><td>규제지역 40%, 비규제지역 70%</td></tr>\n<tr><td>주택가격별 상한</td><td>수도권·규제지역 집을 살 때 최대 금액</td><td>15억 원 이하 6억 원, 15억 원 초과~25억 원 이하 4억 원, 25억 원 초과 2억 원</td></tr>\n<tr><td>DSR</td><td>연소득에 비해 1년에 갚는 원리금 비율</td><td>은행권 40%, 제2금융권 50%</td></tr>\n</tbody>\n</table>\n<p>LTV 40%는 처분조건부 1주택자에게도 같아요. 처분조건부는 원래 집을 정해진 기간 안에 팔기로 약속하고 대출받는 거예요.</p>\n<p>다만 생애최초 주택구입자는 수도권·규제지역에서도 LTV 70%예요.</p>\n<p>DSR에는 이번 주담대뿐 아니라 신용대출 같은 다른 가계대출 원리금도 들어가요. 다만 전세자금대출·중도금대출·이주비대출·서민금융상품 등 일부는 빠져요.</p>\n<p>단, 1주택자가 수도권·규제지역에서 세입자로 받는 전세대출은 이자 상환분이 DSR에 들어가요. 버팀목 같은 정책 전세대출은 빠져요.</p>\n<p>DSR 40%·50%는 이미 가진 대출과 이번에 신청하는 대출을 모두 합쳐 1억 원을 넘을 때 적용돼요.</p>\n<p class=\"fl-basis\">근거: 금융위원회 주택시장 안정화 대출수요 관리 방안(2025년 10월 15일), 금융위원회 DSR 정책 문답</p>\n<h2>스트레스 DSR: 한도를 줄이는 계산용 금리</h2>\n<p>DSR을 계산할 때는 실제 금리에 '스트레스 금리'를 더해요. 앞으로 금리가 오를 수 있다고 보고 더하는 계산용 금리예요.</p>\n<p>이 금리는 한도를 계산할 때만 쓰이고, 실제로 내는 이자에는 붙지 않아요. 수도권·규제지역 주택담보대출은 스트레스 금리 하한이 3%예요.</p>\n<p>변동금리면 이 금리를 모두 더해요. 혼합형·주기형은 금리가 고정되는 기간이 길수록 덜 더해요.</p>\n<p>그래서 같은 사람도 변동금리보다 고정 기간이 긴 상품을 고르면 한도가 더 크게 나올 수 있어요. 지방 주택담보대출은 더하는 비율이 다르니 은행에서 확인해요.</p>\n<p class=\"fl-basis\">근거: 금융위원회 스트레스 DSR 운용 방안, 주택시장 안정화 대출수요 관리 방안(2025년 10월 15일)</p>\n<h2>계산 예시: 연소득 5,000만 원, 7억 원 아파트</h2>\n<p>금리는 한국은행이 집계한 2026년 10월 은행 주택담보대출 평균 금리 연 4.98%로 잡았어요. 다른 대출은 없고, 30년 원리금균등 상환이라고 볼게요.</p>\n<p>DSR 40%면 1년에 갚을 수 있는 원리금은 2,000만 원이에요. 이 금액으로 30년 동안 갚을 수 있는 원금을 거꾸로 계산하면 아래와 같아요.</p>\n<table>\n<thead><tr><th>계산 금리</th><th>DSR 한도</th></tr></thead>\n<tbody>\n<tr><td>연 4.98% (스트레스 금리 없음)</td><td>약 3억 1,117만 원</td></tr>\n<tr><td>연 7.98% (변동금리, 3% 더함)</td><td>약 2억 2,757만 원</td></tr>\n</tbody>\n</table>\n<p>규제지역의 7억 원 아파트를 무주택자가 산다고 해 볼게요. LTV 40%면 2억 8,000만 원이고, 15억 원 이하라 주택가격별 상한은 6억 원이에요.</p>\n<ul>\n<li>변동금리: DSR 한도 약 2억 2,757만 원이 가장 작아서 이 금액이 한도예요.</li>\n<li>고정 기간이 길어 스트레스 금리가 붙지 않는 상품: DSR 한도가 약 3억 1,117만 원이라, LTV 2억 8,000만 원이 한도예요.</li>\n</ul>\n<p>같은 7억 원 아파트가 비규제지역에 있으면 LTV 70%라 4억 9,000만 원이에요. 이때는 소득이 같아도 DSR이 먼저 한도를 막아요.</p>\n<h2>보금자리론으로 조회할 때 기준</h2>\n<p>보금자리론은 한국주택금융공사의 장기 고정금리 정책 대출이에요. 조건이 맞아야 조회와 신청을 할 수 있어요.</p>\n<ul>\n<li>집값: 대출승인일 기준 6억 원 이하</li>\n<li>소득: 부부 합산 연소득 7,000만 원 이하. 미혼이면 본인 소득으로 봐요. 결혼 7년 이내 신혼부부는 8,500만 원, 미성년 자녀가 1명이면 9,000만 원, 다자녀 가구는 1억 원 이하예요</li>\n<li>주택 수: 부부 기준으로 이 집을 빼고 무주택 또는 1주택. 1주택이면 집을 사는 용도만 되고, 기존 집을 대출 실행일부터 3년 안에 팔아야 해요</li>\n<li>최대 금액: 3억 6,000만 원. 다자녀 가구·전세사기피해자는 4억 원, 생애최초 주택구입자는 4억 2,000만 원</li>\n<li>LTV·DTI: 아파트 LTV 최대 70%, DTI 최대 60%. 규제지역이면 둘 다 10%p를 빼요. 다만 생애최초·전세사기피해자·실수요자 등은 규제지역이어도 빼지 않아요. 신용점수 등에 따라 LTV를 10%p 빼는 경우도 있어요</li>\n</ul>\n<p>DTI는 연소득에 비해 대출 상환액이 차지하는 비율이에요. 신혼부부는 부부 합산이 기준을 넘어도 대출받는 사람(채무자)의 연소득이 7,000만 원 이하면 소득 조건을 채운 것으로 봐요.</p>\n<p class=\"fl-basis\">근거: 한국주택금융공사 보금자리론 상품 안내</p>\n<h2>조회 금액보다 적게 나오는 이유</h2>\n<ul>\n<li>다른 대출: 신용대출·자동차 할부가 있으면 DSR에 들어가서 주담대 한도가 줄어요.</li>\n<li>금리 유형: 조회 때는 고정형, 신청 때는 변동형을 고르면 스트레스 금리로 한도가 줄어요.</li>\n<li>소득 증빙: 앱에 넣은 연소득과 서류로 인정받는 소득이 다를 수 있어요.</li>\n<li>집값: 은행이 보는 담보 가치가 내가 생각한 매매가보다 낮을 수 있어요.</li>\n</ul>\n<p>2027년 1월 1일부터는 DSR 소득 계산도 달라져요. 소득이 20% 넘게 오르면 최근 2년 평균, 30% 넘게 오르면 최근 3년 평균 소득으로 봐요.</p>\n<p>또 1억 원이 넘는 신용대출을 받았다면, 대출 실행일부터 1년 동안 규제지역 주택을 살 수 없어요.</p>\n<p class=\"fl-basis\">근거: 금융위원회 부동산 시장 안정을 위한 금융 종합대책(2026년 8월 14일), 주택시장 안정화 대출수요 관리 방안(2025년 10월 15일)</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>앱 조회 금액은 예상치예요. 계약금을 보내기 전에 실제 심사 결과를 보는 게 안전해요.</li>\n<li>한도 조회만으로는 신용점수가 떨어지지 않아요.</li>\n<li>변동금리와 고정 기간이 긴 상품은 같은 소득이어도 한도가 달라요.</li>\n<li>다른 대출이 있으면 그 원리금까지 DSR에 들어가요.</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 주택담보대출 한도 조회 결과는 LTV·DSR·주택가격별 상한 중 가장 작은 금액이고, 스트레스 금리와 다른 대출에 따라 줄어들 수 있어요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>집이 2채 있으면 수도권에서 주담대로 한 채 더 살 수 있나요?</h3>\n<p>수도권·규제지역에서는 2채 이상 가진 사람의 추가 주택 구입 목적 주담대가 막혀 있어요(LTV 0%). 1주택자도 원래 집을 처분하지 않고 한 채 더 사면 마찬가지예요.</p>\n<h3>생활비가 필요해서 집을 담보로 빌릴 수도 있나요?</h3>\n<p>수도권·규제지역 집을 담보로 한 생활안정자금 대출은 최대 1억 원까지예요. 이 지역에 집이 2채 이상이면 그 집들을 담보로는 받을 수 없어요.</p>\n<h3>대출 기간을 40년으로 하면 한도가 늘어나나요?</h3>\n<p>수도권·규제지역 주담대는 만기가 30년 이내로 제한돼 있어요. 그래서 이 지역에서는 기간을 늘려 DSR 한도를 키우기 어려워요.</p>\n<h3>집을 사고 바로 전입해야 하나요?</h3>\n<p>수도권·규제지역에서 주담대로 집을 사면 6개월 안에 전입해야 해요. 보금자리론도 같고, 디딤돌대출은 1개월 안에 전입해야 해요.</p>\n",
+ "tags": [
+  "주택담보대출",
+  "대출한도",
+  "DSR",
+  "LTV",
+  "보금자리론"
+ ],
+ "category": "부동산·이사",
+ "images": [
+  {
+   "prompt": "a bright empty living room of a modern Korean apartment with large windows and city view at sunset",
+   "alt": "노을 지는 도시가 보이는 빈 아파트 거실"
+  }
+ ],
+ "keyword": "주택담보대출한도조회",
+ "status": "auto",
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/niniunini/224478643038",
+   "https://blog.naver.com/kimsong8106/224448974497",
+   "https://blog.naver.com/irumholdings/224471487724",
+   "https://www.hf.go.kr/ko/index.do"
+  ],
+  "questions": [
+   "주택담보대출 한도는 어디에서 조회할 수 있나요?",
+   "연봉 5,000만 원이면 주택담보대출을 얼마까지 받을 수 있나요?",
+   "신용대출이 있으면 주택담보대출 한도가 줄어드나요?",
+   "스트레스 DSR은 실제 대출금리를 올리는 제도인가요?",
+   "생활비가 필요해서 받는 것도 가능한가요?"
+  ],
+  "added": [
+   {
+    "type": "@계산예시",
+    "text": "연소득 5,000만 원·7억 원 아파트로 변동금리(연 7.98%)와 장기 고정금리의 한도 차이를 계산"
+   },
+   {
+    "type": "@최신개정",
+    "text": "2027년 1월 1일부터 DSR 소득을 최근 2년·3년 평균으로 보는 변경"
+   },
+   {
+    "type": "@상황판단",
+    "text": "조회 금액보다 적게 나오는 이유 4가지(다른 대출·금리 유형·소득 증빙·집값)"
+   }
+  ]
+ },
+ "review": [
+  {
+   "claim": "주택담보대출 한도는 LTV·DSR·주택가격별 상한 중 가장 작은 금액",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84824",
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "규제지역 무주택자 주담대 LTV 40%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148970085"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "비규제지역 LTV 70%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148970085"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "처분조건부 1주택자도 규제지역 LTV 40%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수도권·규제지역 주택 구입 주담대 시가 15억 원 이하 6억 원, 15억 원 초과~25억 원 이하 4억 원, 25억 원 초과 2억 원",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148970085"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "수도권·규제지역 최대 6억 원 (무주택자·주택 구입 기준)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "은행권 DSR 40%, 제2금융권 50%",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148970085"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "DSR에는 신용대출 같은 다른 가계대출 원리금도 들어감, 전세자금대출·중도금대출·이주비대출·서민금융상품 등은 빠짐",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "스트레스 금리는 DSR 계산용, 실제 이자에는 붙지 않음",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수도권·규제지역 주택담보대출 스트레스 금리 하한 3%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "변동금리는 스트레스 금리를 모두 더하고, 혼합형·주기형은 고정 기간이 길수록 덜 더함",
+   "urls": [
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "고정 기간이 긴 상품은 변동금리보다 한도가 더 크게 나올 수 있음",
+   "urls": [
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "지방 주택담보대출은 스트레스 금리를 더하는 비율이 다름",
+   "urls": [
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1",
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2026년 10월 은행 주택담보대출 평균 금리 연 4.98% (한국은행, 신규취급액 기준)",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202610/202610/BECBLA0302"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "연소득 5,000만 원 × DSR 40% = 1년 원리금 2,000만 원",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "연 2,000만 원·30년 원리금균등·연 4.98%면 DSR 한도 약 3억 1,117만 원 (계산 예시)",
+   "urls": [
+    "https://ecos.bok.or.kr/api/StatisticSearch/sample/json/kr/1/10/121Y006/M/202610/202610/BECBLA0302",
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "연 7.98%(변동금리, 3% 더함)면 DSR 한도 약 2억 2,757만 원 (계산 예시)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "7억 원 아파트 LTV 40%면 2억 8,000만 원, 15억 원 이하라 상한 6억 원 (계산 예시)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "변동금리면 DSR 한도 약 2억 2,757만 원이 가장 작아 한도 (계산 예시)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "스트레스 금리가 붙지 않는 상품이면 DSR 약 3억 1,117만 원이라 LTV 2억 8,000만 원이 한도 (계산 예시)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.fsc.go.kr/comm/getFile?srvcId=BBSTY1&upperNo=84617&fileTy=ATTACH&fileNo=1"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "비규제지역 7억 원 아파트 LTV 70%면 4억 9,000만 원, DSR이 먼저 한도를 막음 (계산 예시)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "금융감독원: 2011년 10월부터 신용 조회 사실을 신용평가에 반영하지 않음",
+   "urls": [
+    "https://fss.or.kr/fss/main/contents.do?menuNo=200890"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "금융위원회: 앱에서 대출 조건을 여러 번 조회해도 신용점수에 영향 없음",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/80064"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "한도 조회만으로는 신용점수가 떨어지지 않음",
+   "urls": [
+    "https://fss.or.kr/fss/main/contents.do?menuNo=200890",
+    "https://www.fsc.go.kr/no010101/80064"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보금자리론은 한국주택금융공사 누리집 온라인 신청과 은행 창구 신청이 모두 가능",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보금자리론 집값 대출승인일 기준 6억 원 이하",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "보금자리론 DTI 최대 60%, 규제지역이면 10%p 차감",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "2027년 1월 1일부터 DSR 소득: 20% 넘게 오르면 최근 2년 평균, 30% 넘게 오르면 최근 3년 평균",
+   "urls": [
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148970085"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "1억 원 넘는 신용대출 보유자는 대출 실행일부터 1년 동안 규제지역 주택 구입 제한",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수도권·규제지역 2채 이상 보유자, 처분하지 않는 1주택자의 추가 주택 구입 목적 주담대 금지(LTV 0%)",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84824",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수도권·규제지역 생활안정자금 주담대 최대 1억 원, 2채 이상이면 그 집 담보로 불가",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84824",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "수도권·규제지역 주담대 만기 30년 이내",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84824",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "보금자리론은 한국주택금융공사의 장기 고정금리 정책 대출",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "다른 대출(신용대출·자동차 할부)이 있으면 DSR에 들어가 주담대 한도가 줄어듦",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "유지"
+  },
+  {
+   "claim": "생애최초 주택구입자는 수도권·규제지역에서도 LTV 70%",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84824",
+    "https://www.fsc.go.kr/no010101/85432",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true,
+   "round": 2
+  },
+  {
+   "claim": "1주택자가 수도권·규제지역에서 세입자로 받는 전세대출은 이자 상환분이 DSR에 들어감, 버팀목 같은 정책 전세대출은 빠짐",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/85432"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "DSR 40%·50%는 이미 가진 대출과 신청 대출을 합쳐 1억 원을 넘을 때 적용",
+   "urls": [
+    "https://www.fsc.go.kr/po020201/76750"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보금자리론 LTV 아파트 최대 70%, DTI 최대 60%, 규제지역이면 둘 다 10%p 차감, 생애최초·전세사기피해자·실수요자 등은 미차감, 신용점수 등에 따라 LTV 10%p 차감",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보금자리론 주택 수: 부부 기준 이 집을 빼고 무주택 또는 1주택, 1주택이면 구입 용도만, 기존 집은 대출 실행일부터 3년 안에 처분",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "수도권·규제지역 주담대로 집을 사면 6개월 안에 전입, 보금자리론도 같고 디딤돌대출은 1개월",
+   "urls": [
+    "https://www.fsc.go.kr/no010101/84824",
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do",
+    "https://www.korea.kr/news/policyNewsView.do?newsId=148945077"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "DTI는 연소득에 비해 대출 상환액이 차지하는 비율",
+   "urls": [
+    "https://www.fss.or.kr/fss/bbs/B0000172/view.do?nttId=49554&menuNo=200202&pageIndex=1"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보금자리론 최대 3억 6,000만 원, 다자녀 가구·전세사기피해자 4억 원, 생애최초 4억 2,000만 원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "보금자리론 소득: 부부 합산 7,000만 원 이하(미혼은 본인), 결혼 7년 이내 신혼부부 8,500만 원, 1자녀 9,000만 원, 다자녀 1억 원",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "신혼부부는 부부 합산이 기준을 넘어도 채무자 연소득 7,000만 원 이하면 소득 조건 충족",
+   "urls": [
+    "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "rechecked": true
+  },
+  {
+   "claim": "은행 앱·창구 입력 항목은 은행 앱에서 확인 안내",
+   "urls": [],
+   "verdict": "확인불가",
+   "action": "완화"
+  }
+ ],
+ "sources": [
+  {
+   "name": "금융위원회 주택시장 안정화를 위한 대출수요 관리 방안",
+   "url": "https://www.fsc.go.kr/no010101/85432"
+  },
+  {
+   "name": "금융위원회 DSR 정책 문답",
+   "url": "https://www.fsc.go.kr/po020201/76750"
+  },
+  {
+   "name": "한국주택금융공사 보금자리론 상품 안내",
+   "url": "https://www.hf.go.kr/ko/sub01/sub01_01_01.do"
+  }
+ ]
+}
