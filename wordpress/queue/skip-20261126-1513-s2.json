@@ -1,0 +1,12 @@
+{
+ "type": "skip",
+ "keywords": [
+  {"keyword": "병목안시민공원", "why": "공원 공식 안내(주차요금표 안양도시공사)를 열 수 없어 근거 검수 통과가 어려운 지역 시설 주제"},
+  {"keyword": "MXMASTER3S", "why": "특정 회사 상품", "brand": "로지텍"},
+  {"keyword": "기모트레이닝세트", "why": "상품 추천·비교"},
+  {"keyword": "부고장만들기", "why": "민간 앱·서비스 비교·추천"}
+ ],
+ "law_changes": [],
+ "new_benefits": [],
+ "slot": 2
+}
