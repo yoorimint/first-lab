@@ -1,0 +1,339 @@
+{
+ "title": "전기세 조회 방법: 한전ON·고객센터 123, 관리비 합산은 관리사무소",
+ "excerpt": "전기세 조회는 청구서의 고객번호로 한전ON·한전 사이버지점에서 해요. 관리비에 합쳐 나오는 집은 관리사무소, 300kWh 요금 읽는 법까지 정리했어요.",
+ "content_html": "<p>전기세 조회는 한전ON이나 한전 사이버지점에서 고객번호로 할 수 있어요.<br>고지서가 오기 전에 요금이 궁금할 때 쓰면 돼요.<br>✔ 전화는 국번 없이 123<br>✔ 관리비 합산이면 관리사무소<br>✔ 실시간은 파워플래너</p>\n<p>흔히 '전기세'라고 부르지만 한전에 내는 전기요금이에요. 집에 따로 오는 한전 청구서가 있는지부터 보면 어디서 조회할지 정해져요.</p>\n<h2>전기세 조회 방법 4가지</h2>\n<p>아래 네 곳에서는 한전이 직접 청구하는 전기요금을 조회하거나 문의할 수 있어요. 고객번호가 있으면 어디서든 조회를 시작할 수 있어요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>조회하는 곳</th><th>이럴 때 좋아요</th></tr></thead>\n<tbody>\n<tr><td>한전ON(online.kepco.co.kr)</td><td>요금 조회·납부 등 전기 관련 업무를 한곳에서</td></tr>\n<tr><td>한전 사이버지점 간편조회(cyber.kepco.co.kr)</td><td>회원가입 없이 고객번호와 휴대폰 인증으로</td></tr>\n<tr><td>정부24 '전기요금 납부내역 조회'(gov.kr)</td><td>청구 연월별로 낸 내역을 볼 때</td></tr>\n<tr><td>한전 고객센터 123</td><td>인터넷이 어렵거나 고객번호를 모를 때</td></tr>\n</tbody>\n</table></figure>\n<h3>간편조회는 이렇게 해요</h3>\n<ol>\n<li>한전 사이버지점에서 간편조회를 고르고 고객번호를 넣어요.</li>\n<li>청구년월을 고르고 조회를 눌러요.</li>\n<li>본인 명의 휴대폰이나 한전에 등록된 휴대폰 번호로 인증해요.</li>\n</ol>\n<p>간편조회 금액은 고른 청구년월 한 달 치예요. 밀린 미납요금은 빠지고, 연체료는 들어가요.</p>\n<p>정부24 납부내역 조회도 고객번호로 해요. 휴대폰 본인인증을 거쳐야 볼 수 있어요.</p>\n<h2>고객번호는 청구서에서 찾아요</h2>\n<p>고객번호는 한전이 보내는 전기요금 청구서에 적혀 있어요. 조회할 때는 이 번호를 그대로 넣으면 돼요.</p>\n<p>청구서가 없다면 한전 고객센터 123에 문의해 보세요. 이사했다면 예전 집 번호를 넣지 않게 청구서의 주소도 함께 보세요.</p>\n<h2>아파트·오피스텔은 관리비부터 보세요</h2>\n<p>예를 들어 전기요금이 관리비에 합쳐 나오는 아파트라면 한전 조회 화면에 우리 집 요금이 나오지 않아요. 한전 사이버지점도 관리비에 전기요금이 합산되는 고객은 조회가 안 된다고 안내해요.</p>\n<p>이럴 때는 관리비 고지서의 전기료 항목을 보거나 관리사무소에 물어보세요. 한전 청구서를 따로 받는 집이라면 위 방법대로 조회하면 돼요.</p>\n<h2>고지서 전 예상 요금은 파워플래너</h2>\n<p>한전 파워플래너(pp.kepco.co.kr)는 실시간 전기 사용 내역과 분석·통계 정보를 보여 줘요. 고지서가 나오기 전에 지금까지 쓴 양을 볼 때 쓰기 좋아요.</p>\n<h2>조회한 사용량으로 요금 읽는 법</h2>\n<p>예를 들어 11월에 300kWh를 쓴 집이라면, 기본요금과 전력량요금만 1,600원 + 24,000원 + 21,460원 = 47,060원이에요. 같은 300kWh를 7월에 쓰면 910원 + 36,000원 = 36,910원이에요.</p>\n<p>주택용 전기요금은 많이 쓸수록 kWh당 값이 올라가는 누진 구간이 있기 때문이에요. 7·8월(하계)은 구간이 더 넓어요.</p>\n<p>아래는 한전 전기요금표의 주택용 저압 기준이에요. 실제 청구서에는 여기에 다른 요금과 세금이 더해져요.</p>\n<figure class=\"wp-block-table\"><table>\n<thead><tr><th>구간</th><th>7·8월</th><th>그 밖의 달</th><th>기본요금</th><th>1kWh당</th></tr></thead>\n<tbody>\n<tr><td>1구간</td><td>300kWh 이하</td><td>200kWh 이하</td><td>910원</td><td>120.0원</td></tr>\n<tr><td>2구간</td><td>301~450kWh</td><td>201~400kWh</td><td>1,600원</td><td>214.6원</td></tr>\n<tr><td>3구간</td><td>450kWh 초과</td><td>400kWh 초과</td><td>7,300원</td><td>307.3원</td></tr>\n</tbody>\n</table></figure>\n<p>7·8월과 12월~2월에 1,000kWh를 넘게 쓰면 넘는 만큼은 1kWh당 736.2원이에요. 이것을 슈퍼유저요금이라고 해요.</p>\n<p class=\"fl-basis\">근거: 한국전력공사 전기요금표(주택용 저압)</p>\n<h2>요금이 이상하면 이의신청</h2>\n<p>청구된 요금이 이상하면 한전에 이의를 신청할 수 있어요. 방문·우편·팩스·인터넷·전화 중 편한 방법으로 하면 돼요.</p>\n<p>한전은 이의신청을 받은 날부터 30일 이내에 결과를 알려 줘요.</p>\n<p class=\"fl-basis\">근거: 전기공급약관 제74조</p>\n<p><strong>이런 건 꼭 확인하세요</strong></p>\n<ul>\n<li>관리비에 전기요금이 합산되는 집은 한전에서 조회되지 않아요. 관리비 고지서를 보세요.</li>\n<li>간편조회 금액에는 미납요금이 빠져 있어요. 연체료는 들어가요.</li>\n<li>같은 사용량도 7·8월과 다른 달의 누진 구간이 달라요.</li>\n<li>청구서가 없어 고객번호를 모르면 한전 고객센터 123에 문의하세요.</li>\n</ul>\n<p><strong>한 줄 정리:</strong> 전기세 조회는 청구서의 고객번호로 한전ON·사이버지점에서 하고, 관리비에 합쳐 나오는 집은 관리사무소에서 확인해요.</p>\n<h2>자주 묻는 질문</h2>\n<h3>지난 달 요금도 볼 수 있나요?</h3>\n<p>한전 사이버지점 회원으로 가입하면 최근 2년 동안의 전기요금을 월별·연도별로 자세히 볼 수 있어요. 미납요금까지 포함한 상세조회는 로그인 뒤에 돼요.</p>\n<h3>정전이나 고장 신고도 123으로 하나요?</h3>\n<p>네, 123은 24시간 전기상담고객센터예요. 전기 상담과 고장 신고를 함께 받아요.</p>\n<h3>오피스텔도 주택용 요금이 적용되나요?</h3>\n<p>한전 전기요금표에는 주거용 오피스텔 고객이 주택용 전력 적용 대상으로 적혀 있어요. 주거용 오피스텔은 주택은 아니지만 실제로 사는 곳으로 쓰는 오피스텔이에요.</p>\n",
+ "tags": [
+  "전기세 조회",
+  "전기요금 조회",
+  "한전ON",
+  "파워플래너"
+ ],
+ "category": "생활정보",
+ "images": [
+  {
+   "prompt": "a cozy Korean apartment living room at evening with warm ceiling lights and a standing fan unplugged in the corner",
+   "alt": "저녁에 불이 켜진 아파트 거실"
+  }
+ ],
+ "keyword": "전기세조회",
+ "status": "auto",
+ "serp": {
+  "urls": [
+   "https://blog.naver.com/kyonghwan707/224487637647",
+   "https://blog.naver.com/jjuam7622/224478027985",
+   "https://blog.naver.com/ty-story/224430444211",
+   "https://blog.naver.com/bing351/224472308396",
+   "https://blog.naver.com/oioi_090/224485081615"
+  ],
+  "questions": [
+   "한전ON에서 전기요금은 어떻게 조회하나요?",
+   "고객번호는 어디서 확인하나요?",
+   "아파트처럼 관리비에 포함되면 어디서 조회하나요?",
+   "고지서 전에 예상 요금은 어떻게 보나요?",
+   "누진 구간은 어떻게 되나요?"
+  ],
+  "added": [
+   {
+    "type": "@계산예시",
+    "text": "같은 300kWh를 11월과 7월에 쓸 때 기본요금+전력량요금 47,060원과 36,910원 비교"
+   },
+   {
+    "type": "@상황판단",
+    "text": "간편조회 금액에 미납요금은 빠지고 연체료는 들어간다는 점, 요금이 이상하면 이의신청(30일 이내 결과)"
+   },
+   {
+    "type": "@조회방법",
+    "text": "정부24 '전기요금 납부내역 조회'로 청구 연월별 납부내역 확인"
+   }
+  ]
+ },
+ "review": [
+  {
+   "claim": "전기세 조회는 한전ON이나 한전 사이버지점에서 고객번호로 할 수 있어요",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://www.kepco.co.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "전화 조회·상담은 한전 고객센터 국번 없이 123",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://www.kepco.co.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "제목: 전기세 조회 방법 한전ON·고객센터 123, 관리비 합산은 관리사무소",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://www.kepco.co.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "요약: 300kWh 요금 읽는 법 — 청구서의 고객번호로 한전ON·한전 사이버지점에서 조회",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한전ON(online.kepco.co.kr)은 요금 조회·납부 등 전기 관련 업무를 한곳에서",
+   "urls": [
+    "https://www.kepco.co.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "한전 사이버지점 간편조회는 회원가입 없이 고객번호와 휴대폰 인증으로",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정부24 '전기요금 납부내역 조회'는 청구 연월별 납부내역을 보는 서비스",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/B41000200028"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "간편조회 순서: 고객번호 입력 → 청구년월 선택 → 조회",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "본인 명의 휴대폰이나 한전에 등록된 휴대폰 번호로 인증",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "간편조회 금액은 고른 청구년월 한 달 치, 미납요금은 빠지고 연체료는 포함",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "정부24 납부내역 조회도 고객번호로, 휴대폰 본인인증 후 조회",
+   "urls": [
+    "https://www.gov.kr/portal/service/serviceInfo/B41000200028"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "고객번호는 한전 전기요금 청구서에 적혀 있음",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/D/CYEDHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "청구서가 없어 고객번호를 모르면 한전 고객센터 123에 문의",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://www.kepco.co.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "완화",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "관리비에 전기요금이 합산되는 아파트·오피스텔 고객은 한전 조회가 안 됨 — 관리비 고지서·관리사무소",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한전 파워플래너(pp.kepco.co.kr)는 실시간 전기 사용 내역과 분석·통계 정보 제공",
+   "urls": [
+    "https://www.kepco.co.kr/",
+    "https://apps.apple.com/kr/app/id1164394809"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "11월 300kWh 예시: 기본요금과 전력량요금만 1,600원 + 24,000원 + 21,460원 = 47,060원",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "7월 300kWh 예시: 910원 + 36,000원 = 36,910원",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "주택용 저압 하계는 7·8월(7.1~8.31), 하계는 누진 구간이 더 넓음",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "1구간: 7·8월 300kWh 이하, 그 밖의 달 200kWh 이하, 기본요금 910원, 1kWh당 120.0원",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "2구간: 301~450kWh / 201~400kWh, 기본요금 1,600원, 1kWh당 214.6원",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "3구간: 450kWh 초과 / 400kWh 초과, 기본요금 7,300원, 1kWh당 307.3원",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "7·8월과 12월~2월에 1,000kWh를 넘게 쓰면 넘는 만큼은 1kWh당 736.2원 (슈퍼유저요금)",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "요금청구 내역 이의신청은 방문·우편·팩스·인터넷·전화로 가능 (전기공급약관 제74조)",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한전은 이의신청을 받은 날부터 30일 이내에 결과 통지 (전기공급약관 제74조)",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한전 사이버지점 회원은 최근 2년 동안의 전기요금을 월별·연도별로 상세조회",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "미납요금까지 포함한 상세조회는 로그인 뒤 가능",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "123은 24시간 전기상담고객센터, 전기 상담과 고장 신고",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://www.kepco.co.kr/"
+   ],
+   "verdict": "맞음",
+   "action": "유지",
+   "round": 2
+  },
+  {
+   "claim": "한전 전기요금표에 주거용 오피스텔 고객이 주택용 전력 적용 대상으로 적혀 있음 — 주택은 아니지만 실제 주거용도로 쓰는 오피스텔",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  },
+  {
+   "claim": "전기세 조회 4곳(한전ON·사이버지점·정부24·123)에서는 한전이 직접 청구하는 전기요금을 조회하거나 문의 — 관리비 합산 고객은 조회 안 됨",
+   "urls": [
+    "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp",
+    "https://www.gov.kr/portal/service/serviceInfo/B41000200028"
+   ],
+   "verdict": "맞음",
+   "action": "수정",
+   "round": 2,
+   "rechecked": true
+  }
+ ],
+ "sources": [
+  {
+   "name": "한국전력공사 사이버지점 전기요금 간편조회",
+   "url": "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/A/CYEAPP001_esb1.jsp"
+  },
+  {
+   "name": "한국전력공사 주택용 전기요금표",
+   "url": "https://cyber.kepco.co.kr/ckepco/front/jsp/CY/E/E/CYEEHP00101.jsp"
+  },
+  {
+   "name": "정부24 전기요금 납부내역 조회",
+   "url": "https://www.gov.kr/portal/service/serviceInfo/B41000200028"
+  }
+ ]
+}
