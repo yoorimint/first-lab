@@ -376,7 +376,8 @@ class QualityTest(unittest.TestCase):
         self.assertNotIn("tistory", html)
         self.assertEqual(len(dropped), 2)
         self.assertEqual(sources.section([{"name": "x", "url": "http://a.go.kr"}], check=lambda u: True)[0], "")  # https 만
-        for url in ("https://www.korea.kr/news/x", "https://www.airport.kr/ap_ko/906/subview.do"):
+        for url in ("https://www.korea.kr/news/x", "https://www.airport.kr/ap_ko/906/subview.do",
+                    "https://www.durunubi.kr/4-2-1-1-walk-mobility-list.do"):  # 11/27 #8712 한국관광공사 두루누비
             self.assertTrue(sources.is_official(url), url)  # 주소 끝이 .go.kr 이 아닌 공식 기관
         self.assertFalse(sources.is_official("https://notkorea.kr/a"))
 
