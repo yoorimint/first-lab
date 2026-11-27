@@ -197,3 +197,4 @@
 - 11/21 16:18(KST) 운영자 '점검 일시정지해봐': 6시간 점검 예약 작업(trig_01TGfWiiohsNBPk34R93VgpV)을 일시정지(삭제 아님). 다시 하라고 하면 enabled=true 로 켬. 11/25 색인 확인 예약(trig_01ST5dbRGn9xvdM4CixkEQTy)은 그대로.
 - 11/22 운영자 '점검은 매일 13시에만 하자': 점검 예약 작업(trig_01TGfWiiohsNBPk34R93VgpV)을 다시 켜고 매일 12:47(KST) 시작으로 바꿈 (정각은 예약이 몰려 늦어질 수 있어 조금 앞당김, 보고는 13시 전후). 6시간마다 하던 것은 끝.
 - 11/25 색인 확인: 11월 핵심 업데이트 11/24 종료, 12월 핵심 업데이트 예고. 공개 31편 색인 0편(마지막으로 읽은 날 모두 11/16), 검색 노출 최근 7일 16회(그 전 99회). 운영자 '기다려보자 신생사이트라서' → 범위 밖 주제·틀 정리는 보류. 12/15 13:10 다시 확인 예약(trig_01XoiVhExhaMii6xpVdzHfah).
+- 11/27 운영자 '아는 법무사 사무실 문의 만들려고 — 배너 눌러 문의 적으면 알림 가게'(소개 대가 없음): 글 끝 상담 배너 + 문의 폼(first-lab-consult.php, 설정은 테마 consult.json — 비어 있으면 안 보임), 문의는 비공개 글 fl_consult 로 저장, 봇이 매분 텔레그램 전송(bot/consult_notify.py, 키 FIRSTLAB_TELEGRAM_TOKEN·FIRSTLAB_TELEGRAM_CHAT 은 set-secrets.sh), 개인정보 동의 필수·30일 뒤 자동 삭제(tests/test_consult.py 가 PHP·봇 기간 일치 확인). 소개 대가를 받게 되면 법무사법 알선 조항부터 확인.
