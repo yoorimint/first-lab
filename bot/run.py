@@ -393,6 +393,16 @@ def main() -> None:
 
     laps.lap("예약 공개")
 
+    # 법무사 상담 문의 → 텔레그램 (bot/consult_notify.py, 11/27 운영자) — 매분, 10분마다 보관 기간 지난 문의 삭제
+    try:
+        from . import consult_notify
+        for ok, msg in consult_notify.run(now):
+            add_log(state, ok, msg)
+    except Exception as e:  # noqa: BLE001 - 문의 알림 실패가 글 공개·작성을 막지 않게
+        add_log(state, False, f"상담 문의 알림 실패: {str(e)[:150]}")
+
+    laps.lap("상담 문의 알림")
+
     # 서버 상태 기록 (bot/server_stats.py) — 서버를 올릴지 숫자로 정하려고 (11/6 운영자). 사주데이 응답은 5분마다
     try:
         from . import server_stats

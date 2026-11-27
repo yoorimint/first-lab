@@ -1,0 +1,21 @@
+{
+  "_설명": "법무사 사무실 상담 문의 배너 (wordpress/mu-plugins/first-lab-consult.php). enabled=true 이고 이름이 있어야 문의를 받는다(전화는 있으면 배너에 표시). 글 배너는 match 가 비면 안 붙는다 — 지금은 디딤돌 계산기 웹판 문의창만 씀. 문의는 bot/consult_notify.py 가 텔레그램으로 보낸다.",
+  "enabled": true,
+  "office": {
+    "name": "법무사 정철석 사무소",
+    "phone": "",
+    "area": "",
+    "hours": ""
+  },
+  "headline": "대출 받고 집 사면, 등기도 챙기셔야 해요",
+  "services": [
+    "소유권 이전 등기",
+    "근저당 말소",
+    "매매 취득세(취등록세) 문의"
+  ],
+  "match": {
+    "all": false,
+    "tags": [],
+    "keywords": []
+  }
+}
