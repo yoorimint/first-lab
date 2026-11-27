@@ -684,3 +684,4 @@ date,post,fixes,types
 2026-11-27,9050,0,
 2026-11-27,9070,0,
 2026-11-27,9073,0,
+2026-11-27,8712,2,missing_condition:1 wrong_fact:1
