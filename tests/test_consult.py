@@ -113,6 +113,18 @@ class ConsultNotifyTest(unittest.TestCase):
             self.assertTrue(spec["services"])
 
 
+class ChatIdScriptTest(unittest.TestCase):
+    """server/telegram-chat-id.sh: 문법, 실행 권한, 토큰을 화면에 찍지 않음 (공개 저장소·운영자 화면)."""
+
+    def test_script(self):
+        sh = ROOT / "server" / "telegram-chat-id.sh"
+        self.assertEqual(subprocess.run(["bash", "-n", str(sh)]).returncode, 0)
+        self.assertTrue(sh.stat().st_mode & 0o111)
+        text = sh.read_text(encoding="utf-8")
+        self.assertFalse(re.search(r"echo[^\n]*\$\{?TOKEN", text))
+        self.assertIn("FIRSTLAB_TELEGRAM_CHAT", text)
+
+
 @unittest.skipUnless(shutil.which("php"), "php 없음")
 class ConsultPhpTest(unittest.TestCase):
     def test_php_checks(self):
