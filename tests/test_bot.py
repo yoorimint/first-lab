@@ -7138,6 +7138,12 @@ firstlab_stats_render_page();
         self.assertEqual(cg.calc_input_guide("<p>계산기 없음</p>"), [])
         self.assertIn("calc_input_guide", (ROOT / "bot" / "review_gate.py").read_text(encoding="utf-8"))
 
+    def test_nhis_old_menu_known_wrong(self):
+        # 11/27 #9108: 공단 누리집에 없는 옛 메뉴 '민원여기요 → 개인민원' 경로
+        from bot.condition_gate import known_wrong
+        self.assertTrue(known_wrong("<li>인터넷: 국민건강보험공단 누리집(nhis.or.kr)의 민원여기요 → 개인민원 → 환급금 조회/신청</li>"))
+        self.assertEqual(known_wrong("<li>인터넷: 국민건강보험공단 누리집(nhis.or.kr) 첫 화면의 '환급금 조회/신청'</li>"), [])
+
     def test_farm_small_business_employment_insurance_known_wrong(self):
         """11/20 #7680·#2120·#4334: '법인 아닌 농림어업 4명 이하는 고용보험 제외'는 2024.7.1 삭제된 규정 → 관문이 막음 (산재 5명 미만은 그대로)."""
         from bot.condition_gate import known_wrong
