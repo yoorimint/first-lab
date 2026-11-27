@@ -2,8 +2,6 @@
 (function () {
   'use strict';
 
-  const won = (n) => Math.round(n);
-
   /** 상환 방식별 계산. r = 월이율, n = 개월 수 */
   const METHODS = {
     // 원리금균등: 매달 같은 금액 = P·r·(1+r)^n / ((1+r)^n − 1), 금리 0%면 P/n
@@ -50,6 +48,7 @@
 
       const res = calc(P, ratePct / 100 / 12, n);
       const total = P + res.interest;
+      const won = u.round; // 오차 보정 반올림 (딱 ○○.5원이 1원 내려가지 않게)
       const same = won(res.first) === won(res.last);
       const rows = [
         same ? ['월 납입금', u.won(res.first)] : ['월 납입금', `첫 달 ${u.won(res.first)} → 마지막 달 ${u.won(res.last)}`],

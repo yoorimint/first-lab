@@ -40,8 +40,10 @@
     floor10: (n) => Math.sign(n) * Math.floor(Math.abs(n) / 10 + 1e-9) * 10,
     /** 0 쪽으로 버림 (환급 등 음수), 같은 오차 보정 */
     trunc: (n) => (n < 0 ? -Math.floor(-n + Math.abs(n) * FLOOR_REL + 1e-9) : Math.floor(n + Math.abs(n) * FLOOR_REL + 1e-9)),
+    /** 반올림 (같은 오차 보정): 1만 원 × (1 + 7.98%/12) = 10,066.5 가 10,066.4999… 로 계산돼 1원 내려가던 것 (11/27 #9073 대출 계산기) */
+    round: (n) => (n < 0 ? -Math.round(-n + Math.abs(n) * FLOOR_REL + 1e-9) : Math.round(n + Math.abs(n) * FLOOR_REL + 1e-9)),
     /** 금액 → "23,000원" */
-    won: (n) => Math.round(n).toLocaleString('ko-KR') + '원',
+    won: (n) => util.round(n).toLocaleString('ko-KR') + '원',
     /** 'YYYY-MM-DD' → 그날 0시(UTC) 밀리초. 형식이 틀리거나 없는 날짜면 null */
     parseDate(text) {
       const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(text || ''));
